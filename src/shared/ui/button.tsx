@@ -1,7 +1,7 @@
 import { Slot } from "@radix-ui/react-slot"; // shadcn의 Slot
 import { Loader2 } from "lucide-react";
 import * as React from "react";
-import { cn } from "@shared/utils/style";
+import { cn } from "@shared/lib/style";
 
 export interface ButtonProps extends React.ComponentProps<"button"> {
   variant?: "default" | "outline" | "ghost" | "destructive";
