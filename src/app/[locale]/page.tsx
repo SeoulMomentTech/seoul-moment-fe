@@ -1,3 +1,4 @@
+import { Link } from "@/i18n/navigation";
 import { Button } from "@/shared/ui/button";
 
 export default function Home() {
@@ -12,7 +13,7 @@ export default function Home() {
         삭제 중...
       </Button>
       <Button>
-        <a href="/link">링크 버튼</a>
+        <Link href="/link">링크 버튼</Link>
       </Button>
     </div>
   );
