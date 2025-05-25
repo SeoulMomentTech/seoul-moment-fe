@@ -11,9 +11,9 @@ import { Header } from "@/widgets/header";
 import "../globals.css";
 
 interface Props {
-  params: {
-    locale: string;
-  };
+  params: Promise<{
+    locale?: string;
+  }>;
 }
 
 const geistSans = Geist({
