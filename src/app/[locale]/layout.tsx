@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { NextIntlClientProvider } from "next-intl";
+import { notFound } from "next/navigation";
+import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import type { PropsWithChildren } from "react";
+import { routing } from "@/i18n/routing";
 import { ReactQueryProvider } from "@/shared/lib/providers";
-
+import { Footer } from "@/widgets/footer";
+import { Header } from "@/widgets/header";
 import "../globals.css";
 
 interface Props {
@@ -35,13 +38,23 @@ export default async function RootLayout({
   const { locale } = await params;
   const messages = await getMessages();
 
+  if (!hasLocale(routing.locales, locale)) {
+    notFound();
+  }
+
   return (
     <html lang={locale ?? "ko"}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <NextIntlClientProvider messages={messages}>
-          <ReactQueryProvider>{children}</ReactQueryProvider>
+          <ReactQueryProvider>
+            <Header />
+            <main className="min-h-[calc(100vh-500px)] bg-white">
+              {children}
+            </main>
+            <Footer />
+          </ReactQueryProvider>
         </NextIntlClientProvider>
       </body>
     </html>
