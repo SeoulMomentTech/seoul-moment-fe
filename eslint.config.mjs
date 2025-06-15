@@ -103,6 +103,9 @@ const eslintConfig = [
       "@typescript-eslint/method-signature-style": ["error", "method"],
     },
   },
+  {
+    ignores: ["scripts/**"], // 제외할 경로
+  },
 ];
 
 export default eslintConfig;
