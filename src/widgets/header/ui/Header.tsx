@@ -77,7 +77,7 @@ function Desktop() {
 
 function Mobile() {
   return (
-    <div className={cn("hidden", "max-md:flex")}>
+    <div className={cn("hidden", "relative h-full w-full max-md:flex")}>
       <Sheet>
         <SheetTrigger asChild>
           <button className="cursor-pointer" type="button">
@@ -118,6 +118,21 @@ function Mobile() {
           </ul>
         </SheetContent>
       </Sheet>
+      <Link
+        className={cn(
+          "absolute top-0 h-[60px] w-[120px]",
+          "left-[50%] translate-x-[-50%]",
+        )}
+        href="/"
+      >
+        <Image
+          alt=""
+          className="h-full"
+          height={80}
+          src="/logo.png"
+          width={120}
+        />
+      </Link>
     </div>
   );
 }
@@ -129,7 +144,6 @@ export function Header() {
         "h-[60px] w-full bg-white px-[20px]",
         "fixed top-0 left-0",
         "flex items-center text-[20px]",
-        "max-md:h-[50px]",
       )}
     >
       <Desktop />
