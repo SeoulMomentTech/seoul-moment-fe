@@ -50,7 +50,7 @@ export default async function RootLayout({
         <NextIntlClientProvider messages={messages}>
           <ReactQueryProvider>
             <Header />
-            <main className="min-h-[calc(100vh-500px)] bg-white">
+            <main className="min-h-[calc(100vh-200px)] bg-white">
               {children}
             </main>
             <Footer />
