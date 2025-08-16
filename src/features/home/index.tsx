@@ -1,5 +1,5 @@
 export { MainBanner } from "./ui/MainBanner";
 export { SeasonCollection } from "./ui/SeasonCollection";
-export { AboutUs } from "./ui/AboutUs";
-export { IconNic } from "./ui/IconNic";
-export { Journal } from "./ui/Journal";
+export { News } from "./ui/News";
+export { Article } from "./ui/Article";
+export { ContactUS } from "./ui/ContactUS";

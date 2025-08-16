@@ -24,7 +24,7 @@ function Desktop() {
   return (
     <div
       className={cn(
-        "mx-auto flex h-full w-full max-w-[1920px] items-center justify-between",
+        "mx-auto flex h-full w-full max-w-[1280px] items-center justify-between",
         "max-md:hidden",
       )}
     >

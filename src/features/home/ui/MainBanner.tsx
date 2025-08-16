@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export function MainBanner() {
   return (
-    <section className="h-[90vh]">
+    <section className="h-[690px]">
       <Image
         alt=""
         className="h-full min-w-[400px] object-cover"

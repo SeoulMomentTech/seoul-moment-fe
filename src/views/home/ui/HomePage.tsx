@@ -1,20 +1,20 @@
 import {
   SeasonCollection,
-  IconNic,
+  News,
   MainBanner,
-  AboutUs,
-  Journal,
+  Article,
+  ContactUS,
 } from "@/features/home";
 
 export function HomePage() {
   return (
     <>
       <MainBanner />
-      <div className="mx-auto max-w-[1500px]">
+      <div className="mx-auto">
         <SeasonCollection />
-        <AboutUs />
-        <IconNic />
-        <Journal />
+        <News />
+        <Article />
+        <ContactUS />
       </div>
     </>
   );
