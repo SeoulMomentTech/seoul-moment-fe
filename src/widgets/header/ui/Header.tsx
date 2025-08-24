@@ -25,7 +25,7 @@ function Desktop() {
     <div
       className={cn(
         "mx-auto flex h-full w-full max-w-[1280px] items-center justify-between",
-        "max-md:hidden",
+        "max-sm:hidden",
       )}
     >
       <div className="flex items-center gap-[40px]">
@@ -80,7 +80,7 @@ function Mobile() {
     <div
       className={cn(
         "hidden",
-        "h-full w-full max-md:flex max-md:items-center max-md:justify-between",
+        "h-full w-full max-sm:flex max-sm:items-center max-sm:justify-between",
       )}
     >
       <div className="flex items-center gap-[10px]">
@@ -150,6 +150,7 @@ export function Header() {
         "border-b border-b-white/5",
         "fixed top-0 left-0",
         "flex items-center",
+        "max-sm:bg-transparent",
       )}
     >
       <Desktop />
