@@ -1,6 +1,7 @@
 import ArticleCard from "@/entities/article/ui/ArticleCard";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/shared/lib/style";
+import { ArticleSlide } from "@/widgets/article-slide";
 import { SectionWithLabel } from "@/widgets/section-with-label";
 
 export function Article() {
@@ -23,10 +24,17 @@ export function Article() {
         </div>
       }
     >
-      <div className="flex flex-wrap gap-[40px]">
-        <ArticleCard />
-        <ArticleCard />
-      </div>
+      <ArticleCardList />
+      <ArticleSlide />
     </SectionWithLabel>
+  );
+}
+
+function ArticleCardList() {
+  return (
+    <div className="flex flex-wrap gap-[40px] max-sm:hidden">
+      <ArticleCard />
+      <ArticleCard />
+    </div>
   );
 }
