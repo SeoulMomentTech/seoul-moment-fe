@@ -1,13 +1,19 @@
 import Link from "next/link";
+import { cn } from "@/shared/lib/style";
 import { SectionWithLabel } from "@/widgets/section-with-label";
 
 export function News() {
   return (
     <SectionWithLabel
-      className="px-[30px] py-[100px]"
+      className={cn("py-[100px]", "max-sm:py-[50px]")}
       label={
-        <div className="mb-[30px] flex w-full items-end justify-between">
-          <h3 className="text-[36px]">
+        <div
+          className={cn(
+            "mb-[30px] flex w-full items-end justify-between",
+            "max-sm:mb-[20px] max-sm:px-[20px]",
+          )}
+        >
+          <h3 className="text-[32px] max-sm:text-[20px]">
             <b>NEWS</b>
           </h3>
           <Link className="text-[14px] hover:underline" href="/">
@@ -16,11 +22,33 @@ export function News() {
         </div>
       }
     >
-      <div className="flex justify-between gap-[60px]">
-        <div className="flex h-[940px] w-[740px] flex-col bg-gray-400" />
-        <div className="flex justify-between gap-[60px] pt-[64px]">
-          <div className="flex h-[876px] w-[580px] flex-col bg-gray-400" />
-          <div className="flex h-[750px] w-[420px] flex-col bg-gray-400" />
+      <div
+        className={cn(
+          "flex justify-between gap-[60px]",
+          "max-sm:w-full max-sm:flex-col",
+        )}
+      >
+        <div
+          className={cn(
+            "flex h-[596px] w-[460px] flex-col bg-gray-400",
+            "max-sm:h-[457px] max-sm:w-full",
+          )}
+        />
+        <div className="max-sm:flex max-sm:w-full max-sm:justify-end max-sm:px-[20px]">
+          <div
+            className={cn(
+              "flex h-[596px] w-[370px] flex-col bg-gray-400",
+              "max-sm:h-[435px] max-sm:w-[264px]",
+            )}
+          />
+        </div>
+        <div className="max-sm:px-[20px]">
+          <div
+            className={cn(
+              "flex h-[596px] w-[370px] flex-col bg-gray-400",
+              "max-sm:h-[433px] max-sm:w-[210px]",
+            )}
+          />
         </div>
       </div>
     </SectionWithLabel>

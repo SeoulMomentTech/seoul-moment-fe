@@ -1,13 +1,20 @@
+import ArticleCard from "@/entities/article/ui/ArticleCard";
 import { Link } from "@/i18n/navigation";
+import { cn } from "@/shared/lib/style";
 import { SectionWithLabel } from "@/widgets/section-with-label";
 
 export function Article() {
   return (
     <SectionWithLabel
-      className="w-full gap-[30px] px-[30px] py-[100px]"
+      className="w-full py-[100px] max-sm:px-[20px]"
       label={
-        <div className="mb-[30px] flex w-full items-end justify-between">
-          <h3 className="text-[36px]">
+        <div
+          className={cn(
+            "mb-[30px] flex w-full items-end justify-between",
+            "max-sm:mb-[20px]",
+          )}
+        >
+          <h3 className="text-[32px] max-sm:text-[20px]">
             <b>Article</b>
           </h3>
           <Link className="text-[14px] hover:underline" href="/">
@@ -16,9 +23,9 @@ export function Article() {
         </div>
       }
     >
-      <div className="flex flex-wrap gap-[60px]">
-        <div className="h-[500px] flex-1 bg-gray-300" />
-        <div className="h-[500px] flex-1 bg-gray-300" />
+      <div className="flex flex-wrap gap-[40px]">
+        <ArticleCard />
+        <ArticleCard />
       </div>
     </SectionWithLabel>
   );
