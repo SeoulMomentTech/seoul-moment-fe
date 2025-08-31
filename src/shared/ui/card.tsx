@@ -7,6 +7,7 @@ interface CardProps {
   subTitle?: string | ReactNode;
   extraInfo?: string | ReactNode;
   className?: string;
+  contentWrapperClassName?: string;
 }
 
 export function Card({
@@ -15,11 +16,12 @@ export function Card({
   title,
   subTitle,
   extraInfo,
+  contentWrapperClassName,
 }: CardProps) {
   return (
     <div className={cn("flex flex-col gap-[30px]", className)}>
       {image}
-      <div className="flex flex-col gap-[30px]">
+      <div className={cn("flex flex-col gap-[30px]", contentWrapperClassName)}>
         <div className="flex flex-col gap-[10px]">
           {title}
           {subTitle}
