@@ -6,12 +6,14 @@ const styleMap = {
 export function MagazineContents() {
   return (
     <section className={styleMap.section}>
-      <h3 className="mb-[30px] text-center text-[24px] font-semibold">[1]</h3>
-      <h3 className="mb-[40px] text-[24px] font-semibold">
+      <h3 className="mb-[30px] text-center text-[24px] font-semibold max-sm:px-[20px] max-sm:text-[20px]">
+        [1]
+      </h3>
+      <h3 className="mb-[40px] text-[24px] font-semibold max-sm:px-[20px] max-sm:text-[20px]">
         한국의 향과 미감을 바탕으로 지속 가능한 아름다움을 제안하는 프래그런스
         브랜드
       </h3>
-      <p className="mb-[60px] leading-6! text-black/80">
+      <p className="mb-[60px] leading-6! text-black/80 max-sm:px-[20px] max-sm:text-start">
         취 Chwi는 한국의 자연과 공간에서 영감을 받아, 그 곳에서 느껴지는 찰나의
         순간과 미감을 향으로 표현합니다. 수 많은 화려한 향기들 속에서 과연
         ‘우리다움’은 무엇일지 고민하고, 우리가 가장 편안하게 느끼는 향, 잊고
@@ -22,19 +24,18 @@ export function MagazineContents() {
         섬세하게 향으로 표현합니다.눈을 감으면 더 선명해지는 기억, Chwi의 향을
         통해 다시 한번 떠올려보세요.
       </p>
-      <div className="mb-[100px] h-[620px] bg-slate-300" />
-      <div className="flex gap-[128px]">
-        <div className="h-[600px] w-[522px] bg-slate-300" />
-        <div className="w-[630px] text-start">
-          <h3 className="mb-[60px] text-[24px] font-semibold">
+      <div className="mb-[100px] h-[620px] bg-slate-300 max-sm:h-[200px]" />
+      <div className="flex gap-[128px] max-sm:flex-col-reverse max-sm:gap-[40px]">
+        <div className="max-sm:h- h-[600px] w-[522px] bg-slate-300 max-sm:mx-[20px] max-sm:h-[284px] max-sm:w-[264px]" />
+        <div className="w-[630px] text-start max-sm:w-full max-sm:px-[20px]">
+          <h3 className="mb-[60px] text-[24px] font-semibold max-sm:mb-[30px] max-sm:text-[20px]">
             Brand CEO Name
           </h3>
-          <div className="flex flex-col gap-[30px]">
-            <p className="text-[18px] font-semibold">
+          <div className="flex flex-col gap-[30px] max-sm:gap-[20px]">
+            <p className="text-[18px] font-semibold max-sm:text-[16px]">
               Chwi의 향은 부담스럽지 않고 은은한 자연의 향을 표현하기 위해 전문
               조향 기술을 사용합니다.
             </p>
-
             <p>
               “히어리 세라믹 작가 김은지라고 합니다.”라고 해요. 2016년부터
               히어리 세라믹을 통해 작업을 이어오는 동안 제 작업을 좋아해주시는
