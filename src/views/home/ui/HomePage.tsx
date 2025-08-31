@@ -10,8 +10,9 @@ export function HomePage() {
   return (
     <>
       <MainBanner />
-      <SeasonCollection />
-      <div className="mx-auto w-[1280px] max-sm:w-auto">
+
+      <div className="mx-auto w-[1280px] px-[20px] max-sm:w-auto max-sm:px-0">
+        <SeasonCollection />
         <News />
         <Article />
         <ContactUS />

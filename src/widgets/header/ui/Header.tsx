@@ -50,8 +50,8 @@ function Desktop() {
             </Link>
           </li>
           <li>
-            <Link className={styleMap.deskTop.menu} href="/news">
-              News
+            <Link className={styleMap.deskTop.menu} href="/magazine">
+              Magazine
             </Link>
           </li>
         </ul>
@@ -113,8 +113,8 @@ function Mobile() {
                 </Link>
               </li>
               <li>
-                <Link className={styleMap.mobile.menu} href="/news">
-                  News
+                <Link className={styleMap.mobile.menu} href="/magazine">
+                  Magazine
                   <ChevronRightIcon height={16} width={16} />
                 </Link>
               </li>

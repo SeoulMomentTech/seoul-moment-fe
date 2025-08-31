@@ -4,8 +4,8 @@ import { cn } from "@/shared/lib/style";
 interface CardProps {
   image: ReactNode;
   title: string | ReactNode;
-  subTitle: string | ReactNode;
-  extraInfo: string | ReactNode;
+  subTitle?: string | ReactNode;
+  extraInfo?: string | ReactNode;
   className?: string;
 }
 
