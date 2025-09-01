@@ -147,7 +147,7 @@ export function Header() {
     <header
       className={cn(
         "h-[56px] w-full bg-white px-[20px]",
-        "border-b border-b-white/5",
+        "border-b border-b-black/5",
         "fixed top-0 left-0 z-10",
         "flex items-center",
         "max-sm:bg-transparent",
