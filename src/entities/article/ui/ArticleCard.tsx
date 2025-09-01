@@ -1,12 +1,17 @@
 import { cn } from "@/shared/lib/style";
 import { Card } from "@/shared/ui/card";
 
-export default function ArticleCard() {
+interface ArticleCardProps {
+  className?: string;
+}
+
+export default function ArticleCard({ className }: ArticleCardProps) {
   return (
     <Card
       className={cn(
         "h-[500px] w-[625px] flex-1",
         "max-sm:h-[403px] max-sm:w-full",
+        className,
       )}
       extraInfo={
         <div className={cn("text-[14px] text-black/40", "max-sm:text-[13px]")}>
