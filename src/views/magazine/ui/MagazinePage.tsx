@@ -1,93 +1,13 @@
 import Link from "next/link";
 import { cn } from "@/shared/lib/style";
+import { MagazineFeatured } from "@/widgets/magazine-featured";
 import { NewsList } from "@/widgets/news-list";
 import { SectionWithLabel } from "@/widgets/section-with-label";
 
 export function MagazinePage() {
   return (
-    <section className={cn("mx-auto w-[1280px] pt-[96px]", "max-sm:w-full")}>
-      <div
-        className={cn(
-          "flex h-[754px] gap-[40px]",
-          "max-sm:h-auto max-sm:flex-col",
-        )}
-      >
-        <div
-          className={cn(
-            "w-[630px] bg-slate-300",
-            "max-sm:h-[744px] max-sm:w-full",
-          )}
-        />
-        <div
-          className={cn(
-            "flex flex-col gap-[100px]",
-            "max-sm:gap-0 max-sm:px-[20px]",
-          )}
-        >
-          <div
-            className={cn(
-              "flex gap-[30px]",
-              "max-sm:flex-col max-sm:py-[20px]",
-            )}
-          >
-            <div
-              className={cn(
-                "h-[327px] w-[305px] bg-slate-300",
-                "max-sm:h-[202px] max-sm:w-full",
-              )}
-            />
-            <div className="flex w-[275px] flex-col justify-center gap-[20px]">
-              <div>
-                <span>SNEAKERS</span>
-              </div>
-              <h3>
-                <b>
-                  사계절 신어도 좋은 여름 신발 추천, 베드락 샌들의 마운틴 글루
-                </b>
-              </h3>
-              <p>요약 내용입니다.</p>
-              <div className="flex flex-col gap-[40px]">
-                <span className="text-black/40">2025.05.26</span>
-                <div className="flex items-center gap-[4px]">
-                  <div className="h-[24px] w-[24px] rounded-full bg-slate-300" />
-                  <span className="text-[14px]">작가명</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div
-            className={cn(
-              "flex flex-row-reverse gap-[30px]",
-              "max-sm:flex-col max-sm:py-[20px]",
-            )}
-          >
-            <div
-              className={cn(
-                "h-[327px] w-[305px] bg-slate-300",
-                "max-sm:h-[202px] max-sm:w-full",
-              )}
-            />
-            <div className="flex w-[275px] flex-col justify-center gap-[20px]">
-              <div>
-                <span>SNEAKERS</span>
-              </div>
-              <h3>
-                <b>
-                  사계절 신어도 좋은 여름 신발 추천, 베드락 샌들의 마운틴 글루
-                </b>
-              </h3>
-              <p>요약 내용입니다.</p>
-              <div className="flex flex-col gap-[40px]">
-                <span className="text-black/40">2025.05.26</span>
-                <div className="flex items-center gap-[4px]">
-                  <div className="h-[24px] w-[24px] rounded-full bg-slate-300" />
-                  <span className="text-[14px]">작가명</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <section className={cn("mx-auto w-[1280px] pt-[56px]", "max-sm:w-full")}>
+      <MagazineFeatured />
       <SectionWithLabel
         className="pt-[140px] pb-[100px]"
         label={
