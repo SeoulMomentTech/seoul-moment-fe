@@ -13,10 +13,10 @@ export function MagazineFeatured() {
       <div
         className={cn(
           "flex w-[630px] flex-col justify-end bg-slate-200 px-[30px] py-[50px]",
-          "max-sm:h-[744px] max-sm:w-full",
+          "max-sm:h-[744px] max-sm:w-full max-sm:px-[20px] max-sm:py-[40px]",
         )}
       >
-        <MagazineCardInfo textColor="white" />
+        <MagazineCardInfo className="w-full" size="large" textColor="white" />
       </div>
       <div
         className={cn(
