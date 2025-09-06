@@ -150,7 +150,6 @@ export function Header() {
         "border-b border-b-black/5",
         "fixed top-0 left-0 z-10",
         "flex items-center",
-        "max-sm:bg-transparent",
       )}
     >
       <Desktop />
