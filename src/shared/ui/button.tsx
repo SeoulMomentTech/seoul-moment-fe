@@ -39,6 +39,7 @@ export function Button({
     <Comp
       className={cn(
         "inline-flex items-center justify-center rounded-md font-medium transition-colors focus:ring-2 focus:ring-black focus:ring-offset-2 focus:outline-none disabled:pointer-events-none disabled:opacity-50",
+        "cursor-pointer disabled:cursor-not-allowed",
         VARIANT_CLASSES[variant],
         SIZE_CLASSES[size],
         className,
