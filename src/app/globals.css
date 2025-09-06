@@ -12,6 +12,16 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --text-title-1: 36px;
+  --text-title-2: 32px;
+  --text-title-3: 24px;
+  --text-title-4: 20px;
+  --text-body-1: 18px;
+  --text-body-2: 16px;
+  --text-body-3: 14px;
+  --text-body-4: 13px;
+  --text-body-5: 12px;
 }
 
 body {
