@@ -1,5 +1,8 @@
+"use client";
+
 import { MenuIcon, ShoppingCartIcon, ChevronRightIcon } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/shared/lib/style";
 import {
@@ -44,16 +47,16 @@ function Desktop() {
               Product
             </Link>
           </li>
-          <li>
+          {/*<li>
             <Link className={styleMap.deskTop.menu} href="/brand">
               Brand
             </Link>
-          </li>
-          <li>
+          </li>*/}
+          {/*<li>
             <Link className={styleMap.deskTop.menu} href="/magazine">
               Magazine
             </Link>
-          </li>
+          </li>*/}
         </ul>
       </div>
       <div>
@@ -76,6 +79,8 @@ function Desktop() {
 }
 
 function Mobile() {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <div
       className={cn(
@@ -84,9 +89,13 @@ function Mobile() {
       )}
     >
       <div className="flex items-center gap-[10px]">
-        <Sheet>
+        <Sheet onOpenChange={(isOpen) => setIsOpen(isOpen)} open={isOpen}>
           <SheetTrigger asChild>
-            <button className="cursor-pointer" type="button">
+            <button
+              className="cursor-pointer"
+              onClick={() => setIsOpen(true)}
+              type="button"
+            >
               <MenuIcon />
             </button>
           </SheetTrigger>
@@ -101,12 +110,16 @@ function Mobile() {
             </SheetHeader>
             <ul className="flex flex-col">
               <li>
-                <Link className={styleMap.mobile.menu} href="/product">
+                <Link
+                  className={styleMap.mobile.menu}
+                  href="/product"
+                  onClick={() => setIsOpen(false)}
+                >
                   Product
                   <ChevronRightIcon height={16} width={16} />
                 </Link>
               </li>
-              <li>
+              {/*<li>
                 <Link className={styleMap.mobile.menu} href="/brand">
                   Brand
                   <ChevronRightIcon height={16} width={16} />
@@ -117,15 +130,23 @@ function Mobile() {
                   Magazine
                   <ChevronRightIcon height={16} width={16} />
                 </Link>
-              </li>
+              </li>*/}
               <li>
-                <Link className={styleMap.mobile.menu} href="/about">
+                <Link
+                  className={styleMap.mobile.menu}
+                  href="/about"
+                  onClick={() => setIsOpen(false)}
+                >
                   About
                   <ChevronRightIcon height={16} width={16} />
                 </Link>
               </li>
               <li>
-                <Link className={styleMap.mobile.menu} href="/contact">
+                <Link
+                  className={styleMap.mobile.menu}
+                  href="/contact"
+                  onClick={() => setIsOpen(false)}
+                >
                   Contact
                   <ChevronRightIcon height={16} width={16} />
                 </Link>
