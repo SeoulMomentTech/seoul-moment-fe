@@ -17,7 +17,7 @@ export function Footer() {
         styleMap.mobile,
       )}
     >
-      <div className={cn("mx-auto w-full")}>
+      <div className={cn("mx-auto w-full max-w-[1280px]")}>
         <div
           className={cn(
             "flex min-h-[228px] gap-[60px] py-[60px]",
