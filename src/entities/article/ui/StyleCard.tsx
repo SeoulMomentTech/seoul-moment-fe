@@ -6,12 +6,24 @@ interface StyleCardProps {
   className?: string;
   imageClassName?: string;
   textColor?: string;
+  author: string;
+  date: string;
+  category: string;
+  title: string;
+  subTitle: string;
+  imageUrl: string;
 }
 
 export default function StyleCard({
   className,
   imageClassName,
   textColor = "black",
+  author,
+  date,
+  category,
+  title,
+  subTitle,
+  imageUrl,
 }: StyleCardProps) {
   return (
     <Card
@@ -29,14 +41,14 @@ export default function StyleCard({
             textColor === "white" && "text-white",
           )}
         >
-          <span>오끼드</span>
+          <span>{author}</span>
           <Divider
             className={cn(
               "mx-[8px] inline-block bg-black/40 max-sm:inline-block",
               textColor === "white" && "bg-white/80",
             )}
           />
-          <span>2025.05.30</span>
+          <span>{date}</span>
         </div>
       }
       image={
@@ -45,6 +57,7 @@ export default function StyleCard({
             "h-[200px] w-full bg-slate-300 max-sm:h-[221px]",
             imageClassName,
           )}
+          style={{ backgroundImage: `url(${imageUrl})` }}
         />
       }
       subTitle={
@@ -54,7 +67,7 @@ export default function StyleCard({
             textColor === "white" && "text-white",
           )}
         >
-          마음이 모이는곳
+          {subTitle}
         </p>
       }
       title={
@@ -64,9 +77,9 @@ export default function StyleCard({
             textColor === "white" && "text-white",
           )}
         >
-          <span className="text-body-4 max-sm:text-body-5">ITEM</span>
+          <span className="text-body-4 max-sm:text-body-5">{category}</span>
           <h4 className={cn("text-[18px] font-semibold", "max-sm:text-[16px]")}>
-            디자인 갤러리
+            {title}
           </h4>
         </div>
       }
