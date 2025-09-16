@@ -1,6 +1,7 @@
 import { cn } from "@/shared/lib/style";
 import { HotKeywordList } from "@/widgets/hot-list";
 import LifeStyleList from "@/widgets/lifestyle-list/ui/LifeStyleList";
+import { NewsUpdate } from "@/widgets/news-update";
 import { SectionWithLabel } from "@/widgets/section-with-label";
 
 export function NewsPage() {
@@ -19,51 +20,7 @@ export function NewsPage() {
             "max-sm:h-[600px] max-sm:w-full",
           )}
         />
-        <div
-          className={cn("flex flex-1 flex-col gap-[30px]", "max-sm:px-[20px]")}
-        >
-          <h2 className="text-title-2 max-sm:text-title-4 font-bold">
-            News Update
-          </h2>
-          <div className="h-ful flex h-[428px] w-full flex-1 flex-col gap-[20px] overflow-auto">
-            <div className="flex gap-[20px] border-b border-b-black/10 pb-[20px]">
-              <div className="h-[90px] w-[90px] bg-slate-300" />
-              <div className="flex flex-col justify-center gap-[10px]">
-                <span className="text-body-4">SNEAKERS</span>
-                <p className="text-body-2 font-semibold">
-                  사계절 신어도 좋은 여름 신발 추천, 베드락 샌들의 마운틴 글루
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-[20px] border-b border-b-black/10 pb-[20px]">
-              <div className="h-[90px] w-[90px] bg-slate-300" />
-              <div className="flex flex-col justify-center gap-[10px]">
-                <span className="text-body-4">SNEAKERS</span>
-                <p className="text-body-2 font-semibold">
-                  사계절 신어도 좋은 여름 신발 추천, 베드락 샌들의 마운틴 글루
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-[20px] border-b border-b-black/10 pb-[20px]">
-              <div className="h-[90px] w-[90px] bg-slate-300" />
-              <div className="flex flex-col justify-center gap-[10px]">
-                <span className="text-body-4">SNEAKERS</span>
-                <p className="text-body-2 font-semibold">
-                  사계절 신어도 좋은 여름 신발 추천, 베드락 샌들의 마운틴 글루
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-[20px] border-b border-b-black/10 pb-[20px]">
-              <div className="h-[90px] w-[90px] bg-slate-300" />
-              <div className="flex flex-col justify-center gap-[10px]">
-                <span className="text-body-4">SNEAKERS</span>
-                <p className="text-body-2 font-semibold">
-                  사계절 신어도 좋은 여름 신발 추천, 베드락 샌들의 마운틴 글루
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <NewsUpdate />
       </section>
       <SectionWithLabel
         className={cn(
@@ -80,7 +37,7 @@ export function NewsPage() {
       </SectionWithLabel>
       <section
         className={cn(
-          "mx-auto mb-[100px] h-[618px] w-full max-w-[1920px] min-w-[1280px] bg-black py-[100px]",
+          "mx-auto mb-[100px] h-[618px] w-full min-w-[1280px] bg-black py-[100px]",
           "max-sm:mb-[50px] max-sm:h-[511px] max-sm:max-w-none max-sm:min-w-full max-sm:flex-col",
           "max-sm:px-[20px] max-sm:py-[50px]",
         )}
