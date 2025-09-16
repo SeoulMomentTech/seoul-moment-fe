@@ -1,4 +1,5 @@
 import { cn } from "@/shared/lib/style";
+import { EditorPickSlide } from "@/widgets/editor-pick";
 import { HotKeywordList } from "@/widgets/hot-list";
 import LifeStyleList from "@/widgets/lifestyle-list/ui/LifeStyleList";
 import { NewsUpdate } from "@/widgets/news-update";
@@ -25,15 +26,15 @@ export function NewsPage() {
       <SectionWithLabel
         className={cn(
           "mx-auto mb-[103px] w-[1280px]",
-          "max-sm:w-full max-sm:px-[20px]",
+          "max-sm:mb-[90px] max-sm:w-full max-sm:px-[20px]",
         )}
         label={
-          <h2 className="text-title-2 max-sm:text-title-4 mb-[30px] font-bold">
+          <h2 className="text-title-2 max-sm:text-title-4 mb-[30px] font-bold max-sm:mb-[20px]">
             Editor’s Pick
           </h2>
         }
       >
-        <div className="h-[321px] bg-slate-300" />
+        <EditorPickSlide />
       </SectionWithLabel>
       <section
         className={cn(
