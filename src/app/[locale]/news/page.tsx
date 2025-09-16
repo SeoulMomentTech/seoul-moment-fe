@@ -1,3 +1,5 @@
-export default function NewsPage() {
-  return <></>;
+import { NewsPage } from "@/views/news";
+
+export default function News() {
+  return <NewsPage />;
 }
