@@ -1,6 +1,7 @@
 import { cn } from "@/shared/lib/style";
+
 import { Card } from "@/shared/ui/card";
-import Divider from "@/shared/ui/divider";
+import { AuthorWithDate } from "@/widgets/author-with-date";
 
 interface StyleCardProps {
   className?: string;
@@ -34,22 +35,7 @@ export default function StyleCard({
       )}
       contentWrapperClassName="gap-[20px]"
       extraInfo={
-        <div
-          className={cn(
-            "text-[14px] text-black/40",
-            "max-sm:text-[12px]",
-            textColor === "white" && "text-white",
-          )}
-        >
-          <span>{author}</span>
-          <Divider
-            className={cn(
-              "mx-[8px] inline-block bg-black/40 max-sm:inline-block",
-              textColor === "white" && "bg-white/80",
-            )}
-          />
-          <span>{date}</span>
-        </div>
+        <AuthorWithDate author={author} date={date} textColor={textColor} />
       }
       image={
         <div

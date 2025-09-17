@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { cn } from "@/shared/lib/style";
 
 interface CardProps {
-  image: ReactNode;
+  image?: ReactNode;
   title: string | ReactNode;
   subTitle?: string | ReactNode;
   extraInfo?: string | ReactNode;
