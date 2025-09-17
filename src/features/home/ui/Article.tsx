@@ -18,7 +18,7 @@ export function Article() {
           <h3 className="text-[32px] max-sm:text-[20px]">
             <b>Article</b>
           </h3>
-          <Link className="text-[14px] hover:underline" href="/">
+          <Link className="text-[14px] hover:underline" href="/news">
             More
           </Link>
         </div>
