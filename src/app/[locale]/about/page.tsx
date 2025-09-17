@@ -1,3 +1,5 @@
-export default function AboutPage() {
-  return <></>;
+import { AboutPage } from "@/views/about";
+
+export default function About() {
+  return <AboutPage />;
 }
