@@ -27,7 +27,7 @@ export function Mission() {
         alt=""
         className="absolute h-full object-cover"
         height={814}
-        src="/about/mission.png"
+        src="/about/mission.webp"
         width={4000}
       />
       <div

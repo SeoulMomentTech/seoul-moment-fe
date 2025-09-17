@@ -21,7 +21,7 @@ export function MainBanner() {
         alt=""
         className="h-full object-cover"
         height={727}
-        src="/about/seoul.png"
+        src="/about/seoul.webp"
         width={4000}
       />
     </section>
