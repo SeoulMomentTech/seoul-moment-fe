@@ -1,11 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/shared/lib/style";
 import { Tabs, TabsList, TabsTrigger } from "@/shared/ui/tabs";
+import useCategories from "../hooks/useCategories";
+import usePartners from "../hooks/usePartners";
 
 export function Collaborators() {
-  const [filter, setFilter] = useState("beauty");
+  const { data: categories = [], isFetchedAfterMount } = useCategories();
+  const [id, setId] = useState("1");
+
+  const { data: partners } = usePartners(Number(id ?? 1), id != null);
+
+  useEffect(() => {
+    if (categories && isFetchedAfterMount) {
+      setId(categories[0].id.toString());
+    }
+  }, [categories, isFetchedAfterMount]);
+
+  console.log(partners);
 
   return (
     <section className={cn("relative h-[754px]", "max-sm:h-auto")}>
@@ -25,19 +38,19 @@ export function Collaborators() {
         <div className="flex flex-col gap-[40px] max-sm:gap-[30px]">
           <Tabs
             className="border-b border-b-black/10 max-sm:pl-[20px]"
-            defaultValue={filter}
-            onValueChange={setFilter}
+            defaultValue={id}
+            onValueChange={setId}
           >
             <TabsList className="flex h-[50px] items-center gap-[30px]">
-              <TabsTrigger className="text-[18px]" value="beauty">
-                뷰티
-              </TabsTrigger>
-              <TabsTrigger className="text-[18px]" value="fashion">
-                패션
-              </TabsTrigger>
-              <TabsTrigger className="text-[18px]" value="logistics">
-                로지스틱스
-              </TabsTrigger>
+              {categories.map((category) => (
+                <TabsTrigger
+                  className="text-[18px]"
+                  key={category.id}
+                  value={`${category.id}`}
+                >
+                  {category.name}
+                </TabsTrigger>
+              ))}
             </TabsList>
           </Tabs>
           <div className="max-sm:px-[20px]" />

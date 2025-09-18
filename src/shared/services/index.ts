@@ -34,6 +34,8 @@ export const api = ky.create({
               "Accept-language",
               languageMap[languageCode] ?? "ko",
             );
+            url.searchParams.delete("languageCode");
+            return new Request(url.toString(), request);
           }
         }
       },
