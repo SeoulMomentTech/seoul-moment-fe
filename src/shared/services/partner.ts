@@ -1,3 +1,4 @@
+import type { Category } from "./category";
 import type { CommonRes, PublicLanguageCode } from ".";
 import { api } from ".";
 
@@ -21,3 +22,17 @@ export const getPartners = ({ id, country, languageCode }: GetPartnersReq) =>
       },
     })
     .json<CommonRes<GetPartnerRes>>();
+
+interface GetPartnerCategoriesRes {
+  total: number;
+  list: Array<Category>;
+}
+
+export const getPartnerCategories = ({ languageCode }: PublicLanguageCode) =>
+  api
+    .get("partner/category", {
+      searchParams: {
+        languageCode,
+      },
+    })
+    .json<CommonRes<GetPartnerCategoriesRes>>();

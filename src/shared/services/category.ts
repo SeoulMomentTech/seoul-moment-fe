@@ -1,7 +1,7 @@
 import type { CommonRes, PublicLanguageCode } from ".";
 import { api } from ".";
 
-interface Category {
+export interface Category {
   id: number;
   name: string;
 }

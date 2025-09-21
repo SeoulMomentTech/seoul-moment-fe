@@ -11,6 +11,22 @@ export interface CommonRes<T> {
   data: T;
 }
 
+const beforeRequestHandler = (request: Request) => {
+  const { method } = request;
+
+  if (method === "GET") {
+    const url = new URL(request.url);
+    const languageCode = url.searchParams.get("languageCode") as LanguageType;
+
+    if (languageCode) {
+      // 헤더에 추가
+      request.headers.set("Accept-language", languageMap[languageCode] ?? "ko");
+      url.searchParams.delete("languageCode");
+      return new Request(url.toString(), request);
+    }
+  }
+};
+
 export const api = ky.create({
   prefixUrl: "https://api.seoulmoment.com.tw",
   headers: {
@@ -18,27 +34,6 @@ export const api = ky.create({
   },
   timeout: 10000,
   hooks: {
-    beforeRequest: [
-      (request) => {
-        const { method } = request;
-
-        if (method === "GET") {
-          const url = new URL(request.url);
-          const languageCode = url.searchParams.get(
-            "languageCode",
-          ) as LanguageType;
-
-          if (languageCode) {
-            // 헤더에 추가
-            request.headers.set(
-              "Accept-language",
-              languageMap[languageCode] ?? "ko",
-            );
-            url.searchParams.delete("languageCode");
-            return new Request(url.toString(), request);
-          }
-        }
-      },
-    ],
+    beforeRequest: [beforeRequestHandler],
   },
 });
