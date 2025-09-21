@@ -24,7 +24,7 @@ const data = [
 
 export function Company() {
   return (
-    <section className="relative">
+    <section className="relative px-[20px] max-sm:px-0">
       <div
         className={cn(
           "mx-auto max-w-[1280px] py-[140px]",

@@ -34,13 +34,7 @@ export function Vision() {
           "max-sm:hidden",
         )}
       />
-      <div
-        className={cn(
-          "relative z-[1]",
-          "mx-auto max-w-[1280px]",
-          "max-sm:px-[20px]",
-        )}
-      >
+      <div className={cn("relative z-[1] px-[20px]", "mx-auto max-w-[1280px]")}>
         <h2
           className={cn(
             "text-title-2 mb-[60px] font-bold",

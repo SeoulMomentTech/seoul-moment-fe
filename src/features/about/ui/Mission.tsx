@@ -32,8 +32,7 @@ export function Mission() {
       />
       <div
         className={cn(
-          "relative z-[1] mx-auto max-w-[1280px] py-[140px] max-sm:py-[50px]",
-          "max-sm:px-[20px]",
+          "relative z-[1] mx-auto max-w-[1280px] px-[20px] py-[140px] max-sm:py-[50px]",
         )}
       >
         <h2

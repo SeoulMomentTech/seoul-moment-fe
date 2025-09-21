@@ -26,7 +26,7 @@ export function Partners() {
   console.log(partners);
 
   return (
-    <section className={cn("relative h-[754px]", "max-sm:h-auto")}>
+    <section className={cn("relative h-[754px] px-[20px]", "max-sm:h-auto")}>
       <div
         className={cn(
           "relative z-[1] mx-auto max-w-[1280px] pt-[140px] pb-[100px] max-sm:py-[50px]",

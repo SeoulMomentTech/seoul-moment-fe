@@ -1,3 +1,4 @@
+import { Link } from "@/i18n/navigation";
 import { cn } from "@/shared/lib/style";
 import { Button } from "@/shared/ui/button";
 
@@ -22,14 +23,16 @@ export function ContactUS() {
             바랍니다.
           </p>
         </div>
-        <Button
-          className={cn(
-            "h-[48px] w-fit px-[20px] py-[16px] font-semibold",
-            "max-sm:bg-white max-sm:text-black",
-          )}
-        >
-          바로가기
-        </Button>
+        <Link href="/contact">
+          <Button
+            className={cn(
+              "h-[48px] w-fit px-[20px] py-[16px] font-semibold",
+              "max-sm:bg-white max-sm:text-black",
+            )}
+          >
+            바로가기
+          </Button>
+        </Link>
       </div>
       <div
         className={cn(
