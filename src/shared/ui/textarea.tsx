@@ -1,19 +1,18 @@
-import { cn } from "@shared/lib/style";
+import * as React from "react";
+import { cn } from "../lib/style";
 
-function Input({ className, type, ...props }: React.ComponentProps<"input">) {
+function Textarea({ className, ...props }: React.ComponentProps<"textarea">) {
   return (
-    <input
+    <textarea
       className={cn(
         "w-full rounded-[4px] border border-black/20 px-[12px] py-[16px]",
         "disabled:cursor-not-allowed disabled:bg-black/5",
         "placeholder:text-black/20",
         className,
       )}
-      data-slot="input"
-      type={type}
+      data-slot="textarea"
       {...props}
     />
   );
 }
-
-export { Input };
+export { Textarea };
