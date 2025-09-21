@@ -22,7 +22,10 @@ export default function ContactLayout({ children }: PropsWithChildren) {
         <h2 className="text-[28px] font-bold max-sm:hidden">Contact</h2>
         <div className="flex flex-col">
           <Link
-            className="font-semibold max-sm:border-b max-sm:border-b-black max-sm:pt-[10px] max-sm:pb-[16px]"
+            className={cn(
+              "font-semibold",
+              "max-sm:text-body-3 max-sm:border-b max-sm:border-b-black max-sm:pt-[10px] max-sm:pb-[16px]",
+            )}
             href="/contact"
           >
             문의하기(일반&제휴)
