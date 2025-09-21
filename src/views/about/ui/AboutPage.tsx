@@ -1,5 +1,5 @@
 import {
-  Collaborators,
+  Partners,
   Company,
   MainBanner,
   Mission,
@@ -13,7 +13,7 @@ export function AboutPage() {
       <Company />
       <Vision />
       <Mission />
-      <Collaborators />
+      <Partners />
     </>
   );
 }
