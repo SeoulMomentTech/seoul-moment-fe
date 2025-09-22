@@ -30,7 +30,7 @@ export function ProductCategoryFilter({
   categories = defaultCategories,
 }: ProductCategoryFilterProps) {
   return (
-    <div className={cn("flex items-center gap-2", className)}>
+    <div className={cn("flex items-center gap-2 max-sm:w-max", className)}>
       {categories.map((category) => (
         <button
           className={cn(

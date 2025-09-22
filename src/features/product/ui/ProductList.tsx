@@ -96,7 +96,7 @@ export default function ProductList() {
           </Accordion>
         </aside>
         <section className="flex flex-col gap-[20px]">
-          <div>
+          <div className="max-sm:overflow-auto">
             <ProductCategoryFilter
               onCategoryChange={handleChangeCategory}
               selectedCategory={selectedCategory}
