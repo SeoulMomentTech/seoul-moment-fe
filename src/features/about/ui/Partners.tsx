@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { PartnerCard } from "@/entities/partner";
 import { cn } from "@/shared/lib/style";
 import { Tabs, TabsList, TabsTrigger } from "@/shared/ui/tabs";
-import usePartnerCategories from "../hooks/usePartnerCategories";
-import usePartners from "../hooks/usePartners";
+import usePartnerCategories from "../model/usePartnerCategories";
+import usePartners from "../model/usePartners";
 
 export function Partners() {
   const {
