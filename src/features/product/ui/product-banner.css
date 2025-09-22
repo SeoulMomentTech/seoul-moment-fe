@@ -1,0 +1,28 @@
+.product-banner .swiper-pagination {
+  padding-bottom: 30px;
+  bottom: 0 !important;
+}
+
+.product-banner .swiper-pagination-bullet {
+  width: 8px;
+  height: 8px;
+  transform: scale(1) !important;
+  background-color: #ddd;
+  opacity: 1 !important;
+}
+
+.product-banner .swiper-pagination-bullet-active {
+  background-color: black;
+  width: 8px;
+  height: 8px;
+}
+
+@media (max-width: 640px) {
+  .product-banner .swiper-slide {
+    width: 100%;
+  }
+
+  .product-banner .swiper-pagination {
+    display: none;
+  }
+}
