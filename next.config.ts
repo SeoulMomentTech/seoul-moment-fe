@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
         hostname: "images.unsplash.com",
         pathname: "/**", // 모든 경로 허용
       },
+      {
+        protocol: "https",
+        hostname: "image-dev.seoulmoment.com.tw",
+        pathname: "/**",
+      },
     ],
   },
 };
