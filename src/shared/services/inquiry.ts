@@ -16,7 +16,7 @@ export const postEmail = (data: PostEmailRequest) =>
 
 export const postEmailCode = (email: string) =>
   api
-    .post("email/code", {
+    .post("auth/email/code", {
       json: { email },
     })
     .json<{ success: boolean }>();
@@ -28,14 +28,14 @@ interface VerifyEmailCodeRequest {
 
 export const verifyEmailCode = ({ email, code }: VerifyEmailCodeRequest) =>
   api
-    .post("email/verify", {
+    .post("auth/email/verify", {
       json: { email, code },
     })
     .json<{ success: boolean }>();
 
 export const verifyRecaptcha = (token: string) =>
   api
-    .post("recaptcha", {
+    .post("auth/recaptcha", {
       json: { token },
     })
     .json<{ success: boolean }>();
