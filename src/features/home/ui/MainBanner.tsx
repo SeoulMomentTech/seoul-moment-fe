@@ -1,15 +1,29 @@
+"use client";
+
 import Image from "next/image";
+import useHome from "../model/useHome";
 
 export function MainBanner() {
+  const { data } = useHome();
+
   return (
     <section className="h-[690px]">
-      <Image
-        alt=""
-        className="h-full object-cover"
-        height={727}
-        src="https://images.unsplash.com/photo-1538329972958-465d6d2144ed?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3"
-        width={4000}
-      />
+      <picture>
+        <Image
+          alt=""
+          className="h-full object-cover"
+          height={727}
+          src={data.banner[0]}
+          width={4000}
+        />
+        {data.banner.length > 1 && (
+          <source
+            media="max-width: 680px"
+            srcSet={data.banner[1]}
+            type="image/png"
+          />
+        )}
+      </picture>
     </section>
   );
 }

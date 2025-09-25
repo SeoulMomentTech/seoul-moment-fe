@@ -1,36 +1,26 @@
+"use client";
+
 import Link from "next/link";
 import { FeaturedMainNewsCard, FeaturedSubNewsCard } from "@/entities/news/ui";
 
+import useNews from "@/shared/lib/hooks/useNews";
 import { cn } from "@/shared/lib/style";
 
 import { SectionWithLabel } from "@/widgets/section-with-label";
 
 export function News() {
-  // Mock data - in a real app this would come from an API
-  const featuredNews = {
-    author: "버켄스탁",
-    date: "2025.05.30",
-    title: "먼슬리킥스 Ep.22 버켄스탁",
-    subTitle: "클래식으로 완성하는 여름 스타일",
-    imageUrl: "https://placehold.co/460x596",
-  };
+  const { data } = useNews({ count: 3 });
 
-  const newsItems = [
-    {
-      author: "버켄스탁",
-      date: "2025.05.30",
-      title: "먼슬리킥스 Ep.22 버켄스탁",
-      subTitle: "클래식으로 완성하는 여름 스타일",
-      imageUrl: "https://placehold.co/370x498",
-    },
-    {
-      author: "버켄스탁",
-      date: "2025.05.30",
-      title: "먼슬리킥스 Ep.22 버켄스탁",
-      subTitle: "클래식으로 완성하는 여름 스타일",
-      imageUrl: "https://placehold.co/370x498",
-    },
-  ];
+  // Mock data - in a real app this would come from an API
+  const featuredNews = data[0];
+
+  const newsItems = data.slice(1).map((news) => ({
+    title: news.title,
+    subTitle: news.content,
+    imageUrl: news.image,
+    date: news.createDate,
+    author: news.writer,
+  }));
 
   return (
     <SectionWithLabel
@@ -57,13 +47,23 @@ export function News() {
           "max-sm:w-full max-sm:flex-col",
         )}
       >
-        <FeaturedMainNewsCard {...featuredNews} />
-        <div className="flex justify-start max-sm:justify-end">
-          <FeaturedSubNewsCard {...newsItems[0]} />
-        </div>
-        <div>
-          <FeaturedSubNewsCard {...newsItems[1]} />
-        </div>
+        <FeaturedMainNewsCard
+          author={featuredNews.writer}
+          date={featuredNews.createDate}
+          imageUrl={featuredNews.image}
+          subTitle={featuredNews.content}
+          title={featuredNews.title}
+        />
+        {newsItems.length > 0 && (
+          <>
+            <div className="flex justify-start max-sm:justify-end">
+              <FeaturedSubNewsCard {...newsItems[0]} />
+            </div>
+            <div>
+              <FeaturedSubNewsCard {...newsItems[1]} />
+            </div>
+          </>
+        )}
       </div>
     </SectionWithLabel>
   );
