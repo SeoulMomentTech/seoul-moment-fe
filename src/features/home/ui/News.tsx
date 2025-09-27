@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { FeaturedMainNewsCard, FeaturedSubNewsCard } from "@/entities/news/ui";
+import { Link } from "@/i18n/navigation";
 
 import useNews from "@/shared/lib/hooks/useNews";
 import { cn } from "@/shared/lib/style";
@@ -15,6 +15,7 @@ export function News() {
   const featuredNews = data[0];
 
   const newsItems = data.slice(1).map((news) => ({
+    id: news.id,
     title: news.title,
     subTitle: news.content,
     imageUrl: news.image,
@@ -24,7 +25,7 @@ export function News() {
 
   return (
     <SectionWithLabel
-      className={cn("py-[100px]", "max-sm:py-[50px]")}
+      className={cn("w-[1280px] py-[100px]", "max-sm:w-full max-sm:py-[50px]")}
       label={
         <div
           className={cn(
@@ -35,32 +36,35 @@ export function News() {
           <h3 className="text-[32px] max-sm:text-[20px]">
             <b>NEWS</b>
           </h3>
-          <Link className="text-[14px] hover:underline" href="/news">
-            More
-          </Link>
         </div>
       }
     >
       <div
         className={cn(
-          "flex justify-between gap-[60px]",
+          "flex justify-between gap-[40px]",
           "max-sm:w-full max-sm:flex-col",
         )}
       >
-        <FeaturedMainNewsCard
-          author={featuredNews.writer}
-          date={featuredNews.createDate}
-          imageUrl={featuredNews.image}
-          subTitle={featuredNews.content}
-          title={featuredNews.title}
-        />
+        <Link href={`/news/${featuredNews.id}`}>
+          <FeaturedMainNewsCard
+            author={featuredNews.writer}
+            date={featuredNews.createDate}
+            imageUrl={featuredNews.image}
+            subTitle={featuredNews.content}
+            title={featuredNews.title}
+          />
+        </Link>
         {newsItems.length > 0 && (
           <>
             <div className="flex justify-start max-sm:justify-end">
-              <FeaturedSubNewsCard {...newsItems[0]} />
+              <Link href={`/news/${newsItems[0].id}`}>
+                <FeaturedSubNewsCard {...newsItems[0]} />
+              </Link>
             </div>
             <div>
-              <FeaturedSubNewsCard {...newsItems[1]} />
+              <Link href={`/news/${newsItems[1].id}`}>
+                <FeaturedSubNewsCard {...newsItems[1]} />
+              </Link>
             </div>
           </>
         )}

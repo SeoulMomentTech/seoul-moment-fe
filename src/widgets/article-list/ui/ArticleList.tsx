@@ -15,7 +15,7 @@ export default function ArticleList({ className }: ArticleListProps) {
   return (
     <div className={cn("flex gap-[40px] max-sm:hidden", className)}>
       {data.map((article) => (
-        <Link href={`/news/${article.id}`} key={article.id}>
+        <Link href={`/article/${article.id}`} key={article.id}>
           <ArticleCard
             author={article.writer}
             className="flex-none"
