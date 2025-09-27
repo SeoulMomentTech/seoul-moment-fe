@@ -4,7 +4,7 @@ import { MegazineSlide } from "@/widgets/megazine-slide";
 import { MoreMagazineList } from "@/widgets/more-magazine";
 import { SectionWithLabel } from "@/widgets/section-with-label";
 
-const mockMagazineListData = [
+const mockRelatedListData = [
   {
     id: 1,
     title: "Ep.01 우산",
@@ -22,7 +22,7 @@ const mockMagazineListData = [
   },
 ];
 
-export function MagazineList() {
+export function RelatedList() {
   return (
     <div className={cn("mx-auto mt-[-128px] bg-black/5", "max-sm:mt-[-90px]")}>
       <SectionWithLabel
@@ -44,8 +44,8 @@ export function MagazineList() {
           </div>
         }
       >
-        <MoreMagazineList magazines={mockMagazineListData} />
-        <MegazineSlide magazines={mockMagazineListData} />
+        <MoreMagazineList magazines={mockRelatedListData} />
+        <MegazineSlide magazines={mockRelatedListData} />
       </SectionWithLabel>
     </div>
   );

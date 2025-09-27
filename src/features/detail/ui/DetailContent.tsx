@@ -3,7 +3,7 @@ const styleMap = {
     "mx-auto w-[1280px] max-sm:w-full pt-[100px] max-sm:pt-[50px] text-center",
 };
 
-const mockMagazineContentsData = {
+const mockDetailContentData = {
   subtitle: "[1]",
   title:
     "한국의 향과 미감을 바탕으로 지속 가능한 아름다움을 제안하는 프래그런스 브랜드",
@@ -30,27 +30,27 @@ const mockMagazineContentsData = {
   ],
 };
 
-export function MagazineContents() {
+export function DetailContent() {
   return (
     <section className={styleMap.section}>
       <h3 className="mb-[30px] text-center text-[24px] font-semibold max-sm:px-[20px] max-sm:text-[20px]">
-        {mockMagazineContentsData.subtitle}
+        {mockDetailContentData.subtitle}
       </h3>
       <h3 className="mb-[40px] text-[24px] font-semibold max-sm:px-[20px] max-sm:text-[20px]">
-        {mockMagazineContentsData.title}
+        {mockDetailContentData.title}
       </h3>
       <p className="mb-[60px] leading-6! text-black/80 max-sm:px-[20px] max-sm:text-start">
-        {mockMagazineContentsData.content}
+        {mockDetailContentData.content}
       </p>
       <div className="mb-[100px] h-[620px] bg-slate-300 max-sm:h-[200px]" />
       <div className="flex gap-[128px] max-sm:flex-col-reverse max-sm:gap-[40px]">
         <div className="max-sm:h- h-[600px] w-[522px] bg-slate-300 max-sm:mx-[20px] max-sm:h-[284px] max-sm:w-[264px]" />
         <div className="w-[630px] text-start max-sm:w-full max-sm:px-[20px]">
           <h3 className="mb-[60px] text-[24px] font-semibold max-sm:mb-[30px] max-sm:text-[20px]">
-            {mockMagazineContentsData.brandCeoName}
+            {mockDetailContentData.brandCeoName}
           </h3>
           <div className="flex flex-col gap-[30px] max-sm:gap-[20px]">
-            {mockMagazineContentsData.interview.map((item) => (
+            {mockDetailContentData.interview.map((item) => (
               <p
                 className={
                   item.isBold

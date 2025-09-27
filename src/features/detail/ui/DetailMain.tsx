@@ -16,7 +16,7 @@ const styleMap = {
   },
 };
 
-const mockMagazineMainData = {
+const mockDetailMainData = {
   imageUrl:
     "https://images.unsplash.com/photo-1538329972958-465d6d2144ed?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3",
   category: "Korean Beauty & Fragrance",
@@ -29,27 +29,27 @@ const mockMagazineMainData = {
   },
 };
 
-export function MagazineMain() {
+export function DetailMain() {
   return (
     <section className={cn(styleMap.desktop.section, styleMap.mobile.section)}>
       <Image
         alt=""
         className={cn(styleMap.desktop.image, styleMap.mobile.image)}
         height={800}
-        src={mockMagazineMainData.imageUrl}
+        src={mockDetailMainData.imageUrl}
         width={4000}
       />
       <div className={cn(styleMap.desktop.titleBox, styleMap.mobile.titleBox)}>
         <div className="mb-[40px] flex flex-col gap-[30px]">
           <div className="flex flex-col gap-[10px]">
             <span className="max-sm:text-[12px]">
-              {mockMagazineMainData.category}
+              {mockDetailMainData.category}
             </span>
             <h1 className="text-[64px] font-semibold max-sm:text-[24px]">
-              {mockMagazineMainData.title}
+              {mockDetailMainData.title}
             </h1>
           </div>
-          <p className="max-sm:text-[14px]">{mockMagazineMainData.summary}</p>
+          <p className="max-sm:text-[14px]">{mockDetailMainData.summary}</p>
         </div>
         <div
           className={cn(
@@ -57,11 +57,11 @@ export function MagazineMain() {
             "max-sm:flex-row-reverse max-sm:items-center max-sm:justify-end max-sm:gap-0",
           )}
         >
-          <span>{mockMagazineMainData.date}</span>
+          <span>{mockDetailMainData.date}</span>
           <span className="mx-[10px] hidden h-[8px] w-[1px] max-sm:block max-sm:bg-black/40" />
           <div className="flex items-center gap-[10px] max-sm:gap-[4px]">
             <div className="h-[40px] w-[40px] rounded-full bg-slate-300 max-sm:h-[24px] max-sm:w-[24px]" />
-            <span>{mockMagazineMainData.author.name}</span>
+            <span>{mockDetailMainData.author.name}</span>
           </div>
         </div>
       </div>

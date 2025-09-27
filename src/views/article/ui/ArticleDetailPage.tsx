@@ -1,7 +1,7 @@
 import { DetailContent, DetailMain, RelatedList } from "@/features/detail";
 import { BrandProducts } from "@/widgets/brand-products";
 
-export function MagazineDetailPage() {
+export function ArticleDetailPage() {
   return (
     <>
       <DetailMain />
