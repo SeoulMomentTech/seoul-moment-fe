@@ -1,1 +1,1 @@
-export { default as MegazineSlide } from "./ui/MegazineSlide";
+export { MegazineSlide } from "./ui/MegazineSlide";

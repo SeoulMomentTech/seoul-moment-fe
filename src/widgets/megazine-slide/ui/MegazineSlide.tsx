@@ -5,12 +5,22 @@ import { MegazineCard } from "@/entities/megazine";
 
 import "swiper/css";
 
-export default function MegazineSlide() {
+interface Magazine {
+  id: number;
+  title: string;
+  imageUrl: string;
+}
+
+interface MegazineSlideProps {
+  magazines: Magazine[];
+}
+
+export function MegazineSlide({ magazines }: MegazineSlideProps) {
   return (
     <Swiper className="hidden! w-full max-sm:block!">
-      {[1, 2, 3].map((article) => (
-        <SwiperSlide key={article}>
-          <MegazineCard />
+      {magazines.map((magazine) => (
+        <SwiperSlide key={magazine.id}>
+          <MegazineCard title={magazine.title} />
         </SwiperSlide>
       ))}
     </Swiper>

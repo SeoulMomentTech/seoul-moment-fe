@@ -1,1 +1,1 @@
-export { default as MegazineCard } from "./ui/MegazineCard";
+export { MegazineCard } from "./ui/MegazineCard";

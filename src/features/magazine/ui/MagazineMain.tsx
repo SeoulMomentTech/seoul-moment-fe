@@ -16,6 +16,19 @@ const styleMap = {
   },
 };
 
+const mockMagazineMainData = {
+  imageUrl:
+    "https://images.unsplash.com/photo-1538329972958-465d6d2144ed?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3",
+  category: "Korean Beauty & Fragrance",
+  title: "CHWI",
+  summary: "요약 내용입니다.",
+  date: "2025.05.26",
+  author: {
+    name: "작가명",
+    avatarUrl: "",
+  },
+};
+
 export function MagazineMain() {
   return (
     <section className={cn(styleMap.desktop.section, styleMap.mobile.section)}>
@@ -23,20 +36,20 @@ export function MagazineMain() {
         alt=""
         className={cn(styleMap.desktop.image, styleMap.mobile.image)}
         height={800}
-        src="https://images.unsplash.com/photo-1538329972958-465d6d2144ed?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3"
+        src={mockMagazineMainData.imageUrl}
         width={4000}
       />
       <div className={cn(styleMap.desktop.titleBox, styleMap.mobile.titleBox)}>
         <div className="mb-[40px] flex flex-col gap-[30px]">
           <div className="flex flex-col gap-[10px]">
             <span className="max-sm:text-[12px]">
-              Korean Beauty & Fragrance
+              {mockMagazineMainData.category}
             </span>
             <h1 className="text-[64px] font-semibold max-sm:text-[24px]">
-              CHWI
+              {mockMagazineMainData.title}
             </h1>
           </div>
-          <p className="max-sm:text-[14px]">요약 내용입니다.</p>
+          <p className="max-sm:text-[14px]">{mockMagazineMainData.summary}</p>
         </div>
         <div
           className={cn(
@@ -44,11 +57,11 @@ export function MagazineMain() {
             "max-sm:flex-row-reverse max-sm:items-center max-sm:justify-end max-sm:gap-0",
           )}
         >
-          <span>2025.05.26</span>
+          <span>{mockMagazineMainData.date}</span>
           <span className="mx-[10px] hidden h-[8px] w-[1px] max-sm:block max-sm:bg-black/40" />
           <div className="flex items-center gap-[10px] max-sm:gap-[4px]">
             <div className="h-[40px] w-[40px] rounded-full bg-slate-300 max-sm:h-[24px] max-sm:w-[24px]" />
-            <span>작가명</span>
+            <span>{mockMagazineMainData.author.name}</span>
           </div>
         </div>
       </div>

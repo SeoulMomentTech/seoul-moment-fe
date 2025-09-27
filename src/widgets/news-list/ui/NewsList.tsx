@@ -1,5 +1,3 @@
-import { ArticleCard } from "@/entities/article";
-
 export default function NewsList() {
   return (
     <div
@@ -8,10 +6,10 @@ export default function NewsList() {
         gridTemplateColumns: "repeat(2,1fr)",
       }}
     >
-      <ArticleCard className="max-sm:w-full" />
-      <ArticleCard className="max-sm:w-full" />
-      <ArticleCard className="max-sm:w-full" />
-      <ArticleCard className="max-sm:w-full" />
+      {/*<ArticleCard className="max-sm:w-full" />*/}
+      {/*<ArticleCard className="max-sm:w-full" />*/}
+      {/*<ArticleCard className="max-sm:w-full" />*/}
+      {/*<ArticleCard className="max-sm:w-full" />*/}
     </div>
   );
 }
