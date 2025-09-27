@@ -1,4 +1,5 @@
 import { cn } from "@/shared/lib/style";
+import { formatDateTime } from "@/shared/lib/utils";
 import Divider from "@/shared/ui/divider";
 
 interface AuthorWithDateProps {
@@ -30,7 +31,7 @@ export default function AuthorWithDate({
           textColor === "white" && "bg-white/80",
         )}
       />
-      <span>{date}</span>
+      <span>{formatDateTime(date)}</span>
     </div>
   );
 }
