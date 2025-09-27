@@ -1,13 +1,3 @@
-import { DetailContent, DetailMain, RelatedList } from "@/features/detail";
-import { BrandProducts } from "@/widgets/brand-products";
-
 export function MagazineDetailPage() {
-  return (
-    <>
-      <DetailMain />
-      <DetailContent />
-      <RelatedList />
-      <BrandProducts />
-    </>
-  );
+  return <></>;
 }
