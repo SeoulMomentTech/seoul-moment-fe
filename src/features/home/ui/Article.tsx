@@ -1,4 +1,5 @@
-import { Link } from "@/i18n/navigation";
+"use client";
+
 import { cn } from "@/shared/lib/style";
 import { ArticleList } from "@/widgets/article-list";
 import { ArticleSlide } from "@/widgets/article-slide";
@@ -18,9 +19,6 @@ export function Article() {
           <h3 className="text-[32px] max-sm:text-[20px]">
             <b>Article</b>
           </h3>
-          <Link className="text-[14px] hover:underline" href="/news">
-            More
-          </Link>
         </div>
       }
     >

@@ -1,13 +1,14 @@
 "use client";
 
 import Image from "next/image";
+import { cn } from "@/shared/lib/style";
 import useHome from "../model/useHome";
 
 export function MainBanner() {
   const { data } = useHome();
 
   return (
-    <section className="h-[690px]">
+    <section className={cn("h-[690px] min-w-[1280px]", "max-sm:min-w-full")}>
       <picture>
         <Image
           alt=""

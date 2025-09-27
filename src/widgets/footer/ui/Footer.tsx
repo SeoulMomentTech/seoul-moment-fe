@@ -3,8 +3,8 @@ import Link from "next/link";
 import { cn } from "@/shared/lib/style";
 
 const styleMap = {
-  desktop: "min-h-[416px] px-[40px]",
-  mobile: "max-sm:min-h-[429px] max-sm:px-[20px]",
+  desktop: "min-h-[416px] min-w-[1280px] px-[40px]",
+  mobile: "max-sm:min-h-[429px] max-sm:px-[20px] max-sm:min-w-full",
 };
 
 export function Footer() {
