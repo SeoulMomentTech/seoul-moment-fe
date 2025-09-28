@@ -39,7 +39,7 @@ export default function BrandProductList() {
       >
         {data?.list?.map((product, idx) => (
           <Link
-            className="flex-1"
+            className="max-w-[232px] flex-1 max-sm:max-w-[150px]"
             href={`/product/${idx + 1}`}
             key={`product-${idx + 1}`}
           >
