@@ -6,12 +6,14 @@ interface ProductCardProps {
   className?: string;
   imageClassName?: string;
   contentWrapperClassName?: string;
+  hideExtraInfo?: boolean;
 }
 
 export default function ProductCard({
   className,
   imageClassName,
   contentWrapperClassName,
+  hideExtraInfo,
 }: ProductCardProps) {
   return (
     <Card
@@ -21,16 +23,20 @@ export default function ProductCard({
         contentWrapperClassName,
       )}
       extraInfo={
-        <div className="flex gap-[10px] text-[13px] text-black/40">
-          <div className="flex items-center gap-[4px]">
-            <HeartIcon height={14} width={14} />
-            <span>21794</span>
+        hideExtraInfo ? (
+          <></>
+        ) : (
+          <div className="flex gap-[10px] text-[13px] text-black/40">
+            <div className="flex items-center gap-[4px]">
+              <HeartIcon height={14} width={14} />
+              <span>21794</span>
+            </div>
+            <div className="flex items-center gap-[4px]">
+              <StarIcon height={14} width={14} />
+              <span>4.5(330)</span>
+            </div>
           </div>
-          <div className="flex items-center gap-[4px]">
-            <StarIcon height={14} width={14} />
-            <span>4.5(330)</span>
-          </div>
-        </div>
+        )
       }
       image={
         <div

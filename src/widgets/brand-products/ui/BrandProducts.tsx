@@ -1,7 +1,6 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import Link from "next/link";
 import { BrandProductCard } from "@/entities/brand";
 import useLanguage from "@/shared/lib/hooks/useLanguage";
 import { getProductList } from "@/shared/services/product";
@@ -30,12 +29,6 @@ export default function BrandProducts({ id }: BrandProductsProps) {
           <h3 className="text-[32px] max-sm:text-[20px]">
             <b>Brand Products</b>
           </h3>
-          <Link
-            className="text-[14px] hover:underline max-sm:text-[13px]"
-            href="/"
-          >
-            More
-          </Link>
         </div>
       }
     >
