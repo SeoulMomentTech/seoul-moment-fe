@@ -76,17 +76,36 @@ interface GetProductDetailReq extends PublicLanguageCode {
   id: number;
 }
 
+interface OptionValue {
+  id: number;
+  value: string;
+}
+
+type OptionType = "COLOR" | "SIZE" | "MATERIAL" | "FIT" | "STYLE";
+
+type DetailOption = Record<OptionType, OptionValue[]>;
+
 interface GetProductDetailRes {
+  id: number;
+  name: string;
+  brand: Record<"name" | "profileImage", string>;
+  price: number;
+  discountPrice: number;
+  origin: string;
+  shippingInfo: number;
+  shippingCost: number;
+  option: Array<DetailOption>;
   like: number;
   review: number;
   reviewAverage: number;
+  detailImg: string;
+  subImage: string[];
 }
 
 export const getProductDetail = ({ id, languageCode }: GetProductDetailReq) =>
   api
-    .get(`product`, {
+    .get(`product/${id}`, {
       searchParams: {
-        id,
         languageCode,
       },
     })

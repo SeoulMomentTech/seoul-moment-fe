@@ -1,12 +1,39 @@
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
 import { StarIcon } from "lucide-react";
+import { useState } from "react";
 import { BrandProductList } from "@/features/product";
+import useLanguage from "@/shared/lib/hooks/useLanguage";
 import { cn } from "@/shared/lib/style";
+import { setComma } from "@/shared/lib/utils";
+import { getProductDetail } from "@/shared/services/product";
 import { Button } from "@/shared/ui/button";
 import { AvatarBadge } from "@/widgets/avatar-badge/ui/AvatarBadge";
 import { LikeCount } from "@/widgets/like-count/ui/LikeCount";
+import { ProductDetailImage } from "@/widgets/product-detail-image";
 import { ProductGallery } from "@/widgets/product-gallery";
 
-export default function ProductDetailPage() {
+interface ProductDetailPageProps {
+  id: number;
+}
+
+export default function ProductDetailPage({ id }: ProductDetailPageProps) {
+  const languageCode = useLanguage();
+  const { data } = useQuery({
+    queryKey: ["product-detail", id, languageCode],
+    queryFn: () => getProductDetail({ id, languageCode }),
+    select: (res) => res.data,
+  });
+
+  const [showMore, setShowMore] = useState(false);
+
+  const handleToggleShowMore = (showMore: boolean) => {
+    setShowMore(showMore);
+  };
+
+  if (!data) return null;
+
   return (
     <div
       className={cn(
@@ -21,7 +48,7 @@ export default function ProductDetailPage() {
             "max-sm:flex-col max-sm:gap-[30px] max-sm:border-b-transparent max-sm:pb-0",
           )}
         >
-          <ProductGallery />
+          <ProductGallery images={data.subImage} />
           <div className="w-full max-sm:px-[20px]">
             <h2
               className={cn(
@@ -29,15 +56,15 @@ export default function ProductDetailPage() {
                 "max-sm:text-body-2",
               )}
             >
-              맨체스터 유나이티드 24/25 어웨이 저지
+              {data.name}
             </h2>
             <div className="flex items-center justify-between py-[10px]">
               <AvatarBadge
-                avatarUrl="https://image-dev.seoulmoment.com.tw/news/6be9d45c-0a31-428d-8d80-00084c09f301.frro-k080eixous1aa55xahae8"
-                name="아디다스"
+                avatarUrl={data.brand.profileImage}
+                name={data.brand.name}
               />
               <LikeCount
-                count={200}
+                count={data.like}
                 countClassName="max-sm:hidden"
                 iconSize={20}
               />
@@ -86,32 +113,40 @@ export default function ProductDetailPage() {
                     width={16}
                   />
                 </div>
-                <span className="text-body-3 max-sm:text-body-4">리뷰 422</span>
+                <span className="text-body-3 max-sm:text-body-4">
+                  리뷰 {setComma(data.review)}
+                </span>
               </div>
               {/** 가격 영역*/}
               <div className="flex flex-col gap-[20px]">
-                <div className={cn("text-body-3 flex", "text-body-4")}>
-                  <span className="min-w-[120px]">정상가</span>
-                  <span className="text-black/40 line-through">83,300원</span>
-                </div>
-                <div className="flex items-center">
-                  <span
-                    className={cn(
-                      "text-body-3 min-w-[120px]",
-                      "max-sm:text-body-4",
-                    )}
-                  >
-                    판매가
-                  </span>
-                  <span
-                    className={cn(
-                      "text-body-1 font-semibold",
-                      "max-sm:text-body-2",
-                    )}
-                  >
-                    83,300원
-                  </span>
-                </div>
+                {data.price && (
+                  <div className={cn("text-body-3 flex", "text-body-4")}>
+                    <span className="min-w-[120px]">정상가</span>
+                    <span className="text-black/40 line-through">
+                      {setComma(data.price)}
+                    </span>
+                  </div>
+                )}
+                {data.discountPrice && (
+                  <div className="flex items-center">
+                    <span
+                      className={cn(
+                        "text-body-3 min-w-[120px]",
+                        "max-sm:text-body-4",
+                      )}
+                    >
+                      판매가
+                    </span>
+                    <span
+                      className={cn(
+                        "text-body-1 font-semibold",
+                        "max-sm:text-body-2",
+                      )}
+                    >
+                      {setComma(data.discountPrice)}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
             {/** 원산지, 배송 정보 */}
@@ -121,39 +156,29 @@ export default function ProductDetailPage() {
                 "max-sm:gap-[16px] max-sm:pb-[16px]",
               )}
             >
-              <div className={cn("text-body-3 flex", "text-body-4")}>
-                <span className="min-w-[120px]">원산지</span>
-                <span>블라블라</span>
-              </div>
-              <div className={cn("text-body-3 flex", "text-body-4")}>
-                <span className="min-w-[120px]">배송정보</span>
-                <span>00일 이내 출고</span>
-              </div>
-              <div className={cn("text-body-3 flex", "text-body-4")}>
-                <span className="min-w-[120px]">배송비</span>
-                <span>3,300원</span>
-              </div>
+              {data.origin && (
+                <div className={cn("text-body-3 flex", "text-body-4")}>
+                  <span className="min-w-[120px]">원산지</span>
+                  <span>{data.origin}</span>
+                </div>
+              )}
+              {data.shippingInfo && (
+                <div className={cn("text-body-3 flex", "text-body-4")}>
+                  <span className="min-w-[120px]">배송정보</span>
+                  <span>{data.shippingInfo}일 이내 출고</span>
+                </div>
+              )}
+              {data.shippingCost && (
+                <div className={cn("text-body-3 flex", "text-body-4")}>
+                  <span className="min-w-[120px]">배송비</span>
+                  <span>{setComma(data.shippingCost)}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>
-        <div
-          className={cn(
-            "px-[20px] pt-[50px] pb-[76px] max-sm:pt-[40px] max-sm:pb-[40px]",
-          )}
-        >
-          <h3
-            className={cn(
-              "text-title-3 mb-[30px] font-semibold",
-              "max-sm:text-body-1",
-            )}
-          >
-            동일 브랜드 다른 상품
-          </h3>
-          <BrandProductList />
-        </div>
-
-        <div className="relative h-[800px]">
-          <div className="h-full bg-gray-300" />
+        <BrandProductList />
+        <ProductDetailImage imageSrc={data.detailImg} showMore={showMore}>
           <div
             className={cn(
               "flex items-center justify-center",
@@ -169,13 +194,14 @@ export default function ProductDetailPage() {
                 "border-black/20 bg-transparent",
                 "text-body-2 max-sm:mx-[20px] max-sm:w-full",
               )}
+              onClick={() => handleToggleShowMore(!showMore)}
               size="lg"
               variant="outline"
             >
               상품 상세 보기
             </Button>
           </div>
-        </div>
+        </ProductDetailImage>
       </section>
     </div>
   );

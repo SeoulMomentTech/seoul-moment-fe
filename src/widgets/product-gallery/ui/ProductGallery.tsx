@@ -12,7 +12,11 @@ import "swiper/css/free-mode";
 import "swiper/css/navigation";
 import "swiper/css/thumbs";
 
-export default function ProductGallery() {
+interface ProductGalleryProps {
+  images: string[];
+}
+
+export default function ProductGallery({ images }: ProductGalleryProps) {
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperClass | null>(null);
 
   return (
@@ -35,51 +39,11 @@ export default function ProductGallery() {
         }}
         thumbs={{ swiper: thumbsSwiper }}
       >
-        <SwiperSlide>
-          <Image
-            alt=""
-            height={800}
-            src="https://swiperjs.com/demos/images/nature-1.jpg"
-            unoptimized
-            width={800}
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <Image
-            alt=""
-            height={800}
-            src="https://swiperjs.com/demos/images/nature-2.jpg"
-            unoptimized
-            width={800}
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <Image
-            alt=""
-            height={800}
-            src="https://swiperjs.com/demos/images/nature-3.jpg"
-            unoptimized
-            width={800}
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <Image
-            alt=""
-            height={800}
-            src="https://swiperjs.com/demos/images/nature-4.jpg"
-            unoptimized
-            width={800}
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <Image
-            alt=""
-            height={800}
-            src="https://swiperjs.com/demos/images/nature-5.jpg"
-            unoptimized
-            width={800}
-          />
-        </SwiperSlide>
+        {images.map((src, idx) => (
+          <SwiperSlide key={`${src}-${idx + 1}`}>
+            <Image alt="" height={800} src={src} unoptimized width={800} />
+          </SwiperSlide>
+        ))}
       </Swiper>
       <Swiper
         className="mySwiper px-[20px]"
@@ -90,51 +54,11 @@ export default function ProductGallery() {
         spaceBetween={8}
         watchSlidesProgress={true}
       >
-        <SwiperSlide>
-          <Image
-            alt=""
-            height={800}
-            src="https://swiperjs.com/demos/images/nature-1.jpg"
-            unoptimized
-            width={800}
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <Image
-            alt=""
-            height={800}
-            src="https://swiperjs.com/demos/images/nature-2.jpg"
-            unoptimized
-            width={800}
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <Image
-            alt=""
-            height={800}
-            src="https://swiperjs.com/demos/images/nature-3.jpg"
-            unoptimized
-            width={800}
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <Image
-            alt=""
-            height={800}
-            src="https://swiperjs.com/demos/images/nature-4.jpg"
-            unoptimized
-            width={800}
-          />
-        </SwiperSlide>
-        <SwiperSlide>
-          <Image
-            alt=""
-            height={800}
-            src="https://swiperjs.com/demos/images/nature-5.jpg"
-            unoptimized
-            width={800}
-          />
-        </SwiperSlide>
+        {images.map((src, idx) => (
+          <SwiperSlide key={`sub-${src}-${idx + 1}`}>
+            <Image alt="" height={800} src={src} unoptimized width={800} />
+          </SwiperSlide>
+        ))}
       </Swiper>
     </div>
   );

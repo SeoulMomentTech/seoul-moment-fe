@@ -1,5 +1,6 @@
 import { HeartIcon } from "lucide-react";
 import { cn } from "@/shared/lib/style";
+import { setComma } from "@/shared/lib/utils";
 
 interface LikeCountProps {
   className?: string;
@@ -27,7 +28,9 @@ export function LikeCount({
         width={iconSize ?? 14}
       />
       {count && (
-        <span className={cn("text-body-4", countClassName)}>{count}</span>
+        <span className={cn("text-body-4", countClassName)}>
+          {setComma(count)}
+        </span>
       )}
     </div>
   );

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ProductCard } from "@/entities/product";
+import { Link } from "@/i18n/navigation";
 import { cn } from "@/shared/lib/style";
 import {
   Accordion,
@@ -209,38 +210,14 @@ export default function ProductList() {
               "max-sm:grid max-sm:grid-cols-2",
             )}
           >
-            <ProductCard
-              className="max-sm:flex-1"
-              imageClassName=" w-[196px] h-[196px] max-sm:w-full max-sm:h-[150px]"
-            />
-            <ProductCard
-              className="max-sm:flex-1"
-              imageClassName=" w-[196px] h-[196px] max-sm:w-full max-sm:h-[150px]"
-            />
-            <ProductCard
-              className="max-sm:flex-1"
-              imageClassName=" w-[196px] h-[196px] max-sm:w-full max-sm:h-[150px]"
-            />
-            <ProductCard
-              className="max-sm:flex-1"
-              imageClassName=" w-[196px] h-[196px] max-sm:w-full max-sm:h-[150px]"
-            />
-            <ProductCard
-              className="max-sm:flex-1"
-              imageClassName=" w-[196px] h-[196px] max-sm:w-full max-sm:h-[150px]"
-            />
-            <ProductCard
-              className="max-sm:flex-1"
-              imageClassName=" w-[196px] h-[196px] max-sm:w-full max-sm:h-[150px]"
-            />
-            <ProductCard
-              className="max-sm:flex-1"
-              imageClassName=" w-[196px] h-[196px] max-sm:w-full max-sm:h-[150px]"
-            />
-            <ProductCard
-              className="max-sm:flex-1"
-              imageClassName=" w-[196px] h-[196px] max-sm:w-full max-sm:h-[150px]"
-            />
+            {[0, 1, 2, 3, 4, 5, 6, 7].map((_, index) => (
+              <Link href="/product/1" key={`${index + 1}`}>
+                <ProductCard
+                  className="max-sm:flex-1"
+                  imageClassName=" w-[196px] h-[196px] max-sm:w-full max-sm:h-[150px]"
+                />
+              </Link>
+            ))}
           </div>
         </section>
       </div>
