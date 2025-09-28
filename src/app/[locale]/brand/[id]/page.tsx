@@ -183,7 +183,7 @@ export default function BrandDetail() {
           있다고 봅니다.{" "}
         </p>
       </article>
-      <BrandProducts />
+      <BrandProducts id={1} />
     </>
   );
 }

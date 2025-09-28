@@ -37,7 +37,7 @@ export function ArticleDetailPage({ id }: ArticleDetailPageProps) {
       <ArticleDetailMain {...data.main} />
       <ArticleDetailContent data={data.section} />
       <RelatedList />
-      <BrandProducts />
+      <BrandProducts id={data.brandId} />
     </>
   );
 }
