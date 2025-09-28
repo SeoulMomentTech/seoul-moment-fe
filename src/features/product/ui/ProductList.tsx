@@ -43,7 +43,7 @@ export default function ProductList() {
             브랜드
           </h2>
           <Accordion collapsible type="single">
-            <AccordionItem hideBorder value="item-1">
+            <AccordionItem hideBorder value="A_TO_D">
               <AccordionTrigger className="font-semibold">A~D</AccordionTrigger>
               <AccordionContent className="flex flex-col pb-0">
                 <Button
@@ -68,8 +68,108 @@ export default function ProductList() {
                 </Button>
               </AccordionContent>
             </AccordionItem>
-            <AccordionItem hideBorder value="item-2">
+            <AccordionItem hideBorder value="E_TO_H">
               <AccordionTrigger className="font-semibold">E~H</AccordionTrigger>
+              <AccordionContent className="flex flex-col pb-0">
+                <Button
+                  className={cn(
+                    "justify-start px-0 py-[10px] text-black/40",
+                    "hover:bg-transparent hover:text-black",
+                  )}
+                  size="sm"
+                  variant="ghost"
+                >
+                  Apple 1
+                </Button>
+                <Button
+                  className={cn(
+                    "justify-start px-0 py-[10px] text-black/40",
+                    "hover:bg-transparent hover:text-black",
+                  )}
+                  size="sm"
+                  variant="ghost"
+                >
+                  Apple 2
+                </Button>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem hideBorder value="I_TO_L">
+              <AccordionTrigger className="font-semibold">I~L</AccordionTrigger>
+              <AccordionContent className="flex flex-col pb-0">
+                <Button
+                  className={cn(
+                    "justify-start px-0 py-[10px] text-black/40",
+                    "hover:bg-transparent hover:text-black",
+                  )}
+                  size="sm"
+                  variant="ghost"
+                >
+                  Apple 1
+                </Button>
+                <Button
+                  className={cn(
+                    "justify-start px-0 py-[10px] text-black/40",
+                    "hover:bg-transparent hover:text-black",
+                  )}
+                  size="sm"
+                  variant="ghost"
+                >
+                  Apple 2
+                </Button>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem hideBorder value="M_TO_P">
+              <AccordionTrigger className="font-semibold">M~P</AccordionTrigger>
+              <AccordionContent className="flex flex-col pb-0">
+                <Button
+                  className={cn(
+                    "justify-start px-0 py-[10px] text-black/40",
+                    "hover:bg-transparent hover:text-black",
+                  )}
+                  size="sm"
+                  variant="ghost"
+                >
+                  Apple 1
+                </Button>
+                <Button
+                  className={cn(
+                    "justify-start px-0 py-[10px] text-black/40",
+                    "hover:bg-transparent hover:text-black",
+                  )}
+                  size="sm"
+                  variant="ghost"
+                >
+                  Apple 2
+                </Button>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem hideBorder value="Q_TO_T">
+              <AccordionTrigger className="font-semibold">Q~T</AccordionTrigger>
+              <AccordionContent className="flex flex-col pb-0">
+                <Button
+                  className={cn(
+                    "justify-start px-0 py-[10px] text-black/40",
+                    "hover:bg-transparent hover:text-black",
+                  )}
+                  size="sm"
+                  variant="ghost"
+                >
+                  Apple 1
+                </Button>
+                <Button
+                  className={cn(
+                    "justify-start px-0 py-[10px] text-black/40",
+                    "hover:bg-transparent hover:text-black",
+                  )}
+                  size="sm"
+                  variant="ghost"
+                >
+                  Apple 2
+                </Button>
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem hideBorder value="U_TO_Z">
+              <AccordionTrigger className="font-semibold">U~Z</AccordionTrigger>
               <AccordionContent className="flex flex-col pb-0">
                 <Button
                   className={cn(
@@ -106,39 +206,40 @@ export default function ProductList() {
             className={cn(
               "flex w-[1063px] flex-wrap gap-x-[20px] gap-y-[40px]",
               "max-sm:w-full max-sm:gap-y-[30px]",
+              "max-sm:grid max-sm:grid-cols-2",
             )}
           >
             <ProductCard
               className="max-sm:flex-1"
-              imageClassName=" w-[196px] h-[196px] max-sm:w-full  max-sm:aspect-square"
+              imageClassName=" w-[196px] h-[196px] max-sm:w-full max-sm:h-[150px]"
             />
             <ProductCard
               className="max-sm:flex-1"
-              imageClassName=" w-[196px] h-[196px] max-sm:w-full  max-sm:aspect-square"
+              imageClassName=" w-[196px] h-[196px] max-sm:w-full max-sm:h-[150px]"
             />
             <ProductCard
               className="max-sm:flex-1"
-              imageClassName=" w-[196px] h-[196px] max-sm:w-full  max-sm:aspect-square"
+              imageClassName=" w-[196px] h-[196px] max-sm:w-full max-sm:h-[150px]"
             />
             <ProductCard
               className="max-sm:flex-1"
-              imageClassName=" w-[196px] h-[196px] max-sm:w-full  max-sm:aspect-square"
+              imageClassName=" w-[196px] h-[196px] max-sm:w-full max-sm:h-[150px]"
             />
             <ProductCard
               className="max-sm:flex-1"
-              imageClassName=" w-[196px] h-[196px] max-sm:w-full  max-sm:aspect-square"
+              imageClassName=" w-[196px] h-[196px] max-sm:w-full max-sm:h-[150px]"
             />
             <ProductCard
               className="max-sm:flex-1"
-              imageClassName=" w-[196px] h-[196px] max-sm:w-full  max-sm:aspect-square"
+              imageClassName=" w-[196px] h-[196px] max-sm:w-full max-sm:h-[150px]"
             />
             <ProductCard
               className="max-sm:flex-1"
-              imageClassName=" w-[196px] h-[196px] max-sm:w-full  max-sm:aspect-square"
+              imageClassName=" w-[196px] h-[196px] max-sm:w-full max-sm:h-[150px]"
             />
             <ProductCard
               className="max-sm:flex-1"
-              imageClassName=" w-[196px] h-[196px] max-sm:w-full  max-sm:aspect-square"
+              imageClassName=" w-[196px] h-[196px] max-sm:w-full max-sm:h-[150px]"
             />
           </div>
         </section>

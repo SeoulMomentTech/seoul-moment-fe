@@ -47,7 +47,7 @@ interface GetProductListReq extends PublicLanguageCode {
   sort?: string; // ASC, DESC
 }
 
-interface ProductItem {
+export interface ProductItem {
   id: number;
   brandName: string;
   productName: string;
