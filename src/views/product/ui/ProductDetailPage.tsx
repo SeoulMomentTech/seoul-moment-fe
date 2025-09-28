@@ -76,7 +76,7 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
               )}
             >
               <div className="flex gap-[4px]">
-                <div className="flex">
+                <div className="flex items-center">
                   <StarIcon
                     className="text-transparent"
                     fill="#F37B2A"
@@ -84,34 +84,9 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
                     strokeWidth={1}
                     width={16}
                   />
-                  <StarIcon
-                    className="text-transparent"
-                    fill="#F37B2A"
-                    height={16}
-                    strokeWidth={1}
-                    width={16}
-                  />
-                  <StarIcon
-                    className="text-transparent"
-                    fill="#F37B2A"
-                    height={16}
-                    strokeWidth={1}
-                    width={16}
-                  />
-                  <StarIcon
-                    className="text-transparent"
-                    fill="#F37B2A"
-                    height={16}
-                    strokeWidth={1}
-                    width={16}
-                  />
-                  <StarIcon
-                    className="text-transparent"
-                    fill="#F37B2A"
-                    height={16}
-                    strokeWidth={1}
-                    width={16}
-                  />
+                  <span className="text-body-3 max-sm:text-body-4">
+                    ({data.reviewAverage})
+                  </span>
                 </div>
                 <span className="text-body-3 max-sm:text-body-4">
                   리뷰 {setComma(data.review)}

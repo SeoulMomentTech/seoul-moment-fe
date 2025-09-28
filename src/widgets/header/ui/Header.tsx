@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/shared/lib/style";
+import Divider from "@/shared/ui/divider";
 import {
   Sheet,
   SheetContent,
@@ -13,6 +14,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/shared/ui/sheet";
+import { LanguageSupport } from "@/widgets/language-support";
 
 const styleMap = {
   deskTop: {
@@ -71,7 +73,9 @@ function Desktop() {
               Contact
             </Link>
           </li>
-          <li className="h-[56px] py-[20px] text-[14px]">language</li>
+          <li className="h-[56px] py-[20px] text-[14px]">
+            <LanguageSupport />
+          </li>
         </ul>
       </div>
     </div>
@@ -108,18 +112,19 @@ function Mobile() {
               <SheetTitle className="sr-only" />
               <SheetDescription className="sr-only" />
             </SheetHeader>
-            <ul className="flex flex-col">
-              <li>
-                <Link
-                  className={styleMap.mobile.menu}
-                  href="/product"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Product
-                  <ChevronRightIcon height={16} width={16} />
-                </Link>
-              </li>
-              {/*<li>
+            <div className="flex h-full flex-col justify-between">
+              <ul className="flex flex-col">
+                <li>
+                  <Link
+                    className={styleMap.mobile.menu}
+                    href="/product"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Product
+                    <ChevronRightIcon height={16} width={16} />
+                  </Link>
+                </li>
+                {/*<li>
                 <Link className={styleMap.mobile.menu} href="/brand">
                   Brand
                   <ChevronRightIcon height={16} width={16} />
@@ -131,27 +136,35 @@ function Mobile() {
                   <ChevronRightIcon height={16} width={16} />
                 </Link>
               </li>*/}
-              <li>
-                <Link
-                  className={styleMap.mobile.menu}
-                  href="/about"
-                  onClick={() => setIsOpen(false)}
-                >
-                  About
-                  <ChevronRightIcon height={16} width={16} />
-                </Link>
-              </li>
-              <li>
-                <Link
-                  className={styleMap.mobile.menu}
-                  href="/contact"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Contact
-                  <ChevronRightIcon height={16} width={16} />
-                </Link>
-              </li>
-            </ul>
+                <li>
+                  <Link
+                    className={styleMap.mobile.menu}
+                    href="/about"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    About
+                    <ChevronRightIcon height={16} width={16} />
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    className={styleMap.mobile.menu}
+                    href="/contact"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Contact
+                    <ChevronRightIcon height={16} width={16} />
+                  </Link>
+                </li>
+              </ul>
+              <div className="flex items-center pb-[33px]">
+                <Link href="ko">KOR</Link>
+                <Divider className="block bg-black/40" />
+                <Link href="en">ENG</Link>
+                <Divider className="block bg-black/40" />
+                <Link href="zh-TW">繁體中文</Link>
+              </div>
+            </div>
           </SheetContent>
         </Sheet>
         <Link className={cn()} href="/">
