@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { BrandProductCard } from "@/entities/brand";
+import { Link } from "@/i18n/navigation";
 import useLanguage from "@/shared/lib/hooks/useLanguage";
 import { getProductList } from "@/shared/services/product";
 import { SectionWithLabel } from "@/widgets/section-with-label";
@@ -34,7 +35,9 @@ export default function BrandProducts({ id }: BrandProductsProps) {
     >
       <div className="max-sm:scrollbar-hide flex gap-[20px] max-sm:gap-[16px] max-sm:overflow-x-auto max-sm:overflow-y-hidden">
         {data.map((product) => (
-          <BrandProductCard key={product.id} {...product} />
+          <Link href={`/product/${product.id}`} key={product.id}>
+            <BrandProductCard {...product} />
+          </Link>
         ))}
       </div>
     </SectionWithLabel>

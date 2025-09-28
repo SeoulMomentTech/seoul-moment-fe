@@ -36,7 +36,7 @@ export const getProductCategory = ({
     })
     .json<CommonRes<GetProductCategoryRes>>();
 
-interface GetProductListReq extends PublicLanguageCode {
+export interface GetProductListReq extends PublicLanguageCode {
   page: number;
   count: number;
   search?: string;
@@ -58,7 +58,7 @@ export interface ProductItem {
   image: string;
 }
 
-interface GetProductListRes {
+export interface GetProductListRes {
   total: number;
   list: Array<ProductItem>;
 }

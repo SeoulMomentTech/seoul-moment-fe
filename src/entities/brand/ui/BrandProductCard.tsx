@@ -1,6 +1,7 @@
 import { HeartIcon, StarIcon } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/shared/lib/style";
+import { setComma } from "@/shared/lib/utils";
 import type { ProductItem } from "@/shared/services/product";
 import { Card } from "@/shared/ui/card";
 
@@ -13,12 +14,12 @@ export default function BrandProductCard(props: ProductItem) {
         <div className="flex gap-[10px] text-[13px] text-black/40">
           <div className="flex items-center gap-[4px]">
             <HeartIcon height={14} width={14} />
-            <span>{props.like}</span>
+            <span>{setComma(props.like)}</span>
           </div>
           <div className="flex items-center gap-[4px]">
             <StarIcon height={14} width={14} />
             <span>
-              {props.reviewAverage}({props.review})
+              {props.reviewAverage}({setComma(props.review)})
             </span>
           </div>
         </div>
@@ -40,7 +41,9 @@ export default function BrandProductCard(props: ProductItem) {
         </figure>
       }
       subTitle={
-        <span className="text-[14px] font-semibold">{props.price}</span>
+        <span className="text-[14px] font-semibold">
+          {setComma(props.price)}
+        </span>
       }
       title={
         <div className="flex flex-col gap-[8px]">

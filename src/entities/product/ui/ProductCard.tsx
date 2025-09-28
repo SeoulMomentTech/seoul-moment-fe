@@ -1,5 +1,7 @@
 import { HeartIcon, StarIcon } from "lucide-react";
 import { cn } from "@/shared/lib/style";
+import { setComma } from "@/shared/lib/utils";
+import type { ProductItem } from "@/shared/services/product";
 import { Card } from "@/shared/ui/card";
 
 interface ProductCardProps {
@@ -7,6 +9,7 @@ interface ProductCardProps {
   imageClassName?: string;
   contentWrapperClassName?: string;
   hideExtraInfo?: boolean;
+  data: ProductItem;
 }
 
 export default function ProductCard({
@@ -14,6 +17,7 @@ export default function ProductCard({
   imageClassName,
   contentWrapperClassName,
   hideExtraInfo,
+  data,
 }: ProductCardProps) {
   return (
     <Card
@@ -29,11 +33,13 @@ export default function ProductCard({
           <div className="flex gap-[10px] text-[13px] text-black/40">
             <div className="flex items-center gap-[4px]">
               <HeartIcon height={14} width={14} />
-              <span>21794</span>
+              <span>{setComma(data?.like ?? 0)}</span>
             </div>
             <div className="flex items-center gap-[4px]">
               <StarIcon height={14} width={14} />
-              <span>4.5(330)</span>
+              <span>
+                {data?.reviewAverage ?? 0}({setComma(data?.review ?? 0)})
+              </span>
             </div>
           </div>
         )
@@ -47,11 +53,17 @@ export default function ProductCard({
           )}
         />
       }
-      subTitle={<span className="text-[14px] font-semibold">189,000원</span>}
+      subTitle={
+        <span className="text-[14px] font-semibold">
+          {setComma(data?.price ?? 0)}
+        </span>
+      }
       title={
         <div className="flex flex-col gap-[8px]">
-          <span className="text-[12px] font-semibold">51퍼센트</span>
-          <p className="text-[14px]">TUNNEL LINING TROUSE</p>
+          <span className="text-[12px] font-semibold">
+            {data?.brandName ?? ""}
+          </span>
+          <p className="text-[14px]">{data?.productName ?? ""}</p>
         </div>
       }
     />

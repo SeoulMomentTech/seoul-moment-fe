@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ProductCard } from "@/entities/product";
 import { Link } from "@/i18n/navigation";
+import useLanguage from "@/shared/lib/hooks/useLanguage";
 import { cn } from "@/shared/lib/style";
 import {
   Accordion,
@@ -13,9 +14,16 @@ import {
 import { Button } from "@/shared/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/shared/ui/tabs";
 import { ProductCategoryFilter } from "@/widgets/product-category-filter";
+import { useInfiniteProducts } from "../model/useInfiniteProducts";
 
 export default function ProductList() {
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const languageCode = useLanguage();
+
+  const { data } = useInfiniteProducts({
+    count: 10,
+    languageCode,
+  });
 
   const handleChangeCategory = (categoryId: string) => {
     setSelectedCategory(categoryId);
@@ -210,10 +218,11 @@ export default function ProductList() {
               "max-sm:grid max-sm:grid-cols-2",
             )}
           >
-            {[0, 1, 2, 3, 4, 5, 6, 7].map((_, index) => (
-              <Link href="/product/1" key={`${index + 1}`}>
+            {data?.map((product, index) => (
+              <Link className="w-min" href="/product/1" key={`${index + 1}`}>
                 <ProductCard
                   className="max-sm:flex-1"
+                  data={product}
                   imageClassName=" w-[196px] h-[196px] max-sm:w-full max-sm:h-[150px]"
                 />
               </Link>
