@@ -39,7 +39,7 @@ interface LastNews {
   title: string;
 }
 
-interface NewsSection {
+export interface NewsSection {
   title: string;
   subTitle: string;
   content: string;

@@ -39,7 +39,7 @@ interface LastArticle {
   title: string;
 }
 
-interface ArticleSection {
+export interface ArticleSection {
   title: string;
   subTitle: string;
   content: string;

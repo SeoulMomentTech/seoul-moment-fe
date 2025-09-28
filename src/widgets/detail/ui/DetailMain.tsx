@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { cn } from "@/shared/lib/style";
+import { formatDateTime } from "@/shared/lib/utils";
 
 export interface DetailMainProps {
   imageUrl: string;
@@ -33,13 +34,14 @@ export function DetailMain({
   author,
   category,
   imageUrl,
+  avatarUrl,
 }: DetailMainProps) {
   return (
     <section className={cn(styleMap.desktop.section, styleMap.mobile.section)}>
       <Image
         alt=""
         className={cn(styleMap.desktop.image, styleMap.mobile.image)}
-        height={800}
+        height={1200}
         src={imageUrl}
         width={4000}
       />
@@ -59,10 +61,18 @@ export function DetailMain({
             "max-sm:flex-row-reverse max-sm:items-center max-sm:justify-end max-sm:gap-0",
           )}
         >
-          <span>{date}</span>
+          <span>{formatDateTime(date)}</span>
           <span className="mx-[10px] hidden h-[8px] w-[1px] max-sm:block max-sm:bg-black/40" />
           <div className="flex items-center gap-[10px] max-sm:gap-[4px]">
-            <div className="h-[40px] w-[40px] rounded-full bg-slate-300 max-sm:h-[24px] max-sm:w-[24px]" />
+            <figure className="h-[40px] w-[40px] overflow-hidden rounded-full bg-slate-300 max-sm:h-[24px] max-sm:w-[24px]">
+              <Image
+                alt=""
+                className="h-full w-full"
+                height={50}
+                src={avatarUrl}
+                width={50}
+              />
+            </figure>
             <span>{author}</span>
           </div>
         </div>
