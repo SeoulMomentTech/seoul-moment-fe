@@ -1,6 +1,7 @@
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
 @import "tailwindcss";
 @import "tailwindcss-animated";
+@import "tailwind-scrollbar-hide/v4";
 
 :root {
   --background: #ffffff;
