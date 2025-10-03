@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 import type { PropsWithChildren } from "react";
 import { routing } from "@/i18n/routing";
 import { ReactQueryProvider } from "@/shared/lib/providers";
@@ -47,15 +48,17 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <NextIntlClientProvider messages={messages}>
-          <ReactQueryProvider>
-            <Header />
-            <main className="mx-auto min-h-[calc(100vh-200px)] bg-white">
-              {children}
-            </main>
-            <Footer />
-          </ReactQueryProvider>
-        </NextIntlClientProvider>
+        <NuqsAdapter>
+          <NextIntlClientProvider messages={messages}>
+            <ReactQueryProvider>
+              <Header />
+              <main className="mx-auto min-h-[calc(100vh-200px)] bg-white">
+                {children}
+              </main>
+              <Footer />
+            </ReactQueryProvider>
+          </NextIntlClientProvider>
+        </NuqsAdapter>
       </body>
     </html>
   );
