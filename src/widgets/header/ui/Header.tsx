@@ -107,8 +107,8 @@ function Mobile() {
             className="flex w-full px-[20px] sm:max-w-screen"
             side="left"
           >
-            <SheetHeader className="ml-[34px] flex px-0">
-              <Image alt="" height={16} src="/logo.png" width={133} />
+            <SheetHeader className="ml-[34px] flex min-h-[55px] justify-center px-0 py-0">
+              <Image alt="" height={24} src="/logo.png" width={133} />
               <SheetTitle className="sr-only" />
               <SheetDescription className="sr-only" />
             </SheetHeader>
