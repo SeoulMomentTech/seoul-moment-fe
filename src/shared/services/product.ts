@@ -100,6 +100,7 @@ interface GetProductDetailRes {
   reviewAverage: number;
   detailImg: string;
   subImage: string[];
+  relate: ProductItem[];
 }
 
 export const getProductDetail = ({ id, languageCode }: GetProductDetailReq) =>

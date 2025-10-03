@@ -152,7 +152,7 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
             </div>
           </div>
         </div>
-        <BrandProductList />
+        <BrandProductList data={data.relate} />
         <ProductDetailImage imageSrc={data.detailImg} showMore={showMore}>
           <div
             className={cn(
@@ -168,6 +168,7 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
               className={cn(
                 "border-black/20 bg-transparent",
                 "text-body-2 max-sm:mx-[20px] max-sm:w-full",
+                showMore && "hidden",
               )}
               onClick={() => handleToggleShowMore(!showMore)}
               size="lg"

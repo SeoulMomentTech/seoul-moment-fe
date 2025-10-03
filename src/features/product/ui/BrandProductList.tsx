@@ -1,26 +1,17 @@
 import { ProductCard } from "@/entities/product";
 import { Link } from "@/i18n/navigation";
-import useLanguage from "@/shared/lib/hooks/useLanguage";
 import { cn } from "@/shared/lib/style";
-import useProducts from "../model/useProducts";
+import type { ProductItem } from "@/shared/services/product";
 
-export default function BrandProductList() {
-  const languageCode = useLanguage();
-  const { data } = useProducts({
-    options: {
-      queryKey: ["productDetail", "brand-products"],
-    },
-    params: {
-      count: 5,
-      page: 1,
-      languageCode,
-    },
-  });
+interface BrandProductListProps {
+  data: ProductItem[];
+}
 
+export default function BrandProductList({ data }: BrandProductListProps) {
   return (
     <div
       className={cn(
-        "px-[20px] pt-[50px] pb-[76px] max-sm:pt-[40px] max-sm:pb-[40px]",
+        "pt-[50px] pb-[76px] max-sm:px-[20px] max-sm:pt-[40px] max-sm:pb-[40px]",
       )}
     >
       <h3
@@ -37,9 +28,9 @@ export default function BrandProductList() {
           "max-sm:gap-[16px] max-sm:overflow-auto",
         )}
       >
-        {data?.list?.map((product, idx) => (
+        {data?.map((product, idx) => (
           <Link
-            className="max-w-[232px] flex-1 max-sm:max-w-[150px]"
+            className="flex-1 max-sm:max-w-[150px]"
             href={`/product/${idx + 1}`}
             key={`product-${idx + 1}`}
           >
