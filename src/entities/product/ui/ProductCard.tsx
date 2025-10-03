@@ -1,4 +1,5 @@
 import { HeartIcon, StarIcon } from "lucide-react";
+import Image from "next/image";
 import { cn } from "@/shared/lib/style";
 import { setComma } from "@/shared/lib/utils";
 import type { ProductItem } from "@/shared/services/product";
@@ -45,13 +46,21 @@ export default function ProductCard({
         )
       }
       image={
-        <div
+        <figure
           className={cn(
-            "h-[305px] w-[305px] bg-slate-300",
+            "h-[305px] w-[305px]",
             "max-sm:h-[208px] max-sm:w-[208px]",
             imageClassName,
           )}
-        />
+        >
+          <Image
+            alt=""
+            className="h-full w-full object-cover"
+            height={305}
+            src={data.image}
+            width={305}
+          />
+        </figure>
       }
       subTitle={
         <span className="text-[14px] font-semibold">
