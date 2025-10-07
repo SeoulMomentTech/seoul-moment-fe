@@ -30,7 +30,7 @@ export default function LanguageSupport() {
           className={cn(
             "flex min-w-[66px] items-center justify-between px-[10px] text-start",
             "rounded-[8px] text-[14px]",
-            "max-md:min-w-[120px]",
+            "cursor-pointer max-md:min-w-[120px]",
           )}
           type="button"
         >

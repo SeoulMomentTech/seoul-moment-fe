@@ -1,3 +1,5 @@
+"use client";
+
 import { Slot } from "@radix-ui/react-slot"; // shadcn의 Slot
 import { Loader2 } from "lucide-react";
 import * as React from "react";
@@ -38,7 +40,7 @@ export function Button({
   return (
     <Comp
       className={cn(
-        "inline-flex items-center justify-center rounded-md font-medium transition-colors focus:ring-2 focus:ring-transparent focus:ring-offset-0 focus:outline-none disabled:bg-black/10",
+        "inline-flex items-center justify-center rounded-md font-medium transition-colors focus:ring-2 focus:ring-offset-0 focus:outline-none disabled:bg-black/10",
         "cursor-pointer disabled:cursor-not-allowed disabled:text-black/40",
         VARIANT_CLASSES[variant],
         SIZE_CLASSES[size],
