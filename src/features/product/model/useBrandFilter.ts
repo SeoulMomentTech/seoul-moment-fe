@@ -1,5 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import useLanguage from "@/shared/lib/hooks/useLanguage";
+import type { BrandFilter } from "@/shared/services/brand";
 import { getBrandFilter } from "@/shared/services/brand";
 
 const filterName = {
@@ -10,6 +11,10 @@ const filterName = {
   Q_TO_T: "Q ~ T",
   U_TO_Z: "U ~ Z",
 };
+
+export interface BrandFilterType extends BrandFilter {
+  name: string;
+}
 
 const useBrandFilter = (categoryId?: number) => {
   const languageCode = useLanguage();

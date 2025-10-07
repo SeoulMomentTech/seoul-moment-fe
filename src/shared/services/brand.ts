@@ -3,7 +3,7 @@ import { api } from ".";
 
 type Filter = "A_TO_D" | "E_TO_H" | "I_TO_L" | "M_TO_P" | "Q_TO_T" | "U_TO_Z";
 
-interface BrandFilter {
+export interface BrandFilter {
   filter: Filter;
   brandNameList: Array<{ id: number; name: string }>;
 }

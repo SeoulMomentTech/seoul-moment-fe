@@ -5,13 +5,19 @@ import {
   type GetProductListReq,
 } from "@/shared/services/product";
 
-type UseInfiniteProductsParams = Omit<GetProductListReq, "page">;
+type UseInfiniteProductsParams = Omit<GetProductListReq, "page" | "count">;
+
+const LIMIT = 10;
 
 export const useInfiniteProducts = (params: UseInfiniteProductsParams) => {
   return useInfiniteQuery({
     queryKey: ["products", "infinite", params],
     queryFn: ({ pageParam = 1 }) => {
-      return getProductList({ ...params, page: pageParam as number });
+      return getProductList({
+        ...params,
+        page: pageParam as number,
+        count: LIMIT,
+      });
     },
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
