@@ -1,10 +1,16 @@
 "use client";
 
-import { MenuIcon, ShoppingCartIcon, ChevronRightIcon } from "lucide-react";
+import {
+  MenuIcon,
+  ShoppingCartIcon,
+  ChevronRightIcon,
+  SearchIcon,
+} from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/shared/lib/style";
+import { Button } from "@/shared/ui/button";
 import Divider from "@/shared/ui/divider";
 import {
   Sheet,
@@ -15,6 +21,7 @@ import {
   SheetTrigger,
 } from "@/shared/ui/sheet";
 import { LanguageSupport } from "@/widgets/language-support";
+import { Search } from "@/widgets/search";
 
 const styleMap = {
   deskTop: {
@@ -61,7 +68,21 @@ function Desktop() {
           </li>*/}
         </ul>
       </div>
-      <div>
+      <div className="flex items-center-safe gap-[40px]">
+        <div>
+          <Search>
+            <Button
+              className="h-[32px] min-w-[100px] justify-start px-[10px]"
+              variant="outline"
+            >
+              <SearchIcon className="mr-[10px]" height={16} width={16} />
+              <div className="mr-[4px] flex aspect-square w-[20px] items-center justify-center rounded-[5px] bg-black/20">
+                <span className="text-foreground text-body-5">/</span>
+              </div>
+              <span className="text-body-3">를 눌러 검색하세요</span>
+            </Button>
+          </Search>
+        </div>
         <ul className="flex items-center gap-[40px]">
           <li>
             <Link className={styleMap.deskTop.menu} href="/about">
@@ -171,7 +192,14 @@ function Mobile() {
           <Image alt="" height={16} src="/logo.png" width={133} />
         </Link>
       </div>
-      <ShoppingCartIcon />
+      <div className="flex gap-[24px]">
+        <Search>
+          <Button className="h-auto w-auto p-0" variant="ghost">
+            <SearchIcon height={24} width={24} />
+          </Button>
+        </Search>
+        <ShoppingCartIcon height={24} width={24} />
+      </div>
     </div>
   );
 }

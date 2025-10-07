@@ -90,7 +90,7 @@ export default function DeskTop({ filter, handleUpdateFilter }: DesktopProps) {
                       <Button
                         className={cn(
                           "justify-start px-0 py-[10px] text-start text-black/40",
-                          "hover:bg-transparent hover:text-black",
+                          "h-[34px] hover:bg-transparent hover:text-black focus:ring-0",
                           filter.brandId === brand.id && "text-black",
                         )}
                         key={brand.id}
