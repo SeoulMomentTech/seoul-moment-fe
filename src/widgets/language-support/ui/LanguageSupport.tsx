@@ -39,7 +39,7 @@ export default function LanguageSupport() {
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className="min-w-[66px] bg-white text-[14px] max-md:min-w-[120px]"
+        className="min-w-[66px] bg-white text-[14px] focus:ring-transparent! max-md:min-w-[120px]"
         side="top"
       >
         <DropdownMenuGroup>
