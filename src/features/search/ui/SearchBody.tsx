@@ -1,11 +1,11 @@
 "use client";
 
 import { ChevronLeft, SearchIcon } from "lucide-react";
-import { useState } from "react";
 import { cn } from "@/shared/lib/style";
 import { Button } from "@/shared/ui/button";
 import XSolidIcon from "@/shared/ui/icon/x-solid-icon";
 import { Input } from "@/shared/ui/input";
+import useSearch from "../model/useSearch";
 
 interface SearchBodyProps {
   value: string;
@@ -106,22 +106,18 @@ function Mobile({ value, handleOnChange, handleClose }: SearchBodyProps) {
 }
 
 function SearchBody({ handleClose }: Pick<SearchBodyProps, "handleClose">) {
-  const [value, setValue] = useState("");
-
-  const handleOnChange = (value: string) => {
-    setValue(value);
-  };
+  const { value, handleChange } = useSearch();
 
   return (
     <>
       <Desktop
         handleClose={handleClose}
-        handleOnChange={handleOnChange}
+        handleOnChange={handleChange}
         value={value}
       />
       <Mobile
         handleClose={handleClose}
-        handleOnChange={handleOnChange}
+        handleOnChange={handleChange}
         value={value}
       />
     </>

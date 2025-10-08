@@ -10,3 +10,8 @@ declare module "react" {
 export interface PageParams<T> {
   params: Promise<T>;
 }
+
+export interface ModalStatus {
+  open: boolean;
+  type: string;
+}

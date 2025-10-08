@@ -12,6 +12,9 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-orange: #f37b2a;
+  --color-gray: #707070;
+  --color-error: #ff383c;
+  --color-sent: #0088ff;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
