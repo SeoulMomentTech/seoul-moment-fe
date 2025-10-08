@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
+import { Search } from "@/features/search";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/shared/lib/style";
 import { Button } from "@/shared/ui/button";
@@ -21,7 +22,6 @@ import {
   SheetTrigger,
 } from "@/shared/ui/sheet";
 import { LanguageSupport } from "@/widgets/language-support";
-import { Search } from "@/widgets/search";
 
 const styleMap = {
   deskTop: {
