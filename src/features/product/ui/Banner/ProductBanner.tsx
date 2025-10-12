@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { Navigation, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
-import useProductBanner from "../model/useProductBanner";
+import useProductBanner from "../../model/useProductBanner";
 
 import "swiper/css";
 import "swiper/css/pagination";

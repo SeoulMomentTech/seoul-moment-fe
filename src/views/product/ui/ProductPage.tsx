@@ -1,4 +1,4 @@
-import { ProductBanner, ProductList } from "@/features/product";
+import { Banner, ProductList } from "@/features/product";
 import { cn } from "@/shared/lib/style";
 
 export default function ProductPage() {
@@ -10,7 +10,7 @@ export default function ProductPage() {
           "max-sm:w-full max-sm:pt-[76px]",
         )}
       >
-        <ProductBanner />
+        <Banner />
         <ProductList />
       </section>
     </div>
