@@ -2,15 +2,15 @@
 
 import { AccordionContent } from "@radix-ui/react-accordion";
 import { type PropsWithChildren } from "react";
-import { cn } from "@/shared/lib/style";
+import { cn } from "@shared/lib/style";
 import {
   Accordion,
   AccordionItem,
   AccordionTrigger,
-} from "@/shared/ui/accordion";
-import { Button } from "@/shared/ui/button";
+} from "@shared/ui/accordion";
+import { Button } from "@shared/ui/button";
 
-import { FilterSheet } from "@/widgets/filter-sheet";
+import { FilterSheet } from "@widgets/filter-sheet";
 import useBrandFilter from "../model/useBrandFilter";
 import useCategories from "../model/useCategories";
 

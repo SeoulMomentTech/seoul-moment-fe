@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 import { Link } from "@/i18n/navigation";
-import { cn } from "@/shared/lib/style";
+import { cn } from "@shared/lib/style";
 
 export default function ContactLayout({ children }: PropsWithChildren) {
   return (

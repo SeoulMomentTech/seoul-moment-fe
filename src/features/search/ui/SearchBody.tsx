@@ -1,10 +1,10 @@
 "use client";
 
 import { ChevronLeft, SearchIcon } from "lucide-react";
-import { cn } from "@/shared/lib/style";
-import { Button } from "@/shared/ui/button";
-import XSolidIcon from "@/shared/ui/icon/x-solid-icon";
-import { Input } from "@/shared/ui/input";
+import { cn } from "@shared/lib/style";
+import { Button } from "@shared/ui/button";
+import XSolidIcon from "@shared/ui/icon/x-solid-icon";
+import { Input } from "@shared/ui/input";
 import useSearch from "../model/useSearch";
 
 interface SearchBodyProps {

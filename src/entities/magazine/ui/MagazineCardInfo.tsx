@@ -1,6 +1,6 @@
 import { EyeIcon, HeartIcon } from "lucide-react";
-import { cn } from "@/shared/lib/style";
-import Divider from "@/shared/ui/divider";
+import { cn } from "@shared/lib/style";
+import Divider from "@shared/ui/divider";
 
 // 추후 데이터 연동시 props 확장 필요
 interface MagazineCardInfoProps {

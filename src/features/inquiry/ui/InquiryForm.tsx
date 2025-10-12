@@ -4,22 +4,22 @@ import Image from "next/image";
 import { useState } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
+import type { ModalStatus } from "@/types";
 import {
   postEmail,
   postEmailCode,
   verifyEmailCode,
-} from "@/shared/services/inquiry";
-import { Button } from "@/shared/ui/button";
-import { Input } from "@/shared/ui/input";
+} from "@shared/services/inquiry";
+import { Button } from "@shared/ui/button";
+import { Input } from "@shared/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-} from "@/shared/ui/select";
-import { Textarea } from "@/shared/ui/textarea";
-import type { ModalStatus } from "@/types";
-import { AlertModal } from "@/widgets/alert-modal";
+} from "@shared/ui/select";
+import { Textarea } from "@shared/ui/textarea";
+import { AlertModal } from "@widgets/alert-modal";
 import { inquiryFormRezolver, type InquiryFormValues } from "../model/schema";
 
 export default function InquiryForm() {

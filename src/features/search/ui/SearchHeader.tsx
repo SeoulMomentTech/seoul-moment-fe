@@ -1,9 +1,9 @@
 import { SearchIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { cn } from "@/shared/lib/style";
-import { Button } from "@/shared/ui/button";
-import { LanguageSupport } from "@/widgets/language-support";
+import { cn } from "@shared/lib/style";
+import { Button } from "@shared/ui/button";
+import { LanguageSupport } from "@widgets/language-support";
 
 interface SearchHeaderProps {
   handleClose(): void;

@@ -1,6 +1,6 @@
-import { cn } from "@/shared/lib/style";
-import { Card } from "@/shared/ui/card";
-import { AuthorWithDate } from "@/widgets/author-with-date";
+import { cn } from "@shared/lib/style";
+import { Card } from "@shared/ui/card";
+import { AuthorWithDate } from "@widgets/author-with-date";
 
 interface FeaturedMainNewsCardProps {
   author: string;

@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import type { PageParams } from "@/types";
-import { NewsDetailPage } from "@/views/news";
+import { NewsDetailPage } from "@views/news";
 
 export default async function NewsDetail({
   params,

@@ -1,11 +1,11 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { BrandProductCard } from "@/entities/brand";
 import { Link } from "@/i18n/navigation";
-import useLanguage from "@/shared/lib/hooks/useLanguage";
-import { getProductList } from "@/shared/services/product";
-import { SectionWithLabel } from "@/widgets/section-with-label";
+import { BrandProductCard } from "@entities/brand";
+import useLanguage from "@shared/lib/hooks/useLanguage";
+import { getProductList } from "@shared/services/product";
+import { SectionWithLabel } from "@widgets/section-with-label";
 
 interface BrandProductsProps {
   id: number;

@@ -1,7 +1,7 @@
-import { ProductCard } from "@/entities/product";
 import { Link } from "@/i18n/navigation";
-import { cn } from "@/shared/lib/style";
-import type { ProductItem } from "@/shared/services/product";
+import { ProductCard } from "@entities/product";
+import { cn } from "@shared/lib/style";
+import type { ProductItem } from "@shared/services/product";
 
 interface BrandProductListProps {
   data: ProductItem[];

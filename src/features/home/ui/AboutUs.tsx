@@ -1,4 +1,4 @@
-import { SectionWithLabel } from "@/widgets/section-with-label";
+import { SectionWithLabel } from "@widgets/section-with-label";
 
 export function AboutUs() {
   return (

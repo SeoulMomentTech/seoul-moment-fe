@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { getArticleList } from "@/shared/services/article";
-import useLanguage from "./useLanguage";
+import useLanguage from "@shared/lib/hooks/useLanguage";
+import { getArticleList } from "@shared/services/article";
 
 interface UseArticleProps {
   count: number;

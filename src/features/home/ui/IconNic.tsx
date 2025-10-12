@@ -1,5 +1,5 @@
 import { Link } from "@/i18n/navigation";
-import { SectionWithLabel } from "@/widgets/section-with-label";
+import { SectionWithLabel } from "@widgets/section-with-label";
 
 export function IconNic() {
   return (

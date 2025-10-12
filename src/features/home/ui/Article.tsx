@@ -1,9 +1,9 @@
 "use client";
 
-import { cn } from "@/shared/lib/style";
-import { ArticleList } from "@/widgets/article-list";
-import { ArticleSlide } from "@/widgets/article-slide";
-import { SectionWithLabel } from "@/widgets/section-with-label";
+import { cn } from "@shared/lib/style";
+import { ArticleList } from "@widgets/article-list";
+import { ArticleSlide } from "@widgets/article-slide";
+import { SectionWithLabel } from "@widgets/section-with-label";
 
 export function Article() {
   return (

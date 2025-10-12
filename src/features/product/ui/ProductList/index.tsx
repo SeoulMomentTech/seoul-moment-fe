@@ -1,6 +1,6 @@
 "use client";
 
-import useFilter from "@/shared/lib/hooks/useFilter";
+import useFilter from "@shared/lib/hooks/useFilter";
 import DeskTop from "./Desktop";
 import Mobile from "./Mobile";
 

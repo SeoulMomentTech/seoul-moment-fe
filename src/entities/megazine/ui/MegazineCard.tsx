@@ -1,4 +1,4 @@
-import { Card } from "@/shared/ui/card";
+import { Card } from "@shared/ui/card";
 
 interface MegazineCardProps {
   title: string;

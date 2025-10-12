@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import type { PageParams } from "@/types";
-import { ProductDetailPage } from "@/views/product";
+import { ProductDetailPage } from "@views/product";
 
 export default async function ProductDetail({
   params,

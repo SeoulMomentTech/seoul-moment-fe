@@ -1,9 +1,9 @@
 import Image from "next/image";
-import { useBrandDetail } from "@/entities/brand/model/hooks";
 import { Link } from "@/i18n/navigation";
-import useLanguage from "@/shared/lib/hooks/useLanguage";
-import { cn } from "@/shared/lib/style";
-import { Button } from "@/shared/ui/button";
+import { useBrandDetail } from "@entities/brand/model/hooks";
+import useLanguage from "@shared/lib/hooks/useLanguage";
+import { cn } from "@shared/lib/style";
+import { Button } from "@shared/ui/button";
 
 interface ProductBrandBannerProps {
   id: number;

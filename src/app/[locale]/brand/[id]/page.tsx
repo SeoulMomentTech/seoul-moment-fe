@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { cn } from "@/shared/lib/style";
-import { BrandProducts } from "@/widgets/brand-products";
+import { cn } from "@shared/lib/style";
+import { BrandProducts } from "@widgets/brand-products";
 
 export default function BrandDetail() {
   return (

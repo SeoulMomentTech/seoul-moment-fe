@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { cn } from "@/shared/lib/style";
+import { cn } from "@shared/lib/style";
 import useHome from "../model/useHome";
 
 export function MainBanner() {

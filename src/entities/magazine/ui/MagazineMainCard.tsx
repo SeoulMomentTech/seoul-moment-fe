@@ -1,4 +1,4 @@
-import { cn } from "@/shared/lib/style";
+import { cn } from "@shared/lib/style";
 import { MagazineCardInfo } from "./MagazineCardInfo";
 
 interface MagazineMainCardProps {

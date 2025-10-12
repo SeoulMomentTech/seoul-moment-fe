@@ -3,7 +3,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import {
   getProductList,
   type GetProductListReq,
-} from "@/shared/services/product";
+} from "@shared/services/product";
 
 type UseInfiniteProductsParams = Omit<GetProductListReq, "page" | "count">;
 

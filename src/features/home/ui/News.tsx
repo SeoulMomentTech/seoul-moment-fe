@@ -1,12 +1,12 @@
 "use client";
 
-import { FeaturedMainNewsCard, FeaturedSubNewsCard } from "@/entities/news/ui";
 import { Link } from "@/i18n/navigation";
 
-import useNews from "@/shared/lib/hooks/useNews";
 import { cn } from "@/shared/lib/style";
 
 import { SectionWithLabel } from "@/widgets/section-with-label";
+import { useNews } from "@entities/news/model/hooks";
+import { FeaturedMainNewsCard, FeaturedSubNewsCard } from "@entities/news/ui";
 
 export function News() {
   const { data } = useNews({ count: 3 });

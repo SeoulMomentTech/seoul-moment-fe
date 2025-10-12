@@ -1,9 +1,9 @@
 import { HeartIcon, StarIcon } from "lucide-react";
 import Image from "next/image";
-import { cn } from "@/shared/lib/style";
-import { setComma } from "@/shared/lib/utils";
-import type { ProductItem } from "@/shared/services/product";
-import { Card } from "@/shared/ui/card";
+import { cn } from "@shared/lib/style";
+import { setComma } from "@shared/lib/utils";
+import type { ProductItem } from "@shared/services/product";
+import { Card } from "@shared/ui/card";
 
 interface ProductCardProps {
   className?: string;

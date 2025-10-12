@@ -1,7 +1,7 @@
 import Image from "next/image";
-import { cn } from "@/shared/lib/style";
-import { Card } from "@/shared/ui/card";
-import { AuthorWithDate } from "@/widgets/author-with-date";
+import { cn } from "@shared/lib/style";
+import { Card } from "@shared/ui/card";
+import { AuthorWithDate } from "@widgets/author-with-date";
 
 interface ArticleCardProps {
   className?: string;

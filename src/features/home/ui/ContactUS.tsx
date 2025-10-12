@@ -1,6 +1,6 @@
 import { Link } from "@/i18n/navigation";
-import { cn } from "@/shared/lib/style";
-import { Button } from "@/shared/ui/button";
+import { cn } from "@shared/lib/style";
+import { Button } from "@shared/ui/button";
 
 export function ContactUS() {
   return (

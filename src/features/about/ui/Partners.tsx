@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { PartnerCard } from "@/entities/partner";
-import { cn } from "@/shared/lib/style";
-import { Tabs, TabsList, TabsTrigger } from "@/shared/ui/tabs";
+import { PartnerCard } from "@entities/partner";
+import { cn } from "@shared/lib/style";
+import { Tabs, TabsList, TabsTrigger } from "@shared/ui/tabs";
 import usePartnerCategories from "../model/usePartnerCategories";
 import usePartners from "../model/usePartners";
 

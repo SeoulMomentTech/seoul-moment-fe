@@ -1,11 +1,11 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { NewsDetailContent, NewsDetailMain } from "@/features/news";
-import useLanguage from "@/shared/lib/hooks/useLanguage";
-import { getNewsDetail } from "@/shared/services/news";
-import { BrandProducts } from "@/widgets/brand-products";
-import { RelatedList } from "@/widgets/detail";
+import { NewsDetailContent, NewsDetailMain } from "@features/news";
+import useLanguage from "@shared/lib/hooks/useLanguage";
+import { getNewsDetail } from "@shared/services/news";
+import { BrandProducts } from "@widgets/brand-products";
+import { RelatedList } from "@widgets/detail";
 
 interface NewsDetailPageProps {
   id: number;

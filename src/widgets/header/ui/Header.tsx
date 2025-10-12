@@ -3,11 +3,11 @@
 import { MenuIcon, ChevronRightIcon, SearchIcon } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
-import { Search } from "@/features/search";
 import { Link } from "@/i18n/navigation";
-import { cn } from "@/shared/lib/style";
-import { Button } from "@/shared/ui/button";
-import Divider from "@/shared/ui/divider";
+import { Search } from "@features/search";
+import { cn } from "@shared/lib/style";
+import { Button } from "@shared/ui/button";
+import Divider from "@shared/ui/divider";
 import {
   Sheet,
   SheetContent,
@@ -15,8 +15,8 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/shared/ui/sheet";
-import { LanguageSupport } from "@/widgets/language-support";
+} from "@shared/ui/sheet";
+import { LanguageSupport } from "@widgets/language-support";
 
 const styleMap = {
   deskTop: {

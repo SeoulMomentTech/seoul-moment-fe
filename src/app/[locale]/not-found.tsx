@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Button } from "@/shared/ui/button";
+import { Button } from "@shared/ui/button";
 
 export default function NotFound() {
   return (

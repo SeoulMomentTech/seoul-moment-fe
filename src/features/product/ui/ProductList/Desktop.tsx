@@ -1,11 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ProductCard } from "@/entities/product";
 import { Link } from "@/i18n/navigation";
-import useLanguage from "@/shared/lib/hooks/useLanguage";
-import { cn } from "@/shared/lib/style";
-import type { GetProductListReq } from "@/shared/services/product";
 import {
   Accordion,
   AccordionContent,
@@ -15,6 +11,10 @@ import {
 import { Button } from "@/shared/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/shared/ui/tabs";
 import { ProductCategoryFilter } from "@/widgets/product-category-filter";
+import { ProductCard } from "@entities/product";
+import useLanguage from "@shared/lib/hooks/useLanguage";
+import { cn } from "@shared/lib/style";
+import type { GetProductListReq } from "@shared/services/product";
 import useBrandFilter from "../../model/useBrandFilter";
 import useCategories from "../../model/useCategories";
 import { useInfiniteProducts } from "../../model/useInfiniteProducts";

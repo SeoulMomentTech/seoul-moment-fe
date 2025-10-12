@@ -1,15 +1,15 @@
 "use client";
 
-import { ProductCard } from "@/entities/product";
 import { Link } from "@/i18n/navigation";
-import useFilter from "@/shared/lib/hooks/useFilter";
-import useLanguage from "@/shared/lib/hooks/useLanguage";
-import useOpen from "@/shared/lib/hooks/useOpen";
-import { cn } from "@/shared/lib/style";
-import type { GetProductListReq } from "@/shared/services/product";
+import { ProductCard } from "@entities/product";
+import useFilter from "@shared/lib/hooks/useFilter";
+import useLanguage from "@shared/lib/hooks/useLanguage";
+import useOpen from "@shared/lib/hooks/useOpen";
+import { cn } from "@shared/lib/style";
+import type { GetProductListReq } from "@shared/services/product";
 
-import { Button } from "@/shared/ui/button";
-import { FilterIcon } from "@/shared/ui/icon";
+import { Button } from "@shared/ui/button";
+import { FilterIcon } from "@shared/ui/icon";
 import { useInfiniteProducts } from "../../model/useInfiniteProducts";
 import ProductFilterSheet from "../ProductFilterSheet";
 

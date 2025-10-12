@@ -1,9 +1,10 @@
 "use client";
 
-import { ArticleCard } from "@/entities/article";
 import { Link } from "@/i18n/navigation";
-import useArticle from "@/shared/lib/hooks/useArticle";
-import { cn } from "@/shared/lib/style";
+import { ArticleCard } from "@entities/article";
+import { useArticle } from "@entities/article/model/hooks";
+
+import { cn } from "@shared/lib/style";
 
 interface ArticleListProps {
   className?: string;

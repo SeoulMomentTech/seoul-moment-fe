@@ -6,9 +6,9 @@ import { getMessages } from "next-intl/server";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import type { PropsWithChildren } from "react";
 import { routing } from "@/i18n/routing";
-import { ReactQueryProvider } from "@/shared/lib/providers";
-import { Footer } from "@/widgets/footer";
-import { Header } from "@/widgets/header";
+import { ReactQueryProvider } from "@shared/lib/providers";
+import { Footer } from "@widgets/footer";
+import { Header } from "@widgets/header";
 import "../globals.css";
 
 interface Props {
