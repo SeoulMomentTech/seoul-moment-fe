@@ -50,6 +50,7 @@ export default function DeskTop({ filter, handleUpdateFilter }: DesktopProps) {
           "max-sm:hidden",
         )}
         defaultValue="all"
+        value={filter.categoryId?.toString() ?? "all"}
       >
         <TabsList className="flex h-[50px] items-center gap-[30px] max-sm:h-[40px]">
           <TabsTrigger

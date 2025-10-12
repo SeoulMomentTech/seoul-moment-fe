@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type PropsWithChildren } from "react";
+import useEventListener from "@/shared/lib/hooks/useEventListener";
 import {
   Sheet,
   SheetContent,
@@ -12,12 +13,27 @@ import {
 import SearchBody from "./SearchBody";
 import SearchHeader from "./SearchHeader";
 
-function Search({ children }: PropsWithChildren) {
+interface SearchProps extends PropsWithChildren {
+  disableKeyPressOpen?: boolean;
+}
+
+function Search({ children, disableKeyPressOpen }: SearchProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleClose = () => {
     setIsOpen(false);
   };
+
+  useEventListener("keydown", (e) => {
+    if (disableKeyPressOpen) return;
+
+    const event = e as KeyboardEvent;
+    const key = event.key;
+
+    if (key === "/") {
+      setIsOpen(true);
+    }
+  });
 
   return (
     <Sheet onOpenChange={(open) => setIsOpen(open)} open={isOpen}>

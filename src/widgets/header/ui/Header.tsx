@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  MenuIcon,
-  ShoppingCartIcon,
-  ChevronRightIcon,
-  SearchIcon,
-} from "lucide-react";
+import { MenuIcon, ChevronRightIcon, SearchIcon } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { Search } from "@/features/search";
@@ -193,12 +188,11 @@ function Mobile() {
         </Link>
       </div>
       <div className="flex gap-[24px]">
-        <Search>
+        <Search disableKeyPressOpen>
           <Button className="h-auto w-auto p-0" variant="ghost">
             <SearchIcon height={24} width={24} />
           </Button>
         </Search>
-        <ShoppingCartIcon height={24} width={24} />
       </div>
     </div>
   );
