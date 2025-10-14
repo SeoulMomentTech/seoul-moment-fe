@@ -21,6 +21,7 @@ export function MainBanner() {
         alt=""
         className="h-full object-cover"
         height={727}
+        priority
         src="/about/seoul.webp"
         width={4000}
       />

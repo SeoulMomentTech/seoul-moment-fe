@@ -14,6 +14,7 @@ export function MainBanner() {
           alt=""
           className="h-full object-cover"
           height={727}
+          priority
           src={data.banner[0]}
           width={4000}
         />
