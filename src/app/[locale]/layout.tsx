@@ -5,10 +5,12 @@ import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import type { PropsWithChildren } from "react";
+import { Toaster } from "sonner";
 import { routing } from "@/i18n/routing";
 import { ReactQueryProvider } from "@shared/lib/providers";
 import { Footer } from "@widgets/footer";
 import { Header } from "@widgets/header";
+
 import "../globals.css";
 
 interface Props {
@@ -54,6 +56,7 @@ export default async function RootLayout({
               <Header />
               <main className="mx-auto min-h-[calc(100vh-200px)] bg-white">
                 {children}
+                <Toaster />
               </main>
               <Footer />
             </ReactQueryProvider>

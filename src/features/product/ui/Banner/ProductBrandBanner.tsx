@@ -1,5 +1,7 @@
+import { Share2Icon } from "lucide-react";
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
+import useModal from "@/shared/lib/hooks/useModal";
 import { useBrandDetail } from "@entities/brand/model/hooks";
 import useLanguage from "@shared/lib/hooks/useLanguage";
 import { cn } from "@shared/lib/style";
@@ -10,6 +12,7 @@ interface ProductBrandBannerProps {
 }
 
 export default function ProductBrandBanner({ id }: ProductBrandBannerProps) {
+  const { openModal } = useModal();
   const languageCode = useLanguage();
   const { data } = useBrandDetail({
     params: {
@@ -44,10 +47,20 @@ export default function ProductBrandBanner({ id }: ProductBrandBannerProps) {
           width={600}
         />
       </div>
-      <div className="flex flex-col gap-[20px]">
-        <h2 className={cn("text-title-2 font-bold", "max-sm:text-title-3")}>
-          {data?.name}
-        </h2>
+      <div className="flex flex-1 flex-col gap-[20px]">
+        <div className="flex items-center justify-between">
+          <h2 className={cn("text-title-2 font-bold", "max-sm:text-title-3")}>
+            {data?.name}
+          </h2>
+          <Button
+            className="h-auto w-auto rounded-full p-3"
+            onClick={() => openModal("share")}
+            type="button"
+            variant="ghost"
+          >
+            <Share2Icon height={20} width={20} />
+          </Button>
+        </div>
         <div className={cn("flex flex-col gap-[40px]", "max-sm:gap-[20px]")}>
           <p className="text-body-3">{data?.description}</p>
           <Button

@@ -4,6 +4,8 @@ import { MenuIcon, ChevronRightIcon, SearchIcon } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { Link } from "@/i18n/navigation";
+import useModal from "@/shared/lib/hooks/useModal";
+import { ShareModal } from "@/widgets/share-modal";
 import { Search } from "@features/search";
 import { cn } from "@shared/lib/style";
 import { Button } from "@shared/ui/button";
@@ -199,17 +201,22 @@ function Mobile() {
 }
 
 export function Header() {
+  const { isOpen, updateModal } = useModal();
+
   return (
-    <header
-      className={cn(
-        "h-[56px] w-full bg-white px-[20px]",
-        "border-b border-b-black/5",
-        "fixed top-0 left-0 z-10",
-        "flex items-center",
-      )}
-    >
-      <Desktop />
-      <Mobile />
-    </header>
+    <>
+      <header
+        className={cn(
+          "h-[56px] w-full bg-white px-[20px]",
+          "border-b border-b-black/5",
+          "fixed top-0 left-0 z-10",
+          "flex items-center",
+        )}
+      >
+        <Desktop />
+        <Mobile />
+      </header>
+      {isOpen && <ShareModal onOpenChange={updateModal} open={true} />}
+    </>
   );
 }
