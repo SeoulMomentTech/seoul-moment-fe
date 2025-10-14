@@ -1,5 +1,5 @@
 import type { UseQueryOptions } from "@tanstack/react-query";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import type { CommonRes } from "@shared/services";
 import type {
   BrandDetailInfo,
@@ -12,7 +12,7 @@ interface UseBrandDetailProps<T> {
   params: GetBrandDetailReq;
 }
 
-const useBrandDetail = ({
+export const useBrandDetail = ({
   options,
   params,
 }: UseBrandDetailProps<CommonRes<BrandDetailInfo>>) => {
@@ -23,4 +23,13 @@ const useBrandDetail = ({
   });
 };
 
-export default useBrandDetail;
+export const useSuspenseBrandDetail = ({
+  options,
+  params,
+}: UseBrandDetailProps<CommonRes<BrandDetailInfo>>) => {
+  return useSuspenseQuery({
+    ...options,
+    queryFn: () => getBrandDetail(params),
+    select: (res) => res.data,
+  });
+};

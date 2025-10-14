@@ -20,7 +20,7 @@ export default function ProductBrandBanner({ id }: ProductBrandBannerProps) {
       languageCode,
     },
     options: {
-      queryKey: ["brandDetail", id, languageCode],
+      queryKey: ["productBrandBanner", id, languageCode],
     },
   });
 

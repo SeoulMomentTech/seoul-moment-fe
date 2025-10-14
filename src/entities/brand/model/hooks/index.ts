@@ -1,1 +1,1 @@
-export { default as useBrandDetail } from "./useBrandDetail";
+export * from "./useBrandDetail";

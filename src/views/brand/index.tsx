@@ -1,1 +1,1 @@
-export { default as BrandDetailPage } from "./ui/BrandDetailPage.jsx";
+export { default as BrandDetailPage } from "./ui/BrandDetailPage";
