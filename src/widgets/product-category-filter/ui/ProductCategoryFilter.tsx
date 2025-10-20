@@ -30,20 +30,25 @@ export function ProductCategoryFilter({
   categories = defaultCategories,
 }: ProductCategoryFilterProps) {
   return (
-    <div className={cn("flex items-center gap-2 max-sm:w-max", className)}>
+    <div className={cn("flex items-center gap-[10px] max-sm:w-max", className)}>
       {categories.map((category) => (
         <button
           className={cn(
-            "cursor-pointer rounded-full border px-3 py-2 text-sm font-medium transition-all duration-200",
-            selectedCategory === category.id
-              ? "bg-black text-white" // Active state (전체)
-              : "border-gray-300 bg-white text-gray-700 hover:bg-black/20 hover:text-gray-900", // Default and hover states
+            "flex flex-col gap-[8px]",
+            "cursor-pointer rounded-full px-[8px] py-2 text-sm font-medium",
+            category.id === selectedCategory && "font-semibold",
           )}
           key={category.id}
           onClick={() => onCategoryChange(category.id)}
           type="button"
         >
-          {category.label}
+          <div
+            className={cn(
+              "h-[50px] w-[50px] rounded-full bg-slate-300",
+              category.id === selectedCategory && "border",
+            )}
+          />
+          <span>{category.label}</span>
         </button>
       ))}
     </div>

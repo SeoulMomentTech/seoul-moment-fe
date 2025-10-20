@@ -2,22 +2,24 @@
 
 import { useState } from "react";
 import { Link } from "@/i18n/navigation";
+import { ProductCard } from "@entities/product";
+import useLanguage from "@shared/lib/hooks/useLanguage";
+import { cn } from "@shared/lib/style";
+import type { GetProductListReq } from "@shared/services/product";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/shared/ui/accordion";
-import { Button } from "@/shared/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "@/shared/ui/tabs";
-import { ProductCategoryFilter } from "@/widgets/product-category-filter";
-import { ProductCard } from "@entities/product";
-import useLanguage from "@shared/lib/hooks/useLanguage";
-import { cn } from "@shared/lib/style";
-import type { GetProductListReq } from "@shared/services/product";
+} from "@shared/ui/accordion";
+import { Button } from "@shared/ui/button";
+import { Tabs, TabsList, TabsTrigger } from "@shared/ui/tabs";
+import { FilterTabs } from "@widgets/filter-tabs";
+import { ProductCategoryFilter } from "@widgets/product-category-filter";
 import useBrandFilter from "../../model/useBrandFilter";
 import useCategories from "../../model/useCategories";
 import { useInfiniteProducts } from "../../model/useInfiniteProducts";
+import FilterBar from "../FilterBar";
 
 interface DesktopProps {
   filter: Omit<GetProductListReq, "languageCode" | "count" | "page">;
@@ -43,7 +45,7 @@ export default function DeskTop({ filter, handleUpdateFilter }: DesktopProps) {
   };
 
   return (
-    <div className={cn("flex flex-col gap-[40px] pb-[50px]", "max-sm:hidden")}>
+    <div className={cn("flex flex-col gap-[40px] pb-[100px]", "max-sm:hidden")}>
       <Tabs
         className={cn(
           "border-b border-black/10 max-sm:border-t max-sm:pl-[20px]",
@@ -109,7 +111,16 @@ export default function DeskTop({ filter, handleUpdateFilter }: DesktopProps) {
           </Accordion>
         </aside>
         <section className="flex flex-col gap-[20px]">
-          <div className="max-sm:hidden">
+          <div>
+            <div className="mb-[20px] flex items-center justify-between">
+              <FilterTabs
+                onChange={() => {}}
+                options={["브랜드 랭킹", "주목할 브랜드", "장바구니 BEST"]}
+                value="브랜드 랭킹"
+              />
+
+              <FilterBar />
+            </div>
             <ProductCategoryFilter
               onCategoryChange={handleChangeCategory}
               selectedCategory={selectedCategory}
