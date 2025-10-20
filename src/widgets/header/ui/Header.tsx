@@ -3,10 +3,9 @@
 import { MenuIcon, ChevronRightIcon, SearchIcon } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
-import { Link } from "@/i18n/navigation";
-import useModal from "@/shared/lib/hooks/useModal";
-import { ShareModal } from "@/widgets/share-modal";
+import { Link, usePathname } from "@/i18n/navigation";
 import { Search } from "@features/search";
+import useModal from "@shared/lib/hooks/useModal";
 import { cn } from "@shared/lib/style";
 import { Button } from "@shared/ui/button";
 import Divider from "@shared/ui/divider";
@@ -19,10 +18,11 @@ import {
   SheetTrigger,
 } from "@shared/ui/sheet";
 import { LanguageSupport } from "@widgets/language-support";
+import { ShareModal } from "@widgets/share-modal";
 
 const styleMap = {
   deskTop: {
-    menu: "text-[14px] pt-[20px] pb-[20px] transition-all hover:border-b hover:border-b-black hover:font-semibold",
+    menu: "text-[14px] pt-[20px] pb-[20px]",
   },
   mobile: {
     menu: "text-[14px] flex justify-between h-[42px] items-center",
@@ -30,6 +30,8 @@ const styleMap = {
 };
 
 function Desktop() {
+  const pathname = usePathname();
+
   return (
     <div
       className={cn(
@@ -49,7 +51,13 @@ function Desktop() {
         </Link>
         <ul className="flex gap-[40px]">
           <li>
-            <Link className={styleMap.deskTop.menu} href="/product">
+            <Link
+              className={cn(
+                styleMap.deskTop.menu,
+                pathname === "/product" && "font-semibold",
+              )}
+              href="/product"
+            >
               Product
             </Link>
           </li>
@@ -82,12 +90,24 @@ function Desktop() {
         </div>
         <ul className="flex items-center gap-[40px]">
           <li>
-            <Link className={styleMap.deskTop.menu} href="/about">
+            <Link
+              className={cn(
+                styleMap.deskTop.menu,
+                pathname === "/about" && "font-semibold",
+              )}
+              href="/about"
+            >
               About
             </Link>
           </li>
           <li>
-            <Link className={styleMap.deskTop.menu} href="/contact">
+            <Link
+              className={cn(
+                styleMap.deskTop.menu,
+                pathname === "/contact" && "font-semibold",
+              )}
+              href="/contact"
+            >
               Contact
             </Link>
           </li>
