@@ -1,8 +1,8 @@
 import { Share2Icon } from "lucide-react";
 import Image from "next/image";
+import { useBrandBanner } from "@/entities/brand/model/hooks/useBrandBanner";
 import { Link } from "@/i18n/navigation";
 import useModal from "@/shared/lib/hooks/useModal";
-import { useBrandDetail } from "@entities/brand/model/hooks";
 import useLanguage from "@shared/lib/hooks/useLanguage";
 import { cn } from "@shared/lib/style";
 import { Button } from "@shared/ui/button";
@@ -14,9 +14,9 @@ interface ProductBrandBannerProps {
 export default function ProductBrandBanner({ id }: ProductBrandBannerProps) {
   const { openModal } = useModal();
   const languageCode = useLanguage();
-  const { data } = useBrandDetail({
+  const { data } = useBrandBanner({
     params: {
-      id,
+      brandId: id,
       languageCode,
     },
     options: {
@@ -25,6 +25,8 @@ export default function ProductBrandBanner({ id }: ProductBrandBannerProps) {
   });
 
   if (!data) return <BannerSkeleton />;
+
+  console.log(data);
 
   return (
     <div
@@ -43,15 +45,28 @@ export default function ProductBrandBanner({ id }: ProductBrandBannerProps) {
           alt=""
           className="h-full w-full object-cover"
           height={400}
-          src={data?.bannerList?.[0] ?? ""}
+          src={""}
           width={600}
         />
       </div>
       <div className="flex flex-1 flex-col gap-[20px]">
-        <div className="flex items-center justify-between">
-          <h2 className={cn("text-title-2 font-bold", "max-sm:text-title-3")}>
-            {data?.name}
-          </h2>
+        <div
+          className={cn(
+            "flex items-center justify-between",
+            "max-sm:items-start",
+          )}
+        >
+          <div>
+            <h2
+              className={cn(
+                "text-title-2 mb-[12px] font-bold",
+                "max-sm:text-title-3",
+              )}
+            >
+              {data?.name}
+            </h2>
+            <p className="text-black/50">{data?.englishName}</p>
+          </div>
           <Button
             className="h-auto w-auto rounded-full p-3"
             onClick={() => openModal("share")}
@@ -62,7 +77,7 @@ export default function ProductBrandBanner({ id }: ProductBrandBannerProps) {
           </Button>
         </div>
         <div className={cn("flex flex-col gap-[40px]", "max-sm:gap-[20px]")}>
-          <p className="text-body-3">{data?.description}</p>
+          <p className="text-body-3">{data?.description ?? ""}</p>
           <Button
             className={cn(
               "w-fit",

@@ -111,3 +111,29 @@ export const getProductDetail = ({ id, languageCode }: GetProductDetailReq) =>
       },
     })
     .json<CommonRes<GetProductDetailRes>>();
+
+export interface GetProductBrandBannerReq extends PublicLanguageCode {
+  brandId: number;
+}
+
+export interface GetProductBrandBannerRes {
+  brandId: number;
+  banner: string;
+  name: string;
+  englishName: string;
+  description: string;
+  like: number;
+}
+
+export const getProductBrandBanner = ({
+  brandId,
+  languageCode,
+}: GetProductBrandBannerReq) =>
+  api
+    .get(`product/banner/brand`, {
+      searchParams: {
+        brandId,
+        languageCode,
+      },
+    })
+    .json<CommonRes<GetProductBrandBannerRes>>();
