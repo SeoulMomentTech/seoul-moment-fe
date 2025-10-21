@@ -14,7 +14,6 @@ import {
 } from "@shared/ui/accordion";
 import { Button } from "@shared/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@shared/ui/tabs";
-import { FilterTabs } from "@widgets/filter-tabs";
 import { ProductCategoryFilter } from "@widgets/product-category-filter";
 import useBrandFilter from "../../model/useBrandFilter";
 import useCategories from "../../model/useCategories";
@@ -113,12 +112,7 @@ export default function DeskTop({ filter, handleUpdateFilter }: DesktopProps) {
         <section className="flex flex-col gap-[20px]">
           <div>
             <div className="mb-[20px] flex items-center justify-between">
-              <FilterTabs
-                onChange={() => {}}
-                options={["브랜드 랭킹", "주목할 브랜드", "장바구니 BEST"]}
-                value="브랜드 랭킹"
-              />
-
+              <div />
               <FilterBar />
             </div>
             <ProductCategoryFilter

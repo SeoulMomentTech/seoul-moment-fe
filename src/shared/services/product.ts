@@ -15,7 +15,7 @@ export const getProductBanner = () =>
   api.get("product/banner").json<CommonRes<GetProductBannerRes>>();
 
 interface GetProductCategoryReq extends PublicLanguageCode {
-  categoryId: number;
+  categoryId?: number;
 }
 
 interface GetProductCategoryRes {
@@ -137,3 +137,59 @@ export const getProductBrandBanner = ({
       },
     })
     .json<CommonRes<GetProductBrandBannerRes>>();
+
+interface GetProductFilterRes {
+  total: number;
+  list: Array<Category>;
+}
+
+export const getProductFilter = ({ languageCode }: PublicLanguageCode) =>
+  api
+    .get("product/filter", {
+      searchParams: {
+        languageCode,
+      },
+    })
+    .json<CommonRes<GetProductFilterRes>>();
+
+interface Option {
+  id: number;
+  type: string;
+}
+
+interface GetProductOptionsRes {
+  total: number;
+  list: Array<Option>;
+}
+
+// 상품 옵션 리스트
+export const getProductOptions = () =>
+  api.get("product/option").json<CommonRes<GetProductOptionsRes>>();
+
+interface GetProductOptionValueReq extends PublicLanguageCode {
+  optionId: number;
+}
+
+interface OptionValue {
+  id: number;
+  value: string;
+}
+
+interface GetProductOptionValuRes {
+  total: number;
+  list: Array<OptionValue>;
+}
+
+// 상품 옵션 값 리스트
+export const getProdctionOptionValue = ({
+  optionId,
+  languageCode,
+}: GetProductOptionValueReq) =>
+  api
+    .get("product/option/value", {
+      searchParams: {
+        optionId,
+        languageCode,
+      },
+    })
+    .json<CommonRes<GetProductOptionValuRes>>();
