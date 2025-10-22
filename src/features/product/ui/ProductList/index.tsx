@@ -9,7 +9,11 @@ export default function ProductList() {
 
   return (
     <>
-      <DeskTop filter={filter} handleUpdateFilter={handleUpdateFilter} />
+      <DeskTop
+        filter={filter}
+        handleResetFilter={handleResetFilter}
+        handleUpdateFilter={handleUpdateFilter}
+      />
       <Mobile
         filter={filter}
         handleResetFilter={handleResetFilter}

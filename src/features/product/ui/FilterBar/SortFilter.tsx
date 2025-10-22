@@ -1,4 +1,5 @@
 import { ChevronDown } from "lucide-react";
+import { cn } from "@/shared/lib/style";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,7 +14,10 @@ export default function SortFilter() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          className="flex h-full gap-[4px] p-0 hover:bg-transparent"
+          className={cn(
+            "flex h-full gap-[4px] p-0 hover:bg-transparent",
+            "max-sm:text-[14px]",
+          )}
           size="sm"
           variant="ghost"
         >

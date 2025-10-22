@@ -1,7 +1,9 @@
 "use client";
 
+import { SearchIcon } from "lucide-react";
 import { useState } from "react";
 import { Link } from "@/i18n/navigation";
+import { Empty } from "@/widgets/empty";
 import { ProductCard } from "@entities/product";
 import useLanguage from "@shared/lib/hooks/useLanguage";
 import { cn } from "@shared/lib/style";
@@ -25,6 +27,7 @@ interface DesktopProps {
   handleUpdateFilter(
     newFilter: Record<string, string | number | undefined | null>,
   ): () => void;
+  handleResetFilter(): void;
 }
 
 export default function DeskTop({ filter, handleUpdateFilter }: DesktopProps) {
@@ -42,6 +45,8 @@ export default function DeskTop({ filter, handleUpdateFilter }: DesktopProps) {
   const handleChangeCategory = (categoryId: string) => {
     setSelectedCategory(categoryId);
   };
+
+  const isEmpty = data?.length === 0;
 
   return (
     <div className={cn("flex flex-col gap-[40px] pb-[100px]", "max-sm:hidden")}>
@@ -123,19 +128,37 @@ export default function DeskTop({ filter, handleUpdateFilter }: DesktopProps) {
           <div
             className={cn(
               "flex w-[1063px] flex-wrap gap-x-[20px] gap-y-[40px]",
-              "max-sm:w-full max-sm:gap-y-[30px]",
-              "max-sm:grid max-sm:grid-cols-2",
             )}
           >
-            {data?.map((product, index) => (
-              <Link className="flex-1" href="/product/1" key={`${index + 1}`}>
-                <ProductCard
-                  className="max-sm:flex-1"
-                  data={product}
-                  imageClassName=" w-[196px] h-[196px] max-sm:w-full max-sm:h-[150px]"
-                />
-              </Link>
-            ))}
+            {isEmpty ? (
+              <Empty
+                className="h-[687px] w-full"
+                description="검색 결과가 없습니다."
+                icon={
+                  <SearchIcon
+                    className="text-black/30"
+                    height={24}
+                    width={24}
+                  />
+                }
+              />
+            ) : (
+              <>
+                {data?.map((product, index) => (
+                  <Link
+                    className="flex-1"
+                    href="/product/1"
+                    key={`${index + 1}`}
+                  >
+                    <ProductCard
+                      className="max-sm:flex-1"
+                      data={product}
+                      imageClassName=" w-[196px] h-[196px] max-sm:w-full max-sm:h-[150px]"
+                    />
+                  </Link>
+                ))}
+              </>
+            )}
           </div>
         </section>
       </div>
