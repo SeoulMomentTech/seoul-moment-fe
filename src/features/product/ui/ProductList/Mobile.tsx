@@ -36,13 +36,8 @@ export default function Mobile({ filter }: MobileProps) {
   const isEmpty = data?.length === 0;
 
   return (
-    <div
-      className={cn(
-        "hidden pb-[50px]",
-        "max-sm:flex max-sm:flex-col max-sm:gap-0",
-      )}
-    >
-      <div className={cn("flex", "max-sm:flex-col max-sm:gap-[12px]")}>
+    <div className={cn("flex flex-col gap-0")}>
+      <div className={cn("flex flex-col gap-[12px]")}>
         <section className="flex flex-col gap-[20px]">
           <div className="flex h-[56px] items-center justify-between py-[20px]">
             <ProductFilterSheet handleIsOpen={update} isOpen={isOpen}>
@@ -78,17 +73,17 @@ export default function Mobile({ filter }: MobileProps) {
           ) : (
             <div
               className={cn(
-                "gap-x-[20px] gap-y-[40px]",
-                "max-sm:w-full max-sm:gap-y-[30px]",
-                "max-sm:grid max-sm:grid-cols-2",
+                "gap-x-[20px] gap-y-[30px]",
+                "w-full",
+                "grid grid-cols-2",
               )}
             >
               {data?.map((product, index) => (
                 <Link className="flex-1" href="/product/1" key={`${index + 1}`}>
                   <ProductCard
-                    className="max-sm:flex-1"
+                    className="flex-1"
                     data={product}
-                    imageClassName=" w-[196px] h-[196px] max-sm:w-full max-sm:h-[150px]"
+                    imageClassName="w-[196px] h-[196px] max-sm:w-full max-sm:h-[150px]"
                   />
                 </Link>
               ))}
