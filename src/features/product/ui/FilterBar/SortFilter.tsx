@@ -1,13 +1,13 @@
 import { ChevronDown } from "lucide-react";
-import { cn } from "@/shared/lib/style";
+import { cn } from "@shared/lib/style";
+import { Button } from "@shared/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/shared/ui/dropdown-menu";
-import { Button } from "@shared/ui/button";
+} from "@shared/ui/dropdown-menu";
 
 export default function SortFilter() {
   return (

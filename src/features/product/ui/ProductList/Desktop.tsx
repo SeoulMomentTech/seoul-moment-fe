@@ -3,6 +3,7 @@
 import { SearchIcon } from "lucide-react";
 import { useState } from "react";
 import { Link } from "@/i18n/navigation";
+import Divider from "@/shared/ui/divider";
 import { Empty } from "@/widgets/empty";
 import { ProductCard } from "@entities/product";
 import useLanguage from "@shared/lib/hooks/useLanguage";
@@ -30,7 +31,11 @@ interface DesktopProps {
   handleResetFilter(): void;
 }
 
-export default function DeskTop({ filter, handleUpdateFilter }: DesktopProps) {
+export default function DeskTop({
+  filter,
+  handleUpdateFilter,
+  handleResetFilter,
+}: DesktopProps) {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const languageCode = useLanguage();
 
@@ -118,7 +123,13 @@ export default function DeskTop({ filter, handleUpdateFilter }: DesktopProps) {
           <div>
             <div className="mb-[20px] flex items-center justify-between">
               <div />
-              <FilterBar />
+              <FilterBar>
+                <FilterBar.Sort />
+                <Divider className="block bg-black/40" />
+                <FilterBar.Option />
+                <Divider className="block bg-black/40" />
+                <FilterBar.Refresh onReset={handleResetFilter} />
+              </FilterBar>
             </div>
             <ProductCategoryFilter
               onCategoryChange={handleChangeCategory}

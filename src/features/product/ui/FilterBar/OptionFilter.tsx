@@ -1,5 +1,5 @@
-import { Button } from "@/shared/ui/button";
-import { FilterIcon } from "@/shared/ui/icon";
+import { Button } from "@shared/ui/button";
+import { FilterIcon } from "@shared/ui/icon";
 
 export default function OptionFilter() {
   return (

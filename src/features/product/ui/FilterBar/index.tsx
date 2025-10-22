@@ -1,24 +1,12 @@
-import { Button } from "@shared/ui/button";
-import Divider from "@shared/ui/divider";
-import { RefreshIcon } from "@shared/ui/icon";
+import type { PropsWithChildren } from "react";
 import OptionFilter from "./OptionFilter";
+import RefreshFilter from "./RefreshFilter";
 import SortFilter from "./SortFilter";
 
-export default function Filters() {
-  return (
-    <div className="flex items-center">
-      <SortFilter />
-      <Divider className="block bg-black/40" />
-      <OptionFilter />
-      <Divider className="block bg-black/40" />
-      <Button
-        className="flex h-full items-center gap-[4px] p-0 hover:bg-transparent"
-        size="sm"
-        variant="ghost"
-      >
-        <RefreshIcon height={18} width={18} />
-        초기화
-      </Button>
-    </div>
-  );
+export default function FilterBar({ children }: PropsWithChildren) {
+  return <div className="flex items-center">{children}</div>;
 }
+
+FilterBar.Sort = SortFilter;
+FilterBar.Option = OptionFilter;
+FilterBar.Refresh = RefreshFilter;

@@ -2,8 +2,8 @@ import { Share2Icon } from "lucide-react";
 import Image from "next/image";
 import { useBrandBanner } from "@/entities/brand/model/hooks/useBrandBanner";
 import { Link } from "@/i18n/navigation";
-import useModal from "@/shared/lib/hooks/useModal";
 import useLanguage from "@shared/lib/hooks/useLanguage";
+import useModal from "@shared/lib/hooks/useModal";
 import { cn } from "@shared/lib/style";
 import { Button } from "@shared/ui/button";
 
@@ -26,8 +26,6 @@ export default function ProductBrandBanner({ id }: ProductBrandBannerProps) {
 
   if (!data) return <BannerSkeleton />;
 
-  console.log(data);
-
   return (
     <div
       className={cn(
@@ -45,7 +43,7 @@ export default function ProductBrandBanner({ id }: ProductBrandBannerProps) {
           alt=""
           className="h-full w-full object-cover"
           height={400}
-          src={""}
+          src={data.banner}
           width={600}
         />
       </div>
