@@ -2,9 +2,7 @@
 
 import { SearchIcon } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { Empty } from "@/widgets/empty";
 import { ProductCard } from "@entities/product";
-import useFilter from "@shared/lib/hooks/useFilter";
 import useLanguage from "@shared/lib/hooks/useLanguage";
 import useOpen from "@shared/lib/hooks/useOpen";
 import { cn } from "@shared/lib/style";
@@ -12,7 +10,9 @@ import type { GetProductListReq } from "@shared/services/product";
 
 import { Button } from "@shared/ui/button";
 import { FilterIcon } from "@shared/ui/icon";
+import { Empty } from "@widgets/empty";
 import { useInfiniteProducts } from "../../model/useInfiniteProducts";
+import useProductFilter from "../../model/useProductFilter";
 import SortFilter from "../FilterBar/SortFilter";
 import ProductFilterSheet from "../ProductFilterSheet";
 
@@ -27,7 +27,7 @@ interface MobileProps {
 export default function Mobile({ filter }: MobileProps) {
   const { isOpen, update } = useOpen();
   const languageCode = useLanguage();
-  const { count } = useFilter();
+  const { count } = useProductFilter();
   const { data } = useInfiniteProducts({
     ...filter,
     languageCode,

@@ -138,19 +138,19 @@ export const getProductBrandBanner = ({
     })
     .json<CommonRes<GetProductBrandBannerRes>>();
 
-interface GetProductFilterRes {
+interface GetProductSortFilterRes {
   total: number;
   list: Array<Category>;
 }
 
-export const getProductFilter = ({ languageCode }: PublicLanguageCode) =>
+export const getProductSortFilter = ({ languageCode }: PublicLanguageCode) =>
   api
-    .get("product/filter", {
+    .get("product/sort/filter", {
       searchParams: {
         languageCode,
       },
     })
-    .json<CommonRes<GetProductFilterRes>>();
+    .json<CommonRes<GetProductSortFilterRes>>();
 
 interface Option {
   id: number;

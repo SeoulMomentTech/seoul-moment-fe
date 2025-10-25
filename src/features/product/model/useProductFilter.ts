@@ -10,7 +10,7 @@ const initialFilter = {
   sortColumn: null,
 };
 
-const useFilter = () => {
+const useProductFilter = () => {
   const [filter, setFilter] = useQueryStates({
     search: parseAsString,
     brandId: parseAsInteger,
@@ -24,9 +24,9 @@ const useFilter = () => {
     ...filter,
     search: filter.search ?? undefined,
     brandId: filter.brandId ?? undefined,
-    sort: filter.sort ?? undefined,
+    sort: filter.sort ?? "DESC",
     productCategoryId: filter.productCategoryId ?? undefined,
-    sortColumn: filter.sortColumn ?? undefined,
+    sortColumn: filter.sortColumn ?? "creatDate",
     categoryId: filter.categoryId ?? undefined,
   };
 
@@ -65,4 +65,4 @@ const useFilter = () => {
   };
 };
 
-export default useFilter;
+export default useProductFilter;

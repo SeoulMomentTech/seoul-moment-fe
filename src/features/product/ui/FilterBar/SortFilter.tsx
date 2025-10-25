@@ -8,8 +8,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@shared/ui/dropdown-menu";
+import useProductFilter from "../../model/useProductFilter";
+import useProductSortFilter from "../../model/useProductSortFilter";
 
 export default function SortFilter() {
+  const { data } = useProductSortFilter();
+  const { filter } = useProductFilter();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -21,7 +26,7 @@ export default function SortFilter() {
           size="sm"
           variant="ghost"
         >
-          <span>인기순</span>
+          <span>{filter.sortColumn}</span>
           <ChevronDown height={16} width={16} />
         </Button>
       </DropdownMenuTrigger>
@@ -30,8 +35,9 @@ export default function SortFilter() {
         side="bottom"
       >
         <DropdownMenuGroup>
-          <DropdownMenuItem>날짜순</DropdownMenuItem>
-          <DropdownMenuItem>가격순</DropdownMenuItem>
+          {data?.map((item) => (
+            <DropdownMenuItem key={item.id}>{item.name}</DropdownMenuItem>
+          ))}
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>

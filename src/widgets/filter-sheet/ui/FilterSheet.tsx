@@ -1,11 +1,11 @@
 import type { ReactNode } from "react";
 import { useState, type PropsWithChildren } from "react";
-import useFilter from "@/shared/lib/hooks/useFilter";
-import { cn } from "@/shared/lib/style";
+import useProductFilter from "@features/product/model/useProductFilter";
+import { cn } from "@shared/lib/style";
 
-import { Button } from "@/shared/ui/button";
-import FixedBox from "@/shared/ui/fixed-box";
-import { RefreshIcon } from "@/shared/ui/icon";
+import { Button } from "@shared/ui/button";
+import FixedBox from "@shared/ui/fixed-box";
+import { RefreshIcon } from "@shared/ui/icon";
 import {
   Sheet,
   SheetContent,
@@ -13,7 +13,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/shared/ui/sheet";
+} from "@shared/ui/sheet";
 
 type Filter = Record<string, string | number | null | undefined>;
 
@@ -35,7 +35,7 @@ const FilterSheet = ({
     filter: defaultFilter,
     handleUpdateFilter,
     handleResetFilter,
-  } = useFilter();
+  } = useProductFilter();
   const [filter, setFilter] = useState<Filter>(defaultFilter);
 
   const handleApplyFilter = () => {

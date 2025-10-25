@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { StarIcon } from "lucide-react";
 import { useState } from "react";
 import { BrandProductList } from "@/features/product";
+import { Link } from "@/i18n/navigation";
 import useLanguage from "@/shared/lib/hooks/useLanguage";
 import { cn } from "@/shared/lib/style";
 import { setComma } from "@/shared/lib/utils";
@@ -59,10 +60,12 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
               {data.name}
             </h2>
             <div className="flex items-center justify-between py-[10px]">
-              <AvatarBadge
-                avatarUrl={data.brand.profileImage}
-                name={data.brand.name}
-              />
+              <Link href={`/product?brandId=1`}>
+                <AvatarBadge
+                  avatarUrl={data.brand.profileImage}
+                  name={data.brand.name}
+                />
+              </Link>
               <LikeCount
                 count={data.like}
                 countClassName="max-sm:hidden"

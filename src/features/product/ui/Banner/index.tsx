@@ -1,11 +1,11 @@
 "use client";
 
-import useFilter from "@shared/lib/hooks/useFilter";
 import ProductBanner from "./ProductBanner";
 import ProductBrandBanner from "./ProductBrandBanner";
+import useProductFilter from "../../model/useProductFilter";
 
 function Banner() {
-  const { filter } = useFilter();
+  const { filter } = useProductFilter();
 
   if (!filter.brandId) {
     return <ProductBanner />;

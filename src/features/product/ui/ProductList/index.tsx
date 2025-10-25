@@ -1,13 +1,13 @@
 "use client";
 
-import useMediaQuery from "@/shared/lib/hooks/useMediaQuery";
-import useFilter from "@shared/lib/hooks/useFilter";
+import useMediaQuery from "@shared/lib/hooks/useMediaQuery";
 import DeskTop from "./Desktop";
 import Mobile from "./Mobile";
+import useProductFilter from "../../model/useProductFilter";
 
 export default function ProductList() {
   const isMobile = useMediaQuery("(max-width: 40rem)", false);
-  const { filter, handleUpdateFilter, handleResetFilter } = useFilter();
+  const { filter, handleUpdateFilter, handleResetFilter } = useProductFilter();
 
   return (
     <>
