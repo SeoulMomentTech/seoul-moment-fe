@@ -46,7 +46,7 @@ export interface ArticleSection {
   imageList: string[];
 }
 
-interface GetArticleDetailRes {
+export interface GetArticleDetailRes {
   id: number;
   brandId: number;
   writer: string;

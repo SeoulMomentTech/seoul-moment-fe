@@ -42,6 +42,7 @@ export function DetailMain({
         alt=""
         className={cn(styleMap.desktop.image, styleMap.mobile.image)}
         height={1200}
+        priority
         src={imageUrl}
         width={4000}
       />

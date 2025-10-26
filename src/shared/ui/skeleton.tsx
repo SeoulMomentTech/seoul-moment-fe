@@ -1,12 +1,18 @@
 import { cn } from "@shared/lib/style";
 
-function Skeleton({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
+  rounded?: boolean;
+}
+
+function Skeleton({ className, rounded, ...props }: SkeletonProps) {
   return (
     <div
-      className={cn("bg-muted animate-pulse rounded-md", className)}
+      className={cn(
+        "animate-pulse bg-slate-200",
+        rounded && "rounded-md",
+        className,
+      )}
+      data-slot="skeleton"
       {...props}
     />
   );

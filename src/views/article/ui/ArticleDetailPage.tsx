@@ -1,43 +1,37 @@
 "use client";
 
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { use } from "react";
 import { ArticleDetailContent, ArticleDetailMain } from "@/features/article";
-import useLanguage from "@shared/lib/hooks/useLanguage";
-import { getArticleDetail } from "@shared/services/article";
+import type { CommonRes } from "@/shared/services";
+import type { GetArticleDetailRes } from "@shared/services/article";
 import { BrandProducts } from "@widgets/brand-products";
 import { RelatedList } from "@widgets/detail";
 
 interface ArticleDetailPageProps {
   id: number;
+  data: Promise<CommonRes<GetArticleDetailRes>>;
 }
 
-export function ArticleDetailPage({ id }: ArticleDetailPageProps) {
-  const languageCode = useLanguage();
-  const { data } = useSuspenseQuery({
-    queryKey: ["articleDetail", id, languageCode],
-    queryFn: () => getArticleDetail({ languageCode, id }),
-    select: ({ data }) => {
-      return {
-        main: {
-          title: data.title,
-          category: data.category,
-          summary: data.content,
-          date: data.createDate,
-          author: data.writer,
-          avatarUrl: data.profileImage,
-          imageUrl: data.banner,
-        },
-        ...data,
-      };
-    },
-  });
+export default function ArticleDetailPage({ data }: ArticleDetailPageProps) {
+  const articleData = use(data);
+  const main = {
+    title: articleData.data.title,
+    category: articleData.data.category,
+    summary: articleData.data.content,
+    date: articleData.data.createDate,
+    author: articleData.data.writer,
+    avatarUrl: articleData.data.profileImage,
+    imageUrl: articleData.data.banner,
+  };
+  const section = articleData.data.section ?? [];
+  const brandId = articleData.data.brandId;
 
   return (
     <>
-      <ArticleDetailMain {...data.main} />
-      <ArticleDetailContent data={data.section} />
+      <ArticleDetailMain {...main} />
+      <ArticleDetailContent data={section} />
       <RelatedList />
-      <BrandProducts id={data.brandId} />
+      <BrandProducts id={brandId} />
     </>
   );
 }
