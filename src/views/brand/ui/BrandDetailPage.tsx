@@ -1,27 +1,20 @@
 "use client";
 
 import Image from "next/image";
-import { useSuspenseBrandDetail } from "@/entities/brand/model/hooks";
-import useLanguage from "@/shared/lib/hooks/useLanguage";
-import { replaceLineBreaks } from "@/shared/lib/utils";
+import { use } from "react";
 import { cn } from "@shared/lib/style";
+import { replaceLineBreaks } from "@shared/lib/utils";
+import type { CommonRes } from "@shared/services";
+import type { BrandDetailInfo } from "@shared/services/brand";
 import { BrandProducts } from "@widgets/brand-products";
 
 interface BrandDetailPageProps {
   id: number;
+  promise: Promise<CommonRes<BrandDetailInfo>>;
 }
 
-export default function BrandDetailPage({ id }: BrandDetailPageProps) {
-  const languageCode = useLanguage();
-  const { data } = useSuspenseBrandDetail({
-    params: {
-      id,
-      languageCode,
-    },
-    options: {
-      queryKey: ["brandDetail", id, languageCode],
-    },
-  });
+export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
+  const { data } = use(promise);
 
   return (
     <div>
