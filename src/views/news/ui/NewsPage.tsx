@@ -1,9 +1,9 @@
-import { cn } from "@/shared/lib/style";
-import { EditorPickSlide } from "@/widgets/editor-pick";
-import { HotKeywordList } from "@/widgets/hot-list";
-import LifeStyleList from "@/widgets/lifestyle-list/ui/LifeStyleList";
-import { NewsUpdate } from "@/widgets/news-update";
-import { SectionWithLabel } from "@/widgets/section-with-label";
+import { cn } from "@shared/lib/style";
+import { EditorPickSlide } from "@widgets/editor-pick";
+import { HotKeywordList } from "@widgets/hot-list";
+import LifeStyleList from "@widgets/lifestyle-list/ui/LifeStyleList";
+import { NewsUpdate } from "@widgets/news-update";
+import { SectionWithLabel } from "@widgets/section-with-label";
 
 export function NewsPage() {
   return (

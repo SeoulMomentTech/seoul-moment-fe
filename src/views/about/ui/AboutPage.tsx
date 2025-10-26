@@ -4,7 +4,7 @@ import {
   MainBanner,
   Mission,
   Vision,
-} from "@/features/about";
+} from "@features/about";
 
 export function AboutPage() {
   return (

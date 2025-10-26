@@ -1,5 +1,5 @@
-import { cn } from "@/shared/lib/style";
-import { Skeleton } from "@/shared/ui/skeleton";
+import { cn } from "@shared/lib/style";
+import { Skeleton } from "@shared/ui/skeleton";
 
 export default function BrandDetailLoading() {
   return (

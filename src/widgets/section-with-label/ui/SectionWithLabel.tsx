@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from "react";
-import { cn } from "@/shared/lib/style";
+import { cn } from "@shared/lib/style";
 
 interface SectionWithLabelProps extends PropsWithChildren {
   label?: React.ReactElement;

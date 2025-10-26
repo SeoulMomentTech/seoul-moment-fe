@@ -5,7 +5,7 @@ import { useState } from "react";
 import { FreeMode, Navigation, Thumbs } from "swiper/modules";
 import type { SwiperClass } from "swiper/react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { cn } from "@/shared/lib/style";
+import { cn } from "@shared/lib/style";
 
 import "swiper/css";
 import "swiper/css/free-mode";

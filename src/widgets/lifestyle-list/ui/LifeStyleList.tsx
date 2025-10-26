@@ -1,5 +1,5 @@
-import LifeStyleCard from "@/entities/article/ui/StyleCard";
-import { cn } from "@/shared/lib/style";
+import LifeStyleCard from "@entities/article/ui/StyleCard";
+import { cn } from "@shared/lib/style";
 
 const MOCK_LIFESTYLE = [
   {

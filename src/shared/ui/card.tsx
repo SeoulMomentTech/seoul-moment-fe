@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { cn } from "@/shared/lib/style";
+import { cn } from "@shared/lib/style";
 
 interface CardProps {
   image?: ReactNode;

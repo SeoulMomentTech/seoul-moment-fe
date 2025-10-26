@@ -3,17 +3,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { StarIcon } from "lucide-react";
 import { useState } from "react";
-import { BrandProductList } from "@/features/product";
 import { Link } from "@/i18n/navigation";
-import useLanguage from "@/shared/lib/hooks/useLanguage";
-import { cn } from "@/shared/lib/style";
-import { setComma } from "@/shared/lib/utils";
-import { getProductDetail } from "@/shared/services/product";
-import { Button } from "@/shared/ui/button";
-import { AvatarBadge } from "@/widgets/avatar-badge/ui/AvatarBadge";
-import { LikeCount } from "@/widgets/like-count/ui/LikeCount";
-import { ProductDetailImage } from "@/widgets/product-detail-image";
-import { ProductGallery } from "@/widgets/product-gallery";
+import { BrandProductList } from "@features/product";
+import useLanguage from "@shared/lib/hooks/useLanguage";
+import { cn } from "@shared/lib/style";
+import { setComma } from "@shared/lib/utils";
+import { getProductDetail } from "@shared/services/product";
+import { Button } from "@shared/ui/button";
+import { AvatarBadge } from "@widgets/avatar-badge/ui/AvatarBadge";
+import { LikeCount } from "@widgets/like-count/ui/LikeCount";
+import { ProductDetailImage } from "@widgets/product-detail-image";
+import { ProductGallery } from "@widgets/product-gallery";
 
 interface ProductDetailPageProps {
   id: number;

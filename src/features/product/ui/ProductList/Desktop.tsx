@@ -3,11 +3,9 @@
 import { SearchIcon } from "lucide-react";
 import { useState } from "react";
 import { Link } from "@/i18n/navigation";
-import useOpen from "@/shared/lib/hooks/useOpen";
-import Divider from "@/shared/ui/divider";
-import { Empty } from "@/widgets/empty";
 import { ProductCard } from "@entities/product";
 import useLanguage from "@shared/lib/hooks/useLanguage";
+import useOpen from "@shared/lib/hooks/useOpen";
 import { cn } from "@shared/lib/style";
 import type { GetProductListReq } from "@shared/services/product";
 import {
@@ -17,7 +15,9 @@ import {
   AccordionTrigger,
 } from "@shared/ui/accordion";
 import { Button } from "@shared/ui/button";
+import Divider from "@shared/ui/divider";
 import { Tabs, TabsList, TabsTrigger } from "@shared/ui/tabs";
+import { Empty } from "@widgets/empty";
 import { ProductCategoryFilter } from "@widgets/product-category-filter";
 import useBrandFilter from "../../model/useBrandFilter";
 import useCategories from "../../model/useCategories";

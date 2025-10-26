@@ -1,8 +1,8 @@
 "use client";
 
 import { use } from "react";
-import { ArticleDetailContent, ArticleDetailMain } from "@/features/article";
-import type { CommonRes } from "@/shared/services";
+import { ArticleDetailContent, ArticleDetailMain } from "@features/article";
+import type { CommonRes } from "@shared/services";
 import type { GetArticleDetailRes } from "@shared/services/article";
 import { BrandProducts } from "@widgets/brand-products";
 import { RelatedList } from "@widgets/detail";

@@ -2,11 +2,11 @@
 
 import { Link } from "@/i18n/navigation";
 
-import { cn } from "@/shared/lib/style";
-
-import { SectionWithLabel } from "@/widgets/section-with-label";
 import { useNews } from "@entities/news/model/hooks";
 import { FeaturedMainNewsCard, FeaturedSubNewsCard } from "@entities/news/ui";
+import { cn } from "@shared/lib/style";
+
+import { SectionWithLabel } from "@widgets/section-with-label";
 
 export function News() {
   const { data } = useNews({ count: 3 });

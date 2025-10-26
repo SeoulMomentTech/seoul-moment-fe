@@ -24,9 +24,9 @@ const useProductFilter = () => {
     ...filter,
     search: filter.search ?? undefined,
     brandId: filter.brandId ?? undefined,
-    sort: filter.sort ?? "DESC",
+    sort: filter.sort ?? undefined,
     productCategoryId: filter.productCategoryId ?? undefined,
-    sortColumn: filter.sortColumn ?? "creatDate",
+    sortColumn: filter.sortColumn ?? undefined,
     categoryId: filter.categoryId ?? undefined,
   };
 

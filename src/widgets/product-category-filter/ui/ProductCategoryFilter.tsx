@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/shared/lib/style";
+import { cn } from "@shared/lib/style";
 
 interface CategoryItem {
   id: string;

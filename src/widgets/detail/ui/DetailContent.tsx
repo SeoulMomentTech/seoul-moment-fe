@@ -1,7 +1,7 @@
 import Image from "next/image";
-import { replaceLineBreaks } from "@/shared/lib/utils";
-import type { ArticleSection } from "@/shared/services/article";
-import type { NewsSection } from "@/shared/services/news";
+import { replaceLineBreaks } from "@shared/lib/utils";
+import type { ArticleSection } from "@shared/services/article";
+import type { NewsSection } from "@shared/services/news";
 
 export interface DetailContentProps {
   data: NewsSection[] | ArticleSection[];

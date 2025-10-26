@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { cn } from "@/shared/lib/style";
-import { formatDateTime } from "@/shared/lib/utils";
+import { cn } from "@shared/lib/style";
+import { formatDateTime } from "@shared/lib/utils";
 
 export interface DetailMainProps {
   imageUrl: string;

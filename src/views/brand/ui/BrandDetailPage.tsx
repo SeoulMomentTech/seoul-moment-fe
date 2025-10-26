@@ -170,6 +170,7 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
             alt=""
             className="h-full object-cover"
             height={800}
+            priority
             src={data.bannerList[1]}
             width={4000}
           />

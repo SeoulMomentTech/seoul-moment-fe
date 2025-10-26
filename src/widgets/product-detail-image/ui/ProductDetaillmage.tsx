@@ -1,6 +1,6 @@
 import Image from "next/image";
 import type { PropsWithChildren } from "react";
-import { cn } from "@/shared/lib/style";
+import { cn } from "@shared/lib/style";
 
 interface ProductDetailImageProps extends PropsWithChildren {
   showMore: boolean;

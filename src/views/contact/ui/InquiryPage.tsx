@@ -1,7 +1,7 @@
 import Image from "next/image";
-import { InquiryForm } from "@/features/inquiry";
-import { cn } from "@/shared/lib/style";
-import Divider from "@/shared/ui/divider";
+import { InquiryForm } from "@features/inquiry";
+import { cn } from "@shared/lib/style";
+import Divider from "@shared/ui/divider";
 
 export function InquiryPage() {
   return (

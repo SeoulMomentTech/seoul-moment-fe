@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { cn } from "@/shared/lib/style";
-import { MegazineSlide } from "@/widgets/megazine-slide";
-import { MoreMagazineList } from "@/widgets/more-magazine";
-import { SectionWithLabel } from "@/widgets/section-with-label";
+import { cn } from "@shared/lib/style";
+import { MegazineSlide } from "@widgets/megazine-slide";
+import { MoreMagazineList } from "@widgets/more-magazine";
+import { SectionWithLabel } from "@widgets/section-with-label";
 
 const mockRelatedListData = [
   {

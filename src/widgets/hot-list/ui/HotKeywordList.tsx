@@ -1,5 +1,5 @@
-import StyleCard from "@/entities/article/ui/StyleCard";
-import { cn } from "@/shared/lib/style";
+import StyleCard from "@entities/article/ui/StyleCard";
+import { cn } from "@shared/lib/style";
 
 const MOCK_HOT_KEYWORD = [
   {

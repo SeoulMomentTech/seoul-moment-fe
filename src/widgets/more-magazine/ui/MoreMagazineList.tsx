@@ -1,6 +1,6 @@
 "use client";
 
-import { MegazineCard } from "@/entities/megazine";
+import { MegazineCard } from "@entities/megazine";
 
 interface Magazine {
   id: number;

@@ -4,7 +4,7 @@ import {
   MainBanner,
   Article,
   ContactUS,
-} from "@/features/home";
+} from "@features/home";
 
 export function HomePage() {
   return (

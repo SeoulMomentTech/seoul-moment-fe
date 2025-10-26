@@ -1,5 +1,5 @@
 import { useId } from "react";
-import Chip from "@/shared/ui/chip";
+import Chip from "@shared/ui/chip";
 
 interface FilterTabsProps {
   options: string[];

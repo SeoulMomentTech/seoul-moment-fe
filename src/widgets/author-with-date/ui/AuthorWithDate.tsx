@@ -1,6 +1,6 @@
-import { cn } from "@/shared/lib/style";
-import { formatDateTime } from "@/shared/lib/utils";
-import Divider from "@/shared/ui/divider";
+import { cn } from "@shared/lib/style";
+import { formatDateTime } from "@shared/lib/utils";
+import Divider from "@shared/ui/divider";
 
 interface AuthorWithDateProps {
   author: string;

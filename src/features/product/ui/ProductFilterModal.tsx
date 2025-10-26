@@ -1,12 +1,12 @@
-import { cn } from "@/shared/lib/style";
-import { Button } from "@/shared/ui/button";
+import { cn } from "@shared/lib/style";
+import { Button } from "@shared/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/shared/ui/dialog";
+} from "@shared/ui/dialog";
 
 interface ProductFilterModalProps {
   isOpen: boolean;
