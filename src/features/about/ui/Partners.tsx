@@ -23,8 +23,6 @@ export function Partners() {
     }
   }, [categories, isFetchedAfterMount]);
 
-  console.log(partners);
-
   return (
     <section className={cn("relative h-[754px] px-[20px]", "max-sm:h-auto")}>
       <div
