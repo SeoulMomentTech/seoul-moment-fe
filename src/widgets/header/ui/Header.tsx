@@ -2,7 +2,7 @@
 
 import { MenuIcon, ChevronRightIcon } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { lazy, useState } from "react";
 import { Link, usePathname } from "@/i18n/navigation";
 import useModal from "@shared/lib/hooks/useModal";
 import { cn } from "@shared/lib/style";
@@ -16,7 +16,12 @@ import {
   SheetTrigger,
 } from "@shared/ui/sheet";
 import { LanguageSupport } from "@widgets/language-support";
-import { ShareModal } from "@widgets/share-modal";
+
+const ShareModal = lazy(() =>
+  import("@widgets/share-modal").then((module) => ({
+    default: module.ShareModal,
+  })),
+);
 
 const styleMap = {
   deskTop: {
@@ -182,7 +187,7 @@ export function Header() {
     <>
       <header
         className={cn(
-          "h-[56px] w-full bg-white px-[20px]",
+          "h-[56px] w-screen bg-white px-[20px]",
           "border-b border-b-black/5",
           "fixed top-0 left-0 z-10",
           "flex items-center",
