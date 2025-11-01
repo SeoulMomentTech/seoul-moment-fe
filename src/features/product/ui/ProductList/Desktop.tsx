@@ -22,6 +22,7 @@ import { ProductCategoryFilter } from "@widgets/product-category-filter";
 import useBrandFilter from "../../model/useBrandFilter";
 import useCategories from "../../model/useCategories";
 import { useInfiniteProducts } from "../../model/useInfiniteProducts";
+import type { FilterKey } from "../../model/useProductFilter";
 import FilterBar from "../FilterBar";
 import ProductFilterModal from "../ProductFilterModal";
 
@@ -30,7 +31,7 @@ interface DesktopProps {
   handleUpdateFilter(
     newFilter: Record<string, string | number | undefined | null>,
   ): () => void;
-  handleResetFilter(): void;
+  handleResetFilter(ignoreKeys?: FilterKey[]): void;
 }
 
 export default function DeskTop({
@@ -112,7 +113,10 @@ export default function DeskTop({
                             filter.brandId === brand.id && "text-black",
                           )}
                           key={brand.id}
-                          onClick={handleUpdateFilter({ brandId: brand.id })}
+                          onClick={handleUpdateFilter({
+                            brandId:
+                              filter.brandId === brand.id ? null : brand.id,
+                          })}
                           size="sm"
                           variant="ghost"
                         >
@@ -134,7 +138,9 @@ export default function DeskTop({
                   <Divider className="block bg-black/40" />
                   <FilterBar.Option onClick={() => update(true)} />
                   <Divider className="block bg-black/40" />
-                  <FilterBar.Refresh onReset={handleResetFilter} />
+                  <FilterBar.Refresh
+                    onReset={() => handleResetFilter(["brandId"])}
+                  />
                 </FilterBar>
               </div>
               <ProductCategoryFilter

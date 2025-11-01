@@ -39,3 +39,11 @@ body {
   line-height: 1.25;
   @apply focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-0 focus-visible:outline-none;
 }
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}

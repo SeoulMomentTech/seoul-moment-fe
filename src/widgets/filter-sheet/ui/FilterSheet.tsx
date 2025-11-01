@@ -71,7 +71,7 @@ const FilterSheet = ({
           <div className="border-b border-b-black/20 pb-[10px]">
             <div className="flex justify-between px-[20px]">
               <span>검색 결과</span>
-              <button onClick={handleResetFilter} type="button">
+              <button onClick={() => handleResetFilter()} type="button">
                 <RefreshIcon />
               </button>
             </div>
