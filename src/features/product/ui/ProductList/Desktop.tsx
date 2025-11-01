@@ -1,7 +1,7 @@
 "use client";
 
 import { SearchIcon } from "lucide-react";
-import { useState } from "react";
+import { lazy, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import { ProductCard } from "@entities/product";
 import useLanguage from "@shared/lib/hooks/useLanguage";
@@ -24,7 +24,8 @@ import useCategories from "../../model/useCategories";
 import { useInfiniteProducts } from "../../model/useInfiniteProducts";
 import type { FilterKey } from "../../model/useProductFilter";
 import FilterBar from "../FilterBar";
-import ProductFilterModal from "../ProductFilterModal";
+
+const ProductFilterModal = lazy(() => import("../ProductFilterModal"));
 
 interface DesktopProps {
   filter: Omit<GetProductListReq, "languageCode" | "count" | "page">;

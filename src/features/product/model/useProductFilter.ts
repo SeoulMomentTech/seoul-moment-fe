@@ -1,4 +1,9 @@
-import { parseAsInteger, parseAsString, useQueryStates } from "nuqs";
+import {
+  parseAsArrayOf,
+  parseAsInteger,
+  parseAsString,
+  useQueryStates,
+} from "nuqs";
 import { useMemo } from "react";
 
 export type FilterKey = keyof typeof initialFilter;
@@ -10,6 +15,7 @@ const initialFilter = {
   sort: null,
   productCategoryId: null,
   sortColumn: null,
+  optionIdList: null,
 };
 
 const useProductFilter = () => {
@@ -20,6 +26,7 @@ const useProductFilter = () => {
     categoryId: parseAsInteger,
     productCategoryId: parseAsInteger,
     sortColumn: parseAsString,
+    optionIdList: parseAsArrayOf(parseAsInteger),
   });
 
   const normalized = {
@@ -30,6 +37,7 @@ const useProductFilter = () => {
     productCategoryId: filter.productCategoryId ?? undefined,
     sortColumn: filter.sortColumn ?? undefined,
     categoryId: filter.categoryId ?? undefined,
+    optionIdList: filter.optionIdList ?? undefined,
   };
 
   const filterCount = useMemo(() => {
@@ -40,7 +48,10 @@ const useProductFilter = () => {
   }, [filter]);
 
   const handleUpdateFilter =
-    (newFilter: Record<string, string | number | undefined | null>) => () => {
+    (
+      newFilter: Record<string, string | number[] | number | undefined | null>,
+    ) =>
+    () => {
       const filtered = Object.entries(newFilter).reduce(
         (prev, [key, value]) => ({
           ...prev,

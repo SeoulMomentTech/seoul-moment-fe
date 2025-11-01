@@ -2,6 +2,10 @@ import type { ReactNode } from "react";
 import { useState, type PropsWithChildren } from "react";
 import useProductFilter from "@features/product/model/useProductFilter";
 import { cn } from "@shared/lib/style";
+import {
+  mergeOptionIdList,
+  type OptionIdListValue,
+} from "@shared/lib/utils/filter";
 
 import { Button } from "@shared/ui/button";
 import FixedBox from "@shared/ui/fixed-box";
@@ -15,7 +19,8 @@ import {
   SheetTrigger,
 } from "@shared/ui/sheet";
 
-type Filter = Record<string, string | number | null | undefined>;
+type FilterValue = number[] | string | number | null | undefined;
+export type Filter = Record<string, FilterValue>;
 
 interface FilterSheetProps extends PropsWithChildren {
   isOpen: boolean;
@@ -45,13 +50,24 @@ const FilterSheet = ({
 
   const handleCloseFilter = () => {
     handleIsOpen(false);
+    setFilter({});
+  };
+
+  const handleRefresh = () => {
+    setFilter({});
+    handleResetFilter();
   };
 
   const handleFilter = (newFilter: Filter) => {
-    setFilter((prev) => ({
-      ...prev,
-      ...newFilter,
-    }));
+    setFilter((prev) => {
+      const { optionIdList, ...rest } = newFilter;
+      const merged = {
+        ...prev,
+        ...rest,
+      };
+
+      return mergeOptionIdList(merged, optionIdList as OptionIdListValue);
+    });
   };
 
   return (
@@ -71,9 +87,14 @@ const FilterSheet = ({
           <div className="border-b border-b-black/20 pb-[10px]">
             <div className="flex justify-between px-[20px]">
               <span>검색 결과</span>
-              <button onClick={() => handleResetFilter()} type="button">
+              <Button
+                className="h-auto w-auto p-0"
+                onClick={handleRefresh}
+                type="button"
+                variant="ghost"
+              >
                 <RefreshIcon />
-              </button>
+              </Button>
             </div>
           </div>
           <div className="flex h-full flex-col justify-between overflow-auto">

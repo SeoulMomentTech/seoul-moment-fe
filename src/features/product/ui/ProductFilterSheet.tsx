@@ -1,7 +1,8 @@
 "use client";
 
 import { AccordionContent } from "@radix-ui/react-accordion";
-import { type PropsWithChildren } from "react";
+import { useId, type PropsWithChildren } from "react";
+import type { Filter } from "@/widgets/filter-sheet/ui/FilterSheet";
 import { cn } from "@shared/lib/style";
 import {
   Accordion,
@@ -13,6 +14,7 @@ import { Button } from "@shared/ui/button";
 import { FilterSheet } from "@widgets/filter-sheet";
 import useBrandFilter from "../model/useBrandFilter";
 import useCategories from "../model/useCategories";
+import useProductFilterList from "../model/useProductFilterList";
 
 interface FilterSheetProps extends PropsWithChildren {
   isOpen: boolean;
@@ -89,6 +91,9 @@ const ProductFilterSheet = ({
               </Accordion>
             </AccordionContent>
           </AccordionItem>
+          {filter.categoryId && (
+            <OptionalFilters filter={filter} handleFilter={handleFilter} />
+          )}
         </Accordion>
       )}
       handleIsOpen={handleIsOpen}
@@ -96,6 +101,46 @@ const ProductFilterSheet = ({
     >
       {children}
     </FilterSheet>
+  );
+};
+
+interface OptionalFilters {
+  filter: Filter;
+  handleFilter(newFilter: Filter): void;
+}
+
+const OptionalFilters = ({ filter, handleFilter }: OptionalFilters) => {
+  const id = useId();
+  const { data } = useProductFilterList({
+    categoryId: filter.categoryId as number,
+    brandId: filter.brandId as number,
+    productCategoryId: filter.productCategoryId as number,
+  });
+
+  return (
+    <>
+      {data?.map((option) => (
+        <AccordionItem key={`${option.title}-${id}`} value={option.title}>
+          <AccordionTrigger>{option.title}</AccordionTrigger>
+          <AccordionContent>
+            {option.optionValueList.map((item) => (
+              <Button
+                className={cn(
+                  "justify-start py-[10px] pl-[14px] text-start text-black/40",
+                  "hover:bg-transparent hover:text-black",
+                )}
+                key={`mobile-${item.optionId}`}
+                onClick={() => handleFilter({ categoryId: item.optionId })}
+                size="sm"
+                variant="ghost"
+              >
+                {item.value}
+              </Button>
+            ))}
+          </AccordionContent>
+        </AccordionItem>
+      ))}
+    </>
   );
 };
 
