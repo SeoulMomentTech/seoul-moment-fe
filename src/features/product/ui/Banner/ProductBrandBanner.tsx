@@ -35,8 +35,8 @@ export default function ProductBrandBanner({ id }: ProductBrandBannerProps) {
     >
       <div
         className={cn(
-          "h-[300px] max-w-[522px] bg-slate-300",
-          "max-sm:h-[207px] max-sm:w-full max-sm:max-w-full",
+          "h-[300px] min-w-[522px] bg-slate-300",
+          "max-sm:h-[207px] max-sm:min-w-full",
         )}
       >
         <Image
@@ -101,8 +101,8 @@ const BannerSkeleton = () => {
     >
       <div
         className={cn(
-          "h-[300px] w-full max-w-[522px] bg-slate-300",
-          "max-sm:h-[207px] max-sm:w-full max-sm:max-w-full",
+          "h-[300px] min-w-[522px] bg-slate-300",
+          "max-sm:h-[207px] max-sm:max-w-full max-sm:min-w-full",
         )}
       />
       <div className="flex w-full flex-col gap-[20px]">
