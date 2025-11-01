@@ -35,7 +35,7 @@ const ProductFilterSheet = ({
         <Accordion type="multiple">
           <AccordionItem className="border-b-black/20" value="category">
             <AccordionTrigger>카테고리</AccordionTrigger>
-            <AccordionContent>
+            <AccordionContent className="flex flex-col pb-0">
               {categories.map((category) => (
                 <Button
                   className={cn(

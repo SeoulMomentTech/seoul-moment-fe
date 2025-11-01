@@ -76,7 +76,7 @@ export default function ProductFilterModal({
               {filter.categoryId == null && (
                 <AccordionItem value="category">
                   <AccordionTrigger>카테고리</AccordionTrigger>
-                  <AccordionContent>
+                  <AccordionContent className="flex flex-col pb-0">
                     {categoriesData?.map((item) => (
                       <Button
                         className={cn(
