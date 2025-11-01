@@ -16,7 +16,7 @@ const styleMap = {
   desktop: {
     section: "mx-auto flex h-[800px] max-w-[1920px] min-w-[1280px] pt-[56px]",
     image: "h-full w-[50%] object-cover",
-    titleBox: "w-[50%] bg-[#F0F6FF] pt-[131px] pl-[108px]",
+    titleBox: "w-[50%] bg-[#F0F6FF] pt-[131px] px-[40px]",
   },
   mobile: {
     section:

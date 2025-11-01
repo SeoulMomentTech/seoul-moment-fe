@@ -33,7 +33,7 @@ interface GetNewsDetailReq extends PublicLanguageCode {
   id: number;
 }
 
-interface LastNews {
+export interface LastNews {
   id: number;
   banner: string;
   title: string;

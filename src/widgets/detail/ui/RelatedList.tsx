@@ -1,28 +1,15 @@
 import Link from "next/link";
+import type { LastNews } from "@/shared/services/news";
 import { cn } from "@shared/lib/style";
 import { MegazineSlide } from "@widgets/megazine-slide";
 import { MoreMagazineList } from "@widgets/more-magazine";
 import { SectionWithLabel } from "@widgets/section-with-label";
 
-const mockRelatedListData = [
-  {
-    id: 1,
-    title: "Ep.01 우산",
-    imageUrl: "",
-  },
-  {
-    id: 2,
-    title: "Ep.02 향수",
-    imageUrl: "",
-  },
-  {
-    id: 3,
-    title: "Ep.03 책",
-    imageUrl: "",
-  },
-];
+interface RelatedListProps {
+  lastNews: LastNews[];
+}
 
-export function RelatedList() {
+export function RelatedList({ lastNews }: RelatedListProps) {
   return (
     <div className={cn("mx-auto mt-[-128px] bg-black/5", "max-sm:mt-[-90px]")}>
       <SectionWithLabel
@@ -44,8 +31,8 @@ export function RelatedList() {
           </div>
         }
       >
-        <MoreMagazineList magazines={mockRelatedListData} />
-        <MegazineSlide magazines={mockRelatedListData} />
+        <MoreMagazineList magazines={lastNews} />
+        <MegazineSlide magazines={lastNews} />
       </SectionWithLabel>
     </div>
   );

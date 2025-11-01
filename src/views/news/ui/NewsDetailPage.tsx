@@ -36,7 +36,7 @@ export function NewsDetailPage({ id }: NewsDetailPageProps) {
     <>
       <NewsDetailMain {...data.main} />
       <NewsDetailContent data={data.section} />
-      <RelatedList />
+      <RelatedList lastNews={data.lastNews} />
       <BrandProducts id={data.brandId} />
     </>
   );

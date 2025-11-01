@@ -8,7 +8,7 @@ import "swiper/css";
 interface Magazine {
   id: number;
   title: string;
-  imageUrl: string;
+  banner: string;
 }
 
 interface MegazineSlideProps {
@@ -20,7 +20,7 @@ export function MegazineSlide({ magazines }: MegazineSlideProps) {
     <Swiper className="hidden! w-full max-sm:block!">
       {magazines.map((magazine) => (
         <SwiperSlide key={magazine.id}>
-          <MegazineCard title={magazine.title} />
+          <MegazineCard imageUrl={magazine.banner} title={magazine.title} />
         </SwiperSlide>
       ))}
     </Swiper>
