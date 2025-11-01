@@ -1,13 +1,11 @@
 "use client";
 
-import { MenuIcon, ChevronRightIcon, SearchIcon } from "lucide-react";
+import { MenuIcon, ChevronRightIcon } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { Link, usePathname } from "@/i18n/navigation";
-import { Search } from "@features/search";
 import useModal from "@shared/lib/hooks/useModal";
 import { cn } from "@shared/lib/style";
-import { Button } from "@shared/ui/button";
 import Divider from "@shared/ui/divider";
 import {
   Sheet,
@@ -61,33 +59,9 @@ function Desktop() {
               Product
             </Link>
           </li>
-          {/*<li>
-            <Link className={styleMap.deskTop.menu} href="/brand">
-              Brand
-            </Link>
-          </li>*/}
-          {/*<li>
-            <Link className={styleMap.deskTop.menu} href="/magazine">
-              Magazine
-            </Link>
-          </li>*/}
         </ul>
       </div>
       <div className="flex items-center-safe gap-[40px]">
-        <div>
-          <Search>
-            <Button
-              className="h-[32px] min-w-[100px] justify-start px-[10px]"
-              variant="outline"
-            >
-              <SearchIcon className="mr-[10px]" height={16} width={16} />
-              <div className="mr-[4px] flex aspect-square w-[20px] items-center justify-center rounded-[5px] bg-black/20">
-                <span className="text-foreground text-body-5">/</span>
-              </div>
-              <span className="text-body-3">를 눌러 검색하세요</span>
-            </Button>
-          </Search>
-        </div>
         <ul className="flex items-center gap-[40px]">
           <li>
             <Link
@@ -162,18 +136,6 @@ function Mobile() {
                     <ChevronRightIcon height={16} width={16} />
                   </Link>
                 </li>
-                {/*<li>
-                <Link className={styleMap.mobile.menu} href="/brand">
-                  Brand
-                  <ChevronRightIcon height={16} width={16} />
-                </Link>
-              </li>
-              <li>
-                <Link className={styleMap.mobile.menu} href="/magazine">
-                  Magazine
-                  <ChevronRightIcon height={16} width={16} />
-                </Link>
-              </li>*/}
                 <li>
                   <Link
                     className={styleMap.mobile.menu}
@@ -208,13 +170,6 @@ function Mobile() {
         <Link className={cn()} href="/">
           <Image alt="" height={16} src="/logo.png" width={133} />
         </Link>
-      </div>
-      <div className="flex gap-[24px]">
-        <Search disableKeyPressOpen>
-          <Button className="h-auto w-auto p-0" variant="ghost">
-            <SearchIcon height={24} width={24} />
-          </Button>
-        </Search>
       </div>
     </div>
   );
