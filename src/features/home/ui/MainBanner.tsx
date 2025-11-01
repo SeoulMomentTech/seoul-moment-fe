@@ -10,6 +10,13 @@ export function MainBanner() {
   return (
     <section className={cn("h-[690px] min-w-[1280px]", "max-sm:min-w-full")}>
       <picture>
+        {data.banner.length > 1 && (
+          <source
+            media="(max-width: 680px)"
+            srcSet={data.banner[1]}
+            type="image/png"
+          />
+        )}
         <Image
           alt=""
           className="h-full object-cover"
@@ -18,13 +25,6 @@ export function MainBanner() {
           src={data.banner[0]}
           width={4000}
         />
-        {data.banner.length > 1 && (
-          <source
-            media="max-width: 680px"
-            srcSet={data.banner[1]}
-            type="image/png"
-          />
-        )}
       </picture>
     </section>
   );
