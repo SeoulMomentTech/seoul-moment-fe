@@ -43,6 +43,7 @@ export interface GetProductListReq extends PublicLanguageCode {
   brandId?: number;
   categoryId?: number;
   productCategoryId?: number;
+  optionIdList?: number[];
   sortColumn?: string; // creatDate, price
   sort?: string; // ASC, DESC
 }
@@ -63,14 +64,30 @@ export interface GetProductListRes {
   list: Array<ProductItem>;
 }
 
-export const getProductList = (req: GetProductListReq) =>
-  api
+export const getProductList = ({
+  optionIdList,
+  ...params
+}: GetProductListReq) => {
+  const searchParams: Array<Array<string | number | boolean>> = Object.entries(
+    params,
+  ).reduce<Array<Array<string | number | boolean>>>(
+    (acc, [key, value]) =>
+      value === undefined || value === null ? acc : [...acc, [key, value]],
+    [],
+  );
+
+  if (Array.isArray(optionIdList)) {
+    optionIdList.forEach((id) => {
+      searchParams.push(["optionIdList", id]);
+    });
+  }
+
+  return api
     .get("product", {
-      searchParams: {
-        ...req,
-      },
+      searchParams,
     })
     .json<CommonRes<GetProductListRes>>();
+};
 
 interface GetProductDetailReq extends PublicLanguageCode {
   id: number;
@@ -193,3 +210,42 @@ export const getProdctionOptionValue = ({
       },
     })
     .json<CommonRes<GetProductOptionValuRes>>();
+
+interface ProductFilter {
+  title: string;
+  optionValueList: Array<ProductFilterOptionValue>;
+}
+
+interface ProductFilterOptionValue {
+  optionId: number;
+  value: string;
+  colorCode?: string;
+}
+
+interface GetProductFilterReq extends PublicLanguageCode {
+  categoryId: number;
+  brandId?: number;
+  productCategoryId?: number;
+}
+
+interface GetProductFilterRes {
+  total: number;
+  list: Array<ProductFilter>;
+}
+
+export const getProductFilter = ({
+  categoryId,
+  brandId,
+  productCategoryId,
+  languageCode,
+}: GetProductFilterReq) =>
+  api
+    .get("product/filter", {
+      searchParams: {
+        categoryId,
+        brandId,
+        productCategoryId,
+        languageCode,
+      },
+    })
+    .json<CommonRes<GetProductFilterRes>>();
