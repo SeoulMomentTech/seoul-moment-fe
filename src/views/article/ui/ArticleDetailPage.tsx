@@ -25,12 +25,13 @@ export default function ArticleDetailPage({ data }: ArticleDetailPageProps) {
   };
   const section = articleData.data.section ?? [];
   const brandId = articleData.data.brandId;
+  const lastNews = articleData.data.lastNews ?? [];
 
   return (
     <>
       <ArticleDetailMain {...main} />
       <ArticleDetailContent data={section} />
-      <RelatedList />
+      <RelatedList lastNews={lastNews} />
       <BrandProducts id={brandId} />
     </>
   );
