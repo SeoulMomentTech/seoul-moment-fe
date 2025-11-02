@@ -7,9 +7,10 @@ import { SectionWithLabel } from "@widgets/section-with-label";
 
 interface RelatedListProps {
   lastNews: LastNews[];
+  type: "news" | "article";
 }
 
-export function RelatedList({ lastNews }: RelatedListProps) {
+export function RelatedList({ lastNews, type }: RelatedListProps) {
   return (
     <div className={cn("mx-auto mt-[-128px] bg-black/5", "max-sm:mt-[-90px]")}>
       <SectionWithLabel
@@ -31,8 +32,8 @@ export function RelatedList({ lastNews }: RelatedListProps) {
           </div>
         }
       >
-        <MoreMagazineList magazines={lastNews} />
-        <MegazineSlide magazines={lastNews} />
+        <MoreMagazineList magazines={lastNews} type={type} />
+        <MegazineSlide magazines={lastNews} type={type} />
       </SectionWithLabel>
     </div>
   );
