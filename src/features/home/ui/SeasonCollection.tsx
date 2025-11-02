@@ -4,6 +4,7 @@ import { ArrowRightIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@shared/lib/style";
+import { Skeleton } from "@shared/ui/skeleton";
 import useHome from "../model/useHome";
 
 export function SeasonCollection() {
@@ -68,6 +69,56 @@ export function SeasonCollection() {
             width={360}
           />
         </figure>
+      </div>
+    </section>
+  );
+}
+
+export function SeasonCollectionSkeleton() {
+  return (
+    <section
+      className={cn(
+        "mx-auto flex w-[1280px] justify-between py-[140px]",
+        "max-sm:w-auto max-sm:flex-col-reverse max-sm:gap-[40px] max-sm:px-[20px] max-sm:py-[90px]",
+      )}
+    >
+      <div
+        className={cn(
+          "flex flex-col justify-center gap-[90px]",
+          "max-sm:ml-0 max-sm:gap-[30px]",
+        )}
+      >
+        <div className="flex flex-col gap-[20px]">
+          <Skeleton
+            className={cn(
+              "h-[32px] w-[280px]",
+              "max-sm:h-[20px] max-sm:w-[180px]",
+            )}
+          />
+          <div className="flex flex-col gap-[12px]">
+            <Skeleton className="h-[18px] w-[360px] max-sm:w-full" />
+            <Skeleton className="h-[18px] w-[320px] max-sm:hidden" />
+          </div>
+        </div>
+        <Skeleton
+          className={cn(
+            "h-[20px] w-[150px]",
+            "max-sm:h-[18px] max-sm:w-[140px]",
+          )}
+        />
+      </div>
+      <div
+        className={cn(
+          "flex h-[590px] gap-[30px]",
+          "max-sm:h-[199px] max-sm:gap-[16px]",
+        )}
+      >
+        <Skeleton
+          className={cn("h-full w-[354px]", "max-sm:w-auto max-sm:flex-1")}
+        />
+        <Skeleton
+          className={cn("h-full w-[354px]", "max-sm:w-auto max-sm:flex-1")}
+        />
       </div>
     </section>
   );
