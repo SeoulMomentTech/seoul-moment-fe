@@ -1,3 +1,4 @@
+import type { LanguageType } from "@/i18n/const";
 import "react";
 
 declare module "react" {
@@ -7,8 +8,9 @@ declare module "react" {
   }
 }
 
-export interface PageParams<T> {
-  params: Promise<T>;
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface PageParams<T extends Record<string, unknown> = {}> {
+  params: Promise<T & { locale: LanguageType }>;
 }
 
 export interface ModalStatus {
