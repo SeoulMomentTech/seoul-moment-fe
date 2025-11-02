@@ -1,5 +1,6 @@
 "use client";
 
+import { Link } from "@/i18n/navigation";
 import { MegazineCard } from "@entities/megazine";
 
 interface Magazine {
@@ -10,17 +11,16 @@ interface Magazine {
 
 interface MoreMagazineListProps {
   magazines: Magazine[];
+  type: "news" | "article";
 }
 
-export function MoreMagazineList({ magazines }: MoreMagazineListProps) {
+export function MoreMagazineList({ magazines, type }: MoreMagazineListProps) {
   return (
     <div className="flex gap-[40px] max-sm:hidden">
       {magazines.map((magazine) => (
-        <MegazineCard
-          imageUrl={magazine.banner}
-          key={magazine.id}
-          title={magazine.title}
-        />
+        <Link href={`/${type}/${magazine.id}`} key={magazine.id}>
+          <MegazineCard imageUrl={magazine.banner} title={magazine.title} />
+        </Link>
       ))}
     </div>
   );

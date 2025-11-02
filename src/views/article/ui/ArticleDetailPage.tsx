@@ -31,7 +31,7 @@ export default function ArticleDetailPage({ data }: ArticleDetailPageProps) {
     <>
       <ArticleDetailMain {...main} />
       <ArticleDetailContent data={section} />
-      <RelatedList lastNews={lastNews} />
+      <RelatedList lastNews={lastNews} type="article" />
       <BrandProducts id={brandId} />
     </>
   );

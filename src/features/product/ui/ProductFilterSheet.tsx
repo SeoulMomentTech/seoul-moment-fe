@@ -32,7 +32,7 @@ const ProductFilterSheet = ({
   return (
     <FilterSheet
       content={(filter, handleFilter) => (
-        <Accordion type="multiple">
+        <Accordion defaultValue={["category", "brand"]} type="multiple">
           <AccordionItem className="border-b-black/20" value="category">
             <AccordionTrigger>카테고리</AccordionTrigger>
             <AccordionContent className="flex flex-col pb-0">
@@ -126,7 +126,7 @@ const OptionalFilters = ({ filter, handleFilter }: OptionalFilters) => {
             {option.optionValueList.map((item) => (
               <Button
                 className={cn(
-                  "justify-start py-[10px] pl-[14px] text-start text-black/40",
+                  "justify-start gap-[8px] py-[10px] pl-[14px] text-start text-black/40",
                   "hover:bg-transparent hover:text-black",
                 )}
                 key={`mobile-${item.optionId}`}
@@ -134,6 +134,14 @@ const OptionalFilters = ({ filter, handleFilter }: OptionalFilters) => {
                 size="sm"
                 variant="ghost"
               >
+                {item.colorCode && (
+                  <div
+                    className="h-[16px] w-[16px] rounded-full"
+                    style={{
+                      backgroundColor: item.colorCode,
+                    }}
+                  />
+                )}
                 {item.value}
               </Button>
             ))}
