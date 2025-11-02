@@ -1,12 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import useLanguage from "@shared/lib/hooks/useLanguage";
 import { getPartnerCategories } from "@shared/services/partner";
 
 const usePartnerCategories = () => {
   const languageCode = useLanguage();
 
-  const query = useQuery({
-    queryKey: ["about", "categories"],
+  const query = useSuspenseQuery({
+    queryKey: ["about", "categories", languageCode],
     queryFn: () => getPartnerCategories({ languageCode }),
     select: (res) => {
       return res.data.list;
