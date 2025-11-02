@@ -24,6 +24,7 @@ export function FeaturedMainNewsCard({
       className={cn(
         "flex h-[596px] w-[460px] flex-col justify-end bg-cover bg-center",
         "max-sm:h-[457px] max-sm:w-full",
+        "bg-black/50",
         className,
       )}
       style={{ backgroundImage: `url(${imageUrl})` }}
@@ -33,7 +34,7 @@ export function FeaturedMainNewsCard({
         extraInfo={
           <AuthorWithDate author={author} date={date} textColor="white" />
         }
-        subTitle={subTitle}
+        subTitle={<p className="line-clamp-2">{subTitle}</p>}
         title={
           <h4
             className={cn("text-title-3 font-semibold", "max-sm:text-[16px]")}
@@ -81,7 +82,7 @@ export function FeaturedSubNewsCard({
       <Card
         contentWrapperClassName="gap-[20px]"
         extraInfo={<AuthorWithDate author={author} date={date} />}
-        subTitle={<p className="max-sm:text-body-3">{subTitle}</p>}
+        subTitle={<p className="max-sm:text-body-3 line-clamp-2">{subTitle}</p>}
         title={
           <h4 className={cn("text-body-1 font-semibold", "max-sm:text-[16px]")}>
             {title}
