@@ -15,10 +15,10 @@ const styleMap = {
 export function DetailContent({ data }: DetailContentProps) {
   return (
     <section className={styleMap.section}>
-      <h3 className="mb-[30px] text-center text-[24px] font-semibold max-sm:px-[20px] max-sm:text-[20px]">
+      <h3 className="mb-[30px] text-center text-[40px] font-semibold max-sm:px-[20px] max-sm:text-[20px]">
         {data?.[0]?.title}
       </h3>
-      <h3 className="mb-[40px] text-[24px] font-semibold max-sm:px-[20px] max-sm:text-[20px]">
+      <h3 className="mb-[40px] text-[22px] font-semibold max-sm:px-[20px] max-sm:text-[20px]">
         {data?.[0]?.subTitle}
       </h3>
       <p
