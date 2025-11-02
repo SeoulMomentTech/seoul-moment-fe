@@ -23,8 +23,8 @@ export function Vision() {
   return (
     <section
       className={cn(
-        "relative h-[880px] bg-black py-[140px]",
-        "max-sm:h-auto max-sm:py-[50px]",
+        "relative h-[880px] w-full min-w-[1280px] bg-black py-[140px]",
+        "max-sm:h-auto max-sm:min-w-full max-sm:py-[50px]",
         "text-white",
       )}
     >

@@ -3,7 +3,7 @@ import { cn } from "@shared/lib/style";
 
 export function MainBanner() {
   return (
-    <section className="relative h-[600px] pt-[56px]">
+    <section className="relative h-[600px] min-w-[1280px] pt-[56px] max-sm:min-w-full">
       <figure
         className={cn(
           "absolute flex h-full w-full items-center justify-center",

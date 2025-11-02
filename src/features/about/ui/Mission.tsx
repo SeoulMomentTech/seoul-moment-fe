@@ -22,7 +22,12 @@ const data = [
 
 export function Mission() {
   return (
-    <section className={cn("relative h-[814px] text-white", "max-sm:h-auto")}>
+    <section
+      className={cn(
+        "relative h-[814px] min-w-[1280px] text-white",
+        "max-sm:h-auto max-sm:min-w-full",
+      )}
+    >
       <Image
         alt=""
         className="absolute h-full object-cover"

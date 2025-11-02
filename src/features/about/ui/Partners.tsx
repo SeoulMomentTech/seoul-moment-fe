@@ -10,7 +10,7 @@ import usePartnerCategories from "../model/usePartnerCategories";
 import usePartners from "../model/usePartners";
 
 export function Partners() {
-  const [id, setId] = useState<string | null>();
+  const [id, setId] = useState<number | null>();
 
   const {
     data: categories = [],
@@ -18,8 +18,8 @@ export function Partners() {
     isEmpty,
   } = usePartnerCategories();
   const { data: partners, isFetched: isPartnersFetched } = usePartners(
-    Number(id ?? 1),
-    !isEmpty,
+    id ?? 0,
+    !isEmpty && !!id,
   );
 
   const partnerList = partners?.list ?? [];
@@ -28,12 +28,17 @@ export function Partners() {
 
   useEffect(() => {
     if (categories.length > 0 && isFetchedAfterMount) {
-      setId(categories[0].id.toString());
+      setId(categories[0].id);
     }
   }, [categories, isFetchedAfterMount]);
 
   return (
-    <section className={cn("relative h-[754px] px-[20px]", "max-sm:h-auto")}>
+    <section
+      className={cn(
+        "relative h-[754px] min-w-[1280px] px-[20px]",
+        "max-sm:h-auto max-sm:min-w-full",
+      )}
+    >
       <div
         className={cn(
           "relative z-[1] mx-auto max-w-[1280px] pt-[140px] pb-[100px] max-sm:py-[50px]",
@@ -52,8 +57,8 @@ export function Partners() {
           {id && (
             <Tabs
               className="border-b border-b-black/10 max-sm:pl-[20px]"
-              defaultValue={id}
-              onValueChange={setId}
+              defaultValue={id.toString()}
+              onValueChange={(value) => setId(Number(value))}
             >
               <TabsList className="flex h-[50px] items-center gap-[30px]">
                 {categories.map((category) => (
