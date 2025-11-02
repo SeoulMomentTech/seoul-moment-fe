@@ -1,21 +1,30 @@
 "use client";
 
+import { UsersIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { PartnerCard } from "@entities/partner";
 import { cn } from "@shared/lib/style";
 import { Tabs, TabsList, TabsTrigger } from "@shared/ui/tabs";
+import { Empty } from "@widgets/empty";
 import usePartnerCategories from "../model/usePartnerCategories";
 import usePartners from "../model/usePartners";
 
 export function Partners() {
+  const [id, setId] = useState<string | null>();
+
   const {
     data: categories = [],
     isFetchedAfterMount,
     isEmpty,
   } = usePartnerCategories();
-  const [id, setId] = useState<string | null>();
+  const { data: partners, isFetched: isPartnersFetched } = usePartners(
+    Number(id ?? 1),
+    !isEmpty,
+  );
 
-  const { data: partners } = usePartners(Number(id ?? 1), !isEmpty);
+  const partnerList = partners?.list ?? [];
+  const shouldShowEmpty =
+    isEmpty || (isPartnersFetched && partnerList.length === 0);
 
   useEffect(() => {
     if (categories.length > 0 && isFetchedAfterMount) {
@@ -59,35 +68,45 @@ export function Partners() {
               </TabsList>
             </Tabs>
           )}
-          {partners && partners.list.length > 0 && (
-            <div
-              className={cn(
-                "flex gap-[40px] max-sm:px-[20px]",
-                "max-sm:flex-col max-sm:gap-[30px]",
-              )}
-            >
-              <PartnerCard
-                className="h-[360px] w-[400px] gap-[30px]"
-                imageClassName="h-[240px]"
-                imageUrl=""
-                subTitle="심플 브랜드 설명"
-                title="서울 모먼트 Brand"
-              />
-              <PartnerCard
-                className="h-[360px] w-[400px] gap-[30px]"
-                imageClassName="h-[240px]"
-                imageUrl=""
-                subTitle="심플 브랜드 설명"
-                title="서울 모먼트 Brand"
-              />
-              <PartnerCard
-                className="h-[360px] w-[400px] gap-[30px]"
-                imageClassName="h-[240px]"
-                imageUrl=""
-                subTitle="심플 브랜드 설명"
-                title="서울 모먼트 Brand"
-              />
-            </div>
+          {shouldShowEmpty ? (
+            <Empty
+              className="h-[360px] w-full max-sm:px-[20px]"
+              description="등록된 협력사가 없습니다."
+              icon={
+                <UsersIcon className="text-black/30" height={24} width={24} />
+              }
+            />
+          ) : (
+            partnerList.length > 0 && (
+              <div
+                className={cn(
+                  "flex gap-[40px] max-sm:px-[20px]",
+                  "max-sm:flex-col max-sm:gap-[30px]",
+                )}
+              >
+                <PartnerCard
+                  className="h-[360px] w-[400px] gap-[30px]"
+                  imageClassName="h-[240px]"
+                  imageUrl=""
+                  subTitle="심플 브랜드 설명"
+                  title="서울 모먼트 Brand"
+                />
+                <PartnerCard
+                  className="h-[360px] w-[400px] gap-[30px]"
+                  imageClassName="h-[240px]"
+                  imageUrl=""
+                  subTitle="심플 브랜드 설명"
+                  title="서울 모먼트 Brand"
+                />
+                <PartnerCard
+                  className="h-[360px] w-[400px] gap-[30px]"
+                  imageClassName="h-[240px]"
+                  imageUrl=""
+                  subTitle="심플 브랜드 설명"
+                  title="서울 모먼트 Brand"
+                />
+              </div>
+            )
           )}
         </div>
       </div>
