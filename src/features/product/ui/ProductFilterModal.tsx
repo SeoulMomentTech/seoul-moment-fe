@@ -106,7 +106,17 @@ export default function ProductFilterModal({
                   <AccordionTrigger>{item.title}</AccordionTrigger>
                   <AccordionContent>
                     {item.optionValueList.map((option) => (
-                      <div key={option.optionId}>{option.value}</div>
+                      <Button
+                        className={cn(
+                          "justify-start px-0 py-[10px] text-start text-black/40",
+                          "hover:bg-transparent hover:text-black",
+                        )}
+                        key={option.optionId}
+                        size="sm"
+                        variant="ghost"
+                      >
+                        {option.value}
+                      </Button>
                     ))}
                   </AccordionContent>
                 </AccordionItem>
