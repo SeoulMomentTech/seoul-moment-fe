@@ -39,7 +39,7 @@ export default function ArticleCard({
           />
         </figure>
       }
-      subTitle={<p className="max-sm:text-[13px]">{subTitle}</p>}
+      subTitle={<p className="line-clamp-2 max-sm:text-[13px]">{subTitle}</p>}
       title={
         <h4 className={cn("text-[18px] font-semibold", "max-sm:text-[16px]")}>
           {title}
