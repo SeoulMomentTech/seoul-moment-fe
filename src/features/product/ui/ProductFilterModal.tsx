@@ -72,7 +72,7 @@ export default function ProductFilterModal({
         </DialogHeader>
         <div className="relative flex flex-col gap-[32px]">
           <div className="min-h-[300px]">
-            <Accordion type="multiple">
+            <Accordion defaultValue={["category"]} type="multiple">
               {filter.categoryId == null && (
                 <AccordionItem value="category">
                   <AccordionTrigger>카테고리</AccordionTrigger>
@@ -108,13 +108,21 @@ export default function ProductFilterModal({
                     {item.optionValueList.map((option) => (
                       <Button
                         className={cn(
-                          "justify-start px-0 py-[10px] text-start text-black/40",
+                          "justify-start gap-[8px] px-0 py-[10px] text-start text-black/40",
                           "hover:bg-transparent hover:text-black",
                         )}
                         key={option.optionId}
                         size="sm"
                         variant="ghost"
                       >
+                        {option.colorCode && (
+                          <div
+                            className="h-[16px] w-[16px] rounded-full"
+                            style={{
+                              backgroundColor: option.colorCode,
+                            }}
+                          />
+                        )}
                         {option.value}
                       </Button>
                     ))}
