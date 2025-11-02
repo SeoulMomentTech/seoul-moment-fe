@@ -34,7 +34,7 @@ export function FeaturedMainNewsCard({
         extraInfo={
           <AuthorWithDate author={author} date={date} textColor="white" />
         }
-        subTitle={<p className="line-clamp-2">{subTitle}</p>}
+        subTitle={<p className="line-clamp-3">{subTitle}</p>}
         title={
           <h4
             className={cn("text-title-3 font-semibold", "max-sm:text-[16px]")}
@@ -82,7 +82,7 @@ export function FeaturedSubNewsCard({
       <Card
         contentWrapperClassName="gap-[20px]"
         extraInfo={<AuthorWithDate author={author} date={date} />}
-        subTitle={<p className="max-sm:text-body-3 line-clamp-2">{subTitle}</p>}
+        subTitle={<p className="max-sm:text-body-3 line-clamp-3">{subTitle}</p>}
         title={
           <h4 className={cn("text-body-1 font-semibold", "max-sm:text-[16px]")}>
             {title}
