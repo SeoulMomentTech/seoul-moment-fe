@@ -19,7 +19,7 @@ export function MainBanner() {
         )}
         <Image
           alt=""
-          className="h-full object-cover"
+          className="h-full object-cover object-top"
           height={727}
           priority
           src={data.banner[0]}
