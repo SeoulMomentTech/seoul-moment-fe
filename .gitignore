@@ -2,6 +2,8 @@
 
 # dependencies
 /node_modules
+apps/web/node_modules/
+apps/admin/node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -15,14 +17,21 @@
 
 # next.js
 /.next/
+apps/web/.next/
 /out/
+apps/web/out/
+
 
 # production
 /build
+apps/web/build/
+apps/admin/dist/
+apps/admin/build/
 
 # misc
 .DS_Store
 *.pem
+.turbo/
 
 # debug
 npm-debug.log*
@@ -35,10 +44,11 @@ yarn-error.log*
 
 # vercel
 .vercel
+apps/web/.vercel/
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
+apps/web/next-env.d.ts
 
 .eslintcache
 
