@@ -21,7 +21,7 @@ export function RelatedList({ lastNews, type }: RelatedListProps) {
         label={
           <div className="mb-[30px] flex w-full items-end justify-between max-sm:mb-[20px]">
             <h3 className="text-[32px] max-sm:text-[20px]">
-              <b>지난 매거진 보러 가기</b>
+              <b>다른 글 보러가기</b>
             </h3>
             <Link
               className="text-[14px] hover:underline max-sm:text-[13px]"

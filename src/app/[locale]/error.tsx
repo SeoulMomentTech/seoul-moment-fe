@@ -21,7 +21,7 @@ export default function GlobalError() {
           <p>Please try again later.</p>
         </div>
       </div>
-      <Button className="h-[48px] w-[186px] font-semibold max-sm:w-full">
+      <Button className="h-[48px] w-[186px] font-semibold whitespace-pre max-sm:w-full">
         메인 페이지로 이동하기
       </Button>
     </div>
