@@ -10,20 +10,6 @@ import { Skeleton } from "@shared/ui/skeleton";
 import { SectionWithLabel } from "@widgets/section-with-label";
 
 export function News() {
-  const { data } = useNews({ count: 3 });
-
-  // Mock data - in a real app this would come from an API
-  const featuredNews = data[0];
-
-  const newsItems = data.slice(1).map((news) => ({
-    id: news.id,
-    title: news.title,
-    subTitle: news.content,
-    imageUrl: news.image,
-    date: news.createDate,
-    author: news.writer,
-  }));
-
   return (
     <SectionWithLabel
       className={cn("w-[1280px] py-[100px]", "max-sm:w-full max-sm:py-[50px]")}
@@ -40,37 +26,54 @@ export function News() {
         </div>
       }
     >
-      <div
-        className={cn(
-          "flex justify-between gap-[40px]",
-          "max-sm:w-full max-sm:flex-col",
-        )}
-      >
-        <Link href={`/news/${featuredNews.id}`}>
-          <FeaturedMainNewsCard
-            author={featuredNews.writer}
-            date={featuredNews.createDate}
-            imageUrl={featuredNews.image}
-            subTitle={featuredNews.content}
-            title={featuredNews.title}
-          />
-        </Link>
-        {newsItems.length > 0 && (
-          <>
-            <div className="flex justify-start max-sm:justify-end">
-              <Link href={`/news/${newsItems[0].id}`}>
-                <FeaturedSubNewsCard {...newsItems[0]} />
-              </Link>
-            </div>
-            <div>
-              <Link href={`/news/${newsItems[1].id}`}>
-                <FeaturedSubNewsCard {...newsItems[1]} />
-              </Link>
-            </div>
-          </>
-        )}
-      </div>
+      <NewsContents />
     </SectionWithLabel>
+  );
+}
+
+function NewsContents() {
+  const { data } = useNews({ count: 3 });
+
+  return (
+    <div
+      className={cn(
+        "flex justify-between gap-[40px]",
+        "max-sm:w-full max-sm:flex-col",
+      )}
+    >
+      {data.map((news, idx) => {
+        if (idx === 0) {
+          return (
+            <Link href={`/news/${news.id}`} key={`main-${news.id}`}>
+              <FeaturedMainNewsCard
+                author={news.writer}
+                date={news.createDate}
+                imageUrl={news.image}
+                subTitle={news.content}
+                title={news.title}
+              />
+            </Link>
+          );
+        }
+
+        return (
+          <div
+            className={cn(idx === 1 && "flex justify-start max-sm:justify-end")}
+            key={`sub-${news.id}`}
+          >
+            <Link href={`/news/${news.id}`}>
+              <FeaturedSubNewsCard
+                author={news.writer}
+                date={news.createDate}
+                imageUrl={news.image}
+                subTitle={news.content}
+                title={news.title}
+              />
+            </Link>
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
