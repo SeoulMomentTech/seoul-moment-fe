@@ -18,7 +18,10 @@ export function HomePage() {
       <Suspense
         fallback={
           <Skeleton
-            className={cn("h-[690px] min-w-[1280px]", "max-sm:min-w-full")}
+            className={cn(
+              "h-[600px] min-w-[1280px] pt-[56px]",
+              "max-sm:h-[350px] max-sm:min-w-full",
+            )}
           />
         }
       >
