@@ -8,7 +8,12 @@ export function MainBanner() {
   const { data } = useHome();
 
   return (
-    <section className={cn("h-[690px] min-w-[1280px]", "max-sm:min-w-full")}>
+    <section
+      className={cn(
+        "h-[600px] min-w-[1280px] pt-[56px]",
+        "max-sm:h-[350px] max-sm:min-w-full",
+      )}
+    >
       <picture>
         {data.banner.length > 1 && (
           <source
