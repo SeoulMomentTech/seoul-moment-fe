@@ -7,6 +7,10 @@ import useHome from "../model/useHome";
 export function MainBanner() {
   const { data } = useHome();
 
+  if (!data) return null;
+
+  const banner = data.banner[0];
+
   return (
     <section
       className={cn(
@@ -15,19 +19,22 @@ export function MainBanner() {
       )}
     >
       <picture>
-        {data.banner.length > 1 && (
-          <source
-            media="(max-width: 680px)"
-            srcSet={data.banner[1]}
-            type="image/png"
-          />
-        )}
+        <source
+          media="(max-width: 680px)"
+          srcSet={banner.mobileImage}
+          type="image/webp"
+        />
+        <source
+          media="(max-width: 680px)"
+          srcSet={banner.mobileImage}
+          type="image/png"
+        />
         <Image
           alt=""
           className="h-full object-cover object-top"
-          height={727}
+          height={600}
           priority
-          src={data.banner[0]}
+          src={banner.image}
           width={4000}
         />
       </picture>

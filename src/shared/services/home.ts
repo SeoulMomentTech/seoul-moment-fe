@@ -10,7 +10,7 @@ interface HomeSection {
 }
 
 interface GetHomeRes {
-  banner: string[];
+  banner: Array<Record<"image" | "mobileImage", string>>;
   section: HomeSection[];
 }
 
