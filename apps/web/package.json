@@ -45,6 +45,7 @@
     "@eslint/eslintrc": "^3",
     "@seoul-moment/eslint-config": "workspace:*",
     "@seoul-moment/prettier-config": "workspace:*",
+    "@seoul-moment/tailwind-config": "workspace:*",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

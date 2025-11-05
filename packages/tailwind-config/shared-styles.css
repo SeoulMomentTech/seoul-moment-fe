@@ -1,7 +1,5 @@
-@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
 @import "tailwindcss";
-@import "@seoul-moment/tailwind-config";
-@import "tailwind-scrollbar-hide/v4";
+@import "tailwindcss-animated";
 
 :root {
   --background: #ffffff;
@@ -27,17 +25,6 @@
   --text-body-3: 14px;
   --text-body-4: 13px;
   --text-body-5: 12px;
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: "Pretendard", sans-serif;
-}
-
-* {
-  line-height: 1.25;
-  @apply focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-0 focus-visible:outline-none;
 }
 
 button {
