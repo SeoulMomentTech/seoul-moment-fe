@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "pnpm run i18n:sync && next dev --turbopack",
     "build": "next build",
-    "start": "next start",
+    "dev": "pnpm run i18n:sync && next dev --turbopack",
+    "i18n:sync": "node scripts/syncLocaleFromSheet.js",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
-    "i18n:sync": "node scripts/syncLocaleFromSheet.js"
+    "start": "next start"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -43,19 +43,18 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@seoul-moment/eslint-config": "workspace:*",
+    "@seoul-moment/prettier-config": "workspace:*",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "15.3.1",
-    "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-unused-imports": "^4.1.4",
     "google-auth-library": "^10.1.0",
     "googleapis": "^150.0.1",
-    "prettier": "^3.5.3",
-    "prettier-plugin-tailwindcss": "^0.6.11",
+    "prettier": "^3.6.2",
+    "prettier-plugin-packagejson": "^2.5.19",
+    "prettier-plugin-tailwindcss": "^0.6.14",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

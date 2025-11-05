@@ -53,3 +53,5 @@ apps/web/next-env.d.ts
 .eslintcache
 
 account.json
+
+packages/**/node_modules
