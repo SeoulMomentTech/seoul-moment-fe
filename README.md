@@ -1,38 +1,42 @@
-# SeoulMoment - FrontEnd
+# Seoul Moment Frontend Monorepo
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This repository now follows a pnpm-based monorepo layout. The existing Next.js application lives in `apps/web`, and additional apps or shared packages can be added under `apps/*` and `packages/*`.
 
-## Getting Started
+## Structure
 
-First, run the development server:
+- `apps/web` – primary Next.js application
+- `packages/*` – (optional) shared libraries and utilities
+- Root configs – workspace-wide tooling such as Husky hooks and lint-staged rules
+
+## Scripts
+
+Run commands from the repository root (all executed through Turborepo):
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm dev         # start the web app in watch mode
+pnpm dev:admin   # start the Vite admin app
+pnpm build       # run builds for every package
+pnpm start       # launch the production Next.js server
+pnpm lint        # lint every package
+pnpm lint:fix    # lint web with --fix
+pnpm i18n:sync   # sync locale data for the web app
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+You can still `cd` into each app (`apps/web`, `apps/admin`) and run their scripts directly when you need more fine-grained control.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tooling
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Husky git hooks live at the repository root (`.husky`)
+- lint-staged formats/lints staged files in `apps/web` and `apps/admin`
+- turborepo pipeline definition: `turbo.json`
+- pnpm workspace definition: `pnpm-workspace.yaml`
+- pnpm uses isolated `node_modules` per package (`.npmrc`)
 
-## Learn More
+## Adding More Packages
 
-To learn more about Next.js, take a look at the following resources:
+1. Create a new folder under `apps/` or `packages/`
+2. Add its own `package.json`
+3. Install dependencies with `pnpm install`
+4. Reference the package using standard pnpm workspace tooling (`pnpm --filter` or package aliases)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This setup keeps the Next.js app intact while making space for shared UI kits, server apps, or other tooling in the monorepo.
