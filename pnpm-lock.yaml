@@ -8,12 +8,24 @@ importers:
 
   .:
     devDependencies:
+      '@seoul-moment/prettier-config':
+        specifier: workspace:*
+        version: link:packages/prettier-config
       husky:
         specifier: ^9.1.7
         version: 9.1.7
       lint-staged:
         specifier: ^15.5.1
         version: 15.5.2
+      prettier:
+        specifier: ^3.6.2
+        version: 3.6.2
+      prettier-plugin-packagejson:
+        specifier: ^2.5.19
+        version: 2.5.19(prettier@3.6.2)
+      prettier-plugin-tailwindcss:
+        specifier: ^0.6.14
+        version: 0.6.14(prettier@3.6.2)
       turbo:
         specifier: ^2.1.2
         version: 2.6.0
@@ -33,9 +45,6 @@ importers:
       '@seoul-moment/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
-      '@seoul-moment/prettier-config':
-        specifier: workspace:*
-        version: link:../../packages/prettier-config
       '@seoul-moment/tailwind-config':
         specifier: workspace:*
         version: link:../../packages/tailwind-config
@@ -69,15 +78,6 @@ importers:
       globals:
         specifier: ^16.4.0
         version: 16.5.0
-      prettier:
-        specifier: ^3.6.2
-        version: 3.6.2
-      prettier-plugin-packagejson:
-        specifier: ^2.5.19
-        version: 2.5.19(prettier@3.6.2)
-      prettier-plugin-tailwindcss:
-        specifier: ^0.6.14
-        version: 0.6.14(prettier@3.6.2)
       tailwindcss:
         specifier: ^4.1.16
         version: 4.1.16
@@ -187,9 +187,6 @@ importers:
       '@seoul-moment/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
-      '@seoul-moment/prettier-config':
-        specifier: workspace:*
-        version: link:../../packages/prettier-config
       '@seoul-moment/tailwind-config':
         specifier: workspace:*
         version: link:../../packages/tailwind-config
@@ -214,15 +211,6 @@ importers:
       googleapis:
         specifier: ^150.0.1
         version: 150.0.1
-      prettier:
-        specifier: ^3.6.2
-        version: 3.6.2
-      prettier-plugin-packagejson:
-        specifier: ^2.5.19
-        version: 2.5.19(prettier@3.6.2)
-      prettier-plugin-tailwindcss:
-        specifier: ^0.6.14
-        version: 0.6.14(prettier@3.6.2)
       tailwindcss:
         specifier: ^4
         version: 4.1.16
@@ -256,7 +244,7 @@ importers:
         version: 4.3.0(@typescript-eslint/eslint-plugin@8.46.2(@typescript-eslint/parser@8.46.2(eslint@9.39.0(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.0(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.0(jiti@2.6.1))
 
   packages/prettier-config:
-    devDependencies:
+    dependencies:
       prettier:
         specifier: ^3.6.2
         version: 3.6.2

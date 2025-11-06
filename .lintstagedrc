@@ -1,6 +1,6 @@
 {
   "apps/web/src/**/*.{js,ts,jsx,tsx}": [
-    "pnpm --filter @seoul-moment/web exec prettier --write",
+    "pnpm exec prettier --write",
     "pnpm --filter @seoul-moment/web exec eslint --config eslint.config.mjs --cache --max-warnings=0"
   ],
   "apps/admin/src/**/*.{js,ts,jsx,tsx}": [
