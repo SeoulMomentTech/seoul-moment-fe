@@ -96,22 +96,27 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
                 "max-sm:flex-col max-sm:gap-[40px]",
               )}
             >
-              <div className="flex max-sm:justify-start">
+              {data?.section?.[0]?.imageList.map((image, idx) => (
                 <div
                   className={cn(
-                    "h-[500px] w-[305px] bg-slate-300",
-                    "max-sm:h-[320px] max-sm:w-[208px]",
+                    "flex max-sm:justify-start",
+                    idx === 1 && "max-sm:justify-end",
                   )}
-                />
-              </div>
-              <div className="flex max-sm:justify-end">
-                <div
-                  className={cn(
-                    "h-[500px] w-[305px] bg-slate-300",
-                    "max-sm:h-[320px] max-sm:w-[208px]",
-                  )}
-                />
-              </div>
+                  key={`${image}-${idx + 1}`}
+                >
+                  <Image
+                    alt=""
+                    className={cn(
+                      "h-[500px] w-[305px] bg-slate-300",
+                      "max-sm:h-[320px] max-sm:w-[208px]",
+                      "object-cover",
+                    )}
+                    height={500}
+                    src={image}
+                    width={305}
+                  />
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -216,7 +221,101 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
           />
         )}
       </article>
-      <BrandProducts id={1} />
+      {data?.section?.[3] && (
+        <article
+          className={cn("mx-auto w-[1280px]", "max-sm:w-full max-sm:pt-[90px]")}
+        >
+          <div
+            className={cn(
+              "flex gap-[65px] pb-[140px]",
+              "max-sm:flex-col max-sm:gap-[40px] max-sm:px-[20px] max-sm:pb-[90px]",
+            )}
+          >
+            <div className="flex flex-col justify-end gap-[20px]">
+              {data.section[3]?.title && (
+                <h4
+                  className={cn(
+                    "text-body-1 font-semibold",
+                    "max-sm:text-body-2",
+                  )}
+                  dangerouslySetInnerHTML={{
+                    __html: replaceLineBreaks(data.section[3].title),
+                  }}
+                />
+              )}
+              {data.section[3]?.content && (
+                <p
+                  dangerouslySetInnerHTML={{
+                    __html: replaceLineBreaks(data.section[3].content),
+                  }}
+                />
+              )}
+            </div>
+            {data.section[3]?.imageList?.[0] && (
+              <div
+                className={cn(
+                  "h-[640px] min-w-[585px] bg-slate-300",
+                  "max-sm:h-[400px] max-sm:min-w-full",
+                )}
+              >
+                <Image
+                  alt=""
+                  className="h-full object-cover"
+                  height={600}
+                  src={data.section[3].imageList[0]}
+                  width={900}
+                />
+              </div>
+            )}
+          </div>
+        </article>
+      )}
+      {data?.section?.[4] && (
+        <article
+          className={cn(
+            "mx-auto flex w-[1280px] flex-col gap-[60px] pb-[100px] pt-[140px]",
+            "max-sm:w-full max-sm:gap-[40px] max-sm:px-[20px] max-sm:pb-[50px] max-sm:pt-[90px]",
+          )}
+        >
+          {data.section[4]?.title && (
+            <h4
+              className={cn(
+                "text-title-3 font-semibold",
+                "max-sm:text-title-4",
+              )}
+              dangerouslySetInnerHTML={{
+                __html: replaceLineBreaks(data.section[4].title ?? ""),
+              }}
+            />
+          )}
+          {data.section[4]?.imageList && (
+            <div className="flex items-center justify-center">
+              <figure
+                className={cn(
+                  "h-[600px] w-[846px]",
+                  "max-sm:h-[244px] max-sm:w-full",
+                )}
+              >
+                <Image
+                  alt=""
+                  className="h-full object-cover"
+                  height={600}
+                  src={data.section[4].imageList[0]}
+                  width={900}
+                />
+              </figure>
+            </div>
+          )}
+          {data.section[4]?.content && (
+            <p
+              dangerouslySetInnerHTML={{
+                __html: replaceLineBreaks(data.section[4].content),
+              }}
+            />
+          )}
+        </article>
+      )}
+      <BrandProducts id={data.id} />
     </div>
   );
 }
