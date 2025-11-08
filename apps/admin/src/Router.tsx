@@ -36,7 +36,7 @@ const publicRoutes = [
 ];
 
 const PrivateRoute = () => {
-  const isLogin = false;
+  const isLogin = true;
 
   if (!isLogin) {
     return <Navigate replace to={PATH.LOGIN} />;

@@ -19,6 +19,7 @@
     "@radix-ui/react-select": "^2.2.5",
     "@radix-ui/react-slot": "^1.2.2",
     "@radix-ui/react-tabs": "^1.1.11",
+    "@seoul-moment/ui": "workspace:*",
     "@tanstack/react-query": "^5.76.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",

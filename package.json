@@ -3,18 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "turbo run dev",
-    "dev:web": "turbo run dev --filter=@seoul-moment/web",
-    "dev:admin": "turbo run dev --filter=@seoul-moment/admin",
     "build": "turbo run build",
-    "build:web": "turbo run build --filter=@seoul-moment/web",
     "build:admin": "turbo run build --filter=@seoul-moment/admin",
-    "start": "turbo run start --filter=@seoul-moment/web",
-    "lint": "turbo run lint",
-    "lint:fix": "turbo run lint:fix --filter=@seoul-moment/web",
+    "build:ui": "turbo run build --filter=@seoul-moment/ui",
+    "build:web": "turbo run build --filter=@seoul-moment/web",
+    "dev": "turbo run dev",
+    "dev:admin": "turbo run dev --filter=@seoul-moment/admin",
+    "dev:web": "turbo run dev --filter=@seoul-moment/web",
     "i18n:sync": "turbo run i18n:sync --filter=@seoul-moment/web",
+    "lint": "turbo run lint",
+    "lint-staged": "lint-staged",
+    "lint:fix": "turbo run lint:fix --filter=@seoul-moment/web",
     "prepare": "husky",
-    "lint-staged": "lint-staged"
+    "start": "turbo run start --filter=@seoul-moment/web"
   },
   "devDependencies": {
     "@seoul-moment/prettier-config": "workspace:*",

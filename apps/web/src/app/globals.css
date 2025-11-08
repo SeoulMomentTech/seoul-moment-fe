@@ -1,7 +1,10 @@
+@source "../../../packages/ui/**/*.{js,ts,jsx,tsx}";
+
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
 @import "tailwindcss";
 @import "@seoul-moment/tailwind-config";
 @import "tailwind-scrollbar-hide/v4";
+@import "@seoul-moment/ui/styles.css";
 
 :root {
   --background: #ffffff;
@@ -37,7 +40,7 @@ body {
 
 * {
   line-height: 1.25;
-  @apply focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-0 focus-visible:outline-none;
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-0;
 }
 
 button {
