@@ -51,7 +51,6 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-plugin-react-hooks": "^5.2.0",
     "google-auth-library": "^10.1.0",
     "googleapis": "^150.0.1",
     "tailwindcss": "^4",

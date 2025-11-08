@@ -8,9 +8,15 @@ importers:
 
   .:
     devDependencies:
+      '@next/eslint-plugin-next':
+        specifier: ^15.3.1
+        version: 15.3.1
       '@seoul-moment/prettier-config':
         specifier: workspace:*
         version: link:packages/prettier-config
+      eslint-plugin-react-hooks:
+        specifier: ^5.2.0
+        version: 5.2.0(eslint@9.39.0(jiti@2.6.1))
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -217,9 +223,6 @@ importers:
       eslint:
         specifier: ^9
         version: 9.39.0(jiti@2.6.1)
-      eslint-plugin-react-hooks:
-        specifier: ^5.2.0
-        version: 5.2.0(eslint@9.39.0(jiti@2.6.1))
       google-auth-library:
         specifier: ^10.1.0
         version: 10.5.0

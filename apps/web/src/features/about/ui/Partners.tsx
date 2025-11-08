@@ -1,10 +1,10 @@
 "use client";
 
+import { Tabs, TabsList, TabsTrigger } from "@seoul-moment/ui";
 import { UsersIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { PartnerCard } from "@entities/partner";
 import { cn } from "@shared/lib/style";
-import { Tabs, TabsList, TabsTrigger } from "@shared/ui/tabs";
 import { Empty } from "@widgets/empty";
 import usePartnerCategories from "../model/usePartnerCategories";
 import usePartners from "../model/usePartners";

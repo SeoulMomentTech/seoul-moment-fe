@@ -1,8 +1,8 @@
+import { Button } from "@seoul-moment/ui";
 import { SearchIcon } from "lucide-react";
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@shared/lib/style";
-import { Button } from "@shared/ui/button";
 import { LanguageSupport } from "@widgets/language-support";
 
 interface SearchHeaderProps {

@@ -1,3 +1,4 @@
+import { Button } from "@seoul-moment/ui";
 import { Share2Icon } from "lucide-react";
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
@@ -5,7 +6,6 @@ import { useBrandBanner } from "@entities/brand/model/hooks/useBrandBanner";
 import useLanguage from "@shared/lib/hooks/useLanguage";
 import useModal from "@shared/lib/hooks/useModal";
 import { cn } from "@shared/lib/style";
-import { Button } from "@shared/ui/button";
 
 interface ProductBrandBannerProps {
   id: number;

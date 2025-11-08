@@ -1,3 +1,4 @@
+import { Button } from "@seoul-moment/ui";
 import type { ReactNode } from "react";
 import { useState, type PropsWithChildren } from "react";
 import useProductFilter from "@features/product/model/useProductFilter";
@@ -7,7 +8,6 @@ import {
   type OptionIdListValue,
 } from "@shared/lib/utils/filter";
 
-import { Button } from "@shared/ui/button";
 import FixedBox from "@shared/ui/fixed-box";
 import { RefreshIcon } from "@shared/ui/icon";
 import {

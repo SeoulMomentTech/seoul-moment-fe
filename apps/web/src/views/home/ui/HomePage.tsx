@@ -1,3 +1,4 @@
+import { Skeleton } from "@seoul-moment/ui";
 import { Suspense } from "react";
 import {
   SeasonCollection,
@@ -10,7 +11,6 @@ import {
   ContactUS,
 } from "@features/home";
 import { cn } from "@shared/lib/style";
-import { Skeleton } from "@shared/ui/skeleton";
 
 export function HomePage() {
   return (

@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@seoul-moment/ui";
 import { SearchIcon } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { ProductCard } from "@entities/product";
@@ -8,7 +9,6 @@ import useOpen from "@shared/lib/hooks/useOpen";
 import { cn } from "@shared/lib/style";
 import type { GetProductListReq } from "@shared/services/product";
 
-import { Button } from "@shared/ui/button";
 import { FilterIcon } from "@shared/ui/icon";
 import { Empty } from "@widgets/empty";
 import { useInfiniteProducts } from "../../model/useInfiniteProducts";
