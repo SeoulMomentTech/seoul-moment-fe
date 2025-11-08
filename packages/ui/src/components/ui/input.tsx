@@ -1,4 +1,4 @@
-import { cn } from "@shared/lib/style";
+import { cn } from "../../lib/utils";
 
 function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   return (

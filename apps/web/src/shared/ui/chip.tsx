@@ -1,5 +1,5 @@
+import { Button } from "@seoul-moment/ui";
 import type { ComponentProps } from "react";
-import { Button } from "./button";
 import { cn } from "../lib/style";
 
 interface ChipProps extends ComponentProps<"button"> {

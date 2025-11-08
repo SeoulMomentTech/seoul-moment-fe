@@ -1,6 +1,6 @@
+import { Button } from "@seoul-moment/ui";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@shared/lib/style";
-import { Button } from "@shared/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,

@@ -1,11 +1,11 @@
 "use client";
 
+import { Skeleton } from "@seoul-moment/ui";
 import { Link } from "@/i18n/navigation";
 
 import { useNews } from "@entities/news/model/hooks";
 import { FeaturedMainNewsCard, FeaturedSubNewsCard } from "@entities/news/ui";
 import { cn } from "@shared/lib/style";
-import { Skeleton } from "@shared/ui/skeleton";
 
 import { SectionWithLabel } from "@widgets/section-with-label";
 

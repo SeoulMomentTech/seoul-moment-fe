@@ -20,7 +20,7 @@ export default defineConfig([
     },
   },
   ...reactJsConfig,
-  globalIgnores(["dist"]),
+  globalIgnores(["dist", "eslint.config.js"]),
   {
     files: ["**/*.{ts,tsx}"],
     extends: [
@@ -37,10 +37,11 @@ export default defineConfig([
         tsconfigRootDir: import.meta.dirname,
       },
     },
-    settings: {
-      react: {
-        version: "19.1",
-      },
+    rules: {
+      "react-refresh/only-export-components": [
+        "warn",
+        { allowConstantExport: true },
+      ],
     },
   },
 ]);

@@ -1,9 +1,8 @@
 "use client";
 
 import { Slot } from "@radix-ui/react-slot"; // shadcn의 Slot
-import { Loader2 } from "lucide-react";
 import * as React from "react";
-import { cn } from "@shared/lib/style";
+import { cn } from "../../lib/utils";
 
 export interface ButtonProps extends React.ComponentProps<"button"> {
   variant?: "default" | "outline" | "ghost" | "destructive";
@@ -50,7 +49,11 @@ export function Button({
       disabled={isLoading || disabled}
       {...props}
     >
-      {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+      {isLoading && (
+        <span className="mr-2 flex h-4 w-4 animate-spin items-center justify-center">
+          <span className="h-3 w-3 rounded-full border-2 border-current border-t-transparent" />
+        </span>
+      )}
       {children}
     </Comp>
   );

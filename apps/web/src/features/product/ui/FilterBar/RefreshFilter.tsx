@@ -1,4 +1,4 @@
-import { Button } from "@shared/ui/button";
+import { Button } from "@seoul-moment/ui";
 import { RefreshIcon } from "@shared/ui/icon";
 
 interface RefreshFilterProps {

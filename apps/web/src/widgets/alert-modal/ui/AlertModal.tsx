@@ -1,7 +1,5 @@
+import { Button, Dialog, DialogContent, DialogTitle } from "@seoul-moment/ui";
 import type { PropsWithChildren } from "react";
-
-import { Button } from "@shared/ui/button";
-import { Dialog, DialogContent, DialogTitle } from "@shared/ui/dialog";
 
 interface AlertModalProps extends PropsWithChildren {
   open?: boolean;

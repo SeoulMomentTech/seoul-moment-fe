@@ -1,11 +1,11 @@
 "use client";
 
+import { Skeleton } from "@seoul-moment/ui";
 import { ArrowRightIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useId } from "react";
 import { cn } from "@shared/lib/style";
-import { Skeleton } from "@shared/ui/skeleton";
 import useHome from "../model/useHome";
 
 export function SeasonCollection() {

@@ -1,5 +1,13 @@
 "use client";
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+  Button,
+} from "@seoul-moment/ui";
+import { Tabs, TabsList, TabsTrigger } from "@seoul-moment/ui";
 import { SearchIcon } from "lucide-react";
 import { lazy, useState } from "react";
 import { Link } from "@/i18n/navigation";
@@ -8,15 +16,8 @@ import useLanguage from "@shared/lib/hooks/useLanguage";
 import useOpen from "@shared/lib/hooks/useOpen";
 import { cn } from "@shared/lib/style";
 import type { GetProductListReq } from "@shared/services/product";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@shared/ui/accordion";
-import { Button } from "@shared/ui/button";
+
 import Divider from "@shared/ui/divider";
-import { Tabs, TabsList, TabsTrigger } from "@shared/ui/tabs";
 import { Empty } from "@widgets/empty";
 import { ProductCategoryFilter } from "@widgets/product-category-filter";
 import useBrandFilter from "../../model/useBrandFilter";
