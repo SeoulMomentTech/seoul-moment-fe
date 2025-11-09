@@ -1,11 +1,11 @@
 "use client";
 
+import { Button } from "@seoul-moment/ui";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { FreeMode } from "swiper/modules";
 import { Swiper, SwiperSlide, useSwiper } from "swiper/react"; // 예시: Swiper 라이브러리 사용
 import StyleCard from "@entities/article/ui/StyleCard";
 import { cn } from "@shared/lib/style";
-import { Button } from "@shared/ui/button";
 
 import "swiper/css";
 import "./editor-pick-slide.css";

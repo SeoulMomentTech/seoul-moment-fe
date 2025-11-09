@@ -1,4 +1,4 @@
-import { cn } from "@shared/lib/style";
+import { cn } from "../../lib/utils";
 
 interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
   rounded?: boolean;

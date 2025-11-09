@@ -7,7 +7,7 @@ export function IconNic() {
       className="mt-[60px] w-full gap-[14px] px-[40px] pb-[50px]"
       label={
         <div className="flex w-full items-center justify-between">
-          <h2 className="text-[18px]">
+          <h2 className="text-body-1">
             <b>THE ICONIC SILHOUETTES</b>
           </h2>
           <Link className="hover:underline" href="/">

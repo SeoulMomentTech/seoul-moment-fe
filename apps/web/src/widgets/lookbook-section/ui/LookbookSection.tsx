@@ -1,10 +1,10 @@
 "use client";
 
+import { Button } from "@seoul-moment/ui";
+import { Tabs, TabsList, TabsTrigger } from "@seoul-moment/ui";
 import { ChevronDown } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@shared/lib/style";
-import { Button } from "@shared/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "@shared/ui/tabs";
 import { LookbookGallery } from "@widgets/lookbook-gallery";
 import { SectionWithLabel } from "@widgets/section-with-label";
 

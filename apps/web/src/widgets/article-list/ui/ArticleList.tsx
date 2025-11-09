@@ -2,17 +2,16 @@
 
 import { Link } from "@/i18n/navigation";
 import { ArticleCard } from "@entities/article";
-import { useArticle } from "@entities/article/model/hooks";
 
 import { cn } from "@shared/lib/style";
+import type { Article } from "@shared/services/article";
 
 interface ArticleListProps {
   className?: string;
+  data: Article[];
 }
 
-export default function ArticleList({ className }: ArticleListProps) {
-  const { data } = useArticle({ count: 2 });
-
+export default function ArticleList({ className, data }: ArticleListProps) {
   return (
     <div className={cn("flex gap-[40px] max-sm:hidden", className)}>
       {data.map((article) => (

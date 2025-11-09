@@ -1,15 +1,24 @@
-"use client";
-
-import { Link } from "@/i18n/navigation";
-
-import { useNews } from "@entities/news/model/hooks";
-import { FeaturedMainNewsCard, FeaturedSubNewsCard } from "@entities/news/ui";
+import { Skeleton } from "@seoul-moment/ui";
+import { getLocale } from "next-intl/server";
+import { Suspense } from "react";
+import type { LanguageType } from "@/i18n/const";
 import { cn } from "@shared/lib/style";
-import { Skeleton } from "@shared/ui/skeleton";
-
+import { getNewsList } from "@shared/services/news";
 import { SectionWithLabel } from "@widgets/section-with-label";
+import { News as NewsClient } from "./News.client";
 
-export function News() {
+export default async function News() {
+  const locale = (await getLocale()) as LanguageType;
+  const promise = getNewsList({ count: 3, languageCode: locale });
+
+  return (
+    <Suspense fallback={<NewsSkeleton />}>
+      <NewsClient promise={promise} />
+    </Suspense>
+  );
+}
+
+function NewsSkeleton() {
   return (
     <SectionWithLabel
       className={cn("w-[1280px] py-[100px]", "max-sm:w-full max-sm:py-[50px]")}
@@ -20,75 +29,7 @@ export function News() {
             "max-sm:mb-[20px] max-sm:px-[20px]",
           )}
         >
-          <h3 className="text-[32px] max-sm:text-[20px]">
-            <b>NEWS</b>
-          </h3>
-        </div>
-      }
-    >
-      <NewsContents />
-    </SectionWithLabel>
-  );
-}
-
-function NewsContents() {
-  const { data } = useNews({ count: 3 });
-
-  return (
-    <div
-      className={cn(
-        "flex justify-between gap-[40px]",
-        "max-sm:w-full max-sm:flex-col",
-      )}
-    >
-      {data.map((news, idx) => {
-        if (idx === 0) {
-          return (
-            <Link href={`/news/${news.id}`} key={`main-${news.id}`}>
-              <FeaturedMainNewsCard
-                author={news.writer}
-                date={news.createDate}
-                imageUrl={news.image}
-                subTitle={news.content}
-                title={news.title}
-              />
-            </Link>
-          );
-        }
-
-        return (
-          <div
-            className={cn(idx === 1 && "flex justify-start max-sm:justify-end")}
-            key={`sub-${news.id}`}
-          >
-            <Link href={`/news/${news.id}`}>
-              <FeaturedSubNewsCard
-                author={news.writer}
-                date={news.createDate}
-                imageUrl={news.image}
-                subTitle={news.content}
-                title={news.title}
-              />
-            </Link>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-export function NewsSkeleton() {
-  return (
-    <SectionWithLabel
-      className={cn("w-[1280px] py-[100px]", "max-sm:w-full max-sm:py-[50px]")}
-      label={
-        <div
-          className={cn(
-            "mb-[30px] flex w-full items-end justify-between",
-            "max-sm:mb-[20px] max-sm:px-[20px]",
-          )}
-        >
-          <h3 className="text-[32px] max-sm:text-[20px]">
+          <h3 className="text-title-2 max-sm:text-title-4">
             <b>NEWS</b>
           </h3>
         </div>

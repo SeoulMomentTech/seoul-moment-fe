@@ -7,6 +7,18 @@ import { defineConfig, globalIgnores } from "eslint/config";
 import reactJsConfig from "@seoul-moment/eslint-config/react-internal";
 
 export default defineConfig([
+  {
+    plugins: {
+      "@typescript-eslint": tseslint.plugin,
+    },
+  },
+  {
+    files: ["**/*.config.{js,cjs,mjs}"],
+    rules: {
+      "@typescript-eslint/consistent-type-imports": "off",
+      "@typescript-eslint/consistent-indexed-object-style": "off",
+    },
+  },
   ...reactJsConfig,
   globalIgnores(["dist"]),
   {
@@ -20,6 +32,10 @@ export default defineConfig([
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
+      parserOptions: {
+        project: ["./tsconfig.app.json", "./tsconfig.node.json"],
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
     settings: {
       react: {

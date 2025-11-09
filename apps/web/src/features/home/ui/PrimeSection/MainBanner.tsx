@@ -1,15 +1,17 @@
 "use client";
 
 import Image from "next/image";
+import { use } from "react";
 import { cn } from "@shared/lib/style";
-import useHome from "../model/useHome";
+import type { getHome } from "@shared/services/home";
 
-export function MainBanner() {
-  const { data } = useHome();
+interface MainBannerProps {
+  promise: ReturnType<typeof getHome>;
+}
 
-  if (!data) return null;
-
-  const banner = data.banner[0];
+export function MainBanner({ promise }: MainBannerProps) {
+  const res = use(promise);
+  const banner = res.data.banner[0];
 
   return (
     <section

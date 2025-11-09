@@ -1,6 +1,6 @@
+import { Button } from "@seoul-moment/ui";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@shared/lib/style";
-import { Button } from "@shared/ui/button";
 
 export function ContactUS() {
   return (
@@ -14,7 +14,7 @@ export function ContactUS() {
     >
       <div className={cn("flex flex-col gap-[40px]", "max-sm:w-full")}>
         <div className="flex flex-col gap-[20px]">
-          <h2 className={cn("text-[32px] font-bold", "max-sm:text-[24px]")}>
+          <h2 className={cn("text-title-2 font-bold", "max-sm:text-title-3")}>
             Contact Us
           </h2>
           <p>

@@ -1,18 +1,21 @@
 "use client";
 
+import { Skeleton } from "@seoul-moment/ui";
 import { ArrowRightIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useId } from "react";
+import { use, useId } from "react";
 import { cn } from "@shared/lib/style";
-import { Skeleton } from "@shared/ui/skeleton";
-import useHome from "../model/useHome";
+import type { getHome } from "@shared/services/home";
 
-export function SeasonCollection() {
+interface SeasonCollectionProps {
+  promise: ReturnType<typeof getHome>;
+}
+
+export function SeasonCollection({ promise }: SeasonCollectionProps) {
   const id = useId();
-  const {
-    data: { section = [] },
-  } = useHome();
+  const res = use(promise);
+  const section = res.data?.section;
 
   if (!section || section.length === 0) return null;
 
@@ -30,15 +33,17 @@ export function SeasonCollection() {
         )}
       >
         <div className="flex flex-col gap-[20px]">
-          <h3 className={cn("text-[32px] font-semibold", "max-sm:text-[20px]")}>
+          <h3
+            className={cn("text-title-2 font-semibold", "max-sm:text-title-4")}
+          >
             {section?.[0]?.title}
           </h3>
-          <span className="max-sm:text-[14px]">
+          <span className="max-sm:text-body-3">
             {section?.[0]?.description}
           </span>
         </div>
         <Link
-          className={cn("flex items-center text-[14px]", "max-sm:text-[13px]")}
+          className={cn("text-body-3 flex items-center", "max-sm:text-body-4")}
           href="/product"
         >
           <div className="inline-flex gap-[4px] border-b">

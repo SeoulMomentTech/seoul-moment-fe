@@ -1,12 +1,21 @@
 "use client";
 
+import { Skeleton } from "@seoul-moment/ui";
+import { use } from "react";
 import { cn } from "@shared/lib/style";
-import { Skeleton } from "@shared/ui/skeleton";
+import type { getArticleList } from "@shared/services/article";
 import { ArticleList } from "@widgets/article-list";
 import { ArticleSlide } from "@widgets/article-slide";
 import { SectionWithLabel } from "@widgets/section-with-label";
 
-export function Article() {
+interface ArticleProps {
+  promise: ReturnType<typeof getArticleList>;
+}
+
+export function Article({ promise }: ArticleProps) {
+  const res = use(promise);
+  const list = res.data.list;
+
   return (
     <SectionWithLabel
       className="w-[1280px] py-[100px] max-sm:w-full max-sm:px-[20px]"
@@ -17,14 +26,14 @@ export function Article() {
             "max-sm:mb-[20px]",
           )}
         >
-          <h3 className="text-[32px] max-sm:text-[20px]">
+          <h3 className="text-title-2 max-sm:text-title-4">
             <b>Article</b>
           </h3>
         </div>
       }
     >
-      <ArticleList />
-      <ArticleSlide />
+      <ArticleList data={list} />
+      <ArticleSlide data={list} />
     </SectionWithLabel>
   );
 }
@@ -40,7 +49,7 @@ export function ArticleSkeleton() {
             "max-sm:mb-[20px]",
           )}
         >
-          <h3 className="text-[32px] max-sm:text-[20px]">
+          <h3 className="text-title-2 max-sm:text-title-4">
             <b>Article</b>
           </h3>
         </div>

@@ -9,7 +9,7 @@ interface HomeSection {
   image: string[];
 }
 
-interface GetHomeRes {
+export interface GetHomeRes {
   banner: Array<Record<"image" | "mobileImage", string>>;
   section: HomeSection[];
 }

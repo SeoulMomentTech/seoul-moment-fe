@@ -1,8 +1,8 @@
-export { MainBanner } from "./ui/MainBanner";
+export { MainBanner } from "./ui/PrimeSection/MainBanner";
 export {
   SeasonCollection,
   SeasonCollectionSkeleton,
-} from "./ui/SeasonCollection";
-export { News, NewsSkeleton } from "./ui/News";
-export { Article, ArticleSkeleton } from "./ui/Article";
+} from "./ui/PrimeSection/SeasonCollection";
+export { default as News } from "./ui/News";
+export { default as Article } from "./ui/Article";
 export { ContactUS } from "./ui/ContactUS";

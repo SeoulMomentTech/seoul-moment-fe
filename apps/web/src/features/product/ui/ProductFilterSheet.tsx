@@ -1,15 +1,15 @@
 "use client";
 
 import { AccordionContent } from "@radix-ui/react-accordion";
-import { useId, type PropsWithChildren } from "react";
-import type { Filter } from "@/widgets/filter-sheet/ui/FilterSheet";
-import { cn } from "@shared/lib/style";
 import {
   Accordion,
   AccordionItem,
   AccordionTrigger,
-} from "@shared/ui/accordion";
-import { Button } from "@shared/ui/button";
+  Button,
+} from "@seoul-moment/ui";
+import { useId, type PropsWithChildren } from "react";
+import type { Filter } from "@/widgets/filter-sheet/ui/FilterSheet";
+import { cn } from "@shared/lib/style";
 
 import { FilterSheet } from "@widgets/filter-sheet";
 import useBrandFilter from "../model/useBrandFilter";
