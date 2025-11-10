@@ -66,5 +66,9 @@ export const getNewsDetail = ({ id, languageCode }: GetNewsDetailReq) =>
       searchParams: {
         languageCode,
       },
+      next: {
+        revalidate: 86400,
+        tags: [`newsDetail:${id}`, languageCode],
+      },
     })
     .json<CommonRes<GetNewsDetailRes>>();

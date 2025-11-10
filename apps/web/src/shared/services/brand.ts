@@ -46,5 +46,9 @@ export const getBrandDetail = ({ id, languageCode }: GetBrandDetailReq) =>
       searchParams: {
         languageCode,
       },
+      next: {
+        revalidate: 86400,
+        tags: [`brandDetail:${id}`, languageCode],
+      },
     })
     .json<CommonRes<BrandDetailInfo>>();

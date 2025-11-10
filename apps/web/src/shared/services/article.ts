@@ -66,5 +66,9 @@ export const getArticleDetail = ({ id, languageCode }: GetArticleDetailReq) =>
       searchParams: {
         languageCode,
       },
+      next: {
+        revalidate: 86400,
+        tags: [`articleDetail:${id}`, languageCode],
+      },
     })
     .json<CommonRes<GetArticleDetailRes>>();
