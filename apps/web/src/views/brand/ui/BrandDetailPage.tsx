@@ -189,7 +189,10 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
       >
         {data?.section?.[2]?.title && (
           <h4
-            className={cn("text-title-3 font-semibold", "max-sm:text-title-4")}
+            className={cn(
+              "text-title-3 text-center font-semibold",
+              "max-sm:text-title-4",
+            )}
             dangerouslySetInnerHTML={{
               __html: replaceLineBreaks(data.section[2].title ?? ""),
             }}
@@ -215,6 +218,7 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
         )}
         {data?.section?.[2]?.content && (
           <p
+            className="text-center"
             dangerouslySetInnerHTML={{
               __html: replaceLineBreaks(data.section[2].content),
             }}
