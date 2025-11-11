@@ -17,7 +17,7 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
   const { data } = use(promise);
 
   return (
-    <div>
+    <div className="**:leading-loose!">
       {data?.bannerList?.[0] && (
         <section
           className={cn(
@@ -49,14 +49,14 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
         >
           <div
             className={cn(
-              "flex min-w-[522px] flex-col gap-[30px] font-semibold",
-              "max-sm:min-w-full max-sm:gap-[20px] max-sm:px-[20px]",
+              "flex min-w-[522px] flex-col gap-[20px] font-semibold",
+              "max-sm:min-w-full max-sm:px-[20px]",
             )}
           >
-            <h2 className="text-title-2 max-sm:text-title-4">{data?.name}</h2>
+            <h2 className="max-sm:text-title-4 text-[40px]">{data?.name}</h2>
             {data?.description && (
               <p
-                className="text-title-3 max-sm:text-title-4"
+                className="text-title-4"
                 dangerouslySetInnerHTML={{
                   __html: replaceLineBreaks(data.description),
                 }}
@@ -69,13 +69,11 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
               "max-sm:flex-col-reverse max-sm:gap-[40px] max-sm:px-[20px]",
             )}
           >
-            <div
-              className={cn("flex flex-col gap-[30px]", "max-sm:gap-[20px]")}
-            >
+            <div className={cn("flex flex-col gap-[20px]")}>
               {data?.section?.[0]?.title && (
                 <h4
                   className={cn(
-                    "text-body-1 font-semibold",
+                    "text-title-4 bo font-semibold",
                     "max-sm:text-body-2",
                   )}
                 >
@@ -107,7 +105,7 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
                   <Image
                     alt=""
                     className={cn(
-                      "h-[500px] w-[305px] bg-slate-300",
+                      "h-[500px] w-[305px] bg-transparent",
                       "max-sm:h-[320px] max-sm:w-[208px]",
                       "object-cover",
                     )}
@@ -129,7 +127,7 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
           {data?.section?.[1]?.imageList?.[0] && (
             <div
               className={cn(
-                "h-[640px] min-w-[585px] bg-slate-300",
+                "h-[640px] min-w-[585px] bg-transparent",
                 "max-sm:h-[400px] max-sm:min-w-full",
               )}
             >
@@ -146,7 +144,7 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
             {data?.section?.[1]?.title && (
               <h4
                 className={cn(
-                  "text-body-1 font-semibold",
+                  "text-title-4 font-semibold",
                   "max-sm:text-body-2",
                 )}
                 dangerouslySetInnerHTML={{
@@ -235,7 +233,7 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
               "max-sm:flex-col max-sm:gap-[40px] max-sm:px-[20px] max-sm:pb-[90px]",
             )}
           >
-            <div className="flex flex-col justify-end gap-[20px]">
+            <div className="flex flex-col justify-center gap-[20px]">
               {data.section[3]?.title && (
                 <h4
                   className={cn(
@@ -258,7 +256,7 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
             {data.section[3]?.imageList?.[0] && (
               <div
                 className={cn(
-                  "h-[640px] min-w-[585px] bg-slate-300",
+                  "h-[640px] min-w-[585px] bg-transparent",
                   "max-sm:h-[400px] max-sm:min-w-full",
                 )}
               >
@@ -277,7 +275,7 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
       {data?.section?.[4] && (
         <article
           className={cn(
-            "mx-auto flex w-[1280px] flex-col gap-[60px] pb-[100px] pt-[140px]",
+            "mx-auto flex w-[1280px] flex-col gap-[60px] pb-[100px]",
             "max-sm:w-full max-sm:gap-[40px] max-sm:px-[20px] max-sm:pb-[50px] max-sm:pt-[90px]",
           )}
         >
@@ -312,6 +310,7 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
           )}
           {data.section[4]?.content && (
             <p
+              className="text-center"
               dangerouslySetInnerHTML={{
                 __html: replaceLineBreaks(data.section[4].content),
               }}
