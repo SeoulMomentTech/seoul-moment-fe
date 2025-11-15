@@ -55,7 +55,7 @@ export function DetailMain({
         >
           <div className="flex flex-col gap-[10px]">
             <span className="max-sm:text-body-5 font-semibold">{category}</span>
-            <h1 className="max-sm:text-title-3 text-[44px] font-semibold">
+            <h1 className="max-sm:text-title-3 text-title-1 font-semibold">
               {title}
             </h1>
           </div>
@@ -67,7 +67,7 @@ export function DetailMain({
             "max-sm:text-body-3 max-sm:flex-row-reverse max-sm:items-center max-sm:justify-end max-sm:gap-0",
           )}
         >
-          <span>{formatDateTime(date)}</span>
+          <span>{formatDateTime(date, "yyyy.MM.dd (EEE)")}</span>
           <span className="mx-[10px] hidden h-[8px] w-px max-sm:block max-sm:bg-black/40" />
           <div className="flex items-center gap-[10px] max-sm:gap-[4px]">
             <figure className="h-[40px] w-[40px] overflow-hidden rounded-full bg-slate-300 max-sm:h-[24px] max-sm:w-[24px]">

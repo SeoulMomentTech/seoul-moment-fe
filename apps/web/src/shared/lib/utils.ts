@@ -3,8 +3,10 @@ import { Mutex } from "es-toolkit";
 import type { Options } from "ky";
 import ky from "ky";
 
-export const formatDateTime = (datetime: string) =>
-  formatDate(new Date(datetime), "yyyy.MM.dd");
+export const formatDateTime = (
+  datetime: string,
+  format: string = "yyyy.MM.dd",
+) => formatDate(new Date(datetime), format);
 
 export const replaceLineBreaks = (s: string) =>
   s.replace(/(\r\n|\r|\n)/g, "<br/>");
