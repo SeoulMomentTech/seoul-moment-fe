@@ -13,7 +13,7 @@ interface ArticleListProps {
 
 export default function ArticleList({ className, data }: ArticleListProps) {
   return (
-    <div className={cn("flex gap-[40px] max-sm:hidden", className)}>
+    <div className={cn("flex gap-[30px] max-sm:hidden", className)}>
       {data.map((article) => (
         <Link href={`/article/${article.id}`} key={article.id}>
           <ArticleCard
