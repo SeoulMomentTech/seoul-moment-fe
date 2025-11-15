@@ -49,7 +49,7 @@ export default function StyleCard({
       subTitle={
         <p
           className={cn(
-            "max-sm:text-[13px]",
+            "max-sm:text-body-4",
             textColor === "white" && "text-white",
           )}
         >
@@ -64,7 +64,7 @@ export default function StyleCard({
           )}
         >
           <span className="text-body-4 max-sm:text-body-5">{category}</span>
-          <h4 className={cn("text-[18px] font-semibold", "max-sm:text-[16px]")}>
+          <h4 className={cn("text-body-1 font-semibold", "max-sm:text-body-2")}>
             {title}
           </h4>
         </div>

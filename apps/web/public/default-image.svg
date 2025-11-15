@@ -1,0 +1,27 @@
+<svg width="1440" height="900" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1440" height="900" fill="url(#gradient)" />
+  <g opacity="0.4" filter="url(#dropshadow)">
+    <circle cx="360" cy="300" r="220" fill="white" fill-opacity="0.12" />
+    <circle cx="1080" cy="620" r="280" fill="white" fill-opacity="0.08" />
+    <circle cx="960" cy="240" r="140" fill="white" fill-opacity="0.15" />
+  </g>
+  <g filter="url(#blur)">
+    <rect x="260" y="240" width="920" height="420" rx="32" fill="white" fill-opacity="0.06" />
+  </g>
+
+  <defs>
+    <linearGradient id="gradient" x1="0" y1="0" x2="1440" y2="900" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#151C2C" />
+      <stop offset="45%" stop-color="#2A3654" />
+      <stop offset="100%" stop-color="#3F4F79" />
+    </linearGradient>
+    <filter id="dropshadow" x="0" y="0" width="1440" height="900" filterUnits="userSpaceOnUse"
+      color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="40" />
+    </filter>
+    <filter id="blur" x="200" y="180" width="1040" height="540" filterUnits="userSpaceOnUse"
+      color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="30" />
+    </filter>
+  </defs>
+</svg>
