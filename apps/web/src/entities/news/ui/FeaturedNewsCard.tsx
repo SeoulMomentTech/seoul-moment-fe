@@ -27,7 +27,10 @@ export function FeaturedMainNewsCard({
         "bg-black/50",
         className,
       )}
-      style={{ backgroundImage: `url(${imageUrl})` }}
+      style={{
+        backgroundImage: `url(${imageUrl})`,
+        backgroundBlendMode: "darken",
+      }}
     >
       <Card
         className="px-[30px] pb-[50px] text-white"
@@ -37,7 +40,7 @@ export function FeaturedMainNewsCard({
         subTitle={<p className="line-clamp-3">{subTitle}</p>}
         title={
           <h4
-            className={cn("text-title-3 font-semibold", "max-sm:text-[16px]")}
+            className={cn("text-title-3 font-semibold", "max-sm:text-body-2")}
           >
             {title}
           </h4>
