@@ -1,7 +1,9 @@
 "use client";
 
-import { Slot } from "@radix-ui/react-slot"; // shadcn의 Slot
 import * as React from "react";
+
+import { Slot } from "@radix-ui/react-slot"; // shadcn의 Slot
+
 import { cn } from "../../lib/utils";
 
 export interface ButtonProps extends React.ComponentProps<"button"> {
