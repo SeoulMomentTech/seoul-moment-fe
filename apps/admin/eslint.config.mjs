@@ -20,7 +20,7 @@ export default defineConfig([
     },
   },
   ...reactJsConfig,
-  globalIgnores(["dist"]),
+  globalIgnores(["dist", "eslint.config.mjs"]),
   {
     files: ["**/*.{ts,tsx}"],
     extends: [
@@ -32,6 +32,7 @@ export default defineConfig([
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
+      parser: tseslint.parser,
       parserOptions: {
         project: ["./tsconfig.app.json", "./tsconfig.node.json"],
         tsconfigRootDir: import.meta.dirname,

@@ -1,7 +1,9 @@
 "use client";
 
-import * as AccordionPrimitive from "@radix-ui/react-accordion";
 import * as React from "react";
+
+import * as AccordionPrimitive from "@radix-ui/react-accordion";
+
 import { cn } from "../../lib/utils";
 
 const ChevronDown = (props: React.SVGProps<SVGSVGElement>) => (

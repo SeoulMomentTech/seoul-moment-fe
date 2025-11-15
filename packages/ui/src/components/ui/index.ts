@@ -7,3 +7,7 @@ export * from "./skeleton";
 export * from "./form";
 export * from "./textarea";
 export * from "./tabs";
+export * from "./card";
+export * from "./table";
+export * from "./dropdown-menu";
+export * from "./avatar";
