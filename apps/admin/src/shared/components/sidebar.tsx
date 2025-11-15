@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 
 import {
   LayoutDashboard,
@@ -26,7 +26,7 @@ interface SubMenuItem {
 interface MenuItemConfig {
   id: MenuItem;
   label: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
   subItems?: SubMenuItem[];
 }
 
