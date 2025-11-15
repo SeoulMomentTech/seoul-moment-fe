@@ -1,16 +1,14 @@
+import { useNavigate } from "react-router";
+
+import { PATH } from "@/shared/constants/route";
+import { useAuth } from "@/shared/hooks/useAuth";
+
 import { Avatar, AvatarFallback, Button } from "@seoul-moment/ui";
 
-interface User {
-  id: string;
-  email: string;
-  name: string;
-}
+export default function Header() {
+  const navigate = useNavigate();
+  const { logout, user } = useAuth();
 
-interface HeaderProps {
-  user: User;
-}
-
-export default function Header({ user }: HeaderProps) {
   const getInitials = (name: string) => {
     return name
       .split(" ")
@@ -18,6 +16,11 @@ export default function Header({ user }: HeaderProps) {
       .join("")
       .toUpperCase()
       .slice(0, 2);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate(PATH.LOGIN, { replace: true });
   };
 
   return (
@@ -31,15 +34,17 @@ export default function Header({ user }: HeaderProps) {
           <Button className="flex items-center" variant="ghost">
             <Avatar className="mr-[8px] h-8 w-8">
               <AvatarFallback className="bg-gray-900 text-white">
-                {getInitials(user.name)}
+                {getInitials(user?.name ?? "")}
               </AvatarFallback>
             </Avatar>
             <div className="text-left">
-              <div className="text-sm">{user.name}</div>
-              <div className="text-xs text-gray-500">{user.email}</div>
+              <div className="text-sm">{user?.name}</div>
+              <div className="text-xs text-gray-500">{user?.email}</div>
             </div>
           </Button>
-          <Button size="sm">로그아웃</Button>
+          <Button onClick={handleLogout} size="sm">
+            로그아웃
+          </Button>
         </div>
       </div>
     </header>

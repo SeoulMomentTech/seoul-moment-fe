@@ -1,6 +1,11 @@
 import { useState, type FormEvent } from "react";
 
+import { useNavigate } from "react-router";
+
 import { Lock } from "lucide-react";
+
+import { PATH } from "@/shared/constants/route";
+import { useAuthStore } from "@/shared/hooks/useAuth";
 
 import {
   Button,
@@ -18,11 +23,10 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const onLogin = (email: string, password: string) => {
-    console.log(email, password);
-  };
+  const navigate = useNavigate();
+  const login = useAuthStore((state) => state.login);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
 
@@ -36,7 +40,16 @@ export default function LoginPage() {
       return;
     }
 
-    onLogin(email, password);
+    login({
+      accessToken: "temporary-token",
+      user: {
+        id: Date.now(),
+        email,
+        name: email.split("@")[0] ?? "관리자",
+      },
+    });
+
+    navigate(PATH.INDEX, { replace: true });
   };
 
   return (
