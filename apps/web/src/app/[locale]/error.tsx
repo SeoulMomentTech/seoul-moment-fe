@@ -1,8 +1,9 @@
 "use client";
 
-import { Button } from "@seoul-moment/ui";
 import Image from "next/image";
 import Link from "next/link";
+
+import { Button } from "@seoul-moment/ui";
 
 export default function GlobalError() {
   return (

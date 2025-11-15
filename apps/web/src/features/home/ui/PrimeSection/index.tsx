@@ -1,8 +1,13 @@
-import { cn, Skeleton } from "@seoul-moment/ui";
-import { getLocale } from "next-intl/server";
 import { Suspense } from "react";
-import type { LanguageType } from "@/i18n/const";
+
+import { getLocale } from "next-intl/server";
+
 import { getHome } from "@shared/services/home";
+
+import type { LanguageType } from "@/i18n/const";
+
+import { cn, Skeleton } from "@seoul-moment/ui";
+
 import { MainBanner } from "./MainBanner";
 import { SeasonCollection, SeasonCollectionSkeleton } from "./SeasonCollection";
 

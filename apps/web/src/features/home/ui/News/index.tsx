@@ -1,10 +1,15 @@
-import { Skeleton } from "@seoul-moment/ui";
-import { getLocale } from "next-intl/server";
 import { Suspense } from "react";
-import type { LanguageType } from "@/i18n/const";
+
+import { getLocale } from "next-intl/server";
+
 import { cn } from "@shared/lib/style";
 import { getNewsList } from "@shared/services/news";
+
+import type { LanguageType } from "@/i18n/const";
+
+import { Skeleton } from "@seoul-moment/ui";
 import { SectionWithLabel } from "@widgets/section-with-label";
+
 import { News as NewsClient } from "./News.client";
 
 export default async function News() {

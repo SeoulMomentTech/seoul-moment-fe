@@ -1,6 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
 import useLanguage from "@shared/lib/hooks/useLanguage";
 import { getProductCategory } from "@shared/services/product";
+
+import { useQuery } from "@tanstack/react-query";
 
 const useProductCategory = (categoryId: number) => {
   const languageCode = useLanguage();

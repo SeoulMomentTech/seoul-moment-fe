@@ -1,12 +1,13 @@
 "use client";
 
 import { use } from "react";
-import { Link } from "@/i18n/navigation";
 
 import { FeaturedMainNewsCard, FeaturedSubNewsCard } from "@entities/news/ui";
 import { cn } from "@shared/lib/style";
-
 import type { getNewsList, News } from "@shared/services/news";
+
+import { Link } from "@/i18n/navigation";
+
 import { SectionWithLabel } from "@widgets/section-with-label";
 
 interface NewsProps {

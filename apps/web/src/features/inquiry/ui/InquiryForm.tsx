@@ -1,11 +1,11 @@
 "use client";
 
-import { Button, Input, Textarea } from "@seoul-moment/ui";
-import Image from "next/image";
 import { useState } from "react";
+
+import Image from "next/image";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
-import type { ModalStatus } from "@/types";
+
 import {
   postEmail,
   postEmailCode,
@@ -17,7 +17,12 @@ import {
   SelectItem,
   SelectTrigger,
 } from "@shared/ui/select";
+
+import type { ModalStatus } from "@/types";
+
+import { Button, Input, Textarea } from "@seoul-moment/ui";
 import { AlertModal } from "@widgets/alert-modal";
+
 import { inquiryFormRezolver, type InquiryFormValues } from "../model/schema";
 
 export default function InquiryForm() {

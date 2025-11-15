@@ -1,4 +1,5 @@
 import { EyeIcon, HeartIcon } from "lucide-react";
+
 import { cn } from "@shared/lib/style";
 import Divider from "@shared/ui/divider";
 

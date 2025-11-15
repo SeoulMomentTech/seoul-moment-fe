@@ -1,6 +1,9 @@
 import { notFound } from "next/navigation";
-import type { PageParams } from "@/types";
+
 import { getBrandDetail } from "@shared/services/brand";
+
+import type { PageParams } from "@/types";
+
 import { BrandDetailPage } from "@views/brand";
 
 export default async function BrandDetail({

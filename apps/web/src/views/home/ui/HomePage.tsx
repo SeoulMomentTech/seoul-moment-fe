@@ -1,4 +1,5 @@
 import PrimeSection from "@/features/home/ui/PrimeSection";
+
 import { News, Article, ContactUS } from "@features/home";
 
 export function HomePage() {

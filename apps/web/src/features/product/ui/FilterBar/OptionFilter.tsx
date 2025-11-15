@@ -1,5 +1,6 @@
-import { Button } from "@seoul-moment/ui";
 import { FilterIcon } from "@shared/ui/icon";
+
+import { Button } from "@seoul-moment/ui";
 
 interface OptionFilterProps {
   onClick(): void;

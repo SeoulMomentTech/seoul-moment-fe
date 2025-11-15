@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type PropsWithChildren } from "react";
+
 import useEventListener from "@shared/lib/hooks/useEventListener";
 import {
   Sheet,
@@ -10,6 +11,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@shared/ui/sheet";
+
 import SearchBody from "./SearchBody";
 import SearchHeader from "./SearchHeader";
 

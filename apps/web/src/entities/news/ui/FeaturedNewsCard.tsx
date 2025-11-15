@@ -1,6 +1,7 @@
 import { cn } from "@shared/lib/style";
 import { BaseImage } from "@shared/ui/base-image";
 import { Card } from "@shared/ui/card";
+
 import { AuthorWithDate } from "@widgets/author-with-date";
 
 interface FeaturedMainNewsCardProps {

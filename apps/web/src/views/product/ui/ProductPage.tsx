@@ -1,5 +1,6 @@
-import { Banner, ProductList } from "@features/product";
 import { cn } from "@shared/lib/style";
+
+import { Banner, ProductList } from "@features/product";
 
 export default function ProductPage() {
   return (

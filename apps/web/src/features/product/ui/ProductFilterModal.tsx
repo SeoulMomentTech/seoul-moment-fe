@@ -1,3 +1,10 @@
+import { useState } from "react";
+
+import { cn } from "@shared/lib/style";
+import { mergeOptionIdList } from "@shared/lib/utils/filter";
+import type { OptionIdListValue } from "@shared/lib/utils/filter";
+import type { Filter } from "@widgets/filter-sheet/ui/FilterSheet";
+
 import {
   Accordion,
   AccordionContent,
@@ -10,12 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@seoul-moment/ui";
-import { useState } from "react";
-import { cn } from "@shared/lib/style";
-import { mergeOptionIdList } from "@shared/lib/utils/filter";
-import type { OptionIdListValue } from "@shared/lib/utils/filter";
 
-import type { Filter } from "@widgets/filter-sheet/ui/FilterSheet";
 import useCategories from "../model/useCategories";
 import useProductFilter from "../model/useProductFilter";
 import useProductFilterList from "../model/useProductFilterList";

@@ -4,10 +4,12 @@ import {
   Outlet,
   RouterProvider,
 } from "react-router";
-import { PATH } from "./constants/route";
-import HomePage from "./pages/HomePage";
-import LoginPage from "./pages/LoginPage";
-import SignUpPage from "./pages/SignUpPage";
+
+import { PATH } from "@shared/constants/route";
+
+import HomePage from "@pages/HomePage";
+import LoginPage from "@pages/LoginPage";
+import SignUpPage from "@pages/SignUpPage";
 
 const PublicRoute = () => {
   const isLogin = true;

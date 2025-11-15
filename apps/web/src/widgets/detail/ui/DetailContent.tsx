@@ -1,9 +1,10 @@
-import { cn } from "@seoul-moment/ui";
 import { DEFAULT_IMAGE_SRC } from "@shared/constants/image";
 import { createMarkup } from "@shared/lib/utils";
 import type { ArticleSection } from "@shared/services/article";
 import type { NewsSection } from "@shared/services/news";
 import { BaseImage } from "@shared/ui/base-image";
+
+import { cn } from "@seoul-moment/ui";
 
 export interface DetailContentProps {
   data: NewsSection[] | ArticleSection[];

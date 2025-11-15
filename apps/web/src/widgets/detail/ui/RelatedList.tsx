@@ -1,6 +1,8 @@
 import Link from "next/link";
+
 import { cn } from "@shared/lib/style";
 import type { LastNews } from "@shared/services/news";
+
 import { MegazineSlide } from "@widgets/megazine-slide";
 import { MoreMagazineList } from "@widgets/more-magazine";
 import { SectionWithLabel } from "@widgets/section-with-label";

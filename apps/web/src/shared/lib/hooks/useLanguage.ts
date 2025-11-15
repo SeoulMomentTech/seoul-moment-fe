@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
+
 import type { LanguageType } from "@/i18n/const";
 
 const useLanguage = () => {

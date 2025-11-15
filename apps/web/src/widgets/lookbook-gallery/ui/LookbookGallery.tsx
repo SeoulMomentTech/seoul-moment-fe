@@ -1,5 +1,6 @@
-import { LookbookItem } from "@entities/lookbook";
 import { cn } from "@shared/lib/style";
+
+import { LookbookItem } from "@entities/lookbook";
 
 interface LookbookGalleryProps {
   className?: string;

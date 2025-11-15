@@ -1,9 +1,11 @@
 "use client";
 
-import { Skeleton } from "@seoul-moment/ui";
 import { use } from "react";
+
 import { cn } from "@shared/lib/style";
 import type { getArticleList } from "@shared/services/article";
+
+import { Skeleton } from "@seoul-moment/ui";
 import { ArticleList } from "@widgets/article-list";
 import { ArticleSlide } from "@widgets/article-slide";
 import { SectionWithLabel } from "@widgets/section-with-label";

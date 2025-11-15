@@ -1,9 +1,10 @@
 "use client";
 
+import { lazy, useState } from "react";
+
 import { MenuIcon, ChevronRightIcon } from "lucide-react";
 import Image from "next/image";
-import { lazy, useState } from "react";
-import { Link, usePathname } from "@/i18n/navigation";
+
 import useModal from "@shared/lib/hooks/useModal";
 import { cn } from "@shared/lib/style";
 import Divider from "@shared/ui/divider";
@@ -15,6 +16,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@shared/ui/sheet";
+
+import { Link, usePathname } from "@/i18n/navigation";
+
 import { LanguageSupport } from "@widgets/language-support";
 
 const ShareModal = lazy(() =>

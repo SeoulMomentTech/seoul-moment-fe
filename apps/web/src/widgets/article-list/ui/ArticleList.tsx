@@ -1,10 +1,11 @@
 "use client";
 
-import { Link } from "@/i18n/navigation";
-import { ArticleCard } from "@entities/article";
-
 import { cn } from "@shared/lib/style";
 import type { Article } from "@shared/services/article";
+
+import { Link } from "@/i18n/navigation";
+
+import { ArticleCard } from "@entities/article";
 
 interface ArticleListProps {
   className?: string;

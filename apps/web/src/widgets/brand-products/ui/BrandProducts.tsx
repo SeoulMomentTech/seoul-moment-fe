@@ -1,11 +1,14 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
 import { PackageSearchIcon } from "lucide-react";
-import { Link } from "@/i18n/navigation";
-import { BrandProductCard } from "@entities/brand";
+
 import useLanguage from "@shared/lib/hooks/useLanguage";
 import { getProductList } from "@shared/services/product";
+
+import { Link } from "@/i18n/navigation";
+
+import { BrandProductCard } from "@entities/brand";
+import { useQuery } from "@tanstack/react-query";
 import { Empty } from "@widgets/empty";
 import { SectionWithLabel } from "@widgets/section-with-label";
 

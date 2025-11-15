@@ -1,5 +1,5 @@
-import { Button } from "@seoul-moment/ui";
 import { ChevronDown } from "lucide-react";
+
 import { cn } from "@shared/lib/style";
 import {
   DropdownMenu,
@@ -8,6 +8,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@shared/ui/dropdown-menu";
+
+import { Button } from "@seoul-moment/ui";
+
 import useProductFilter from "../../model/useProductFilter";
 import useProductSortFilter from "../../model/useProductSortFilter";
 
