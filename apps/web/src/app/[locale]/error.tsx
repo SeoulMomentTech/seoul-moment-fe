@@ -2,6 +2,7 @@
 
 import { Button } from "@seoul-moment/ui";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function GlobalError() {
   return (
@@ -22,7 +23,7 @@ export default function GlobalError() {
         </div>
       </div>
       <Button className="h-[48px] w-[186px] whitespace-pre font-semibold max-sm:w-full">
-        메인 페이지로 이동하기
+        <Link href="/">메인 페이지로 이동하기</Link>
       </Button>
     </div>
   );

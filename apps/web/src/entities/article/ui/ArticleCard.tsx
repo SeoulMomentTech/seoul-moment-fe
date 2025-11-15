@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { DEFAULT_IMAGE_SRC } from "@shared/constants/image";
 import { cn } from "@shared/lib/style";
+import { BaseImage } from "@shared/ui/base-image";
 import { Card } from "@shared/ui/card";
 import { AuthorWithDate } from "@widgets/author-with-date";
 
@@ -41,7 +41,7 @@ export default function ArticleCard({
       extraInfo={<AuthorWithDate author={author} date={date} />}
       image={
         <figure className={cn("h-[400px] w-full", "max-sm:h-[300px]")}>
-          <Image
+          <BaseImage
             alt=""
             className={cn("h-[400px] object-cover", "max-sm:h-[300px]")}
             height={400}
