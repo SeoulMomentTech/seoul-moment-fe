@@ -22,7 +22,10 @@ export default function GlobalError() {
           <p>Please try again later.</p>
         </div>
       </div>
-      <Button className="h-[48px] w-[186px] whitespace-pre font-semibold max-sm:w-full">
+      <Button
+        asChild
+        className="h-[48px] w-[186px] whitespace-pre font-semibold max-sm:w-full"
+      >
         <Link href="/">메인 페이지로 이동하기</Link>
       </Button>
     </div>
