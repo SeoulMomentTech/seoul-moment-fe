@@ -3,25 +3,28 @@ import {
   Navigate,
   Outlet,
   RouterProvider,
+  type RouteObject,
 } from "react-router";
 
+import { Layout } from "@shared/components/layout";
 import { PATH } from "@shared/constants/route";
+import { useAuthStore } from "@shared/hooks/useAuth";
 
 import HomePage from "@pages/HomePage";
 import LoginPage from "@pages/LoginPage";
 import SignUpPage from "@pages/SignUpPage";
 
 const PublicRoute = () => {
-  const isLogin = true;
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
-  if (isLogin) {
+  if (isAuthenticated) {
     return <Navigate replace to={PATH.INDEX} />;
   }
 
   return <Outlet />;
 };
 
-const publicRoutes = [
+const publicRoutes: RouteObject[] = [
   {
     element: <PublicRoute />,
     children: [
@@ -38,21 +41,25 @@ const publicRoutes = [
 ];
 
 const PrivateRoute = () => {
-  const isLogin = true;
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
-  if (!isLogin) {
+  if (!isAuthenticated) {
     return <Navigate replace to={PATH.LOGIN} />;
   }
 
-  return <Outlet />;
+  return (
+    <Layout>
+      <Outlet />
+    </Layout>
+  );
 };
 
-const privateRoutes = [
+const privateRoutes: RouteObject[] = [
   {
     element: <PrivateRoute />,
     children: [
       {
-        path: "/",
+        path: PATH.INDEX,
         element: <HomePage />,
       },
     ],
