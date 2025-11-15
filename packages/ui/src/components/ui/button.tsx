@@ -49,12 +49,15 @@ export function Button({
       disabled={isLoading || disabled}
       {...props}
     >
-      {isLoading && (
-        <span className="mr-2 flex h-4 w-4 animate-spin items-center justify-center">
-          <span className="h-3 w-3 rounded-full border-2 border-current border-t-transparent" />
-        </span>
-      )}
-      {children}
+      <div className="inline-flex items-center justify-center">
+        {isLoading ? (
+          <span className="mr-2 flex h-4 w-4 animate-spin items-center justify-center">
+            <span className="h-3 w-3 rounded-full border-2 border-current border-t-transparent" />
+          </span>
+        ) : (
+          children
+        )}
+      </div>
     </Comp>
   );
 }
