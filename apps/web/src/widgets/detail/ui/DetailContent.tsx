@@ -112,7 +112,7 @@ export function DetailContent({ data }: DetailContentProps) {
             <p dangerouslySetInnerHTML={createMarkup(third?.content)} />
           </div>
         </div>
-        {third?.imageList.length && (
+        {third?.imageList.length > 0 && (
           <figure
             className={cn(
               "relative h-[680px] w-[541px]",
@@ -136,7 +136,7 @@ export function DetailContent({ data }: DetailContentProps) {
           fourth?.imageList.length === 0 && "text-center",
         )}
       >
-        {fourth?.imageList.length && (
+        {fourth?.imageList.length > 0 && (
           <figure className="h-[482px] max-sm:h-[200px]">
             <BaseImage
               alt=""
