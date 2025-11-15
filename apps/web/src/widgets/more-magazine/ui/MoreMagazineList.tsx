@@ -1,6 +1,7 @@
 "use client";
 
 import { Link } from "@/i18n/navigation";
+
 import { MegazineCard } from "@entities/megazine";
 
 interface Magazine {

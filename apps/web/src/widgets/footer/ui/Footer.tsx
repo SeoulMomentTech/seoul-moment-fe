@@ -1,6 +1,8 @@
 import Image from "next/image";
-import { Link } from "@/i18n/navigation";
+
 import { cn } from "@shared/lib/style";
+
+import { Link } from "@/i18n/navigation";
 
 const styleMap = {
   desktop: "min-h-[416px] min-w-[1280px] px-[40px]",

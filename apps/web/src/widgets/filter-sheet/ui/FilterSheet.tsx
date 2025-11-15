@@ -1,13 +1,12 @@
-import { Button } from "@seoul-moment/ui";
 import type { ReactNode } from "react";
 import { useState, type PropsWithChildren } from "react";
+
 import useProductFilter from "@features/product/model/useProductFilter";
 import { cn } from "@shared/lib/style";
 import {
   mergeOptionIdList,
   type OptionIdListValue,
 } from "@shared/lib/utils/filter";
-
 import FixedBox from "@shared/ui/fixed-box";
 import { RefreshIcon } from "@shared/ui/icon";
 import {
@@ -18,6 +17,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@shared/ui/sheet";
+
+import { Button } from "@seoul-moment/ui";
 
 type FilterValue = number[] | string | number | null | undefined;
 export type Filter = Record<string, FilterValue>;

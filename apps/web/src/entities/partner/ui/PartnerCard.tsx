@@ -1,4 +1,5 @@
 import { ArrowRight } from "lucide-react";
+
 import { cn } from "@shared/lib/style";
 import { Card } from "@shared/ui/card";
 

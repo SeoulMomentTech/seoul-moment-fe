@@ -1,5 +1,6 @@
-import { NewsCard } from "@entities/news";
 import { cn } from "@shared/lib/style";
+
+import { NewsCard } from "@entities/news";
 
 const MOCK_NEWS = [
   {

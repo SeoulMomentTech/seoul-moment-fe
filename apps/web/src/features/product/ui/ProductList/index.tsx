@@ -1,6 +1,7 @@
 "use client";
 
 import useMediaQuery from "@shared/lib/hooks/useMediaQuery";
+
 import DeskTop from "./Desktop";
 import Mobile from "./Mobile";
 import useProductFilter from "../../model/useProductFilter";

@@ -1,9 +1,10 @@
-import { Dialog, DialogContent, DialogTitle } from "@seoul-moment/ui";
 import { LinkIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import useCopyToClipBoard from "@shared/lib/hooks/useCopyToClipboard";
 import useModal from "@shared/lib/hooks/useModal";
+
+import { Dialog, DialogContent, DialogTitle } from "@seoul-moment/ui";
 
 interface ShareModalProps {
   open?: boolean;

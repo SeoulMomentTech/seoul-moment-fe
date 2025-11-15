@@ -1,4 +1,5 @@
 import { StrictMode } from "react";
+
 import { createRoot } from "react-dom/client";
 import "@seoul-moment/ui/styles.css";
 import "./index.css";

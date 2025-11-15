@@ -1,11 +1,14 @@
 "use client";
 
-import Image from "next/image";
 import { use } from "react";
+
+import Image from "next/image";
+
 import { cn } from "@shared/lib/style";
 import { replaceLineBreaks } from "@shared/lib/utils";
-import type { CommonRes } from "@shared/services";
 import type { BrandDetailInfo } from "@shared/services/brand";
+
+import type { CommonRes } from "@shared/services";
 import { BrandProducts } from "@widgets/brand-products";
 
 interface BrandDetailPageProps {

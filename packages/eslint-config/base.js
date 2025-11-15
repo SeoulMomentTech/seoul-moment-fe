@@ -31,17 +31,43 @@ const base = [
           ],
           pathGroups: [
             {
-              pattern: "@",
+              pattern: "react",
               group: "external",
-              position: "after",
+              position: "before",
+            },
+            {
+              pattern: "react-dom",
+              group: "external",
+              position: "before",
+            },
+            {
+              pattern: "react-router",
+              group: "external",
+              position: "before",
+            },
+            {
+              pattern: "react-router-dom",
+              group: "external",
+              position: "before",
             },
             {
               pattern: "@",
               group: "internal",
               position: "after",
             },
+            {
+              pattern: "@/**",
+              group: "internal",
+              position: "after",
+            },
+            {
+              pattern: "@*/*",
+              group: "internal",
+              position: "after",
+            },
           ],
-          pathGroupsExcludedImportTypes: [],
+          pathGroupsExcludedImportTypes: ["builtin"],
+          "newlines-between": "always",
           alphabetize: {
             order: "asc",
             caseInsensitive: true,

@@ -1,4 +1,5 @@
 import ky from "ky";
+
 import type { LanguageType } from "@/i18n/const";
 import { languageMap } from "@/i18n/const";
 

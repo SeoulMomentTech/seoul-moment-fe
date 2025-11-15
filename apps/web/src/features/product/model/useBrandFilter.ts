@@ -1,7 +1,8 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
 import useLanguage from "@shared/lib/hooks/useLanguage";
 import type { BrandFilter } from "@shared/services/brand";
 import { getBrandFilter } from "@shared/services/brand";
+
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 const filterName = {
   A_TO_D: "A ~ D",

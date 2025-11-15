@@ -1,5 +1,6 @@
-import { Skeleton } from "@seoul-moment/ui";
 import { cn } from "@shared/lib/style";
+
+import { Skeleton } from "@seoul-moment/ui";
 
 const styleMap = {
   desktop: {

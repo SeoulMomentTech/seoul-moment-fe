@@ -1,6 +1,8 @@
-import { Button } from "@seoul-moment/ui";
 import Image from "next/image";
+
 import { Link } from "@/i18n/navigation";
+
+import { Button } from "@seoul-moment/ui";
 
 export default function NotFound() {
   return (

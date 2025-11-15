@@ -3,6 +3,7 @@
 import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { useLocale } from "next-intl";
+
 import { cn } from "@shared/lib/style";
 import {
   DropdownMenu,

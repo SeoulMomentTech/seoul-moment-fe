@@ -1,5 +1,7 @@
 import Link from "next/link";
+
 import { cn } from "@shared/lib/style";
+
 import { LookbookSection } from "@widgets/lookbook-section";
 import { MagazineFeatured } from "@widgets/magazine-featured";
 import { NewsList } from "@widgets/news-list";

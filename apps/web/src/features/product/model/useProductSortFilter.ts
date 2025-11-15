@@ -1,6 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
 import useLanguage from "@shared/lib/hooks/useLanguage";
 import { getProductSortFilter } from "@shared/services/product";
+
+import { useQuery } from "@tanstack/react-query";
 
 const useProductSortFilter = () => {
   const languageCode = useLanguage();

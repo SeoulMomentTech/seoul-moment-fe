@@ -1,6 +1,7 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
 import useLanguage from "@shared/lib/hooks/useLanguage";
 import { getCategories } from "@shared/services/category";
+
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 const useCategories = () => {
   const languageCode = useLanguage();

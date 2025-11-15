@@ -1,6 +1,7 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
 import useLanguage from "@shared/lib/hooks/useLanguage";
 import { getNewsList } from "@shared/services/news";
+
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 interface UseNewsProps {
   count: number;

@@ -1,7 +1,9 @@
 "use client";
 
 import { Swiper, SwiperSlide } from "swiper/react"; // 예시: Swiper 라이브러리 사용
+
 import { Link } from "@/i18n/navigation";
+
 import { MegazineCard } from "@entities/megazine";
 
 import "swiper/css";

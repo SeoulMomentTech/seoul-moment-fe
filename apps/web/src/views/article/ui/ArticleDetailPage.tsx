@@ -1,9 +1,11 @@
 "use client";
 
 import { use } from "react";
+
+import type { GetArticleDetailRes } from "@shared/services/article";
+
 import { ArticleDetailContent, ArticleDetailMain } from "@features/article";
 import type { CommonRes } from "@shared/services";
-import type { GetArticleDetailRes } from "@shared/services/article";
 import { BrandProducts } from "@widgets/brand-products";
 import { RelatedList } from "@widgets/detail";
 

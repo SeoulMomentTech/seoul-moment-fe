@@ -1,5 +1,7 @@
-import Image from "next/image";
 import type { PropsWithChildren } from "react";
+
+import Image from "next/image";
+
 import { cn } from "@shared/lib/style";
 
 interface ProductDetailImageProps extends PropsWithChildren {

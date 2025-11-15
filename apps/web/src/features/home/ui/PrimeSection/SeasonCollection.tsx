@@ -1,12 +1,15 @@
 "use client";
 
-import { Skeleton } from "@seoul-moment/ui";
+import { use, useId } from "react";
+
 import { ArrowRightIcon } from "lucide-react";
 import Link from "next/link";
-import { use, useId } from "react";
+
 import { cn } from "@shared/lib/style";
 import type { getHome } from "@shared/services/home";
 import { BaseImage } from "@shared/ui/base-image";
+
+import { Skeleton } from "@seoul-moment/ui";
 
 interface SeasonCollectionProps {
   promise: ReturnType<typeof getHome>;

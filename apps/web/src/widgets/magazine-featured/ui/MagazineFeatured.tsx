@@ -1,6 +1,7 @@
-import { MagazineMainCard } from "@entities/magazine";
 import { MagazineCardInfo } from "@entities/magazine/ui/MagazineCardInfo";
 import { cn } from "@shared/lib/style";
+
+import { MagazineMainCard } from "@entities/magazine";
 
 export function MagazineFeatured() {
   return (

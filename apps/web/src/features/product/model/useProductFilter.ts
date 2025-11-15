@@ -1,10 +1,11 @@
+import { useMemo } from "react";
+
 import {
   parseAsArrayOf,
   parseAsInteger,
   parseAsString,
   useQueryStates,
 } from "nuqs";
-import { useMemo } from "react";
 
 export type FilterKey = keyof typeof initialFilter;
 

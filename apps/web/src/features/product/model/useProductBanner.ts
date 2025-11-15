@@ -1,5 +1,6 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
 import { getProductBanner } from "@shared/services/product";
+
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 const useProductBanner = () => {
   return useSuspenseQuery({

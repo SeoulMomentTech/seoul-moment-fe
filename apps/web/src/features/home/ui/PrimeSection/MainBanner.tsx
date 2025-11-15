@@ -1,6 +1,7 @@
 "use client";
 
 import { use } from "react";
+
 import { cn } from "@shared/lib/style";
 import type { getHome } from "@shared/services/home";
 import { BaseImage } from "@shared/ui/base-image";

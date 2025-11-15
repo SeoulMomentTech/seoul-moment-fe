@@ -1,6 +1,9 @@
 import { notFound } from "next/navigation";
-import type { PageParams } from "@/types";
+
 import { getArticleDetail } from "@shared/services/article";
+
+import type { PageParams } from "@/types";
+
 import { ArticleDetailPage } from "@views/article";
 
 export default async function ArticleDetail({
