@@ -1,6 +1,6 @@
-import Image from "next/image";
 import { cn } from "@shared/lib/style";
 import { formatDateTime } from "@shared/lib/utils";
+import { BaseImage } from "@shared/ui/base-image";
 
 export interface DetailMainProps {
   imageUrl: string;
@@ -38,7 +38,7 @@ export function DetailMain({
 }: DetailMainProps) {
   return (
     <section className={cn(styleMap.desktop.section, styleMap.mobile.section)}>
-      <Image
+      <BaseImage
         alt=""
         className={cn(styleMap.desktop.image, styleMap.mobile.image)}
         height={1200}
@@ -71,7 +71,7 @@ export function DetailMain({
           <span className="mx-[10px] hidden h-[8px] w-px max-sm:block max-sm:bg-black/40" />
           <div className="flex items-center gap-[10px] max-sm:gap-[4px]">
             <figure className="h-[40px] w-[40px] overflow-hidden rounded-full bg-slate-300 max-sm:h-[24px] max-sm:w-[24px]">
-              <Image
+              <BaseImage
                 alt=""
                 className="h-full w-full"
                 height={50}

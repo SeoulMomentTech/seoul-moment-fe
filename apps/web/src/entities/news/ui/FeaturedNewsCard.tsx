@@ -1,4 +1,5 @@
 import { cn } from "@shared/lib/style";
+import { BaseImage } from "@shared/ui/base-image";
 import { Card } from "@shared/ui/card";
 import { AuthorWithDate } from "@widgets/author-with-date";
 
@@ -30,6 +31,7 @@ export function FeaturedMainNewsCard({
       style={{
         backgroundImage: `url(${imageUrl})`,
         backgroundBlendMode: "darken",
+        backgroundSize: "100% 100%",
       }}
     >
       <Card
@@ -75,19 +77,20 @@ export function FeaturedSubNewsCard({
         className,
       )}
     >
-      <div
+      <figure
         className={cn(
-          "flex h-[498px] flex-col bg-cover bg-center",
+          "relative flex h-[498px] flex-col bg-black bg-contain bg-center bg-no-repeat",
           "max-sm:h-[342px]",
         )}
-        style={{ backgroundImage: `url(${imageUrl})` }}
-      />
+      >
+        <BaseImage alt="" fill src={imageUrl} />
+      </figure>
       <Card
         contentWrapperClassName="gap-[20px]"
         extraInfo={<AuthorWithDate author={author} date={date} />}
         subTitle={<p className="max-sm:text-body-3 line-clamp-3">{subTitle}</p>}
         title={
-          <h4 className={cn("text-body-1 font-semibold", "max-sm:text-[16px]")}>
+          <h4 className={cn("text-body-1 font-semibold", "max-sm:text-body-2")}>
             {title}
           </h4>
         }

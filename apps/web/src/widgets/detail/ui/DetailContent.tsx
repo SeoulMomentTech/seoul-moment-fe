@@ -1,9 +1,9 @@
 import { cn } from "@seoul-moment/ui";
-import Image from "next/image";
 import { DEFAULT_IMAGE_SRC } from "@shared/constants/image";
 import { createMarkup } from "@shared/lib/utils";
 import type { ArticleSection } from "@shared/services/article";
 import type { NewsSection } from "@shared/services/news";
+import { BaseImage } from "@shared/ui/base-image";
 
 export interface DetailContentProps {
   data: NewsSection[] | ArticleSection[];
@@ -49,7 +49,7 @@ export function DetailContent({ data }: DetailContentProps) {
           dangerouslySetInnerHTML={createMarkup(first?.content)}
         />
         <div className="mb-[100px] h-[642px] max-sm:mb-[90px] max-sm:h-[200px]">
-          <Image
+          <BaseImage
             alt=""
             className="h-full w-full object-cover object-top"
             height={700}
@@ -70,7 +70,7 @@ export function DetailContent({ data }: DetailContentProps) {
             "max-sm:mx-[20px] max-sm:h-[284px] max-sm:w-[264px]",
           )}
         >
-          <Image
+          <BaseImage
             alt=""
             className="h-full w-full"
             fill
@@ -119,7 +119,7 @@ export function DetailContent({ data }: DetailContentProps) {
               "max-sm:mx-[20px] max-sm:h-[284px] max-sm:w-[264px]",
             )}
           >
-            <Image
+            <BaseImage
               alt=""
               className="h-full object-cover"
               fill
@@ -138,7 +138,7 @@ export function DetailContent({ data }: DetailContentProps) {
       >
         {fourth?.imageList.length && (
           <figure className="h-[482px] max-sm:h-[200px]">
-            <Image
+            <BaseImage
               alt=""
               className="h-full w-full object-cover"
               height={500}

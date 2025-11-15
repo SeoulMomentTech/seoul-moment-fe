@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { BaseImage } from "@shared/ui/base-image";
 import { Card } from "@shared/ui/card";
 
 interface MegazineCardProps {
@@ -11,7 +11,7 @@ export function MegazineCard({ title, imageUrl }: MegazineCardProps) {
     <Card
       className="gap-[20px]"
       image={
-        <Image
+        <BaseImage
           alt=""
           className="h-[260px] w-[400px] bg-slate-300 max-sm:h-[210px] max-sm:w-full"
           height={260}
