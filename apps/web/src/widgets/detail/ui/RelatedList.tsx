@@ -12,19 +12,19 @@ interface RelatedListProps {
 
 export function RelatedList({ lastNews, type }: RelatedListProps) {
   return (
-    <div className={cn("mx-auto mt-[-128px] bg-black/5", "max-sm:mt-[-90px]")}>
+    <div className={cn("mx-auto bg-black/5")}>
       <SectionWithLabel
         className={cn(
-          "mx-auto w-[1280px] pb-[100px] pt-[228px]",
-          "max-sm:w-full max-sm:px-[20px] max-sm:pt-[180px]",
+          "mx-auto w-[1280px] py-[100px]",
+          "max-sm:w-full max-sm:px-[20px] max-sm:py-[50px]",
         )}
         label={
           <div className="mb-[30px] flex w-full items-end justify-between max-sm:mb-[20px]">
-            <h3 className="text-[32px] max-sm:text-[20px]">
+            <h3 className="text-title-2 max-sm:text-title-4">
               <b>다른 글 보러가기</b>
             </h3>
             <Link
-              className="text-[14px] hover:underline max-sm:text-[13px]"
+              className="text-body-3 max-sm:text-body-4 hover:underline"
               href="/"
             >
               More

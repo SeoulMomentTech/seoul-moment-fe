@@ -11,6 +11,10 @@ export const replaceLineBreaks = (s: string) =>
 
 export const splitLineBreaks = (s: string) => s.split(/(\r\n|\r|\n)/g);
 
+export const createMarkup = (content?: string) => ({
+  __html: replaceLineBreaks(content ?? ""),
+});
+
 export const setComma = (num: number, maximumFractionDigits?: number): string =>
   num.toLocaleString(undefined, {
     maximumFractionDigits: maximumFractionDigits ?? 2,
