@@ -1,5 +1,3 @@
-import type { User } from "lucide-react";
-
 import { Avatar, AvatarFallback, Button } from "@seoul-moment/ui";
 
 interface User {
