@@ -40,6 +40,6 @@ body {
 }
 
 * {
-  line-height: 1.25;
+  box-sizing: border-box;
   @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-0;
 }

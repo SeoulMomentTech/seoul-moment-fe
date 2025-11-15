@@ -14,14 +14,14 @@ export interface DetailMainProps {
 
 const styleMap = {
   desktop: {
-    section: "mx-auto flex h-[800px] max-w-[1920px] min-w-[1280px] pt-[56px]",
+    section: "mx-auto flex h-[600px] max-w-[1280px] min-w-[1280px] pt-[56px]",
     image: "h-full w-[50%] object-cover",
-    titleBox: "w-[50%] bg-[#F0F6FF] pt-[131px] px-[40px]",
+    titleBox: "w-[50%] bg-[#F0F6FF] pt-[60px] px-[40px]",
   },
   mobile: {
     section:
-      "max-sm:flex max-sm:flex-col max-sm:max-w-auto max-sm:min-w-auto max-sm:w-full",
-    image: "max-sm:w-full",
+      "max-sm:flex max-sm:flex-col max-sm:max-w-auto max-sm:min-w-auto max-sm:w-full max-sm:min-h-[686px] max-sm:h-auto",
+    image: "max-sm:w-full max-sm:h-[400px]",
     titleBox: "max-sm:w-full max-sm:py-[40px] max-sm:px-[20px]",
     category: "",
   },
@@ -47,23 +47,28 @@ export function DetailMain({
         width={4000}
       />
       <div className={cn(styleMap.desktop.titleBox, styleMap.mobile.titleBox)}>
-        <div className="mb-[40px] flex flex-col gap-[30px]">
+        <div
+          className={cn(
+            "mb-[40px] flex flex-col gap-[30px]",
+            "max-sm:mb-[30px] max-sm:gap-[20px]",
+          )}
+        >
           <div className="flex flex-col gap-[10px]">
-            <span className="max-sm:text-[12px]">{category}</span>
-            <h1 className="text-[64px] font-semibold max-sm:text-[24px]">
+            <span className="max-sm:text-body-5 font-semibold">{category}</span>
+            <h1 className="max-sm:text-title-3 text-[44px] font-semibold">
               {title}
             </h1>
           </div>
-          <p className="max-sm:text-[14px]">{summary}</p>
+          <p className="max-sm:text-body-3">{summary}</p>
         </div>
         <div
           className={cn(
-            "flex flex-col gap-[60px]",
-            "max-sm:flex-row-reverse max-sm:items-center max-sm:justify-end max-sm:gap-0",
+            "flex flex-col gap-[10px] font-semibold",
+            "max-sm:text-body-3 max-sm:flex-row-reverse max-sm:items-center max-sm:justify-end max-sm:gap-0",
           )}
         >
           <span>{formatDateTime(date)}</span>
-          <span className="mx-[10px] hidden h-[8px] w-[1px] max-sm:block max-sm:bg-black/40" />
+          <span className="mx-[10px] hidden h-[8px] w-px max-sm:block max-sm:bg-black/40" />
           <div className="flex items-center gap-[10px] max-sm:gap-[4px]">
             <figure className="h-[40px] w-[40px] overflow-hidden rounded-full bg-slate-300 max-sm:h-[24px] max-sm:w-[24px]">
               <Image
