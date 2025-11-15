@@ -42,7 +42,10 @@ export function FeaturedMainNewsCard({
         subTitle={<p className="line-clamp-3">{subTitle}</p>}
         title={
           <h4
-            className={cn("text-title-3 font-semibold", "max-sm:text-body-2")}
+            className={cn(
+              "text-title-3 break-keep font-semibold",
+              "max-sm:text-body-2",
+            )}
           >
             {title}
           </h4>
@@ -90,7 +93,12 @@ export function FeaturedSubNewsCard({
         extraInfo={<AuthorWithDate author={author} date={date} />}
         subTitle={<p className="max-sm:text-body-3 line-clamp-3">{subTitle}</p>}
         title={
-          <h4 className={cn("text-body-1 font-semibold", "max-sm:text-body-2")}>
+          <h4
+            className={cn(
+              "text-body-1 break-keep font-semibold",
+              "max-sm:text-body-2",
+            )}
+          >
             {title}
           </h4>
         }

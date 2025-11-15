@@ -66,7 +66,12 @@ export default function ArticleCard({
         </p>
       }
       title={
-        <h4 className={cn("text-body-1 font-semibold", "max-sm:text-body-2")}>
+        <h4
+          className={cn(
+            "text-body-1 break-keep font-semibold",
+            "max-sm:text-body-2",
+          )}
+        >
           {title}
         </h4>
       }
