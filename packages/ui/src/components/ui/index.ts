@@ -7,3 +7,5 @@ export * from "./skeleton";
 export * from "./form";
 export * from "./textarea";
 export * from "./tabs";
+export * from "./card";
+export * from "./table";
