@@ -8,15 +8,16 @@ import {
 
 import { Layout } from "@shared/components/layout";
 import { PATH } from "@shared/constants/route";
+import { useAuthStore } from "@shared/hooks/useAuth";
 
 import HomePage from "@pages/HomePage";
 import LoginPage from "@pages/LoginPage";
 import SignUpPage from "@pages/SignUpPage";
 
 const PublicRoute = () => {
-  const isLogin = false;
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
-  if (isLogin) {
+  if (isAuthenticated) {
     return <Navigate replace to={PATH.INDEX} />;
   }
 
@@ -40,9 +41,9 @@ const publicRoutes: RouteObject[] = [
 ];
 
 const PrivateRoute = () => {
-  const isLogin = true;
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
-  if (!isLogin) {
+  if (!isAuthenticated) {
     return <Navigate replace to={PATH.LOGIN} />;
   }
 
@@ -58,7 +59,7 @@ const privateRoutes: RouteObject[] = [
     element: <PrivateRoute />,
     children: [
       {
-        path: "/",
+        path: PATH.INDEX,
         element: <HomePage />,
       },
     ],
