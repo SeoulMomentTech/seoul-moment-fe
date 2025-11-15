@@ -2,11 +2,11 @@
 
 import { Skeleton } from "@seoul-moment/ui";
 import { ArrowRightIcon } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { use, useId } from "react";
 import { cn } from "@shared/lib/style";
 import type { getHome } from "@shared/services/home";
+import { BaseImage } from "@shared/ui/base-image";
 
 interface SeasonCollectionProps {
   promise: ReturnType<typeof getHome>;
@@ -66,7 +66,7 @@ export function SeasonCollection({ promise }: SeasonCollectionProps) {
             )}
             key={`${id}-${src}-${idx + 1}`}
           >
-            <Image
+            <BaseImage
               alt=""
               className="h-full object-cover"
               height={600}

@@ -87,7 +87,7 @@ export function FeaturedSubNewsCard({
         extraInfo={<AuthorWithDate author={author} date={date} />}
         subTitle={<p className="max-sm:text-body-3 line-clamp-3">{subTitle}</p>}
         title={
-          <h4 className={cn("text-body-1 font-semibold", "max-sm:text-[16px]")}>
+          <h4 className={cn("text-body-1 font-semibold", "max-sm:text-body-2")}>
             {title}
           </h4>
         }

@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import { use } from "react";
 import { cn } from "@shared/lib/style";
 import type { getHome } from "@shared/services/home";
+import { BaseImage } from "@shared/ui/base-image";
 
 interface MainBannerProps {
   promise: ReturnType<typeof getHome>;
@@ -31,7 +31,7 @@ export function MainBanner({ promise }: MainBannerProps) {
           srcSet={banner.mobileImage}
           type="image/png"
         />
-        <Image
+        <BaseImage
           alt=""
           className="h-full object-cover object-top"
           height={600}
