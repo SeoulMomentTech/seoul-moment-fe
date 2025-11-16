@@ -4,8 +4,8 @@ import { useNavigate } from "react-router";
 
 import { Lock } from "lucide-react";
 
-import { PATH } from "@/shared/constants/route";
-import { useAuthStore } from "@/shared/hooks/useAuth";
+import { PATH } from "@shared/constants/route";
+import { useAuthStore } from "@shared/hooks/useAuth";
 
 import {
   Button,

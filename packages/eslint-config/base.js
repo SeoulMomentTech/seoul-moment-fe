@@ -51,6 +51,11 @@ const base = [
               position: "before",
             },
             {
+              pattern: "lucide-react",
+              group: "external",
+              position: "before",
+            },
+            {
               pattern: "@",
               group: "internal",
               position: "after",
