@@ -3,6 +3,7 @@
 import { lazy, useState } from "react";
 
 import { MenuIcon, ChevronRightIcon } from "lucide-react";
+
 import Image from "next/image";
 
 import useModal from "@shared/lib/hooks/useModal";

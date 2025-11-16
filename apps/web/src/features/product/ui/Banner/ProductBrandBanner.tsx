@@ -1,4 +1,5 @@
 import { Share2Icon } from "lucide-react";
+
 import Image from "next/image";
 
 import { useBrandBanner } from "@entities/brand/model/hooks/useBrandBanner";

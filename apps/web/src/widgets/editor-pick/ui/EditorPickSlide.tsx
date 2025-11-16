@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
+
 import { FreeMode } from "swiper/modules";
 import { Swiper, SwiperSlide, useSwiper } from "swiper/react"; // 예시: Swiper 라이브러리 사용
 

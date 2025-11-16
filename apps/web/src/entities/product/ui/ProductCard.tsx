@@ -1,4 +1,5 @@
 import { HeartIcon, StarIcon } from "lucide-react";
+
 import Image from "next/image";
 
 import { cn } from "@shared/lib/style";
