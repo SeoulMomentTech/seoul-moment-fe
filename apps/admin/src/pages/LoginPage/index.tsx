@@ -40,6 +40,11 @@ export default function LoginPage() {
       return;
     }
 
+    if (email !== "admin@seoulmoment.com.tw") {
+      setError("계정이 존재하지 않습니다.");
+      return;
+    }
+
     login({
       accessToken: "temporary-token",
       user: {
