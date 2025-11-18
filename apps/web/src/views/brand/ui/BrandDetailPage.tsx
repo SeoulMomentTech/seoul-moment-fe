@@ -24,17 +24,17 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
       {data?.bannerList?.[0] && (
         <section
           className={cn(
-            "mx-auto h-[856px] min-w-[1280px] max-w-[1928px] pt-[56px] max-sm:h-[456px]",
-            "max-sm:min-w-auto max-sm:max-w-none",
+            "mx-auto h-[856px] w-[1280px] pt-[56px] max-sm:h-[456px]",
+            "max-sm:w-full",
           )}
         >
           <Image
             alt=""
-            className="h-full object-cover"
-            height={800}
+            className="h-full object-cover max-sm:object-contain"
+            height={600}
             priority
             src={data.bannerList[0] ?? ""}
-            width={4000}
+            width={1300}
           />
         </section>
       )}
@@ -168,8 +168,8 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
       {data?.bannerList?.[1] && (
         <section
           className={cn(
-            "mx-auto h-[800px] min-h-[800px] min-w-[1280px] max-w-[1928px]",
-            "max-sm:min-w-auto max-sm:h-[240px] max-sm:min-h-[240px] max-sm:max-w-none",
+            "mx-auto h-[800px] min-h-[800px] w-[1280px]",
+            "max-sm:h-[240px] max-sm:min-h-[240px] max-sm:w-full",
           )}
         >
           <Image
