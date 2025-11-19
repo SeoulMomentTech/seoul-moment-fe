@@ -5,8 +5,9 @@ import { use } from "react";
 import Image from "next/image";
 
 import { cn } from "@shared/lib/style";
-import { replaceLineBreaks } from "@shared/lib/utils";
 import type { BrandDetailInfo } from "@shared/services/brand";
+import { HtmlContent } from "@shared/ui/html-content";
+import { ResponsiveBanner } from "@shared/ui/responsive-banner";
 
 import type { CommonRes } from "@shared/services";
 import { BrandProducts } from "@widgets/brand-products";
@@ -19,25 +20,33 @@ interface BrandDetailPageProps {
 export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
   const { data } = use(promise);
 
+  const { bannerList = [], mobileBannerList = [], section = [] } = data;
+
+  const [mainBanner, subBanner] = bannerList;
+  const [mobileMainBanner, mobileSubBanner] = mobileBannerList;
+  const [first, second, third, fourth, fifth] = section;
+
   return (
     <div className="**:leading-loose!">
-      {data?.bannerList?.[0] && (
-        <section
-          className={cn(
-            "mx-auto h-[856px] w-[1280px] pt-[56px] max-sm:h-[456px]",
-            "max-sm:w-full",
-          )}
-        >
-          <Image
-            alt=""
-            className="h-full object-cover max-sm:object-contain"
-            height={600}
-            priority
-            src={data.bannerList[0] ?? ""}
-            width={1300}
-          />
-        </section>
-      )}
+      <ResponsiveBanner
+        containerClassName={cn(
+          "mx-auto h-[856px] w-[1280px] pt-[56px] max-sm:h-[456px]",
+          "max-sm:w-full",
+        )}
+        desktop={{
+          className: "max-sm:hidden",
+          height: 600,
+          src: mainBanner,
+          width: 1300,
+        }}
+        mobile={{
+          className: "hidden max-sm:block",
+          height: 600,
+          src: mobileMainBanner,
+          width: 700,
+        }}
+      />
+
       <article
         className={cn(
           "mx-auto w-[1280px] pt-[100px]",
@@ -57,14 +66,7 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
             )}
           >
             <h2 className="max-sm:text-title-4 text-[40px]">{data?.name}</h2>
-            {data?.description && (
-              <p
-                className="text-title-4"
-                dangerouslySetInnerHTML={{
-                  __html: replaceLineBreaks(data.description),
-                }}
-              />
-            )}
+            <HtmlContent className="text-title-4" html={data.description} />
           </div>
           <div
             className={cn(
@@ -73,23 +75,15 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
             )}
           >
             <div className={cn("flex flex-col gap-[20px]")}>
-              {data?.section?.[0]?.title && (
-                <h4
-                  className={cn(
-                    "text-title-4 bo font-semibold",
-                    "max-sm:text-body-2",
-                  )}
-                >
-                  {data.section[0].title}
-                </h4>
-              )}
-              {data?.section?.[0]?.content && (
-                <p
-                  dangerouslySetInnerHTML={{
-                    __html: replaceLineBreaks(data.section[0].content),
-                  }}
-                />
-              )}
+              <HtmlContent
+                as="h4"
+                className={cn(
+                  "text-title-4 bo font-semibold",
+                  "max-sm:text-body-2",
+                )}
+                html={first?.title}
+              />
+              <HtmlContent html={first?.content} />
             </div>
             <div
               className={cn(
@@ -97,7 +91,7 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
                 "max-sm:flex-col max-sm:gap-[40px]",
               )}
             >
-              {data?.section?.[0]?.imageList.map((image, idx) => (
+              {first?.imageList?.map((image, idx) => (
                 <div
                   className={cn(
                     "flex max-sm:justify-start",
@@ -127,7 +121,7 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
             "max-sm:flex-col max-sm:gap-[40px] max-sm:px-[20px] max-sm:pb-[90px]",
           )}
         >
-          {data?.section?.[1]?.imageList?.[0] && (
+          {second?.imageList?.[0] && (
             <div
               className={cn(
                 "h-[640px] min-w-[585px] bg-transparent",
@@ -138,68 +132,56 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
                 alt=""
                 className="h-full object-cover"
                 height={600}
-                src={data.section[1].imageList[0]}
+                src={second.imageList[0]}
                 width={900}
               />
             </div>
           )}
           <div className="flex flex-col justify-end gap-[20px]">
-            {data?.section?.[1]?.title && (
-              <h4
-                className={cn(
-                  "text-title-4 font-semibold",
-                  "max-sm:text-body-2",
-                )}
-                dangerouslySetInnerHTML={{
-                  __html: replaceLineBreaks(data.section[1].title),
-                }}
-              />
-            )}
-            {data?.section?.[1]?.content && (
-              <p
-                dangerouslySetInnerHTML={{
-                  __html: replaceLineBreaks(data.section[1].content),
-                }}
-              />
-            )}
+            <HtmlContent
+              as="h4"
+              className={cn("text-title-4 font-semibold", "max-sm:text-body-2")}
+              html={second?.title}
+            />
+            <HtmlContent html={second?.content} />
           </div>
         </div>
       </article>
-      {data?.bannerList?.[1] && (
-        <section
-          className={cn(
-            "mx-auto h-[800px] min-h-[800px] w-[1280px]",
-            "max-sm:h-[240px] max-sm:min-h-[240px] max-sm:w-full",
-          )}
-        >
-          <Image
-            alt=""
-            className="h-full object-cover"
-            height={800}
-            priority
-            src={data.bannerList[1]}
-            width={4000}
-          />
-        </section>
-      )}
+
+      <ResponsiveBanner
+        containerClassName={cn(
+          "mx-auto h-[800px] min-h-[800px] w-[1280px]",
+          "max-sm:h-[240px] max-sm:min-h-[240px] max-sm:w-full",
+        )}
+        desktop={{
+          className: "max-sm:hidden",
+          height: 800,
+          src: subBanner,
+          width: 1300,
+        }}
+        mobile={{
+          className: "hidden max-sm:block",
+          height: 300,
+          src: mobileSubBanner,
+          width: 700,
+        }}
+      />
+
       <article
         className={cn(
           "mx-auto flex w-[1280px] flex-col gap-[60px] pb-[100px] pt-[140px]",
           "max-sm:w-full max-sm:gap-[40px] max-sm:px-[20px] max-sm:pb-[50px] max-sm:pt-[90px]",
         )}
       >
-        {data?.section?.[2]?.title && (
-          <h4
-            className={cn(
-              "text-title-3 text-center font-semibold",
-              "max-sm:text-title-4",
-            )}
-            dangerouslySetInnerHTML={{
-              __html: replaceLineBreaks(data.section[2].title ?? ""),
-            }}
-          />
-        )}
-        {data?.section?.[2]?.imageList && (
+        <HtmlContent
+          as="h4"
+          className={cn(
+            "text-title-3 text-center font-semibold",
+            "max-sm:text-title-4",
+          )}
+          html={third?.title}
+        />
+        {third?.imageList && (
           <div className="flex items-center justify-center">
             <figure
               className={cn(
@@ -211,22 +193,15 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
                 alt=""
                 className="h-full object-cover"
                 height={600}
-                src={data.section[2].imageList[0]}
+                src={third.imageList[0]}
                 width={900}
               />
             </figure>
           </div>
         )}
-        {data?.section?.[2]?.content && (
-          <p
-            className="text-center"
-            dangerouslySetInnerHTML={{
-              __html: replaceLineBreaks(data.section[2].content),
-            }}
-          />
-        )}
+        <HtmlContent className="text-center" html={third?.content} />
       </article>
-      {data?.section?.[3] && (
+      {fourth && (
         <article
           className={cn("mx-auto w-[1280px]", "max-sm:w-full max-sm:pt-[90px]")}
         >
@@ -237,26 +212,17 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
             )}
           >
             <div className="flex flex-col justify-center gap-[20px]">
-              {data.section[3]?.title && (
-                <h4
-                  className={cn(
-                    "text-body-1 font-semibold",
-                    "max-sm:text-body-2",
-                  )}
-                  dangerouslySetInnerHTML={{
-                    __html: replaceLineBreaks(data.section[3].title),
-                  }}
-                />
-              )}
-              {data.section[3]?.content && (
-                <p
-                  dangerouslySetInnerHTML={{
-                    __html: replaceLineBreaks(data.section[3].content),
-                  }}
-                />
-              )}
+              <HtmlContent
+                as="h4"
+                className={cn(
+                  "text-body-1 font-semibold",
+                  "max-sm:text-body-2",
+                )}
+                html={fourth?.title}
+              />
+              <HtmlContent html={fourth?.content} />
             </div>
-            {data.section[3]?.imageList?.[0] && (
+            {fourth?.imageList?.[0] && (
               <div
                 className={cn(
                   "h-[640px] min-w-[585px] bg-transparent",
@@ -267,7 +233,7 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
                   alt=""
                   className="h-full object-cover"
                   height={600}
-                  src={data.section[3].imageList[0]}
+                  src={fourth.imageList[0]}
                   width={900}
                 />
               </div>
@@ -275,25 +241,19 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
           </div>
         </article>
       )}
-      {data?.section?.[4] && (
+      {fifth && (
         <article
           className={cn(
             "mx-auto flex w-[1280px] flex-col gap-[60px] pb-[100px]",
             "max-sm:w-full max-sm:gap-[40px] max-sm:px-[20px] max-sm:pb-[50px] max-sm:pt-[90px]",
           )}
         >
-          {data.section[4]?.title && (
-            <h4
-              className={cn(
-                "text-title-3 font-semibold",
-                "max-sm:text-title-4",
-              )}
-              dangerouslySetInnerHTML={{
-                __html: replaceLineBreaks(data.section[4].title ?? ""),
-              }}
-            />
-          )}
-          {data.section[4]?.imageList && (
+          <HtmlContent
+            as="h4"
+            className={cn("text-title-3 font-semibold", "max-sm:text-title-4")}
+            html={fifth?.title}
+          />
+          {fifth?.imageList && (
             <div className="flex items-center justify-center">
               <figure
                 className={cn(
@@ -305,20 +265,13 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
                   alt=""
                   className="h-full object-cover"
                   height={600}
-                  src={data.section[4].imageList[0]}
+                  src={fifth.imageList[0]}
                   width={900}
                 />
               </figure>
             </div>
           )}
-          {data.section[4]?.content && (
-            <p
-              className="text-center"
-              dangerouslySetInnerHTML={{
-                __html: replaceLineBreaks(data.section[4].content),
-              }}
-            />
-          )}
+          <HtmlContent className="text-center" html={fifth?.content} />
         </article>
       )}
       <BrandProducts id={data.id} />

@@ -35,6 +35,7 @@ interface BrandDetailSection {
 export interface BrandDetailInfo {
   id: number;
   bannerList: string[];
+  mobileBannerList: string[];
   name: string;
   description: string;
   section: BrandDetailSection[];
