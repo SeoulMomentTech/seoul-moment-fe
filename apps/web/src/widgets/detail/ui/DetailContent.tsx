@@ -1,8 +1,9 @@
 import { DEFAULT_IMAGE_SRC } from "@shared/constants/image";
-import { createMarkup } from "@shared/lib/utils";
 import type { ArticleSection } from "@shared/services/article";
 import type { NewsSection } from "@shared/services/news";
 import { BaseImage } from "@shared/ui/base-image";
+
+import { HtmlContent } from "@/shared/ui/html-content";
 
 import { cn } from "@seoul-moment/ui";
 
@@ -42,13 +43,14 @@ export function DetailContent({ data }: DetailContentProps) {
         >
           {first?.subTitle}
         </h4>
-        <p
+        <HtmlContent
           className={cn(
             "leading-6! mb-[60px] text-black/80",
             "max-sm:px-[20px] max-sm:text-start",
           )}
-          dangerouslySetInnerHTML={createMarkup(first?.content)}
+          html={first?.content}
         />
+
         <div className="mb-[100px] h-[642px] max-sm:mb-[90px] max-sm:h-[200px]">
           <BaseImage
             alt=""
@@ -87,7 +89,7 @@ export function DetailContent({ data }: DetailContentProps) {
             <p className="text-body-1 max-sm:text-body-2 font-semibold">
               {second?.subTitle}
             </p>
-            <p dangerouslySetInnerHTML={createMarkup(second?.content)} />
+            <HtmlContent html={second?.content} />
           </div>
         </div>
       </div>
@@ -110,7 +112,7 @@ export function DetailContent({ data }: DetailContentProps) {
             <p className="text-body-1 max-sm:text-body-2 font-semibold">
               {third?.subTitle}
             </p>
-            <p dangerouslySetInnerHTML={createMarkup(third?.content)} />
+            <HtmlContent html={third?.content} />
           </div>
         </div>
         {third?.imageList.length > 0 && (
@@ -160,7 +162,7 @@ export function DetailContent({ data }: DetailContentProps) {
             >
               {fourth?.subTitle}
             </p>
-            <p dangerouslySetInnerHTML={createMarkup(fourth?.content)} />
+            <HtmlContent html={fourth?.content} />
           </div>
         </div>
       </div>
