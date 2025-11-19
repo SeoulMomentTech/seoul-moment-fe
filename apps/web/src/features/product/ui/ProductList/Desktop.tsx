@@ -157,6 +157,7 @@ export default function DeskTop({
             <div
               className={cn(
                 "flex w-[1063px] flex-wrap gap-x-[20px] gap-y-[40px]",
+                "min-h-[687px]",
               )}
             >
               {isEmpty ? (

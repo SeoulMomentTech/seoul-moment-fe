@@ -77,7 +77,7 @@ export default function Mobile({ filter }: MobileProps) {
             <div
               className={cn(
                 "gap-x-[20px] gap-y-[30px]",
-                "w-full",
+                "min-h-[400px] w-full",
                 "grid grid-cols-2",
               )}
             >
