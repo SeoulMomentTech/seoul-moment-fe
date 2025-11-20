@@ -36,14 +36,14 @@ api.interceptors.response.use(
 );
 
 export const fetcher = {
-  get: (pathname: string, options?: AxiosRequestConfig) =>
-    api.get(pathname, options),
-  post: (pathname: string, options?: AxiosRequestConfig) =>
-    api.post(pathname, options),
-  put: (pathname: string, options?: AxiosRequestConfig) =>
-    api.put(pathname, options),
-  patch: (pathname: string, options?: AxiosRequestConfig) =>
-    api.patch(pathname, options),
-  delete: (pathname: string, options?: AxiosRequestConfig) =>
-    api.delete(pathname, options),
+  get: <T>(pathname: string, options?: AxiosRequestConfig) =>
+    api.get<T>(pathname, options).then((res) => res.data),
+  post: <T>(pathname: string, data?: unknown, config?: AxiosRequestConfig) =>
+    api.post<T>(pathname, data, config).then((res) => res.data),
+  put: <T>(pathname: string, data?: unknown, config?: AxiosRequestConfig) =>
+    api.put<T>(pathname, data, config).then((res) => res.data),
+  patch: <T>(pathname: string, data?: unknown, config?: AxiosRequestConfig) =>
+    api.patch<T>(pathname, data, config).then((res) => res.data),
+  delete: <T>(pathname: string, config?: AxiosRequestConfig) =>
+    api.delete<T>(pathname, config).then((res) => res.data),
 };
