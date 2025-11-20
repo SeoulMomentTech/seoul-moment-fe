@@ -58,7 +58,7 @@ export const getAdminCategory = (categoryId: number) =>
   );
 
 export const createAdminCategory = (payload: CreateAdminCategoryRequest) =>
-  fetcher.post("/admin/category", { data: payload });
+  fetcher.post("/admin/category", payload);
 
 export const updateAdminCategory = (
   categoryId: CategoryId,
