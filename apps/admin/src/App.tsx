@@ -1,7 +1,13 @@
+import Providers from "@shared/components/providers";
+
 import Router from "./Router";
 
 function App() {
-  return <Router />;
+  return (
+    <Providers>
+      <Router />
+    </Providers>
+  );
 }
 
 export default App;

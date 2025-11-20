@@ -11,3 +11,4 @@ export * from "./card";
 export * from "./table";
 export * from "./dropdown-menu";
 export * from "./avatar";
+export * from "./select";

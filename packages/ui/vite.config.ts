@@ -26,6 +26,9 @@ export default defineConfig({
         "@radix-ui/react-tabs",
         "@radix-ui/react-label",
         "@radix-ui/react-dialog",
+        "@radix-ui/react-select",
+        "@radix-ui/react-avatar",
+        "@radix-ui/react-dropdown-menu",
       ],
       output: [
         {
