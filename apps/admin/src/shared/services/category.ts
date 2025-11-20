@@ -8,7 +8,7 @@ interface ApiResponse<T> {
 export type AdminCategorySort = "ASC" | "DESC";
 export type AdminCategorySearchColumn = "name";
 
-export type CategoryId = Branded<number, "CatagoryId">;
+export type CategoryId = Branded<number, "CategoryId">;
 
 export interface AdminCategoryName {
   languageCode: string;
@@ -24,6 +24,8 @@ interface AdminCategoryListData {
   total: number;
   list: AdminCategory[];
 }
+
+type AdminCategoryDetailData = AdminCategory;
 
 export interface AdminCategoryListParams {
   page?: number;
@@ -53,7 +55,7 @@ export const getAdminCategoryList = (params?: AdminCategoryListParams) =>
   });
 
 export const getAdminCategory = (categoryId: number) =>
-  fetcher.get<ApiResponse<AdminCategoryListData>>(
+  fetcher.get<ApiResponse<AdminCategoryDetailData>>(
     `/admin/category/${categoryId}`,
   );
 
