@@ -9,8 +9,8 @@ export type MenuItem =
   | "user-roles"
   | "user-groups"
   | "products"
-  | "product-categories"
-  | "product-inventory"
+  | "categories"
+  | "inventory"
   | "orders"
   | "analytics"
   | "settings";

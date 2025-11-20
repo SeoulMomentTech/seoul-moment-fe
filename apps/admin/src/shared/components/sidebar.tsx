@@ -1,13 +1,8 @@
 import { type ReactNode } from "react";
 
-import {
-  LayoutDashboard,
-  Users,
-  Package,
-  ShoppingCart,
-  BarChart3,
-  Settings,
-} from "lucide-react";
+import { Link } from "react-router";
+
+import { LayoutDashboard, Package } from "lucide-react";
 
 import {
   Accordion,
@@ -22,18 +17,19 @@ import type { MenuItem } from "./layout";
 interface SidebarProps {
   selectedMenu?: MenuItem;
   isMobileMenuOpen: boolean;
-  onMenuSelect?(menu: MenuItem): void;
   onMobileMenuClose(): void;
 }
 
 interface SubMenuItem {
   id: MenuItem;
   label: string;
+  path: string;
 }
 
 interface MenuItemConfig {
   id: MenuItem;
   label: string;
+  path?: string;
   icon: ReactNode;
   subItems?: SubMenuItem[];
 }
@@ -41,43 +37,28 @@ interface MenuItemConfig {
 const menuItems: MenuItemConfig[] = [
   {
     id: "dashboard",
+    path: "/",
     label: "대시보드",
     icon: <LayoutDashboard className="h-5 w-5" />,
   },
-  {
-    id: "users",
-    label: "사용자 관리",
-    icon: <Users className="h-5 w-5" />,
-    subItems: [
-      { id: "users", label: "전체 사용자" },
-      { id: "user-roles", label: "권한 관리" },
-      { id: "user-groups", label: "그룹 관리" },
-    ],
-  },
+  //{
+  //  id: "users",
+  //  label: "사용자 관리",
+  //  icon: <Users className="h-5 w-5" />,
+  //  subItems: [
+  //    { id: "users", label: "전체 사용자" },
+  //    { id: "user-roles", label: "권한 관리" },
+  //    { id: "user-groups", label: "그룹 관리" },
+  //  ],
+  //},
   {
     id: "products",
     label: "상품 관리",
+    path: "",
     icon: <Package className="h-5 w-5" />,
     subItems: [
-      { id: "products", label: "전체 상품" },
-      { id: "product-categories", label: "카테고리" },
-      { id: "product-inventory", label: "재고 관리" },
+      { id: "categories", label: "카테고리", path: "/products/categories" },
     ],
-  },
-  {
-    id: "orders",
-    label: "주문 관리",
-    icon: <ShoppingCart className="h-5 w-5" />,
-  },
-  {
-    id: "analytics",
-    label: "분석",
-    icon: <BarChart3 className="h-5 w-5" />,
-  },
-  {
-    id: "settings",
-    label: "설정",
-    icon: <Settings className="h-5 w-5" />,
   },
 ];
 
@@ -87,7 +68,6 @@ export default function Sidebar({
   isMobileMenuOpen,
   selectedMenu,
   onMobileMenuClose,
-  onMenuSelect,
 }: SidebarProps) {
   const isSubItemSelected = (item: MenuItemConfig) => {
     if (!item.subItems) return false;
@@ -141,7 +121,7 @@ export default function Sidebar({
                     </AccordionTrigger>
                     <AccordionContent className="space-y-1 pb-0 pt-2">
                       {item.subItems.map((subItem) => (
-                        <button
+                        <Link
                           className={cn(
                             "flex w-full items-center gap-3 rounded-lg px-4 py-2 text-sm transition-colors",
                             "text-gray-600 hover:bg-gray-50",
@@ -149,11 +129,10 @@ export default function Sidebar({
                               "bg-gray-100 text-gray-900",
                           )}
                           key={subItem.id}
-                          onClick={() => onMenuSelect?.(subItem.id)}
-                          type="button"
+                          to={subItem.path}
                         >
                           <span>{subItem.label}</span>
-                        </button>
+                        </Link>
                       ))}
                     </AccordionContent>
                   </AccordionItem>
@@ -161,21 +140,20 @@ export default function Sidebar({
               }
 
               return (
-                <button
+                <Link
                   className={`flex w-full items-center justify-between rounded-lg px-4 py-3 transition-colors ${
                     isSelected
                       ? "bg-gray-900 text-white"
                       : "text-gray-700 hover:bg-gray-100"
                   }`}
                   key={item.id}
-                  onClick={() => onMenuSelect?.(item.id)}
-                  type="button"
+                  to={item.path ?? "/"}
                 >
                   <div className="text-body-3 flex items-center gap-3">
                     {item.icon}
                     <span>{item.label}</span>
                   </div>
-                </button>
+                </Link>
               );
             })}
           </Accordion>

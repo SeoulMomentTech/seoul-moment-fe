@@ -12,6 +12,7 @@ import { useAuthStore } from "@shared/hooks/useAuth";
 
 import HomePage from "@pages/HomePage";
 import LoginPage from "@pages/LoginPage";
+import ProductCategoriesPage from "@pages/ProductCategoriesPage";
 import SignUpPage from "@pages/SignUpPage";
 
 const PublicRoute = () => {
@@ -61,6 +62,10 @@ const privateRoutes: RouteObject[] = [
       {
         path: PATH.INDEX,
         element: <HomePage />,
+      },
+      {
+        path: PATH.PRODUCT_CATEGORIES,
+        element: <ProductCategoriesPage />,
       },
     ],
   },
