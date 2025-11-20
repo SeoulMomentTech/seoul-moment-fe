@@ -63,7 +63,7 @@ export const createAdminCategory = (payload: CreateAdminCategoryRequest) =>
 export const updateAdminCategory = (
   categoryId: CategoryId,
   payload: UpdateAdminCategoryRequest,
-) => fetcher.patch(`/admin/category/${categoryId}`, { data: payload });
+) => fetcher.patch(`/admin/category/${categoryId}`, payload);
 
 export const deleteAdminCategory = (categoryId: CategoryId) =>
   fetcher.delete(`/admin/category/${categoryId}`);

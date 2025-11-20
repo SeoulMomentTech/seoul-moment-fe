@@ -20,6 +20,7 @@ interface CategoryTableProps {
   categories: AdminCategory[];
   isLoading: boolean;
   isDeleting: boolean;
+  onEdit(category: AdminCategory): void;
   onDelete(categoryId: CategoryId): void;
 }
 
@@ -35,6 +36,7 @@ export function CategoryTable({
   categories,
   isLoading,
   isDeleting,
+  onEdit,
   onDelete,
 }: CategoryTableProps) {
   if (isLoading) {
@@ -74,7 +76,7 @@ export function CategoryTable({
               </TableCell>
               <TableCell>
                 <div className="flex gap-2">
-                  <Button size="sm" variant="ghost">
+                  <Button onClick={() => onEdit(category)} size="sm" variant="ghost">
                     <Edit className="h-4 w-4" />
                   </Button>
                   <Button
