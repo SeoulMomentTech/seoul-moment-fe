@@ -16,17 +16,21 @@ import {
   useDeleteAdminCategoryMutation,
   useUpdateAdminCategoryMutation,
 } from "./hooks";
+import {
+  EMPTY_NAMES,
+  makeNameChangeHandler,
+  toNamePayload,
+  type CategoryNames,
+} from "./utils";
 
 export default function ProductCategoriesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newCategoryNameKo, setNewCategoryNameKo] = useState("");
-  const [newCategoryNameEn, setNewCategoryNameEn] = useState("");
-  const [newCategoryNameZh, setNewCategoryNameZh] = useState("");
-  const [editCategoryNameKo, setEditCategoryNameKo] = useState("");
-  const [editCategoryNameEn, setEditCategoryNameEn] = useState("");
-  const [editCategoryNameZh, setEditCategoryNameZh] = useState("");
+  const [newCategoryNames, setNewCategoryNames] =
+    useState<CategoryNames>(EMPTY_NAMES);
+  const [editCategoryNames, setEditCategoryNames] =
+    useState<CategoryNames>(EMPTY_NAMES);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [sort] = useState<"ASC" | "DESC">("DESC");
@@ -34,6 +38,8 @@ export default function ProductCategoriesPage() {
   const [editingCategory, setEditingCategory] = useState<AdminCategory | null>(
     null,
   );
+  const handleNewNameChange = makeNameChangeHandler(setNewCategoryNames);
+  const handleEditNameChange = makeNameChangeHandler(setEditCategoryNames);
 
   const {
     data: categoryResponse,
@@ -62,22 +68,16 @@ export default function ProductCategoriesPage() {
   };
 
   const handleAddCategory = async () => {
-    if (!newCategoryNameKo.trim()) {
+    if (!newCategoryNames.ko.trim()) {
       alert("카테고리 이름(한국어)을 입력해주세요.");
       return;
     }
 
     try {
       await createCategory({
-        list: [
-          { languageId: 1, name: newCategoryNameKo.trim() },
-          { languageId: 2, name: newCategoryNameEn.trim() },
-          { languageId: 3, name: newCategoryNameZh.trim() },
-        ],
+        list: toNamePayload(newCategoryNames),
       });
-      setNewCategoryNameKo("");
-      setNewCategoryNameEn("");
-      setNewCategoryNameZh("");
+      setNewCategoryNames(EMPTY_NAMES);
       setIsModalOpen(false);
       setPage(1);
     } catch (error) {
@@ -110,9 +110,7 @@ export default function ProductCategoriesPage() {
   const resetEditState = () => {
     setIsEditModalOpen(false);
     setEditingCategory(null);
-    setEditCategoryNameKo("");
-    setEditCategoryNameEn("");
-    setEditCategoryNameZh("");
+    setEditCategoryNames(EMPTY_NAMES);
   };
 
   const openEditModal = (category: AdminCategory) => {
@@ -120,16 +118,18 @@ export default function ProductCategoriesPage() {
     const getName = (code: string) =>
       category.nameDto.find((n) => n.languageCode === code)?.name ?? "";
 
-    setEditCategoryNameKo(getName("ko"));
-    setEditCategoryNameEn(getName("en"));
-    setEditCategoryNameZh(getName("zh-TW"));
+    setEditCategoryNames({
+      ko: getName("ko"),
+      en: getName("en"),
+      zh: getName("zh-TW"),
+    });
     setIsEditModalOpen(true);
   };
 
   const handleUpdateCategory = async () => {
     if (!editingCategory) return;
 
-    if (!editCategoryNameKo.trim()) {
+    if (!editCategoryNames.ko.trim()) {
       alert("카테고리 이름(한국어)을 입력해주세요.");
       return;
     }
@@ -138,11 +138,7 @@ export default function ProductCategoriesPage() {
       await updateCategory({
         categoryId: editingCategory.id,
         payload: {
-          list: [
-            { languageId: 1, name: editCategoryNameKo.trim() },
-            { languageId: 2, name: editCategoryNameEn.trim() },
-            { languageId: 3, name: editCategoryNameZh.trim() },
-          ],
+          list: toNamePayload(editCategoryNames),
         },
       });
       resetEditState();
@@ -155,7 +151,8 @@ export default function ProductCategoriesPage() {
 
   const categories = categoryResponse?.data.list ?? [];
   const total = categoryResponse?.data.total ?? 0;
-  const totalPages = Math.ceil(total / pageSize);
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const isListLoading = isLoading || isFetching;
 
   return (
     <div className="p-8 pt-24">
@@ -164,25 +161,25 @@ export default function ProductCategoriesPage() {
       <CategoryCreateModal
         isOpen={isModalOpen}
         isSubmitting={isCreating}
-        newCategoryNameEn={newCategoryNameEn}
-        newCategoryNameKo={newCategoryNameKo}
-        newCategoryNameZh={newCategoryNameZh}
-        onChangeEn={(e) => setNewCategoryNameEn(e.target.value)}
-        onChangeKo={(e) => setNewCategoryNameKo(e.target.value)}
-        onChangeZh={(e) => setNewCategoryNameZh(e.target.value)}
+        newCategoryNameEn={newCategoryNames.en}
+        newCategoryNameKo={newCategoryNames.ko}
+        newCategoryNameZh={newCategoryNames.zh}
+        onChangeEn={(e) => handleNewNameChange("en")(e.target.value)}
+        onChangeKo={(e) => handleNewNameChange("ko")(e.target.value)}
+        onChangeZh={(e) => handleNewNameChange("zh")(e.target.value)}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleAddCategory}
       />
 
       <CategoryEditModal
-        editCategoryNameEn={editCategoryNameEn}
-        editCategoryNameKo={editCategoryNameKo}
-        editCategoryNameZh={editCategoryNameZh}
+        editCategoryNameEn={editCategoryNames.en}
+        editCategoryNameKo={editCategoryNames.ko}
+        editCategoryNameZh={editCategoryNames.zh}
         isOpen={isEditModalOpen}
         isSubmitting={isUpdating}
-        onChangeEn={(e) => setEditCategoryNameEn(e.target.value)}
-        onChangeKo={(e) => setEditCategoryNameKo(e.target.value)}
-        onChangeZh={(e) => setEditCategoryNameZh(e.target.value)}
+        onChangeEn={(e) => handleEditNameChange("en")(e.target.value)}
+        onChangeKo={(e) => handleEditNameChange("ko")(e.target.value)}
+        onChangeZh={(e) => handleEditNameChange("zh")(e.target.value)}
         onClose={resetEditState}
         onSubmit={handleUpdateCategory}
       />
@@ -207,7 +204,7 @@ export default function ProductCategoriesPage() {
         <CategoryTable
           categories={categories}
           isDeleting={isDeleting}
-          isLoading={isLoading || isFetching}
+          isLoading={isListLoading}
           onDelete={handleDeleteCategory}
           onEdit={openEditModal}
         />

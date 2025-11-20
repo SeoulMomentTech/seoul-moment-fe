@@ -29,6 +29,12 @@ export function CategoryCreateModal({
   onChangeEn,
   onChangeZh,
 }: CategoryCreateModalProps) {
+  const disabled =
+    isSubmitting ||
+    newCategoryNameKo.length === 0 ||
+    newCategoryNameEn.length === 0 ||
+    newCategoryNameZh.length === 0;
+
   if (!isOpen) return null;
 
   return (
@@ -81,7 +87,7 @@ export function CategoryCreateModal({
           <Button onClick={onClose} variant="outline">
             취소
           </Button>
-          <Button disabled={isSubmitting} onClick={onSubmit}>
+          <Button disabled={disabled} onClick={onSubmit}>
             {isSubmitting ? "추가 중..." : "추가"}
           </Button>
         </div>

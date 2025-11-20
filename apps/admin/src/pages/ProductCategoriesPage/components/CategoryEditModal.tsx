@@ -29,6 +29,12 @@ export function CategoryEditModal({
   onChangeEn,
   onChangeZh,
 }: CategoryEditModalProps) {
+  const disabled =
+    isSubmitting ||
+    editCategoryNameKo.length === 0 ||
+    editCategoryNameEn.length === 0 ||
+    editCategoryNameZh.length === 0;
+
   if (!isOpen) return null;
 
   return (
@@ -81,7 +87,7 @@ export function CategoryEditModal({
           <Button onClick={onClose} variant="outline">
             취소
           </Button>
-          <Button disabled={isSubmitting} onClick={onSubmit}>
+          <Button disabled={disabled} onClick={onSubmit}>
             {isSubmitting ? "저장 중..." : "저장"}
           </Button>
         </div>

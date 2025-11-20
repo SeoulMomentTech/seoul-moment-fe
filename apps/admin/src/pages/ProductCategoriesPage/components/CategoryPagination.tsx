@@ -26,7 +26,7 @@ export function CategoryPagination({
   return (
     <div className="flex items-center justify-between">
       <div className="text-sm text-gray-600">
-        <p>현재 페이지: {countOnPage}개</p>
+        <p>이 페이지에 표시: {countOnPage}개</p>
       </div>
 
       <div className="flex items-center gap-2">
