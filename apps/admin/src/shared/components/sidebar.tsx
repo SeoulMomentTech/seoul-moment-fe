@@ -2,7 +2,7 @@ import { type ReactNode } from "react";
 
 import { Link } from "react-router";
 
-import { LayoutDashboard, Package } from "lucide-react";
+import { LayoutDashboard, Package, Image } from "lucide-react";
 
 import {
   Accordion,
@@ -51,6 +51,13 @@ const menuItems: MenuItemConfig[] = [
   //    { id: "user-groups", label: "그룹 관리" },
   //  ],
   //},
+  {
+    id: "banner",
+    label: "배너 관리",
+    path: "",
+    icon: <Image className="h-5 w-5" />,
+    subItems: [{ id: "home-banner", label: "홈 배너", path: "/banner/home" }],
+  },
   {
     id: "products",
     label: "상품 관리",

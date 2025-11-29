@@ -13,7 +13,9 @@ export type MenuItem =
   | "inventory"
   | "orders"
   | "analytics"
-  | "settings";
+  | "settings"
+  | "banner"
+  | "home-banner";
 
 export function Layout({ children }: PropsWithChildren) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

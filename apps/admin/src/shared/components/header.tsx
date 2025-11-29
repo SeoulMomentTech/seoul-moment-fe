@@ -2,8 +2,8 @@ import { useNavigate } from "react-router";
 
 import { Menu } from "lucide-react";
 
-import { PATH } from "@/shared/constants/route";
-import { useAuth } from "@/shared/hooks/useAuth";
+import { PATH } from "@shared/constants/route";
+import { useAuth } from "@shared/hooks/useAuth";
 
 import { Avatar, AvatarFallback, Button, cn } from "@seoul-moment/ui";
 

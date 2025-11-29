@@ -15,6 +15,8 @@ import LoginPage from "@pages/LoginPage";
 import ProductCategoriesPage from "@pages/ProductCategoriesPage";
 import SignUpPage from "@pages/SignUpPage";
 
+import { HomeBannersPage } from "./pages/HomeBannerPage";
+
 const PublicRoute = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
@@ -66,6 +68,10 @@ const privateRoutes: RouteObject[] = [
       {
         path: PATH.PRODUCT_CATEGORIES,
         element: <ProductCategoriesPage />,
+      },
+      {
+        path: PATH.HOME_BANNER,
+        element: <HomeBannersPage />,
       },
     ],
   },
