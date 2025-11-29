@@ -4,6 +4,9 @@ import { Link, useNavigate } from "react-router";
 
 import { UserPlus } from "lucide-react";
 
+import { PATH } from "@shared/constants/route";
+import { postAdminSignUp } from "@shared/services/auth";
+
 import {
   Button,
   Card,
@@ -21,10 +24,11 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
@@ -48,10 +52,25 @@ export default function SignupPage() {
       return;
     }
 
-    navigate("/login", {
-      replace: true,
-    });
-    //onSignup(name, email, password);
+    setIsLoading(true);
+
+    try {
+      await postAdminSignUp({
+        email,
+        password,
+        name,
+      });
+      navigate(PATH.LOGIN, {
+        replace: true,
+      });
+    } catch (err) {
+      const message =
+        (err as { response?: { data?: { message?: string } } }).response?.data
+          ?.message ?? "회원가입에 실패했습니다. 다시 시도해주세요.";
+      setError(message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -111,15 +130,15 @@ export default function SignupPage() {
               />
             </div>
             {error && <div className="text-sm text-red-600">{error}</div>}
-            <Button className="w-full" type="submit">
-              가입하기
+            <Button className="w-full" disabled={isLoading} type="submit">
+              {isLoading ? "처리 중..." : "가입하기"}
             </Button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               이미 계정이 있으신가요?{" "}
-              <Link className="text-gray-900 hover:underline" to="/login">
+              <Link className="text-gray-900 hover:underline" to={PATH.LOGIN}>
                 로그인
               </Link>
             </p>
