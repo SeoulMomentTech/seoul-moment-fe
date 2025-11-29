@@ -113,7 +113,7 @@ export default function LoginPage() {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               계정이 없으신가요?{" "}
-              <Link className="text-gray-900 hover:underline" to="/signup">
+              <Link className="text-gray-900 hover:underline" to={PATH.SIGNUP}>
                 회원가입
               </Link>
             </p>
