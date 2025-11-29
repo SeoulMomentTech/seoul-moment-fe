@@ -1,5 +1,9 @@
 import { useAuthStore } from "@shared/hooks/useAuth";
-import axios, { type AxiosRequestConfig } from "axios";
+import axios, {
+  type AxiosError,
+  type AxiosRequestConfig,
+  type InternalAxiosRequestConfig,
+} from "axios";
 
 const api = axios.create({
   baseURL:
@@ -22,14 +26,81 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+interface ApiResponse<T> {
+  result: boolean;
+  data: T;
+}
+
+interface AdminOneTimeTokenResponse {
+  oneTimeToken: string;
+}
+
+let refreshPromise: Promise<string | null> | null = null;
+
+const refreshAccessToken = async (): Promise<string | null> => {
+  if (refreshPromise) {
+    return refreshPromise;
+  }
+
+  const refreshToken = useAuthStore.getState().refreshToken;
+
+  if (!refreshToken) {
+    useAuthStore.getState().logout();
+    return null;
+  }
+
+  refreshPromise = axios
+    .get<ApiResponse<AdminOneTimeTokenResponse>>(
+      "/admin/auth/one-time-token",
+      {
+        baseURL: api.defaults.baseURL,
+        timeout: 10000,
+        headers: {
+          Authorization: `Bearer ${refreshToken}`,
+        },
+      },
+    )
+    .then((res) => {
+      const newToken = res.data.data.oneTimeToken;
+      useAuthStore.getState().updateAccessToken(newToken);
+      return newToken;
+    })
+    .catch(() => {
+      useAuthStore.getState().logout();
+      return null;
+    })
+    .finally(() => {
+      refreshPromise = null;
+    });
+
+  return refreshPromise;
+};
+
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
+  async (error: AxiosError) => {
+    const status = error.response?.status;
+    const originalRequest = (error.config ??
+      {}) as InternalAxiosRequestConfig & { _retry?: boolean };
+
+    if (status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      const newToken = await refreshAccessToken();
+
+      if (newToken) {
+        originalRequest.headers = {
+          ...(originalRequest.headers ?? {}),
+          Authorization: `Bearer ${newToken}`,
+        } as InternalAxiosRequestConfig["headers"];
+        return api(originalRequest);
+      }
+    } else if (status === 401) {
       useAuthStore.getState().logout();
     }
 
-    // todo: token refresh
+    if (status === 403) {
+      useAuthStore.getState().logout();
+    }
 
     return Promise.reject(error);
   },
