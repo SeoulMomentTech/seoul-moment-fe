@@ -6,4 +6,6 @@ export const PATH = {
   PRODUCT_CATEGORIES: "/products/categories",
   // Banner
   HOME_BANNER: "/banner/home",
+  // Brand
+  BRAND: "/brand",
 } as const;

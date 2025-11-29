@@ -1,0 +1,104 @@
+import { useState } from "react";
+
+import { Plus } from "lucide-react";
+
+import { useDebounceValue } from "@shared/hooks/useDebounceValue";
+
+import { Button } from "@seoul-moment/ui";
+
+import { BrandFilters, BrandPagination, BrandTable } from "./components";
+import { useAdminBrandListQuery } from "./hooks";
+
+export function BrandsPage() {
+  return (
+    <div className="p-8 pt-24">
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <h2 className="mb-2">브랜드 관리</h2>
+          <p className="text-gray-600">브랜드를 등록하고 관리할 수 있습니다.</p>
+        </div>
+        <Button className="flex items-center gap-2" disabled>
+          <Plus className="h-4 w-4" />
+          브랜드 추가 (준비 중)
+        </Button>
+      </div>
+
+      <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+        <BrandListContents />
+      </div>
+    </div>
+  );
+}
+
+function BrandListContents() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const debouncedQuery = useDebounceValue(searchQuery, 300);
+
+  const {
+    data: brandResponse,
+    isLoading,
+    isFetching,
+  } = useAdminBrandListQuery({
+    page: currentPage,
+    count: itemsPerPage,
+    search: debouncedQuery || undefined,
+    searchColumn: "name",
+    sort: "DESC",
+  });
+
+  const brands = brandResponse?.data.list ?? [];
+  const totalItems = brandResponse?.data.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(Math.min(Math.max(1, page), totalPages));
+  };
+
+  // Reset to page 1 when search changes
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    setCurrentPage(1);
+  };
+
+  const handleItemsPerPageChange = (value: number) => {
+    setItemsPerPage(value);
+    setCurrentPage(1);
+  };
+
+  const handleDelete = (id: number) => {
+    if (!confirm("삭제 기능은 준비 중입니다. 계속하시겠습니까?")) {
+      return;
+    }
+
+    alert(`브랜드 ID ${id} 삭제 기능은 추후 제공됩니다.`);
+  };
+
+  return (
+    <>
+      <BrandFilters
+        onSearchChange={handleSearchChange}
+        searchQuery={searchQuery}
+      />
+
+      <BrandTable
+        brands={brands}
+        hasSearchQuery={Boolean(searchQuery)}
+        isFetching={isFetching}
+        isLoading={isLoading}
+        onDelete={handleDelete}
+      />
+
+      <BrandPagination
+        currentPage={currentPage}
+        isDisabled={isLoading || isFetching}
+        itemsPerPage={itemsPerPage}
+        onItemsPerPageChange={handleItemsPerPageChange}
+        onPageChange={handlePageChange}
+        totalItems={totalItems}
+        totalPages={totalPages}
+      />
+    </>
+  );
+}
