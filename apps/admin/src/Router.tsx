@@ -6,6 +6,7 @@ import {
   type RouteObject,
 } from "react-router";
 
+import { GlobalErrorBoundary } from "@shared/components/global-errorboundary";
 import { Layout } from "@shared/components/layout";
 import { PATH } from "@shared/constants/route";
 import { useAuthStore } from "@shared/hooks/useAuth";
@@ -60,7 +61,11 @@ const PrivateRoute = () => {
 
 const privateRoutes: RouteObject[] = [
   {
-    element: <PrivateRoute />,
+    element: (
+      <GlobalErrorBoundary>
+        <PrivateRoute />
+      </GlobalErrorBoundary>
+    ),
     children: [
       {
         path: PATH.INDEX,
