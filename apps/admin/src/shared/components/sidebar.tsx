@@ -2,7 +2,7 @@ import { type ReactNode } from "react";
 
 import { Link } from "react-router";
 
-import { LayoutDashboard, Package, Image } from "lucide-react";
+import { LayoutDashboard, Package, Image, Tag } from "lucide-react";
 
 import {
   Accordion,
@@ -66,6 +66,12 @@ const menuItems: MenuItemConfig[] = [
     subItems: [
       { id: "categories", label: "카테고리", path: "/products/categories" },
     ],
+  },
+  {
+    id: "brand",
+    label: "브랜드",
+    path: "/brand",
+    icon: <Tag className="h-5 w-5" />,
   },
 ];
 
