@@ -15,6 +15,7 @@ import LoginPage from "@pages/LoginPage";
 import ProductCategoriesPage from "@pages/ProductCategoriesPage";
 import SignUpPage from "@pages/SignUpPage";
 
+import { BrandsPage } from "./pages/BrandPage";
 import { HomeBannersPage } from "./pages/HomeBannerPage";
 
 const PublicRoute = () => {
@@ -72,6 +73,10 @@ const privateRoutes: RouteObject[] = [
       {
         path: PATH.HOME_BANNER,
         element: <HomeBannersPage />,
+      },
+      {
+        path: PATH.BRAND,
+        element: <BrandsPage />,
       },
     ],
   },
