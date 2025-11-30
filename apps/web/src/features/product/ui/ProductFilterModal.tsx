@@ -54,8 +54,8 @@ export default function ProductFilterModal({
   };
 
   const handleApplyFilter = () => {
+    handleUpdateFilter(instantFilter)();
     handleIsOpen(false);
-    handleUpdateFilter(instantFilter);
   };
 
   const handleCloseFilter = () => {
