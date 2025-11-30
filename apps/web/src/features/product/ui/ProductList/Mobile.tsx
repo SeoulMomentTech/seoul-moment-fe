@@ -1,5 +1,7 @@
 "use client";
 
+import { Suspense } from "react";
+
 import { SearchIcon } from "lucide-react";
 
 import useLanguage from "@shared/lib/hooks/useLanguage";
@@ -16,7 +18,7 @@ import { Empty } from "@widgets/empty";
 
 import { useInfiniteProducts } from "../../model/useInfiniteProducts";
 import useProductFilter from "../../model/useProductFilter";
-import SortFilter from "../FilterBar/SortFilter";
+import FilterBar from "../FilterBar";
 import ProductFilterSheet from "../ProductFilterSheet";
 
 interface MobileProps {
@@ -56,7 +58,9 @@ export default function Mobile({ filter }: MobileProps) {
                 )}
               </Button>
             </ProductFilterSheet>
-            <SortFilter />
+            <Suspense fallback={<FilterBar.SortSkeleton />}>
+              <FilterBar.Sort />
+            </Suspense>
           </div>
 
           {isEmpty ? (

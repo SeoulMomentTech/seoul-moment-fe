@@ -1,6 +1,6 @@
 "use client";
 
-import { lazy, useState } from "react";
+import { lazy, Suspense, useState } from "react";
 
 import { SearchIcon } from "lucide-react";
 
@@ -78,7 +78,7 @@ export default function DeskTop({
         >
           <TabsList className="flex h-[50px] items-center gap-[30px] max-sm:h-[40px]">
             <TabsTrigger
-              className="text-[18px]"
+              className="text-body-1"
               onClick={handleUpdateFilter({ categoryId: null })}
               value="all"
             >
@@ -86,7 +86,7 @@ export default function DeskTop({
             </TabsTrigger>
             {categories.map((category) => (
               <TabsTrigger
-                className="text-[18px]"
+                className="text-body-1"
                 key={category.id}
                 onClick={handleUpdateFilter({ categoryId: category.id })}
                 value={category.id.toString()}
@@ -140,7 +140,9 @@ export default function DeskTop({
               <div className="mb-[20px] flex items-center justify-between">
                 <div />
                 <FilterBar>
-                  <FilterBar.Sort />
+                  <Suspense fallback={<FilterBar.SortSkeleton />}>
+                    <FilterBar.Sort />
+                  </Suspense>
                   <Divider className="block bg-black/40" />
                   <FilterBar.Option onClick={() => update(true)} />
                   <Divider className="block bg-black/40" />

@@ -13,9 +13,9 @@ const initialFilter = {
   page: 1,
   search: null,
   brandId: null,
-  sort: null,
+  sort: "DESC",
   productCategoryId: null,
-  sortColumn: null,
+  sortColumn: "createDate",
   optionIdList: null,
 };
 

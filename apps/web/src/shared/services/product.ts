@@ -156,9 +156,14 @@ export const getProductBrandBanner = ({
     })
     .json<CommonRes<GetProductBrandBannerRes>>();
 
+export type SortOption = Category & {
+  sortColumn: string;
+  sort: "ASC" | "DESC";
+};
+
 interface GetProductSortFilterRes {
   total: number;
-  list: Array<Category>;
+  list: Array<SortOption>;
 }
 
 export const getProductSortFilter = ({ languageCode }: PublicLanguageCode) =>
