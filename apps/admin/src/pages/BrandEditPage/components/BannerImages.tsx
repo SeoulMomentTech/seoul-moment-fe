@@ -2,15 +2,19 @@ import { MultipleImageUpload } from "@shared/components/multi-image-upload";
 
 interface BannerImagesProps {
   bannerImageUrlList: string[];
+  bannerError?: string;
   setBannerImageUrlList(urls: string[]): void;
   mobileBannerImageUrlList: string[];
+  mobileBannerError?: string;
   setMobileBannerImageUrlList(urls: string[]): void;
 }
 
 export function BannerImages({
   bannerImageUrlList,
+  bannerError,
   setBannerImageUrlList,
   mobileBannerImageUrlList,
+  mobileBannerError,
   setMobileBannerImageUrlList,
 }: BannerImagesProps) {
   return (
@@ -21,6 +25,9 @@ export function BannerImages({
         onChange={setBannerImageUrlList}
         value={bannerImageUrlList}
       />
+      {bannerError && (
+        <p className="text-sm text-red-500">{bannerError}</p>
+      )}
 
       <MultipleImageUpload
         label="모바일 배너 이미지(1.메인, 2.서브)"
@@ -28,6 +35,9 @@ export function BannerImages({
         onChange={setMobileBannerImageUrlList}
         value={mobileBannerImageUrlList}
       />
+      {mobileBannerError && (
+        <p className="text-sm text-red-500">{mobileBannerError}</p>
+      )}
     </div>
   );
 }
