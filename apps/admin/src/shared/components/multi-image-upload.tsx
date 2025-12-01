@@ -2,6 +2,8 @@ import { useState, useRef } from "react";
 
 import { Upload, X } from "lucide-react";
 
+import { uploadImageFile } from "@shared/utils/image";
+
 import { Button, Label } from "@seoul-moment/ui";
 
 interface MultipleImageUploadProps {
@@ -9,6 +11,7 @@ interface MultipleImageUploadProps {
   onChange(urls: string[]): void;
   label?: string;
   maxImages?: number;
+  folder?: string;
 }
 
 export function MultipleImageUpload({
@@ -16,11 +19,13 @@ export function MultipleImageUpload({
   onChange,
   label,
   maxImages = 10,
+  folder = "brand",
 }: MultipleImageUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileSelect = (files: FileList) => {
+  const handleFileSelect = async (files: FileList) => {
     const remainingSlots = maxImages - value.length;
     const filesToProcess = Array.from(files).slice(0, remainingSlots);
 
@@ -33,20 +38,18 @@ export function MultipleImageUpload({
       return;
     }
 
-    // 각 파일을 읽어서 preview URL 생성
-    const promises = validFiles.map((file) => {
-      return new Promise<string>((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          resolve(reader.result as string);
-        };
-        reader.readAsDataURL(file);
-      });
-    });
-
-    Promise.all(promises).then((urls) => {
+    setIsUploading(true);
+    try {
+      const urls = await Promise.all(
+        validFiles.map((file) => uploadImageFile(file, folder)),
+      );
       onChange([...value, ...urls]);
-    });
+    } catch (error) {
+      console.error("이미지 업로드 실패:", error);
+      alert("이미지 업로드 중 오류가 발생했습니다.");
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -64,13 +67,13 @@ export function MultipleImageUpload({
     setIsDragging(false);
 
     if (e.dataTransfer.files.length > 0) {
-      handleFileSelect(e.dataTransfer.files);
+      void handleFileSelect(e.dataTransfer.files);
     }
   };
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      handleFileSelect(e.target.files);
+      void handleFileSelect(e.target.files);
     }
   };
 
@@ -78,7 +81,7 @@ export function MultipleImageUpload({
     onChange(value.filter((_, i) => i !== index));
   };
 
-  const canAddMore = value.length < maxImages;
+  const canAddMore = value.length < maxImages && !isUploading;
 
   return (
     <div className="space-y-3">
@@ -138,6 +141,9 @@ export function MultipleImageUpload({
             ref={fileInputRef}
             type="file"
           />
+          {isUploading && (
+            <p className="mt-2 text-xs text-gray-500">업로드 중...</p>
+          )}
         </div>
       )}
 
