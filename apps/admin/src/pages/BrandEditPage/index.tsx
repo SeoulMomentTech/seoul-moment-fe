@@ -2,10 +2,10 @@ import { useNavigate } from "react-router";
 
 import { ArrowLeft } from "lucide-react";
 
+import { LANGUAGE_LIST } from "@shared/constants/locale";
+import { PATH } from "@shared/constants/route";
+import { type CreateAdminBrandRequest } from "@shared/services/brand";
 import { useFormik, type FormikErrors } from "formik";
-
-import { PATH } from "@/shared/constants/route";
-import { type CreateAdminBrandRequest } from "@/shared/services/brand";
 
 import {
   Button,
@@ -15,27 +15,29 @@ import {
   TabsTrigger,
 } from "@seoul-moment/ui";
 
-import { BannerImagesTab } from "./components/BannerImages";
-import { BasicInfoTab } from "./components/BasicInfo";
+import { BannerImages } from "./components/BannerImages";
+import { BasicInfo } from "./components/BasicInfo";
+import { BrandSections } from "./components/BrandSection";
 import { useCreateAdminBrandMutation } from "./hooks";
-
-const LANGUAGES = [
-  { id: 1, name: "한국어", code: "ko" },
-  { id: 2, name: "English", code: "en" },
-  { id: 3, name: "中文", code: "zh" },
-];
+import { createEmptySection } from "./utils/section";
 
 const INITIAL_FORM_VALUES: CreateAdminBrandRequest = {
   englishName: "",
   categoryId: 1,
   profileImageUrl: "",
   bannerImageUrl: "",
-  textList: LANGUAGES.map((language) => ({
+  textList: LANGUAGE_LIST.map((language) => ({
     languageId: language.id,
     name: "",
     description: "",
   })),
-  sectionList: [],
+  sectionList: [
+    createEmptySection(),
+    createEmptySection(),
+    createEmptySection(),
+    createEmptySection(),
+    createEmptySection(),
+  ],
   bannerImageUrlList: [],
   mobileBannerImageUrlList: [],
 };
@@ -64,8 +66,8 @@ export function BrandEditPage() {
 
       values.textList.forEach((text) => {
         const languageName =
-          LANGUAGES.find((language) => language.id === text.languageId)?.name ??
-          "";
+          LANGUAGE_LIST.find((language) => language.id === text.languageId)
+            ?.name ?? "";
 
         if (!text.name.trim()) {
           validationErrors[`name_${text.languageId}`] =
@@ -83,12 +85,18 @@ export function BrandEditPage() {
     onSubmit: async (values) => {
       await createBrand({
         ...values,
-        bannerImageUrlList: values.bannerImageUrl
-          ? [values.bannerImageUrl]
-          : [],
-        mobileBannerImageUrlList: values.bannerImageUrl
-          ? [values.bannerImageUrl]
-          : [],
+        bannerImageUrlList:
+          values.bannerImageUrlList.length > 0
+            ? values.bannerImageUrlList
+            : values.bannerImageUrl
+              ? [values.bannerImageUrl]
+              : [],
+        mobileBannerImageUrlList:
+          values.mobileBannerImageUrlList.length > 0
+            ? values.mobileBannerImageUrlList
+            : values.bannerImageUrl
+              ? [values.bannerImageUrl]
+              : [],
       });
     },
   });
@@ -132,10 +140,10 @@ export function BrandEditPage() {
               </TabsTrigger>
             </TabsList>
             <TabsContent className="mt-6 space-y-6" value="basic">
-              <BasicInfoTab formik={formik} />
+              <BasicInfo formik={formik} />
             </TabsContent>
             <TabsContent className="mt-6 space-y-6" value="banners">
-              <BannerImagesTab
+              <BannerImages
                 bannerImageUrlList={formik.values.bannerImageUrlList}
                 mobileBannerImageUrlList={
                   formik.values.mobileBannerImageUrlList
@@ -147,6 +155,9 @@ export function BrandEditPage() {
                   formik.setFieldValue("mobileBannerImageUrlList", urls)
                 }
               />
+            </TabsContent>
+            <TabsContent className="mt-6 space-y-6" value="sections">
+              <BrandSections formik={formik} />
             </TabsContent>
           </Tabs>
 
