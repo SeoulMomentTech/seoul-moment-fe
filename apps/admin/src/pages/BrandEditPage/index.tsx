@@ -82,13 +82,31 @@ export function BrandEditPage() {
         }
       });
 
+      values.sectionList.forEach((section, sectionIndex) => {
+        section.textList.forEach((text) => {
+          const languageName =
+            LANGUAGE_LIST.find((language) => language.id === text.languageId)
+              ?.name ?? "";
+
+          if (!text.title.trim()) {
+            validationErrors[
+              `section_${sectionIndex}_title_${text.languageId}`
+            ] = `${languageName} 섹션 제목을 입력해주세요.`;
+          }
+
+          if (!text.content.trim()) {
+            validationErrors[
+              `section_${sectionIndex}_content_${text.languageId}`
+            ] = `${languageName} 섹션 내용을 입력해주세요.`;
+          }
+        });
+      });
+
       if (values.bannerImageUrlList.length < BANNER_REQUIRED_COUNT) {
         validationErrors.bannerImageUrlList = `PC 배너 이미지를 ${BANNER_REQUIRED_COUNT}장 업로드해주세요.`;
       }
 
-      if (
-        values.mobileBannerImageUrlList.length < BANNER_REQUIRED_COUNT
-      ) {
+      if (values.mobileBannerImageUrlList.length < BANNER_REQUIRED_COUNT) {
         validationErrors.mobileBannerImageUrlList = `모바일 배너 이미지를 ${BANNER_REQUIRED_COUNT}장 업로드해주세요.`;
       }
 
