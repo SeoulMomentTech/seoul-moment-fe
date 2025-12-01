@@ -11,6 +11,7 @@ import { Layout } from "@shared/components/layout";
 import { PATH } from "@shared/constants/route";
 import { useAuthStore } from "@shared/hooks/useAuth";
 
+import { BrandEditPage } from "@pages/BrandEditPage";
 import { BrandsPage } from "@pages/BrandPage";
 import { HomeBannersPage } from "@pages/HomeBannerPage";
 import HomePage from "@pages/HomePage";
@@ -91,6 +92,14 @@ const privateRoutes: RouteObject[] = [
       {
         path: PATH.BRAND,
         element: <BrandsPage />,
+      },
+      {
+        path: PATH.BRAND_ADD,
+        element: <BrandEditPage />,
+      },
+      {
+        path: PATH.BRAND_EDIT,
+        element: <BrandEditPage />,
       },
     ],
   },

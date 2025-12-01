@@ -9,7 +9,7 @@ import {
   type UseMutationOptions,
 } from "@tanstack/react-query";
 
-import { BRAND_QUERY_KEY } from "./queryKeys";
+import { BRAND_QUERY_KEY } from "../../BrandPage/hooks/queryKeys";
 
 type CreateAdminBrandResponse = Awaited<ReturnType<typeof createAdminBrand>>;
 
