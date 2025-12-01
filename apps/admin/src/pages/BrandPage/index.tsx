@@ -1,7 +1,10 @@
 import { useState } from "react";
 
+import { useNavigate } from "react-router";
+
 import { Plus } from "lucide-react";
 
+import { PATH } from "@shared/constants/route";
 import { useDebounceValue } from "@shared/hooks/useDebounceValue";
 
 import { Button, HStack } from "@seoul-moment/ui";
@@ -10,6 +13,7 @@ import { BrandFilters, BrandPagination, BrandTable } from "./components";
 import { useAdminBrandListQuery } from "./hooks";
 
 export function BrandsPage() {
+  const navigate = useNavigate();
   return (
     <div className="p-8 pt-24">
       <HStack align="between" className="mb-6">
@@ -17,9 +21,12 @@ export function BrandsPage() {
           <h2 className="mb-2">브랜드 관리</h2>
           <p className="text-gray-600">브랜드를 등록하고 관리할 수 있습니다.</p>
         </div>
-        <Button className="flex items-center gap-2" disabled>
+        <Button
+          className="flex items-center gap-2"
+          onClick={() => navigate(PATH.BRAND_ADD)}
+        >
           <Plus className="h-4 w-4" />
-          브랜드 추가 (준비 중)
+          브랜드 추가
         </Button>
       </HStack>
 
