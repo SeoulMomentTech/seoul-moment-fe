@@ -16,6 +16,7 @@ import LoginPage from "@pages/LoginPage";
 import ProductCategoriesPage from "@pages/ProductCategoriesPage";
 import SignUpPage from "@pages/SignUpPage";
 
+import { BrandEditPage } from "./pages/BrandEditPage";
 import { BrandsPage } from "./pages/BrandPage";
 import { HomeBannersPage } from "./pages/HomeBannerPage";
 
@@ -82,6 +83,14 @@ const privateRoutes: RouteObject[] = [
       {
         path: PATH.BRAND,
         element: <BrandsPage />,
+      },
+      {
+        path: PATH.BRAND_ADD,
+        element: <BrandEditPage />,
+      },
+      {
+        path: PATH.BRAND_EDIT,
+        element: <BrandEditPage />,
       },
     ],
   },
