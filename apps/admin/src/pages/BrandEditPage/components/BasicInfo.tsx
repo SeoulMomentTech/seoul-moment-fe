@@ -10,11 +10,11 @@ import { type FormikProps } from "formik";
 
 import { Button, Input, Label, Textarea } from "@seoul-moment/ui";
 
-interface BasicInfoTabProps {
+interface BasicInfoProps {
   formik: FormikProps<CreateAdminBrandRequest>;
 }
 
-export function BasicInfoTab({ formik }: BasicInfoTabProps) {
+export function BasicInfo({ formik }: BasicInfoProps) {
   const { data: categoryResponse, isLoading: isCategoryLoading } =
     useAdminCategoryListQuery({ page: 1, count: 100 });
   const categories = useMemo(
