@@ -14,7 +14,8 @@ interface BrandSectionsProps {
 }
 
 export function BrandSections({ formik }: BrandSectionsProps) {
-  const { values, setFieldValue } = formik;
+  const { values, setFieldValue, errors: formikErrors } = formik;
+  const errors = formikErrors as Record<string, string>;
   const sectionList = values.sectionList;
 
   const addSection = () =>
@@ -55,6 +56,12 @@ export function BrandSections({ formik }: BrandSectionsProps) {
     );
     setFieldValue("sectionList", updated);
   };
+
+  const getError = (
+    sectionIndex: number,
+    languageId: number,
+    field: "title" | "content",
+  ) => errors[`section_${sectionIndex}_${field}_${languageId}`];
 
   return (
     <div className="space-y-6">
@@ -107,6 +114,11 @@ export function BrandSections({ formik }: BrandSectionsProps) {
                       제목
                     </Label>
                     <Input
+                      className={
+                        getError(sectionIndex, language.id, "title")
+                          ? "border-red-500"
+                          : ""
+                      }
                       id={`section_${sectionIndex}_title_${language.id}`}
                       onChange={(e) =>
                         updateSectionText(
@@ -125,6 +137,11 @@ export function BrandSections({ formik }: BrandSectionsProps) {
                       }
                       value={text.title}
                     />
+                    {getError(sectionIndex, language.id, "title") && (
+                      <p className="text-sm text-red-500">
+                        {getError(sectionIndex, language.id, "title")}
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -134,6 +151,11 @@ export function BrandSections({ formik }: BrandSectionsProps) {
                       내용
                     </Label>
                     <Textarea
+                      className={
+                        getError(sectionIndex, language.id, "content")
+                          ? "border-red-500"
+                          : ""
+                      }
                       id={`section_${sectionIndex}_content_${language.id}`}
                       onChange={(e) =>
                         updateSectionText(
@@ -146,6 +168,11 @@ export function BrandSections({ formik }: BrandSectionsProps) {
                       rows={3}
                       value={text.content}
                     />
+                    {getError(sectionIndex, language.id, "content") && (
+                      <p className="text-sm text-red-500">
+                        {getError(sectionIndex, language.id, "content")}
+                      </p>
+                    )}
                   </div>
                 </div>
               );
