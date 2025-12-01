@@ -21,6 +21,8 @@ import { BrandSections } from "./components/BrandSection";
 import { useCreateAdminBrandMutation } from "./hooks";
 import { createEmptySection } from "./utils/section";
 
+const BANNER_REQUIRED_COUNT = 2;
+
 const INITIAL_FORM_VALUES: CreateAdminBrandRequest = {
   englishName: "",
   categoryId: 1,
@@ -79,6 +81,16 @@ export function BrandEditPage() {
             `${languageName} 설명을 입력해주세요.`;
         }
       });
+
+      if (values.bannerImageUrlList.length < BANNER_REQUIRED_COUNT) {
+        validationErrors.bannerImageUrlList = `PC 배너 이미지를 ${BANNER_REQUIRED_COUNT}장 업로드해주세요.`;
+      }
+
+      if (
+        values.mobileBannerImageUrlList.length < BANNER_REQUIRED_COUNT
+      ) {
+        validationErrors.mobileBannerImageUrlList = `모바일 배너 이미지를 ${BANNER_REQUIRED_COUNT}장 업로드해주세요.`;
+      }
 
       return validationErrors;
     },
@@ -144,7 +156,13 @@ export function BrandEditPage() {
             </TabsContent>
             <TabsContent className="mt-6 space-y-6" value="banners">
               <BannerImages
+                bannerError={
+                  formik.errors.bannerImageUrlList as string | undefined
+                }
                 bannerImageUrlList={formik.values.bannerImageUrlList}
+                mobileBannerError={
+                  formik.errors.mobileBannerImageUrlList as string | undefined
+                }
                 mobileBannerImageUrlList={
                   formik.values.mobileBannerImageUrlList
                 }
