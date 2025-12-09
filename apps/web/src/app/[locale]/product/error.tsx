@@ -2,8 +2,9 @@
 
 import { useEffect } from "react";
 
+import useLanguage from "@shared/lib/hooks/useLanguage";
+
 import { redirect } from "@/i18n/navigation";
-import useLanguage from "@/shared/lib/hooks/useLanguage";
 
 export default function ProductPageError() {
   const locale = useLanguage();

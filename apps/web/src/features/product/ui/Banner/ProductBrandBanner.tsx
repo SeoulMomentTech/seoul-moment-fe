@@ -25,6 +25,7 @@ export default function ProductBrandBanner({ id }: ProductBrandBannerProps) {
     },
     options: {
       queryKey: ["productBrandBanner", id, languageCode],
+      throwOnError: true,
     },
   });
 

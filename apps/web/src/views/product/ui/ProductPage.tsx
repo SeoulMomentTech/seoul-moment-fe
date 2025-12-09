@@ -1,8 +1,13 @@
+"use client";
+
+import useValidateFilter from "@features/product/model/useValidateProductFilter";
 import { cn } from "@shared/lib/style";
 
 import { Banner, ProductList } from "@features/product";
 
 export default function ProductPage() {
+  useValidateFilter();
+
   return (
     <div className="px-[20px]">
       <section
