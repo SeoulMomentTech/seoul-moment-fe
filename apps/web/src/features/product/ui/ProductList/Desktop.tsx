@@ -176,16 +176,16 @@ export default function DeskTop({
                 />
               ) : (
                 <>
-                  {data?.map((product, index) => (
+                  {data?.map((product) => (
                     <Link
-                      className="flex-1"
-                      href="/product/1"
-                      key={`${index + 1}`}
+                      className="h-fit w-[196px]"
+                      href={`/product/${product.id}`}
+                      key={product.id}
                     >
                       <ProductCard
                         className="max-sm:flex-1"
                         data={product}
-                        imageClassName=" w-[196px] h-[196px] max-sm:w-full max-sm:h-[150px]"
+                        imageClassName="w-[196px] h-[196px]"
                       />
                     </Link>
                   ))}
