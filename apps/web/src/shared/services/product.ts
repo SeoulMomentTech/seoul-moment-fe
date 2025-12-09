@@ -217,10 +217,20 @@ export const getProdctionOptionValue = ({
     })
     .json<CommonRes<GetProductOptionValuRes>>();
 
-interface ProductFilter {
+export interface ProductFilter {
   title: string;
   optionValueList: Array<ProductFilterOptionValue>;
 }
+
+export interface GridOptionInfo extends ProductFilter {
+  type: "grid";
+}
+
+export interface RadioOptionInfo extends ProductFilter {
+  type: "radio";
+}
+
+export type OptionInfo = GridOptionInfo | RadioOptionInfo;
 
 interface ProductFilterOptionValue {
   optionId: number;

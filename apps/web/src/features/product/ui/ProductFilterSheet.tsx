@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, type PropsWithChildren } from "react";
+import { type PropsWithChildren } from "react";
 
 import { cn } from "@shared/lib/style";
 
@@ -15,6 +15,7 @@ import {
 } from "@seoul-moment/ui";
 import { FilterSheet } from "@widgets/filter-sheet";
 
+import Options from "./Options";
 import useBrandFilter from "../model/useBrandFilter";
 import useCategories from "../model/useCategories";
 import useProductFilterList from "../model/useProductFilterList";
@@ -112,47 +113,14 @@ interface OptionalFilters {
   handleFilter(newFilter: Filter): void;
 }
 
-const OptionalFilters = ({ filter, handleFilter }: OptionalFilters) => {
-  const id = useId();
+const OptionalFilters = ({ filter }: OptionalFilters) => {
   const { data } = useProductFilterList({
     categoryId: filter.categoryId as number,
     brandId: filter.brandId as number,
     productCategoryId: filter.productCategoryId as number,
   });
 
-  return (
-    <>
-      {data?.map((option) => (
-        <AccordionItem key={`${option.title}-${id}`} value={option.title}>
-          <AccordionTrigger>{option.title}</AccordionTrigger>
-          <AccordionContent>
-            {option.optionValueList.map((item) => (
-              <Button
-                className={cn(
-                  "justify-start gap-[8px] py-[10px] pl-[14px] text-start text-black/40",
-                  "hover:bg-transparent hover:text-black",
-                )}
-                key={`mobile-${item.optionId}`}
-                onClick={() => handleFilter({ categoryId: item.optionId })}
-                size="sm"
-                variant="ghost"
-              >
-                {item.colorCode && (
-                  <div
-                    className="h-[16px] w-[16px] rounded-full"
-                    style={{
-                      backgroundColor: item.colorCode,
-                    }}
-                  />
-                )}
-                {item.value}
-              </Button>
-            ))}
-          </AccordionContent>
-        </AccordionItem>
-      ))}
-    </>
-  );
+  return <Options data={data ?? []} />;
 };
 
 export default ProductFilterSheet;

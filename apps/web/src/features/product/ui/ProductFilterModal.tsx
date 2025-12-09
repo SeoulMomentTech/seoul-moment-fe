@@ -18,6 +18,7 @@ import {
   DialogTitle,
 } from "@seoul-moment/ui";
 
+import Options from "./Options";
 import useCategories from "../model/useCategories";
 import useProductFilter from "../model/useProductFilter";
 import useProductFilterList from "../model/useProductFilterList";
@@ -98,38 +99,7 @@ export default function ProductFilterModal({
                   </AccordionContent>
                 </AccordionItem>
               )}
-              {data?.map((item) => (
-                <AccordionItem
-                  className="border-b-black/20"
-                  key={item.title}
-                  value={item.title}
-                >
-                  <AccordionTrigger>{item.title}</AccordionTrigger>
-                  <AccordionContent>
-                    {item.optionValueList.map((option) => (
-                      <Button
-                        className={cn(
-                          "justify-start gap-[8px] px-0 py-[10px] text-start text-black/40",
-                          "hover:bg-transparent hover:text-black",
-                        )}
-                        key={option.optionId}
-                        size="sm"
-                        variant="ghost"
-                      >
-                        {option.colorCode && (
-                          <div
-                            className="h-[16px] w-[16px] rounded-full"
-                            style={{
-                              backgroundColor: option.colorCode,
-                            }}
-                          />
-                        )}
-                        {option.value}
-                      </Button>
-                    ))}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
+              <Options data={data ?? []} />
             </Accordion>
           </div>
           <div className={cn("flex justify-center gap-[8px] px-[20px]")}>
