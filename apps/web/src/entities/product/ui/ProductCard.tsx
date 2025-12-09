@@ -33,7 +33,7 @@ export default function ProductCard({
         hideExtraInfo ? (
           <></>
         ) : (
-          <div className="flex gap-[10px] text-[13px] text-black/40">
+          <div className="text-body-4 flex gap-[10px] text-black/40">
             <div className="flex items-center gap-[4px]">
               <HeartIcon height={14} width={14} />
               <span>{setComma(data?.like ?? 0)}</span>
@@ -65,16 +65,16 @@ export default function ProductCard({
         </figure>
       }
       subTitle={
-        <span className="text-[14px] font-semibold">
+        <span className="text-body-3 font-semibold">
           {setComma(data?.price ?? 0)}
         </span>
       }
       title={
         <div className="flex flex-col gap-[8px]">
-          <span className="text-[12px] font-semibold">
+          <span className="text-body-5 font-semibold">
             {data?.brandName ?? ""}
           </span>
-          <p className="text-[14px]">{data?.productName ?? ""}</p>
+          <p className="text-body-3 min-h-[42px]">{data?.productName ?? ""}</p>
         </div>
       }
     />

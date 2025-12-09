@@ -41,9 +41,9 @@ export default function Mobile({ filter }: MobileProps) {
   const isEmpty = data?.length === 0;
 
   return (
-    <div className={cn("flex flex-col gap-0")}>
+    <div>
       <div className={cn("flex flex-col gap-[12px]")}>
-        <section className="flex flex-col gap-[20px]">
+        <section className="flex flex-col gap-[20px] pb-[50px]">
           <div className="flex h-[56px] items-center justify-between py-[20px]">
             <ProductFilterSheet handleIsOpen={update} isOpen={isOpen}>
               <Button
@@ -85,12 +85,16 @@ export default function Mobile({ filter }: MobileProps) {
                 "grid grid-cols-2",
               )}
             >
-              {data?.map((product, index) => (
-                <Link className="flex-1" href="/product/1" key={`${index + 1}`}>
+              {data?.map((product) => (
+                <Link
+                  className="flex-1"
+                  href={`/product/${product.id}`}
+                  key={`mobile-product-${product.id}`}
+                >
                   <ProductCard
                     className="flex-1"
                     data={product}
-                    imageClassName="w-[196px] h-[196px] max-sm:w-full max-sm:h-[150px]"
+                    imageClassName="max-sm:w-full max-sm:h-[150px]"
                   />
                 </Link>
               ))}
