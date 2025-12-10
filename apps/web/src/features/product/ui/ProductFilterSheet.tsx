@@ -57,7 +57,7 @@ const ProductFilterSheet = ({
               ))}
             </AccordionContent>
           </AccordionItem>
-          <AccordionItem value="brand">
+          <AccordionItem className="border-b-black/20" value="brand">
             <AccordionTrigger>브랜드</AccordionTrigger>
             <AccordionContent>
               <Accordion collapsible type="single">

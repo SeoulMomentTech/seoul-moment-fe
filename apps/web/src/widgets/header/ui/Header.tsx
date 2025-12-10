@@ -95,7 +95,7 @@ function Desktop() {
               Contact
             </Link>
           </li>
-          <li className="h-[56px] py-[20px] text-[14px]">
+          <li className="text-body-3 h-[56px] py-[20px]">
             <LanguageSupport />
           </li>
         </ul>
