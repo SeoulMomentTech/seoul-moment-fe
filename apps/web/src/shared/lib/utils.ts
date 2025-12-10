@@ -22,6 +22,11 @@ export const setComma = (num: number, maximumFractionDigits?: number): string =>
     maximumFractionDigits: maximumFractionDigits ?? 2,
   });
 
+export const toNTCurrency = (
+  num: number,
+  maximumFractionDigits?: number,
+): string => `NT$${setComma(num, maximumFractionDigits)}`;
+
 const throttleFetchMutex = new Mutex();
 
 export async function throttledFetch(url: string, options?: Options) {

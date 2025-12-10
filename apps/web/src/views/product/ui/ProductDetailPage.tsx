@@ -6,7 +6,7 @@ import { StarIcon } from "lucide-react";
 
 import { useLanguage } from "@shared/lib/hooks";
 import { cn } from "@shared/lib/style";
-import { setComma } from "@shared/lib/utils";
+import { setComma, toNTCurrency } from "@shared/lib/utils";
 import { getProductDetail } from "@shared/services/product";
 import { AvatarBadge } from "@widgets/avatar-badge/ui/AvatarBadge";
 import { LikeCount } from "@widgets/like-count/ui/LikeCount";
@@ -104,8 +104,13 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
                 {data.price && (
                   <div className={cn("text-body-3 flex", "text-body-4")}>
                     <span className="min-w-[120px]">정상가</span>
-                    <span className="text-black/40 line-through">
-                      {setComma(data.price)}
+                    <span
+                      className={cn(
+                        "text-black",
+                        data.discountPrice && "text-black/40 line-through",
+                      )}
+                    >
+                      {toNTCurrency(data.price)}
                     </span>
                   </div>
                 )}
@@ -125,7 +130,7 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
                         "max-sm:text-body-2",
                       )}
                     >
-                      {setComma(data.discountPrice)}
+                      {toNTCurrency(data.discountPrice)}
                     </span>
                   </div>
                 )}
@@ -153,7 +158,7 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
               {data.shippingCost && (
                 <div className={cn("text-body-3 flex", "text-body-4")}>
                   <span className="min-w-[120px]">배송비</span>
-                  <span>{setComma(data.shippingCost)}</span>
+                  <span>{toNTCurrency(data.shippingCost)}</span>
                 </div>
               )}
             </div>
