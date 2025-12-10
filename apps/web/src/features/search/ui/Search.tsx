@@ -2,7 +2,7 @@
 
 import { useState, type PropsWithChildren } from "react";
 
-import useEventListener from "@shared/lib/hooks/useEventListener";
+import { useEventListener } from "@shared/lib/hooks";
 import {
   Sheet,
   SheetContent,

@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-import useLanguage from "@shared/lib/hooks/useLanguage";
+import { useLanguage } from "@shared/lib/hooks";
 
 import { redirect } from "@/i18n/navigation";
 

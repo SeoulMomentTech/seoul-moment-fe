@@ -1,11 +1,11 @@
 "use client";
 
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useRef, useState } from "react";
 
 import { SearchIcon } from "lucide-react";
 
-import useLanguage from "@shared/lib/hooks/useLanguage";
-import useOpen from "@shared/lib/hooks/useOpen";
+import { useLanguage } from "@shared/lib/hooks";
+import { useOpen, useIntersectionObserver } from "@shared/lib/hooks";
 import { cn } from "@shared/lib/style";
 import type { GetProductListReq } from "@shared/services/product";
 import Divider from "@shared/ui/divider";
@@ -59,26 +59,18 @@ export default function DeskTop({
       languageCode,
     });
 
-  useEffect(() => {
-    const target = loadMoreRef.current;
-
-    if (!target || !hasNextPage) {
-      return;
+  const handleIntersect = useCallback(() => {
+    if (!isFetchingNextPage) {
+      fetchNextPage();
     }
+  }, [fetchNextPage, isFetchingNextPage]);
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !isFetchingNextPage) {
-          fetchNextPage();
-        }
-      },
-      { rootMargin: "200px" },
-    );
-
-    observer.observe(target);
-
-    return () => observer.disconnect();
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+  useIntersectionObserver({
+    target: loadMoreRef,
+    enabled: hasNextPage,
+    rootMargin: "200px",
+    onIntersect: handleIntersect,
+  });
 
   const handleChangeCategory = (categoryId: string) => {
     setSelectedCategory(categoryId);

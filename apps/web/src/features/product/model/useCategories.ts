@@ -1,4 +1,4 @@
-import useLanguage from "@shared/lib/hooks/useLanguage";
+import { useLanguage } from "@shared/lib/hooks";
 import { getCategories } from "@shared/services/category";
 
 import { useSuspenseQuery } from "@tanstack/react-query";

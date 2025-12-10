@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { StarIcon } from "lucide-react";
 
-import useLanguage from "@shared/lib/hooks/useLanguage";
+import { useLanguage } from "@shared/lib/hooks";
 import { cn } from "@shared/lib/style";
 import { setComma } from "@shared/lib/utils";
 import { getProductDetail } from "@shared/services/product";

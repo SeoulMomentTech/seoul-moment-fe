@@ -1,4 +1,4 @@
-import useLanguage from "@shared/lib/hooks/useLanguage";
+import { useLanguage } from "@shared/lib/hooks";
 import { getArticleList } from "@shared/services/article";
 
 import { useSuspenseQuery } from "@tanstack/react-query";

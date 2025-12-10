@@ -1,4 +1,4 @@
-import useLanguage from "@shared/lib/hooks/useLanguage";
+import { useLanguage } from "@shared/lib/hooks";
 import type { SortOption } from "@shared/services/product";
 import { getProductSortFilter } from "@shared/services/product";
 
