@@ -6,7 +6,7 @@ import { MenuIcon, ChevronRightIcon } from "lucide-react";
 
 import Image from "next/image";
 
-import useModal from "@shared/lib/hooks/useModal";
+import { useModal } from "@shared/lib/hooks";
 import { cn } from "@shared/lib/style";
 import Divider from "@shared/ui/divider";
 import {

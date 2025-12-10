@@ -1,6 +1,6 @@
 "use client";
 
-import useLanguage from "@shared/lib/hooks/useLanguage";
+import { useLanguage } from "@shared/lib/hooks";
 import { getNewsDetail } from "@shared/services/news";
 
 import { NewsDetailContent, NewsDetailMain } from "@features/news";

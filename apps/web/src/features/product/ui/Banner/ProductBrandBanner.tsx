@@ -3,8 +3,8 @@ import { Share2Icon } from "lucide-react";
 import Image from "next/image";
 
 import { useBrandBanner } from "@entities/brand/model/hooks/useBrandBanner";
-import useLanguage from "@shared/lib/hooks/useLanguage";
-import useModal from "@shared/lib/hooks/useModal";
+import { useLanguage } from "@shared/lib/hooks";
+import { useModal } from "@shared/lib/hooks";
 import { cn } from "@shared/lib/style";
 
 import { Link } from "@/i18n/navigation";

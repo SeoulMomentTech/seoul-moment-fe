@@ -1,4 +1,4 @@
-import useLanguage from "@shared/lib/hooks/useLanguage";
+import { useLanguage } from "@shared/lib/hooks";
 import { getPartners } from "@shared/services/partner";
 
 import { useQuery } from "@tanstack/react-query";

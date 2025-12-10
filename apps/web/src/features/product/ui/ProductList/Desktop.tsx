@@ -1,11 +1,11 @@
 "use client";
 
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense, useCallback, useRef, useState } from "react";
 
 import { SearchIcon } from "lucide-react";
 
-import useLanguage from "@shared/lib/hooks/useLanguage";
-import useOpen from "@shared/lib/hooks/useOpen";
+import { useLanguage } from "@shared/lib/hooks";
+import { useOpen, useIntersectionObserver } from "@shared/lib/hooks";
 import { cn } from "@shared/lib/style";
 import type { GetProductListReq } from "@shared/services/product";
 import Divider from "@shared/ui/divider";
@@ -51,10 +51,25 @@ export default function DeskTop({
   const { isOpen, update } = useOpen();
   const { data: categories } = useCategories();
   const { data: brandFilters } = useBrandFilter();
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
-  const { data } = useInfiniteProducts({
-    ...filter,
-    languageCode,
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteProducts({
+      ...filter,
+      languageCode,
+    });
+
+  const handleIntersect = useCallback(() => {
+    if (!isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [fetchNextPage, isFetchingNextPage]);
+
+  useIntersectionObserver({
+    target: loadMoreRef,
+    enabled: hasNextPage,
+    rootMargin: "200px",
+    onIntersect: handleIntersect,
   });
 
   const handleChangeCategory = (categoryId: string) => {
@@ -189,6 +204,7 @@ export default function DeskTop({
                       />
                     </Link>
                   ))}
+                  <div className="h-px w-full" ref={loadMoreRef} />
                 </>
               )}
             </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import useMediaQuery from "@shared/lib/hooks/useMediaQuery";
+import { useMediaQuery } from "@shared/lib/hooks";
 
 import DeskTop from "./Desktop";
 import Mobile from "./Mobile";

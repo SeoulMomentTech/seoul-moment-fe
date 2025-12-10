@@ -1,4 +1,4 @@
-import useLanguage from "@shared/lib/hooks/useLanguage";
+import { useLanguage } from "@shared/lib/hooks";
 import type { BrandFilter } from "@shared/services/brand";
 import { getBrandFilter } from "@shared/services/brand";
 

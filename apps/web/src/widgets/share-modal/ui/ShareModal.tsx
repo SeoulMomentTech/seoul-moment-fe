@@ -2,8 +2,7 @@ import { LinkIcon } from "lucide-react";
 
 import { toast } from "sonner";
 
-import useCopyToClipBoard from "@shared/lib/hooks/useCopyToClipboard";
-import useModal from "@shared/lib/hooks/useModal";
+import { useCopyToClipboard, useModal } from "@shared/lib/hooks";
 
 import { Dialog, DialogContent, DialogTitle } from "@seoul-moment/ui";
 
@@ -13,7 +12,7 @@ interface ShareModalProps {
 }
 
 export default function ShareModal({ open, onOpenChange }: ShareModalProps) {
-  const { copy } = useCopyToClipBoard();
+  const { copy } = useCopyToClipboard();
   const { modalType } = useModal();
   const isOpen = open && modalType === "share";
 

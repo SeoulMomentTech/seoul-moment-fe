@@ -2,7 +2,7 @@
 
 import { PackageSearchIcon } from "lucide-react";
 
-import useLanguage from "@shared/lib/hooks/useLanguage";
+import { useLanguage } from "@shared/lib/hooks";
 import { getProductList } from "@shared/services/product";
 
 import { Link } from "@/i18n/navigation";

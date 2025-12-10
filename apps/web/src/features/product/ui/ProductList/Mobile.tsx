@@ -1,11 +1,11 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useCallback, useRef } from "react";
 
 import { SearchIcon } from "lucide-react";
 
-import useLanguage from "@shared/lib/hooks/useLanguage";
-import useOpen from "@shared/lib/hooks/useOpen";
+import { useLanguage } from "@shared/lib/hooks";
+import { useOpen, useIntersectionObserver } from "@shared/lib/hooks";
 import { cn } from "@shared/lib/style";
 import type { GetProductListReq } from "@shared/services/product";
 import { FilterIcon } from "@shared/ui/icon";
@@ -33,9 +33,24 @@ export default function Mobile({ filter }: MobileProps) {
   const { isOpen, update } = useOpen();
   const languageCode = useLanguage();
   const { count } = useProductFilter();
-  const { data } = useInfiniteProducts({
-    ...filter,
-    languageCode,
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteProducts({
+      ...filter,
+      languageCode,
+    });
+
+  const handleIntersect = useCallback(() => {
+    if (!isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [fetchNextPage, isFetchingNextPage]);
+
+  useIntersectionObserver({
+    target: loadMoreRef,
+    enabled: hasNextPage,
+    rootMargin: "200px",
+    onIntersect: handleIntersect,
   });
 
   const isEmpty = data?.length === 0;
@@ -78,27 +93,30 @@ export default function Mobile({ filter }: MobileProps) {
               />
             </div>
           ) : (
-            <div
-              className={cn(
-                "gap-x-[20px] gap-y-[30px]",
-                "min-h-[400px] w-full",
-                "grid grid-cols-2",
-              )}
-            >
-              {data?.map((product) => (
-                <Link
-                  className="flex-1"
-                  href={`/product/${product.id}`}
-                  key={`mobile-product-${product.id}`}
-                >
-                  <ProductCard
+            <>
+              <div
+                className={cn(
+                  "gap-x-[20px] gap-y-[30px]",
+                  "min-h-[400px] w-full",
+                  "grid grid-cols-2",
+                )}
+              >
+                {data?.map((product) => (
+                  <Link
                     className="flex-1"
-                    data={product}
-                    imageClassName="max-sm:w-full max-sm:h-[150px]"
-                  />
-                </Link>
-              ))}
-            </div>
+                    href={`/product/${product.id}`}
+                    key={`mobile-product-${product.id}`}
+                  >
+                    <ProductCard
+                      className="flex-1"
+                      data={product}
+                      imageClassName="max-sm:w-full max-sm:h-[150px]"
+                    />
+                  </Link>
+                ))}
+              </div>
+              <div className="h-px w-full" ref={loadMoreRef} />
+            </>
           )}
         </section>
       </div>
