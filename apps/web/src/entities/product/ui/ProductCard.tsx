@@ -3,7 +3,7 @@ import { HeartIcon, StarIcon } from "lucide-react";
 import Image from "next/image";
 
 import { cn } from "@shared/lib/style";
-import { setComma } from "@shared/lib/utils";
+import { setComma, toNTCurrency } from "@shared/lib/utils";
 import type { ProductItem } from "@shared/services/product";
 import { Card } from "@shared/ui/card";
 
@@ -66,7 +66,7 @@ export default function ProductCard({
       }
       subTitle={
         <span className="text-body-3 font-semibold">
-          {setComma(data?.price ?? 0)}
+          {toNTCurrency(data?.price ?? 0)}
         </span>
       }
       title={
