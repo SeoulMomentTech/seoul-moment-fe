@@ -30,11 +30,11 @@ export default function BrandProductList({ data }: BrandProductListProps) {
           "max-sm:gap-[16px] max-sm:overflow-auto",
         )}
       >
-        {data?.map((product, idx) => (
+        {data.map((product) => (
           <Link
             className="flex-1 max-sm:max-w-[150px]"
-            href={`/product/${idx + 1}`}
-            key={`product-${idx + 1}`}
+            href={`/product/${product.id}`}
+            key={`related-product-${product.id}`}
           >
             <ProductCard
               data={product}
