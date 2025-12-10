@@ -9,15 +9,17 @@ export default function ProductPage() {
   useValidateFilter();
 
   return (
-    <div className="px-[20px]">
+    <div>
       <section
         className={cn(
           "mx-auto w-[1280px] pt-[106px]",
-          "max-sm:w-full max-sm:pt-[76px]",
+          "max-sm:w-full max-sm:pt-[56px]",
         )}
       >
         <Banner />
-        <ProductList />
+        <div className="px-[20px]">
+          <ProductList />
+        </div>
       </section>
     </div>
   );

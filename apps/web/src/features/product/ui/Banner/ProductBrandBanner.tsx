@@ -40,8 +40,8 @@ export default function ProductBrandBanner({ id }: ProductBrandBannerProps) {
     >
       <div
         className={cn(
-          "h-[300px] min-w-[522px] bg-slate-300",
-          "max-sm:h-[207px] max-sm:min-w-full",
+          "h-[300px] w-[522px] bg-slate-300",
+          "max-sm:h-[207px] max-sm:w-full",
         )}
       >
         <Image
@@ -52,7 +52,7 @@ export default function ProductBrandBanner({ id }: ProductBrandBannerProps) {
           width={600}
         />
       </div>
-      <div className="flex flex-1 flex-col gap-[20px]">
+      <div className="flex flex-1 flex-col gap-[20px] px-[20px]">
         <div
           className={cn(
             "flex items-center justify-between",
