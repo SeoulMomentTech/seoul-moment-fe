@@ -1,6 +1,6 @@
 "use client";
 
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 
 import { SearchIcon } from "lucide-react";
 
@@ -51,11 +51,34 @@ export default function DeskTop({
   const { isOpen, update } = useOpen();
   const { data: categories } = useCategories();
   const { data: brandFilters } = useBrandFilter();
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
-  const { data } = useInfiniteProducts({
-    ...filter,
-    languageCode,
-  });
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteProducts({
+      ...filter,
+      languageCode,
+    });
+
+  useEffect(() => {
+    const target = loadMoreRef.current;
+
+    if (!target || !hasNextPage) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { rootMargin: "200px" },
+    );
+
+    observer.observe(target);
+
+    return () => observer.disconnect();
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   const handleChangeCategory = (categoryId: string) => {
     setSelectedCategory(categoryId);
@@ -189,6 +212,7 @@ export default function DeskTop({
                       />
                     </Link>
                   ))}
+                  <div className="h-px w-full" ref={loadMoreRef} />
                 </>
               )}
             </div>

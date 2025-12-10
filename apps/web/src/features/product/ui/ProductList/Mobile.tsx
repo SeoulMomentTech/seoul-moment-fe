@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useEffect, useRef } from "react";
 
 import { SearchIcon } from "lucide-react";
 
@@ -33,10 +33,33 @@ export default function Mobile({ filter }: MobileProps) {
   const { isOpen, update } = useOpen();
   const languageCode = useLanguage();
   const { count } = useProductFilter();
-  const { data } = useInfiniteProducts({
-    ...filter,
-    languageCode,
-  });
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useInfiniteProducts({
+      ...filter,
+      languageCode,
+    });
+
+  useEffect(() => {
+    const target = loadMoreRef.current;
+
+    if (!target || !hasNextPage) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { rootMargin: "200px" },
+    );
+
+    observer.observe(target);
+
+    return () => observer.disconnect();
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   const isEmpty = data?.length === 0;
 
@@ -78,27 +101,30 @@ export default function Mobile({ filter }: MobileProps) {
               />
             </div>
           ) : (
-            <div
-              className={cn(
-                "gap-x-[20px] gap-y-[30px]",
-                "min-h-[400px] w-full",
-                "grid grid-cols-2",
-              )}
-            >
-              {data?.map((product) => (
-                <Link
-                  className="flex-1"
-                  href={`/product/${product.id}`}
-                  key={`mobile-product-${product.id}`}
-                >
-                  <ProductCard
+            <>
+              <div
+                className={cn(
+                  "gap-x-[20px] gap-y-[30px]",
+                  "min-h-[400px] w-full",
+                  "grid grid-cols-2",
+                )}
+              >
+                {data?.map((product) => (
+                  <Link
                     className="flex-1"
-                    data={product}
-                    imageClassName="max-sm:w-full max-sm:h-[150px]"
-                  />
-                </Link>
-              ))}
-            </div>
+                    href={`/product/${product.id}`}
+                    key={`mobile-product-${product.id}`}
+                  >
+                    <ProductCard
+                      className="flex-1"
+                      data={product}
+                      imageClassName="max-sm:w-full max-sm:h-[150px]"
+                    />
+                  </Link>
+                ))}
+              </div>
+              <div className="h-px w-full" ref={loadMoreRef} />
+            </>
           )}
         </section>
       </div>
