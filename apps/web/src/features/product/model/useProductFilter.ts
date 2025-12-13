@@ -27,7 +27,7 @@ const useProductFilter = () => {
     categoryId: parseAsInteger,
     productCategoryId: parseAsInteger,
     sortColumn: parseAsString,
-    optionIdList: parseAsArrayOf(parseAsInteger),
+    optionIdList: parseAsArrayOf(parseAsInteger).withDefault([]),
   });
 
   const normalized = {

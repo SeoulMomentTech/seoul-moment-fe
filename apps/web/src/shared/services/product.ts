@@ -226,14 +226,15 @@ export const getProdctionOptionValue = ({
 export interface ProductFilter {
   title: string;
   optionValueList: Array<ProductFilterOptionValue>;
+  type: "RADIO" | "GRID";
 }
 
 export interface GridOptionInfo extends ProductFilter {
-  type: "grid";
+  type: "GRID";
 }
 
 export interface RadioOptionInfo extends ProductFilter {
-  type: "radio";
+  type: "RADIO";
 }
 
 export type OptionInfo = GridOptionInfo | RadioOptionInfo;
