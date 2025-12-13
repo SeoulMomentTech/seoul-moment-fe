@@ -10,9 +10,15 @@ import { OptionRenderer } from "./OptionRenderer";
 
 interface OptionsProps {
   data: ProductFilter[];
+  selectedOpionIds: number[];
+  handleSelectOption(id: number): void;
 }
 
-export default function Options({ data }: OptionsProps) {
+export default function Options({
+  data,
+  selectedOpionIds,
+  handleSelectOption,
+}: OptionsProps) {
   return (
     <>
       {data.map((option) => (
@@ -24,10 +30,9 @@ export default function Options({ data }: OptionsProps) {
           <AccordionTrigger>{option.title}</AccordionTrigger>
           <AccordionContent>
             <OptionRenderer
-              option={{
-                ...option,
-                type: option.title === "성별" ? "grid" : "radio",
-              }}
+              handleSelectOption={handleSelectOption}
+              option={option}
+              selectedOptionIds={selectedOpionIds}
             />
           </AccordionContent>
         </AccordionItem>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { cn } from "@shared/lib/style";
 import { mergeOptionIdList } from "@shared/lib/utils/filter";
@@ -19,6 +19,7 @@ import {
 } from "@seoul-moment/ui";
 
 import Options from "./Options";
+import { getOptionMetaById } from "../lib/getOptionMetaById";
 import useCategories from "../model/useCategories";
 import useProductFilter from "../model/useProductFilter";
 import useProductFilterList from "../model/useProductFilterList";
@@ -41,6 +42,37 @@ export default function ProductFilterModal({
     brandId: filter.brandId,
     productCategoryId: filter.productCategoryId,
   });
+
+  const optionMetaById = useMemo(() => getOptionMetaById(data), [data]);
+
+  const handleSelectOption = (id: number) => {
+    const meta = optionMetaById[id];
+
+    setInstantFilter((prev) => {
+      const currentIds = Array.isArray(prev.optionIdList)
+        ? (prev.optionIdList as number[])
+        : [];
+
+      if (!meta) {
+        return mergeOptionIdList(prev, id);
+      }
+
+      // 모든 타입에서 같은 그룹의 기존 선택을 제거하고 새 선택으로 대체
+      const next = [
+        ...currentIds.filter(
+          (currentId) => optionMetaById[currentId]?.group !== meta.group,
+        ),
+        id,
+      ];
+
+      const uniqueNext = Array.from(new Set(next));
+
+      return {
+        ...prev,
+        optionIdList: uniqueNext,
+      };
+    });
+  };
 
   const handleInstantFilter = (newFilter: Filter) => {
     setInstantFilter((prev) => {
@@ -99,7 +131,13 @@ export default function ProductFilterModal({
                   </AccordionContent>
                 </AccordionItem>
               )}
-              <Options data={data ?? []} />
+              <Options
+                data={data ?? []}
+                handleSelectOption={handleSelectOption}
+                selectedOpionIds={
+                  (instantFilter?.optionIdList as number[]) ?? []
+                }
+              />
             </Accordion>
           </div>
           <div className={cn("flex justify-center gap-[8px] px-[20px]")}>
