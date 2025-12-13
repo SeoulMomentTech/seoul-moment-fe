@@ -149,7 +149,7 @@ const OptionalFilters = ({ filter, handleFilter }: OptionalFilters) => {
     <Options
       data={data ?? []}
       handleSelectOption={handleSelectOption}
-      selectedOpionIds={
+      selectedOptionIds={
         Array.isArray(filter.optionIdList)
           ? (filter.optionIdList as number[])
           : []

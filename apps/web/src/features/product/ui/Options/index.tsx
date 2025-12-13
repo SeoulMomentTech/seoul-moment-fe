@@ -10,13 +10,13 @@ import { OptionRenderer } from "./OptionRenderer";
 
 interface OptionsProps {
   data: ProductFilter[];
-  selectedOpionIds: number[];
+  selectedOptionIds: number[];
   handleSelectOption(id: number): void;
 }
 
 export default function Options({
   data,
-  selectedOpionIds,
+  selectedOptionIds,
   handleSelectOption,
 }: OptionsProps) {
   return (
@@ -32,7 +32,7 @@ export default function Options({
             <OptionRenderer
               handleSelectOption={handleSelectOption}
               option={option}
-              selectedOptionIds={selectedOpionIds}
+              selectedOptionIds={selectedOptionIds}
             />
           </AccordionContent>
         </AccordionItem>

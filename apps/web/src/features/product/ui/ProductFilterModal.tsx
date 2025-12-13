@@ -134,7 +134,7 @@ export default function ProductFilterModal({
               <Options
                 data={data ?? []}
                 handleSelectOption={handleSelectOption}
-                selectedOpionIds={
+                selectedOptionIds={
                   (instantFilter?.optionIdList as number[]) ?? []
                 }
               />
