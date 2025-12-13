@@ -58,6 +58,8 @@ export interface ProductItem {
   review: number;
   reviewAverage: number;
   image: string;
+  colorName: string;
+  colorCode: string;
 }
 
 export interface GetProductListRes {

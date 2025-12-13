@@ -7,10 +7,13 @@ import { setComma, toNTCurrency } from "@shared/lib/utils";
 import type { ProductItem } from "@shared/services/product";
 import { Card } from "@shared/ui/card";
 
+import { Badge } from "@seoul-moment/ui";
+
 interface ProductCardProps {
   className?: string;
   imageClassName?: string;
   contentWrapperClassName?: string;
+  contentClassName?: string;
   hideExtraInfo?: boolean;
   data: ProductItem;
 }
@@ -65,9 +68,20 @@ export default function ProductCard({
         </figure>
       }
       subTitle={
-        <span className="text-body-3 font-semibold">
-          {toNTCurrency(data?.price ?? 0)}
-        </span>
+        <div className="text-body-3 flex flex-wrap items-center gap-[4px]">
+          <span className="font-semibold">
+            {toNTCurrency(data?.price ?? 0)}
+          </span>
+          <div className="flex items-center gap-[4px]">
+            <Badge
+              className="h-[12px] w-[12px] border-black/20 p-0"
+              style={{
+                backgroundColor: data.colorCode,
+              }}
+            />
+            <span>{data.colorName}</span>
+          </div>
+        </div>
       }
       title={
         <div className="flex flex-col gap-[8px]">
