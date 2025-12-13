@@ -63,6 +63,7 @@ export default function ProductCard({
             className="h-full w-full object-cover"
             height={305}
             src={data.image}
+            unoptimized
             width={305}
           />
         </figure>

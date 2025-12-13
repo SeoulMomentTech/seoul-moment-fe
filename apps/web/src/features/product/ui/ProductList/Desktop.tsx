@@ -1,6 +1,6 @@
 "use client";
 
-import { lazy, Suspense, useCallback, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useRef } from "react";
 
 import { SearchIcon } from "lucide-react";
 
@@ -45,7 +45,6 @@ export default function DeskTop({
   handleUpdateFilter,
   handleResetFilter,
 }: DesktopProps) {
-  const [selectedCategory, setSelectedCategory] = useState("all");
   const languageCode = useLanguage();
 
   const { isOpen, update } = useOpen();
@@ -71,10 +70,6 @@ export default function DeskTop({
     rootMargin: "200px",
     onIntersect: handleIntersect,
   });
-
-  const handleChangeCategory = (categoryId: string) => {
-    setSelectedCategory(categoryId);
-  };
 
   const isEmpty = data?.length === 0;
 
@@ -166,10 +161,9 @@ export default function DeskTop({
                   />
                 </FilterBar>
               </div>
-              <ProductCategoryFilter
-                onCategoryChange={handleChangeCategory}
-                selectedCategory={selectedCategory}
-              />
+              <Suspense fallback={<></>}>
+                <ProductCategoryFilter />
+              </Suspense>
             </div>
             <div
               className={cn(
