@@ -15,13 +15,17 @@ interface GetProductBannerRes {
 export const getProductBanner = () =>
   api.get("product/banner").json<CommonRes<GetProductBannerRes>>();
 
+interface ProductCategory extends Category {
+  image: string;
+}
+
 interface GetProductCategoryReq extends PublicLanguageCode {
   categoryId?: number;
 }
 
 interface GetProductCategoryRes {
   total: number;
-  list: Array<Category>;
+  list: Array<ProductCategory>;
 }
 
 export const getProductCategory = ({

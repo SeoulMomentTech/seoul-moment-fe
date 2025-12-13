@@ -8,7 +8,7 @@ import useProductFilter from "./useProductFilter";
 
 const useValidateProductFilter = () => {
   const params = useSearchParams();
-  const { handleUpdateFilter } = useProductFilter();
+  const { handleClearFilter } = useProductFilter();
 
   const brandId = params.get("brandId");
   const categoryId = params.get("categoryId");
@@ -16,17 +16,17 @@ const useValidateProductFilter = () => {
 
   const validateFilters = useCallback(() => {
     if (brandId && isNaN(Number(brandId))) {
-      handleUpdateFilter({ brandId: null });
+      handleClearFilter({ brandId: null });
     }
 
     if (categoryId && isNaN(Number(categoryId))) {
-      handleUpdateFilter({ categoryId: null });
+      handleClearFilter({ categoryId: null });
     }
 
     if (productCategoryId && isNaN(Number(productCategoryId))) {
-      handleUpdateFilter({ productCategoryId: null });
+      handleClearFilter({ productCategoryId: null });
     }
-  }, [brandId, categoryId, productCategoryId, handleUpdateFilter]);
+  }, [brandId, categoryId, productCategoryId, handleClearFilter]);
 
   useEffect(() => {
     validateFilters();
