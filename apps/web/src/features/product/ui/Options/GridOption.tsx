@@ -6,7 +6,6 @@ interface GridOptionProps {
   options: ProductFilter["optionValueList"];
   selectedOptionIds: number[];
   handleSelectOption(id: number): void;
-  handleSelectOption(id: number): void;
 }
 
 export function GridOption({
