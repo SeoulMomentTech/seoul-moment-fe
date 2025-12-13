@@ -67,6 +67,13 @@ const useProductFilter = () => {
       }));
     };
 
+  const handleClearFilter = (newFilter: Record<string, null>) => {
+    setFilter((prev) => ({
+      ...prev,
+      ...newFilter,
+    }));
+  };
+
   const handleResetFilter = (ignoreKeys: FilterKey[] = []) => {
     // TODO: 필터 초기화 로직 구현 및 ignoreKeys 내 없는 키는 유지되도록 수정
     setFilter((prev) => {
@@ -91,6 +98,7 @@ const useProductFilter = () => {
     count: filterCount,
     handleUpdateFilter,
     handleResetFilter,
+    handleClearFilter,
   };
 };
 
