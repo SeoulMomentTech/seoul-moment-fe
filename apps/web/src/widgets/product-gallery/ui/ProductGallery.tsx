@@ -29,7 +29,10 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
       )}
     >
       <Swiper
-        className="mb-[17px] h-[560px] w-[560px]"
+        className={cn(
+          "mb-[17px] h-[560px] w-[560px]",
+          "max-sm:h-[360px] max-sm:w-full",
+        )}
         modules={[FreeMode, Navigation, Thumbs]}
         navigation={true}
         spaceBetween={10}
