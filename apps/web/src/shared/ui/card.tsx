@@ -23,7 +23,12 @@ export function Card({
     <div className={cn("flex flex-col gap-[30px]", className)}>
       {image}
       <div className={cn("flex flex-col gap-[30px]", contentWrapperClassName)}>
-        <div className="flex flex-col gap-[10px]">
+        <div
+          className={cn(
+            "flex flex-col gap-[10px]",
+            "max-sm:h-full max-sm:justify-between",
+          )}
+        >
           {title}
           {subTitle}
         </div>

@@ -108,9 +108,11 @@ export default function Mobile({ filter }: MobileProps) {
                     key={`mobile-product-${product.id}`}
                   >
                     <ProductCard
-                      className="flex-1"
+                      className="h-full flex-1"
+                      contentClassName="h-full justify-between"
+                      contentWrapperClassName="h-full justify-between"
                       data={product}
-                      imageClassName="max-sm:w-full max-sm:h-[150px]"
+                      imageClassName="max-sm:w-full max-sm:max-h-[150px] max-sm:min-h-[150px]"
                     />
                   </Link>
                 ))}
