@@ -29,7 +29,7 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
       )}
     >
       <Swiper
-        className="mb-[17px]"
+        className="mb-[17px] h-[560px] w-[560px]"
         modules={[FreeMode, Navigation, Thumbs]}
         navigation={true}
         spaceBetween={10}
@@ -43,7 +43,14 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
       >
         {images.map((src, idx) => (
           <SwiperSlide key={`${src}-${idx + 1}`}>
-            <Image alt="" height={800} src={src} unoptimized width={800} />
+            <Image
+              alt=""
+              className="h-full"
+              height={800}
+              src={src}
+              unoptimized
+              width={800}
+            />
           </SwiperSlide>
         ))}
       </Swiper>

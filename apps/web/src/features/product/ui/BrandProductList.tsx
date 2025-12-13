@@ -26,13 +26,13 @@ export default function BrandProductList({ data }: BrandProductListProps) {
       </h3>
       <div
         className={cn(
-          "flex w-full gap-[20px]",
+          "flex w-full gap-[30px]",
           "max-sm:gap-[16px] max-sm:overflow-auto",
         )}
       >
         {data.map((product) => (
           <Link
-            className="flex-1 max-sm:max-w-[150px]"
+            className="max-w-[216px] flex-1 max-sm:max-w-[150px]"
             href={`/product/${product.id}`}
             key={`related-product-${product.id}`}
           >
