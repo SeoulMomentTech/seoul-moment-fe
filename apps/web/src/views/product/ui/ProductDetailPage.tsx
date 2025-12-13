@@ -46,7 +46,7 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
         "max-sm:px-0 max-sm:pb-0 max-sm:pt-[56px]",
       )}
     >
-      <section className={cn("mx-auto w-[1280px]", "max-sm:w-full")}>
+      <section className={cn("mx-auto w-[1200px]", "max-sm:w-full")}>
         <div
           className={cn(
             "flex gap-[80px] border-b border-b-black/10 pb-[50px]",

@@ -43,3 +43,8 @@ body {
   box-sizing: border-box;
   @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-0;
 }
+
+.swiper-button-prev,
+.swiper-button-next {
+  filter: drop-shadow(2px 4px 6px black);
+}
