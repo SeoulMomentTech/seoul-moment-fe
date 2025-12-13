@@ -5,19 +5,36 @@ import { RadioOption } from "./RadioOption";
 
 interface OptionRendererProps {
   option: OptionInfo;
+  selectedOptionIds: number[];
+  handleSelectOption(id: number): void;
 }
 
-export function OptionRenderer({ option }: OptionRendererProps) {
+export function OptionRenderer({
+  option,
+  selectedOptionIds,
+  handleSelectOption,
+}: OptionRendererProps) {
   const assertOptionType = (x: never): never => {
     throw new Error(`Unhandled option type: ${x}`);
   };
 
   switch (option.type) {
-    case "grid":
-      return <GridOption options={option.optionValueList} />;
-    case "radio":
+    case "GRID":
       return (
-        <RadioOption name={option.title} options={option.optionValueList} />
+        <GridOption
+          handleSelectOption={handleSelectOption}
+          options={option.optionValueList}
+          selectedOptionIds={selectedOptionIds}
+        />
+      );
+    case "RADIO":
+      return (
+        <RadioOption
+          handleSelectOption={handleSelectOption}
+          name={option.title}
+          options={option.optionValueList}
+          selectedOptionIds={selectedOptionIds}
+        />
       );
     default:
       return assertOptionType(option);
