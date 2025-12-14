@@ -1,11 +1,52 @@
 "use client";
 
+import { type HTTPError, isKyError } from "ky";
 import Image from "next/image";
-import Link from "next/link";
+
+import { Link } from "@/i18n/navigation";
 
 import { Button } from "@seoul-moment/ui";
 
-export default function GlobalError() {
+interface GlobalErrorProps {
+  error: Error & { digest?: string };
+}
+
+const DEFAULT_ERROR = {
+  title: "Something went wrong",
+  description: [
+    "Something went wrong :(",
+    "An unexpected error has occurred.",
+    "Please try again later.",
+  ],
+};
+
+const SERVER_ERROR = {
+  title: "500 Error",
+  description: [
+    "Internal Server Error :(",
+    "Sorry, something went wrong on our side.",
+    "Please try again later.",
+  ],
+};
+
+function resolveErrorContent(error: Error) {
+  if (isKyError(error)) {
+    const status = (error as HTTPError).response?.status;
+
+    if (status && status >= 500) {
+      return {
+        title: `${status} Error`,
+        description: SERVER_ERROR.description,
+      };
+    }
+  }
+
+  return DEFAULT_ERROR;
+}
+
+export default function GlobalError({ error }: GlobalErrorProps) {
+  const { title, description } = resolveErrorContent(error);
+
   return (
     <div className="flex flex-col items-center gap-[60px] pt-[156px] max-sm:px-[20px] max-sm:pt-[136px]">
       <div className="flex flex-col items-center gap-[30px] text-center">
@@ -14,20 +55,21 @@ export default function GlobalError() {
             <Image alt="" height={60} src="/404.png" width={60} />
           </figure>
           <h1 className="text-title-2 max-sm:text-title-3 font-extrabold">
-            500 Error
+            {title}
           </h1>
         </div>
         <div className="max-sm:text-body-3">
-          <p>Internal Server Error :(</p>
-          <p>Sorry, something went wrong on our side.</p>
-          <p>Please try again later.</p>
+          {description.map((line) => (
+            <p key={line}>{line}</p>
+          ))}
         </div>
       </div>
+
       <Button
         asChild
         className="h-[48px] w-[186px] whitespace-pre font-semibold max-sm:w-full"
       >
-        <Link href="/">메인 페이지로 이동하기</Link>
+        <Link href="/">Back to Home</Link>
       </Button>
     </div>
   );
