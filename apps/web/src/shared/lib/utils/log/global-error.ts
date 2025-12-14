@@ -1,6 +1,6 @@
 import { resolveErrorType, type GlobalErrorType } from "./error-type";
 
-export function buildGlobalErrorPayload(error: Error & { digest?: string }) {
+export function buildErrorPayload(error: Error & { digest?: string }) {
   const { type, status, url } = resolveErrorType(error);
 
   return {
