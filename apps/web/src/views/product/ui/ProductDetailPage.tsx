@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { StarIcon } from "lucide-react";
 
-import { useLanguage } from "@shared/lib/hooks";
+import { useAppQuery, useLanguage } from "@shared/lib/hooks";
 import { cn } from "@shared/lib/style";
 import { setComma, toNTCurrency } from "@shared/lib/utils";
 import { getProductDetail } from "@shared/services/product";
@@ -15,7 +15,6 @@ import { Link } from "@/i18n/navigation";
 
 import { BrandProductList } from "@features/product";
 import { Button } from "@seoul-moment/ui";
-import { useQuery } from "@tanstack/react-query";
 import { ProductDetailImage } from "@widgets/product-detail-image";
 import { ProductGallery } from "@widgets/product-gallery";
 
@@ -25,7 +24,7 @@ interface ProductDetailPageProps {
 
 export default function ProductDetailPage({ id }: ProductDetailPageProps) {
   const languageCode = useLanguage();
-  const { data } = useQuery({
+  const { data } = useAppQuery({
     queryKey: ["product-detail", id, languageCode],
     queryFn: () => getProductDetail({ id, languageCode }),
     select: (res) => res.data,

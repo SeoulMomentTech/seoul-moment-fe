@@ -1,7 +1,5 @@
-import { useLanguage } from "@shared/lib/hooks";
+import { useAppQuery, useLanguage } from "@shared/lib/hooks";
 import { getProductFilter } from "@shared/services/product";
-
-import { useQuery } from "@tanstack/react-query";
 
 interface UseProductFilterListParams {
   categoryId?: number;
@@ -16,7 +14,7 @@ const useProductFilterList = ({
 }: UseProductFilterListParams) => {
   const languageCode = useLanguage();
 
-  return useQuery({
+  return useAppQuery({
     queryKey: [
       "product-filter",
       languageCode,

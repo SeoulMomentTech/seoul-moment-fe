@@ -1,3 +1,4 @@
+import { useAppQuery } from "@shared/lib/hooks";
 import type {
   BrandDetailInfo,
   GetBrandDetailReq,
@@ -6,7 +7,7 @@ import { getBrandDetail } from "@shared/services/brand";
 
 import type { CommonRes } from "@shared/services";
 import type { UseQueryOptions } from "@tanstack/react-query";
-import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 interface UseBrandDetailProps<T> {
   options: Omit<UseQueryOptions<T>, "queryFn">;
@@ -17,7 +18,7 @@ export const useBrandDetail = ({
   options,
   params,
 }: UseBrandDetailProps<CommonRes<BrandDetailInfo>>) => {
-  return useQuery({
+  return useAppQuery({
     ...options,
     queryFn: () => getBrandDetail(params),
     select: (res) => res.data,

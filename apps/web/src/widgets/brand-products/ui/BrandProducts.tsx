@@ -2,13 +2,12 @@
 
 import { PackageSearchIcon } from "lucide-react";
 
-import { useLanguage } from "@shared/lib/hooks";
+import { useAppQuery, useLanguage } from "@shared/lib/hooks";
 import { getProductList } from "@shared/services/product";
 
 import { Link } from "@/i18n/navigation";
 
 import { BrandProductCard } from "@entities/brand";
-import { useQuery } from "@tanstack/react-query";
 import { Empty } from "@widgets/empty";
 import { SectionWithLabel } from "@widgets/section-with-label";
 
@@ -18,7 +17,7 @@ interface BrandProductsProps {
 
 export default function BrandProducts({ id }: BrandProductsProps) {
   const languageCode = useLanguage();
-  const { data: products = [], isPending } = useQuery({
+  const { data: products = [], isPending } = useAppQuery({
     queryKey: ["brand-products", id],
     queryFn: () =>
       getProductList({ brandId: id, page: 1, count: 4, languageCode }),
