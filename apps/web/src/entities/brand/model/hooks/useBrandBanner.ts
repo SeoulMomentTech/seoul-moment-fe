@@ -1,3 +1,4 @@
+import { useAppQuery } from "@shared/lib/hooks";
 import type {
   GetProductBrandBannerReq,
   GetProductBrandBannerRes,
@@ -6,7 +7,7 @@ import { getProductBrandBanner } from "@shared/services/product";
 
 import type { CommonRes } from "@shared/services";
 import type { UseQueryOptions } from "@tanstack/react-query";
-import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 interface UseBrandBannerProps<T> {
   options: Omit<UseQueryOptions<T>, "queryFn">;
@@ -17,7 +18,7 @@ export const useBrandBanner = ({
   options,
   params,
 }: UseBrandBannerProps<CommonRes<GetProductBrandBannerRes>>) => {
-  return useQuery({
+  return useAppQuery({
     ...options,
     queryFn: () => getProductBrandBanner(params),
     select: (res) => res.data,

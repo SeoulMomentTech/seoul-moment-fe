@@ -2,6 +2,8 @@
 
 import type { ReactNode } from "react";
 
+import { toast } from "sonner";
+
 import {
   MutationCache,
   QueryClient,
@@ -16,7 +18,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-      retry: 1,
+      retry: false,
       staleTime: 5 * 60 * 1000, // 5분
     },
   },
@@ -25,6 +27,10 @@ const queryClient = new QueryClient({
       if (mutation.meta?.logError) {
         // track error
         console.error(err.message);
+      }
+
+      if (mutation.meta?.showToast) {
+        toast.error(err.message);
       }
     },
   }),

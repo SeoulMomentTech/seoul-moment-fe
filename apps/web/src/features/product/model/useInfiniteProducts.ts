@@ -1,16 +1,15 @@
+import { useAppInfiniteQuery } from "@shared/lib/hooks";
 import {
   getProductList,
   type GetProductListReq,
 } from "@shared/services/product";
-
-import { useInfiniteQuery } from "@tanstack/react-query";
 
 type UseInfiniteProductsParams = Omit<GetProductListReq, "page" | "count">;
 
 const LIMIT = 10;
 
 export const useInfiniteProducts = (params: UseInfiniteProductsParams) => {
-  return useInfiniteQuery({
+  return useAppInfiniteQuery({
     queryKey: ["products", "infinite", params],
     queryFn: ({ pageParam = 1 }) => {
       return getProductList({

@@ -1,3 +1,4 @@
+import { useAppQuery } from "@shared/lib/hooks";
 import type {
   GetProductListReq,
   GetProductListRes,
@@ -6,7 +7,6 @@ import { getProductList } from "@shared/services/product";
 
 import type { CommonRes } from "@shared/services";
 import type { UseQueryOptions } from "@tanstack/react-query";
-import { useQuery } from "@tanstack/react-query";
 
 interface UseProductsProps<T> {
   options: UseQueryOptions<T>;
@@ -17,7 +17,7 @@ const useProducts = ({
   options,
   params,
 }: UseProductsProps<CommonRes<GetProductListRes>>) => {
-  return useQuery({
+  return useAppQuery({
     ...options,
     queryFn: () => getProductList(params),
     select: (res) => res.data,
