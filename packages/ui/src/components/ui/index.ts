@@ -13,3 +13,4 @@ export * from "./dropdown-menu";
 export * from "./avatar";
 export * from "./select";
 export * from "./badge";
+export * from "./radio";
