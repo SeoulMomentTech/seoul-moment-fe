@@ -69,13 +69,13 @@ export default function ProductCard({
         </figure>
       }
       subTitle={
-        <div className="text-body-3 flex flex-wrap items-center gap-[4px]">
+        <div className="text-body-3 flex flex-col gap-[4px]">
           <span className="font-semibold">
             {toNTCurrency(data?.price ?? 0)}
           </span>
           <div className="flex items-center gap-[4px]">
             <Badge
-              className="h-[12px] w-[12px] border-black/20 p-0"
+              className="h-[12px] w-[24px] rounded-none border-black/20 p-0"
               style={{
                 backgroundColor: data.colorCode,
               }}
