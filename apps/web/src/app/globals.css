@@ -33,6 +33,100 @@
   --text-body-5: 12px;
 }
 
+@utility scrollbar-hide {
+  /* Firefox */
+  scrollbar-width: none;
+
+  /* Safari and Chrome */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility scrollbar-default {
+  /* Firefox */
+  scrollbar-width: auto;
+
+  /* Safari and Chrome */
+  &::-webkit-scrollbar {
+    display: block;
+  }
+}
+
+@utility scrollbar-medium {
+  @supports selector(::-webkit-scrollbar) {
+    &::-webkit-scrollbar {
+      width: 12px;
+      height: 12px;
+    }
+  }
+
+  @supports selector(::-webkit-scrollbar-thumb) {
+    &::-webkit-scrollbar-thumb {
+      background: rgba(19, 20, 22, 0.1);
+      border-radius: 999px;
+      margin-top: 10px;
+      border: 4px solid transparent;
+      background-clip: padding-box;
+    }
+  }
+
+  @supports selector(::-webkit-scrollbar-track) {
+    &::-webkit-scrollbar-track {
+      width: 0px;
+      background: transparent;
+      margin-top: 30px;
+      padding-top: 30px;
+    }
+  }
+
+  @supports not selector(::-webkit-scrollbar) {
+    scrollbar-color: rgba(19, 20, 22, 0.1);
+    scrollbar-width: thin;
+    scrollbar-height: thin;
+  }
+}
+
+@utility scrollbar-thin {
+  @supports selector(::-webkit-scrollbar) {
+    &::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+  }
+
+  @supports not selector(::-webkit-scrollbar) {
+    scrollbar-width: thin;
+    scrollbar-height: thin;
+  }
+}
+
+@utility scrollbar-color-transparent {
+  @supports selector(::-webkit-scrollbar-thumb) {
+    &::-webkit-scrollbar-thumb {
+      background: transparent;
+    }
+  }
+
+  @supports not selector(::-webkit-scrollbar) {
+    scrollbar-color: transparent transparent;
+  }
+}
+
+@utility scrollbar-transition {
+  transition: all 0.3s ease;
+
+  @supports selector(::-webkit-scrollbar-thumb) {
+    &::-webkit-scrollbar-thumb {
+      transition: all 0.3s ease;
+    }
+  }
+
+  @supports not selector(::-webkit-scrollbar) {
+    transition: all 0.3s ease;
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

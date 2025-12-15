@@ -98,7 +98,7 @@ const FilterSheet = ({
               </Button>
             </div>
           </div>
-          <div className="flex h-full flex-col justify-between overflow-auto">
+          <div className="scrollbar-medium flex h-full flex-col justify-between overflow-auto">
             <div className="px-[20px] py-[10px]">
               {typeof content === "function"
                 ? content(filter, (filter) => {

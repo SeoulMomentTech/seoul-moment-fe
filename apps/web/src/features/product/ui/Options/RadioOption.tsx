@@ -1,6 +1,6 @@
 import type { ProductFilter } from "@shared/services/product";
 
-import { Input } from "@seoul-moment/ui";
+import { RadioGroup, RadioGroupItem, cn } from "@seoul-moment/ui";
 
 interface RadioOptionProps {
   name: string;
@@ -15,31 +15,37 @@ export function RadioOption({
   selectedOptionIds,
   handleSelectOption,
 }: RadioOptionProps) {
-  return (
-    <div className="flex flex-wrap">
-      {options.map((option) => {
-        const isChecked = selectedOptionIds.includes(option.optionId);
+  const option = options.find(({ optionId }) =>
+    selectedOptionIds.includes(optionId),
+  );
 
+  return (
+    <RadioGroup
+      className="flex flex-wrap justify-between"
+      name={name}
+      onValueChange={(value) => handleSelectOption(Number(value))}
+      value={option ? option.optionId.toString() : undefined}
+    >
+      {options.map((option) => {
         return (
           <label
-            className="flex w-[50%] items-center justify-between px-[14px] py-[16px]"
+            className={cn(
+              "flex w-[48%] items-center justify-between px-[14px] py-[16px]",
+              "max-sm:w-full",
+            )}
             htmlFor={`${option.optionId}`}
             key={option.optionId}
           >
-            <div className="flex gap-[4px]">
-              <Input
-                checked={isChecked}
+            <div className="flex items-center gap-[4px]">
+              <RadioGroupItem
                 id={`${option.optionId}`}
-                name={name}
-                onChange={(e) => handleSelectOption(Number(e.target.value))}
-                type="radio"
-                value={option.optionId}
+                value={option.optionId.toString()}
               />
               <span className="text-body-3 whitespace-pre">{option.value}</span>
             </div>
             {option.colorCode && (
               <div
-                className="h-[16px] w-[16px] rounded-full border"
+                className="h-[16px] w-[32px] border border-black/40"
                 style={{
                   backgroundColor: option.colorCode,
                 }}
@@ -48,6 +54,6 @@ export function RadioOption({
           </label>
         );
       })}
-    </div>
+    </RadioGroup>
   );
 }

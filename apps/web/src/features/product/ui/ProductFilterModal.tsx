@@ -105,7 +105,7 @@ export default function ProductFilterModal({
           <DialogDescription className="sr-only" />
         </DialogHeader>
         <div className="relative flex flex-col gap-[32px]">
-          <div className="min-h-[300px]">
+          <div className="scrollbar-medium max-h-[550px] min-h-[300px] overflow-y-auto overflow-x-hidden">
             <Accordion defaultValue={["category"]} type="multiple">
               {filter.categoryId == null && (
                 <AccordionItem className="border-b-black/20" value="category">
