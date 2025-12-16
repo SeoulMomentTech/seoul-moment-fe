@@ -44,12 +44,7 @@ interface NewsContentsProps {
 
 function NewsContents({ data }: NewsContentsProps) {
   return (
-    <div
-      className={cn(
-        "flex justify-between gap-[40px]",
-        "max-sm:w-full max-sm:flex-col",
-      )}
-    >
+    <div className={cn("flex gap-[40px]", "max-sm:w-full max-sm:flex-col")}>
       {data.map((news, idx) => {
         if (idx === 0) {
           return (
