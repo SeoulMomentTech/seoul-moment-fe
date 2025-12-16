@@ -19,7 +19,7 @@ export default function ArticleList({ className, data }: ArticleListProps) {
         <Link href={`/article/${article.id}`} key={article.id}>
           <ArticleCard
             author={article.writer}
-            className="flex-none"
+            className="w-[407px] flex-none"
             date={article.createDate}
             imageUrl={article.image}
             subTitle={article.content}
