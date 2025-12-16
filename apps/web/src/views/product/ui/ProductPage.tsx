@@ -12,7 +12,7 @@ export default function ProductPage() {
     <div>
       <section
         className={cn(
-          "mx-auto w-[1280px] pt-[106px]",
+          "mx-auto w-[1320px] pt-[106px]",
           "max-sm:w-full max-sm:pt-[56px]",
         )}
       >
