@@ -57,21 +57,30 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
           </SwiperSlide>
         ))}
       </Swiper>
-      <Swiper
-        className="mySwiper px-[20px]"
-        freeMode={true}
-        modules={[FreeMode, Navigation, Thumbs]}
-        onSwiper={setThumbsSwiper}
-        slidesPerView={8}
-        spaceBetween={8}
-        watchSlidesProgress={true}
-      >
-        {images.map((src, idx) => (
-          <SwiperSlide key={`sub-${src}-${idx + 1}`}>
-            <Image alt="" height={800} src={src} unoptimized width={800} />
-          </SwiperSlide>
-        ))}
-      </Swiper>
+      <div className="px-[20px]">
+        <Swiper
+          className="mySwiper"
+          freeMode={true}
+          modules={[FreeMode, Navigation, Thumbs]}
+          onSwiper={setThumbsSwiper}
+          slidesPerView={8}
+          spaceBetween={8}
+          watchSlidesProgress={true}
+        >
+          {images.map((src, idx) => (
+            <SwiperSlide key={`sub-${src}-${idx + 1}`}>
+              <Image
+                alt=""
+                className="object-contain"
+                height={800}
+                src={src}
+                unoptimized
+                width={800}
+              />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      </div>
     </div>
   );
 }
