@@ -141,6 +141,7 @@ function Mobile() {
                     className={styleMap.mobile.menu}
                     href="/product"
                     onClick={() => setIsOpen(false)}
+                    prefetch={false}
                   >
                     Product
                     <ChevronRightIcon height={16} width={16} />
@@ -151,6 +152,7 @@ function Mobile() {
                     className={styleMap.mobile.menu}
                     href="/about"
                     onClick={() => setIsOpen(false)}
+                    prefetch={false}
                   >
                     About
                     <ChevronRightIcon height={16} width={16} />
@@ -161,6 +163,7 @@ function Mobile() {
                     className={styleMap.mobile.menu}
                     href="/contact"
                     onClick={() => setIsOpen(false)}
+                    prefetch={false}
                   >
                     Contact
                     <ChevronRightIcon height={16} width={16} />
@@ -168,11 +171,17 @@ function Mobile() {
                 </li>
               </ul>
               <div className="flex items-center pb-[33px]">
-                <Link href="ko">KOR</Link>
+                <Link href="ko" prefetch={false}>
+                  KOR
+                </Link>
                 <Divider className="block bg-black/40" />
-                <Link href="en">ENG</Link>
+                <Link href="en" prefetch={false}>
+                  ENG
+                </Link>
                 <Divider className="block bg-black/40" />
-                <Link href="zh-TW">繁體中文</Link>
+                <Link href="zh-TW" prefetch={false}>
+                  繁體中文
+                </Link>
               </div>
             </div>
           </SheetContent>
