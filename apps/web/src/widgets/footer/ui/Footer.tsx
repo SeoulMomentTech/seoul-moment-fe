@@ -35,7 +35,7 @@ export function Footer() {
             <div
               className={cn(
                 "flex w-[380px] flex-col gap-[30px]",
-                "max-sm:w-auto max-sm:gap-[20px] max-sm:text-[14px]",
+                "max-sm:text-body-3 max-sm:w-auto max-sm:gap-[20px]",
               )}
             >
               <Link href="/about">About</Link>
@@ -48,10 +48,10 @@ export function Footer() {
                 "max-sm:w-auto max-sm:gap-[24px]",
               )}
             >
-              <p className="font-semibold max-sm:text-[14px]">
+              <p className="max-sm:text-body-3 font-semibold">
                 고객센터 영업시간
               </p>
-              <p className="max-sm:text-[13px]">월~금 09:00~18:00</p>
+              <p className="max-sm:text-body-4">월~금 09:00~18:00</p>
             </div>
           </div>
           <div className="flex h-fit flex-1 justify-end gap-[10px]">
@@ -76,31 +76,31 @@ export function Footer() {
           </div>
         </div>
         <div className={cn("flex flex-col py-[40px] text-white/80")}>
-          <div className={cn("mb-[20px] font-semibold", "max-sm:text-[14px]")}>
+          <div className={cn("mb-[20px] font-semibold", "max-sm:text-body-3")}>
             首爾映像有限公司(Seoul Moment Co., Ltd.)
           </div>
           <div
             className={cn(
-              "mb-[20px] flex items-center text-[14px]",
-              "max-sm:mb-[10px] max-sm:flex-col max-sm:items-start max-sm:gap-[10px] max-sm:text-[13px]",
+              "text-body-3 mb-[20px] flex items-center",
+              "max-sm:text-body-4 max-sm:mb-[10px] max-sm:flex-col max-sm:items-start max-sm:gap-[10px]",
             )}
           >
             <div className="flex">
               <span>統一編號: 00148871</span>
-              <div className="mx-[10px] h-[8px] w-[1px] bg-white/45" />
+              <div className="mx-[10px] h-[8px] w-px bg-white/45" />
               <span>CEO: Justin Park</span>
             </div>
-            <div className="mx-[10px] h-[8px] w-[1px] bg-white/45 max-sm:hidden" />
+            <div className="mx-[10px] h-[8px] w-px bg-white/45 max-sm:hidden" />
             <span>地址: 台北市大安區忠孝東路四段231號10樓之2</span>
           </div>
           <div
             className={cn(
-              "flex items-center text-[14px]",
-              "max-sm:flex-col max-sm:items-start max-sm:gap-[10px] max-sm:text-[13px]",
+              "text-body-3 flex items-center",
+              "max-sm:text-body-4 max-sm:flex-col max-sm:items-start max-sm:gap-[10px]",
             )}
           >
             <span>Email : seoulmomenttw@gmail.com</span>
-            <div className="mx-[10px] h-[8px] w-[1px] bg-white/45 max-sm:hidden" />
+            <div className="mx-[10px] h-[8px] w-px bg-white/45 max-sm:hidden" />
             <span>Line Customer Service ID : seoulmoment</span>
           </div>
         </div>
