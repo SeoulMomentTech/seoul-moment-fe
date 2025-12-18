@@ -16,7 +16,13 @@ export default function ProductDetaillmage({
 }: ProductDetailImageProps) {
   return (
     <div className="relative px-[20px] max-sm:px-0">
-      <div className={cn("h-[800px] bg-gray-300", showMore && "h-full")}>
+      <div
+        className={cn(
+          "h-[800px] bg-gray-300",
+          "max-sm:h-[500px]",
+          showMore && "h-full max-sm:h-full",
+        )}
+      >
         <Image
           alt=""
           className={cn(

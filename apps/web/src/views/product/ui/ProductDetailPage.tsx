@@ -162,7 +162,11 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
                 </div>
               )}
             </div>
+            {/* 색상 정보 */}
+            <div />
           </div>
+          {/* 사이즈 */}
+          <div />
         </div>
         <BrandProductList data={data.relate} />
         <ProductDetailImage imageSrc={data.detailImg} showMore={showMore}>
