@@ -2,24 +2,19 @@
 
 import { Suspense, useCallback, useRef } from "react";
 
-import { SearchIcon } from "lucide-react";
-
 import { useLanguage } from "@shared/lib/hooks";
 import { useOpen, useIntersectionObserver } from "@shared/lib/hooks";
 import { cn } from "@shared/lib/style";
 import type { GetProductListReq } from "@shared/services/product";
 import { FilterIcon } from "@shared/ui/icon";
 
-import { Link } from "@/i18n/navigation";
-
-import { ProductCard } from "@entities/product";
 import { Button } from "@seoul-moment/ui";
-import { Empty } from "@widgets/empty";
 
-import { useInfiniteProducts } from "../../model/useInfiniteProducts";
-import useProductFilter from "../../model/useProductFilter";
-import FilterBar from "../FilterBar";
-import ProductFilterSheet from "../ProductFilterSheet";
+import ProductListSection from "./ProductListSection";
+import { useInfiniteProducts } from "../../../model/useInfiniteProducts";
+import useProductFilter from "../../../model/useProductFilter";
+import FilterBar from "../../FilterBar";
+import ProductFilterSheet from "../../ProductFilterSheet";
 
 interface MobileProps {
   filter: Omit<GetProductListReq, "languageCode" | "count" | "page">;
@@ -78,48 +73,11 @@ export default function Mobile({ filter }: MobileProps) {
             </Suspense>
           </div>
 
-          {isEmpty ? (
-            <div>
-              <Empty
-                className="h-[400px] w-full"
-                description="검색 결과가 없습니다."
-                icon={
-                  <SearchIcon
-                    className="text-black/30"
-                    height={24}
-                    width={24}
-                  />
-                }
-              />
-            </div>
-          ) : (
-            <>
-              <div
-                className={cn(
-                  "gap-x-[20px] gap-y-[30px]",
-                  "min-h-[400px] w-full",
-                  "grid grid-cols-2",
-                )}
-              >
-                {data?.map((product) => (
-                  <Link
-                    className="flex-1"
-                    href={`/product/${product.id}`}
-                    key={`mobile-product-${product.id}`}
-                  >
-                    <ProductCard
-                      className="h-full flex-1"
-                      contentClassName="h-full justify-between"
-                      contentWrapperClassName="h-full justify-between"
-                      data={product}
-                      imageClassName="max-sm:w-full max-sm:max-h-[150px] max-sm:min-h-[150px]"
-                    />
-                  </Link>
-                ))}
-              </div>
-              <div className="h-px w-full" ref={loadMoreRef} />
-            </>
-          )}
+          <ProductListSection
+            data={data}
+            isEmpty={isEmpty}
+            loadMoreRef={loadMoreRef}
+          />
         </section>
       </div>
     </div>
