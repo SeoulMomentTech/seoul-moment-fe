@@ -43,7 +43,10 @@ const useProductFilter = () => {
 
   const filterCount = useMemo(() => {
     return Object.values(filter).reduce(
-      (prev: number, value) => (value == null ? prev : prev + 1),
+      (prev: number, value) =>
+        value == null || (Array.isArray(value) && value.length === 0)
+          ? prev
+          : prev + 1,
       0,
     );
   }, [filter]);
