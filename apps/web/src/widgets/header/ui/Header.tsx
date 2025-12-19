@@ -201,10 +201,11 @@ export function Header() {
     <>
       <header
         className={cn(
-          "h-[56px] w-screen bg-white px-[20px]",
+          "h-[56px] w-[calc(100%-40px)] bg-white px-[20px]",
           "border-b border-b-black/5",
           "fixed left-0 top-0 z-10",
           "flex items-center",
+          "max-sm:w-screen",
         )}
       >
         <Desktop />

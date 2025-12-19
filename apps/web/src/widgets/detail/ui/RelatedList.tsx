@@ -14,7 +14,9 @@ interface RelatedListProps {
 
 export function RelatedList({ lastNews, type }: RelatedListProps) {
   return (
-    <div className={cn("mx-auto bg-black/5")}>
+    <div
+      className={cn("mx-auto min-w-[1280px] bg-black/5", "max-sm:min-w-auto")}
+    >
       <SectionWithLabel
         className={cn(
           "mx-auto w-[1280px] py-[100px]",
