@@ -4,5 +4,8 @@
     "source.fixAll.eslint": "explicit"
   },
   "editor.formatOnSave": true,
-  "i18n-ally.localesPaths": ["src/i18n", "src/i18n/messages"]
+  "i18n-ally.localesPaths": ["src/i18n", "src/i18n/messages"],
+  "files.associations": {
+    "*.css": "tailwindcss"
+  }
 }
