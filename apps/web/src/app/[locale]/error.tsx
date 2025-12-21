@@ -18,7 +18,7 @@ interface GlobalErrorProps {
 const DEFAULT_ERROR = {
   title: "Something went wrong",
   description: [
-    "Something went wrong :(",
+    "Something went wrong",
     "An unexpected error has occurred.",
     "Please try again later.",
   ],
@@ -27,7 +27,7 @@ const DEFAULT_ERROR = {
 const SERVER_ERROR = {
   title: "500 Error",
   description: [
-    "Internal Server Error :(",
+    "Internal Server Error",
     "Sorry, something went wrong on our side.",
     "Please try again later.",
   ],
