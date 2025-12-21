@@ -37,20 +37,14 @@ const beforeErrorHandler = async (error: HTTPError) => {
   const { request, response } = error;
 
   if (error.response && error.response.status >= 500) {
-    // To avoid "Body has already been used" error, we need to clone the request/response
-    // before reading the body.
-    const requestData = request.body
-      ? await request
-          .clone()
-          .json()
-          .catch(() => "Could not parse request body")
-      : null;
-    const responseData = response.body
-      ? await response
-          .clone()
-          .json()
-          .catch(() => "Could not parse response body")
-      : null;
+    const contentType = response.headers.get("content-type");
+    const responseData =
+      contentType?.includes("application/json") && response.body
+        ? await response
+            .clone()
+            .json()
+            .catch(() => undefined)
+        : null;
 
     Sentry.withScope((scope) => {
       scope.setTag("API", "Internal Server Error");
@@ -58,7 +52,6 @@ const beforeErrorHandler = async (error: HTTPError) => {
         method: request.method,
         url: request.url,
         headers: Object.fromEntries(request.headers),
-        data: requestData,
       });
 
       scope.setContext("API Response", {
