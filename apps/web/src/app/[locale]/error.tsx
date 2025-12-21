@@ -1,11 +1,15 @@
 "use client";
 
+import { useEffect } from "react";
+
 import { type HTTPError, isKyError } from "ky";
 import Image from "next/image";
 
 import { Link } from "@/i18n/navigation";
 
+import * as Sentry from "@sentry/nextjs";
 import { Button } from "@seoul-moment/ui";
+import type { ExtendedHTTPError } from "@shared/services";
 
 interface GlobalErrorProps {
   error: Error & { digest?: string };
@@ -46,6 +50,13 @@ function resolveErrorContent(error: Error) {
 
 export default function GlobalError({ error }: GlobalErrorProps) {
   const { title, description } = resolveErrorContent(error);
+
+  useEffect(() => {
+    // 이미 다른 곳(ky, React Query)에서 보고된 에러가 아니라면 Sentry로 전송
+    if (!(error as ExtendedHTTPError).isReported) {
+      Sentry.captureException(error);
+    }
+  }, [error]);
 
   return (
     <div className="flex flex-col items-center gap-[60px] pt-[156px] max-sm:px-[20px] max-sm:pt-[136px]">
