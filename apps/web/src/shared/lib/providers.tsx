@@ -23,7 +23,7 @@ const queryClient = new QueryClient({
   },
   queryCache: new QueryCache({
     onError: (err, query) => {
-      if (!(err as ExtendedHTTPError).isReported) {
+      if (query.meta?.logError && !(err as ExtendedHTTPError).isReported) {
         Sentry.withScope((scope) => {
           scope.setTag("type", "query");
           scope.setContext("Query Info", {
