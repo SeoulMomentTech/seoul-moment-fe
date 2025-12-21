@@ -20,15 +20,12 @@ const nextConfig: NextConfig = {
     ],
     minimumCacheTTL: 86400,
   },
+  productionBrowserSourceMaps: true,
 };
 
 const withNextIntl = createNextIntlPlugin();
-export default withSentryConfig(withNextIntl(nextConfig), {
-  // For all available options, see:
-  // https://www.npmjs.com/package/@sentry/webpack-plugin#options
-
+const sentryBuildOptions = {
   org: "seoulmoment",
-
   project: "seoulmoment-service-fe",
 
   // Only print logs for uploading source maps in CI
@@ -52,11 +49,12 @@ export default withSentryConfig(withNextIntl(nextConfig), {
     // https://docs.sentry.io/product/crons/
     // https://vercel.com/docs/cron-jobs
     automaticVercelMonitors: true,
-
     // Tree-shaking options for reducing bundle size
     treeshake: {
       // Automatically tree-shake Sentry logger statements to reduce bundle size
       removeDebugLogging: true,
     },
   },
-});
+};
+
+export default withSentryConfig(withNextIntl(nextConfig), sentryBuildOptions);
