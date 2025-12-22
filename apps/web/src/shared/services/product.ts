@@ -112,7 +112,7 @@ type DetailOption = Record<OptionType, OptionValue[]>;
 interface GetProductDetailRes {
   id: number;
   name: string;
-  brand: Record<"name" | "profileImage", string>;
+  brand: Record<"name" | "profileImg" | "id", string>;
   price: number;
   discountPrice: number;
   origin: string;

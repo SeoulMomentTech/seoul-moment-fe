@@ -10,8 +10,7 @@ export default async function BrandDetail({
   params,
 }: PageParams<{ id: string }>) {
   const { id, locale } = await params;
-
-  const brandId = Number(id);
+  const brandId = parseInt(id);
 
   if (!Number.isInteger(brandId)) {
     notFound();

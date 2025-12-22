@@ -10,7 +10,7 @@ export default async function ArticleDetail({
   params,
 }: PageParams<{ id: string }>) {
   const { id, locale } = await params;
-  const articleId = Number(id);
+  const articleId = parseInt(id);
 
   if (!Number.isInteger(articleId)) {
     notFound();
