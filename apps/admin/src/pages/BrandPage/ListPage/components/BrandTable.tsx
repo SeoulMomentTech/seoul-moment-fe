@@ -1,3 +1,5 @@
+import { Link } from "react-router";
+
 import { Edit, Trash2 } from "lucide-react";
 
 import type { AdminBrandListItem } from "@shared/services/brand";
@@ -20,10 +22,7 @@ interface BrandTableProps {
   onDelete(id: number): void;
 }
 
-const getNameByLanguage = (
-  brand: AdminBrandListItem,
-  languageCode: string,
-) =>
+const getNameByLanguage = (brand: AdminBrandListItem, languageCode: string) =>
   brand.nameDto.find((name) => name.languageCode === languageCode)?.name ?? "";
 
 export function BrandTable({
@@ -56,7 +55,9 @@ export function BrandTable({
         ) : brands.length === 0 ? (
           <TableRow>
             <TableCell className="py-8 text-center text-gray-500" colSpan={5}>
-              {hasSearchQuery ? "검색 결과가 없습니다." : "등록된 브랜드가 없습니다."}
+              {hasSearchQuery
+                ? "검색 결과가 없습니다."
+                : "등록된 브랜드가 없습니다."}
             </TableCell>
           </TableRow>
         ) : (
@@ -71,9 +72,12 @@ export function BrandTable({
 
               <TableCell className="text-right">
                 <div className="flex justify-end gap-2">
-                  <Button size="sm" variant="ghost">
+                  <Link
+                    className="flex items-center justify-center"
+                    to={`/brand/edit/${brand.id}`}
+                  >
                     <Edit className="h-4 w-4" />
-                  </Button>
+                  </Link>
                   <Button
                     onClick={() => onDelete(brand.id)}
                     size="sm"

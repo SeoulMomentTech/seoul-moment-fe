@@ -16,8 +16,9 @@ import LoginPage from "@pages/LoginPage";
 import ProductCategoriesPage from "@pages/ProductCategoriesPage";
 import SignUpPage from "@pages/SignUpPage";
 
-import { BrandEditPage } from "./pages/BrandEditPage";
-import { BrandsPage } from "./pages/BrandPage";
+import { BrandAddPage } from "./pages/BrandPage/AddPage";
+import { BrandEditPage } from "./pages/BrandPage/EditPage";
+import { BrandListPage } from "./pages/BrandPage/ListPage";
 import { HomeBannersPage } from "./pages/HomeBannerPage";
 
 const PublicRoute = () => {
@@ -82,11 +83,11 @@ const privateRoutes: RouteObject[] = [
       },
       {
         path: PATH.BRAND,
-        element: <BrandsPage />,
+        element: <BrandListPage />,
       },
       {
         path: PATH.BRAND_ADD,
-        element: <BrandEditPage />,
+        element: <BrandAddPage />,
       },
       {
         path: PATH.BRAND_EDIT,

@@ -12,7 +12,7 @@ import { Button, HStack } from "@seoul-moment/ui";
 import { BrandFilters, BrandPagination, BrandTable } from "./components";
 import { useAdminBrandListQuery } from "./hooks";
 
-export function BrandsPage() {
+export function BrandListPage() {
   const navigate = useNavigate();
   return (
     <div className="p-8 pt-24">
