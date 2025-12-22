@@ -37,7 +37,7 @@ function SelectTrigger({ className, children, ...props }: SelectTriggerProps) {
   return (
     <SelectPrimitive.Trigger
       className={cn(
-        "data-[placeholder]:text-muted-foreground focus:ring-transparent! flex h-10 w-full items-center justify-between rounded-md border border-black/20 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+        "data-placeholder:text-muted-foreground focus:ring-transparent! flex h-10 w-full items-center justify-between rounded-md border border-black/20 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
         className,
       )}
       {...props}
@@ -126,7 +126,7 @@ function SelectContent({
         <SelectPrimitive.Viewport
           className={cn(
             position === "popper" &&
-              "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]",
+              "h-(--radix-select-trigger-height) min-w-(--radix-select-trigger-width) w-full",
           )}
         >
           {children}
@@ -160,7 +160,7 @@ function SelectItem({ className, children, ...props }: SelectItemProps) {
   return (
     <SelectPrimitive.Item
       className={cn(
-        "focus:bg-accent focus:text-accent-foreground focus:ring-transparent! relative flex w-full cursor-default select-none items-center rounded-sm px-[12px] py-[10px] text-sm outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+        "focus:bg-accent focus:text-accent-foreground focus:ring-transparent! data-disabled:pointer-events-none data-disabled:opacity-50 relative flex w-full cursor-default select-none items-center rounded-sm px-[12px] py-[10px] text-sm outline-none",
         "cursor-pointer hover:bg-black/10",
         className,
       )}
