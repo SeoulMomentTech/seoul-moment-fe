@@ -12,6 +12,7 @@ export interface AdminUploadImageRequest {
 
 export interface AdminUploadImageResponse {
   imageUrl: string;
+  imagePath: string;
 }
 
 export const uploadAdminImage = (payload: AdminUploadImageRequest) =>
