@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+
 import Image from "next/image";
 
 import useProductCategory from "@features/product/model/useProductCategory";
@@ -13,11 +15,14 @@ interface ProductCategoryFilterProps {
 export function ProductCategoryFilter({
   className,
 }: ProductCategoryFilterProps) {
-  const { filter, handleUpdateFilter } = useProductFilter();
+  const { filter, handleUpdateFilter, handleClearFilter } = useProductFilter();
   const categoryId = filter.categoryId;
   const productCategoryId = filter.productCategoryId;
 
   const { data: categories } = useProductCategory(categoryId);
+  const isValid = categories.find(
+    (category) => category.id === productCategoryId,
+  );
 
   const handleChangeCategory = (id: number) => {
     handleUpdateFilter({
@@ -25,8 +30,33 @@ export function ProductCategoryFilter({
     })();
   };
 
+  useEffect(() => {
+    if (!isValid) {
+      handleClearFilter({ productCategoryId: null });
+    }
+  }, [isValid, handleClearFilter]);
+
   return (
     <div className={cn("flex items-center gap-[10px] max-sm:w-max", className)}>
+      <button
+        className={cn(
+          "flex flex-col items-center gap-[8px]",
+          "cursor-pointer rounded-full px-[8px] py-2 text-sm font-medium",
+          productCategoryId == null && "font-semibold",
+        )}
+        onClick={() => handleClearFilter({ productCategoryId: null })}
+        type="button"
+      >
+        <div
+          className={cn(
+            "flex h-[50px] w-[50px] items-center justify-center overflow-hidden rounded-full border border-black/5",
+            productCategoryId == null && "border-black",
+          )}
+        >
+          ALL
+        </div>
+        <span>전체</span>
+      </button>
       {categories.map((category) => (
         <button
           className={cn(
@@ -40,7 +70,7 @@ export function ProductCategoryFilter({
         >
           <div
             className={cn(
-              "h-[50px] w-[50px] overflow-hidden rounded-full border border-black/5 bg-slate-300",
+              "h-[50px] w-[50px] overflow-hidden rounded-full border border-black/5",
               category.id === productCategoryId && "border-black",
             )}
           >

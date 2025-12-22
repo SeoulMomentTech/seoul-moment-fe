@@ -9,7 +9,7 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Toaster } from "sonner";
 
 import { ReactQueryProvider } from "@shared/lib/providers";
-import ScrollToTop from "@shared/ui/ScrollToTop";
+import ScrollToTop from "@shared/ui/scroll-to-top";
 
 import { routing } from "@/i18n/routing";
 
