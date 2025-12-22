@@ -13,7 +13,6 @@ import type { CommonRes } from "@shared/services";
 import { BrandProducts } from "@widgets/brand-products";
 
 interface BrandDetailPageProps {
-  id: number;
   promise: Promise<CommonRes<BrandDetailInfo>>;
 }
 
