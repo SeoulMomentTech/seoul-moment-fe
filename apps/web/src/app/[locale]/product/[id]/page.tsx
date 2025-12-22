@@ -8,8 +8,9 @@ export default async function ProductDetail({
   params,
 }: PageParams<{ id: string }>) {
   const { id } = await params;
+  const productId = parseInt(id);
 
-  if (isNaN(Number(id))) {
+  if (!Number.isInteger(productId)) {
     notFound();
   }
 
