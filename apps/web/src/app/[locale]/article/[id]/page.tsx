@@ -10,13 +10,15 @@ export default async function ArticleDetail({
   params,
 }: PageParams<{ id: string }>) {
   const { id, locale } = await params;
-  const data = getArticleDetail({ id: Number(id), languageCode: locale }).catch(
-    () => notFound(),
-  );
+  const articleId = Number(id);
 
-  if (id == null || isNaN(Number(id))) {
+  if (!Number.isInteger(articleId)) {
     notFound();
   }
 
-  return <ArticleDetailPage data={data} id={Number(id)} />;
+  const data = getArticleDetail({ id: articleId, languageCode: locale }).catch(
+    () => notFound(),
+  );
+
+  return <ArticleDetailPage data={data} />;
 }

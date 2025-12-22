@@ -10,14 +10,17 @@ export default async function BrandDetail({
   params,
 }: PageParams<{ id: string }>) {
   const { id, locale } = await params;
-  const promise = getBrandDetail({
-    id: Number(id),
-    languageCode: locale,
-  }).catch(() => notFound());
 
-  if (id == null || isNaN(Number(id))) {
+  const brandId = Number(id);
+
+  if (!Number.isInteger(brandId)) {
     notFound();
   }
 
-  return <BrandDetailPage id={Number(id)} promise={promise} />;
+  const promise = getBrandDetail({
+    id: brandId,
+    languageCode: locale,
+  }).catch(() => notFound());
+
+  return <BrandDetailPage promise={promise} />;
 }

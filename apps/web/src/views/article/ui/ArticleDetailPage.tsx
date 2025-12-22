@@ -10,7 +10,6 @@ import { BrandProducts } from "@widgets/brand-products";
 import { RelatedList } from "@widgets/detail";
 
 interface ArticleDetailPageProps {
-  id: number;
   data: Promise<CommonRes<GetArticleDetailRes>>;
 }
 

@@ -41,7 +41,7 @@ function ArticleDetailLoading() {
             )}
           >
             <Skeleton className="h-[20px] w-[120px]" />
-            <span className="mx-[10px] hidden h-[8px] w-[1px] max-sm:block max-sm:bg-black/40" />
+            <span className="mx-[10px] hidden h-[8px] w-px max-sm:block max-sm:bg-black/40" />
             <div className="flex items-center gap-[10px] max-sm:gap-[4px]">
               <Skeleton className="h-[40px] w-[40px] rounded-full max-sm:h-[24px] max-sm:w-[24px]" />
               <Skeleton className="h-[20px] w-[40px]" />
