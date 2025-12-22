@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
 import {
   parseAsArrayOf,
@@ -70,12 +70,15 @@ const useProductFilter = () => {
       }));
     };
 
-  const handleClearFilter = (newFilter: Record<string, null>) => {
-    setFilter((prev) => ({
-      ...prev,
-      ...newFilter,
-    }));
-  };
+  const handleClearFilter = useCallback(
+    (newFilter: Record<string, null>) => {
+      setFilter((prev) => ({
+        ...prev,
+        ...newFilter,
+      }));
+    },
+    [setFilter],
+  );
 
   const handleResetFilter = (ignoreKeys: FilterKey[] = []) => {
     // TODO: 필터 초기화 로직 구현 및 ignoreKeys 내 없는 키는 유지되도록 수정
