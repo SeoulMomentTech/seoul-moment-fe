@@ -64,9 +64,9 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
               {data.name}
             </h2>
             <div className="flex items-center justify-between py-[10px]">
-              <Link href={`/product?brandId=1`}>
+              <Link href={`/product?brandId=${data.brand.id}`}>
                 <AvatarBadge
-                  avatarUrl={data.brand.profileImage}
+                  avatarUrl={data.brand.profileImg}
                   name={data.brand.name}
                 />
               </Link>
