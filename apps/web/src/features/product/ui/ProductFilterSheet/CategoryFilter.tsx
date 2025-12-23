@@ -1,3 +1,6 @@
+import { useState } from "react";
+
+import type { Category } from "@shared/services/category";
 import type { Filter } from "@widgets/filter-sheet/ui/FilterSheet";
 
 import {
@@ -25,22 +28,12 @@ const CategoryFilter = ({ filter, handleFilter }: CategoryInterface) => {
       <AccordionTrigger>카테고리</AccordionTrigger>
       <AccordionContent className="flex flex-col pb-0">
         {categories.map((category) => (
-          <Accordion collapsible key={category.id} type="single">
-            <AccordionItem
-              className="pl-[14px]"
-              hideBorder
-              value={category.id.toString()}
-            >
-              <AccordionTrigger className="font-semibold">
-                {category.name}
-              </AccordionTrigger>
-              <ProductCategory
-                categoryId={category.id}
-                filter={filter}
-                handleFilter={handleFilter}
-              />
-            </AccordionItem>
-          </Accordion>
+          <ProductCategory
+            category={category}
+            filter={filter}
+            handleFilter={handleFilter}
+            key={category.id}
+          />
         ))}
       </AccordionContent>
     </AccordionItem>
@@ -48,16 +41,50 @@ const CategoryFilter = ({ filter, handleFilter }: CategoryInterface) => {
 };
 
 interface ProductCategoryProps {
-  categoryId: number;
+  category: Category;
   filter: Filter;
   handleFilter(newFilter: Filter): void;
 }
 
 const ProductCategory = ({
+  category,
+  filter,
+  handleFilter,
+}: ProductCategoryProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <Accordion collapsible type="single">
+      <AccordionItem className="pl-[14px]" hideBorder value={category.name}>
+        <AccordionTrigger
+          className="font-semibold"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          {category.name}
+        </AccordionTrigger>
+        {isOpen && (
+          <ProductSubCategory
+            categoryId={category.id}
+            filter={filter}
+            handleFilter={handleFilter}
+          />
+        )}
+      </AccordionItem>
+    </Accordion>
+  );
+};
+
+interface ProductSubCategoryProps {
+  categoryId: number;
+  filter: Filter;
+  handleFilter(newFilter: Filter): void;
+}
+
+const ProductSubCategory = ({
   filter,
   categoryId,
   handleFilter,
-}: ProductCategoryProps) => {
+}: ProductSubCategoryProps) => {
   const { data: categories } = useProductCategory(categoryId);
 
   return (
