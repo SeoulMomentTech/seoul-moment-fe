@@ -6,11 +6,13 @@ import { Plus } from "lucide-react";
 
 import { PATH } from "@shared/constants/route";
 import { useDebounceValue } from "@shared/hooks/useDebounceValue";
+import type { BrandId } from "@shared/services/brand";
 
 import { Button, HStack } from "@seoul-moment/ui";
 
 import { BrandFilters, BrandPagination, BrandTable } from "./components";
 import { useAdminBrandListQuery } from "./hooks";
+import { useDeleteAdminBrandMutation } from "../hooks/useDeleteAdminBrandMutation";
 
 export function BrandListPage() {
   const navigate = useNavigate();
@@ -55,6 +57,8 @@ function BrandListContents() {
     sort: "DESC",
   });
 
+  const { mutateAsync: deleteBrand } = useDeleteAdminBrandMutation();
+
   const brands = brandResponse?.data.list ?? [];
   const totalItems = brandResponse?.data.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
@@ -74,12 +78,12 @@ function BrandListContents() {
     setCurrentPage(1);
   };
 
-  const handleDelete = (id: number) => {
-    if (!confirm("삭제 기능은 준비 중입니다. 계속하시겠습니까?")) {
+  const handleDelete = (id: BrandId) => {
+    if (!confirm("삭제 하시겠습니까?")) {
       return;
     }
 
-    alert(`브랜드 ID ${id} 삭제 기능은 추후 제공됩니다.`);
+    deleteBrand({ brandId: id });
   };
 
   return (
