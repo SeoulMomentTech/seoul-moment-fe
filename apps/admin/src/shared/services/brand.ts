@@ -116,6 +116,10 @@ export interface AdminBrandMultilingualText {
 
 export interface AdminBrandDetail {
   id: BrandId;
+  categoryId: number;
+  englishName: string;
+  profileImage: string;
+  productBannerImage: string;
   bannerList: string[];
   mobileBannerList: string[];
   multilingualTextList: AdminBrandMultilingualText[];
@@ -136,3 +140,6 @@ export const updateAdminBrand = (
   brandId: BrandId,
   payload: UpdateAdminBrandRequest,
 ) => fetcher.patch(`/admin/brand/${brandId}`, payload);
+
+export const deleteAdminBrand = (brandId: BrandId) =>
+  fetcher.delete(`/admin/brand/${brandId}`);
