@@ -21,7 +21,7 @@ import {
 import { BannerImages } from "../../components/BannerImages";
 import { BasicInfo } from "../../components/BasicInfo";
 import { BrandSections } from "../../components/BrandSection";
-import { useCreateAdminBrandMutation } from "../../hooks";
+import { useUpdateAdminBrandMutation } from "../../hooks";
 import { useAdminBrandQuery } from "../../hooks/useAdminBrandQuery";
 import { createEmptySection } from "../../utils/section";
 
@@ -56,7 +56,7 @@ export default function BrandForm({ id }: BrandFormProps) {
   const navigate = useNavigate();
 
   const { data: brandData } = useAdminBrandQuery(id);
-  const { mutateAsync: createBrand, isPending } = useCreateAdminBrandMutation({
+  const { isPending } = useUpdateAdminBrandMutation({
     onSuccess: () => navigate(PATH.BRAND),
   });
 
@@ -123,21 +123,8 @@ export default function BrandForm({ id }: BrandFormProps) {
       return validationErrors;
     },
     onSubmit: async (values) => {
-      await createBrand({
-        ...values,
-        bannerImageUrlList:
-          values.bannerImageUrlList.length > 0
-            ? values.bannerImageUrlList
-            : values.bannerImageUrl
-              ? [values.bannerImageUrl]
-              : [],
-        mobileBannerImageUrlList:
-          values.mobileBannerImageUrlList.length > 0
-            ? values.mobileBannerImageUrlList
-            : values.bannerImageUrl
-              ? [values.bannerImageUrl]
-              : [],
-      });
+      // updateBrand
+      console.log(values);
     },
   });
 
@@ -146,8 +133,15 @@ export default function BrandForm({ id }: BrandFormProps) {
   useEffect(() => {
     if (!brandData?.data) return;
 
-    const { bannerList, mobileBannerList, multilingualTextList } =
-      brandData.data;
+    const {
+      bannerList,
+      mobileBannerList,
+      multilingualTextList,
+      categoryId,
+      englishName,
+      profileImage,
+      productBannerImage,
+    } = brandData.data;
 
     const textList = LANGUAGE_LIST.map((language) => {
       const text = multilingualTextList.find(
@@ -202,20 +196,12 @@ export default function BrandForm({ id }: BrandFormProps) {
       ...prev,
       textList,
       sectionList,
+      englishName,
+      categoryId,
+      profileImageUrl: profileImage,
+      bannerImageUrl: productBannerImage,
       bannerImageUrlList: bannerList,
       mobileBannerImageUrlList: mobileBannerList,
-      englishName:
-        (brandData.data as Partial<CreateAdminBrandRequest>).englishName ??
-        prev.englishName,
-      profileImageUrl:
-        (brandData.data as Partial<CreateAdminBrandRequest>).profileImageUrl ??
-        prev.profileImageUrl,
-      categoryId:
-        (brandData.data as Partial<CreateAdminBrandRequest>).categoryId ??
-        prev.categoryId,
-      bannerImageUrl:
-        (brandData.data as Partial<CreateAdminBrandRequest>).bannerImageUrl ??
-        prev.bannerImageUrl,
     }));
   }, [brandData, setValues]);
 
