@@ -2,7 +2,7 @@ import { Link } from "react-router";
 
 import { Edit, Trash2 } from "lucide-react";
 
-import type { AdminBrandListItem } from "@shared/services/brand";
+import type { AdminBrandListItem, BrandId } from "@shared/services/brand";
 
 import {
   Button,
@@ -19,7 +19,7 @@ interface BrandTableProps {
   isLoading: boolean;
   isFetching: boolean;
   hasSearchQuery: boolean;
-  onDelete(id: number): void;
+  onDelete(id: BrandId): void;
 }
 
 const getNameByLanguage = (brand: AdminBrandListItem, languageCode: string) =>
