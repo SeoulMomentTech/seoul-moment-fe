@@ -1,6 +1,6 @@
 import type { ElementType } from "react";
 
-import Flex, { type FlexBaseProps, type FlexProps } from "./flex";
+import { Flex, type FlexBaseProps, type FlexProps } from "./flex";
 
 type Align = "top" | "bottom" | "center" | "between" | "around";
 
@@ -19,7 +19,7 @@ type VStackProps<T extends ElementType> = Omit<
  * 즉, 행(row)을 추가한다고 생각하면 됩니다.
  **/
 
-export default function VStack<T extends ElementType = "div">({
+export function VStack<T extends ElementType = "div">({
   as,
   align = "top",
   reversed = false,

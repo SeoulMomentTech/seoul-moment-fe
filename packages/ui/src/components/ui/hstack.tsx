@@ -1,6 +1,6 @@
 import type { ElementType } from "react";
 
-import Flex, { type FlexBaseProps, type FlexProps } from "./flex";
+import { Flex, type FlexBaseProps, type FlexProps } from "./flex";
 
 type Align = "start" | "end" | "center" | "between" | "around";
 
@@ -18,7 +18,7 @@ type HStackProps<T extends ElementType> = Omit<
  * 좌-우 방향으로 이어 붙입니다.
  * 즉, 열(column)을 추가한다고 생각하면 됩니다.
  **/
-export default function HStack<T extends ElementType = "div">({
+export function HStack<T extends ElementType = "div">({
   as,
   align = "start",
   reversed = false,

@@ -41,7 +41,7 @@ export type FlexProps<T extends ElementType> = PropsWithChildren<
   FlexBaseProps & Omit<ComponentPropsWithoutRef<T>, keyof FlexBaseProps>
 >;
 
-export default function Flex<T extends ElementType = "div">({
+export function Flex<T extends ElementType = "div">({
   children,
   as = "div",
   display = "flex",
