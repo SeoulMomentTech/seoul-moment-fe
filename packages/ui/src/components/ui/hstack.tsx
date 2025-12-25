@@ -12,6 +12,12 @@ type HStackProps<T extends ElementType> = Omit<
   align?: Align;
 };
 
+/**
+ * @description
+ * hstack - horizontal stack(가로로 쌓기)
+ * 좌-우 방향으로 이어 붙입니다.
+ * 즉, 열(column)을 추가한다고 생각하면 됩니다.
+ **/
 export default function HStack<T extends ElementType = "div">({
   as,
   align = "start",
