@@ -3,7 +3,7 @@ import { Edit, Image as ImageIcon } from "lucide-react";
 import { ImageWithFallback } from "@shared/components/image-with-fallback";
 import type { HomeBanner } from "@shared/services/banner";
 
-import { Button } from "@seoul-moment/ui";
+import { Button, HStack } from "@seoul-moment/ui";
 
 interface BannerPreviewProps {
   banner: HomeBanner | null;
@@ -19,9 +19,9 @@ export function BannerPreview({
   if (isLoading) {
     return (
       <div className="rounded-lg border border-gray-200 bg-white">
-        <div className="flex items-center justify-center p-12">
+        <HStack align="center" className="p-12">
           <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900" />
-        </div>
+        </HStack>
       </div>
     );
   }

@@ -8,12 +8,14 @@ import type {
 
 import {
   Button,
+  Flex,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
+  VStack,
 } from "@seoul-moment/ui";
 
 interface CategoryTableProps {
@@ -41,9 +43,9 @@ export function CategoryTable({
 }: CategoryTableProps) {
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center p-12">
+      <VStack align="center" className="p-12">
         <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900" />
-      </div>
+      </VStack>
     );
   }
 
@@ -75,8 +77,12 @@ export function CategoryTable({
                 {getCategoryName(category.nameDto, "zh-TW")}
               </TableCell>
               <TableCell>
-                <div className="flex gap-2">
-                  <Button onClick={() => onEdit(category)} size="sm" variant="ghost">
+                <Flex gap={8}>
+                  <Button
+                    onClick={() => onEdit(category)}
+                    size="sm"
+                    variant="ghost"
+                  >
                     <Edit className="h-4 w-4" />
                   </Button>
                   <Button
@@ -87,7 +93,7 @@ export function CategoryTable({
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
-                </div>
+                </Flex>
               </TableCell>
             </TableRow>
           ))

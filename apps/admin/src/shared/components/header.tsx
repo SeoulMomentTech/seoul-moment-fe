@@ -5,7 +5,7 @@ import { Menu } from "lucide-react";
 import { PATH } from "@shared/constants/route";
 import { useAuth } from "@shared/hooks/useAuth";
 
-import { Avatar, AvatarFallback, Button, cn } from "@seoul-moment/ui";
+import { Avatar, AvatarFallback, Button, cn, HStack } from "@seoul-moment/ui";
 
 interface HeaderProps {
   onMenuToggle(): void;
@@ -31,13 +31,11 @@ export default function Header({ onMenuToggle }: HeaderProps) {
 
   return (
     <header className="fixed left-0 right-0 top-0 z-50 h-16 border-b border-gray-200 bg-white">
-      <div
-        className={cn(
-          "flex h-full items-center justify-between px-6",
-          "max-lg:px-3",
-        )}
+      <HStack
+        align="between"
+        className={cn("h-full justify-between px-6", "max-lg:px-3")}
       >
-        <div className="flex items-center gap-4">
+        <HStack gap={16}>
           <Button
             className="px-2 lg:hidden"
             onClick={onMenuToggle}
@@ -46,9 +44,9 @@ export default function Header({ onMenuToggle }: HeaderProps) {
             <Menu className="h-5 w-5" />
           </Button>
           <h1 className="text-gray-900">Admin Dashboard</h1>
-        </div>
+        </HStack>
 
-        <div className="flex items-center gap-4">
+        <HStack gap={16}>
           <Button
             className={cn("flex items-center", "max-lg:px-0")}
             variant="ghost"
@@ -66,8 +64,8 @@ export default function Header({ onMenuToggle }: HeaderProps) {
           <Button onClick={handleLogout} size="sm">
             로그아웃
           </Button>
-        </div>
-      </div>
+        </HStack>
+      </HStack>
     </header>
   );
 }

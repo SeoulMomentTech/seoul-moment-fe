@@ -2,7 +2,7 @@ import type { ChangeEventHandler } from "react";
 
 import { X } from "lucide-react";
 
-import { Button, Input, Label } from "@seoul-moment/ui";
+import { Button, Flex, Input, Label } from "@seoul-moment/ui";
 
 interface CategoryCreateModalProps {
   isOpen: boolean;
@@ -83,14 +83,14 @@ export function CategoryCreateModal({
             />
           </div>
         </div>
-        <div className="flex justify-end gap-2">
+        <Flex gap={8} justify="flex-end">
           <Button onClick={onClose} variant="outline">
             취소
           </Button>
           <Button disabled={disabled} onClick={onSubmit}>
             {isSubmitting ? "추가 중..." : "추가"}
           </Button>
-        </div>
+        </Flex>
       </div>
     </div>
   );

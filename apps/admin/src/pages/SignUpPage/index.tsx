@@ -14,6 +14,8 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  Flex,
+  HStack,
   Input,
   Label,
 } from "@seoul-moment/ui";
@@ -74,14 +76,17 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
+    <HStack align="center" className="min-h-screen bg-gray-50 px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-4">
-          <div className="flex justify-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-900">
+          <Flex justify="center">
+            <HStack
+              align="center"
+              className="h-12 w-12 rounded-full bg-gray-900"
+            >
               <UserPlus className="h-6 w-6 text-white" />
-            </div>
-          </div>
+            </HStack>
+          </Flex>
           <div className="text-center">
             <CardTitle>회원가입</CardTitle>
             <CardDescription>새로운 관리자 계정을 생성하세요</CardDescription>
@@ -145,6 +150,6 @@ export default function SignupPage() {
           </div>
         </CardContent>
       </Card>
-    </div>
+    </HStack>
   );
 }
