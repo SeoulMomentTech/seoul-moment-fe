@@ -4,7 +4,7 @@ import { Image as ImageIcon, X } from "lucide-react";
 
 import { uploadImageFile } from "@shared/utils/image";
 
-import { Button, Label } from "@seoul-moment/ui";
+import { Button, Flex, HStack, Label } from "@seoul-moment/ui";
 
 interface BannerModalProps {
   isOpen: boolean;
@@ -113,10 +113,10 @@ export function BannerModal({
     !mobileImageFile;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <HStack align="center" className="fixed inset-0 z-50">
       <div className="fixed inset-0 bg-black/50" onClick={handleClose} />
       <div className="relative z-10 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-white p-6 shadow-lg">
-        <div className="mb-4 flex items-center justify-between">
+        <HStack align="between" className="mb-4">
           <h2>{initialPcImageUrl ? "배너 수정" : "배너 등록"}</h2>
           <button
             className="rounded-sm opacity-70 hover:opacity-100"
@@ -125,7 +125,7 @@ export function BannerModal({
           >
             <X className="h-4 w-4" />
           </button>
-        </div>
+        </HStack>
         <p className="mb-6 text-sm text-gray-500">
           {initialPcImageUrl
             ? "배너 이미지를 수정합니다."
@@ -156,7 +156,7 @@ export function BannerModal({
           />
         </div>
 
-        <div className="flex justify-end gap-2">
+        <Flex gap={8} justify="flex-end">
           <Button onClick={handleClose} variant="outline">
             취소
           </Button>
@@ -167,9 +167,9 @@ export function BannerModal({
                 ? "수정"
                 : "등록"}
           </Button>
-        </div>
+        </Flex>
       </div>
-    </div>
+    </HStack>
   );
 }
 

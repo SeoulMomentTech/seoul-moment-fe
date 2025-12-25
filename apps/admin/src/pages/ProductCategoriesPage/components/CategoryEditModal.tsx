@@ -2,7 +2,7 @@ import type { ChangeEventHandler } from "react";
 
 import { X } from "lucide-react";
 
-import { Button, Input, Label } from "@seoul-moment/ui";
+import { Button, Flex, Input, Label, VStack } from "@seoul-moment/ui";
 
 interface CategoryEditModalProps {
   isOpen: boolean;
@@ -38,10 +38,10 @@ export function CategoryEditModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <VStack align="center" className="fixed inset-0 z-50">
       <div className="fixed inset-0 bg-black/50" onClick={onClose} />
       <div className="relative z-10 w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
-        <div className="mb-4 flex items-center justify-between">
+        <Flex align="center" className="mb-4" justify="space-between">
           <h2>카테고리 수정</h2>
           <button
             className="rounded-sm opacity-70 hover:opacity-100"
@@ -50,7 +50,7 @@ export function CategoryEditModal({
           >
             <X className="h-4 w-4" />
           </button>
-        </div>
+        </Flex>
         <p className="mb-4 text-sm text-gray-500">
           선택한 상품 카테고리의 이름을 수정합니다.
         </p>
@@ -83,15 +83,15 @@ export function CategoryEditModal({
             />
           </div>
         </div>
-        <div className="flex justify-end gap-2">
+        <Flex gap={8} justify="flex-end">
           <Button onClick={onClose} variant="outline">
             취소
           </Button>
           <Button disabled={disabled} onClick={onSubmit}>
             {isSubmitting ? "저장 중..." : "저장"}
           </Button>
-        </div>
+        </Flex>
       </div>
-    </div>
+    </VStack>
   );
 }

@@ -4,7 +4,7 @@ import { Plus } from "lucide-react";
 
 import { useDebounceValue } from "@shared/hooks/useDebounceValue";
 
-import { Button } from "@seoul-moment/ui";
+import { Button, HStack } from "@seoul-moment/ui";
 
 import { BrandFilters, BrandPagination, BrandTable } from "./components";
 import { useAdminBrandListQuery } from "./hooks";
@@ -12,7 +12,7 @@ import { useAdminBrandListQuery } from "./hooks";
 export function BrandsPage() {
   return (
     <div className="p-8 pt-24">
-      <div className="mb-6 flex items-center justify-between">
+      <HStack align="between" className="mb-6">
         <div>
           <h2 className="mb-2">브랜드 관리</h2>
           <p className="text-gray-600">브랜드를 등록하고 관리할 수 있습니다.</p>
@@ -21,7 +21,7 @@ export function BrandsPage() {
           <Plus className="h-4 w-4" />
           브랜드 추가 (준비 중)
         </Button>
-      </div>
+      </HStack>
 
       <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
         <BrandListContents />
