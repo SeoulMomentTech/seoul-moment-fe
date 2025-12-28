@@ -1,31 +1,21 @@
 import { useState, type KeyboardEvent } from "react";
 
-import { Search, ChevronLeft, ChevronRight, ArrowUpDown } from "lucide-react";
-
+import { Pagination } from "@shared/components/pagination";
 import {
-  Button,
-  Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@seoul-moment/ui";
+  DEFAULT_PAGE,
+  DEFAULT_PAGE_SIZE,
+  DEFAULT_SORT,
+} from "@shared/constants/page";
 
+import { ProductFilters, ProductTable } from "./components";
 import { useAdminProductItemListQuery } from "./hooks";
 
 export default function ProductsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchInput, setSearchInput] = useState("");
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [sort, setSort] = useState<"ASC" | "DESC">("DESC");
+  const [page, setPage] = useState(DEFAULT_PAGE);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [sort, setSort] = useState<"ASC" | "DESC">(DEFAULT_SORT);
   const { data, isLoading } = useAdminProductItemListQuery({
     page,
     count: pageSize,
@@ -54,7 +44,8 @@ export default function ProductsPage() {
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("ko-KR", {
       style: "currency",
-      currency: "KRW",
+      currency: "TWD",
+      maximumFractionDigits: 0,
     }).format(price);
   };
 
@@ -74,143 +65,40 @@ export default function ProductsPage() {
           <p className="text-sm text-gray-600">총 {total}개의 상품</p>
         </div>
 
-        <div className="border-b border-gray-200 bg-gray-50 p-4">
-          <div className="flex items-center gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
-              <Input
-                className="h-[40px] rounded-md bg-white pl-10"
-                onChange={(e) => setSearchInput(e.target.value)}
-                onKeyDown={handleSearchKeyPress}
-                placeholder="상품명으로 검색..."
-                value={searchInput}
-              />
-            </div>
-            <Button onClick={handleSearch}>
-              <Search className="mr-2 h-4 w-4" />
-              검색
-            </Button>
-            <Button onClick={toggleSort} variant="outline">
-              <ArrowUpDown className="mr-2 h-4 w-4" />
-              {sort === "ASC" ? "오름차순" : "내림차순"}
-            </Button>
-            <Select
-              onValueChange={(value) => {
-                setPageSize(Number(value));
-                setPage(1);
-              }}
-              value={pageSize.toString()}
-            >
-              <SelectTrigger className="w-32 bg-white">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="10">10개씩</SelectItem>
-                <SelectItem value="20">20개씩</SelectItem>
-                <SelectItem value="50">50개씩</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+        <ProductFilters
+          onPageSizeChange={(size) => {
+            setPageSize(size);
+            setPage(DEFAULT_PAGE);
+          }}
+          onSearch={handleSearch}
+          onSearchInputChange={setSearchInput}
+          onSearchKeyDown={handleSearchKeyPress}
+          onToggleSort={toggleSort}
+          pageSize={pageSize}
+          searchInput={searchInput}
+          sort={sort}
+        />
 
-        {isLoading ? (
-          <div className="flex items-center justify-center p-12">
-            <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900" />
-          </div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-20">ID</TableHead>
-                <TableHead>상품 ID</TableHead>
-                <TableHead>대표 이미지</TableHead>
-                <TableHead>색상 코드</TableHead>
-                <TableHead>가격</TableHead>
-                <TableHead>할인가</TableHead>
-                <TableHead>등록일</TableHead>
-                <TableHead>수정일</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {products.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    className="py-12 text-center text-gray-500"
-                    colSpan={8}
-                  >
-                    상품이 없습니다.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                products.map((product) => (
-                  <TableRow key={product.id}>
-                    <TableCell>{product.id}</TableCell>
-                    <TableCell>{product.productId}</TableCell>
-                    <TableCell>
-                      {product.imageUrl ? (
-                        <img
-                          alt={`product-${product.id}`}
-                          className="h-12 w-12 rounded-lg object-cover"
-                          src={product.imageUrl}
-                        />
-                      ) : (
-                        "-"
-                      )}
-                    </TableCell>
-                    <TableCell>{product.colorCode || "-"}</TableCell>
-                    <TableCell>
-                      <p>{formatPrice(product.price)}</p>
-                    </TableCell>
-                    <TableCell>
-                      {product.discountPrice
-                        ? formatPrice(product.discountPrice)
-                        : "-"}
-                    </TableCell>
-                    <TableCell className="text-sm text-gray-600">
-                      {new Date(product.createDate).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell className="text-sm text-gray-600">
-                      {new Date(product.updateDate).toLocaleDateString()}
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        )}
+        <ProductTable
+          formatPrice={formatPrice}
+          isLoading={isLoading}
+          products={products}
+        />
       </div>
 
-      <div className="flex items-center justify-between">
-        <div className="text-sm text-gray-600">
-          <p>현재 페이지: {products.length}개</p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Button
-            disabled={page === 1}
-            onClick={() => setPage(page - 1)}
-            size="sm"
-            variant="outline"
-          >
-            <ChevronLeft className="h-4 w-4" />
-            이전
-          </Button>
-          <div className="flex items-center gap-1">
-            <span className="text-sm text-gray-600">
-              {page} / {totalPages || 1}
-            </span>
-          </div>
-          <Button
-            disabled={page >= totalPages}
-            onClick={() => setPage(page + 1)}
-            size="sm"
-            variant="outline"
-          >
-            다음
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
+      <Pagination
+        countOnPage={products.length}
+        disableNext={page >= totalPages}
+        disablePrev={page === 1}
+        onNext={() => {
+          setPage((current) => (current >= totalPages ? current : current + 1));
+        }}
+        onPrev={() => {
+          setPage((current) => Math.max(1, current - 1));
+        }}
+        page={page}
+        totalPages={totalPages}
+      />
     </div>
   );
 }
