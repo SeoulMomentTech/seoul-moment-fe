@@ -22,7 +22,7 @@ type AdminProductCategoryQueryOptions = Omit<
 >;
 
 export const useAdminProductCategoryQuery = (
-  productCategoryId: ProductCategoryId | number,
+  productCategoryId: ProductCategoryId,
   options?: AdminProductCategoryQueryOptions,
 ) =>
   useQuery({
