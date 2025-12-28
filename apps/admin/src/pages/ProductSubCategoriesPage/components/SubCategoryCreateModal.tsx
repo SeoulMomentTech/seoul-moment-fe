@@ -1,8 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { X } from "lucide-react";
 
 import { useForm, type SubmitHandler } from "react-hook-form";
+
+import { ImageUploader } from "@/shared/components/image-uploader";
+import { uploadImageFile } from "@/shared/utils/image";
 
 import { Button, Input, Label, VStack } from "@seoul-moment/ui";
 
@@ -27,24 +30,36 @@ export function SubCategoryCreateModal({
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors, isValid },
   } = useForm<SubCategoryFormValues>({
     defaultValues,
     mode: "onChange",
   });
+  const [imagePreview, setImagePreview] = useState(defaultValues.imageUrl);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   useEffect(() => {
     reset(defaultValues);
-  }, [defaultValues, reset]);
+    setImagePreview(defaultValues.imageUrl);
+    setValue("imageUrl", defaultValues.imageUrl ?? "", {
+      shouldValidate: true,
+    });
+  }, [defaultValues, reset, setValue]);
 
   const handleClose = () => {
     reset(defaultValues);
+    setImagePreview(defaultValues.imageUrl);
     onClose();
   };
 
   const onValid: SubmitHandler<SubCategoryFormValues> = async (values) => {
-    await onSubmit(values);
+    await onSubmit({
+      ...values,
+      imageUrl: values.imageUrl.trim(),
+    });
     reset(defaultValues);
+    setImagePreview(defaultValues.imageUrl);
   };
 
   if (!isOpen) return null;
@@ -129,11 +144,41 @@ export function SubCategoryCreateModal({
           </div>
           <div className="space-y-2">
             <Label htmlFor="subcategoryImageUrl">이미지 URL *</Label>
-            <Input
-              className="h-[40px] rounded-md bg-white"
+            <ImageUploader
+              id="subcategoryImage"
+              label="서브 카테고리 이미지"
+              onChange={async (e) => {
+                if (isUploadingImage || isSubmitting) return;
+                const file = e.target.files?.[0];
+                if (!file) return;
+                setIsUploadingImage(true);
+                setImagePreview(URL.createObjectURL(file));
+                try {
+                  const uploadedPath = await uploadImageFile(
+                    file,
+                    "product-category",
+                  );
+                  setValue("imageUrl", uploadedPath, { shouldValidate: true });
+                } catch (error) {
+                  console.error("이미지 업로드 오류:", error);
+                  alert("이미지 업로드 중 오류가 발생했습니다.");
+                  setImagePreview(defaultValues.imageUrl);
+                } finally {
+                  setIsUploadingImage(false);
+                }
+              }}
+              onClear={() => {
+                if (isUploadingImage || isSubmitting) return;
+                setImagePreview("");
+                setValue("imageUrl", "", { shouldValidate: true });
+              }}
+              preview={imagePreview}
+            />
+            <input
+              className="hidden"
               id="subcategoryImageUrl"
-              placeholder="예: https://example.com/image.png"
               {...register("imageUrl", { required: true })}
+              type="text"
             />
             {errors.imageUrl ? (
               <p className="text-sm text-red-500">이미지 URL을 입력해주세요.</p>

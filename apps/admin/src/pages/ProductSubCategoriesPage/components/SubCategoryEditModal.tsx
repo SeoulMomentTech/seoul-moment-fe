@@ -1,9 +1,12 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { X } from "lucide-react";
 
 import type { ProductCategoryId } from "@shared/services/productCategory";
 import { useForm, type SubmitHandler } from "react-hook-form";
+
+import { ImageUploader } from "@/shared/components/image-uploader";
+import { uploadImageFile } from "@/shared/utils/image";
 
 import { Button, Input, Label, VStack } from "@seoul-moment/ui";
 
@@ -49,23 +52,35 @@ export function SubCategoryEditModal({
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors, isValid },
   } = useForm<SubCategoryFormValues>({
     defaultValues: resolvedValues,
     mode: "onChange",
   });
+  const [imagePreview, setImagePreview] = useState(resolvedValues.imageUrl);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   useEffect(() => {
     reset(resolvedValues);
-  }, [resolvedValues, reset]);
+    setImagePreview(resolvedValues.imageUrl);
+    setValue("imageUrl", resolvedValues.imageUrl ?? "", {
+      shouldValidate: true,
+    });
+  }, [resolvedValues, reset, setValue]);
 
   const onValid: SubmitHandler<SubCategoryFormValues> = async (values) => {
-    await onSubmit(values);
+    await onSubmit({
+      ...values,
+      imageUrl: values.imageUrl.trim(),
+    });
     reset(resolvedValues);
+    setImagePreview(resolvedValues.imageUrl);
   };
 
   const handleClose = () => {
     reset(resolvedValues);
+    setImagePreview(resolvedValues.imageUrl);
     onClose();
   };
 
@@ -156,13 +171,42 @@ export function SubCategoryEditModal({
             ) : null}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="editSubcategoryImageUrl">이미지 URL</Label>
-            <Input
-              className="h-[40px] rounded-md bg-white"
-              disabled={isSubmitting}
+            <Label htmlFor="editSubcategoryImageUrl">이미지</Label>
+            <ImageUploader
+              id="editSubcategoryImage"
+              label="서브 카테고리 이미지"
+              onChange={async (e) => {
+                if (isSubmitting || isUploadingImage) return;
+                const file = e.target.files?.[0];
+                if (!file) return;
+                setIsUploadingImage(true);
+                setImagePreview(URL.createObjectURL(file));
+                try {
+                  const uploadedPath = await uploadImageFile(
+                    file,
+                    "product-category",
+                  );
+                  setValue("imageUrl", uploadedPath, { shouldValidate: true });
+                } catch (error) {
+                  console.error("이미지 업로드 오류:", error);
+                  alert("이미지 업로드 중 오류가 발생했습니다.");
+                  setImagePreview(resolvedValues.imageUrl);
+                } finally {
+                  setIsUploadingImage(false);
+                }
+              }}
+              onClear={() => {
+                if (isSubmitting || isUploadingImage) return;
+                setImagePreview("");
+                setValue("imageUrl", "", { shouldValidate: true });
+              }}
+              preview={imagePreview}
+            />
+            <input
+              className="hidden"
               id="editSubcategoryImageUrl"
-              placeholder="예: https://example.com/image.png"
               {...register("imageUrl")}
+              type="text"
             />
           </div>
         </div>
