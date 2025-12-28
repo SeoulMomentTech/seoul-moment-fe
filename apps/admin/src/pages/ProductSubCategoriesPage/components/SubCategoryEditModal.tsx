@@ -47,12 +47,13 @@ export function SubCategoryEditModal({
       <div className="relative z-10 w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
         <div className="mb-4 flex items-center justify-between">
           <h2>서브 카테고리 수정</h2>
-          <Button
+          <button
             className="rounded-sm opacity-70 hover:opacity-100"
             onClick={onClose}
+            type="button"
           >
             <X className="h-4 w-4" />
-          </Button>
+          </button>
         </div>
         <p className="mb-4 text-sm text-gray-500">
           선택한 서브 카테고리 정보를 수정합니다.
@@ -63,6 +64,7 @@ export function SubCategoryEditModal({
               서브 카테고리 이름(한국어) *
             </Label>
             <Input
+              className="h-[40px] rounded-md bg-white"
               disabled={disableActions}
               id="editSubcategoryNameKo"
               onChange={(e) => onChangeKo(e.target.value)}
@@ -75,6 +77,7 @@ export function SubCategoryEditModal({
               서브 카테고리 이름(영어)
             </Label>
             <Input
+              className="h-[40px] rounded-md bg-white"
               disabled={disableActions}
               id="editSubcategoryNameEn"
               onChange={(e) => onChangeEn(e.target.value)}
@@ -87,6 +90,7 @@ export function SubCategoryEditModal({
               서브 카테고리 이름(중국어)
             </Label>
             <Input
+              className="h-[40px] rounded-md bg-white"
               disabled={disableActions}
               id="editSubcategoryNameZh"
               onChange={(e) => onChangeZh(e.target.value)}
@@ -97,6 +101,7 @@ export function SubCategoryEditModal({
           <div className="space-y-2">
             <Label htmlFor="editParentCategoryId">상위 카테고리 ID *</Label>
             <Input
+              className="h-[40px] rounded-md bg-white"
               disabled={disableActions}
               id="editParentCategoryId"
               inputMode="numeric"
@@ -110,6 +115,7 @@ export function SubCategoryEditModal({
           <div className="space-y-2">
             <Label htmlFor="editSubcategoryImageUrl">이미지 URL *</Label>
             <Input
+              className="h-[40px] rounded-md bg-white"
               disabled={disableActions}
               id="editSubcategoryImageUrl"
               onChange={(e) => onChangeImageUrl(e.target.value)}

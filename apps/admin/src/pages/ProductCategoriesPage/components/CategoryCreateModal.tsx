@@ -58,6 +58,7 @@ export function CategoryCreateModal({
           <div className="space-y-2">
             <Label htmlFor="categoryNameKo">카테고리 이름(한국어)</Label>
             <Input
+              className="h-[40px] rounded-md bg-white"
               id="categoryNameKo"
               onChange={onChangeKo}
               placeholder="예: 전자기기"
@@ -67,6 +68,7 @@ export function CategoryCreateModal({
           <div className="space-y-2">
             <Label htmlFor="categoryNameEn">카테고리 이름(영어)</Label>
             <Input
+              className="h-[40px] rounded-md bg-white"
               id="categoryNameEn"
               onChange={onChangeEn}
               placeholder="예: Electronics"
@@ -76,6 +78,7 @@ export function CategoryCreateModal({
           <div className="space-y-2">
             <Label htmlFor="categoryNameZh">카테고리 이름(중국어)</Label>
             <Input
+              className="h-[40px] rounded-md bg-white"
               id="categoryNameZh"
               onChange={onChangeZh}
               placeholder="예: 电子产品"
