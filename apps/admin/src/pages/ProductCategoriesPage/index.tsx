@@ -1,5 +1,6 @@
 import { useState, type KeyboardEvent } from "react";
 
+import { Pagination } from "@shared/components/pagination";
 import type { AdminCategory, CategoryId } from "@shared/services/category";
 
 import {
@@ -7,7 +8,6 @@ import {
   CategoryEditModal,
   CategoryFilters,
   CategoryHeader,
-  CategoryPagination,
   CategoryTable,
 } from "./components";
 import {
@@ -210,7 +210,7 @@ export default function ProductCategoriesPage() {
         />
       </div>
 
-      <CategoryPagination
+      <Pagination
         countOnPage={categories.length}
         disableNext={page >= totalPages}
         disablePrev={page === 1}

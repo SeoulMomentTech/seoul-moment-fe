@@ -1,5 +1,6 @@
 import { useState, type KeyboardEvent } from "react";
 
+import { Pagination } from "@shared/components/pagination";
 import type {
   AdminProductCategoryListItem,
   ProductCategoryId,
@@ -10,7 +11,6 @@ import {
   SubCategoryEditModal,
   SubCategoryFilters,
   SubCategoryHeader,
-  SubCategoryPagination,
   SubCategoryTable,
 } from "./components";
 import {
@@ -269,7 +269,7 @@ export default function ProductSubcategoriesPage() {
         />
       </div>
 
-      <SubCategoryPagination
+      <Pagination
         countOnPage={subcategories.length}
         disableNext={page >= totalPages}
         disablePrev={page === 1}

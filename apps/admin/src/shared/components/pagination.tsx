@@ -2,7 +2,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { Button, HStack } from "@seoul-moment/ui";
 
-interface CategoryPaginationProps {
+interface PaginationProps {
   page: number;
   totalPages: number;
   countOnPage: number;
@@ -12,7 +12,7 @@ interface CategoryPaginationProps {
   disableNext: boolean;
 }
 
-export function CategoryPagination({
+export function Pagination({
   page,
   totalPages,
   countOnPage,
@@ -20,7 +20,7 @@ export function CategoryPagination({
   onNext,
   disablePrev,
   disableNext,
-}: CategoryPaginationProps) {
+}: PaginationProps) {
   const displayTotalPages = totalPages || 1;
 
   return (
