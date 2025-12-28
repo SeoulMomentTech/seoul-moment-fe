@@ -7,6 +7,8 @@ import {
   DEFAULT_SORT,
 } from "@shared/constants/page";
 
+import { PageHeader } from "@/shared/components/page-header";
+
 import { ProductFilters, ProductTable } from "./components";
 import { useAdminProductItemListQuery } from "./hooks";
 
@@ -53,13 +55,7 @@ export default function ProductsPage() {
 
   return (
     <div className="p-8 pt-24">
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="mb-2">전체 상품</h1>
-          <p className="text-gray-600">등록된 상품을 조회하세요.</p>
-        </div>
-      </div>
-
+      <PageHeader description="등록된 상품을 조회하세요." title="전체 상품" />
       <div className="mb-6 rounded-lg border border-gray-200 bg-white">
         <div className="border-b border-gray-200 px-6 py-4">
           <p className="text-sm text-gray-600">총 {total}개의 상품</p>
