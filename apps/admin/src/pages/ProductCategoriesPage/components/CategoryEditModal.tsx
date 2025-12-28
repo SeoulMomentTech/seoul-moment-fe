@@ -1,20 +1,19 @@
-import type { ChangeEventHandler } from "react";
+import { useEffect } from "react";
 
 import { X } from "lucide-react";
 
+import { useForm, type SubmitHandler } from "react-hook-form";
+
 import { Button, Flex, Input, Label, VStack } from "@seoul-moment/ui";
+
+import type { CategoryNames } from "../utils";
 
 interface CategoryEditModalProps {
   isOpen: boolean;
+  defaultValues: CategoryNames;
   onClose(): void;
-  onSubmit(): void | Promise<void>;
+  onSubmit(values: CategoryNames): void | Promise<void>;
   isSubmitting?: boolean;
-  editCategoryNameKo: string;
-  editCategoryNameEn: string;
-  editCategoryNameZh: string;
-  onChangeKo: ChangeEventHandler<HTMLInputElement>;
-  onChangeEn: ChangeEventHandler<HTMLInputElement>;
-  onChangeZh: ChangeEventHandler<HTMLInputElement>;
 }
 
 export function CategoryEditModal({
@@ -22,30 +21,48 @@ export function CategoryEditModal({
   onClose,
   onSubmit,
   isSubmitting,
-  editCategoryNameKo,
-  editCategoryNameEn,
-  editCategoryNameZh,
-  onChangeKo,
-  onChangeEn,
-  onChangeZh,
+  defaultValues,
 }: CategoryEditModalProps) {
-  const disabled =
-    isSubmitting ||
-    editCategoryNameKo.length === 0 ||
-    editCategoryNameEn.length === 0 ||
-    editCategoryNameZh.length === 0;
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { isValid, errors },
+  } = useForm<CategoryNames>({
+    defaultValues,
+    mode: "onChange",
+  });
+
+  useEffect(() => {
+    reset(defaultValues);
+  }, [defaultValues, reset]);
+
+  const handleClose = () => {
+    reset(defaultValues);
+    onClose();
+  };
+
+  const onValid: SubmitHandler<CategoryNames> = async (values) => {
+    await onSubmit(values);
+    reset(defaultValues);
+  };
 
   if (!isOpen) return null;
 
   return (
-    <VStack align="center" className="fixed inset-0 z-50">
-      <div className="fixed inset-0 bg-black/50" onClick={onClose} />
+    <VStack
+      align="center"
+      as="form"
+      className="fixed inset-0 z-50"
+      onSubmit={handleSubmit(onValid)}
+    >
+      <div className="fixed inset-0 bg-black/50" onClick={handleClose} />
       <div className="relative z-10 w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
         <Flex align="center" className="mb-4" justify="space-between">
           <h2>카테고리 수정</h2>
           <button
             className="rounded-sm opacity-70 hover:opacity-100"
-            onClick={onClose}
+            onClick={handleClose}
             type="button"
           >
             <X className="h-4 w-4" />
@@ -60,37 +77,47 @@ export function CategoryEditModal({
             <Input
               className="h-[40px] rounded-md bg-white"
               id="editCategoryNameKo"
-              onChange={onChangeKo}
               placeholder="예: 전자기기"
-              value={editCategoryNameKo}
+              {...register("ko", { required: true })}
             />
+            {errors.ko ? (
+              <p className="text-sm text-red-500">
+                한국어 이름을 입력해주세요.
+              </p>
+            ) : null}
           </div>
           <div className="space-y-2">
             <Label htmlFor="editCategoryNameEn">카테고리 이름(영어)</Label>
             <Input
               className="h-[40px] rounded-md bg-white"
               id="editCategoryNameEn"
-              onChange={onChangeEn}
               placeholder="예: Electronics"
-              value={editCategoryNameEn}
+              {...register("en", { required: true })}
             />
+            {errors.en ? (
+              <p className="text-sm text-red-500">영어 이름을 입력해주세요.</p>
+            ) : null}
           </div>
           <div className="space-y-2">
             <Label htmlFor="editCategoryNameZh">카테고리 이름(중국어)</Label>
             <Input
               className="h-[40px] rounded-md bg-white"
               id="editCategoryNameZh"
-              onChange={onChangeZh}
               placeholder="예: 电子产品"
-              value={editCategoryNameZh}
+              {...register("zh", { required: true })}
             />
+            {errors.zh ? (
+              <p className="text-sm text-red-500">
+                중국어 이름을 입력해주세요.
+              </p>
+            ) : null}
           </div>
         </div>
         <Flex gap={8} justify="flex-end">
-          <Button onClick={onClose} variant="outline">
+          <Button onClick={handleClose} type="button" variant="outline">
             취소
           </Button>
-          <Button disabled={disabled} onClick={onSubmit}>
+          <Button disabled={isSubmitting || !isValid} type="submit">
             {isSubmitting ? "저장 중..." : "저장"}
           </Button>
         </Flex>

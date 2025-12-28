@@ -1,51 +1,68 @@
+import { useEffect } from "react";
+
 import { X } from "lucide-react";
 
-import { Button, Input, Label } from "@seoul-moment/ui";
+import { useForm, type SubmitHandler } from "react-hook-form";
+
+import { Button, Input, Label, VStack } from "@seoul-moment/ui";
+
+import type { SubCategoryFormValues } from "../utils";
 
 interface SubCategoryCreateModalProps {
   isOpen: boolean;
-  isSubmitting: boolean;
-  newSubcategoryNameKo: string;
-  newSubcategoryNameEn: string;
-  newSubcategoryNameZh: string;
-  newCategoryId: number | "";
-  newImageUrl: string;
-  onChangeKo(value: string): void;
-  onChangeEn(value: string): void;
-  onChangeZh(value: string): void;
-  onChangeCategoryId(value: number | ""): void;
-  onChangeImageUrl(value: string): void;
+  defaultValues: SubCategoryFormValues;
   onClose(): void;
-  onSubmit(): void;
+  onSubmit(values: SubCategoryFormValues): void | Promise<void>;
+  isSubmitting?: boolean;
 }
 
 export function SubCategoryCreateModal({
   isOpen,
-  isSubmitting,
-  newSubcategoryNameKo,
-  newSubcategoryNameEn,
-  newSubcategoryNameZh,
-  newCategoryId,
-  newImageUrl,
-  onChangeKo,
-  onChangeEn,
-  onChangeZh,
-  onChangeCategoryId,
-  onChangeImageUrl,
+  defaultValues,
   onClose,
   onSubmit,
+  isSubmitting,
 }: SubCategoryCreateModalProps) {
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isValid },
+  } = useForm<SubCategoryFormValues>({
+    defaultValues,
+    mode: "onChange",
+  });
+
+  useEffect(() => {
+    reset(defaultValues);
+  }, [defaultValues, reset]);
+
+  const handleClose = () => {
+    reset(defaultValues);
+    onClose();
+  };
+
+  const onValid: SubmitHandler<SubCategoryFormValues> = async (values) => {
+    await onSubmit(values);
+    reset(defaultValues);
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="fixed inset-0 bg-black/50" onClick={onClose} />
+    <VStack
+      align="center"
+      as="form"
+      className="fixed inset-0 z-50"
+      onSubmit={handleSubmit(onValid)}
+    >
+      <div className="fixed inset-0 bg-black/50" onClick={handleClose} />
       <div className="relative z-10 w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
         <div className="mb-4 flex items-center justify-between">
           <h2>새 서브 카테고리 추가</h2>
           <button
             className="rounded-sm opacity-70 hover:opacity-100"
-            onClick={onClose}
+            onClick={handleClose}
             type="button"
           >
             <X className="h-4 w-4" />
@@ -62,19 +79,22 @@ export function SubCategoryCreateModal({
             <Input
               className="h-[40px] rounded-md bg-white"
               id="subcategoryNameKo"
-              onChange={(e) => onChangeKo(e.target.value)}
               placeholder="예: 남성의류"
-              value={newSubcategoryNameKo}
+              {...register("ko", { required: true })}
             />
+            {errors.ko ? (
+              <p className="text-sm text-red-500">
+                한국어 이름을 입력해주세요.
+              </p>
+            ) : null}
           </div>
           <div className="space-y-2">
             <Label htmlFor="subcategoryNameEn">서브 카테고리 이름(영어)</Label>
             <Input
               className="h-[40px] rounded-md bg-white"
               id="subcategoryNameEn"
-              onChange={(e) => onChangeEn(e.target.value)}
               placeholder="예: Men's Clothing"
-              value={newSubcategoryNameEn}
+              {...register("en")}
             />
           </div>
           <div className="space-y-2">
@@ -84,9 +104,8 @@ export function SubCategoryCreateModal({
             <Input
               className="h-[40px] rounded-md bg-white"
               id="subcategoryNameZh"
-              onChange={(e) => onChangeZh(e.target.value)}
               placeholder="예: 男装"
-              value={newSubcategoryNameZh}
+              {...register("zh")}
             />
           </div>
           <div className="space-y-2">
@@ -95,33 +114,41 @@ export function SubCategoryCreateModal({
               className="h-[40px] rounded-md bg-white"
               id="parentCategoryId"
               inputMode="numeric"
-              onChange={(e) =>
-                onChangeCategoryId(e.target.value ? Number(e.target.value) : "")
-              }
               placeholder="예: 1"
-              value={newCategoryId}
+              {...register("categoryId", {
+                required: true,
+                min: 1,
+                setValueAs: (value) => (value === "" ? "" : Number(value)),
+              })}
             />
+            {errors.categoryId ? (
+              <p className="text-sm text-red-500">
+                상위 카테고리 ID를 입력해주세요.
+              </p>
+            ) : null}
           </div>
           <div className="space-y-2">
             <Label htmlFor="subcategoryImageUrl">이미지 URL *</Label>
             <Input
               className="h-[40px] rounded-md bg-white"
               id="subcategoryImageUrl"
-              onChange={(e) => onChangeImageUrl(e.target.value)}
               placeholder="예: https://example.com/image.png"
-              value={newImageUrl}
+              {...register("imageUrl", { required: true })}
             />
+            {errors.imageUrl ? (
+              <p className="text-sm text-red-500">이미지 URL을 입력해주세요.</p>
+            ) : null}
           </div>
         </div>
         <div className="flex justify-end gap-2">
-          <Button onClick={onClose} variant="outline">
+          <Button onClick={handleClose} type="button" variant="outline">
             취소
           </Button>
-          <Button disabled={isSubmitting} onClick={onSubmit}>
+          <Button disabled={isSubmitting || !isValid} type="submit">
             {isSubmitting ? "추가 중..." : "추가"}
           </Button>
         </div>
       </div>
-    </div>
+    </VStack>
   );
 }

@@ -1,53 +1,90 @@
+import { useEffect, useMemo } from "react";
+
 import { X } from "lucide-react";
 
-import { Button, Input, Label } from "@seoul-moment/ui";
+import type { ProductCategoryId } from "@shared/services/productCategory";
+import { useForm, type SubmitHandler } from "react-hook-form";
+
+import { Button, Input, Label, VStack } from "@seoul-moment/ui";
+
+import { useAdminProductCategoryQuery } from "../hooks";
+import { toSubCategoryFormValues, type SubCategoryFormValues } from "../utils";
 
 interface SubCategoryEditModalProps {
   isOpen: boolean;
-  isSubmitting: boolean;
-  editSubcategoryNameKo: string;
-  editSubcategoryNameEn: string;
-  editSubcategoryNameZh: string;
-  editCategoryId: number | "";
-  editImageUrl: string;
-  onChangeKo(value: string): void;
-  onChangeEn(value: string): void;
-  onChangeZh(value: string): void;
-  onChangeCategoryId(value: number | ""): void;
-  onChangeImageUrl(value: string): void;
+  productCategoryId: ProductCategoryId | null;
+  defaultValues: SubCategoryFormValues;
   onClose(): void;
-  onSubmit(): void;
+  onSubmit(values: SubCategoryFormValues): void | Promise<void>;
+  isSubmitting?: boolean;
 }
 
 export function SubCategoryEditModal({
   isOpen,
-  isSubmitting,
-  editSubcategoryNameKo,
-  editSubcategoryNameEn,
-  editSubcategoryNameZh,
-  editCategoryId,
-  editImageUrl,
-  onChangeKo,
-  onChangeEn,
-  onChangeZh,
-  onChangeCategoryId,
-  onChangeImageUrl,
+  productCategoryId,
+  defaultValues,
   onClose,
   onSubmit,
+  isSubmitting,
 }: SubCategoryEditModalProps) {
+  const { data } = useAdminProductCategoryQuery(
+    (productCategoryId ?? 0) as ProductCategoryId,
+    {
+      enabled: isOpen && Boolean(productCategoryId),
+    },
+  );
+
+  const resolvedValues = useMemo(() => {
+    if (!data?.data) return defaultValues;
+
+    const { categoryId, imageUrl } = toSubCategoryFormValues(data.data);
+
+    return {
+      ...defaultValues,
+      categoryId,
+      imageUrl,
+    };
+  }, [data?.data, defaultValues]);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isValid },
+  } = useForm<SubCategoryFormValues>({
+    defaultValues: resolvedValues,
+    mode: "onChange",
+  });
+
+  useEffect(() => {
+    reset(resolvedValues);
+  }, [resolvedValues, reset]);
+
+  const onValid: SubmitHandler<SubCategoryFormValues> = async (values) => {
+    await onSubmit(values);
+    reset(resolvedValues);
+  };
+
+  const handleClose = () => {
+    reset(resolvedValues);
+    onClose();
+  };
+
   if (!isOpen) return null;
 
-  const disableActions = isSubmitting;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="fixed inset-0 bg-black/50" onClick={onClose} />
+    <VStack
+      align="center"
+      as="form"
+      className="fixed inset-0 z-50"
+      onSubmit={handleSubmit(onValid)}
+    >
+      <div className="fixed inset-0 bg-black/50" onClick={handleClose} />
       <div className="relative z-10 w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
         <div className="mb-4 flex items-center justify-between">
           <h2>서브 카테고리 수정</h2>
           <button
             className="rounded-sm opacity-70 hover:opacity-100"
-            onClick={onClose}
+            onClick={handleClose}
             type="button"
           >
             <X className="h-4 w-4" />
@@ -63,12 +100,16 @@ export function SubCategoryEditModal({
             </Label>
             <Input
               className="h-[40px] rounded-md bg-white"
-              disabled={disableActions}
+              disabled={isSubmitting}
               id="editSubcategoryNameKo"
-              onChange={(e) => onChangeKo(e.target.value)}
               placeholder="예: 남성의류"
-              value={editSubcategoryNameKo}
+              {...register("ko", { required: true })}
             />
+            {errors.ko ? (
+              <p className="text-sm text-red-500">
+                한국어 이름을 입력해주세요.
+              </p>
+            ) : null}
           </div>
           <div className="space-y-2">
             <Label htmlFor="editSubcategoryNameEn">
@@ -76,11 +117,10 @@ export function SubCategoryEditModal({
             </Label>
             <Input
               className="h-[40px] rounded-md bg-white"
-              disabled={disableActions}
+              disabled={isSubmitting}
               id="editSubcategoryNameEn"
-              onChange={(e) => onChangeEn(e.target.value)}
               placeholder="예: Men's Clothing"
-              value={editSubcategoryNameEn}
+              {...register("en")}
             />
           </div>
           <div className="space-y-2">
@@ -89,48 +129,52 @@ export function SubCategoryEditModal({
             </Label>
             <Input
               className="h-[40px] rounded-md bg-white"
-              disabled={disableActions}
+              disabled={isSubmitting}
               id="editSubcategoryNameZh"
-              onChange={(e) => onChangeZh(e.target.value)}
               placeholder="예: 男装"
-              value={editSubcategoryNameZh}
+              {...register("zh")}
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="editParentCategoryId">상위 카테고리 ID *</Label>
             <Input
               className="h-[40px] rounded-md bg-white"
-              disabled={disableActions}
+              disabled={isSubmitting}
               id="editParentCategoryId"
               inputMode="numeric"
-              onChange={(e) =>
-                onChangeCategoryId(e.target.value ? Number(e.target.value) : "")
-              }
               placeholder="예: 1"
-              value={editCategoryId}
+              {...register("categoryId", {
+                required: true,
+                min: 1,
+                setValueAs: (value) => (value === "" ? "" : Number(value)),
+              })}
             />
+            {errors.categoryId ? (
+              <p className="text-sm text-red-500">
+                상위 카테고리 ID를 입력해주세요.
+              </p>
+            ) : null}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="editSubcategoryImageUrl">이미지 URL *</Label>
+            <Label htmlFor="editSubcategoryImageUrl">이미지 URL</Label>
             <Input
               className="h-[40px] rounded-md bg-white"
-              disabled={disableActions}
+              disabled={isSubmitting}
               id="editSubcategoryImageUrl"
-              onChange={(e) => onChangeImageUrl(e.target.value)}
               placeholder="예: https://example.com/image.png"
-              value={editImageUrl}
+              {...register("imageUrl")}
             />
           </div>
         </div>
         <div className="flex justify-end gap-2">
-          <Button onClick={onClose} variant="outline">
+          <Button onClick={handleClose} type="button" variant="outline">
             취소
           </Button>
-          <Button disabled={disableActions} onClick={onSubmit}>
+          <Button disabled={isSubmitting || !isValid} type="submit">
             {isSubmitting ? "수정 중..." : "수정"}
           </Button>
         </div>
       </div>
-    </div>
+    </VStack>
   );
 }
