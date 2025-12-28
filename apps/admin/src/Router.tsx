@@ -96,7 +96,14 @@ const privateRoutes: RouteObject[] = [
   },
 ];
 
-const router = createBrowserRouter([...publicRoutes, ...privateRoutes]);
+const router = createBrowserRouter([
+  ...publicRoutes,
+  ...privateRoutes,
+  {
+    path: "*",
+    element: <Navigate replace to={PATH.INDEX} />,
+  },
+]);
 
 const Router = () => {
   return <RouterProvider router={router} />;
