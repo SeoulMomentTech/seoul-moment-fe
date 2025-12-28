@@ -1,4 +1,4 @@
-import { useState, type KeyboardEvent } from "react";
+import { useMemo, useState, type KeyboardEvent } from "react";
 
 import { Pagination } from "@shared/components/pagination";
 import type {
@@ -19,22 +19,20 @@ import {
   useDeleteAdminProductCategoryMutation,
   useUpdateAdminProductCategoryMutation,
 } from "./hooks";
+import {
+  EMPTY_SUBCATEGORY_FORM,
+  toNamePayload,
+  toSubCategoryFormValues,
+  type SubCategoryFormValues,
+} from "./utils";
 
 export default function ProductSubcategoriesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [newSubcategoryNameKo, setNewSubcategoryNameKo] = useState("");
-  const [newSubcategoryNameEn, setNewSubcategoryNameEn] = useState("");
-  const [newSubcategoryNameZh, setNewSubcategoryNameZh] = useState("");
-  const [newImageUrl, setNewImageUrl] = useState("");
-  const [newCategoryId, setNewCategoryId] = useState<number | "">("");
-  const [editSubcategoryNameKo, setEditSubcategoryNameKo] = useState("");
-  const [editSubcategoryNameEn, setEditSubcategoryNameEn] = useState("");
-  const [editSubcategoryNameZh, setEditSubcategoryNameZh] = useState("");
-  const [editImageUrl, setEditImageUrl] = useState("");
-  const [editCategoryId, setEditCategoryId] = useState<number | "">("");
+  const [editingSubcategory, setEditingSubcategory] =
+    useState<AdminProductCategoryListItem | null>(null);
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -71,49 +69,14 @@ export default function ProductSubcategoriesPage() {
     }
   };
 
-  const toNamePayload = (ko: string, en: string, zh: string) =>
-    [
-      { code: "ko", value: ko },
-      { code: "en", value: en },
-      { code: "zh-TW", value: zh },
-    ]
-      .filter(({ value }) => value.trim())
-      .map(({ code, value }) => ({
-        languageId: code === "ko" ? 1 : code === "en" ? 2 : 3,
-        name: value.trim(),
-      }));
-
-  const handleAddSubcategory = async () => {
-    if (!newSubcategoryNameKo.trim()) {
-      alert("서브카테고리 이름(한국어)을 입력해주세요.");
-      return;
-    }
-
-    if (!newCategoryId) {
-      alert("상위 카테고리 ID를 입력해주세요.");
-      return;
-    }
-
-    if (!newImageUrl.trim()) {
-      alert("이미지 URL을 입력해주세요.");
-      return;
-    }
-
+  const handleAddSubcategory = async (values: SubCategoryFormValues) => {
+    if (!values.categoryId) return;
     try {
       await createSubcategory({
-        list: toNamePayload(
-          newSubcategoryNameKo,
-          newSubcategoryNameEn,
-          newSubcategoryNameZh,
-        ),
-        categoryId: Number(newCategoryId),
-        imageUrl: newImageUrl.trim(),
+        list: toNamePayload(values),
+        categoryId: Number(values.categoryId),
+        imageUrl: values.imageUrl.trim(),
       });
-      setNewSubcategoryNameKo("");
-      setNewSubcategoryNameEn("");
-      setNewSubcategoryNameZh("");
-      setNewImageUrl("");
-      setNewCategoryId("");
       setIsModalOpen(false);
       setPage(1);
     } catch (error) {
@@ -122,60 +85,24 @@ export default function ProductSubcategoriesPage() {
     }
   };
 
-  const getNameFromDto = (
-    subcategory: Pick<AdminProductCategoryListItem, "nameDto">,
-    languageCode: string,
-  ) =>
-    subcategory.nameDto.find((n) => n.languageCode === languageCode)?.name ??
-    "";
-
   const resetEditState = () => {
     setIsEditModalOpen(false);
-    setEditSubcategoryNameKo("");
-    setEditSubcategoryNameEn("");
-    setEditSubcategoryNameZh("");
-    setEditImageUrl("");
-    setEditCategoryId("");
+    setEditingSubcategory(null);
   };
 
   const openEditModal = (subcategory: AdminProductCategoryListItem) => {
-    setEditCategoryId(subcategory.id);
-    setEditSubcategoryNameKo(getNameFromDto(subcategory, "ko"));
-    setEditSubcategoryNameEn(getNameFromDto(subcategory, "en"));
-    setEditSubcategoryNameZh(getNameFromDto(subcategory, "zh-TW"));
-    setEditImageUrl(subcategory.imageUrl);
+    setEditingSubcategory(subcategory);
     setIsEditModalOpen(true);
   };
 
-  const handleUpdateSubcategory = async () => {
-    if (!editCategoryId) return;
-
-    if (!editSubcategoryNameKo.trim()) {
-      alert("서브카테고리 이름(한국어)을 입력해주세요.");
-      return;
-    }
-
-    if (!editCategoryId) {
-      alert("상위 카테고리 ID를 입력해주세요.");
-      return;
-    }
-
-    // todo: image upload
-    //if (!editImageUrl.trim()) {
-    //  alert("이미지 URL을 입력해주세요.");
-    //  return;
-    //}
-
+  const handleUpdateSubcategory = async (values: SubCategoryFormValues) => {
+    if (!editingSubcategory || !values.categoryId) return;
     try {
       await updateSubcategory({
-        productCategoryId: editCategoryId as ProductCategoryId,
+        productCategoryId: editingSubcategory.id as ProductCategoryId,
         payload: {
-          list: toNamePayload(
-            editSubcategoryNameKo,
-            editSubcategoryNameEn,
-            editSubcategoryNameZh,
-          ),
-          categoryId: Number(editCategoryId),
+          list: toNamePayload(values),
+          categoryId: Number(values.categoryId),
         },
       });
       resetEditState();
@@ -206,41 +133,28 @@ export default function ProductSubcategoriesPage() {
   const total = subcategoryResponse?.data.total ?? 0;
   const totalPages = Math.ceil(total / pageSize);
   const isListLoading = isLoading || isFetching;
+  const editDefaultValues = useMemo(
+    () => toSubCategoryFormValues(editingSubcategory),
+    [editingSubcategory],
+  );
 
   return (
     <div className="p-8 pt-24">
       <SubCategoryHeader onClickAdd={() => setIsModalOpen(true)} />
       <SubCategoryCreateModal
+        defaultValues={EMPTY_SUBCATEGORY_FORM}
         isOpen={isModalOpen}
         isSubmitting={isCreating}
-        newCategoryId={newCategoryId}
-        newImageUrl={newImageUrl}
-        newSubcategoryNameEn={newSubcategoryNameEn}
-        newSubcategoryNameKo={newSubcategoryNameKo}
-        newSubcategoryNameZh={newSubcategoryNameZh}
-        onChangeCategoryId={setNewCategoryId}
-        onChangeEn={setNewSubcategoryNameEn}
-        onChangeImageUrl={setNewImageUrl}
-        onChangeKo={setNewSubcategoryNameKo}
-        onChangeZh={setNewSubcategoryNameZh}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleAddSubcategory}
       />
       <SubCategoryEditModal
-        editCategoryId={editCategoryId}
-        editImageUrl={editImageUrl}
-        editSubcategoryNameEn={editSubcategoryNameEn}
-        editSubcategoryNameKo={editSubcategoryNameKo}
-        editSubcategoryNameZh={editSubcategoryNameZh}
+        defaultValues={editDefaultValues}
         isOpen={isEditModalOpen}
         isSubmitting={isUpdating}
-        onChangeCategoryId={setEditCategoryId}
-        onChangeEn={setEditSubcategoryNameEn}
-        onChangeImageUrl={setEditImageUrl}
-        onChangeKo={setEditSubcategoryNameKo}
-        onChangeZh={setEditSubcategoryNameZh}
         onClose={resetEditState}
         onSubmit={handleUpdateSubcategory}
+        productCategoryId={editingSubcategory?.id ?? null}
       />
 
       <div className="mb-6 rounded-lg border border-gray-200 bg-white">
