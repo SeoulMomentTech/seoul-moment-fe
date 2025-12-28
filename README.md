@@ -4,7 +4,8 @@ This repository now follows a pnpm-based monorepo layout. The existing Next.js a
 
 ## Structure
 
-- `apps/web` – primary Next.js application
+- `apps/web` – main service application
+- `apps/admin` - admin application
 - `packages/*` – (optional) shared libraries and utilities
 - Root configs – workspace-wide tooling such as Husky hooks and lint-staged rules
 
