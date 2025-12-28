@@ -162,7 +162,7 @@ export function SubCategoryCreateModal({
                 } catch (error) {
                   console.error("이미지 업로드 오류:", error);
                   alert("이미지 업로드 중 오류가 발생했습니다.");
-                  setImagePreview(defaultValues.imageUrl);
+                  setImagePreview("");
                 } finally {
                   setIsUploadingImage(false);
                 }
