@@ -1,6 +1,7 @@
 import { type AdminProductItem } from "@shared/services/products";
 
 import {
+  Flex,
   Table,
   TableBody,
   TableCell,
@@ -65,7 +66,21 @@ export const ProductTable = ({
                   "-"
                 )}
               </TableCell>
-              <TableCell>{product.colorCode || "-"}</TableCell>
+              <TableCell>
+                {product.colorCode ? (
+                  <Flex align="center" className="text-sm" gap={4}>
+                    <div
+                      className="aspect-square w-[20px] rounded-full border border-black/30"
+                      style={{
+                        background: product.colorCode,
+                      }}
+                    />
+                    {product.colorCode}
+                  </Flex>
+                ) : (
+                  "-"
+                )}
+              </TableCell>
               <TableCell>
                 <p>{formatPrice(product.price)}</p>
               </TableCell>
