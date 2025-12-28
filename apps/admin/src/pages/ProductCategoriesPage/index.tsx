@@ -1,5 +1,6 @@
-import { useState, type KeyboardEvent } from "react";
+import { useMemo, useState, type KeyboardEvent } from "react";
 
+import { Pagination } from "@shared/components/pagination";
 import type { AdminCategory, CategoryId } from "@shared/services/category";
 
 import {
@@ -7,7 +8,6 @@ import {
   CategoryEditModal,
   CategoryFilters,
   CategoryHeader,
-  CategoryPagination,
   CategoryTable,
 } from "./components";
 import {
@@ -16,21 +16,12 @@ import {
   useDeleteAdminCategoryMutation,
   useUpdateAdminCategoryMutation,
 } from "./hooks";
-import {
-  EMPTY_NAMES,
-  makeNameChangeHandler,
-  toNamePayload,
-  type CategoryNames,
-} from "./utils";
+import { EMPTY_NAMES, toNamePayload, type CategoryNames } from "./utils";
 
 export default function ProductCategoriesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newCategoryNames, setNewCategoryNames] =
-    useState<CategoryNames>(EMPTY_NAMES);
-  const [editCategoryNames, setEditCategoryNames] =
-    useState<CategoryNames>(EMPTY_NAMES);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [sort] = useState<"ASC" | "DESC">("DESC");
@@ -38,8 +29,6 @@ export default function ProductCategoriesPage() {
   const [editingCategory, setEditingCategory] = useState<AdminCategory | null>(
     null,
   );
-  const handleNewNameChange = makeNameChangeHandler(setNewCategoryNames);
-  const handleEditNameChange = makeNameChangeHandler(setEditCategoryNames);
 
   const {
     data: categoryResponse,
@@ -67,17 +56,11 @@ export default function ProductCategoriesPage() {
     }
   };
 
-  const handleAddCategory = async () => {
-    if (!newCategoryNames.ko.trim()) {
-      alert("카테고리 이름(한국어)을 입력해주세요.");
-      return;
-    }
-
+  const handleAddCategory = async (values: CategoryNames) => {
     try {
       await createCategory({
-        list: toNamePayload(newCategoryNames),
+        list: toNamePayload(values),
       });
-      setNewCategoryNames(EMPTY_NAMES);
       setIsModalOpen(false);
       setPage(1);
     } catch (error) {
@@ -110,35 +93,21 @@ export default function ProductCategoriesPage() {
   const resetEditState = () => {
     setIsEditModalOpen(false);
     setEditingCategory(null);
-    setEditCategoryNames(EMPTY_NAMES);
   };
 
   const openEditModal = (category: AdminCategory) => {
     setEditingCategory(category);
-    const getName = (code: string) =>
-      category.nameDto.find((n) => n.languageCode === code)?.name ?? "";
-
-    setEditCategoryNames({
-      ko: getName("ko"),
-      en: getName("en"),
-      zh: getName("zh-TW"),
-    });
     setIsEditModalOpen(true);
   };
 
-  const handleUpdateCategory = async () => {
+  const handleUpdateCategory = async (values: CategoryNames) => {
     if (!editingCategory) return;
-
-    if (!editCategoryNames.ko.trim()) {
-      alert("카테고리 이름(한국어)을 입력해주세요.");
-      return;
-    }
 
     try {
       await updateCategory({
         categoryId: editingCategory.id,
         payload: {
-          list: toNamePayload(editCategoryNames),
+          list: toNamePayload(values),
         },
       });
       resetEditState();
@@ -148,6 +117,21 @@ export default function ProductCategoriesPage() {
       alert("카테고리를 수정하는 중 오류가 발생했습니다.");
     }
   };
+
+  const editDefaultValues = useMemo<CategoryNames>(() => {
+    if (!editingCategory) {
+      return EMPTY_NAMES;
+    }
+
+    const getName = (code: string) =>
+      editingCategory.nameDto.find((n) => n.languageCode === code)?.name ?? "";
+
+    return {
+      ko: getName("ko"),
+      en: getName("en"),
+      zh: getName("zh-TW"),
+    };
+  }, [editingCategory]);
 
   const categories = categoryResponse?.data.list ?? [];
   const total = categoryResponse?.data.total ?? 0;
@@ -159,27 +143,17 @@ export default function ProductCategoriesPage() {
       <CategoryHeader onClickAdd={() => setIsModalOpen(true)} />
 
       <CategoryCreateModal
+        defaultValues={EMPTY_NAMES}
         isOpen={isModalOpen}
         isSubmitting={isCreating}
-        newCategoryNameEn={newCategoryNames.en}
-        newCategoryNameKo={newCategoryNames.ko}
-        newCategoryNameZh={newCategoryNames.zh}
-        onChangeEn={(e) => handleNewNameChange("en")(e.target.value)}
-        onChangeKo={(e) => handleNewNameChange("ko")(e.target.value)}
-        onChangeZh={(e) => handleNewNameChange("zh")(e.target.value)}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleAddCategory}
       />
 
       <CategoryEditModal
-        editCategoryNameEn={editCategoryNames.en}
-        editCategoryNameKo={editCategoryNames.ko}
-        editCategoryNameZh={editCategoryNames.zh}
+        defaultValues={editDefaultValues}
         isOpen={isEditModalOpen}
         isSubmitting={isUpdating}
-        onChangeEn={(e) => handleEditNameChange("en")(e.target.value)}
-        onChangeKo={(e) => handleEditNameChange("ko")(e.target.value)}
-        onChangeZh={(e) => handleEditNameChange("zh")(e.target.value)}
         onClose={resetEditState}
         onSubmit={handleUpdateCategory}
       />
@@ -210,7 +184,7 @@ export default function ProductCategoriesPage() {
         />
       </div>
 
-      <CategoryPagination
+      <Pagination
         countOnPage={categories.length}
         disableNext={page >= totalPages}
         disablePrev={page === 1}

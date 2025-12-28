@@ -4,7 +4,7 @@ import { Edit, Trash2 } from "lucide-react";
 
 import type { HomeBanner } from "@shared/services/banner";
 
-import { Button } from "@seoul-moment/ui";
+import { Button, Flex, HStack } from "@seoul-moment/ui";
 
 import { BannerModal } from "./components/BannerModal";
 import { BannerPreview } from "./components/BannerPreview";
@@ -78,13 +78,13 @@ export function HomeBannersPage() {
 
   return (
     <div className="p-8 pt-24">
-      <div className="mb-8 flex items-center justify-between">
+      <HStack align="between" className="mb-8">
         <div>
           <h1 className="mb-2">홈 배너 관리</h1>
           <p className="text-gray-600">홈 페이지에 표시될 배너를 관리하세요.</p>
         </div>
         {banner && (
-          <div className="flex gap-2">
+          <Flex gap={8}>
             <Button onClick={openModal}>
               <Edit className="mr-2 h-4 w-4" />
               배너 수정
@@ -97,7 +97,7 @@ export function HomeBannersPage() {
               <Trash2 className="mr-2 h-4 w-4" />
               {isDeleting ? "삭제 중..." : "배너 삭제"}
             </Button>
-          </div>
+          </Flex>
         )}
         {!banner && (
           <Button onClick={openModal}>
@@ -105,7 +105,7 @@ export function HomeBannersPage() {
             배너 등록
           </Button>
         )}
-      </div>
+      </HStack>
 
       {/* 배너 추가/수정 모달 */}
       <BannerModal

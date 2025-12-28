@@ -11,13 +11,14 @@ import { Layout } from "@shared/components/layout";
 import { PATH } from "@shared/constants/route";
 import { useAuthStore } from "@shared/hooks/useAuth";
 
+import { BrandsPage } from "@pages/BrandPage";
+import { HomeBannersPage } from "@pages/HomeBannerPage";
 import HomePage from "@pages/HomePage";
 import LoginPage from "@pages/LoginPage";
 import ProductCategoriesPage from "@pages/ProductCategoriesPage";
+import ProductsPage from "@pages/ProductPage";
+import ProductSubCategoriesPage from "@pages/ProductSubCategoriesPage";
 import SignUpPage from "@pages/SignUpPage";
-
-import { BrandsPage } from "./pages/BrandPage";
-import { HomeBannersPage } from "./pages/HomeBannerPage";
 
 const PublicRoute = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -72,8 +73,16 @@ const privateRoutes: RouteObject[] = [
         element: <HomePage />,
       },
       {
+        path: PATH.PRODUCTS,
+        element: <ProductsPage />,
+      },
+      {
         path: PATH.PRODUCT_CATEGORIES,
         element: <ProductCategoriesPage />,
+      },
+      {
+        path: PATH.PRODUCT_SUB_CATEGORIES,
+        element: <ProductSubCategoriesPage />,
       },
       {
         path: PATH.HOME_BANNER,

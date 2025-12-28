@@ -1,8 +1,8 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-import { Button } from "@seoul-moment/ui";
+import { Button, HStack } from "@seoul-moment/ui";
 
-interface CategoryPaginationProps {
+interface PaginationProps {
   page: number;
   totalPages: number;
   countOnPage: number;
@@ -12,7 +12,7 @@ interface CategoryPaginationProps {
   disableNext: boolean;
 }
 
-export function CategoryPagination({
+export function Pagination({
   page,
   totalPages,
   countOnPage,
@@ -20,16 +20,16 @@ export function CategoryPagination({
   onNext,
   disablePrev,
   disableNext,
-}: CategoryPaginationProps) {
+}: PaginationProps) {
   const displayTotalPages = totalPages || 1;
 
   return (
-    <div className="flex items-center justify-between">
+    <HStack align="between">
       <div className="text-sm text-gray-600">
         <p>이 페이지에 표시: {countOnPage}개</p>
       </div>
 
-      <div className="flex items-center gap-2">
+      <HStack gap={8}>
         <Button
           disabled={disablePrev}
           onClick={onPrev}
@@ -39,11 +39,11 @@ export function CategoryPagination({
           <ChevronLeft className="h-4 w-4" />
           이전
         </Button>
-        <div className="flex items-center gap-1">
+        <HStack gap={4}>
           <span className="text-sm text-gray-600">
             {page} / {displayTotalPages}
           </span>
-        </div>
+        </HStack>
         <Button
           disabled={disableNext}
           onClick={onNext}
@@ -53,7 +53,7 @@ export function CategoryPagination({
           다음
           <ChevronRight className="h-4 w-4" />
         </Button>
-      </div>
-    </div>
+      </HStack>
+    </HStack>
   );
 }

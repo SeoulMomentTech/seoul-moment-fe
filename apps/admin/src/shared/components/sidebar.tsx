@@ -10,6 +10,7 @@ import {
   AccordionItem,
   AccordionTrigger,
   cn,
+  HStack,
 } from "@seoul-moment/ui";
 
 import type { MenuItem } from "./layout";
@@ -64,7 +65,13 @@ const menuItems: MenuItemConfig[] = [
     path: "",
     icon: <Package className="h-5 w-5" />,
     subItems: [
+      { id: "products", label: "전체 상품", path: "/products" },
       { id: "categories", label: "카테고리", path: "/products/categories" },
+      {
+        id: "product-categories",
+        label: "서브 카테고리",
+        path: "/products/sub-categories",
+      },
     ],
   },
   {
@@ -127,10 +134,10 @@ export default function Sidebar({
                         isSelected && "bg-gray-900 text-white",
                       )}
                     >
-                      <div className="flex flex-1 items-center gap-3 text-left">
+                      <HStack className="flex-1 text-left" gap={12}>
                         {item.icon}
                         <span>{item.label}</span>
-                      </div>
+                      </HStack>
                     </AccordionTrigger>
                     <AccordionContent className="space-y-1 pb-0 pt-2">
                       {item.subItems.map((subItem) => (
@@ -162,10 +169,10 @@ export default function Sidebar({
                   key={item.id}
                   to={item.path ?? "/"}
                 >
-                  <div className="text-body-3 flex items-center gap-3">
+                  <HStack className="text-body-3" gap={12}>
                     {item.icon}
                     <span>{item.label}</span>
-                  </div>
+                  </HStack>
                 </Link>
               );
             })}
