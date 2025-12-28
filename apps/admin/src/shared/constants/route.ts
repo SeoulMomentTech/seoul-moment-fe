@@ -4,6 +4,9 @@ export const PATH = {
   SIGNUP: "/signup",
   // Product
   PRODUCT_CATEGORIES: "/products/categories",
+  PRODUCT_SUB_CATEGORIES: "/products/sub-categories",
+  PRODUCT_LIST: "/products/list",
+
   // Banner
   HOME_BANNER: "/banner/home",
   // Brand

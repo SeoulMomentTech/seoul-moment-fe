@@ -12,6 +12,7 @@ export type MenuItem =
   | "user-groups"
   | "products"
   | "categories"
+  | "product-categories"
   | "inventory"
   | "orders"
   | "analytics"

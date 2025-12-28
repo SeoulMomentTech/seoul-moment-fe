@@ -58,6 +58,7 @@ export function CategoryEditModal({
           <div className="space-y-2">
             <Label htmlFor="editCategoryNameKo">카테고리 이름(한국어)</Label>
             <Input
+              className="h-[40px] rounded-md bg-white"
               id="editCategoryNameKo"
               onChange={onChangeKo}
               placeholder="예: 전자기기"
@@ -67,6 +68,7 @@ export function CategoryEditModal({
           <div className="space-y-2">
             <Label htmlFor="editCategoryNameEn">카테고리 이름(영어)</Label>
             <Input
+              className="h-[40px] rounded-md bg-white"
               id="editCategoryNameEn"
               onChange={onChangeEn}
               placeholder="예: Electronics"
@@ -76,6 +78,7 @@ export function CategoryEditModal({
           <div className="space-y-2">
             <Label htmlFor="editCategoryNameZh">카테고리 이름(중국어)</Label>
             <Input
+              className="h-[40px] rounded-md bg-white"
               id="editCategoryNameZh"
               onChange={onChangeZh}
               placeholder="예: 电子产品"
