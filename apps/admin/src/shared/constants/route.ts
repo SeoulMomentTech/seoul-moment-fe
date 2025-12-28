@@ -3,6 +3,7 @@ export const PATH = {
   LOGIN: "/login",
   SIGNUP: "/signup",
   // Product
+  PRODUCTS: "/products",
   PRODUCT_CATEGORIES: "/products/categories",
   PRODUCT_SUB_CATEGORIES: "/products/sub-categories",
   PRODUCT_LIST: "/products/list",

@@ -65,6 +65,7 @@ const menuItems: MenuItemConfig[] = [
     path: "",
     icon: <Package className="h-5 w-5" />,
     subItems: [
+      { id: "products", label: "전체 상품", path: "/products" },
       { id: "categories", label: "카테고리", path: "/products/categories" },
       {
         id: "product-categories",

@@ -11,12 +11,14 @@ interface CategoryHeaderProps {
 export function CategoryHeader({ onClickAdd }: CategoryHeaderProps) {
   return (
     <PageHeader
+      description="카테고리를 관리하세요."
       right={
         <Button onClick={onClickAdd}>
           <Plus className="mr-2 h-4 w-4" />
           카테고리 추가
         </Button>
       }
+      title="카테고리 관리"
     />
   );
 }
