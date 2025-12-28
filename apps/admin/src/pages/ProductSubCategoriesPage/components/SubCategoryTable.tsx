@@ -22,7 +22,7 @@ interface SubCategoryTableProps {
   subcategories: AdminProductCategoryListItem[];
   isLoading: boolean;
   isDeleting: boolean;
-  onEdit(subcategoryId: ProductCategoryId): void;
+  onEdit(subcategory: AdminProductCategoryListItem): void;
   onDelete(subcategoryId: ProductCategoryId): void;
 }
 
@@ -78,7 +78,7 @@ export function SubCategoryTable({
               </TableCell>
               <TableCell>
                 <Flex gap={8}>
-                  <Button onClick={() => onEdit(subcategory.id)} size="sm" variant="ghost">
+                  <Button onClick={() => onEdit(subcategory)} size="sm" variant="ghost">
                     <Edit className="h-4 w-4" />
                   </Button>
                   <Button

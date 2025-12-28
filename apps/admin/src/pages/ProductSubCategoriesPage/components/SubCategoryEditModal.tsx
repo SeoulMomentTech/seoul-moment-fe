@@ -4,7 +4,6 @@ import { Button, Input, Label } from "@seoul-moment/ui";
 
 interface SubCategoryEditModalProps {
   isOpen: boolean;
-  isLoading: boolean;
   isSubmitting: boolean;
   editSubcategoryNameKo: string;
   editSubcategoryNameEn: string;
@@ -22,7 +21,6 @@ interface SubCategoryEditModalProps {
 
 export function SubCategoryEditModal({
   isOpen,
-  isLoading,
   isSubmitting,
   editSubcategoryNameKo,
   editSubcategoryNameEn,
@@ -39,7 +37,7 @@ export function SubCategoryEditModal({
 }: SubCategoryEditModalProps) {
   if (!isOpen) return null;
 
-  const disableActions = isSubmitting || isLoading;
+  const disableActions = isSubmitting;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">

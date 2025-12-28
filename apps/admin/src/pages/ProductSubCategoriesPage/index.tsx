@@ -1,6 +1,9 @@
-import { useEffect, useState, type KeyboardEvent } from "react";
+import { useState, type KeyboardEvent } from "react";
 
-import type { ProductCategoryId } from "@shared/services/productCategory";
+import type {
+  AdminProductCategoryListItem,
+  ProductCategoryId,
+} from "@shared/services/productCategory";
 
 import {
   SubCategoryCreateModal,
@@ -14,7 +17,6 @@ import {
   useAdminProductCategoryListQuery,
   useCreateAdminProductCategoryMutation,
   useDeleteAdminProductCategoryMutation,
-  useAdminProductCategoryQuery,
   useUpdateAdminProductCategoryMutation,
 } from "./hooks";
 
@@ -33,8 +35,7 @@ export default function ProductSubcategoriesPage() {
   const [editSubcategoryNameZh, setEditSubcategoryNameZh] = useState("");
   const [editImageUrl, setEditImageUrl] = useState("");
   const [editCategoryId, setEditCategoryId] = useState<number | "">("");
-  const [editingSubcategoryId, setEditingSubcategoryId] =
-    useState<ProductCategoryId | null>(null);
+
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [sort] = useState<"ASC" | "DESC">("DESC");
@@ -59,11 +60,6 @@ export default function ProductSubcategoriesPage() {
   const { mutateAsync: updateSubcategory, isPending: isUpdating } =
     useUpdateAdminProductCategoryMutation();
 
-  const { data: editSubcategoryDetail, isFetching: isFetchingDetail } =
-    useAdminProductCategoryQuery(editingSubcategoryId ?? 0, {
-      enabled: Boolean(editingSubcategoryId),
-    });
-
   const handleSearch = () => {
     setSearchQuery(searchInput);
     setPage(1);
@@ -86,23 +82,6 @@ export default function ProductSubcategoriesPage() {
         languageId: code === "ko" ? 1 : code === "en" ? 2 : 3,
         name: value.trim(),
       }));
-
-  useEffect(() => {
-    if (!editSubcategoryDetail) return;
-
-    const nameMap = new Map(
-      editSubcategoryDetail.data.list.map((item) => [
-        item.languageId,
-        item.name,
-      ]),
-    );
-
-    setEditSubcategoryNameKo(nameMap.get(1) ?? "");
-    setEditSubcategoryNameEn(nameMap.get(2) ?? "");
-    setEditSubcategoryNameZh(nameMap.get(3) ?? "");
-    setEditCategoryId(editSubcategoryDetail.data.categoryId);
-    setEditImageUrl(editSubcategoryDetail.data.imageUrl);
-  }, [editSubcategoryDetail]);
 
   const handleAddSubcategory = async () => {
     if (!newSubcategoryNameKo.trim()) {
@@ -143,9 +122,15 @@ export default function ProductSubcategoriesPage() {
     }
   };
 
+  const getNameFromDto = (
+    subcategory: Pick<AdminProductCategoryListItem, "nameDto">,
+    languageCode: string,
+  ) =>
+    subcategory.nameDto.find((n) => n.languageCode === languageCode)?.name ??
+    "";
+
   const resetEditState = () => {
     setIsEditModalOpen(false);
-    setEditingSubcategoryId(null);
     setEditSubcategoryNameKo("");
     setEditSubcategoryNameEn("");
     setEditSubcategoryNameZh("");
@@ -153,13 +138,17 @@ export default function ProductSubcategoriesPage() {
     setEditCategoryId("");
   };
 
-  const openEditModal = (subcategoryId: ProductCategoryId) => {
-    setEditingSubcategoryId(subcategoryId);
+  const openEditModal = (subcategory: AdminProductCategoryListItem) => {
+    setEditCategoryId(subcategory.id);
+    setEditSubcategoryNameKo(getNameFromDto(subcategory, "ko"));
+    setEditSubcategoryNameEn(getNameFromDto(subcategory, "en"));
+    setEditSubcategoryNameZh(getNameFromDto(subcategory, "zh-TW"));
+    setEditImageUrl(subcategory.imageUrl);
     setIsEditModalOpen(true);
   };
 
   const handleUpdateSubcategory = async () => {
-    if (!editingSubcategoryId) return;
+    if (!editCategoryId) return;
 
     if (!editSubcategoryNameKo.trim()) {
       alert("서브카테고리 이름(한국어)을 입력해주세요.");
@@ -171,14 +160,15 @@ export default function ProductSubcategoriesPage() {
       return;
     }
 
-    if (!editImageUrl.trim()) {
-      alert("이미지 URL을 입력해주세요.");
-      return;
-    }
+    // todo: image upload
+    //if (!editImageUrl.trim()) {
+    //  alert("이미지 URL을 입력해주세요.");
+    //  return;
+    //}
 
     try {
       await updateSubcategory({
-        productCategoryId: editingSubcategoryId,
+        productCategoryId: editCategoryId as ProductCategoryId,
         payload: {
           list: toNamePayload(
             editSubcategoryNameKo,
@@ -186,7 +176,6 @@ export default function ProductSubcategoriesPage() {
             editSubcategoryNameZh,
           ),
           categoryId: Number(editCategoryId),
-          imageUrl: editImageUrl.trim(),
         },
       });
       resetEditState();
@@ -243,7 +232,6 @@ export default function ProductSubcategoriesPage() {
         editSubcategoryNameEn={editSubcategoryNameEn}
         editSubcategoryNameKo={editSubcategoryNameKo}
         editSubcategoryNameZh={editSubcategoryNameZh}
-        isLoading={isFetchingDetail}
         isOpen={isEditModalOpen}
         isSubmitting={isUpdating}
         onChangeCategoryId={setEditCategoryId}
