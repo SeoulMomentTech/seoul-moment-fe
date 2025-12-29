@@ -161,11 +161,26 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
                   <span>{toNTCurrency(data.shippingCost)}</span>
                 </div>
               )}
+              {/* 색상 정보 */}
+              {data.option?.COLOR?.length > 0 && (
+                <div className={cn("text-body-3 flex", "text-body-4")}>
+                  <span className="min-w-[120px]">색상</span>
+                  <span>{data.option.COLOR[0].value}</span>
+                </div>
+              )}
+              {/* 사이즈 */}
+              {data.option?.SIZE?.length > 0 && (
+                <div className={cn("text-body-3 flex", "text-body-4")}>
+                  <span className="min-w-[120px]">사이즈</span>
+                  <span>
+                    {data.option.SIZE.map((item) => item.value).join("/")}
+                  </span>
+                </div>
+              )}
             </div>
-            {/* 색상 정보 */}
             <div />
           </div>
-          {/* 사이즈 */}
+
           <div />
         </div>
         <BrandProductList data={data.relate} />

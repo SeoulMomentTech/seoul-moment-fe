@@ -73,7 +73,12 @@ export default function ProductCard({
           <span className="font-semibold">
             {toNTCurrency(data?.price ?? 0)}
           </span>
-          <div className="flex items-center gap-[4px]">
+          <div
+            className={cn(
+              "flex min-h-[21px] items-center gap-[4px]",
+              !data.colorCode && "invisible",
+            )}
+          >
             <Badge
               className="h-[12px] w-[24px] rounded-none border-black/20 p-0"
               style={{
