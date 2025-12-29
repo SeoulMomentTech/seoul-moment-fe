@@ -118,7 +118,7 @@ interface GetProductDetailRes {
   origin: string;
   shippingInfo: number;
   shippingCost: number;
-  option: Array<DetailOption>;
+  option: DetailOption;
   like: number;
   review: number;
   reviewAverage: number;
