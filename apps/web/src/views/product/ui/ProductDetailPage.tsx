@@ -162,14 +162,14 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
                 </div>
               )}
               {/* 색상 정보 */}
-              {data.option.COLOR && (
+              {data.option?.COLOR?.length > 0 && (
                 <div className={cn("text-body-3 flex", "text-body-4")}>
                   <span className="min-w-[120px]">색상</span>
                   <span>{data.option.COLOR[0].value}</span>
                 </div>
               )}
               {/* 사이즈 */}
-              {data.option.SIZE && (
+              {data.option?.SIZE?.length > 0 && (
                 <div className={cn("text-body-3 flex", "text-body-4")}>
                   <span className="min-w-[120px]">사이즈</span>
                   <span>
