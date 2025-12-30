@@ -41,7 +41,9 @@ export function MultipleImageUpload({
     setIsUploading(true);
     try {
       const urls = await Promise.all(
-        validFiles.map((file) => uploadImageFile(file, folder)),
+        validFiles.map((file) =>
+          uploadImageFile(file, folder).then((res) => res.imageUrl),
+        ),
       );
       onChange([...value, ...urls]);
     } catch (error) {
