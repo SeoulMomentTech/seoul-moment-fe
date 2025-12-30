@@ -42,11 +42,11 @@ export function BasicInfo({ formik }: BasicInfoProps) {
   const handleImageUpload = useCallback(
     async (
       file: File | undefined,
-      field: "profileImageUrl" | "bannerImageUrl",
+      field: "profileImageUrl" | "productBannerImageUrl",
     ) => {
       if (!file) return;
       try {
-        const imageUrl = await uploadImageFile(file, "brand");
+        const { imageUrl } = await uploadImageFile(file, "brand");
         setFieldValue(field, imageUrl);
       } catch (error) {
         console.error("이미지 업로드 실패:", error);
@@ -78,9 +78,11 @@ export function BasicInfo({ formik }: BasicInfoProps) {
             value={values.profileImageUrl}
           />
           <BannerImageUploader
-            onChange={(file) => handleImageUpload(file, "bannerImageUrl")}
-            onClear={() => setFieldValue("bannerImageUrl", "")}
-            value={values.bannerImageUrl}
+            onChange={(file) =>
+              handleImageUpload(file, "productBannerImageUrl")
+            }
+            onClear={() => setFieldValue("productBannerImageUrl", "")}
+            value={values.productBannerImageUrl}
           />
         </div>
       </div>

@@ -17,7 +17,7 @@ import { BannerImages } from "../../components/BannerImages";
 import { BasicInfo } from "../../components/BasicInfo";
 import { BrandSections } from "../../components/BrandSection";
 import { useCreateAdminBrandMutation } from "../../hooks";
-import { createEmptySection } from "../../utils/section";
+import { createEmptySection, stripImageDomain } from "../../utils/section";
 
 const BANNER_REQUIRED_COUNT = 2;
 
@@ -25,7 +25,7 @@ const INITIAL_FORM_VALUES: CreateAdminBrandRequest = {
   englishName: "",
   categoryId: 1,
   profileImageUrl: "",
-  bannerImageUrl: "",
+  productBannerImageUrl: "",
   textList: LANGUAGE_LIST.map((language) => ({
     languageId: language.id,
     name: "",
@@ -114,18 +114,15 @@ export default function BrandForm() {
     onSubmit: async (values) => {
       await createBrand({
         ...values,
-        bannerImageUrlList:
-          values.bannerImageUrlList.length > 0
-            ? values.bannerImageUrlList
-            : values.bannerImageUrl
-              ? [values.bannerImageUrl]
-              : [],
+        profileImageUrl: stripImageDomain(values.profileImageUrl),
+        productBannerImageUrl: stripImageDomain(values.productBannerImageUrl),
+        bannerImageUrlList: values.bannerImageUrlList.map(stripImageDomain),
         mobileBannerImageUrlList:
-          values.mobileBannerImageUrlList.length > 0
-            ? values.mobileBannerImageUrlList
-            : values.bannerImageUrl
-              ? [values.bannerImageUrl]
-              : [],
+          values.mobileBannerImageUrlList.map(stripImageDomain),
+        sectionList: values.sectionList.map((section) => ({
+          ...section,
+          imageUrlList: section.imageUrlList.map(stripImageDomain),
+        })),
       });
     },
   });

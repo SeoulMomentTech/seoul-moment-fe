@@ -57,7 +57,7 @@ export interface CreateAdminBrandRequest {
   sectionList: AdminBrandSectionPayload[];
   bannerImageUrlList: string[];
   mobileBannerImageUrlList: string[];
-  bannerImageUrl: string;
+  productBannerImageUrl: string;
   englishName: string;
 }
 
