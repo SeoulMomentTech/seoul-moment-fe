@@ -343,7 +343,7 @@ export default function BrandForm({ id }: BrandFormProps) {
           disabled={formik.isSubmitting || isPending}
           type="submit"
         >
-          {"등록하기"}
+          등록하기
         </Button>
         <Button
           className="flex-1"
