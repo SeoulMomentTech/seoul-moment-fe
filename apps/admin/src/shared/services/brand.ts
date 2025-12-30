@@ -57,7 +57,7 @@ export interface CreateAdminBrandRequest {
   sectionList: AdminBrandSectionPayload[];
   bannerImageUrlList: string[];
   mobileBannerImageUrlList: string[];
-  bannerImageUrl: string;
+  productBannerImageUrl: string;
   englishName: string;
 }
 
@@ -71,34 +71,28 @@ export interface UpdateAdminBrandSectionImageSortOrder {
   sortOrder: number;
 }
 
-export interface UpdateAdminBrandInfoSection {
-  id: number;
-  title?: string;
-  content?: string;
-  sectionImageList?: UpdateAdminBrandImagePayload[];
-  sortOrderList?: UpdateAdminBrandSectionImageSortOrder[];
-}
-
-export interface UpdateAdminBrandInfoText {
-  languageId: number;
-  name?: string;
-  description?: string;
-  section?: UpdateAdminBrandInfoSection[];
-}
-
 export interface UpdateAdminBrandSectionSortOrder {
   sectionId: number;
   sortOrder: number;
 }
 
+export interface UpdateAdminBrandSectionPayload {
+  id: number;
+  textList: AdminBrandSectionTextPayload[];
+  imageUrlList: UpdateAdminBrandImagePayload[];
+  imageSortOrderList: UpdateAdminBrandSectionImageSortOrder[];
+}
+
 export interface UpdateAdminBrandRequest {
-  productBannerImage?: string;
-  profileImage?: string;
-  englishName?: string;
-  bannerList?: UpdateAdminBrandImagePayload[];
-  mobileBannerList?: UpdateAdminBrandImagePayload[];
-  textList?: UpdateAdminBrandInfoText[];
-  sectionSortOrderList?: UpdateAdminBrandSectionSortOrder[];
+  textList: AdminBrandTextPayload[];
+  categoryId: number;
+  profileImageUrl: string;
+  sectionList: UpdateAdminBrandSectionPayload[];
+  bannerImageUrlList: UpdateAdminBrandImagePayload[];
+  mobileBannerImageUrlList: UpdateAdminBrandImagePayload[];
+  productBannerImage: string;
+  englishName: string;
+  sectionSortOrderList: UpdateAdminBrandSectionSortOrder[];
 }
 
 export interface AdminBrandSectionContent {
@@ -116,6 +110,10 @@ export interface AdminBrandMultilingualText {
 
 export interface AdminBrandDetail {
   id: BrandId;
+  categoryId: number;
+  englishName: string;
+  profileImage: string;
+  productBannerImage: string;
   bannerList: string[];
   mobileBannerList: string[];
   multilingualTextList: AdminBrandMultilingualText[];
@@ -136,3 +134,6 @@ export const updateAdminBrand = (
   brandId: BrandId,
   payload: UpdateAdminBrandRequest,
 ) => fetcher.patch(`/admin/brand/${brandId}`, payload);
+
+export const deleteAdminBrand = (brandId: BrandId) =>
+  fetcher.delete(`/admin/brand/${brandId}`);

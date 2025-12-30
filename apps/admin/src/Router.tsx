@@ -6,12 +6,14 @@ import {
   type RouteObject,
 } from "react-router";
 
+import { BrandAddPage } from "@pages/BrandPage/AddPage";
+import { BrandEditPage } from "@pages/BrandPage/EditPage";
+import { BrandListPage } from "@pages/BrandPage/ListPage";
 import { GlobalErrorBoundary } from "@shared/components/global-errorboundary";
 import { Layout } from "@shared/components/layout";
 import { PATH } from "@shared/constants/route";
 import { useAuthStore } from "@shared/hooks/useAuth";
 
-import { BrandsPage } from "@pages/BrandPage";
 import { HomeBannersPage } from "@pages/HomeBannerPage";
 import HomePage from "@pages/HomePage";
 import LoginPage from "@pages/LoginPage";
@@ -90,7 +92,15 @@ const privateRoutes: RouteObject[] = [
       },
       {
         path: PATH.BRAND,
-        element: <BrandsPage />,
+        element: <BrandListPage />,
+      },
+      {
+        path: PATH.BRAND_ADD,
+        element: <BrandAddPage />,
+      },
+      {
+        path: PATH.BRAND_EDIT,
+        element: <BrandEditPage />,
       },
     ],
   },

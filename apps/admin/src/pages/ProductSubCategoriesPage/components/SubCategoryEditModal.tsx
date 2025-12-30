@@ -182,7 +182,7 @@ export function SubCategoryEditModal({
                 setIsUploadingImage(true);
                 setImagePreview(URL.createObjectURL(file));
                 try {
-                  const uploadedPath = await uploadImageFile(
+                  const { imagePath: uploadedPath } = await uploadImageFile(
                     file,
                     "product-category",
                   );
