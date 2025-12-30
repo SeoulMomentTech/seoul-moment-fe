@@ -86,10 +86,10 @@ export function BannerModal({
     try {
       setIsUploading(true);
       const pcImageUrl = pcImageFile
-        ? await uploadImageFile(pcImageFile, "banner")
+        ? (await uploadImageFile(pcImageFile, "banner")).imagePath
         : pcImagePreview;
       const mobileImageUrl = mobileImageFile
-        ? await uploadImageFile(mobileImageFile, "banner")
+        ? (await uploadImageFile(mobileImageFile, "banner")).imagePath
         : mobileImagePreview;
 
       await onSave({

@@ -11,5 +11,5 @@ export const fileToBase64 = (file: File) =>
 export const uploadImageFile = async (file: File, folder: string) => {
   const base64 = await fileToBase64(file);
   const { data } = await uploadAdminImage({ base64, folder });
-  return data.imagePath;
+  return data;
 };
