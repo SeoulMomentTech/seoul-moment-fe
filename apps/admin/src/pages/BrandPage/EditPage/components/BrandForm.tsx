@@ -179,7 +179,7 @@ export default function BrandForm({ id }: BrandFormProps) {
 
           const imageSortOrderList: UpdateAdminBrandSectionImageSortOrder[] =
             section.imageUrlList.map((imageUrl, imageIndex) => ({
-              imageUrl,
+              imageUrl: stripImageDomain(imageUrl),
               sortOrder: imageIndex + 1,
             }));
 
