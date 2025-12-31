@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { LANGUAGE_LIST } from "@shared/constants/locale";
 import { PATH } from "@shared/constants/route";
 import { type CreateAdminBrandRequest } from "@shared/services/brand";
-import { useFormik, type FormikErrors } from "formik";
+import { useFormik } from "formik";
 
 import {
   Button,
@@ -16,9 +16,12 @@ import {
 import { BannerImages } from "../../components/BannerImages";
 import { BasicInfo } from "../../components/BasicInfo";
 import { BrandSections } from "../../components/BrandSection";
-import { BANNER_REQUIRED_COUNT } from "../../constants";
 import { useCreateAdminBrandMutation } from "../../hooks";
-import { getAddFormPayload, createEmptySection } from "../../utils";
+import {
+  getAddFormPayload,
+  createEmptySection,
+  validateForm,
+} from "../../utils";
 
 const INITIAL_FORM_VALUES: CreateAdminBrandRequest = {
   englishName: "",
@@ -53,61 +56,7 @@ export default function BrandForm() {
     validateOnBlur: false,
     validateOnChange: false,
     validate: (values) => {
-      const validationErrors: FormikErrors<CreateAdminBrandRequest> &
-        Record<string, string> = {};
-
-      if (!values.englishName.trim()) {
-        validationErrors.englishName = "영어 이름을 입력해주세요.";
-      }
-
-      if (!values.profileImageUrl) {
-        validationErrors.profileImageUrl = "프로필 이미지를 업로드해주세요.";
-      }
-
-      values.textList.forEach((text) => {
-        const languageName =
-          LANGUAGE_LIST.find((language) => language.id === text.languageId)
-            ?.name ?? "";
-
-        if (!text.name.trim()) {
-          validationErrors[`name_${text.languageId}`] =
-            `${languageName} 브랜드명을 입력해주세요.`;
-        }
-
-        if (!text.description.trim()) {
-          validationErrors[`description_${text.languageId}`] =
-            `${languageName} 설명을 입력해주세요.`;
-        }
-      });
-
-      values.sectionList.forEach((section, sectionIndex) => {
-        section.textList.forEach((text) => {
-          const languageName =
-            LANGUAGE_LIST.find((language) => language.id === text.languageId)
-              ?.name ?? "";
-
-          if (!text.title.trim()) {
-            validationErrors[
-              `section_${sectionIndex}_title_${text.languageId}`
-            ] = `${languageName} 섹션 제목을 입력해주세요.`;
-          }
-
-          if (!text.content.trim()) {
-            validationErrors[
-              `section_${sectionIndex}_content_${text.languageId}`
-            ] = `${languageName} 섹션 내용을 입력해주세요.`;
-          }
-        });
-      });
-
-      if (values.bannerImageUrlList.length < BANNER_REQUIRED_COUNT) {
-        validationErrors.bannerImageUrlList = `PC 배너 이미지를 ${BANNER_REQUIRED_COUNT}장 업로드해주세요.`;
-      }
-
-      if (values.mobileBannerImageUrlList.length < BANNER_REQUIRED_COUNT) {
-        validationErrors.mobileBannerImageUrlList = `모바일 배너 이미지를 ${BANNER_REQUIRED_COUNT}장 업로드해주세요.`;
-      }
-
+      const validationErrors = validateForm(values);
       return validationErrors;
     },
     onSubmit: async (values) => {
@@ -169,7 +118,7 @@ export default function BrandForm() {
           disabled={formik.isSubmitting || isPending}
           type="submit"
         >
-          {"등록하기"}
+          등록하기
         </Button>
         <Button
           className="flex-1"
