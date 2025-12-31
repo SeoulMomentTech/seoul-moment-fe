@@ -27,7 +27,7 @@ import { BannerImages } from "../../components/BannerImages";
 import { BasicInfo } from "../../components/BasicInfo";
 import { BrandSections } from "../../components/BrandSection";
 import { useUpdateAdminBrandMutation } from "../../hooks";
-import { useAdminBrandQuery } from "../../hooks/useAdminBrandQuery";
+import { useAdminBrandSuspenseQuery } from "../../hooks/useAdminBrandQuery";
 import { createEmptySection, stripImageDomain } from "../../utils/section";
 
 interface BrandFormProps {
@@ -60,7 +60,7 @@ const INITIAL_FORM_VALUES: CreateAdminBrandRequest = {
 export default function BrandForm({ id }: BrandFormProps) {
   const navigate = useNavigate();
 
-  const { data: brandData } = useAdminBrandQuery(id);
+  const { data: brandData } = useAdminBrandSuspenseQuery(id);
   const { mutate, isPending } = useUpdateAdminBrandMutation({
     onSuccess: () => navigate(PATH.BRAND),
   });
@@ -128,8 +128,9 @@ export default function BrandForm({ id }: BrandFormProps) {
       return validationErrors;
     },
     onSubmit: (values) => {
-      const existingBannerList = brandData?.data.bannerList ?? [];
-      const existingMobileBannerList = brandData?.data.mobileBannerList ?? [];
+      const sectionId = brandData.data.multilingualTextList[0].section[0].id;
+      const existingBannerList = brandData.data.bannerList ?? [];
+      const existingMobileBannerList = brandData.data.mobileBannerList ?? [];
       const existingSectionImageLists = (() => {
         const multilingualTextList = brandData?.data.multilingualTextList;
         if (!multilingualTextList?.length) return [];
@@ -184,7 +185,7 @@ export default function BrandForm({ id }: BrandFormProps) {
             }));
 
           return {
-            id: sectionIndex + 1,
+            id: sectionId,
             textList: section.textList,
             imageUrlList,
             imageSortOrderList,
@@ -216,7 +217,7 @@ export default function BrandForm({ id }: BrandFormProps) {
   const { setValues } = formik;
 
   useEffect(() => {
-    if (!brandData?.data) return;
+    if (!brandData) return;
 
     const {
       bannerList,
