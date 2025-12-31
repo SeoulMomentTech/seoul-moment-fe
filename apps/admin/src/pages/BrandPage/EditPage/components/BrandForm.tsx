@@ -21,16 +21,16 @@ import {
 import { BannerImages } from "../../components/BannerImages";
 import { BasicInfo } from "../../components/BasicInfo";
 import { BrandSections } from "../../components/BrandSection";
-import { useUpdateAdminBrandMutation } from "../../hooks";
-import { useAdminBrandSuspenseQuery } from "../../hooks/useAdminBrandQuery";
-import { getEditFormPayload } from "../../utils/form";
-import { createEmptySection } from "../../utils/section";
+import { BANNER_REQUIRED_COUNT } from "../../constants";
+import {
+  useUpdateAdminBrandMutation,
+  useAdminBrandSuspenseQuery,
+} from "../../hooks";
+import { getEditFormPayload, createEmptySection } from "../../utils";
 
 interface BrandFormProps {
   id: BrandId;
 }
-
-const BANNER_REQUIRED_COUNT = 2;
 
 const INITIAL_FORM_VALUES: CreateAdminBrandRequest = {
   englishName: "",

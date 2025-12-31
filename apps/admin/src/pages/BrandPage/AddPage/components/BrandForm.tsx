@@ -16,11 +16,9 @@ import {
 import { BannerImages } from "../../components/BannerImages";
 import { BasicInfo } from "../../components/BasicInfo";
 import { BrandSections } from "../../components/BrandSection";
+import { BANNER_REQUIRED_COUNT } from "../../constants";
 import { useCreateAdminBrandMutation } from "../../hooks";
-import { getAddFormPayload } from "../../utils/form";
-import { createEmptySection } from "../../utils/section";
-
-const BANNER_REQUIRED_COUNT = 2;
+import { getAddFormPayload, createEmptySection } from "../../utils";
 
 const INITIAL_FORM_VALUES: CreateAdminBrandRequest = {
   englishName: "",
