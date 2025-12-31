@@ -36,7 +36,7 @@ interface GetEditFormPayload {
 }
 
 export const getEditFormPayload = ({ data, values }: GetEditFormPayload) => {
-  const sectionId = data.multilingualTextList[0].section[0].id;
+  const sections = data.multilingualTextList[0].section;
   const existingBannerList = data.bannerList ?? [];
   const existingMobileBannerList = data.mobileBannerList ?? [];
   const existingSectionImageLists = (() => {
@@ -92,7 +92,7 @@ export const getEditFormPayload = ({ data, values }: GetEditFormPayload) => {
         }));
 
       return {
-        id: sectionId,
+        id: sections[sectionIndex].id,
         textList: section.textList,
         imageUrlList,
         imageSortOrderList,
