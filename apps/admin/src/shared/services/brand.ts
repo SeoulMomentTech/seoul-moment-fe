@@ -96,6 +96,7 @@ export interface UpdateAdminBrandRequest {
 }
 
 export interface AdminBrandSectionContent {
+  id: number;
   title: string;
   content: string;
   imageList: string[];

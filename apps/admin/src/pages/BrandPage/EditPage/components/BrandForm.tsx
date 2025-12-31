@@ -7,13 +7,8 @@ import { PATH } from "@shared/constants/route";
 import {
   type BrandId,
   type CreateAdminBrandRequest,
-  type UpdateAdminBrandImagePayload,
-  type UpdateAdminBrandRequest,
-  type UpdateAdminBrandSectionImageSortOrder,
-  type UpdateAdminBrandSectionPayload,
-  type UpdateAdminBrandSectionSortOrder,
 } from "@shared/services/brand";
-import { useFormik, type FormikErrors } from "formik";
+import { useFormik } from "formik";
 
 import {
   Button,
@@ -26,15 +21,20 @@ import {
 import { BannerImages } from "../../components/BannerImages";
 import { BasicInfo } from "../../components/BasicInfo";
 import { BrandSections } from "../../components/BrandSection";
-import { useUpdateAdminBrandMutation } from "../../hooks";
-import { useAdminBrandQuery } from "../../hooks/useAdminBrandQuery";
-import { createEmptySection, stripImageDomain } from "../../utils/section";
+import {
+  useUpdateAdminBrandMutation,
+  useAdminBrandSuspenseQuery,
+} from "../../hooks";
+import {
+  getEditFormPayload,
+  createEmptySection,
+  validateForm,
+  getInitialValuesFromData,
+} from "../../utils";
 
 interface BrandFormProps {
   id: BrandId;
 }
-
-const BANNER_REQUIRED_COUNT = 2;
 
 const INITIAL_FORM_VALUES: CreateAdminBrandRequest = {
   englishName: "",
@@ -60,7 +60,7 @@ const INITIAL_FORM_VALUES: CreateAdminBrandRequest = {
 export default function BrandForm({ id }: BrandFormProps) {
   const navigate = useNavigate();
 
-  const { data: brandData } = useAdminBrandQuery(id);
+  const { data: brandData } = useAdminBrandSuspenseQuery(id);
   const { mutate, isPending } = useUpdateAdminBrandMutation({
     onSuccess: () => navigate(PATH.BRAND),
   });
@@ -70,145 +70,11 @@ export default function BrandForm({ id }: BrandFormProps) {
     validateOnBlur: false,
     validateOnChange: false,
     validate: (values) => {
-      const validationErrors: FormikErrors<CreateAdminBrandRequest> &
-        Record<string, string> = {};
-
-      if (!values.englishName.trim()) {
-        validationErrors.englishName = "영어 이름을 입력해주세요.";
-      }
-
-      if (!values.profileImageUrl) {
-        validationErrors.profileImageUrl = "프로필 이미지를 업로드해주세요.";
-      }
-
-      values.textList.forEach((text) => {
-        const languageName =
-          LANGUAGE_LIST.find((language) => language.id === text.languageId)
-            ?.name ?? "";
-
-        if (!text.name.trim()) {
-          validationErrors[`name_${text.languageId}`] =
-            `${languageName} 브랜드명을 입력해주세요.`;
-        }
-
-        if (!text.description.trim()) {
-          validationErrors[`description_${text.languageId}`] =
-            `${languageName} 설명을 입력해주세요.`;
-        }
-      });
-
-      values.sectionList.forEach((section, sectionIndex) => {
-        section.textList.forEach((text) => {
-          const languageName =
-            LANGUAGE_LIST.find((language) => language.id === text.languageId)
-              ?.name ?? "";
-
-          if (!text.title.trim()) {
-            validationErrors[
-              `section_${sectionIndex}_title_${text.languageId}`
-            ] = `${languageName} 섹션 제목을 입력해주세요.`;
-          }
-
-          if (!text.content.trim()) {
-            validationErrors[
-              `section_${sectionIndex}_content_${text.languageId}`
-            ] = `${languageName} 섹션 내용을 입력해주세요.`;
-          }
-        });
-      });
-
-      if (values.bannerImageUrlList.length < BANNER_REQUIRED_COUNT) {
-        validationErrors.bannerImageUrlList = `PC 배너 이미지를 ${BANNER_REQUIRED_COUNT}장 업로드해주세요.`;
-      }
-
-      if (values.mobileBannerImageUrlList.length < BANNER_REQUIRED_COUNT) {
-        validationErrors.mobileBannerImageUrlList = `모바일 배너 이미지를 ${BANNER_REQUIRED_COUNT}장 업로드해주세요.`;
-      }
-
+      const validationErrors = validateForm(values);
       return validationErrors;
     },
     onSubmit: (values) => {
-      const existingBannerList = brandData?.data.bannerList ?? [];
-      const existingMobileBannerList = brandData?.data.mobileBannerList ?? [];
-      const existingSectionImageLists = (() => {
-        const multilingualTextList = brandData?.data.multilingualTextList;
-        if (!multilingualTextList?.length) return [];
-
-        const sectionCount = multilingualTextList.reduce(
-          (max, text) => Math.max(max, text.section?.length ?? 0),
-          0,
-        );
-
-        return Array.from({ length: sectionCount }, (_, sectionIndex) => {
-          const sectionForImages = multilingualTextList.find(
-            (text) => text.section?.[sectionIndex]?.imageList.length,
-          );
-
-          return (
-            sectionForImages?.section?.[sectionIndex]?.imageList ??
-            multilingualTextList[0]?.section?.[sectionIndex]?.imageList ??
-            []
-          );
-        });
-      })();
-
-      const bannerImageUrlList: UpdateAdminBrandImagePayload[] =
-        values.bannerImageUrlList.map((imageUrl, index) => ({
-          oldImageUrl: stripImageDomain(existingBannerList[index] ?? imageUrl),
-          newImageUrl: stripImageDomain(imageUrl),
-        }));
-
-      const mobileBannerImageUrlList: UpdateAdminBrandImagePayload[] =
-        values.mobileBannerImageUrlList.map((imageUrl, index) => ({
-          oldImageUrl: stripImageDomain(
-            existingMobileBannerList[index] ?? imageUrl,
-          ),
-          newImageUrl: stripImageDomain(imageUrl),
-        }));
-
-      const sectionList: UpdateAdminBrandSectionPayload[] =
-        values.sectionList.map((section, sectionIndex) => {
-          const imageUrlList: UpdateAdminBrandImagePayload[] =
-            section.imageUrlList.map((imageUrl, imageIndex) => ({
-              oldImageUrl: stripImageDomain(
-                existingSectionImageLists[sectionIndex]?.[imageIndex] ??
-                  imageUrl,
-              ),
-              newImageUrl: stripImageDomain(imageUrl),
-            }));
-
-          const imageSortOrderList: UpdateAdminBrandSectionImageSortOrder[] =
-            section.imageUrlList.map((imageUrl, imageIndex) => ({
-              imageUrl: stripImageDomain(imageUrl),
-              sortOrder: imageIndex + 1,
-            }));
-
-          return {
-            id: sectionIndex + 1,
-            textList: section.textList,
-            imageUrlList,
-            imageSortOrderList,
-          };
-        });
-
-      const sectionSortOrderList: UpdateAdminBrandSectionSortOrder[] =
-        sectionList.map((section, sectionIndex) => ({
-          sectionId: section.id,
-          sortOrder: sectionIndex + 1,
-        }));
-
-      const payload: UpdateAdminBrandRequest = {
-        textList: values.textList,
-        categoryId: values.categoryId,
-        profileImageUrl: stripImageDomain(values.profileImageUrl),
-        sectionList,
-        bannerImageUrlList,
-        mobileBannerImageUrlList,
-        productBannerImage: stripImageDomain(values.productBannerImageUrl),
-        englishName: values.englishName,
-        sectionSortOrderList,
-      };
-
+      const payload = getEditFormPayload({ data: brandData.data, values });
       mutate({ brandId: id, payload });
     },
   });
@@ -216,78 +82,10 @@ export default function BrandForm({ id }: BrandFormProps) {
   const { setValues } = formik;
 
   useEffect(() => {
-    if (!brandData?.data) return;
+    if (!brandData) return;
 
-    const {
-      bannerList,
-      mobileBannerList,
-      multilingualTextList,
-      categoryId,
-      englishName,
-      profileImage,
-      productBannerImage,
-    } = brandData.data;
-
-    const textList = LANGUAGE_LIST.map((language) => {
-      const text = multilingualTextList.find(
-        (item) => item.languageId === language.id,
-      );
-
-      return {
-        languageId: language.id,
-        name: text?.name ?? "",
-        description: text?.description ?? "",
-      };
-    });
-
-    const sectionCount = multilingualTextList.reduce(
-      (max, text) => Math.max(max, text.section?.length ?? 0),
-      0,
-    );
-
-    const sectionList =
-      sectionCount > 0
-        ? Array.from({ length: sectionCount }, (_, sectionIndex) => {
-            const baseSection = createEmptySection();
-            const sectionForImages = multilingualTextList.find(
-              (text) => text.section?.[sectionIndex]?.imageList.length,
-            );
-            const imageUrlList =
-              sectionForImages?.section?.[sectionIndex]?.imageList ??
-              multilingualTextList[0]?.section?.[sectionIndex]?.imageList ??
-              [];
-
-            const sectionTextList = LANGUAGE_LIST.map((language) => {
-              const section = multilingualTextList.find(
-                (text) => text.languageId === language.id,
-              )?.section?.[sectionIndex];
-
-              return {
-                languageId: language.id,
-                title: section?.title ?? "",
-                content: section?.content ?? "",
-              };
-            });
-
-            return {
-              ...baseSection,
-              imageUrlList,
-              textList: sectionTextList,
-            };
-          })
-        : [createEmptySection()];
-
-    setValues((prev) => ({
-      ...prev,
-      textList,
-      sectionList,
-      englishName,
-      categoryId,
-      profileImageUrl: profileImage,
-      productBannerImageUrl: productBannerImage,
-      bannerImageUrlList: bannerList,
-      mobileBannerImageUrlList: mobileBannerList,
-    }));
+    const initialValues = getInitialValuesFromData(brandData.data);
+    setValues(initialValues);
   }, [brandData, setValues]);
 
   return (
