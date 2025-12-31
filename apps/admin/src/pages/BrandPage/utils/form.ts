@@ -10,7 +10,7 @@ import type {
 } from "@shared/services/brand";
 import type { FormikErrors } from "formik";
 
-import { stripImageDomain } from "./section";
+import { createEmptySection, stripImageDomain } from "./section";
 import { BANNER_REQUIRED_COUNT } from "../constants";
 
 export const getAddFormPayload = (values: CreateAdminBrandRequest) => {
@@ -176,4 +176,76 @@ export const validateForm = (values: CreateAdminBrandRequest) => {
   }
 
   return validationErrors;
+};
+
+export const getInitialValuesFromData = (data: AdminBrandDetail) => {
+  const {
+    bannerList,
+    mobileBannerList,
+    multilingualTextList,
+    categoryId,
+    englishName,
+    profileImage,
+    productBannerImage,
+  } = data;
+
+  const textList = LANGUAGE_LIST.map((language) => {
+    const text = multilingualTextList.find(
+      (item) => item.languageId === language.id,
+    );
+
+    return {
+      languageId: language.id,
+      name: text?.name ?? "",
+      description: text?.description ?? "",
+    };
+  });
+
+  const sectionCount = multilingualTextList.reduce(
+    (max: number, text) => Math.max(max, text.section?.length ?? 0),
+    0,
+  );
+
+  const sectionList =
+    sectionCount > 0
+      ? Array.from({ length: sectionCount }, (_, sectionIndex) => {
+          const baseSection = createEmptySection();
+          const sectionForImages = multilingualTextList.find(
+            (text) => text.section?.[sectionIndex]?.imageList.length,
+          );
+          const imageUrlList =
+            sectionForImages?.section?.[sectionIndex]?.imageList ??
+            multilingualTextList[0]?.section?.[sectionIndex]?.imageList ??
+            [];
+
+          const sectionTextList = LANGUAGE_LIST.map((language) => {
+            const section = multilingualTextList.find(
+              (text) => text.languageId === language.id,
+            )?.section?.[sectionIndex];
+
+            return {
+              languageId: language.id,
+              title: section?.title ?? "",
+              content: section?.content ?? "",
+            };
+          });
+
+          return {
+            ...baseSection,
+            imageUrlList,
+            textList: sectionTextList,
+          };
+        })
+      : [createEmptySection()];
+
+  return {
+    englishName,
+    categoryId,
+    profileImageUrl: profileImage,
+    productBannerImageUrl: productBannerImage,
+    textList,
+    sectionList,
+    bannerImageUrlList: bannerList,
+    mobileBannerImageUrlList: mobileBannerList,
+  };
 };

@@ -30,8 +30,8 @@ export function BrandEditPage() {
             <ArrowLeft className="mr-2 h-4 w-4" />
             목록으로
           </Button>
-          <h2 className="mb-2">브랜드 추가</h2>
-          <p className="text-gray-600">새로운 브랜드를 등록합니다.</p>
+          <h2 className="mb-2">브랜드 수정</h2>
+          <p className="text-gray-600">브랜드 정보를 수정합니다.</p>
         </div>
         <BrandForm id={id as BrandId} />
       </div>
