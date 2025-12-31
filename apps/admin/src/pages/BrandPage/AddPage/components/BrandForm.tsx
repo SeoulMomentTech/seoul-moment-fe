@@ -17,7 +17,8 @@ import { BannerImages } from "../../components/BannerImages";
 import { BasicInfo } from "../../components/BasicInfo";
 import { BrandSections } from "../../components/BrandSection";
 import { useCreateAdminBrandMutation } from "../../hooks";
-import { createEmptySection, stripImageDomain } from "../../utils/section";
+import { getAddFormPayload } from "../../utils/form";
+import { createEmptySection } from "../../utils/section";
 
 const BANNER_REQUIRED_COUNT = 2;
 
@@ -112,18 +113,8 @@ export default function BrandForm() {
       return validationErrors;
     },
     onSubmit: async (values) => {
-      await createBrand({
-        ...values,
-        profileImageUrl: stripImageDomain(values.profileImageUrl),
-        productBannerImageUrl: stripImageDomain(values.productBannerImageUrl),
-        bannerImageUrlList: values.bannerImageUrlList.map(stripImageDomain),
-        mobileBannerImageUrlList:
-          values.mobileBannerImageUrlList.map(stripImageDomain),
-        sectionList: values.sectionList.map((section) => ({
-          ...section,
-          imageUrlList: section.imageUrlList.map(stripImageDomain),
-        })),
-      });
+      const payload = getAddFormPayload(values);
+      await createBrand(payload);
     },
   });
 
