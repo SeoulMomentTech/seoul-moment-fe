@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+
 import { Navigate, useNavigate, useParams } from "react-router";
 
 import { ArrowLeft } from "lucide-react";
@@ -33,7 +35,9 @@ export function BrandEditPage() {
           <h2 className="mb-2">브랜드 수정</h2>
           <p className="text-gray-600">브랜드 정보를 수정합니다.</p>
         </div>
-        <BrandForm id={id as BrandId} />
+        <Suspense fallback={<></>}>
+          <BrandForm id={id as BrandId} />
+        </Suspense>
       </div>
     </div>
   );
