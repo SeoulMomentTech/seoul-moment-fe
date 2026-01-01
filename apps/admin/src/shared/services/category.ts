@@ -41,7 +41,7 @@ export interface AdminCategoryTextPayload {
 }
 
 export interface CreateAdminCategoryRequest {
-  list: AdminCategoryTextPayload[];
+  name: string;
 }
 
 export interface UpdateAdminCategoryRequest {

@@ -10,9 +10,9 @@ import type { CategoryNames } from "../utils";
 
 interface CategoryCreateModalProps {
   isOpen: boolean;
-  defaultValues: CategoryNames;
+  defaultValues: Pick<CategoryNames, "ko">;
   onClose(): void;
-  onSubmit(values: CategoryNames): void | Promise<void>;
+  onSubmit(value: string): void | Promise<void>;
   isSubmitting?: boolean;
 }
 
@@ -28,7 +28,7 @@ export function CategoryCreateModal({
     handleSubmit,
     reset,
     formState: { isValid, errors },
-  } = useForm<CategoryNames>({
+  } = useForm<Pick<CategoryNames, "ko">>({
     defaultValues,
     mode: "onChange",
   });
@@ -38,13 +38,14 @@ export function CategoryCreateModal({
   }, [defaultValues, reset]);
 
   const handleClose = () => {
+    if (isSubmitting) return;
+
     reset(defaultValues);
     onClose();
   };
 
-  const onValid: SubmitHandler<CategoryNames> = async (values) => {
-    await onSubmit(values);
-    reset(defaultValues);
+  const onValid: SubmitHandler<Pick<CategoryNames, "ko">> = async (values) => {
+    await onSubmit(values.ko);
   };
 
   if (!isOpen) {
@@ -64,6 +65,7 @@ export function CategoryCreateModal({
           <h2>새 카테고리 추가</h2>
           <button
             className="rounded-sm opacity-70 hover:opacity-100"
+            disabled={isSubmitting}
             onClick={handleClose}
             type="button"
           >
@@ -78,6 +80,7 @@ export function CategoryCreateModal({
             <Label htmlFor="categoryNameKo">카테고리 이름(한국어)</Label>
             <Input
               className="h-[40px] rounded-md bg-white"
+              disabled={isSubmitting}
               id="categoryNameKo"
               placeholder="예: 전자기기"
               {...register("ko", { required: true })}
@@ -88,35 +91,14 @@ export function CategoryCreateModal({
               </p>
             ) : null}
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="categoryNameEn">카테고리 이름(영어)</Label>
-            <Input
-              className="h-[40px] rounded-md bg-white"
-              id="categoryNameEn"
-              placeholder="예: Electronics"
-              {...register("en", { required: true })}
-            />
-            {errors.en ? (
-              <p className="text-sm text-red-500">영어 이름을 입력해주세요.</p>
-            ) : null}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="categoryNameZh">카테고리 이름(중국어)</Label>
-            <Input
-              className="h-[40px] rounded-md bg-white"
-              id="categoryNameZh"
-              placeholder="예: 电子产品"
-              {...register("zh", { required: true })}
-            />
-            {errors.zh ? (
-              <p className="text-sm text-red-500">
-                중국어 이름을 입력해주세요.
-              </p>
-            ) : null}
-          </div>
         </div>
         <Flex gap={8} justify="flex-end">
-          <Button onClick={handleClose} type="button" variant="outline">
+          <Button
+            disabled={isSubmitting}
+            onClick={handleClose}
+            type="button"
+            variant="outline"
+          >
             취소
           </Button>
           <Button disabled={isSubmitting || !isValid} type="submit">
