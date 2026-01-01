@@ -1,6 +1,7 @@
 import { useMemo, useState, type KeyboardEvent } from "react";
 
 import { Pagination } from "@shared/components/pagination";
+import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from "@shared/constants/page";
 import type { AdminCategory, CategoryId } from "@shared/services/category";
 
 import {
@@ -23,7 +24,7 @@ export default function ProductCategoriesPage() {
   const [searchInput, setSearchInput] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [sort] = useState<"ASC" | "DESC">("DESC");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<AdminCategory | null>(
@@ -56,13 +57,13 @@ export default function ProductCategoriesPage() {
     }
   };
 
-  const handleAddCategory = async (values: CategoryNames) => {
+  const handleAddCategory = async (value: CategoryNames["ko"]) => {
     try {
       await createCategory({
-        list: toNamePayload(values),
+        name: value,
       });
       setIsModalOpen(false);
-      setPage(1);
+      setPage(DEFAULT_PAGE);
     } catch (error) {
       console.error("카테고리 추가 오류:", error);
       alert("카테고리를 추가하는 중 오류가 발생했습니다.");
@@ -143,7 +144,7 @@ export default function ProductCategoriesPage() {
       <CategoryHeader onClickAdd={() => setIsModalOpen(true)} />
 
       <CategoryCreateModal
-        defaultValues={EMPTY_NAMES}
+        defaultValues={{ ko: EMPTY_NAMES["ko"] }}
         isOpen={isModalOpen}
         isSubmitting={isCreating}
         onClose={() => setIsModalOpen(false)}
@@ -166,7 +167,7 @@ export default function ProductCategoriesPage() {
         <CategoryFilters
           onPageSizeChange={(value) => {
             setPageSize(value);
-            setPage(1);
+            setPage(DEFAULT_PAGE);
           }}
           onSearch={handleSearch}
           onSearchInputChange={(value) => setSearchInput(value)}
