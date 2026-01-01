@@ -38,6 +38,8 @@ export function CategoryEditModal({
   }, [defaultValues, reset]);
 
   const handleClose = () => {
+    if (isSubmitting) return;
+
     reset(defaultValues);
     onClose();
   };
@@ -79,6 +81,7 @@ export function CategoryEditModal({
               id="editCategoryNameKo"
               placeholder="예: 전자기기"
               {...register("ko", { required: true })}
+              disabled={isSubmitting}
             />
             {errors.ko ? (
               <p className="text-sm text-red-500">
@@ -93,6 +96,7 @@ export function CategoryEditModal({
               id="editCategoryNameEn"
               placeholder="예: Electronics"
               {...register("en", { required: true })}
+              disabled={isSubmitting}
             />
             {errors.en ? (
               <p className="text-sm text-red-500">영어 이름을 입력해주세요.</p>
@@ -105,6 +109,7 @@ export function CategoryEditModal({
               id="editCategoryNameZh"
               placeholder="예: 电子产品"
               {...register("zh", { required: true })}
+              disabled={isSubmitting}
             />
             {errors.zh ? (
               <p className="text-sm text-red-500">
