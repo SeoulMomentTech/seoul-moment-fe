@@ -1,5 +1,7 @@
 import { useState, type KeyboardEvent } from "react";
 
+import { useNavigate } from "react-router";
+
 import { Plus } from "lucide-react";
 
 import { PageHeader } from "@shared/components/page-header";
@@ -10,6 +12,8 @@ import {
   DEFAULT_SORT,
 } from "@shared/constants/page";
 import type { ProductOptionId } from "@shared/services/productOption";
+
+import { PATH } from "@/shared/constants/route";
 
 import { Button } from "@seoul-moment/ui";
 
@@ -31,6 +35,8 @@ export default function ProductOptionsPage() {
     search: searchQuery || undefined,
     sort,
   });
+
+  const navigate = useNavigate();
 
   const { mutateAsync: deleteOption, isPending: isDeleting } =
     useDeleteAdminProductOptionMutation();
@@ -75,7 +81,7 @@ export default function ProductOptionsPage() {
       <PageHeader
         description="상품에 적용할 옵션을 관리하세요."
         right={
-          <Button disabled>
+          <Button onClick={() => navigate(PATH.PRODUCT_OPTIONS_ADD)}>
             <Plus className="mr-2 h-4 w-4" />
             옵션 추가
           </Button>

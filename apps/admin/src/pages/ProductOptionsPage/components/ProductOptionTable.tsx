@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router";
+
 import { Edit, Trash2 } from "lucide-react";
 
 import {
@@ -28,6 +30,8 @@ export function ProductOptionTable({
   onDelete,
   isDeleting,
 }: ProductOptionTableProps) {
+  const navigate = useNavigate();
+
   if (isLoading) {
     return (
       <div className="flex w-full items-center justify-center p-12">
@@ -76,7 +80,13 @@ export function ProductOptionTable({
                   : "-"}
               </TableCell>
               <TableCell>
-                <Button size="sm" variant="ghost">
+                <Button
+                  onClick={() =>
+                    navigate(`/products/options/edit/${option.id}`)
+                  }
+                  size="sm"
+                  variant="ghost"
+                >
                   <Edit className="h-4 w-4" />
                 </Button>
                 <Button

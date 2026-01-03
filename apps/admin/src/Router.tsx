@@ -9,6 +9,8 @@ import {
 import { BrandAddPage } from "@pages/BrandPage/AddPage";
 import { BrandEditPage } from "@pages/BrandPage/EditPage";
 import { BrandListPage } from "@pages/BrandPage/ListPage";
+import ProductOptionAddPage from "@pages/ProductOptionsPage/AddPage";
+import ProductOptionEditPage from "@pages/ProductOptionsPage/EditPage";
 import { GlobalErrorBoundary } from "@shared/components/global-errorboundary";
 import { Layout } from "@shared/components/layout";
 import { PATH } from "@shared/constants/route";
@@ -90,6 +92,14 @@ const privateRoutes: RouteObject[] = [
       {
         path: PATH.PRODUCT_OPTIONS,
         element: <ProductOptionsPage />,
+      },
+      {
+        path: PATH.PRODUCT_OPTIONS_ADD,
+        element: <ProductOptionAddPage />,
+      },
+      {
+        path: PATH.PRODUCT_OPTIONS_EDIT,
+        element: <ProductOptionEditPage />,
       },
       {
         path: PATH.HOME_BANNER,
