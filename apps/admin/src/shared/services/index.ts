@@ -5,6 +5,8 @@ import axios, {
   type InternalAxiosRequestConfig,
 } from "axios";
 
+import { type ApiResponse } from "./types";
+
 const api = axios.create({
   baseURL:
     import.meta.env.VITE_ADMIN_API_BASE_URL ??
@@ -26,11 +28,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-interface ApiResponse<T> {
-  result: boolean;
-  data: T;
-}
-
 interface AdminOneTimeTokenResponse {
   oneTimeToken: string;
 }
@@ -50,16 +47,13 @@ const refreshAccessToken = async (): Promise<string | null> => {
   }
 
   refreshPromise = axios
-    .get<ApiResponse<AdminOneTimeTokenResponse>>(
-      "/admin/auth/one-time-token",
-      {
-        baseURL: api.defaults.baseURL,
-        timeout: 10000,
-        headers: {
-          Authorization: `Bearer ${refreshToken}`,
-        },
+    .get<ApiResponse<AdminOneTimeTokenResponse>>("/admin/auth/one-time-token", {
+      baseURL: api.defaults.baseURL,
+      timeout: 10000,
+      headers: {
+        Authorization: `Bearer ${refreshToken}`,
       },
-    )
+    })
     .then((res) => {
       const newToken = res.data.data.oneTimeToken;
       useAuthStore.getState().updateAccessToken(newToken);

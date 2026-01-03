@@ -1,11 +1,8 @@
+import { type ApiResponse, type SortDirection } from "./types";
+
 import { fetcher } from ".";
 
-interface ApiResponse<T> {
-  result: boolean;
-  data: T;
-}
-
-export type AdminProductBannerSort = "ASC" | "DESC";
+export type AdminProductBannerSort = SortDirection;
 export type ProductBannerId = Branded<number, "ProductBannerId">;
 
 export interface AdminProductBannerListItem {
@@ -85,22 +82,18 @@ export const updateAdminProductBannerSortOrder = (
 export const updateAdminProductBanner = (
   productBannerId: ProductBannerId,
   payload: UpdateAdminProductBannerRequest,
-) =>
-  fetcher.patch(`/admin/product/banner/${productBannerId}`, payload);
+) => fetcher.patch(`/admin/product/banner/${productBannerId}`, payload);
 
 /**
  * @description 상품 배너 삭제
  */
-export const deleteAdminProductBanner = (
-  productBannerId: ProductBannerId,
-) => fetcher.delete(`/admin/product/banner/${productBannerId}`);
+export const deleteAdminProductBanner = (productBannerId: ProductBannerId) =>
+  fetcher.delete(`/admin/product/banner/${productBannerId}`);
 
 /**
  * @description 상품 배너 상세 조회
  */
-export const getAdminProductBannerDetail = (
-  productBannerId: ProductBannerId,
-) =>
+export const getAdminProductBannerDetail = (productBannerId: ProductBannerId) =>
   fetcher.get<ApiResponse<AdminProductBannerDetail>>(
     `/admin/product/banner/${productBannerId}`,
   );

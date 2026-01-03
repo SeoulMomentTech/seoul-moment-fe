@@ -1,11 +1,8 @@
+import { type ApiResponse, type SortDirection } from "./types";
+
 import { fetcher } from ".";
 
-interface ApiResponse<T> {
-  result: boolean;
-  data: T;
-}
-
-export type AdminCategorySort = "ASC" | "DESC";
+export type AdminCategorySort = SortDirection;
 export type AdminCategorySearchColumn = "name";
 
 export type CategoryId = Branded<number, "CategoryId">;
