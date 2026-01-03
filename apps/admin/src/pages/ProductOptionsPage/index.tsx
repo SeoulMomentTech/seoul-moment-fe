@@ -1,5 +1,7 @@
 import { useState, type KeyboardEvent } from "react";
 
+import { Plus } from "lucide-react";
+
 import { PageHeader } from "@shared/components/page-header";
 import { Pagination } from "@shared/components/pagination";
 import {
@@ -8,6 +10,8 @@ import {
   DEFAULT_SORT,
 } from "@shared/constants/page";
 import type { ProductOptionId } from "@shared/services/productOption";
+
+import { Button } from "@seoul-moment/ui";
 
 import { ProductOptionFilters, ProductOptionTable } from "./components";
 import {
@@ -70,6 +74,12 @@ export default function ProductOptionsPage() {
     <div className="p-8 pt-24">
       <PageHeader
         description="상품에 적용할 옵션을 관리하세요."
+        right={
+          <Button disabled>
+            <Plus className="mr-2 h-4 w-4" />
+            옵션 추가
+          </Button>
+        }
         title="상품 옵션 관리"
       />
       <div className="mb-6 rounded-lg border border-gray-200 bg-white">
