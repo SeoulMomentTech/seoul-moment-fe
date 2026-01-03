@@ -6,4 +6,6 @@ export const productOptionQueryKeys = {
   all: PRODUCT_OPTION_QUERY_KEY,
   list: (params?: AdminProductOptionListParams) =>
     [...PRODUCT_OPTION_QUERY_KEY, "list", params] as const,
+  detail: (optionId: number) =>
+    [...PRODUCT_OPTION_QUERY_KEY, "detail", optionId] as const,
 };
