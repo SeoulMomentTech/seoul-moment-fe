@@ -1,11 +1,8 @@
+import { type ApiResponse, type SortDirection } from "./types";
+
 import { fetcher } from ".";
 
-interface ApiResponse<T> {
-  result: boolean;
-  data: T;
-}
-
-export type AdminProductItemSort = "ASC" | "DESC";
+export type AdminProductItemSort = SortDirection;
 
 export type AdminProductItemId = Branded<number, "AdminProductItemId">;
 
@@ -37,9 +34,7 @@ export interface AdminProductItemListParams {
 /**
  * @description 상품 정보 리스트
  */
-export const getAdminProductItemList = (
-  params?: AdminProductItemListParams,
-) =>
+export const getAdminProductItemList = (params?: AdminProductItemListParams) =>
   fetcher.get<ApiResponse<AdminProductItemListData>>("/admin/product/item", {
     params,
   });

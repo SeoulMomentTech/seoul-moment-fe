@@ -19,7 +19,8 @@ export type MenuItem =
   | "settings"
   | "banner"
   | "home-banner"
-  | "brand";
+  | "brand"
+  | "product-options";
 
 export function Layout({ children }: PropsWithChildren) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

@@ -7,6 +7,11 @@ export const PATH = {
   PRODUCT_CATEGORIES: "/products/categories",
   PRODUCT_SUB_CATEGORIES: "/products/sub-categories",
   PRODUCT_LIST: "/products/list",
+  PRODUCT_OPTIONS: "/products/options",
+  PRODUCT_OPTIONS_ADD: "/products/options/add",
+  PRODUCT_OPTIONS_EDIT: "/products/options/edit/:id",
+  // Order
+  ORDERS: "/orders",
 
   // Banner
   HOME_BANNER: "/banner/home",
