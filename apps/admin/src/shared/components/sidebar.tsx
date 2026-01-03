@@ -72,6 +72,11 @@ const menuItems: MenuItemConfig[] = [
         label: "서브 카테고리",
         path: "/products/sub-categories",
       },
+      {
+        id: "product-options",
+        label: "상품 옵션",
+        path: "/products/options",
+      },
     ],
   },
   {

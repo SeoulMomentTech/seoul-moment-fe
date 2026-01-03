@@ -9,6 +9,8 @@ import {
 import { BrandAddPage } from "@pages/BrandPage/AddPage";
 import { BrandEditPage } from "@pages/BrandPage/EditPage";
 import { BrandListPage } from "@pages/BrandPage/ListPage";
+import ProductOptionAddPage from "@pages/ProductOptionsPage/AddPage";
+import ProductOptionEditPage from "@pages/ProductOptionsPage/EditPage";
 import { GlobalErrorBoundary } from "@shared/components/global-errorboundary";
 import { Layout } from "@shared/components/layout";
 import { PATH } from "@shared/constants/route";
@@ -18,6 +20,7 @@ import { HomeBannersPage } from "@pages/HomeBannerPage";
 import HomePage from "@pages/HomePage";
 import LoginPage from "@pages/LoginPage";
 import ProductCategoriesPage from "@pages/ProductCategoriesPage";
+import ProductOptionsPage from "@pages/ProductOptionsPage";
 import ProductsPage from "@pages/ProductPage";
 import ProductSubCategoriesPage from "@pages/ProductSubCategoriesPage";
 import SignUpPage from "@pages/SignUpPage";
@@ -85,6 +88,18 @@ const privateRoutes: RouteObject[] = [
       {
         path: PATH.PRODUCT_SUB_CATEGORIES,
         element: <ProductSubCategoriesPage />,
+      },
+      {
+        path: PATH.PRODUCT_OPTIONS,
+        element: <ProductOptionsPage />,
+      },
+      {
+        path: PATH.PRODUCT_OPTIONS_ADD,
+        element: <ProductOptionAddPage />,
+      },
+      {
+        path: PATH.PRODUCT_OPTIONS_EDIT,
+        element: <ProductOptionEditPage />,
       },
       {
         path: PATH.HOME_BANNER,
