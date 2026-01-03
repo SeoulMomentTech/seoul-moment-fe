@@ -30,7 +30,7 @@ export function ProductOptionTable({
 }: ProductOptionTableProps) {
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center p-12">
+      <div className="flex w-full items-center justify-center p-12">
         <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900" />
       </div>
     );
@@ -52,7 +52,7 @@ export function ProductOptionTable({
       <TableBody>
         {options.length === 0 ? (
           <TableRow>
-            <TableCell className="py-12 text-center text-gray-500" colSpan={1}>
+            <TableCell className="py-12 text-center text-gray-500" colSpan={7}>
               옵션이 없습니다.
             </TableCell>
           </TableRow>
