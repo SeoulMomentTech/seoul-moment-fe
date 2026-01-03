@@ -1,6 +1,9 @@
 import { Edit, Trash2 } from "lucide-react";
 
-import { type AdminProductOptionListItem } from "@shared/services/productOption";
+import {
+  type AdminProductOptionListItem,
+  type ProductOptionId,
+} from "@shared/services/productOption";
 
 import {
   Table,
@@ -14,12 +17,16 @@ import {
 
 interface ProductOptionTableProps {
   options: AdminProductOptionListItem[];
+  onDelete(optionId: ProductOptionId): void;
   isLoading: boolean;
+  isDeleting: boolean;
 }
 
 export function ProductOptionTable({
   options,
   isLoading,
+  onDelete,
+  isDeleting,
 }: ProductOptionTableProps) {
   if (isLoading) {
     return (
@@ -72,7 +79,12 @@ export function ProductOptionTable({
                 <Button size="sm" variant="ghost">
                   <Edit className="h-4 w-4" />
                 </Button>
-                <Button size="sm" variant="ghost">
+                <Button
+                  disabled={isDeleting}
+                  onClick={() => onDelete(option.id)}
+                  size="sm"
+                  variant="ghost"
+                >
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </TableCell>

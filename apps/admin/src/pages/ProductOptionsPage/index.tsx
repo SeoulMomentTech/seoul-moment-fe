@@ -1,15 +1,19 @@
 import { useState, type KeyboardEvent } from "react";
 
-import { PageHeader } from "@/shared/components/page-header";
-import { Pagination } from "@/shared/components/pagination";
+import { PageHeader } from "@shared/components/page-header";
+import { Pagination } from "@shared/components/pagination";
 import {
   DEFAULT_PAGE,
   DEFAULT_PAGE_SIZE,
   DEFAULT_SORT,
-} from "@/shared/constants/page";
+} from "@shared/constants/page";
+import type { ProductOptionId } from "@shared/services/productOption";
 
 import { ProductOptionFilters, ProductOptionTable } from "./components";
-import { useAdminProductOptionListQuery } from "./hooks";
+import {
+  useAdminProductOptionListQuery,
+  useDeleteAdminProductOptionMutation,
+} from "./hooks";
 
 export default function ProductOptionsPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -23,6 +27,9 @@ export default function ProductOptionsPage() {
     search: searchQuery || undefined,
     sort,
   });
+
+  const { mutateAsync: deleteOption, isPending: isDeleting } =
+    useDeleteAdminProductOptionMutation();
 
   const options = data?.data.list ?? [];
   const total = data?.data.total ?? 0;
@@ -41,6 +48,22 @@ export default function ProductOptionsPage() {
 
   const toggleSort = () => {
     setSort(sort === "ASC" ? "DESC" : "ASC");
+  };
+
+  const handleDeleteOption = async (optionId: ProductOptionId) => {
+    const confirmed = confirm("정말 이 옵션을 삭제하시겠습니까?");
+    if (!confirmed) return;
+
+    try {
+      await deleteOption(optionId, {
+        onSuccess: () => {
+          setPage(1);
+        },
+      });
+    } catch (error) {
+      console.error("옵션 삭제 오류:", error);
+      alert("옵션을 삭제하는 중 오류가 발생했습니다.");
+    }
   };
 
   return (
@@ -66,7 +89,12 @@ export default function ProductOptionsPage() {
           searchInput={searchInput}
           sort={sort}
         />
-        <ProductOptionTable isLoading={isLoading} options={options} />
+        <ProductOptionTable
+          isDeleting={isDeleting}
+          isLoading={isLoading}
+          onDelete={handleDeleteOption}
+          options={options}
+        />
       </div>
 
       <Pagination
