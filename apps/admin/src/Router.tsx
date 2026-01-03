@@ -18,6 +18,7 @@ import { HomeBannersPage } from "@pages/HomeBannerPage";
 import HomePage from "@pages/HomePage";
 import LoginPage from "@pages/LoginPage";
 import ProductCategoriesPage from "@pages/ProductCategoriesPage";
+import ProductOptionsPage from "@pages/ProductOptionsPage";
 import ProductsPage from "@pages/ProductPage";
 import ProductSubCategoriesPage from "@pages/ProductSubCategoriesPage";
 import SignUpPage from "@pages/SignUpPage";
@@ -85,6 +86,10 @@ const privateRoutes: RouteObject[] = [
       {
         path: PATH.PRODUCT_SUB_CATEGORIES,
         element: <ProductSubCategoriesPage />,
+      },
+      {
+        path: PATH.PRODUCT_OPTIONS,
+        element: <ProductOptionsPage />,
       },
       {
         path: PATH.HOME_BANNER,
