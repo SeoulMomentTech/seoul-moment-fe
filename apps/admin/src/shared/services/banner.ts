@@ -1,9 +1,6 @@
-import { fetcher } from ".";
+import { type ApiResponse } from "./types";
 
-interface ApiResponse<T> {
-  result: boolean;
-  data: T;
-}
+import { fetcher } from ".";
 
 export type HomeBannerId = Branded<number, "HomeBannerId">;
 
