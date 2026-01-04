@@ -17,6 +17,7 @@ export function MainBanner({ promise }: MainBannerProps) {
   return (
     <section
       className={cn(
+        "flex justify-center",
         "h-[600px] min-w-[1280px] pt-[56px]",
         "max-sm:h-[350px] max-sm:min-w-full",
       )}
