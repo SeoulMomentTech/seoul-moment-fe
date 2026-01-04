@@ -2,6 +2,7 @@ import type { PropsWithChildren } from "react";
 
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
@@ -13,6 +14,7 @@ import ScrollToTop from "@shared/ui/scroll-to-top";
 
 import { routing } from "@/i18n/routing";
 
+import { cn } from "@seoul-moment/ui";
 import { Footer } from "@widgets/footer";
 import { Header } from "@widgets/header";
 
@@ -43,6 +45,9 @@ export default async function RootLayout({
   children,
   params,
 }: PropsWithChildren<Props>) {
+  const h = headers();
+  const isWebview = (await h).get("x-app-client") === "seoul-moment";
+
   const { locale } = await params;
   const messages = await getMessages();
 
@@ -53,7 +58,10 @@ export default async function RootLayout({
   return (
     <html lang={locale ?? "ko"}>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={cn(
+          `${geistSans.variable} ${geistMono.variable} antialiased`,
+          isWebview && "webview",
+        )}
       >
         <ScrollToTop />
         <NuqsAdapter>

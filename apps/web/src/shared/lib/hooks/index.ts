@@ -9,3 +9,4 @@ export { default as useIntersectionObserver } from "./useIntersectionObserver";
 export { default as useAppMutaion } from "./query/useAppMutation";
 export { default as useAppQuery } from "./query/useAppQuery";
 export { default as useAppInfiniteQuery } from "./query/useAppInfiniteQuery";
+export { default as useIsApp } from "./useIsApp";

@@ -114,11 +114,11 @@ function Mobile() {
         "h-full w-full max-sm:flex max-sm:items-center max-sm:justify-between",
       )}
     >
-      <div className="flex items-center gap-[10px]">
+      <div className={cn("flex items-center gap-[10px]")}>
         <Sheet onOpenChange={(isOpen) => setIsOpen(isOpen)} open={isOpen}>
           <SheetTrigger asChild>
             <button
-              className="cursor-pointer"
+              className="webview:hidden cursor-pointer"
               onClick={() => setIsOpen(true)}
               type="button"
             >
@@ -186,6 +186,7 @@ function Mobile() {
             </div>
           </SheetContent>
         </Sheet>
+
         <Link className={cn()} href="/">
           <Image alt="" height={16} src="/logo.png" width={133} />
         </Link>

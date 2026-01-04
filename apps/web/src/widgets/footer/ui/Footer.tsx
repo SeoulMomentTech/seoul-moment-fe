@@ -17,6 +17,7 @@ export function Footer() {
         "w-full bg-black font-medium text-white",
         styleMap.desktop,
         styleMap.mobile,
+        "webview:hidden",
       )}
     >
       <div className={cn("mx-auto w-full max-w-[1280px]")}>
