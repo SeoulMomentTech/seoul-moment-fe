@@ -28,7 +28,8 @@
     }
   },
   "include": [
-    "next-env.d.ts",
+    "src",
+    "**/*.d.ts",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",

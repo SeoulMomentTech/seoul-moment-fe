@@ -13,6 +13,9 @@ import {
   QueryClientProvider,
 } from "@tanstack/react-query";
 
+import { useIsApp } from "./hooks";
+import { cn } from "./style";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -63,4 +66,10 @@ export function ReactQueryProvider({ children }: PropsWithChildren) {
   return (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
+}
+
+export function WebviewProvider({ children }: PropsWithChildren) {
+  const isApp = useIsApp();
+
+  return <div className={cn(isApp && "webview")}>{children}</div>;
 }

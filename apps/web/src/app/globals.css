@@ -33,6 +33,8 @@
   --text-body-5: 12px;
 }
 
+@custom-variant webview (&:where(.webview, .webview *));
+
 @utility scrollbar-hide {
   /* Firefox */
   scrollbar-width: none;
