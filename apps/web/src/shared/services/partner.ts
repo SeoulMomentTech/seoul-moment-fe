@@ -8,17 +8,24 @@ interface GetPartnersReq extends PublicLanguageCode {
   country: PublicLanguageCode["languageCode"];
 }
 
-interface GetPartnerRes {
-  total: number;
-  list: [];
+interface Partner {
+  id: number;
+  image: string;
+  title: string;
+  description: string;
+  link: string;
 }
 
-export const getPartners = ({ id, country, languageCode }: GetPartnersReq) =>
+interface GetPartnerRes {
+  total: number;
+  list: Array<Partner>;
+}
+
+export const getPartners = ({ id, languageCode }: GetPartnersReq) =>
   api
     .get("partner", {
       searchParams: {
         partnerCategoryId: id,
-        country,
         languageCode,
       },
     })

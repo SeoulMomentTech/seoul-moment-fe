@@ -16,11 +16,7 @@ import usePartners from "../model/usePartners";
 export function Partners() {
   const [id, setId] = useState<number | null>();
 
-  const {
-    data: categories = [],
-    isFetchedAfterMount,
-    isEmpty,
-  } = usePartnerCategories();
+  const { data: categories = [], isEmpty } = usePartnerCategories();
   const { data: partners, isFetched: isPartnersFetched } = usePartners(
     id ?? 0,
     !isEmpty && !!id,
@@ -31,10 +27,10 @@ export function Partners() {
     isEmpty || (isPartnersFetched && partnerList.length === 0);
 
   useEffect(() => {
-    if (categories.length > 0 && isFetchedAfterMount) {
+    if (categories.length > 0) {
       setId(categories[0].id);
     }
-  }, [categories, isFetchedAfterMount]);
+  }, [categories]);
 
   return (
     <section
@@ -45,7 +41,7 @@ export function Partners() {
     >
       <div
         className={cn(
-          "relative z-[1] mx-auto max-w-[1280px] pb-[100px] pt-[140px] max-sm:py-[50px]",
+          "z-1 relative mx-auto max-w-[1280px] pb-[100px] pt-[140px] max-sm:py-[50px]",
         )}
       >
         <h2
@@ -67,7 +63,7 @@ export function Partners() {
               <TabsList className="flex h-[50px] items-center gap-[30px]">
                 {categories.map((category) => (
                   <TabsTrigger
-                    className="text-[18px]"
+                    className="text-body-1"
                     key={category.id}
                     value={`${category.id}`}
                   >
@@ -77,6 +73,7 @@ export function Partners() {
               </TabsList>
             </Tabs>
           )}
+
           {shouldShowEmpty ? (
             <Empty
               className="h-[360px] w-full max-sm:px-[20px]"
@@ -86,36 +83,23 @@ export function Partners() {
               }
             />
           ) : (
-            partnerList.length > 0 && (
-              <div
-                className={cn(
-                  "flex gap-[40px] max-sm:px-[20px]",
-                  "max-sm:flex-col max-sm:gap-[30px]",
-                )}
-              >
+            <div
+              className={cn(
+                "inline-flex gap-[40px] max-sm:px-[20px]",
+                "max-sm:flex-col max-sm:items-center max-sm:gap-[30px]",
+              )}
+            >
+              {partnerList.slice(0, 3).map((item) => (
                 <PartnerCard
-                  className="h-[360px] w-[400px] gap-[30px]"
-                  imageClassName="h-[240px]"
-                  imageUrl=""
-                  subTitle="심플 브랜드 설명"
-                  title="서울 모먼트 Brand"
+                  className="h-[360px] w-full max-w-[400px] gap-[30px]"
+                  imageUrl={item.image}
+                  key={item.id}
+                  link={item.link}
+                  subTitle={item.description}
+                  title={item.title}
                 />
-                <PartnerCard
-                  className="h-[360px] w-[400px] gap-[30px]"
-                  imageClassName="h-[240px]"
-                  imageUrl=""
-                  subTitle="심플 브랜드 설명"
-                  title="서울 모먼트 Brand"
-                />
-                <PartnerCard
-                  className="h-[360px] w-[400px] gap-[30px]"
-                  imageClassName="h-[240px]"
-                  imageUrl=""
-                  subTitle="심플 브랜드 설명"
-                  title="서울 모먼트 Brand"
-                />
-              </div>
-            )
+              ))}
+            </div>
           )}
         </div>
       </div>
