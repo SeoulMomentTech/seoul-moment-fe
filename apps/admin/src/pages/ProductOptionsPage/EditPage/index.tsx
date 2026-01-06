@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Navigate, useNavigate, useParams } from "react-router";
 
@@ -10,6 +10,7 @@ import type {
   ProductOptionType,
   ProductOptionUiType,
 } from "@shared/services/productOption";
+import { useFormik } from "formik";
 
 import { Button, Input, Label } from "@seoul-moment/ui";
 
@@ -67,21 +68,11 @@ interface ProductOptionContentsProps {
 }
 
 function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
-  const [optionType, setOptionType] = useState<ProductOptionType>("COLOR");
-  const [uiType, setUiType] = useState<ProductOptionUiType>("GRID");
-
-  const [textList, setTextList] = useState<
-    { languageId: number; name: string }[]
-  >(
-    LANGUAGE_OPTIONS.map((lang) => ({
-      languageId: lang.id,
-      name: "",
-    })),
-  );
   const [optionValues, setOptionValues] = useState<OptionValueForm[]>([]);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const hydratedOptionIdRef = useRef<number | null>(null);
 
   const navigate = useNavigate();
 
@@ -90,6 +81,45 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
 
   // useAdminProductOptionQuery 호출
   const { data, isPending } = useAdminProductOptionQuery(optionId);
+  const formik = useFormik({
+    initialValues: {
+      text: LANGUAGE_OPTIONS.map((lang) => ({
+        languageId: lang.id,
+        name: "",
+      })),
+      type: "COLOR" as ProductOptionType,
+      uiType: "GRID" as ProductOptionUiType,
+    },
+    enableReinitialize: false,
+    onSubmit: async (values, { setSubmitting }) => {
+      const allFilled = values.text.every(
+        (text) => text.name.trim().length > 0,
+      );
+      if (!allFilled) {
+        alert("모든 언어의 옵션 이름을 입력해주세요.");
+        return;
+      }
+
+      try {
+        await updateOption({
+          optionId,
+          payload: {
+            text: values.text,
+            type: values.type,
+            uiType: values.uiType,
+          },
+        });
+        alert("옵션 정보가 수정되었습니다.");
+      } catch (error) {
+        console.error("옵션 수정 오류:", error);
+        alert("옵션을 수정하는 중 오류가 발생했습니다.");
+      } finally {
+        setSubmitting(false);
+      }
+    },
+  });
+
+  const { dirty, resetForm } = formik;
 
   useEffect(() => {
     if (data) {
@@ -99,40 +129,47 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
         "zh-TW": 3,
       };
 
-      setOptionType(data.type);
-      setUiType(data.uiType);
+      const nextTextList = LANGUAGE_OPTIONS.map((lang) => {
+        const matchedName = data.nameDto.find(
+          (dto) => LANGUAGE_CODE_TO_ID[dto.languageCode] === lang.id,
+        );
+        return { languageId: lang.id, name: matchedName?.name ?? "" };
+      });
 
-      setTextList((prev) =>
-        prev.map((text) => {
-          const matchedName = data.nameDto.find(
-            (dto) => LANGUAGE_CODE_TO_ID[dto.languageCode] === text.languageId,
-          );
-          return { ...text, name: matchedName?.name ?? "" };
-        }),
-      );
-      setOptionValues(
-        data.optionValueList.map((value) => ({
-          id: value.id,
-          text: LANGUAGE_OPTIONS.map((lang) => ({
-            languageId: lang.id,
-            value:
-              value.nameDto.find(
-                (dto) => LANGUAGE_CODE_TO_ID[dto.languageCode] === lang.id,
-              )?.value ?? "",
-          })),
+      const nextOptionValues = data.optionValueList.map((value) => ({
+        id: value.id,
+        text: LANGUAGE_OPTIONS.map((lang) => ({
+          languageId: lang.id,
+          value:
+            value.nameDto.find(
+              (dto) => LANGUAGE_CODE_TO_ID[dto.languageCode] === lang.id,
+            )?.value ?? "",
         })),
-      );
-      setEditingIndex(null);
-      setIsAddModalOpen(false);
-      setIsEditModalOpen(false);
-    }
-  }, [data]);
+      }));
 
-  const handleChangeName = (index: number, value: string) => {
-    setTextList((prev) =>
-      prev.map((text, i) => (i === index ? { ...text, name: value } : text)),
-    );
-  };
+      setOptionValues(nextOptionValues);
+      const isDifferentOption = hydratedOptionIdRef.current !== optionId;
+
+      const derivedValues = {
+        text: nextTextList,
+        type: data.type,
+        uiType: data.uiType,
+      };
+
+      if (isDifferentOption) {
+        resetForm({ values: derivedValues });
+        setEditingIndex(null);
+        setIsAddModalOpen(false);
+        setIsEditModalOpen(false);
+        hydratedOptionIdRef.current = optionId;
+        return;
+      }
+
+      if (!dirty) {
+        resetForm({ values: derivedValues });
+      }
+    }
+  }, [data, resetForm, dirty, optionId]);
 
   const handleOpenAddModal = () => setIsAddModalOpen(true);
   const handleCloseAddModal = () => setIsAddModalOpen(false);
@@ -164,30 +201,7 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
     navigate(PATH.PRODUCT_OPTIONS, { replace: true });
   };
 
-  const handleSubmitOption = async () => {
-    const allFilled = textList.every((text) => text.name.trim().length > 0);
-    if (!allFilled) {
-      alert("모든 언어의 옵션 이름을 입력해주세요.");
-      return;
-    }
-
-    try {
-      await updateOption({
-        optionId,
-        payload: {
-          text: textList,
-          type: optionType,
-          uiType,
-        },
-      });
-      alert("옵션 정보가 수정되었습니다.");
-    } catch (error) {
-      console.error("옵션 수정 오류:", error);
-      alert("옵션을 수정하는 중 오류가 발생했습니다.");
-    }
-  };
-
-  const isFormDisabled = isPending || isUpdatingOption;
+  const isFormDisabled = isPending || isUpdatingOption || formik.isSubmitting;
 
   return (
     <div className="space-y-6">
@@ -195,7 +209,7 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
         <h2 className="mb-4">옵션 기본 정보</h2>
         <div className="space-y-6">
           <div className="grid grid-cols-3 gap-4">
-            {textList.map((text, index) => (
+            {formik.values.text.map((text, index) => (
               <div className="space-y-2" key={text.languageId}>
                 <Label htmlFor={`optionName-${text.languageId}`}>
                   옵션 이름({LANGUAGE_OPTIONS[index].label}) *
@@ -204,7 +218,8 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
                   className="h-[40px] rounded-md bg-white"
                   disabled={isFormDisabled}
                   id={`optionName-${text.languageId}`}
-                  onChange={(e) => handleChangeName(index, e.target.value)}
+                  name={`text.${index}.name`}
+                  onChange={formik.handleChange}
                   placeholder="옵션 이름을 입력하세요"
                   required
                   value={text.name}
@@ -215,13 +230,13 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
           <div className="grid grid-cols-2 gap-4">
             <OptionTypeSelector
               isPending={isFormDisabled}
-              optionType={optionType}
-              setOptionType={setOptionType}
+              optionType={formik.values.type}
+              setOptionType={(value) => formik.setFieldValue("type", value)}
             />
             <OptionUITypeSelector
               isPending={isFormDisabled}
-              setUiType={setUiType}
-              uiType={uiType}
+              setUiType={(value) => formik.setFieldValue("uiType", value)}
+              uiType={formik.values.uiType}
             />
           </div>
           <div className="flex justify-end gap-3">
@@ -236,7 +251,7 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
             <Button
               className="w-[96px]"
               disabled={isFormDisabled}
-              onClick={handleSubmitOption}
+              onClick={() => formik.handleSubmit()}
               type="button"
             >
               수정
