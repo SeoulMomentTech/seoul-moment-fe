@@ -5,25 +5,28 @@ import { X } from "lucide-react";
 import { Button, Input, Label } from "@seoul-moment/ui";
 
 import type { LanguageOption, OptionValueForm } from "./OptionValueTable";
+import { useCreateAdminProductOptionValueMutation } from "../hooks/useCreateAdminProductOptionValueMutation";
 
 interface OptionValueAddModalProps {
   isOpen: boolean;
   isPending?: boolean;
+  optionId: number;
   languages: LanguageOption[];
   onClose(): void;
-  onSubmit(texts: OptionValueForm["text"]): void;
 }
 
 export function OptionValueAddModal({
   isOpen,
   isPending = false,
+  optionId,
   languages,
   onClose,
-  onSubmit,
 }: OptionValueAddModalProps) {
   const [texts, setTexts] = useState<OptionValueForm["text"]>(
     languages.map((lang) => ({ languageId: lang.id, value: "" })),
   );
+  const { mutateAsync: createOptionValue, isPending: isCreating } =
+    useCreateAdminProductOptionValueMutation();
 
   useEffect(() => {
     if (isOpen) {
@@ -47,8 +50,13 @@ export function OptionValueAddModal({
       alert(`${firstLangLabel} 값을 입력해주세요.`);
       return;
     }
-    onSubmit(texts);
+    createOptionValue({ optionId, text: texts }).catch((error) => {
+      console.error("옵션 값 추가 오류:", error);
+      alert("옵션 값을 추가하는 중 오류가 발생했습니다.");
+    });
   };
+
+  const isDisabled = isPending || isCreating;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -68,19 +76,22 @@ export function OptionValueAddModal({
         <div className="space-y-4">
           {languages.map((language, index) => (
             <div className="space-y-2" key={language.id}>
-              <Label className="text-sm text-gray-800" htmlFor={`add-${language.id}`}>
+              <Label
+                className="text-sm text-gray-800"
+                htmlFor={`add-${language.id}`}
+              >
                 {language.label}
                 {index === 0 ? " *" : ""}
               </Label>
               <Input
                 className="bg-gray-100"
-                disabled={isPending}
+                disabled={isDisabled}
                 id={`add-${language.id}`}
                 onChange={(e) => handleChange(language.id, e.target.value)}
                 placeholder={language.label}
                 value={
-                  texts.find((text) => text.languageId === language.id)?.value ??
-                  ""
+                  texts.find((text) => text.languageId === language.id)
+                    ?.value ?? ""
                 }
               />
             </div>
@@ -93,7 +104,7 @@ export function OptionValueAddModal({
           </Button>
           <Button
             className="bg-gray-900 text-white hover:bg-gray-800"
-            disabled={isPending}
+            disabled={isDisabled}
             onClick={handleSubmit}
             type="button"
           >

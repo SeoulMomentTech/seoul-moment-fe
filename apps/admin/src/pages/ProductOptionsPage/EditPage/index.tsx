@@ -17,6 +17,8 @@ import {
   OptionTypeSelector,
   OptionUITypeSelector,
   OptionValueTable,
+  OptionValueAddModal,
+  OptionValueEditModal,
 } from "../components";
 import type { OptionValueForm } from "../components/OptionValueTable";
 import { useAdminProductOptionQuery } from "../hooks/useAdminProductOptionQuery";
@@ -75,6 +77,8 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
   );
   const [optionValues, setOptionValues] = useState<OptionValueForm[]>([]);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   // useAdminProductOptionQuery 호출
   const { data, isPending } = useAdminProductOptionQuery(optionId);
@@ -111,6 +115,8 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
         })),
       );
       setEditingIndex(null);
+      setIsAddModalOpen(false);
+      setIsEditModalOpen(false);
     }
   }, [data]);
 
@@ -120,44 +126,28 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
     );
   };
 
-  const handleAddOptionValue = () => {
-    setOptionValues((prev) => {
-      const next = [
-        ...prev,
-        {
-          id: null,
-          text: LANGUAGE_OPTIONS.map((lang) => ({
-            languageId: lang.id,
-            value: "",
-          })),
-        },
-      ];
-      setEditingIndex(next.length - 1);
-      return next;
-    });
-  };
-
-  const handleChangeOptionValueText = (
-    valueIndex: number,
-    textIndex: number,
-    nextValue: string,
-  ) => {
-    setOptionValues((prev) =>
-      prev.map((value, i) =>
-        i === valueIndex
-          ? {
-              ...value,
-              text: value.text.map((text, tIdx) =>
-                tIdx === textIndex ? { ...text, value: nextValue } : text,
-              ),
-            }
-          : value,
-      ),
-    );
-  };
+  const handleOpenAddModal = () => setIsAddModalOpen(true);
+  const handleCloseAddModal = () => setIsAddModalOpen(false);
 
   const handleEditOptionValue = (index: number) => {
     setEditingIndex(index);
+    setIsEditModalOpen(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setEditingIndex(null);
+    setIsEditModalOpen(false);
+  };
+
+  const handleSubmitEditOptionValue = (texts: OptionValueForm["text"]) => {
+    if (editingIndex === null) return;
+
+    setOptionValues((prev) =>
+      prev.map((value, i) =>
+        i === editingIndex ? { ...value, text: texts } : value,
+      ),
+    );
+    handleCloseEditModal();
   };
 
   const handleRemoveOptionValue = (index: number) => {
@@ -168,6 +158,9 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
       if (current > index) return current - 1;
       return current;
     });
+    if (editingIndex === index) {
+      setIsEditModalOpen(false);
+    }
   };
 
   return (
@@ -209,14 +202,28 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
       </div>
 
       <OptionValueTable
-        editingIndex={editingIndex}
         isPending={isPending}
         languages={LANGUAGE_OPTIONS}
-        onAdd={handleAddOptionValue}
-        onChangeValue={handleChangeOptionValueText}
+        onAdd={handleOpenAddModal}
         onEdit={handleEditOptionValue}
         onRemove={handleRemoveOptionValue}
         values={optionValues}
+      />
+
+      <OptionValueAddModal
+        isOpen={isAddModalOpen}
+        isPending={isPending}
+        languages={LANGUAGE_OPTIONS}
+        onClose={handleCloseAddModal}
+        optionId={optionId}
+      />
+      <OptionValueEditModal
+        initialValue={editingIndex !== null ? optionValues[editingIndex] : null}
+        isOpen={isEditModalOpen}
+        isPending={isPending}
+        languages={LANGUAGE_OPTIONS}
+        onClose={handleCloseEditModal}
+        onSubmit={handleSubmitEditOptionValue}
       />
     </div>
   );
