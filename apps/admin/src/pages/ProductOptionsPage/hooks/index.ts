@@ -6,3 +6,4 @@ export { useUpdateAdminProductOptionMutation } from "./useUpdateAdminProductOpti
 export { useCreateAdminProductOptionValueMutation } from "./useCreateAdminProductOptionValueMutation";
 export { useUpdateAdminProductOptionValueMutation } from "./useUpdateAdminProductOptionValueMutation";
 export { useDeleteAdminProductOptionValueMutation } from "./useDeleteAdminProductOptionValueMutation";
+export { useAdminProductOptionQuery } from "./useAdminProductOptionQuery";
