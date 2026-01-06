@@ -4,12 +4,12 @@ import { Navigate, useNavigate, useParams } from "react-router";
 
 import { ArrowLeft } from "lucide-react";
 
-import { PATH } from "@/shared/constants/route";
+import { PATH } from "@shared/constants/route";
 import type {
   ProductOptionId,
   ProductOptionType,
   ProductOptionUiType,
-} from "@/shared/services/productOption";
+} from "@shared/services/productOption";
 
 import { Button, Input, Label } from "@seoul-moment/ui";
 
@@ -19,9 +19,12 @@ import {
   OptionValueTable,
   OptionValueAddModal,
   OptionValueEditModal,
+  type OptionValueForm,
 } from "../components";
-import type { OptionValueForm } from "../components/OptionValueTable";
-import { useAdminProductOptionQuery } from "../hooks/useAdminProductOptionQuery";
+import {
+  useAdminProductOptionQuery,
+  useUpdateAdminProductOptionMutation,
+} from "../hooks";
 
 const LANGUAGE_OPTIONS = [
   { id: 1, label: "한국어" },
@@ -79,6 +82,11 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  const navigate = useNavigate();
+
+  const { mutateAsync: updateOption, isPending: isUpdatingOption } =
+    useUpdateAdminProductOptionMutation();
 
   // useAdminProductOptionQuery 호출
   const { data, isPending } = useAdminProductOptionQuery(optionId);
@@ -152,6 +160,35 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
     }
   };
 
+  const handleCancel = () => {
+    navigate(PATH.PRODUCT_OPTIONS, { replace: true });
+  };
+
+  const handleSubmitOption = async () => {
+    const allFilled = textList.every((text) => text.name.trim().length > 0);
+    if (!allFilled) {
+      alert("모든 언어의 옵션 이름을 입력해주세요.");
+      return;
+    }
+
+    try {
+      await updateOption({
+        optionId,
+        payload: {
+          text: textList,
+          type: optionType,
+          uiType,
+        },
+      });
+      alert("옵션 정보가 수정되었습니다.");
+    } catch (error) {
+      console.error("옵션 수정 오류:", error);
+      alert("옵션을 수정하는 중 오류가 발생했습니다.");
+    }
+  };
+
+  const isFormDisabled = isPending || isUpdatingOption;
+
   return (
     <div className="space-y-6">
       <div className="rounded-lg border border-gray-200 bg-white p-6">
@@ -165,7 +202,7 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
                 </Label>
                 <Input
                   className="h-[40px] rounded-md bg-white"
-                  disabled={isPending}
+                  disabled={isFormDisabled}
                   id={`optionName-${text.languageId}`}
                   onChange={(e) => handleChangeName(index, e.target.value)}
                   placeholder="옵션 이름을 입력하세요"
@@ -177,15 +214,33 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <OptionTypeSelector
-              isPending={isPending}
+              isPending={isFormDisabled}
               optionType={optionType}
               setOptionType={setOptionType}
             />
             <OptionUITypeSelector
-              isPending={isPending}
+              isPending={isFormDisabled}
               setUiType={setUiType}
               uiType={uiType}
             />
+          </div>
+          <div className="flex justify-end gap-3">
+            <Button
+              disabled={isFormDisabled}
+              onClick={handleCancel}
+              type="button"
+              variant="outline"
+            >
+              취소
+            </Button>
+            <Button
+              className="w-[96px]"
+              disabled={isFormDisabled}
+              onClick={handleSubmitOption}
+              type="button"
+            >
+              수정
+            </Button>
           </div>
         </div>
       </div>
