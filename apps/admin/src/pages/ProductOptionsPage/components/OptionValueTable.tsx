@@ -4,7 +4,6 @@ import type { ProductOptionValueId } from "@shared/services/productOption";
 
 import {
   Button,
-  Input,
   Table,
   TableBody,
   TableCell,
@@ -13,7 +12,7 @@ import {
   TableRow,
 } from "@seoul-moment/ui";
 
-interface LanguageOption {
+export interface LanguageOption {
   id: number;
   label: string;
 }
@@ -28,11 +27,9 @@ interface OptionValueTableProps {
   description?: string;
   languages: LanguageOption[];
   values: OptionValueForm[];
-  editingIndex: number | null;
   isPending?: boolean;
   onAdd(): void;
   onEdit(index: number): void;
-  onChangeValue(valueIndex: number, textIndex: number, nextValue: string): void;
   onRemove(index: number): void;
 }
 
@@ -41,11 +38,9 @@ export function OptionValueTable({
   description = "언어별 옵션 값을 추가·수정하세요.",
   languages,
   values,
-  editingIndex,
   isPending = false,
   onAdd,
   onEdit,
-  onChangeValue,
   onRemove,
 }: OptionValueTableProps) {
   return (
@@ -88,74 +83,53 @@ export function OptionValueTable({
                 </TableCell>
               </TableRow>
             ) : (
-              values.map((value, valueIndex) => {
-                const isEditing =
-                  editingIndex === valueIndex || value.id === null;
+              values.map((value, valueIndex) => (
+                <TableRow key={value.id ?? `new-${valueIndex}`}>
+                  <TableCell className="text-sm font-medium text-gray-700">
+                    {value.id ?? "-"}
+                  </TableCell>
 
-                return (
-                  <TableRow key={value.id ?? `new-${valueIndex}`}>
-                    <TableCell className="text-sm font-medium text-gray-700">
-                      {value.id ?? "-"}
-                    </TableCell>
+                  {languages.map((lang) => {
+                    const text = value.text.find(
+                      (t) => t.languageId === lang.id,
+                    );
+                    const displayValue = text?.value ?? "";
 
-                    {languages.map((lang, textIndex) => {
-                      const text = value.text.find(
-                        (t) => t.languageId === lang.id,
-                      );
-                      const displayValue = text?.value ?? "";
-
-                      return (
-                        <TableCell className="align-middle" key={lang.id}>
-                          {isEditing ? (
-                            <Input
-                              className="h-[40px] bg-white"
-                              disabled={isPending}
-                              onChange={(e) =>
-                                onChangeValue(
-                                  valueIndex,
-                                  textIndex,
-                                  e.target.value,
-                                )
-                              }
-                              placeholder={`${lang.label} 값`}
-                              value={displayValue}
-                            />
-                          ) : (
-                            <span
-                              className={
-                                displayValue ? "text-gray-900" : "text-gray-400"
-                              }
-                            >
-                              {displayValue || "미입력"}
-                            </span>
-                          )}
-                        </TableCell>
-                      );
-                    })}
-
-                    <TableCell className="text-center">
-                      <div className="flex items-center justify-center gap-1">
-                        <Button
-                          disabled={isPending}
-                          onClick={() => onEdit(valueIndex)}
-                          type="button"
-                          variant="ghost"
+                    return (
+                      <TableCell className="align-middle" key={lang.id}>
+                        <span
+                          className={
+                            displayValue ? "text-gray-900" : "text-gray-400"
+                          }
                         >
-                          <SquarePen className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          disabled={isPending}
-                          onClick={() => onRemove(valueIndex)}
-                          type="button"
-                          variant="ghost"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                );
-              })
+                          {displayValue || "미입력"}
+                        </span>
+                      </TableCell>
+                    );
+                  })}
+
+                  <TableCell className="text-center">
+                    <div className="flex items-center justify-center gap-1">
+                      <Button
+                        disabled={isPending}
+                        onClick={() => onEdit(valueIndex)}
+                        type="button"
+                        variant="ghost"
+                      >
+                        <SquarePen className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        disabled={isPending}
+                        onClick={() => onRemove(valueIndex)}
+                        type="button"
+                        variant="ghost"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
             )}
           </TableBody>
         </Table>
