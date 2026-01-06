@@ -7,7 +7,7 @@ import type { ProductOptionId } from "@shared/services/productOption";
 import { Button, Input, Label } from "@seoul-moment/ui";
 
 import type { LanguageOption, OptionValueForm } from "./OptionValueTable";
-import { useUpdateAdminProductOptionValueMutation } from "../hooks/useUpdateAdminProductOptionValueMutation";
+import { useUpdateAdminProductOptionValueMutation } from "../hooks";
 
 interface OptionValueEditModalProps {
   isOpen: boolean;

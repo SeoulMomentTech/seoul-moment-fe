@@ -15,7 +15,8 @@ import {
   TableRow,
 } from "@seoul-moment/ui";
 
-import { useDeleteAdminProductOptionValueMutation } from "../hooks/useDeleteAdminProductOptionValueMutation";
+import { useDeleteAdminProductOptionValueMutation } from "../hooks";
+
 export interface LanguageOption {
   id: number;
   label: string;

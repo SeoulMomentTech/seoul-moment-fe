@@ -5,7 +5,7 @@ import { X } from "lucide-react";
 import { Button, Input, Label } from "@seoul-moment/ui";
 
 import type { LanguageOption, OptionValueForm } from "./OptionValueTable";
-import { useCreateAdminProductOptionValueMutation } from "../hooks/useCreateAdminProductOptionValueMutation";
+import { useCreateAdminProductOptionValueMutation } from "../hooks";
 
 interface OptionValueAddModalProps {
   isOpen: boolean;
