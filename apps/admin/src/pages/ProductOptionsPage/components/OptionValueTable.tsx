@@ -1,6 +1,9 @@
 import { Plus, SquarePen, Trash2 } from "lucide-react";
 
-import type { ProductOptionValueId } from "@shared/services/productOption";
+import type {
+  ProductOptionId,
+  ProductOptionValueId,
+} from "@shared/services/productOption";
 
 import {
   Button,
@@ -12,6 +15,7 @@ import {
   TableRow,
 } from "@seoul-moment/ui";
 
+import { useDeleteAdminProductOptionValueMutation } from "../hooks/useDeleteAdminProductOptionValueMutation";
 export interface LanguageOption {
   id: number;
   label: string;
@@ -25,6 +29,7 @@ export interface OptionValueForm {
 interface OptionValueTableProps {
   title?: string;
   description?: string;
+  optionId: number;
   languages: LanguageOption[];
   values: OptionValueForm[];
   isPending?: boolean;
@@ -36,6 +41,7 @@ interface OptionValueTableProps {
 export function OptionValueTable({
   title = "옵션 값 관리",
   description = "언어별 옵션 값을 추가·수정하세요.",
+  optionId,
   languages,
   values,
   isPending = false,
@@ -43,6 +49,33 @@ export function OptionValueTable({
   onEdit,
   onRemove,
 }: OptionValueTableProps) {
+  const { mutateAsync: deleteOptionValue, isPending: isDeleting } =
+    useDeleteAdminProductOptionValueMutation();
+
+  const handleRemove = (valueIndex: number) => {
+    if (!confirm("정말 이 옵션 값을 삭제하시겠습니까?")) {
+      return;
+    }
+
+    const target = values[valueIndex];
+    if (!target) return;
+
+    if (target.id === null) {
+      onRemove(valueIndex);
+      return;
+    }
+
+    deleteOptionValue({
+      optionValueId: target.id,
+      optionId: optionId as ProductOptionId,
+    })
+      .then(() => onRemove(valueIndex))
+      .catch((error) => {
+        console.error("옵션 값 삭제 오류:", error);
+        alert("옵션 값을 삭제하는 중 오류가 발생했습니다.");
+      });
+  };
+
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
@@ -119,8 +152,8 @@ export function OptionValueTable({
                         <SquarePen className="h-4 w-4" />
                       </Button>
                       <Button
-                        disabled={isPending}
-                        onClick={() => onRemove(valueIndex)}
+                        disabled={isPending || isDeleting}
+                        onClick={() => handleRemove(valueIndex)}
                         type="button"
                         variant="ghost"
                       >
