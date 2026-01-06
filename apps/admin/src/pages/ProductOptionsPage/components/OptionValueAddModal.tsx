@@ -50,10 +50,14 @@ export function OptionValueAddModal({
       alert(`${firstLangLabel} 값을 입력해주세요.`);
       return;
     }
-    createOptionValue({ optionId, text: texts }).catch((error) => {
-      console.error("옵션 값 추가 오류:", error);
-      alert("옵션 값을 추가하는 중 오류가 발생했습니다.");
-    });
+    createOptionValue({ optionId, text: texts })
+      .then(() => {
+        onClose();
+      })
+      .catch((error) => {
+        console.error("옵션 값 추가 오류:", error);
+        alert("옵션 값을 추가하는 중 오류가 발생했습니다.");
+      });
   };
 
   const isDisabled = isPending || isCreating;

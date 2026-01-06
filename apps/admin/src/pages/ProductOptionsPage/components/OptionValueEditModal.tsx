@@ -2,30 +2,35 @@ import { useEffect, useState } from "react";
 
 import { X } from "lucide-react";
 
+import type { ProductOptionId } from "@shared/services/productOption";
+
 import { Button, Input, Label } from "@seoul-moment/ui";
 
 import type { LanguageOption, OptionValueForm } from "./OptionValueTable";
+import { useUpdateAdminProductOptionValueMutation } from "../hooks/useUpdateAdminProductOptionValueMutation";
 
 interface OptionValueEditModalProps {
   isOpen: boolean;
   isPending?: boolean;
+  optionId: number;
   languages: LanguageOption[];
   initialValue: OptionValueForm | null;
   onClose(): void;
-  onSubmit(texts: OptionValueForm["text"]): void;
 }
 
 export function OptionValueEditModal({
   isOpen,
   isPending = false,
+  optionId,
   languages,
   initialValue,
   onClose,
-  onSubmit,
 }: OptionValueEditModalProps) {
   const [texts, setTexts] = useState<OptionValueForm["text"]>(
     languages.map((lang) => ({ languageId: lang.id, value: "" })),
   );
+  const { mutateAsync: updateOptionValue, isPending: isUpdating } =
+    useUpdateAdminProductOptionValueMutation();
 
   useEffect(() => {
     if (!isOpen) return;
@@ -59,13 +64,29 @@ export function OptionValueEditModal({
       onClose();
       return;
     }
+    const optionValueId = initialValue.id;
+    if (!optionValueId) {
+      alert("저장된 옵션 값만 수정할 수 있습니다.");
+      return;
+    }
     const firstLangLabel = languages[0]?.label ?? "첫번째 언어";
     if (!texts[0]?.value.trim()) {
       alert(`${firstLangLabel} 값을 입력해주세요.`);
       return;
     }
-    onSubmit(texts);
+    updateOptionValue({
+      optionValueId,
+      payload: { text: texts },
+      optionId: optionId as ProductOptionId,
+    })
+      .then(() => onClose())
+      .catch((error) => {
+        console.error("옵션 값 수정 오류:", error);
+        alert("옵션 값을 수정하는 중 오류가 발생했습니다.");
+      });
   };
+
+  const isDisabled = isPending || isUpdating || !initialValue?.id;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -85,19 +106,22 @@ export function OptionValueEditModal({
         <div className="space-y-4">
           {languages.map((language, index) => (
             <div className="space-y-2" key={language.id}>
-              <Label className="text-sm text-gray-800" htmlFor={`edit-${language.id}`}>
+              <Label
+                className="text-sm text-gray-800"
+                htmlFor={`edit-${language.id}`}
+              >
                 {language.label}
                 {index === 0 ? " *" : ""}
               </Label>
               <Input
                 className="bg-gray-100"
-                disabled={isPending}
+                disabled={isDisabled}
                 id={`edit-${language.id}`}
                 onChange={(e) => handleChange(language.id, e.target.value)}
                 placeholder={language.label}
                 value={
-                  texts.find((text) => text.languageId === language.id)?.value ??
-                  ""
+                  texts.find((text) => text.languageId === language.id)
+                    ?.value ?? ""
                 }
               />
             </div>
@@ -110,7 +134,7 @@ export function OptionValueEditModal({
           </Button>
           <Button
             className="bg-gray-900 text-white hover:bg-gray-800"
-            disabled={isPending || !initialValue}
+            disabled={isDisabled}
             onClick={handleSubmit}
             type="button"
           >

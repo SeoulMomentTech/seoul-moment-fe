@@ -139,17 +139,6 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
     setIsEditModalOpen(false);
   };
 
-  const handleSubmitEditOptionValue = (texts: OptionValueForm["text"]) => {
-    if (editingIndex === null) return;
-
-    setOptionValues((prev) =>
-      prev.map((value, i) =>
-        i === editingIndex ? { ...value, text: texts } : value,
-      ),
-    );
-    handleCloseEditModal();
-  };
-
   const handleRemoveOptionValue = (index: number) => {
     setOptionValues((prev) => prev.filter((_, i) => i !== index));
     setEditingIndex((current) => {
@@ -207,6 +196,7 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
         onAdd={handleOpenAddModal}
         onEdit={handleEditOptionValue}
         onRemove={handleRemoveOptionValue}
+        optionId={optionId}
         values={optionValues}
       />
 
@@ -223,7 +213,7 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
         isPending={isPending}
         languages={LANGUAGE_OPTIONS}
         onClose={handleCloseEditModal}
-        onSubmit={handleSubmitEditOptionValue}
+        optionId={optionId}
       />
     </div>
   );
