@@ -1,17 +1,44 @@
-import { useNavigate } from "react-router";
+import { useEffect, useState } from "react";
+
+import { Navigate, useNavigate, useParams } from "react-router";
 
 import { ArrowLeft } from "lucide-react";
 
 import { PATH } from "@/shared/constants/route";
+import type {
+  ProductOptionId,
+  ProductOptionType,
+  ProductOptionUiType,
+} from "@/shared/services/productOption";
 
-import { Button } from "@seoul-moment/ui";
+import { Button, Input, Label } from "@seoul-moment/ui";
+
+import {
+  OptionTypeSelector,
+  OptionUITypeSelector,
+  OptionValueTable,
+} from "../components";
+import type { OptionValueForm } from "../components/OptionValueTable";
+import { useAdminProductOptionQuery } from "../hooks/useAdminProductOptionQuery";
+
+const LANGUAGE_OPTIONS = [
+  { id: 1, label: "한국어" },
+  { id: 2, label: "영어" },
+  { id: 3, label: "중국어(번체)" },
+];
 
 export default function ProductOptionEditPage() {
   const navigate = useNavigate();
+  const params = useParams();
+  const optionId = Number(params.id);
+
+  if (isNaN(optionId)) {
+    return <Navigate replace to={PATH.PRODUCT_OPTIONS} />;
+  }
 
   return (
     <div className="p-8 pt-24">
-      <div className="mx-auto max-w-4xl">
+      <div className="max-w-4xl">
         <div className="mb-6">
           <Button
             className="-ml-2 mb-4"
@@ -25,6 +52,172 @@ export default function ProductOptionEditPage() {
           <p className="text-gray-600">옵션 정보와 옵션 값을 수정하세요.</p>
         </div>
       </div>
+      <ProductOptionContents optionId={optionId as ProductOptionId} />
+    </div>
+  );
+}
+
+interface ProductOptionContentsProps {
+  optionId: ProductOptionId;
+}
+
+function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
+  const [optionType, setOptionType] = useState<ProductOptionType>("COLOR");
+  const [uiType, setUiType] = useState<ProductOptionUiType>("GRID");
+
+  const [textList, setTextList] = useState<
+    { languageId: number; name: string }[]
+  >(
+    LANGUAGE_OPTIONS.map((lang) => ({
+      languageId: lang.id,
+      name: "",
+    })),
+  );
+  const [optionValues, setOptionValues] = useState<OptionValueForm[]>([]);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+
+  // useAdminProductOptionQuery 호출
+  const { data, isPending } = useAdminProductOptionQuery(optionId);
+
+  useEffect(() => {
+    if (data) {
+      const LANGUAGE_CODE_TO_ID: Record<string, number> = {
+        ko: 1,
+        en: 2,
+        "zh-TW": 3,
+      };
+
+      setOptionType(data.type);
+      setUiType(data.uiType);
+
+      setTextList((prev) =>
+        prev.map((text) => {
+          const matchedName = data.nameDto.find(
+            (dto) => LANGUAGE_CODE_TO_ID[dto.languageCode] === text.languageId,
+          );
+          return { ...text, name: matchedName?.name ?? "" };
+        }),
+      );
+      setOptionValues(
+        data.optionValueList.map((value) => ({
+          id: value.id,
+          text: LANGUAGE_OPTIONS.map((lang) => ({
+            languageId: lang.id,
+            value:
+              value.nameDto.find(
+                (dto) => LANGUAGE_CODE_TO_ID[dto.languageCode] === lang.id,
+              )?.value ?? "",
+          })),
+        })),
+      );
+      setEditingIndex(null);
+    }
+  }, [data]);
+
+  const handleChangeName = (index: number, value: string) => {
+    setTextList((prev) =>
+      prev.map((text, i) => (i === index ? { ...text, name: value } : text)),
+    );
+  };
+
+  const handleAddOptionValue = () => {
+    setOptionValues((prev) => {
+      const next = [
+        ...prev,
+        {
+          id: null,
+          text: LANGUAGE_OPTIONS.map((lang) => ({
+            languageId: lang.id,
+            value: "",
+          })),
+        },
+      ];
+      setEditingIndex(next.length - 1);
+      return next;
+    });
+  };
+
+  const handleChangeOptionValueText = (
+    valueIndex: number,
+    textIndex: number,
+    nextValue: string,
+  ) => {
+    setOptionValues((prev) =>
+      prev.map((value, i) =>
+        i === valueIndex
+          ? {
+              ...value,
+              text: value.text.map((text, tIdx) =>
+                tIdx === textIndex ? { ...text, value: nextValue } : text,
+              ),
+            }
+          : value,
+      ),
+    );
+  };
+
+  const handleEditOptionValue = (index: number) => {
+    setEditingIndex(index);
+  };
+
+  const handleRemoveOptionValue = (index: number) => {
+    setOptionValues((prev) => prev.filter((_, i) => i !== index));
+    setEditingIndex((current) => {
+      if (current === null) return current;
+      if (current === index) return null;
+      if (current > index) return current - 1;
+      return current;
+    });
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="rounded-lg border border-gray-200 bg-white p-6">
+        <h2 className="mb-4">옵션 기본 정보</h2>
+        <div className="space-y-6">
+          <div className="grid grid-cols-3 gap-4">
+            {textList.map((text, index) => (
+              <div className="space-y-2" key={text.languageId}>
+                <Label htmlFor={`optionName-${text.languageId}`}>
+                  옵션 이름({LANGUAGE_OPTIONS[index].label}) *
+                </Label>
+                <Input
+                  className="h-[40px] rounded-md bg-white"
+                  disabled={isPending}
+                  id={`optionName-${text.languageId}`}
+                  onChange={(e) => handleChangeName(index, e.target.value)}
+                  placeholder="옵션 이름을 입력하세요"
+                  required
+                  value={text.name}
+                />
+              </div>
+            ))}
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <OptionTypeSelector
+              isPending={isPending}
+              optionType={optionType}
+              setOptionType={setOptionType}
+            />
+            <OptionUITypeSelector
+              isPending={isPending}
+              setUiType={setUiType}
+              uiType={uiType}
+            />
+          </div>
+        </div>
+      </div>
+
+      <OptionValueTable
+        editingIndex={editingIndex}
+        isPending={isPending}
+        languages={LANGUAGE_OPTIONS}
+        onAdd={handleAddOptionValue}
+        onChangeValue={handleChangeOptionValueText}
+        onEdit={handleEditOptionValue}
+        onRemove={handleRemoveOptionValue}
+        values={optionValues}
+      />
     </div>
   );
 }
