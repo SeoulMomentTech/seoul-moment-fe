@@ -30,5 +30,6 @@ export const useAdminProductOptionQuery = (
     queryKey: productOptionQueryKeys.detail(optionId),
     ...options,
     enabled: options?.enabled ?? Boolean(optionId),
+    select: (res) => res.data,
   });
 };

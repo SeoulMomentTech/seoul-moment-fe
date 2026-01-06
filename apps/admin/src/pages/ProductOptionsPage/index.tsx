@@ -11,9 +11,8 @@ import {
   DEFAULT_PAGE_SIZE,
   DEFAULT_SORT,
 } from "@shared/constants/page";
+import { PATH } from "@shared/constants/route";
 import type { ProductOptionId } from "@shared/services/productOption";
-
-import { PATH } from "@/shared/constants/route";
 
 import { Button } from "@seoul-moment/ui";
 
