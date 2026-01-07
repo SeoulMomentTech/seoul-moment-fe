@@ -19,6 +19,7 @@ import { useAuthStore } from "@shared/hooks/useAuth";
 import { HomeBannersPage } from "@pages/HomeBannerPage";
 import HomePage from "@pages/HomePage";
 import LoginPage from "@pages/LoginPage";
+import { ProductBannerPage } from "@pages/ProductBannerPage";
 import ProductCategoriesPage from "@pages/ProductCategoriesPage";
 import ProductOptionsPage from "@pages/ProductOptionsPage";
 import ProductsPage from "@pages/ProductPage";
@@ -104,6 +105,10 @@ const privateRoutes: RouteObject[] = [
       {
         path: PATH.HOME_BANNER,
         element: <HomeBannersPage />,
+      },
+      {
+        path: PATH.PRODUCT_BANNER,
+        element: <ProductBannerPage />,
       },
       {
         path: PATH.BRAND,

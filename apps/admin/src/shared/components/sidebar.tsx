@@ -57,7 +57,14 @@ const menuItems: MenuItemConfig[] = [
     label: "배너 관리",
     path: "",
     icon: <Image className="h-5 w-5" />,
-    subItems: [{ id: "home-banner", label: "홈 배너", path: "/banner/home" }],
+    subItems: [
+      { id: "home-banner", label: "홈 배너", path: "/banner/home" },
+      {
+        id: "product-banner",
+        label: "상품 배너",
+        path: "/banner/product",
+      },
+    ],
   },
   {
     id: "products",
