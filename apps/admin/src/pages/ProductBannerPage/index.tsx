@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { Pagination } from "@shared/components/pagination";
-import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from "@shared/constants/page";
+import { DEFAULT_PAGE } from "@shared/constants/page";
 import type {
   AdminProductBannerListItem,
   ProductBannerId,
@@ -22,7 +22,6 @@ import {
 
 export function ProductBannerPage() {
   const [page, setPage] = useState(DEFAULT_PAGE);
-  const [pageSize] = useState(DEFAULT_PAGE_SIZE);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBanner, setEditingBanner] =
     useState<AdminProductBannerListItem | null>(null);
@@ -35,7 +34,7 @@ export function ProductBannerPage() {
     isFetching,
   } = useAdminProductBannerListQuery({
     page,
-    count: pageSize,
+    count: 50,
     sort: "ASC",
   });
 
@@ -57,7 +56,7 @@ export function ProductBannerPage() {
     return banners;
   }, [banners]);
 
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const totalPages = Math.max(1, Math.ceil(total / 50));
 
   useEffect(() => {
     setIsSortEditing(false);
