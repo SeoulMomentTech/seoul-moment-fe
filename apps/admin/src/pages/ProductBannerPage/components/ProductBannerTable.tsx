@@ -24,7 +24,6 @@ interface ProductBannerTableProps {
   isFetching: boolean;
   isSortEditing: boolean;
   isSavingSort: boolean;
-  hasSearchQuery: boolean;
   onReorder(dragId: ProductBannerId, targetId: ProductBannerId): void;
   onEdit(banner: AdminProductBannerListItem): void;
   onDelete(bannerId: ProductBannerId): void;
@@ -46,7 +45,6 @@ export function ProductBannerTable({
   isFetching,
   isSortEditing,
   isSavingSort,
-  hasSearchQuery,
   onReorder,
   onEdit,
   onDelete,
@@ -102,9 +100,7 @@ export function ProductBannerTable({
         ) : banners.length === 0 ? (
           <TableRow>
             <TableCell className="py-12 text-center text-gray-500" colSpan={5}>
-              {hasSearchQuery
-                ? "검색 결과가 없습니다."
-                : "등록된 배너가 없습니다."}
+              등록된 배너가 없습니다.
             </TableCell>
           </TableRow>
         ) : (

@@ -1,18 +1,13 @@
-import { useEffect, useMemo, useState, type KeyboardEvent } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Pagination } from "@shared/components/pagination";
-import {
-  DEFAULT_PAGE,
-  DEFAULT_PAGE_SIZE,
-  DEFAULT_SORT,
-} from "@shared/constants/page";
+import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from "@shared/constants/page";
 import type {
   AdminProductBannerListItem,
   ProductBannerId,
 } from "@shared/services/productBanner";
 
 import {
-  ProductBannerFilters,
   ProductBannerHeader,
   ProductBannerModal,
   ProductBannerTable,
@@ -26,8 +21,6 @@ import {
 } from "./hooks";
 
 export function ProductBannerPage() {
-  const [searchInput, setSearchInput] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(DEFAULT_PAGE);
   const [pageSize] = useState(DEFAULT_PAGE_SIZE);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -43,7 +36,7 @@ export function ProductBannerPage() {
   } = useAdminProductBannerListQuery({
     page,
     count: pageSize,
-    sort: DEFAULT_SORT,
+    sort: "ASC",
   });
 
   const { mutateAsync: createBanner, isPending: isCreating } =
@@ -61,14 +54,8 @@ export function ProductBannerPage() {
   const total = bannerResponse?.data.total ?? 0;
 
   const filteredBanners = useMemo(() => {
-    if (!searchQuery) return banners;
-
-    const query = searchQuery.toLowerCase();
-    return banners.filter((banner) => {
-      const haystack = `${banner.id} ${banner.imageUrl}`.toLowerCase();
-      return haystack.includes(query);
-    });
-  }, [banners, searchQuery]);
+    return banners;
+  }, [banners]);
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
@@ -76,17 +63,6 @@ export function ProductBannerPage() {
     setIsSortEditing(false);
     setOrderedIds([]);
   }, [page, bannerResponse?.data.list]);
-
-  const handleSearch = () => {
-    setSearchQuery(searchInput);
-    setPage(DEFAULT_PAGE);
-  };
-
-  const handleSearchKeyPress = (event: KeyboardEvent) => {
-    if (event.key === "Enter") {
-      handleSearch();
-    }
-  };
 
   const openCreateModal = () => {
     setEditingBanner(null);
@@ -178,11 +154,7 @@ export function ProductBannerPage() {
   };
 
   const displayBanners = useMemo(() => {
-    if (!isSortEditing) {
-      return filteredBanners;
-    }
-
-    if (!orderedIds.length) {
+    if (!orderedIds.length || !isSortEditing) {
       return banners;
     }
 
@@ -192,10 +164,7 @@ export function ProductBannerPage() {
       .filter((banner): banner is AdminProductBannerListItem =>
         Boolean(banner),
       );
-  }, [banners, filteredBanners, isSortEditing, orderedIds]);
-
-  const summaryTotal =
-    isSortEditing || !searchQuery ? total : filteredBanners.length;
+  }, [banners, isSortEditing, orderedIds]);
 
   return (
     <div className="p-8 pt-24">
@@ -218,20 +187,10 @@ export function ProductBannerPage() {
 
       <div className="mb-6 rounded-lg border border-gray-200 bg-white">
         <div className="border-b border-gray-200 px-6 py-4">
-          <p className="text-sm text-gray-600">총 {summaryTotal}개의 배너</p>
+          <p className="text-sm text-gray-600">총 {total}개의 배너</p>
         </div>
-
-        <ProductBannerFilters
-          isDisabled={isSortEditing}
-          onSearch={handleSearch}
-          onSearchInputChange={setSearchInput}
-          onSearchKeyPress={handleSearchKeyPress}
-          searchInput={searchInput}
-        />
-
         <ProductBannerTable
           banners={displayBanners}
-          hasSearchQuery={Boolean(searchQuery)}
           isFetching={isFetching}
           isLoading={isLoading}
           isSavingSort={isUpdatingSort}
