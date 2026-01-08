@@ -59,8 +59,7 @@ export function ProductBannerTable({
     setDraggingId(bannerId);
   };
 
-  const handleDragOver =
-    (bannerId: ProductBannerId) => (event: DragEvent) => {
+  const handleDragOver = (bannerId: ProductBannerId) => (event: DragEvent) => {
     event.preventDefault();
     setOverId(bannerId);
   };
@@ -86,6 +85,7 @@ export function ProductBannerTable({
       <TableHeader>
         <TableRow>
           <TableHead className="w-20">ID</TableHead>
+          <TableHead className="w-20">순서</TableHead>
           <TableHead className="w-[140px]">이미지</TableHead>
           <TableHead>링크 URL</TableHead>
           <TableHead className="w-[160px]">생성 시간</TableHead>
@@ -108,7 +108,7 @@ export function ProductBannerTable({
             </TableCell>
           </TableRow>
         ) : (
-          banners.map((banner) => {
+          banners.map((banner, idx) => {
             const linkUrl =
               (banner as AdminProductBannerListItem & { linkUrl?: string })
                 .linkUrl ?? "-";
@@ -123,8 +123,12 @@ export function ProductBannerTable({
                 draggable={isSortEditing}
                 key={banner.id}
                 onDragEnd={handleDragEnd}
-                onDragOver={isSortEditing ? handleDragOver(banner.id) : undefined}
-                onDragStart={isSortEditing ? handleDragStart(banner.id) : undefined}
+                onDragOver={
+                  isSortEditing ? handleDragOver(banner.id) : undefined
+                }
+                onDragStart={
+                  isSortEditing ? handleDragStart(banner.id) : undefined
+                }
                 onDrop={isSortEditing ? handleDrop(banner.id) : undefined}
               >
                 <TableCell>
@@ -134,6 +138,9 @@ export function ProductBannerTable({
                     )}
                     {banner.id}
                   </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">{idx + 1}</div>
                 </TableCell>
                 <TableCell>
                   <ImageWithFallback
