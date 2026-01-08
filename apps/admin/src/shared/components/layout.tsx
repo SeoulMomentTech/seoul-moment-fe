@@ -19,6 +19,7 @@ export type MenuItem =
   | "settings"
   | "banner"
   | "home-banner"
+  | "product-banner"
   | "brand"
   | "product-options";
 

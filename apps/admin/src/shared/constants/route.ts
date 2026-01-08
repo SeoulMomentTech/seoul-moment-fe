@@ -15,6 +15,7 @@ export const PATH = {
 
   // Banner
   HOME_BANNER: "/banner/home",
+  PRODUCT_BANNER: "/banner/product",
   // Brand
   BRAND: "/brand",
   BRAND_ADD: "/brand/add",
