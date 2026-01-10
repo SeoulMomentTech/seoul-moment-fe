@@ -38,10 +38,10 @@ export function NewsMetaFields({
 }: NewsMetaFieldsProps) {
   return (
     <div className="space-y-4">
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-3">
         <div className="space-y-2">
           <Label htmlFor="categoryId">
-            카테고리 ID <span className="text-red-500">*</span>
+            카테고리 <span className="text-red-500">*</span>
           </Label>
           <Select
             onValueChange={(value) => onChange("categoryId", value)}
@@ -69,7 +69,7 @@ export function NewsMetaFields({
           )}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="brandId">브랜드 ID</Label>
+          <Label htmlFor="brandId">브랜드</Label>
           <Select
             onValueChange={(value) => onChange("brandId", value)}
             value={values.brandId ? values.brandId.toString() : "none"}
@@ -91,8 +91,6 @@ export function NewsMetaFields({
             </SelectContent>
           </Select>
         </div>
-      </div>
-      <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="writer">
             작성자 <span className="text-red-500">*</span>
@@ -101,7 +99,7 @@ export function NewsMetaFields({
             className={errors.writer ? "border-red-500" : ""}
             id="writer"
             onChange={(e) => onChange("writer", e.target.value)}
-            placeholder="예: 장원영"
+            placeholder="작성자 이름"
             value={values.writer}
           />
           {errors.writer && (

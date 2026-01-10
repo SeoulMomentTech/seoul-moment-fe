@@ -22,11 +22,11 @@ export function NewsImageFields({
   onClear,
 }: NewsImageFieldsProps) {
   return (
-    <div className="space-y-6">
+    <div className="grid gap-4 md:grid-cols-3">
       <div className="space-y-2">
         <ImageUploader
           id="news-banner"
-          label="배너 이미지 (권장: 1200x600px)"
+          label="배너 이미지 *"
           onChange={onChange("banner")}
           onClear={() => onClear("banner")}
           preview={previews.banner}
@@ -38,7 +38,7 @@ export function NewsImageFields({
       <div className="space-y-2">
         <ImageUploader
           id="news-profile"
-          label="작성자 프로필 이미지 (권장: 400x400px)"
+          label="프로필 이미지 *"
           onChange={onChange("profile")}
           onClear={() => onClear("profile")}
           preview={previews.profile}
@@ -50,7 +50,7 @@ export function NewsImageFields({
       <div className="space-y-2">
         <ImageUploader
           id="news-home"
-          label="홈 이미지 (권장: 1200x600px)"
+          label="홈 이미지 *"
           onChange={onChange("homeImage")}
           onClear={() => onClear("homeImage")}
           preview={previews.homeImage}

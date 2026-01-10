@@ -13,6 +13,7 @@ import { useFormik } from "formik";
 import { useCreateAdminNewsMutation } from "../../hooks";
 import type { NewsFormErrors } from "../types";
 import { createInitialValues, validateNewsForm } from "../utils";
+import { NewsDetailSections } from "./NewsDetailSections";
 import { NewsFormFooter } from "./NewsFormFooter";
 import { NewsImageFields } from "./NewsImageFields";
 import { NewsInfoCard } from "./NewsInfoCard";
@@ -30,6 +31,7 @@ export function NewsForm() {
   const [bannerPreview, setBannerPreview] = useState("");
   const [profilePreview, setProfilePreview] = useState("");
   const [homeImagePreview, setHomeImagePreview] = useState("");
+  const [sectionKeys, setSectionKeys] = useState<string[]>([]);
   const {
     data: categoryResponse,
     isLoading: isCategoryLoading,
@@ -97,53 +99,51 @@ export function NewsForm() {
 
   return (
     <form className="space-y-6" onSubmit={formik.handleSubmit}>
-      <NewsInfoCard
-        errors={errors}
-        onChange={(languageId, field, value) => {
-          const index = formik.values.list.findIndex(
-            (item) => item.languageId === languageId,
-          );
-          if (index === -1) return;
-          formik.setFieldValue(`list[${index}].${field}`, value);
-        }}
-        values={formik.values}
-      />
-
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <div className="mb-6">
+      <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+        <div className="border-b border-gray-200 px-6 py-4">
           <h3 className="text-base font-semibold">기본 정보</h3>
-          <p className="mt-1 text-sm text-gray-600">
-            작성자 및 이미지 정보를 입력하세요.
-          </p>
         </div>
-        <NewsMetaFields
-          brandOptions={brandOptions}
-          categoryOptions={categoryOptions}
-          errors={errors}
-          isBrandLoading={isBrandLoading}
-          isCategoryLoading={isCategoryLoading}
-          onChange={(field, value) => {
-            if (field === "categoryId") {
-              formik.setFieldValue("categoryId", Number(value));
-              return;
-            }
-
-            if (field === "brandId") {
-              if (value === "none") {
-                formik.setFieldValue("brandId", undefined);
+        <div className="px-6 py-5">
+          <NewsMetaFields
+            brandOptions={brandOptions}
+            categoryOptions={categoryOptions}
+            errors={errors}
+            isBrandLoading={isBrandLoading}
+            isCategoryLoading={isCategoryLoading}
+            onChange={(field, value) => {
+              if (field === "categoryId") {
+                formik.setFieldValue("categoryId", Number(value));
                 return;
               }
 
-              formik.setFieldValue("brandId", value ? Number(value) : undefined);
-              return;
-            }
+              if (field === "brandId") {
+                if (value === "none") {
+                  formik.setFieldValue("brandId", undefined);
+                  return;
+                }
 
-            formik.setFieldValue(field, value);
-          }}
-          values={formik.values}
-        />
+                formik.setFieldValue(
+                  "brandId",
+                  value ? Number(value) : undefined,
+                );
+                return;
+              }
 
-        <div className="mt-6 border-t border-gray-200 pt-6">
+              formik.setFieldValue(field, value);
+            }}
+            values={formik.values}
+          />
+        </div>
+      </div>
+
+      <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
+        <div className="border-b border-gray-200 px-6 py-4">
+          <h3 className="text-base font-semibold">메인 이미지</h3>
+          <p className="mt-1 text-sm text-gray-600">
+            배너, 프로필, 홈 이미지를 업로드하세요.
+          </p>
+        </div>
+        <div className="px-6 py-5">
           <NewsImageFields
             errors={errors}
             onChange={(field) => (event) => {
@@ -199,6 +199,71 @@ export function NewsForm() {
           />
         </div>
       </div>
+
+      <NewsInfoCard
+        errors={errors}
+        onChange={(languageId, field, value) => {
+          const index = formik.values.list.findIndex(
+            (item) => item.languageId === languageId,
+          );
+          if (index === -1) return;
+          formik.setFieldValue(`list[${index}].${field}`, value);
+        }}
+        values={formik.values}
+      />
+
+      <NewsDetailSections
+        onAddSection={() => {
+          const nextSection = {
+            textList: LANGUAGE_LIST.map((language) => ({
+              languageId: language.id,
+              title: "",
+              subTitle: "",
+              content: "",
+            })),
+            imageUrlList: [],
+          };
+
+          formik.setFieldValue("sectionList", [
+            ...formik.values.sectionList,
+            nextSection,
+          ]);
+          setSectionKeys((current) => [
+            ...current,
+            `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          ]);
+        }}
+        onChangeText={(index, languageId, field, value) => {
+          const sectionIndex = formik.values.sectionList[index];
+          if (!sectionIndex) return;
+
+          const textIndex = sectionIndex.textList.findIndex(
+            (item) => item.languageId === languageId,
+          );
+          if (textIndex === -1) return;
+
+          formik.setFieldValue(
+            `sectionList[${index}].textList[${textIndex}].${field}`,
+            value,
+          );
+        }}
+        onImagesChange={(index, urls) => {
+          formik.setFieldValue(`sectionList[${index}].imageUrlList`, urls);
+        }}
+        onRemoveSection={(index) => {
+          formik.setFieldValue(
+            "sectionList",
+            formik.values.sectionList.filter(
+              (_, itemIndex) => itemIndex !== index,
+            ),
+          );
+          setSectionKeys((current) =>
+            current.filter((_, itemIndex) => itemIndex !== index),
+          );
+        }}
+        sectionKeys={sectionKeys}
+        sections={formik.values.sectionList}
+      />
 
       <NewsFormFooter
         isSubmitting={formik.isSubmitting || isPending}

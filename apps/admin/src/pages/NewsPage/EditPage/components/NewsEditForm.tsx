@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useNavigate } from "react-router";
 
@@ -15,6 +15,7 @@ import type {
 import { uploadImageFile } from "@shared/utils/image";
 import { useFormik } from "formik";
 
+import { NewsDetailSections } from "../../AddPage/components/NewsDetailSections";
 import { NewsFormFooter } from "../../AddPage/components/NewsFormFooter";
 import { NewsImageFields } from "../../AddPage/components/NewsImageFields";
 import { NewsInfoCard } from "../../AddPage/components/NewsInfoCard";
@@ -29,25 +30,55 @@ interface NewsEditFormProps {
 
 const buildInitialValues = (
   detail: AdminNewsDetail,
-): CreateAdminNewsRequest => ({
-  categoryId: detail.categoryId,
-  brandId: detail.brandId,
-  writer: detail.writer ?? "",
-  banner: detail.banner ?? "",
-  profile: detail.profile ?? "",
-  homeImage: detail.homeImage ?? "",
-  list: LANGUAGE_LIST.map((language) => {
-    const text = detail.multilingualTextList.find(
-      (item) => item.languageId === language.id,
-    );
+): CreateAdminNewsRequest => {
+  const sectionCount = Math.max(
+    0,
+    ...detail.multilingualTextList.map((item) => item.section?.length ?? 0),
+  );
+
+  const sectionList = Array.from({ length: sectionCount }, (_, index) => {
+    const imageList =
+      detail.multilingualTextList.find(
+        (item) => item.section?.[index]?.imageList?.length,
+      )?.section?.[index]?.imageList ?? [];
+
     return {
-      languageId: language.id,
-      title: text?.title ?? "",
-      content: text?.content ?? "",
+      textList: LANGUAGE_LIST.map((language) => {
+        const text = detail.multilingualTextList.find(
+          (item) => item.languageId === language.id,
+        );
+        const section = text?.section?.[index];
+        return {
+          languageId: language.id,
+          title: section?.title ?? "",
+          subTitle: section?.subTitle ?? "",
+          content: section?.content ?? "",
+        };
+      }),
+      imageUrlList: imageList,
     };
-  }),
-  sectionList: [],
-});
+  });
+
+  return {
+    categoryId: detail.categoryId,
+    brandId: detail.brandId,
+    writer: detail.writer ?? "",
+    banner: detail.banner ?? "",
+    profile: detail.profile ?? "",
+    homeImage: detail.homeImage ?? "",
+    list: LANGUAGE_LIST.map((language) => {
+      const text = detail.multilingualTextList.find(
+        (item) => item.languageId === language.id,
+      );
+      return {
+        languageId: language.id,
+        title: text?.title ?? "",
+        content: text?.content ?? "",
+      };
+    }),
+    sectionList,
+  };
+};
 
 export function NewsEditForm({ newsId }: NewsEditFormProps) {
   const navigate = useNavigate();
@@ -57,6 +88,11 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
   const [bannerPreview, setBannerPreview] = useState("");
   const [profilePreview, setProfilePreview] = useState("");
   const [homeImagePreview, setHomeImagePreview] = useState("");
+  const [sectionKeys, setSectionKeys] = useState<string[]>([]);
+  const [sectionIds, setSectionIds] = useState<(number | null)[]>([]);
+  const [sectionImageOriginals, setSectionImageOriginals] = useState<
+    string[][]
+  >([]);
   const { data: categoryResponse, isLoading: isCategoryLoading } =
     useAdminCategoryListQuery({
       page: 1,
@@ -79,6 +115,27 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
     () => (detail ? buildInitialValues(detail) : undefined),
     [detail],
   );
+
+  useEffect(() => {
+    if (!detail || !initialValues) {
+      return;
+    }
+
+    const baseSections =
+      detail.multilingualTextList.find((item) => item.section?.length)?.section ??
+      [];
+    const ids = baseSections.map((section) => section.id ?? null);
+    setSectionIds(ids);
+    setSectionKeys(
+      ids.map(
+        (id, index) =>
+          id !== null ? `section-${id}` : `section-${index + 1}`,
+      ),
+    );
+    setSectionImageOriginals(
+      initialValues.sectionList.map((section) => section.imageUrlList ?? []),
+    );
+  }, [detail, initialValues]);
 
   const { mutateAsync: updateNews, isPending } = useUpdateAdminNewsMutation({
     onSuccess: () => navigate(PATH.NEWS),
@@ -117,6 +174,17 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
           ? (await uploadImageFile(homeImageFile, "news")).imagePath
           : values.homeImage;
 
+      const sectionImageLists = values.sectionList.map((section, index) => {
+        const originalImages = sectionImageOriginals[index] ?? [];
+        return section.imageUrlList
+          .map((newUrl, imageIndex) => {
+            const oldUrl = originalImages[imageIndex] ?? "";
+            if (oldUrl === newUrl) return null;
+            return { oldImageUrl: oldUrl, newImageUrl: newUrl };
+          })
+          .filter(Boolean) as { oldImageUrl: string; newImageUrl: string }[];
+      });
+
       const payload: UpdateAdminNewsRequest = {
         categoryId: values.categoryId,
         brandId: values.brandId,
@@ -128,6 +196,18 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
           languageId: item.languageId,
           title: item.title,
           content: item.content,
+          section: values.sectionList.map((section, sectionIndex) => {
+            const sectionText = section.textList.find(
+              (text) => text.languageId === item.languageId,
+            );
+            return {
+              id: sectionIds[sectionIndex] ?? 0,
+              title: sectionText?.title ?? "",
+              subTitle: sectionText?.subTitle ?? "",
+              content: sectionText?.content ?? "",
+              sectionImageList: sectionImageLists[sectionIndex],
+            };
+          }),
         })),
       };
 
@@ -158,8 +238,6 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
       </div>
     );
   }
-
-  console.log(formik.values);
 
   return (
     <form className="space-y-6" onSubmit={formik.handleSubmit}>
@@ -268,6 +346,67 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
           />
         </div>
       </div>
+
+      <NewsDetailSections
+        onAddSection={() => {
+          const nextSection = {
+            textList: LANGUAGE_LIST.map((language) => ({
+              languageId: language.id,
+              title: "",
+              subTitle: "",
+              content: "",
+            })),
+            imageUrlList: [],
+          };
+
+          formik.setFieldValue("sectionList", [
+            ...formik.values.sectionList,
+            nextSection,
+          ]);
+          setSectionKeys((current) => [
+            ...current,
+            `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          ]);
+          setSectionIds((current) => [...current, null]);
+          setSectionImageOriginals((current) => [...current, []]);
+        }}
+        onChangeText={(index, languageId, field, value) => {
+          const sectionValue = formik.values.sectionList[index];
+          if (!sectionValue) return;
+
+          const textIndex = sectionValue.textList.findIndex(
+            (item) => item.languageId === languageId,
+          );
+          if (textIndex === -1) return;
+
+          formik.setFieldValue(
+            `sectionList[${index}].textList[${textIndex}].${field}`,
+            value,
+          );
+        }}
+        onImagesChange={(index, urls) => {
+          formik.setFieldValue(`sectionList[${index}].imageUrlList`, urls);
+        }}
+        onRemoveSection={(index) => {
+          formik.setFieldValue(
+            "sectionList",
+            formik.values.sectionList.filter(
+              (_, itemIndex) => itemIndex !== index,
+            ),
+          );
+          setSectionKeys((current) =>
+            current.filter((_, itemIndex) => itemIndex !== index),
+          );
+          setSectionIds((current) =>
+            current.filter((_, itemIndex) => itemIndex !== index),
+          );
+          setSectionImageOriginals((current) =>
+            current.filter((_, itemIndex) => itemIndex !== index),
+          );
+        }}
+        sectionKeys={sectionKeys}
+        sections={formik.values.sectionList}
+      />
 
       <NewsFormFooter
         isSubmitting={formik.isSubmitting || isPending}

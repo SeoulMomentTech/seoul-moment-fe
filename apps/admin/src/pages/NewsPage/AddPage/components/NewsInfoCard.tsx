@@ -1,6 +1,14 @@
 import { LANGUAGE_LIST } from "@shared/constants/locale";
 
-import { Input, Label, Tabs, TabsContent, TabsList, TabsTrigger, Textarea } from "@seoul-moment/ui";
+import {
+  Input,
+  Label,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+  Textarea,
+} from "@seoul-moment/ui";
 
 import type { NewsFormErrors, NewsFormValues } from "../types";
 
@@ -24,9 +32,9 @@ export function NewsInfoCard({ values, errors, onChange }: NewsInfoCardProps) {
   return (
     <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
       <div className="border-b border-gray-200 px-6 py-4">
-        <h3 className="text-base font-semibold">뉴스 정보</h3>
+        <h3 className="text-base font-semibold">기본 내용</h3>
         <p className="mt-1 text-sm text-gray-600">
-          다국어로 뉴스 제목과 내용을 입력하세요.
+          뉴스의 기본 제목과 요약 내용을 입력하세요.
         </p>
       </div>
       <div className="p-6">
@@ -83,7 +91,7 @@ export function NewsInfoCard({ values, errors, onChange }: NewsInfoCardProps) {
 
                 <div className="space-y-2">
                   <Label htmlFor={`content_${language.id}`}>
-                    내용 ({getLanguageLabel(language.code)})
+                    요약 내용 ({getLanguageLabel(language.code)})
                     {language.code === "ko" && (
                       <span className="text-red-500"> *</span>
                     )}
@@ -96,7 +104,7 @@ export function NewsInfoCard({ values, errors, onChange }: NewsInfoCardProps) {
                     }
                     placeholder={
                       language.code === "ko"
-                        ? "뉴스의 상세 내용을 입력하세요..."
+                        ? "요약 내용을 입력하세요"
                         : "Enter content"
                     }
                     rows={5}
