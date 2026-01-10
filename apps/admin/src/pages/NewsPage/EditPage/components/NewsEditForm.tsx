@@ -383,6 +383,7 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
       </div>
 
       <NewsDetailSections
+        errors={errors}
         onAddSection={() => {
           const nextSection = {
             textList: LANGUAGE_LIST.map((language) => ({

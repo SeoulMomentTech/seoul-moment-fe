@@ -56,5 +56,18 @@ export const validateNewsForm = (
     errors.content_1 = "한국어 내용은 필수입니다.";
   }
 
+  values.sectionList.forEach((section, sectionIndex) => {
+    section.textList.forEach((text) => {
+      if (!text.title.trim()) {
+        errors[`section_title_${sectionIndex}_${text.languageId}`] =
+          "섹션 제목은 필수입니다.";
+      }
+      if (!text.content.trim()) {
+        errors[`section_content_${sectionIndex}_${text.languageId}`] =
+          "섹션 내용은 필수입니다.";
+      }
+    });
+  });
+
   return errors;
 };

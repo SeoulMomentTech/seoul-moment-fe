@@ -21,6 +21,7 @@ type NewsSection = CreateAdminNewsRequest["sectionList"][number];
 interface NewsDetailSectionsProps {
   sections: NewsSection[];
   sectionKeys: string[];
+  errors?: Record<string, string | undefined>;
   onAddSection(): void;
   onRemoveSection(index: number): void;
   onChangeText(
@@ -41,6 +42,7 @@ const getLanguageLabel = (languageCode: string) => {
 export function NewsDetailSections({
   sections,
   sectionKeys,
+  errors,
   onAddSection,
   onRemoveSection,
   onChangeText,
@@ -98,8 +100,14 @@ export function NewsDetailSections({
                   folder="news"
                   label="이미지 업로드"
                   onChange={(urls) => onImagesChange(sectionIndex, urls)}
+                  required
                   value={section.imageUrlList}
                 />
+                {errors?.[`section_images_${sectionIndex}`] && (
+                  <p className="text-sm text-red-500">
+                    {errors?.[`section_images_${sectionIndex}`]}
+                  </p>
+                )}
               </div>
 
               <Tabs
@@ -138,6 +146,13 @@ export function NewsDetailSections({
                             제목
                           </Label>
                           <Input
+                            className={
+                              errors?.[
+                                `section_title_${sectionIndex}_${language.id}`
+                              ]
+                                ? "border-red-500"
+                                : ""
+                            }
                             id={`section-title-${sectionIndex}-${language.id}`}
                             onChange={(e) =>
                               onChangeText(
@@ -150,6 +165,17 @@ export function NewsDetailSections({
                             placeholder="섹션 제목"
                             value={text.title}
                           />
+                          {errors?.[
+                            `section_title_${sectionIndex}_${language.id}`
+                          ] && (
+                            <p className="text-sm text-red-500">
+                              {
+                                errors?.[
+                                  `section_title_${sectionIndex}_${language.id}`
+                                ]
+                              }
+                            </p>
+                          )}
                         </div>
                         <div className="w-full space-y-2">
                           <Label
@@ -178,6 +204,13 @@ export function NewsDetailSections({
                             내용
                           </Label>
                           <Textarea
+                            className={
+                              errors?.[
+                                `section_content_${sectionIndex}_${language.id}`
+                              ]
+                                ? "border-red-500"
+                                : ""
+                            }
                             id={`section-content-${sectionIndex}-${language.id}`}
                             onChange={(e) =>
                               onChangeText(
@@ -191,6 +224,17 @@ export function NewsDetailSections({
                             rows={4}
                             value={text.content}
                           />
+                          {errors?.[
+                            `section_content_${sectionIndex}_${language.id}`
+                          ] && (
+                            <p className="text-sm text-red-500">
+                              {
+                                errors?.[
+                                  `section_content_${sectionIndex}_${language.id}`
+                                ]
+                              }
+                            </p>
+                          )}
                         </div>
                       </VStack>
                     </TabsContent>

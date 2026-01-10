@@ -26,10 +26,11 @@ export function NewsImageFields({
       <div className="space-y-2">
         <ImageUploader
           id="news-banner"
-          label="배너 이미지 *"
+          label="배너 이미지"
           onChange={onChange("banner")}
           onClear={() => onClear("banner")}
           preview={previews.banner}
+          required
         />
         {errors.banner && (
           <p className="text-sm text-red-500">{errors.banner}</p>
@@ -38,10 +39,11 @@ export function NewsImageFields({
       <div className="space-y-2">
         <ImageUploader
           id="news-profile"
-          label="프로필 이미지 *"
+          label="프로필 이미지"
           onChange={onChange("profile")}
           onClear={() => onClear("profile")}
           preview={previews.profile}
+          required
         />
         {errors.profile && (
           <p className="text-sm text-red-500">{errors.profile}</p>
@@ -50,10 +52,11 @@ export function NewsImageFields({
       <div className="space-y-2">
         <ImageUploader
           id="news-home"
-          label="홈 이미지 *"
+          label="홈 이미지"
           onChange={onChange("homeImage")}
           onClear={() => onClear("homeImage")}
           preview={previews.homeImage}
+          required
         />
         {errors.homeImage && (
           <p className="text-sm text-red-500">{errors.homeImage}</p>
