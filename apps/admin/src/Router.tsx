@@ -16,9 +16,11 @@ import { Layout } from "@shared/components/layout";
 import { PATH } from "@shared/constants/route";
 import { useAuthStore } from "@shared/hooks/useAuth";
 
+import ArticlePage from "@pages/ArticlePage";
 import { HomeBannersPage } from "@pages/HomeBannerPage";
 import HomePage from "@pages/HomePage";
 import LoginPage from "@pages/LoginPage";
+import NewsPage from "@pages/NewsPage";
 import { ProductBannerPage } from "@pages/ProductBannerPage";
 import ProductCategoriesPage from "@pages/ProductCategoriesPage";
 import ProductOptionsPage from "@pages/ProductOptionsPage";
@@ -109,6 +111,14 @@ const privateRoutes: RouteObject[] = [
       {
         path: PATH.PRODUCT_BANNER,
         element: <ProductBannerPage />,
+      },
+      {
+        path: PATH.ARTICLE,
+        element: <ArticlePage />,
+      },
+      {
+        path: PATH.NEWS,
+        element: <NewsPage />,
       },
       {
         path: PATH.BRAND,

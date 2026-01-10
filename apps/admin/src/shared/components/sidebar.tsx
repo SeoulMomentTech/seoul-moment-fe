@@ -2,7 +2,7 @@ import { type ReactNode } from "react";
 
 import { Link } from "react-router";
 
-import { LayoutDashboard, Package, Image, Tag } from "lucide-react";
+import { LayoutDashboard, Package, Image, Tag, Newspaper } from "lucide-react";
 
 import {
   Accordion,
@@ -87,8 +87,14 @@ const menuItems: MenuItemConfig[] = [
     ],
   },
   {
+    id: "news",
+    label: "뉴스 관리",
+    path: "/news",
+    icon: <Newspaper className="h-5 w-5" />,
+  },
+  {
     id: "brand",
-    label: "브랜드",
+    label: "브랜드 관리",
     path: "/brand",
     icon: <Tag className="h-5 w-5" />,
   },
