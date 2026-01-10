@@ -10,18 +10,19 @@ import { type CreateAdminNewsRequest } from "@shared/services/news";
 import { uploadImageFile } from "@shared/utils/image";
 import { useFormik } from "formik";
 
+import {
+  NewsDetailSections,
+  NewsFormFooter,
+  NewsImageFields,
+  NewsInfoCard,
+  NewsMetaFields,
+} from "../../components";
 import { useCreateAdminNewsMutation } from "../../hooks";
 import type { NewsFormErrors } from "../types";
 import { createInitialValues, validateNewsForm } from "../utils";
-import { NewsDetailSections } from "./NewsDetailSections";
-import { NewsFormFooter } from "./NewsFormFooter";
-import { NewsImageFields } from "./NewsImageFields";
-import { NewsInfoCard } from "./NewsInfoCard";
-import { NewsMetaFields } from "./NewsMetaFields";
 
-const INITIAL_FORM_VALUES: CreateAdminNewsRequest = createInitialValues(
-  LANGUAGE_LIST,
-);
+const INITIAL_FORM_VALUES: CreateAdminNewsRequest =
+  createInitialValues(LANGUAGE_LIST);
 
 export function NewsForm() {
   const navigate = useNavigate();
@@ -32,15 +33,13 @@ export function NewsForm() {
   const [profilePreview, setProfilePreview] = useState("");
   const [homeImagePreview, setHomeImagePreview] = useState("");
   const [sectionKeys, setSectionKeys] = useState<string[]>([]);
-  const {
-    data: categoryResponse,
-    isLoading: isCategoryLoading,
-  } = useAdminCategoryListQuery({
-    page: 1,
-    count: 100,
-    searchColumn: "name",
-    sort: "DESC",
-  });
+  const { data: categoryResponse, isLoading: isCategoryLoading } =
+    useAdminCategoryListQuery({
+      page: 1,
+      count: 100,
+      searchColumn: "name",
+      sort: "DESC",
+    });
   const { data: brandResponse, isLoading: isBrandLoading } =
     useAdminBrandListQuery({
       page: 1,

@@ -10,7 +10,7 @@ import {
   Textarea,
 } from "@seoul-moment/ui";
 
-import type { NewsFormErrors, NewsFormValues } from "../types";
+import type { NewsFormErrors, NewsFormValues } from "../AddPage/types";
 
 interface NewsInfoCardProps {
   values: NewsFormValues;

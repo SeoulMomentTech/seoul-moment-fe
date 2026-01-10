@@ -55,7 +55,11 @@ export function NewsDetailSections({
             뉴스의 상세 섹션을 추가할 수 있습니다.
           </p>
         </div>
-        <Button className="flex items-center gap-2" onClick={onAddSection} type="button">
+        <Button
+          className="flex items-center gap-2"
+          onClick={onAddSection}
+          type="button"
+        >
           <Plus className="h-4 w-4" />
           섹션 추가
         </Button>
@@ -73,7 +77,9 @@ export function NewsDetailSections({
               key={sectionKeys[sectionIndex]}
             >
               <div className="flex items-center justify-between">
-                <h4 className="text-sm font-semibold">섹션 {sectionIndex + 1}</h4>
+                <h4 className="text-sm font-semibold">
+                  섹션 {sectionIndex + 1}
+                </h4>
                 <Button
                   onClick={() => onRemoveSection(sectionIndex)}
                   size="sm"
@@ -85,7 +91,9 @@ export function NewsDetailSections({
               </div>
 
               <div className="mt-4 space-y-2">
-                <Label htmlFor={`news-section-image-${sectionIndex}`}>이미지</Label>
+                <Label htmlFor={`news-section-image-${sectionIndex}`}>
+                  이미지
+                </Label>
                 <MultipleImageUpload
                   folder="news"
                   label="이미지 업로드"
@@ -122,9 +130,11 @@ export function NewsDetailSections({
                       key={`${sectionKeys[sectionIndex]}-${language.id}`}
                       value={language.code}
                     >
-                      <VStack align="start" gap={8}>
+                      <VStack gap={8}>
                         <div className="w-full space-y-2">
-                          <Label htmlFor={`section-title-${sectionIndex}-${language.id}`}>
+                          <Label
+                            htmlFor={`section-title-${sectionIndex}-${language.id}`}
+                          >
                             제목
                           </Label>
                           <Input
@@ -142,7 +152,9 @@ export function NewsDetailSections({
                           />
                         </div>
                         <div className="w-full space-y-2">
-                          <Label htmlFor={`section-subtitle-${sectionIndex}-${language.id}`}>
+                          <Label
+                            htmlFor={`section-subtitle-${sectionIndex}-${language.id}`}
+                          >
                             부제목
                           </Label>
                           <Input
@@ -160,7 +172,9 @@ export function NewsDetailSections({
                           />
                         </div>
                         <div className="w-full space-y-2">
-                          <Label htmlFor={`section-content-${sectionIndex}-${language.id}`}>
+                          <Label
+                            htmlFor={`section-content-${sectionIndex}-${language.id}`}
+                          >
                             내용
                           </Label>
                           <Textarea

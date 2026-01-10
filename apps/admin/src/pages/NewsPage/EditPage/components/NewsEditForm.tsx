@@ -15,13 +15,15 @@ import type {
 import { stripImageDomain, uploadImageFile } from "@shared/utils/image";
 import { useFormik } from "formik";
 
-import { NewsDetailSections } from "../../AddPage/components/NewsDetailSections";
-import { NewsFormFooter } from "../../AddPage/components/NewsFormFooter";
-import { NewsImageFields } from "../../AddPage/components/NewsImageFields";
-import { NewsInfoCard } from "../../AddPage/components/NewsInfoCard";
-import { NewsMetaFields } from "../../AddPage/components/NewsMetaFields";
 import type { NewsFormErrors } from "../../AddPage/types";
 import { validateNewsForm } from "../../AddPage/utils";
+import {
+  NewsDetailSections,
+  NewsFormFooter,
+  NewsImageFields,
+  NewsInfoCard,
+  NewsMetaFields,
+} from "../../components";
 import { useAdminNewsQuery, useUpdateAdminNewsMutation } from "../../hooks";
 
 interface NewsEditFormProps {
