@@ -1,4 +1,17 @@
-import { Label, Input } from "@seoul-moment/ui";
+import {
+  Input,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@seoul-moment/ui";
+
+interface SelectOption {
+  value: number;
+  label: string;
+}
 
 interface NewsMetaFieldsProps {
   values: {
@@ -6,12 +19,20 @@ interface NewsMetaFieldsProps {
     brandId?: number;
     writer: string;
   };
+  categoryOptions: SelectOption[];
+  brandOptions: SelectOption[];
+  isCategoryLoading?: boolean;
+  isBrandLoading?: boolean;
   errors: Record<string, string | undefined>;
   onChange(field: keyof NewsMetaFieldsProps["values"], value: string): void;
 }
 
 export function NewsMetaFields({
   values,
+  categoryOptions,
+  brandOptions,
+  isCategoryLoading,
+  isBrandLoading,
   errors,
   onChange,
 }: NewsMetaFieldsProps) {
@@ -22,27 +43,53 @@ export function NewsMetaFields({
           <Label htmlFor="categoryId">
             카테고리 ID <span className="text-red-500">*</span>
           </Label>
-          <Input
-            className={errors.categoryId ? "border-red-500" : ""}
-            id="categoryId"
-            onChange={(e) => onChange("categoryId", e.target.value)}
-            placeholder="예: 1"
-            type="number"
-            value={values.categoryId}
-          />
+          <Select
+            onValueChange={(value) => onChange("categoryId", value)}
+            value={values.categoryId ? values.categoryId.toString() : ""}
+          >
+            <SelectTrigger className="bg-white">
+              <SelectValue
+                placeholder={
+                  isCategoryLoading
+                    ? "카테고리 불러오는 중..."
+                    : "카테고리 선택"
+                }
+              />
+            </SelectTrigger>
+            <SelectContent className="**:cursor-pointer max-h-[320px] bg-white">
+              {categoryOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value.toString()}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           {errors.categoryId && (
             <p className="text-sm text-red-500">{errors.categoryId}</p>
           )}
         </div>
         <div className="space-y-2">
           <Label htmlFor="brandId">브랜드 ID</Label>
-          <Input
-            id="brandId"
-            onChange={(e) => onChange("brandId", e.target.value)}
-            placeholder="선택 입력"
-            type="number"
-            value={values.brandId ?? ""}
-          />
+          <Select
+            onValueChange={(value) => onChange("brandId", value)}
+            value={values.brandId ? values.brandId.toString() : "none"}
+          >
+            <SelectTrigger className="bg-white">
+              <SelectValue
+                placeholder={
+                  isBrandLoading ? "브랜드 불러오는 중..." : "브랜드 선택"
+                }
+              />
+            </SelectTrigger>
+            <SelectContent className="**:cursor-pointer max-h-[320px] bg-white">
+              <SelectItem value="none">선택 안함</SelectItem>
+              {brandOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value.toString()}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
       <div className="grid gap-4 md:grid-cols-2">

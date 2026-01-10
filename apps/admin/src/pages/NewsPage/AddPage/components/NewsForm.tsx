@@ -2,6 +2,8 @@ import { useState } from "react";
 
 import { useNavigate } from "react-router";
 
+import { useAdminBrandListQuery } from "@pages/BrandPage/ListPage/hooks";
+import { useAdminCategoryListQuery } from "@pages/ProductCategoriesPage/hooks";
 import { LANGUAGE_LIST } from "@shared/constants/locale";
 import { PATH } from "@shared/constants/route";
 import { type CreateAdminNewsRequest } from "@shared/services/news";
@@ -28,6 +30,22 @@ export function NewsForm() {
   const [bannerPreview, setBannerPreview] = useState("");
   const [profilePreview, setProfilePreview] = useState("");
   const [homeImagePreview, setHomeImagePreview] = useState("");
+  const {
+    data: categoryResponse,
+    isLoading: isCategoryLoading,
+  } = useAdminCategoryListQuery({
+    page: 1,
+    count: 100,
+    searchColumn: "name",
+    sort: "DESC",
+  });
+  const { data: brandResponse, isLoading: isBrandLoading } =
+    useAdminBrandListQuery({
+      page: 1,
+      count: 100,
+      searchColumn: "name",
+      sort: "DESC",
+    });
 
   const { mutateAsync: createNews, isPending } = useCreateAdminNewsMutation({
     onSuccess: () => navigate(PATH.NEWS),
@@ -62,6 +80,20 @@ export function NewsForm() {
   });
 
   const errors = formik.errors as NewsFormErrors;
+  const categoryOptions =
+    categoryResponse?.data.list.map((category) => ({
+      value: category.id,
+      label:
+        category.nameDto.find((item) => item.languageCode === "ko")?.name ??
+        `ID ${category.id}`,
+    })) ?? [];
+  const brandOptions =
+    brandResponse?.data.list.map((brand) => ({
+      value: brand.id,
+      label:
+        brand.nameDto.find((item) => item.languageCode === "ko")?.name ??
+        `ID ${brand.id}`,
+    })) ?? [];
 
   return (
     <form className="space-y-6" onSubmit={formik.handleSubmit}>
@@ -85,7 +117,11 @@ export function NewsForm() {
           </p>
         </div>
         <NewsMetaFields
+          brandOptions={brandOptions}
+          categoryOptions={categoryOptions}
           errors={errors}
+          isBrandLoading={isBrandLoading}
+          isCategoryLoading={isCategoryLoading}
           onChange={(field, value) => {
             if (field === "categoryId") {
               formik.setFieldValue("categoryId", Number(value));
@@ -93,6 +129,11 @@ export function NewsForm() {
             }
 
             if (field === "brandId") {
+              if (value === "none") {
+                formik.setFieldValue("brandId", undefined);
+                return;
+              }
+
               formik.setFieldValue("brandId", value ? Number(value) : undefined);
               return;
             }
