@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useNavigate } from "react-router";
 
@@ -12,7 +12,7 @@ import type {
   CreateAdminNewsRequest,
   UpdateAdminNewsRequest,
 } from "@shared/services/news";
-import { uploadImageFile } from "@shared/utils/image";
+import { stripImageDomain, uploadImageFile } from "@shared/utils/image";
 import { useFormik } from "formik";
 
 import { NewsDetailSections } from "../../AddPage/components/NewsDetailSections";
@@ -85,14 +85,13 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
   const [bannerFile, setBannerFile] = useState<File | null>(null);
   const [profileFile, setProfileFile] = useState<File | null>(null);
   const [homeImageFile, setHomeImageFile] = useState<File | null>(null);
-  const [bannerPreview, setBannerPreview] = useState("");
-  const [profilePreview, setProfilePreview] = useState("");
-  const [homeImagePreview, setHomeImagePreview] = useState("");
   const [sectionKeys, setSectionKeys] = useState<string[]>([]);
   const [sectionIds, setSectionIds] = useState<(number | null)[]>([]);
   const [sectionImageOriginals, setSectionImageOriginals] = useState<
     string[][]
   >([]);
+  const initializedRef = useRef(false);
+  const brandClearedRef = useRef(false);
   const { data: categoryResponse, isLoading: isCategoryLoading } =
     useAdminCategoryListQuery({
       page: 1,
@@ -111,39 +110,12 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
   const { data: newsResponse, isLoading } = useAdminNewsQuery(newsId);
   const detail = newsResponse?.data;
 
-  const initialValues = useMemo(
-    () => (detail ? buildInitialValues(detail) : undefined),
-    [detail],
-  );
-
-  useEffect(() => {
-    if (!detail || !initialValues) {
-      return;
-    }
-
-    const baseSections =
-      detail.multilingualTextList.find((item) => item.section?.length)?.section ??
-      [];
-    const ids = baseSections.map((section) => section.id ?? null);
-    setSectionIds(ids);
-    setSectionKeys(
-      ids.map(
-        (id, index) =>
-          id !== null ? `section-${id}` : `section-${index + 1}`,
-      ),
-    );
-    setSectionImageOriginals(
-      initialValues.sectionList.map((section) => section.imageUrlList ?? []),
-    );
-  }, [detail, initialValues]);
-
   const { mutateAsync: updateNews, isPending } = useUpdateAdminNewsMutation({
     onSuccess: () => navigate(PATH.NEWS),
   });
 
   const formik = useFormik<CreateAdminNewsRequest>({
-    enableReinitialize: true,
-    initialValues: initialValues ?? {
+    initialValues: {
       categoryId: 1,
       brandId: undefined,
       writer: "",
@@ -164,15 +136,15 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
       const banner =
         bannerFile !== null
           ? (await uploadImageFile(bannerFile, "news")).imagePath
-          : values.banner;
+          : stripImageDomain(values.banner);
       const profile =
         profileFile !== null
           ? (await uploadImageFile(profileFile, "news")).imagePath
-          : values.profile;
+          : stripImageDomain(values.profile);
       const homeImage =
         homeImageFile !== null
           ? (await uploadImageFile(homeImageFile, "news")).imagePath
-          : values.homeImage;
+          : stripImageDomain(values.homeImage);
 
       const sectionImageLists = values.sectionList.map((section, index) => {
         const originalImages = sectionImageOriginals[index] ?? [];
@@ -215,6 +187,78 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
     },
   });
 
+  const { setFieldValue, setValues } = formik;
+
+  const handleChangeMetaField = useCallback(
+    (field: "categoryId" | "brandId" | "writer", value: string) => {
+      if (field === "categoryId") {
+        setFieldValue("categoryId", Number(value));
+        return;
+      }
+
+      if (field === "brandId") {
+        if (value === "none") {
+          if (isBrandLoading) {
+            return;
+          }
+
+          brandClearedRef.current = true;
+          setFieldValue("brandId", undefined);
+          return;
+        }
+
+        brandClearedRef.current = false;
+        setFieldValue("brandId", value ? Number(value) : undefined);
+        return;
+      }
+
+      setFieldValue(field, value);
+    },
+    [isBrandLoading, setFieldValue],
+  );
+
+  useEffect(() => {
+    if (!detail || initializedRef.current) {
+      return;
+    }
+
+    const nextValues = buildInitialValues(detail);
+    const baseSections =
+      detail.multilingualTextList.find((item) => item.section?.length)
+        ?.section ?? [];
+    const ids = baseSections.map((section) => section.id ?? null);
+    setSectionIds(ids);
+    setSectionKeys(
+      ids.map((id, index) =>
+        id !== null ? `section-${id}` : `section-${index + 1}`,
+      ),
+    );
+    setSectionImageOriginals(
+      nextValues.sectionList.map((section) => section.imageUrlList ?? []),
+    );
+
+    setValues(nextValues, false);
+    initializedRef.current = true;
+  }, [detail, setValues]);
+
+  useEffect(() => {
+    if (!detail?.brandId) {
+      return;
+    }
+
+    if (brandClearedRef.current) {
+      return;
+    }
+
+    if (formik.values.brandId === undefined || formik.values.brandId === null) {
+      setFieldValue("brandId", detail.brandId, false);
+    }
+  }, [detail?.brandId, formik.values.brandId, setFieldValue]);
+
+  useEffect(() => {
+    initializedRef.current = false;
+  }, [newsId]);
+
   const errors = formik.errors as NewsFormErrors;
   const categoryOptions =
     categoryResponse?.data.list.map((category) => ({
@@ -223,13 +267,23 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
         category.nameDto.find((item) => item.languageCode === "ko")?.name ??
         `ID ${category.id}`,
     })) ?? [];
-  const brandOptions =
+  const baseBrandOptions =
     brandResponse?.data.list.map((brand) => ({
       value: brand.id,
       label:
         brand.nameDto.find((item) => item.languageCode === "ko")?.name ??
         `ID ${brand.id}`,
     })) ?? [];
+  const selectedBrandId = formik.values.brandId;
+  const brandOptions =
+    selectedBrandId !== undefined &&
+    selectedBrandId !== null &&
+    !baseBrandOptions.some((option) => option.value === selectedBrandId)
+      ? [
+          { value: selectedBrandId, label: `ID ${selectedBrandId}` },
+          ...baseBrandOptions,
+        ]
+      : baseBrandOptions;
 
   if (isLoading || !detail) {
     return (
@@ -266,27 +320,7 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
           errors={errors}
           isBrandLoading={isBrandLoading}
           isCategoryLoading={isCategoryLoading}
-          onChange={(field, value) => {
-            if (field === "categoryId") {
-              formik.setFieldValue("categoryId", Number(value));
-              return;
-            }
-
-            if (field === "brandId") {
-              if (value === "none") {
-                formik.setFieldValue("brandId", undefined);
-                return;
-              }
-
-              formik.setFieldValue(
-                "brandId",
-                value ? Number(value) : undefined,
-              );
-              return;
-            }
-
-            formik.setFieldValue(field, value);
-          }}
+          onChange={handleChangeMetaField}
           values={formik.values}
         />
 
@@ -303,45 +337,39 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
 
               if (field === "banner") {
                 setBannerFile(file);
-                setBannerPreview(previewUrl);
                 formik.setFieldValue("banner", previewUrl);
                 return;
               }
 
               if (field === "profile") {
                 setProfileFile(file);
-                setProfilePreview(previewUrl);
                 formik.setFieldValue("profile", previewUrl);
                 return;
               }
 
               setHomeImageFile(file);
-              setHomeImagePreview(previewUrl);
               formik.setFieldValue("homeImage", previewUrl);
             }}
             onClear={(field) => {
               if (field === "banner") {
                 setBannerFile(null);
-                setBannerPreview("");
                 formik.setFieldValue("banner", "");
                 return;
               }
 
               if (field === "profile") {
                 setProfileFile(null);
-                setProfilePreview("");
                 formik.setFieldValue("profile", "");
                 return;
               }
 
               setHomeImageFile(null);
-              setHomeImagePreview("");
               formik.setFieldValue("homeImage", "");
             }}
             previews={{
-              banner: bannerPreview || detail.banner,
-              profile: profilePreview || detail.profile,
-              homeImage: homeImagePreview || detail.homeImage,
+              banner: formik.values.banner,
+              profile: formik.values.profile,
+              homeImage: formik.values.homeImage,
             }}
           />
         </div>

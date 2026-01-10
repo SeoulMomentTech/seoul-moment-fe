@@ -1,4 +1,5 @@
 import {
+  cn,
   Input,
   Label,
   Select,
@@ -45,7 +46,11 @@ export function NewsMetaFields({
           </Label>
           <Select
             onValueChange={(value) => onChange("categoryId", value)}
-            value={values.categoryId ? values.categoryId.toString() : ""}
+            value={
+              values.categoryId !== undefined && values.categoryId !== null
+                ? values.categoryId.toString()
+                : ""
+            }
           >
             <SelectTrigger className="bg-white">
               <SelectValue
@@ -72,7 +77,11 @@ export function NewsMetaFields({
           <Label htmlFor="brandId">브랜드</Label>
           <Select
             onValueChange={(value) => onChange("brandId", value)}
-            value={values.brandId ? values.brandId.toString() : "none"}
+            value={
+              values.brandId !== undefined && values.brandId !== null
+                ? values.brandId.toString()
+                : "none"
+            }
           >
             <SelectTrigger className="bg-white">
               <SelectValue
@@ -91,12 +100,16 @@ export function NewsMetaFields({
             </SelectContent>
           </Select>
         </div>
+
         <div className="space-y-2">
           <Label htmlFor="writer">
             작성자 <span className="text-red-500">*</span>
           </Label>
           <Input
-            className={errors.writer ? "border-red-500" : ""}
+            className={cn(
+              "h-[36px] py-2",
+              errors.writer ? "border-red-500" : "",
+            )}
             id="writer"
             onChange={(e) => onChange("writer", e.target.value)}
             placeholder="작성자 이름"

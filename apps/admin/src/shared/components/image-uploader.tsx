@@ -28,7 +28,7 @@ export function ImageUploader({
               className="h-48 w-full rounded-lg"
               src={preview}
             />
-            <Button onClick={onClear} size="sm" variant="outline">
+            <Button onClick={onClear} size="sm" type="button" variant="outline">
               이미지 제거
             </Button>
           </div>
