@@ -102,7 +102,7 @@ export function DetailContent({ data }: DetailContentProps) {
         <div
           className={cn(
             "w-[630px] text-start max-sm:w-full max-sm:px-[20px]",
-            third.imageList.length === 0 && "w-full text-center",
+            third?.imageList.length === 0 && "w-full text-center",
           )}
         >
           <h3 className="text-title-3 max-sm:text-title-4 mb-[30px] font-semibold max-sm:mb-[30px]">
