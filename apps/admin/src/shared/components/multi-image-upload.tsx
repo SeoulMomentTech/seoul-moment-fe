@@ -12,6 +12,7 @@ interface MultipleImageUploadProps {
   label?: string;
   maxImages?: number;
   folder?: string;
+  required?: boolean;
 }
 
 export function MultipleImageUpload({
@@ -20,6 +21,7 @@ export function MultipleImageUpload({
   label,
   maxImages = 10,
   folder = "brand",
+  required = false,
 }: MultipleImageUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -87,7 +89,12 @@ export function MultipleImageUpload({
 
   return (
     <div className="space-y-3">
-      {label && <Label>{label}</Label>}
+      {label && (
+        <Label>
+          {label}
+          {required && <span className="text-red-500"> *</span>}
+        </Label>
+      )}
 
       {value.length > 0 && (
         <div className="grid grid-cols-4 gap-3">

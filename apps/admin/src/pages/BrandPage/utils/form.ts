@@ -8,9 +8,10 @@ import type {
   UpdateAdminBrandSectionPayload,
   UpdateAdminBrandSectionSortOrder,
 } from "@shared/services/brand";
+import { stripImageDomain } from "@shared/utils/image";
 import type { FormikErrors } from "formik";
 
-import { createEmptySection, stripImageDomain } from "./section";
+import { createEmptySection } from "./section";
 import { BANNER_REQUIRED_COUNT } from "../constants";
 
 export const getAddFormPayload = (values: CreateAdminBrandRequest) => {

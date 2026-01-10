@@ -16,6 +16,17 @@ export const PATH = {
   // Banner
   HOME_BANNER: "/banner/home",
   PRODUCT_BANNER: "/banner/product",
+
+  // News
+  NEWS: "/news",
+  NEWS_ADD: "/news/add",
+  NEWS_EDIT: "/news/edit/:id",
+
+  // Article
+  ARTICLE: "/article",
+  ARTICLE_ADD: "/article/add",
+  ARTICLE_EDIT: "/article/edit/:id",
+
   // Brand
   BRAND: "/brand",
   BRAND_ADD: "/brand/add",

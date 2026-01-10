@@ -13,3 +13,7 @@ export const uploadImageFile = async (file: File, folder: string) => {
   const { data } = await uploadAdminImage({ base64, folder });
   return data;
 };
+
+const IMAGE_DOMAIN_REGEX = /https:\/\/image-dev\.seoulmoment\.com\.tw/g;
+export const stripImageDomain = (url: string) =>
+  url.replace(IMAGE_DOMAIN_REGEX, "");
