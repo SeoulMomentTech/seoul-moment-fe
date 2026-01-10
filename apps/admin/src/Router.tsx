@@ -9,6 +9,7 @@ import {
 import { BrandAddPage } from "@pages/BrandPage/AddPage";
 import { BrandEditPage } from "@pages/BrandPage/EditPage";
 import { BrandListPage } from "@pages/BrandPage/ListPage";
+import NewsAddPage from "@pages/NewsPage/AddPage";
 import ProductOptionAddPage from "@pages/ProductOptionsPage/AddPage";
 import ProductOptionEditPage from "@pages/ProductOptionsPage/EditPage";
 import { GlobalErrorBoundary } from "@shared/components/global-errorboundary";
@@ -27,6 +28,7 @@ import ProductOptionsPage from "@pages/ProductOptionsPage";
 import ProductsPage from "@pages/ProductPage";
 import ProductSubCategoriesPage from "@pages/ProductSubCategoriesPage";
 import SignUpPage from "@pages/SignUpPage";
+
 
 const PublicRoute = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -119,6 +121,10 @@ const privateRoutes: RouteObject[] = [
       {
         path: PATH.NEWS,
         element: <NewsPage />,
+      },
+      {
+        path: PATH.NEWS_ADD,
+        element: <NewsAddPage />,
       },
       {
         path: PATH.BRAND,
