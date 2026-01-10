@@ -6,6 +6,8 @@ import {
   type RouteObject,
 } from "react-router";
 
+import ArticleAddPage from "@pages/ArticlePage/AddPage";
+import ArticleEditPage from "@pages/ArticlePage/EditPage";
 import { BrandAddPage } from "@pages/BrandPage/AddPage";
 import { BrandEditPage } from "@pages/BrandPage/EditPage";
 import { BrandListPage } from "@pages/BrandPage/ListPage";
@@ -29,7 +31,6 @@ import ProductOptionsPage from "@pages/ProductOptionsPage";
 import ProductsPage from "@pages/ProductPage";
 import ProductSubCategoriesPage from "@pages/ProductSubCategoriesPage";
 import SignUpPage from "@pages/SignUpPage";
-
 
 const PublicRoute = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -118,6 +119,14 @@ const privateRoutes: RouteObject[] = [
       {
         path: PATH.ARTICLE,
         element: <ArticlePage />,
+      },
+      {
+        path: PATH.ARTICLE_ADD,
+        element: <ArticleAddPage />,
+      },
+      {
+        path: PATH.ARTICLE_EDIT,
+        element: <ArticleEditPage />,
       },
       {
         path: PATH.NEWS,
