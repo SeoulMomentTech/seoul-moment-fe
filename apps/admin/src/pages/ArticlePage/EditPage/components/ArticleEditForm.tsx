@@ -90,9 +90,6 @@ export function ArticleEditForm({ articleId }: ArticleEditFormProps) {
   const [bannerFile, setBannerFile] = useState<File | null>(null);
   const [profileFile, setProfileFile] = useState<File | null>(null);
   const [homeImageFile, setHomeImageFile] = useState<File | null>(null);
-  const [bannerPreview, setBannerPreview] = useState("");
-  const [profilePreview, setProfilePreview] = useState("");
-  const [homeImagePreview, setHomeImagePreview] = useState("");
   const [sectionKeys, setSectionKeys] = useState<string[]>([]);
   const [sectionIds, setSectionIds] = useState<(number | null)[]>([]);
   const [sectionImageOriginals, setSectionImageOriginals] = useState<
@@ -351,45 +348,39 @@ export function ArticleEditForm({ articleId }: ArticleEditFormProps) {
 
               if (field === "banner") {
                 setBannerFile(file);
-                setBannerPreview(previewUrl);
                 formik.setFieldValue("banner", previewUrl);
                 return;
               }
 
               if (field === "profile") {
                 setProfileFile(file);
-                setProfilePreview(previewUrl);
                 formik.setFieldValue("profile", previewUrl);
                 return;
               }
 
               setHomeImageFile(file);
-              setHomeImagePreview(previewUrl);
               formik.setFieldValue("homeImage", previewUrl);
             }}
             onClear={(field) => {
               if (field === "banner") {
                 setBannerFile(null);
-                setBannerPreview("");
                 formik.setFieldValue("banner", "");
                 return;
               }
 
               if (field === "profile") {
                 setProfileFile(null);
-                setProfilePreview("");
                 formik.setFieldValue("profile", "");
                 return;
               }
 
               setHomeImageFile(null);
-              setHomeImagePreview("");
               formik.setFieldValue("homeImage", "");
             }}
             previews={{
-              banner: bannerPreview || detail.banner,
-              profile: profilePreview || detail.profile,
-              homeImage: homeImagePreview || detail.homeImage,
+              banner: formik.values.banner,
+              profile: formik.values.profile,
+              homeImage: formik.values.homeImage,
             }}
           />
         </div>
