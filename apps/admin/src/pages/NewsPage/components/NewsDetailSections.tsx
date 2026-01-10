@@ -99,6 +99,7 @@ export function NewsDetailSections({
                 <MultipleImageUpload
                   folder="news"
                   label="이미지 업로드"
+                  maxImages={1}
                   onChange={(urls) => onImagesChange(sectionIndex, urls)}
                   required
                   value={section.imageUrlList}
