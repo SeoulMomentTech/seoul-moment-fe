@@ -7,7 +7,7 @@ import { useAdminCategoryListQuery } from "@pages/ProductCategoriesPage/hooks";
 import { LANGUAGE_LIST } from "@shared/constants/locale";
 import { PATH } from "@shared/constants/route";
 import { type CreateAdminNewsRequest } from "@shared/services/news";
-import { uploadImageFile } from "@shared/utils/image";
+import { stripImageDomain, uploadImageFile } from "@shared/utils/image";
 import { useFormik } from "formik";
 
 import {
@@ -71,11 +71,17 @@ export function NewsForm() {
           ? (await uploadImageFile(homeImageFile, "news")).imagePath
           : values.homeImage;
 
+      const sectionList = values.sectionList.map((section) => ({
+        ...section,
+        imageUrlList: section.imageUrlList.map((url) => stripImageDomain(url)),
+      }));
+
       await createNews({
         ...values,
         banner,
         profile,
         homeImage,
+        sectionList,
       });
     },
   });

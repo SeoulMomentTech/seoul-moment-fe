@@ -153,8 +153,13 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
         return section.imageUrlList
           .map((newUrl, imageIndex) => {
             const oldUrl = originalImages[imageIndex] ?? "";
-            if (oldUrl === newUrl) return null;
-            return { oldImageUrl: oldUrl, newImageUrl: newUrl };
+            const normalizedOldUrl = stripImageDomain(oldUrl);
+            const normalizedNewUrl = stripImageDomain(newUrl);
+            if (normalizedOldUrl === normalizedNewUrl) return null;
+            return {
+              oldImageUrl: normalizedOldUrl,
+              newImageUrl: normalizedNewUrl,
+            };
           })
           .filter(Boolean) as { oldImageUrl: string; newImageUrl: string }[];
       });
