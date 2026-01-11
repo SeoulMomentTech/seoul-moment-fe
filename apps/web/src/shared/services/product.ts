@@ -66,6 +66,13 @@ export interface ProductItem {
   colorCode: string;
 }
 
+export interface External {
+  id: number;
+  name: string;
+  imageUrl: string;
+  url: string;
+}
+
 export interface GetProductListRes {
   total: number;
   list: Array<ProductItem>;
@@ -125,6 +132,7 @@ interface GetProductDetailRes {
   detailImg: string;
   subImage: string[];
   relate: ProductItem[];
+  external: External[];
 }
 
 export const getProductDetail = ({ id, languageCode }: GetProductDetailReq) =>
