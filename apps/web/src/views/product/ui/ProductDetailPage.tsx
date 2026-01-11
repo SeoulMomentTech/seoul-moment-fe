@@ -14,7 +14,7 @@ import { LikeCount } from "@widgets/like-count/ui/LikeCount";
 import { Link } from "@/i18n/navigation";
 
 import { BrandProductList } from "@features/product";
-import { Button } from "@seoul-moment/ui";
+import { Button, VStack } from "@seoul-moment/ui";
 import { ProductDetailImage } from "@widgets/product-detail-image";
 import { ProductGallery } from "@widgets/product-gallery";
 
@@ -178,7 +178,22 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
                 </div>
               )}
             </div>
-            <div />
+            {data.external.length > 0 && (
+              <VStack data-role="product-external-group" gap={8}>
+                {data.external.map((item) => (
+                  <Button
+                    className="w-full"
+                    key={item.id}
+                    onClick={() =>
+                      window.open(item.url, "_blank", "noreferrer")
+                    }
+                    role="link"
+                  >
+                    {item.name}
+                  </Button>
+                ))}
+              </VStack>
+            )}
           </div>
 
           <div />

@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import { cn } from "@shared/lib/style";
 
 import { Link } from "@/i18n/navigation";
@@ -41,7 +43,15 @@ export function ContactUS() {
           "h-[400px] w-[627px] bg-slate-300",
           "max-sm:h-[220px] max-sm:w-full",
         )}
-      />
+      >
+        <Image
+          alt=""
+          className="h-full w-full"
+          height={400}
+          src="/contact-us.webp"
+          width={627}
+        />
+      </div>
     </section>
   );
 }
