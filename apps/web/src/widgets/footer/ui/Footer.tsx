@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@shared/lib/style";
 
@@ -10,6 +11,8 @@ const styleMap = {
 };
 
 export function Footer() {
+  const t = useTranslations();
+
   return (
     <footer
       className={cn(
@@ -38,9 +41,9 @@ export function Footer() {
                 "max-sm:text-body-3 max-sm:w-auto max-sm:gap-[20px]",
               )}
             >
-              <Link href="/about">About</Link>
-              <Link href="/contact">Contact</Link>
-              <Link href="/policy">Policy</Link>
+              <Link href="/about">{t("about")}</Link>
+              <Link href="/contact">{t("contact")}</Link>
+              <Link href="/policy">{t("policy")}</Link>
             </div>
             <div
               className={cn(
@@ -49,9 +52,11 @@ export function Footer() {
               )}
             >
               <p className="max-sm:text-body-3 font-semibold">
-                고객센터 영업시간
+                {t("customer_service")}
               </p>
-              <p className="max-sm:text-body-4">월~금 09:00~18:00</p>
+              <p className="max-sm:text-body-4">
+                {t("mon_to_fri")} 09:00~18:00
+              </p>
             </div>
           </div>
           <div className="flex h-fit flex-1 justify-end gap-[10px]">
@@ -77,7 +82,7 @@ export function Footer() {
         </div>
         <div className={cn("flex flex-col py-[40px] text-white/80")}>
           <div className={cn("mb-[20px] font-semibold", "max-sm:text-body-3")}>
-            首爾映像有限公司(Seoul Moment Co., Ltd.)
+            {t("seoulmoment")}
           </div>
           <div
             className={cn(
@@ -86,12 +91,12 @@ export function Footer() {
             )}
           >
             <div className="flex">
-              <span>統一編號: 00148871</span>
+              <span>{t("business_license_number")}: 00148871</span>
               <div className="mx-[10px] h-[8px] w-px bg-white/45" />
-              <span>CEO: Justin Park</span>
+              <span>{t("ceo-info")}</span>
             </div>
             <div className="mx-[10px] h-[8px] w-px bg-white/45 max-sm:hidden" />
-            <span>地址: 台北市大安區忠孝東路四段231號10樓之2</span>
+            <span>{t("address")}</span>
           </div>
           <div
             className={cn(
@@ -99,7 +104,7 @@ export function Footer() {
               "max-sm:text-body-4 max-sm:flex-col max-sm:items-start max-sm:gap-[10px]",
             )}
           >
-            <span>Email : seoulmomenttw@gmail.com</span>
+            <span>{t("seoulmoment_email")}</span>
             <div className="mx-[10px] h-[8px] w-px bg-white/45 max-sm:hidden" />
             <span>Line Customer Service ID : seoulmoment</span>
           </div>

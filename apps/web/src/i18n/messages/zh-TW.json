@@ -1,4 +1,22 @@
 {
   "title": "首爾映像",
-  "-": "地址: 台北市大安區忠孝東路四段231號10樓之2"
+  "product": "產品",
+  "brand": "品牌",
+  "megazine": "Magazine",
+  "about": "關於我們",
+  "contact": "聯絡方式",
+  "language": "選擇語言",
+  "korean": "韓語",
+  "chinese": "繁體中文",
+  "english": "英文",
+  "policy": "關於策略",
+  "customer_service": "客服中心",
+  "mon_to_fri": "禮拜一~五",
+  "seoulmoment": "首爾映像有限公司(Seoul Moment Co., Ltd.)",
+  "business_license_number": "統一編號",
+  "ceo-info": "CEO: Justin Park",
+  "address": "地址: 台北市大安區忠孝東路四段231號10樓之2",
+  "seoulmoment_email": "Email : seoulmomentkr@gmail.com",
+  "kakao_line_id": "kakao & Line : seoulmoment",
+  "global_inquiry": "全球 B2B 商務洽詢"
 }
