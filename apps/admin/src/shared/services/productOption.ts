@@ -67,11 +67,13 @@ export interface CreateAdminProductOptionValueTextPayload {
 export interface CreateAdminProductOptionValueRequest {
   optionId: number;
   text: CreateAdminProductOptionValueTextPayload[];
+  colorCode?: string;
 }
 
 export interface UpdateAdminProductOptionValueRequest {
   optionId?: number;
   text?: CreateAdminProductOptionValueTextPayload[];
+  colorCode?: string;
 }
 
 export interface UpdateAdminProductOptionRequest {
