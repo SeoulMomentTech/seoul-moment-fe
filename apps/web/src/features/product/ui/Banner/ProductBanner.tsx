@@ -1,13 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { Navigation, Pagination } from "swiper/modules";
+import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 
 import useProductBanner from "../../model/useProductBanner";
 
 import "swiper/css";
 import "swiper/css/pagination";
+import "swiper/css/navigation";
 import "./product-banner.css";
 
 export default function ProductBanner() {
@@ -16,16 +17,22 @@ export default function ProductBanner() {
   return (
     <div className="mb-[40px] max-sm:mb-[20px]">
       <Swiper
+        autoplay={{
+          delay: 5000,
+          disableOnInteraction: false,
+        }}
         breakpoints={{
           640: {
             spaceBetween: 0,
           },
         }}
         className="product-banner"
-        freeMode
         loop
-        modules={[Pagination, Navigation]}
-        pagination
+        modules={[Pagination, Navigation, Autoplay]}
+        pagination={{
+          type: "bullets",
+          clickable: true,
+        }}
         slidesPerView="auto"
         spaceBetween={8}
       >
@@ -37,7 +44,7 @@ export default function ProductBanner() {
                 className="h-full object-cover"
                 height={1000}
                 src={item.banner}
-                width={1280}
+                width={1340}
               />
             </figure>
           </SwiperSlide>
