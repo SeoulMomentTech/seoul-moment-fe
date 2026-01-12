@@ -1,4 +1,22 @@
 {
   "title": "Seoul Moment",
-  "-": "Address : No. 231, Section 4, Zhongxiao E Rd, Da’an District, Taipei City, Taiwan 106"
+  "product": "Product",
+  "brand": "Brand",
+  "megazine": "Magazine",
+  "about": "About",
+  "contact": "Contact",
+  "language": "Language",
+  "korean": "Korea",
+  "chinese": "Taiwan",
+  "english": "English",
+  "policy": "Policy",
+  "customer_service": "Customer Service",
+  "mon_to_fri": "Mon~Fri",
+  "seoulmoment": "Seoul Moment Co., Ltd.(首爾映像有限公司)",
+  "business_license_number": "Business License Number",
+  "ceo-info": "CEO: Justin Park",
+  "address": "Address : No. 231, Section 4, Zhongxiao E Rd, Da’an District, Taipei City, Taiwan 106",
+  "seoulmoment_email": "Email : seoulmomentkr@gmail.com",
+  "kakao_line_id": "kakao & Line : seoulmoment",
+  "global_inquiry": "Global B2B Inquiry"
 }

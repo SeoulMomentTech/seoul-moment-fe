@@ -5,6 +5,7 @@ import { lazy, useState } from "react";
 import { MenuIcon, ChevronRightIcon } from "lucide-react";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 import { useModal } from "@shared/lib/hooks";
 import { cn } from "@shared/lib/style";
@@ -39,6 +40,7 @@ const styleMap = {
 
 function Desktop() {
   const pathname = usePathname();
+  const t = useTranslations();
 
   return (
     <div
@@ -66,7 +68,7 @@ function Desktop() {
               )}
               href="/product"
             >
-              Product
+              {t("product")}
             </Link>
           </li>
         </ul>
@@ -81,7 +83,7 @@ function Desktop() {
               )}
               href="/about"
             >
-              About
+              {t("about")}
             </Link>
           </li>
           <li>
@@ -92,7 +94,7 @@ function Desktop() {
               )}
               href="/contact"
             >
-              Contact
+              {t("contact")}
             </Link>
           </li>
           <li className="text-body-3 h-[56px] py-[20px]">
@@ -106,6 +108,7 @@ function Desktop() {
 
 function Mobile() {
   const [isOpen, setIsOpen] = useState(false);
+  const t = useTranslations();
 
   return (
     <div
@@ -143,7 +146,7 @@ function Mobile() {
                     onClick={() => setIsOpen(false)}
                     prefetch={false}
                   >
-                    Product
+                    {t("product")}
                     <ChevronRightIcon height={16} width={16} />
                   </Link>
                 </li>
@@ -154,7 +157,7 @@ function Mobile() {
                     onClick={() => setIsOpen(false)}
                     prefetch={false}
                   >
-                    About
+                    {t("about")}
                     <ChevronRightIcon height={16} width={16} />
                   </Link>
                 </li>
@@ -165,7 +168,7 @@ function Mobile() {
                     onClick={() => setIsOpen(false)}
                     prefetch={false}
                   >
-                    Contact
+                    {t("contact")}
                     <ChevronRightIcon height={16} width={16} />
                   </Link>
                 </li>
