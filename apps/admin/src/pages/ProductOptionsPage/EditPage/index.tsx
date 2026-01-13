@@ -205,8 +205,6 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
 
   const isFormDisabled = isPending || isUpdatingOption || formik.isSubmitting;
 
-  console.log();
-
   return (
     <div className="space-y-6">
       <div className="rounded-lg border border-gray-200 bg-white p-6">
