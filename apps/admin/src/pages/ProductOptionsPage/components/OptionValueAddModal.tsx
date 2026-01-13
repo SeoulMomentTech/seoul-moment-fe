@@ -6,12 +6,14 @@ import { Button, Input, Label } from "@seoul-moment/ui";
 
 import type { LanguageOption, OptionValueForm } from "./OptionValueTable";
 import { useCreateAdminProductOptionValueMutation } from "../hooks";
+import { isHexCode } from "../utils";
 
 interface OptionValueAddModalProps {
   isOpen: boolean;
   isPending?: boolean;
   optionId: number;
   languages: LanguageOption[];
+  type: string;
   onClose(): void;
 }
 
@@ -20,17 +22,22 @@ export function OptionValueAddModal({
   isPending = false,
   optionId,
   languages,
+  type,
   onClose,
 }: OptionValueAddModalProps) {
   const [texts, setTexts] = useState<OptionValueForm["text"]>(
     languages.map((lang) => ({ languageId: lang.id, value: "" })),
   );
+  const [colorCode, setColorCode] = useState<
+    OptionValueForm["colorCode"] | null
+  >(null);
   const { mutateAsync: createOptionValue, isPending: isCreating } =
     useCreateAdminProductOptionValueMutation();
 
   useEffect(() => {
     if (isOpen) {
       setTexts(languages.map((lang) => ({ languageId: lang.id, value: "" })));
+      setColorCode(null);
     }
   }, [isOpen, languages]);
 
@@ -44,13 +51,32 @@ export function OptionValueAddModal({
     );
   };
 
+  const handleChangeColorCode = (value: string) => {
+    setColorCode(value);
+  };
+
   const handleSubmit = () => {
     const firstLangLabel = languages[0]?.label ?? "첫번째 언어";
     if (!texts[0]?.value.trim()) {
       alert(`${firstLangLabel} 값을 입력해주세요.`);
       return;
     }
-    createOptionValue({ optionId, text: texts })
+
+    if (type === "COLOR" && !colorCode) {
+      alert("ColorCode를 입력해주세요.");
+      return;
+    }
+
+    if (type === "COLOR" && colorCode && !isHexCode(colorCode)) {
+      alert("ColorCode 형식이 올바르지 않습니다.");
+      return;
+    }
+
+    createOptionValue({
+      optionId,
+      text: texts,
+      ...(type === "COLOR" && colorCode ? { colorCode } : {}),
+    })
       .then(() => {
         onClose();
       })
@@ -100,6 +126,22 @@ export function OptionValueAddModal({
               />
             </div>
           ))}
+          {type === "COLOR" && (
+            <div className="space-y-2">
+              <Label className="text-sm text-gray-800" htmlFor="edit-colorCode">
+                ColorCode
+              </Label>
+              <Input
+                className="bg-gray-100"
+                disabled={isDisabled}
+                id={`edit-colorCode`}
+                maxLength={7}
+                onChange={(e) => handleChangeColorCode(e.target.value)}
+                placeholder="#000000"
+                value={colorCode ?? ""}
+              />
+            </div>
+          )}
         </div>
 
         <div className="mt-6 flex justify-end gap-3">

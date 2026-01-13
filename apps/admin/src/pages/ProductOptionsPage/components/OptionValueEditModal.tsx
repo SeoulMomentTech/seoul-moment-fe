@@ -8,6 +8,7 @@ import { Button, Input, Label } from "@seoul-moment/ui";
 
 import type { LanguageOption, OptionValueForm } from "./OptionValueTable";
 import { useUpdateAdminProductOptionValueMutation } from "../hooks";
+import { isHexCode } from "../utils";
 
 interface OptionValueEditModalProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ interface OptionValueEditModalProps {
   optionId: number;
   languages: LanguageOption[];
   initialValue: OptionValueForm | null;
+  type: string;
   onClose(): void;
 }
 
@@ -24,11 +26,15 @@ export function OptionValueEditModal({
   optionId,
   languages,
   initialValue,
+  type,
   onClose,
 }: OptionValueEditModalProps) {
   const [texts, setTexts] = useState<OptionValueForm["text"]>(
     languages.map((lang) => ({ languageId: lang.id, value: "" })),
   );
+  const [colorCode, setColorCode] = useState<
+    OptionValueForm["colorCode"] | null
+  >(null);
   const { mutateAsync: updateOptionValue, isPending: isUpdating } =
     useUpdateAdminProductOptionValueMutation();
 
@@ -44,8 +50,10 @@ export function OptionValueEditModal({
           return { languageId: lang.id, value: matched?.value ?? "" };
         }),
       );
+      setColorCode(initialValue.colorCode);
     } else {
       setTexts(languages.map((lang) => ({ languageId: lang.id, value: "" })));
+      setColorCode(null);
     }
   }, [initialValue, isOpen, languages]);
 
@@ -57,6 +65,10 @@ export function OptionValueEditModal({
         text.languageId === languageId ? { ...text, value } : text,
       ),
     );
+  };
+
+  const handleChangeColorCode = (value: string) => {
+    setColorCode(value);
   };
 
   const handleSubmit = () => {
@@ -74,10 +86,24 @@ export function OptionValueEditModal({
       alert(`${firstLangLabel} 값을 입력해주세요.`);
       return;
     }
+
+    if (type === "COLOR" && !colorCode) {
+      alert("ColorCode를 입력해주세요.");
+      return;
+    }
+
+    if (type === "COLOR" && colorCode && !isHexCode(colorCode)) {
+      alert("ColorCode 형식이 올바르지 않습니다.");
+      return;
+    }
+
     updateOptionValue({
       optionValueId,
-      payload: { text: texts },
-      optionId: optionId as ProductOptionId,
+      payload: {
+        text: texts,
+        colorCode,
+        optionId: optionId as ProductOptionId,
+      },
     })
       .then(() => onClose())
       .catch((error) => {
@@ -126,6 +152,22 @@ export function OptionValueEditModal({
               />
             </div>
           ))}
+          {type === "COLOR" && (
+            <div className="space-y-2">
+              <Label className="text-sm text-gray-800" htmlFor="edit-colorCode">
+                ColorCode
+              </Label>
+              <Input
+                className="bg-gray-100"
+                disabled={isDisabled}
+                id={`edit-colorCode`}
+                maxLength={7}
+                onChange={(e) => handleChangeColorCode(e.target.value)}
+                placeholder="#000000"
+                value={colorCode ?? ""}
+              />
+            </div>
+          )}
         </div>
 
         <div className="mt-6 flex justify-end gap-3">
