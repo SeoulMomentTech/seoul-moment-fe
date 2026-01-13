@@ -73,7 +73,7 @@ export interface CreateAdminProductOptionValueRequest {
 export interface UpdateAdminProductOptionValueRequest {
   optionId?: number;
   text?: CreateAdminProductOptionValueTextPayload[];
-  colorCode?: string;
+  colorCode: string | null;
 }
 
 export interface UpdateAdminProductOptionRequest {
@@ -88,6 +88,7 @@ export interface AdminProductOptionValue {
   nameDto: AdminProductOptionValueName[];
   createDate: string;
   updateDate: string;
+  colorCode: string | null;
 }
 
 export interface AdminProductOptionDetail {

@@ -25,7 +25,7 @@ export interface LanguageOption {
 export interface OptionValueForm {
   id: ProductOptionValueId | null;
   text: { languageId: number; value: string }[];
-  colorCode?: string;
+  colorCode: string | null;
 }
 
 interface OptionValueTableProps {
