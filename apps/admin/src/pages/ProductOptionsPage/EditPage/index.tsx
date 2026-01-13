@@ -119,7 +119,8 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
     },
   });
 
-  const { dirty, resetForm } = formik;
+  const { dirty, resetForm, values } = formik;
+  const type = values.type;
 
   useEffect(() => {
     if (data) {
@@ -145,6 +146,7 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
               (dto) => LANGUAGE_CODE_TO_ID[dto.languageCode] === lang.id,
             )?.value ?? "",
         })),
+        colorCode: value.colorCode,
       }));
 
       setOptionValues(nextOptionValues);
@@ -267,6 +269,7 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
         onEdit={handleEditOptionValue}
         onRemove={handleRemoveOptionValue}
         optionId={optionId}
+        type={type}
         values={optionValues}
       />
 
@@ -276,6 +279,7 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
         languages={LANGUAGE_OPTIONS}
         onClose={handleCloseAddModal}
         optionId={optionId}
+        type={type}
       />
       <OptionValueEditModal
         initialValue={editingIndex !== null ? optionValues[editingIndex] : null}
@@ -284,6 +288,7 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
         languages={LANGUAGE_OPTIONS}
         onClose={handleCloseEditModal}
         optionId={optionId}
+        type={type}
       />
     </div>
   );

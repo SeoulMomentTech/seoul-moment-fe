@@ -25,6 +25,7 @@ export interface LanguageOption {
 export interface OptionValueForm {
   id: ProductOptionValueId | null;
   text: { languageId: number; value: string }[];
+  colorCode: string | null;
 }
 
 interface OptionValueTableProps {
@@ -34,6 +35,7 @@ interface OptionValueTableProps {
   languages: LanguageOption[];
   values: OptionValueForm[];
   isPending?: boolean;
+  type: string;
   onAdd(): void;
   onEdit(index: number): void;
   onRemove(index: number): void;
@@ -45,6 +47,7 @@ export function OptionValueTable({
   optionId,
   languages,
   values,
+  type,
   isPending = false,
   onAdd,
   onEdit,
@@ -103,6 +106,9 @@ export function OptionValueTable({
               {languages.map((lang) => (
                 <TableHead key={lang.id}>{lang.label}</TableHead>
               ))}
+              {type === "COLOR" && (
+                <TableHead className="w-[120px] text-center">색상</TableHead>
+              )}
               <TableHead className="w-[120px] text-center">액션</TableHead>
             </TableRow>
           </TableHeader>
@@ -141,6 +147,17 @@ export function OptionValueTable({
                       </TableCell>
                     );
                   })}
+                  {type === "COLOR" && value.colorCode && (
+                    <TableCell className="text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <span
+                          className="block h-[12px] w-[12px] border"
+                          style={{ backgroundColor: value.colorCode }}
+                        />
+                        {value.colorCode}
+                      </div>
+                    </TableCell>
+                  )}
 
                   <TableCell className="text-center">
                     <div className="flex items-center justify-center gap-1">
