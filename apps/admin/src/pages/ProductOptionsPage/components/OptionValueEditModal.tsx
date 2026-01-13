@@ -8,6 +8,7 @@ import { Button, Input, Label } from "@seoul-moment/ui";
 
 import type { LanguageOption, OptionValueForm } from "./OptionValueTable";
 import { useUpdateAdminProductOptionValueMutation } from "../hooks";
+import { isHexCode } from "../utils";
 
 interface OptionValueEditModalProps {
   isOpen: boolean;
@@ -91,6 +92,11 @@ export function OptionValueEditModal({
       return;
     }
 
+    if (type === "COLOR" && colorCode && !isHexCode(colorCode)) {
+      alert("ColorCode 형식이 올바르지 않습니다.");
+      return;
+    }
+
     updateOptionValue({
       optionValueId,
       payload: {
@@ -155,6 +161,7 @@ export function OptionValueEditModal({
                 className="bg-gray-100"
                 disabled={isDisabled}
                 id={`edit-colorCode`}
+                maxLength={7}
                 onChange={(e) => handleChangeColorCode(e.target.value)}
                 placeholder="#000000"
                 value={colorCode ?? ""}
