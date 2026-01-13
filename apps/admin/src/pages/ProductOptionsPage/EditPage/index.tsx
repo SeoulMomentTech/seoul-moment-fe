@@ -271,6 +271,7 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
         onEdit={handleEditOptionValue}
         onRemove={handleRemoveOptionValue}
         optionId={optionId}
+        type={type}
         values={optionValues}
       />
 
