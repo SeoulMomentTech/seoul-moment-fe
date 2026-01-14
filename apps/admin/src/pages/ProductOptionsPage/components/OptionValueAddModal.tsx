@@ -56,10 +56,12 @@ export function OptionValueAddModal({
   };
 
   const handleSubmit = () => {
-    const firstLangLabel = languages[0]?.label ?? "첫번째 언어";
-    if (!texts[0]?.value.trim()) {
-      alert(`${firstLangLabel} 값을 입력해주세요.`);
-      return;
+    for (let i = 0; i < texts.length; i++) {
+      const text = texts[i];
+      if (!text?.value.trim()) {
+        alert(`${languages[i]?.label} 값을 입력해주세요.`);
+        return;
+      }
     }
 
     if (type === "COLOR" && !colorCode) {
@@ -104,14 +106,13 @@ export function OptionValueAddModal({
         </div>
 
         <div className="space-y-4">
-          {languages.map((language, index) => (
+          {languages.map((language) => (
             <div className="space-y-2" key={language.id}>
               <Label
                 className="text-sm text-gray-800"
                 htmlFor={`add-${language.id}`}
               >
-                {language.label}
-                {index === 0 ? " *" : ""}
+                {language.label} *
               </Label>
               <Input
                 className="bg-gray-100"
