@@ -132,5 +132,10 @@ export const updateAdminNews = (
   payload: UpdateAdminNewsRequest,
 ) => fetcher.patch(`/admin/news/${newsId}`, payload);
 
+export const updateAdminNewsV2 = (
+  newsId: AdminNewsId,
+  payload: UpdateAdminNewsRequest,
+) => fetcher.patch(`/admin/news/v2/${newsId}`, payload);
+
 export const deleteAdminNews = (newsId: AdminNewsId) =>
   fetcher.delete(`/admin/news/${newsId}`);
