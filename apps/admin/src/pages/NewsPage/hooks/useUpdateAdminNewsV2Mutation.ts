@@ -1,7 +1,7 @@
 import {
   updateAdminNewsV2,
   type AdminNewsId,
-  type UpdateAdminNewsRequest,
+  type UpdateAdminNewsRequestV2,
 } from "@shared/services/news";
 
 import {
@@ -16,7 +16,7 @@ type UpdateAdminNewsV2Response = Awaited<ReturnType<typeof updateAdminNewsV2>>;
 
 interface UpdateAdminNewsV2Variables {
   newsId: AdminNewsId;
-  payload: UpdateAdminNewsRequest;
+  payload: UpdateAdminNewsRequestV2;
 }
 
 type UpdateAdminNewsV2Options = Omit<

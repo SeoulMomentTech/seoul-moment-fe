@@ -10,9 +10,9 @@ import type {
   AdminNewsDetail,
   AdminNewsId,
   CreateAdminNewsRequest,
-  UpdateAdminNewsRequest,
+  UpdateAdminNewsRequestV2,
 } from "@shared/services/news";
-import { stripImageDomain, uploadImageFile } from "@shared/utils/image";
+import { uploadImageFile } from "@shared/utils/image";
 import { useFormik } from "formik";
 
 import type { NewsFormErrors } from "../../AddPage/types";
@@ -24,7 +24,7 @@ import {
   NewsInfoCard,
   NewsMetaFields,
 } from "../../components";
-import { useAdminNewsQuery, useUpdateAdminNewsMutation } from "../../hooks";
+import { useAdminNewsQuery, useUpdateAdminNewsV2Mutation } from "../../hooks";
 
 interface NewsEditFormProps {
   newsId: AdminNewsId;
@@ -89,9 +89,7 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
   const [homeImageFile, setHomeImageFile] = useState<File | null>(null);
   const [sectionKeys, setSectionKeys] = useState<string[]>([]);
   const [sectionIds, setSectionIds] = useState<(number | null)[]>([]);
-  const [sectionImageOriginals, setSectionImageOriginals] = useState<
-    string[][]
-  >([]);
+
   const initializedRef = useRef(false);
   const brandClearedRef = useRef(false);
   const { data: categoryResponse, isLoading: isCategoryLoading } =
@@ -112,7 +110,7 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
   const { data: newsResponse, isLoading } = useAdminNewsQuery(newsId);
   const detail = newsResponse?.data;
 
-  const { mutateAsync: updateNews, isPending } = useUpdateAdminNewsMutation({
+  const { mutateAsync: updateNews, isPending } = useUpdateAdminNewsV2Mutation({
     onSuccess: () => navigate(PATH.NEWS),
   });
 
@@ -137,34 +135,18 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
     onSubmit: async (values) => {
       const banner =
         bannerFile !== null
-          ? (await uploadImageFile(bannerFile, "news")).imagePath
-          : stripImageDomain(values.banner);
+          ? (await uploadImageFile(bannerFile, "news")).imageUrl
+          : values.banner;
       const profile =
         profileFile !== null
-          ? (await uploadImageFile(profileFile, "news")).imagePath
-          : stripImageDomain(values.profile);
+          ? (await uploadImageFile(profileFile, "news")).imageUrl
+          : values.profile;
       const homeImage =
         homeImageFile !== null
-          ? (await uploadImageFile(homeImageFile, "news")).imagePath
-          : stripImageDomain(values.homeImage);
+          ? (await uploadImageFile(homeImageFile, "news")).imageUrl
+          : values.homeImage;
 
-      const sectionImageLists = values.sectionList.map((section, index) => {
-        const originalImages = sectionImageOriginals[index] ?? [];
-        return section.imageUrlList
-          .map((newUrl, imageIndex) => {
-            const oldUrl = originalImages[imageIndex] ?? "";
-            const normalizedOldUrl = stripImageDomain(oldUrl);
-            const normalizedNewUrl = stripImageDomain(newUrl);
-            if (normalizedOldUrl === normalizedNewUrl) return null;
-            return {
-              oldImageUrl: normalizedOldUrl,
-              newImageUrl: normalizedNewUrl,
-            };
-          })
-          .filter(Boolean) as { oldImageUrl: string; newImageUrl: string }[];
-      });
-
-      const payload: UpdateAdminNewsRequest = {
+      const payload: UpdateAdminNewsRequestV2 = {
         categoryId: values.categoryId,
         brandId: values.brandId,
         writer: values.writer,
@@ -173,18 +155,17 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
         homeImage,
         multilingualTextList: values.list.map((item) => ({
           languageId: item.languageId,
-          title: item.title,
-          content: item.content,
+          name: item.title,
+          description: item.content,
           section: values.sectionList.map((section, sectionIndex) => {
             const sectionText = section.textList.find(
               (text) => text.languageId === item.languageId,
             );
             return {
-              id: sectionIds[sectionIndex] ?? 0,
+              id: sectionIds[sectionIndex] ?? undefined,
               title: sectionText?.title ?? "",
-              subTitle: sectionText?.subTitle ?? "",
               content: sectionText?.content ?? "",
-              sectionImageList: sectionImageLists[sectionIndex],
+              imageList: section.imageUrlList,
             };
           }),
         })),
@@ -239,9 +220,6 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
       ids.map((id, index) =>
         id !== null ? `section-${id}` : `section-${index + 1}`,
       ),
-    );
-    setSectionImageOriginals(
-      nextValues.sectionList.map((section) => section.imageUrlList ?? []),
     );
 
     setValues(nextValues, false);
@@ -404,7 +382,6 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
             `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
           ]);
           setSectionIds((current) => [...current, null]);
-          setSectionImageOriginals((current) => [...current, []]);
         }}
         onChangeText={(index, languageId, field, value) => {
           const sectionValue = formik.values.sectionList[index];
@@ -434,9 +411,6 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
             current.filter((_, itemIndex) => itemIndex !== index),
           );
           setSectionIds((current) =>
-            current.filter((_, itemIndex) => itemIndex !== index),
-          );
-          setSectionImageOriginals((current) =>
             current.filter((_, itemIndex) => itemIndex !== index),
           );
         }}
