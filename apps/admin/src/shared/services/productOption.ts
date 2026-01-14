@@ -6,13 +6,7 @@ export type AdminProductOptionSort = SortDirection;
 export type ProductOptionId = Branded<number, "ProductOptionId">;
 export type ProductOptionValueId = Branded<number, "ProductOptionValueId">;
 
-export type ProductOptionType =
-  | "COLOR"
-  | "SIZE"
-  | "MATERIAL"
-  | "FIT"
-  | "STYLE"
-  | "GENDER";
+export type ProductOptionType = string;
 
 export type ProductOptionUiType = "GRID" | "RADIO";
 

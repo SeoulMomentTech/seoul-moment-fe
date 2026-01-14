@@ -13,7 +13,7 @@ import {
 
 import { Button, Flex, Input, Label } from "@seoul-moment/ui";
 
-import { OptionTypeSelector, OptionUITypeSelector } from "../components";
+import { OptionTypeInput, OptionUITypeSelector } from "../components";
 import { useCreateAdminProductOptionMutation } from "../hooks";
 
 const LANGUAGE_OPTIONS = [
@@ -24,7 +24,7 @@ const LANGUAGE_OPTIONS = [
 
 export default function ProductOptionAddPage() {
   const navigate = useNavigate();
-  const [optionType, setOptionType] = useState<ProductOptionType>("COLOR");
+  const [optionType, setOptionType] = useState<ProductOptionType>("");
   const [uiType, setUiType] = useState<ProductOptionUiType>("GRID");
   const [textList, setTextList] = useState<
     CreateAdminProductOptionRequest["text"]
@@ -53,6 +53,11 @@ export default function ProductOptionAddPage() {
 
     if (!allFilled) {
       alert("모든 언어의 옵션 이름을 입력해주세요.");
+      return;
+    }
+
+    if (!optionType) {
+      alert("옵션 분류를 입력해주세요.");
       return;
     }
 
@@ -112,7 +117,7 @@ export default function ProductOptionAddPage() {
             ))}
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <OptionTypeSelector
+            <OptionTypeInput
               isPending={isPending}
               optionType={optionType}
               setOptionType={setOptionType}
@@ -129,7 +134,9 @@ export default function ProductOptionAddPage() {
         <Button
           className="w-[120px]"
           disabled={
-            isPending || textList.some((text) => !text.name.trim().length)
+            isPending ||
+            textList.some((text) => !text.name.trim().length) ||
+            !optionType
           }
           onClick={handleSubmit}
         >

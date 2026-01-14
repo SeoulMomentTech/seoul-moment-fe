@@ -15,7 +15,7 @@ import { useFormik } from "formik";
 import { Button, Input, Label } from "@seoul-moment/ui";
 
 import {
-  OptionTypeSelector,
+  OptionTypeInput,
   OptionUITypeSelector,
   OptionValueTable,
   OptionValueAddModal,
@@ -87,7 +87,7 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
         languageId: lang.id,
         name: "",
       })),
-      type: "COLOR" as ProductOptionType,
+      type: "" as ProductOptionType,
       uiType: "GRID" as ProductOptionUiType,
     },
     enableReinitialize: false,
@@ -97,6 +97,11 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
       );
       if (!allFilled) {
         alert("모든 언어의 옵션 이름을 입력해주세요.");
+        return;
+      }
+
+      if (!values.type) {
+        alert("옵션 분류를 입력해주세요.");
         return;
       }
 
@@ -120,7 +125,7 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
   });
 
   const { dirty, resetForm, values } = formik;
-  const type = values.type;
+  const type = data?.type ?? "";
 
   useEffect(() => {
     if (data) {
@@ -230,7 +235,7 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
             ))}
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <OptionTypeSelector
+            <OptionTypeInput
               isPending={isFormDisabled}
               optionType={formik.values.type}
               setOptionType={(value) => formik.setFieldValue("type", value)}
@@ -252,7 +257,7 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
             </Button>
             <Button
               className="w-[96px]"
-              disabled={isFormDisabled}
+              disabled={isFormDisabled || !values.type}
               onClick={() => formik.handleSubmit()}
               type="button"
             >
