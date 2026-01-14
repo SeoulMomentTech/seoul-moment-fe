@@ -87,7 +87,7 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
         languageId: lang.id,
         name: "",
       })),
-      type: "COLOR" as ProductOptionType,
+      type: "" as ProductOptionType,
       uiType: "GRID" as ProductOptionUiType,
     },
     enableReinitialize: false,
