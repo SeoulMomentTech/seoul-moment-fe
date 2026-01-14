@@ -100,6 +100,11 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
         return;
       }
 
+      if (!values.type) {
+        alert("옵션 분류를 입력해주세요.");
+        return;
+      }
+
       try {
         await updateOption({
           optionId,
@@ -120,7 +125,7 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
   });
 
   const { dirty, resetForm, values } = formik;
-  const type = values.type;
+  const type = data?.type ?? "";
 
   useEffect(() => {
     if (data) {
@@ -252,7 +257,7 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
             </Button>
             <Button
               className="w-[96px]"
-              disabled={isFormDisabled}
+              disabled={isFormDisabled || !values.type}
               onClick={() => formik.handleSubmit()}
               type="button"
             >

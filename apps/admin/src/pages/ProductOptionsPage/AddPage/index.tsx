@@ -56,6 +56,11 @@ export default function ProductOptionAddPage() {
       return;
     }
 
+    if (!optionType) {
+      alert("옵션 분류를 입력해주세요.");
+      return;
+    }
+
     const payload: CreateAdminProductOptionRequest = {
       text: textList,
       type: optionType,
@@ -129,7 +134,9 @@ export default function ProductOptionAddPage() {
         <Button
           className="w-[120px]"
           disabled={
-            isPending || textList.some((text) => !text.name.trim().length)
+            isPending ||
+            textList.some((text) => !text.name.trim().length) ||
+            !optionType
           }
           onClick={handleSubmit}
         >
