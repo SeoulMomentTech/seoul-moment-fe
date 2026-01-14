@@ -81,10 +81,13 @@ export function OptionValueEditModal({
       alert("저장된 옵션 값만 수정할 수 있습니다.");
       return;
     }
-    const firstLangLabel = languages[0]?.label ?? "첫번째 언어";
-    if (!texts[0]?.value.trim()) {
-      alert(`${firstLangLabel} 값을 입력해주세요.`);
-      return;
+
+    for (let i = 0; i < texts.length; i++) {
+      const text = texts[i];
+      if (!text?.value.trim()) {
+        alert(`${languages[i]?.label} 값을 입력해주세요.`);
+        return;
+      }
     }
 
     if (type === "COLOR" && !colorCode) {
