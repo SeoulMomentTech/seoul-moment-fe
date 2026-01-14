@@ -13,7 +13,7 @@ import {
 
 import { Button, Flex, Input, Label } from "@seoul-moment/ui";
 
-import { OptionTypeSelector, OptionUITypeSelector } from "../components";
+import { OptionTypeInput, OptionUITypeSelector } from "../components";
 import { useCreateAdminProductOptionMutation } from "../hooks";
 
 const LANGUAGE_OPTIONS = [
@@ -24,7 +24,7 @@ const LANGUAGE_OPTIONS = [
 
 export default function ProductOptionAddPage() {
   const navigate = useNavigate();
-  const [optionType, setOptionType] = useState<ProductOptionType>("COLOR");
+  const [optionType, setOptionType] = useState<ProductOptionType>("");
   const [uiType, setUiType] = useState<ProductOptionUiType>("GRID");
   const [textList, setTextList] = useState<
     CreateAdminProductOptionRequest["text"]
@@ -112,7 +112,7 @@ export default function ProductOptionAddPage() {
             ))}
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <OptionTypeSelector
+            <OptionTypeInput
               isPending={isPending}
               optionType={optionType}
               setOptionType={setOptionType}

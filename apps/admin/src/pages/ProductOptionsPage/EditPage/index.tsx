@@ -15,7 +15,7 @@ import { useFormik } from "formik";
 import { Button, Input, Label } from "@seoul-moment/ui";
 
 import {
-  OptionTypeSelector,
+  OptionTypeInput,
   OptionUITypeSelector,
   OptionValueTable,
   OptionValueAddModal,
@@ -230,7 +230,7 @@ function ProductOptionContents({ optionId }: ProductOptionContentsProps) {
             ))}
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <OptionTypeSelector
+            <OptionTypeInput
               isPending={isFormDisabled}
               optionType={formik.values.type}
               setOptionType={(value) => formik.setFieldValue("type", value)}
