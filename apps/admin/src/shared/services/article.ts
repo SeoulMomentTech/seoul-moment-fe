@@ -82,16 +82,6 @@ export interface UpdateAdminArticleInfoTextPayload {
   section?: UpdateAdminArticleSectionPayload[];
 }
 
-export interface UpdateAdminArticleRequest {
-  categoryId?: number;
-  brandId?: number;
-  writer?: string;
-  banner?: string;
-  profile?: string;
-  homeImage?: string;
-  multilingualTextList?: UpdateAdminArticleInfoTextPayload[];
-}
-
 export interface V2UpdateAdminArticleRequest {
   categoryId?: number;
   brandId?: number;
@@ -136,11 +126,6 @@ export const getAdminArticleInfo = (articleId: AdminArticleId) =>
 
 export const createAdminArticle = (payload: CreateAdminArticleRequest) =>
   fetcher.post("/admin/article", payload);
-
-export const updateAdminArticle = (
-  articleId: AdminArticleId,
-  payload: UpdateAdminArticleRequest,
-) => fetcher.patch(`/admin/article/${articleId}`, payload);
 
 export const updateAdminArticleV2 = (
   articleId: AdminArticleId,
