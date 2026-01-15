@@ -57,11 +57,6 @@ export const validateArticleForm = (
   }
 
   values.sectionList.forEach((section, sectionIndex) => {
-    if (section.imageUrlList.length === 0) {
-      errors[`section_images_${sectionIndex}`] =
-        "섹션 이미지는 최소 1장 필요합니다.";
-    }
-
     section.textList.forEach((text) => {
       if (!text.title.trim()) {
         errors[`section_title_${sectionIndex}_${text.languageId}`] =
