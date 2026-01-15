@@ -10,7 +10,7 @@ import type {
   AdminArticleDetail,
   AdminArticleId,
   CreateAdminArticleRequest,
-  UpdateAdminArticleRequest,
+  V2UpdateAdminArticleRequest,
 } from "@shared/services/article";
 import { stripImageDomain, uploadImageFile } from "@shared/utils/image";
 import { useFormik } from "formik";
@@ -26,7 +26,7 @@ import {
 } from "../../components";
 import {
   useAdminArticleQuery,
-  useUpdateAdminArticleMutation,
+  useUpdateAdminArticleV2Mutation,
 } from "../../hooks";
 
 interface ArticleEditFormProps {
@@ -92,9 +92,7 @@ export function ArticleEditForm({ articleId }: ArticleEditFormProps) {
   const [homeImageFile, setHomeImageFile] = useState<File | null>(null);
   const [sectionKeys, setSectionKeys] = useState<string[]>([]);
   const [sectionIds, setSectionIds] = useState<(number | null)[]>([]);
-  const [sectionImageOriginals, setSectionImageOriginals] = useState<
-    string[][]
-  >([]);
+
   const initializedRef = useRef(false);
   const brandClearedRef = useRef(false);
   const { data: categoryResponse, isLoading: isCategoryLoading } =
@@ -116,7 +114,7 @@ export function ArticleEditForm({ articleId }: ArticleEditFormProps) {
   const detail = articleResponse?.data;
 
   const { mutateAsync: updateArticle, isPending } =
-    useUpdateAdminArticleMutation({
+    useUpdateAdminArticleV2Mutation({
       onSuccess: () => navigate(PATH.ARTICLE),
     });
 
@@ -152,23 +150,7 @@ export function ArticleEditForm({ articleId }: ArticleEditFormProps) {
           ? (await uploadImageFile(homeImageFile, "article")).imagePath
           : stripImageDomain(values.homeImage);
 
-      const sectionImageLists = values.sectionList.map((section, index) => {
-        const originalImages = sectionImageOriginals[index] ?? [];
-        return section.imageUrlList
-          .map((newUrl, imageIndex) => {
-            const oldUrl = originalImages[imageIndex] ?? "";
-            const normalizedOldUrl = stripImageDomain(oldUrl);
-            const normalizedNewUrl = stripImageDomain(newUrl);
-            if (normalizedOldUrl === normalizedNewUrl) return null;
-            return {
-              oldImageUrl: normalizedOldUrl,
-              newImageUrl: normalizedNewUrl,
-            };
-          })
-          .filter(Boolean) as { oldImageUrl: string; newImageUrl: string }[];
-      });
-
-      const payload: UpdateAdminArticleRequest = {
+      const payload: V2UpdateAdminArticleRequest = {
         categoryId: values.categoryId,
         brandId: values.brandId,
         writer: values.writer,
@@ -188,7 +170,9 @@ export function ArticleEditForm({ articleId }: ArticleEditFormProps) {
               title: sectionText?.title ?? "",
               subTitle: sectionText?.subTitle ?? "",
               content: sectionText?.content ?? "",
-              sectionImageList: sectionImageLists[sectionIndex],
+              imageList: section.imageUrlList.map((imageUrl) =>
+                stripImageDomain(imageUrl),
+              ),
             };
           }),
         })),
@@ -243,9 +227,6 @@ export function ArticleEditForm({ articleId }: ArticleEditFormProps) {
       ids.map((id, index) =>
         id !== null ? `section-${id}` : `section-${index + 1}`,
       ),
-    );
-    setSectionImageOriginals(
-      nextValues.sectionList.map((section) => section.imageUrlList ?? []),
     );
 
     setValues(nextValues, false);
@@ -408,7 +389,6 @@ export function ArticleEditForm({ articleId }: ArticleEditFormProps) {
             `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
           ]);
           setSectionIds((current) => [...current, null]);
-          setSectionImageOriginals((current) => [...current, []]);
         }}
         onChangeText={(index, languageId, field, value) => {
           const sectionValue = formik.values.sectionList[index];
@@ -438,9 +418,6 @@ export function ArticleEditForm({ articleId }: ArticleEditFormProps) {
             current.filter((_, itemIndex) => itemIndex !== index),
           );
           setSectionIds((current) =>
-            current.filter((_, itemIndex) => itemIndex !== index),
-          );
-          setSectionImageOriginals((current) =>
             current.filter((_, itemIndex) => itemIndex !== index),
           );
         }}
