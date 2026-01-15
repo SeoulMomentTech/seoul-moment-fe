@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@shared/lib/style";
 
@@ -6,24 +7,22 @@ const data = [
   {
     id: "A",
     title: "Identity",
-    contents:
-      "서울모먼트는 서울의 대표 지역인 HASH(한남동, 압구정, 성수, 홍대)의 고유한 지역감성을 기반으로 설립된 글로벌 스타일 플랫폼입니다.",
+    contents: "identity_contents",
   },
   {
     id: "B",
     title: "Storyteller",
-    contents:
-      "서울모먼트는 플랫폼과 브랜드 매거진을 통해 한국의 브랜드의 대만 진출을 목적으로 하며, 각 브랜드의 정체성과 스토리를 세련된 방식으로 현지 소비자에게 전달합니다.",
+    contents: "storyteller_contents",
   },
   {
     id: "C",
     title: "Connector",
-    contents:
-      "서울의 현대적인 모던함을 전 세계에 알리고, 한국과 대만 간 다양한 스타일 (패션, 뷰티, 라이프스타일) 분야의 비즈니스 교류를 촉진하는 것을 목표로 하고 있습니다.",
+    contents: "connector_contents",
   },
 ];
 
 export function Company() {
+  const t = useTranslations();
   return (
     <section className="relative min-w-[1280px] px-[20px] max-sm:min-w-full max-sm:px-0">
       <div
@@ -75,7 +74,7 @@ export function Company() {
                   "max-sm:text-body-3 max-sm:w-auto",
                 )}
               >
-                {item.contents}
+                {t(item.contents)}
               </p>
             </div>
           ))}

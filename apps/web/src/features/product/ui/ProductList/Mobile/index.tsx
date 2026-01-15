@@ -2,6 +2,8 @@
 
 import { Suspense, useCallback, useRef } from "react";
 
+import { useTranslations } from "next-intl";
+
 import { useLanguage } from "@shared/lib/hooks";
 import { useOpen, useIntersectionObserver } from "@shared/lib/hooks";
 import { cn } from "@shared/lib/style";
@@ -34,6 +36,7 @@ export default function Mobile({ filter }: MobileProps) {
       ...filter,
       languageCode,
     });
+  const t = useTranslations();
 
   const handleIntersect = useCallback(() => {
     if (!isFetchingNextPage) {
@@ -62,7 +65,7 @@ export default function Mobile({ filter }: MobileProps) {
                 variant="ghost"
               >
                 <FilterIcon />
-                필터{" "}
+                {t("select_filter")}{" "}
                 {count > 0 && (
                   <span className="text-body-3 text-orange">{count}</span>
                 )}

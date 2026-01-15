@@ -4,6 +4,8 @@ import { type ComponentProps, type RefObject, Suspense } from "react";
 
 import { SearchIcon } from "lucide-react";
 
+import { useTranslations } from "next-intl";
+
 import { cn } from "@shared/lib/style";
 import Divider from "@shared/ui/divider";
 
@@ -31,6 +33,8 @@ export default function ProductGridSection({
   onOpenFilterModal,
   handleResetFilter,
 }: ProductGridSectionProps) {
+  const t = useTranslations();
+
   return (
     <section className="flex flex-col gap-[20px]">
       <div>
@@ -59,7 +63,7 @@ export default function ProductGridSection({
         {isEmpty ? (
           <Empty
             className="h-[687px] w-full"
-            description="검색 결과가 없습니다."
+            description={t("no_search_result")}
             icon={
               <SearchIcon className="text-black/30" height={24} width={24} />
             }

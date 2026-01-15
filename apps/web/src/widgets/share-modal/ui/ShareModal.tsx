@@ -1,5 +1,6 @@
 import { LinkIcon } from "lucide-react";
 
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 import { useCopyToClipboard, useModal } from "@shared/lib/hooks";
@@ -14,6 +15,7 @@ interface ShareModalProps {
 export default function ShareModal({ open, onOpenChange }: ShareModalProps) {
   const { copy } = useCopyToClipboard();
   const { modalType } = useModal();
+  const t = useTranslations();
   const isOpen = open && modalType === "share";
 
   const handleCopyLink = async () => {
@@ -27,7 +29,7 @@ export default function ShareModal({ open, onOpenChange }: ShareModalProps) {
       <DialogTitle />
       <DialogContent className="h-[308px] w-[325px] px-[40px] pb-[40px] pt-[32px]">
         <div className="flex flex-col gap-[32px]">
-          <h2 className="text-title-4 text-center">공유하기</h2>
+          <h2 className="text-title-4 text-center">{t("share")}</h2>
           <div className="flex gap-x-[16px] gap-y-[24px]">
             <button
               className="flex cursor-pointer flex-col gap-[8px]"
@@ -37,7 +39,7 @@ export default function ShareModal({ open, onOpenChange }: ShareModalProps) {
               <div className="flex h-[56px] w-[56px] items-center justify-center rounded-full border border-black/10">
                 <LinkIcon height={24} width={24} />
               </div>
-              <span>링크복사</span>
+              <span>{t("copy_link")}</span>
             </button>
           </div>
         </div>

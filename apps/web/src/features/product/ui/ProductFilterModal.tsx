@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
 
+import { useTranslations } from "next-intl";
+
 import { cn } from "@shared/lib/style";
 import { mergeOptionIdList } from "@shared/lib/utils/filter";
 import type { OptionIdListValue } from "@shared/lib/utils/filter";
@@ -42,6 +44,7 @@ export default function ProductFilterModal({
     brandId: filter.brandId,
     productCategoryId: filter.productCategoryId,
   });
+  const t = useTranslations();
 
   const optionMetaById = useMemo(() => getOptionMetaById(data), [data]);
 
@@ -100,7 +103,7 @@ export default function ProductFilterModal({
       <DialogContent className="w-[522px] pt-[32px]">
         <DialogHeader>
           <DialogTitle className="text-title-4 text-center font-semibold">
-            필터
+            {t("select_filter")}
           </DialogTitle>
           <DialogDescription className="sr-only" />
         </DialogHeader>
@@ -109,7 +112,7 @@ export default function ProductFilterModal({
             <Accordion defaultValue={["category"]} type="multiple">
               {filter.categoryId == null && (
                 <AccordionItem className="border-b-black/20" value="category">
-                  <AccordionTrigger>카테고리</AccordionTrigger>
+                  <AccordionTrigger>{t("category")}</AccordionTrigger>
                   <AccordionContent className="flex flex-col pb-0">
                     {categoriesData?.map((item) => (
                       <Button

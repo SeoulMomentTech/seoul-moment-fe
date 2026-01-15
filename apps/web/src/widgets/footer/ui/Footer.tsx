@@ -104,7 +104,7 @@ export function Footer() {
               "max-sm:text-body-4 max-sm:flex-col max-sm:items-start max-sm:gap-[10px]",
             )}
           >
-            <span>{t("seoulmoment_email")}</span>
+            <span>Email: seoulmomentkr@gmail.com</span>
             <div className="mx-[10px] h-[8px] w-px bg-white/45 max-sm:hidden" />
             <span>Line Customer Service ID : seoulmoment</span>
           </div>

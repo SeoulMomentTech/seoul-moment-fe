@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl";
+
 import { cn } from "@shared/lib/style";
 import type { ProductItem } from "@shared/services/product";
 
@@ -10,6 +12,7 @@ interface BrandProductListProps {
 }
 
 export default function BrandProductList({ data }: BrandProductListProps) {
+  const t = useTranslations();
   return (
     <div
       className={cn(
@@ -22,7 +25,7 @@ export default function BrandProductList({ data }: BrandProductListProps) {
           "max-sm:text-body-1",
         )}
       >
-        동일 브랜드 다른 상품
+        {t("more_from_this_brand")}
       </h3>
       <div
         className={cn(

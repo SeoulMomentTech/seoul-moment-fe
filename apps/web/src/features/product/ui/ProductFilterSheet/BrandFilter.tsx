@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl";
+
 import type { Filter } from "@widgets/filter-sheet/ui/FilterSheet";
 
 import {
@@ -18,10 +20,11 @@ interface BrandFilterProps {
 
 const BrandFilter = ({ filter, handleFilter }: BrandFilterProps) => {
   const { data: brandFilters } = useBrandFilter();
+  const t = useTranslations();
 
   return (
     <AccordionItem className="border-b-black/20" value="brand">
-      <AccordionTrigger>브랜드</AccordionTrigger>
+      <AccordionTrigger>{t("product_brand")}</AccordionTrigger>
       <AccordionContent>
         <Accordion collapsible type="single">
           {brandFilters.map((item) => (

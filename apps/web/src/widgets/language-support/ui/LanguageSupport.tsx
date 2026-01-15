@@ -17,8 +17,8 @@ import {
 type LanguageCode = keyof typeof locales;
 
 const locales = {
-  ko: "KOR",
-  en: "ENG",
+  ko: "한국어",
+  en: "English",
   "zh-TW": "繁體中文",
 };
 
@@ -31,7 +31,7 @@ export default function LanguageSupport() {
         <button
           className={cn(
             "flex min-w-[66px] items-center justify-between px-[10px] text-start",
-            "rounded-[8px] text-[14px]",
+            "text-body-3 rounded-[8px]",
             "cursor-pointer max-md:min-w-[120px]",
           )}
           type="button"
@@ -41,18 +41,18 @@ export default function LanguageSupport() {
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className="focus:ring-transparent! min-w-[66px] bg-white text-[14px] max-md:min-w-[120px]"
+        className="focus:ring-transparent! text-body-3 min-w-[66px] bg-white max-md:min-w-[120px]"
         side="top"
       >
         <DropdownMenuGroup>
           <DropdownMenuItem>
             <Link className="w-full" href="/ko">
-              KOR
+              한국어
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <Link className="w-full" href="/en">
-              ENG
+              English
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem>

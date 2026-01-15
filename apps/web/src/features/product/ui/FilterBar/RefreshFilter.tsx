@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl";
+
 import { RefreshIcon } from "@shared/ui/icon";
 
 import { Button } from "@seoul-moment/ui";
@@ -7,6 +9,7 @@ interface RefreshFilterProps {
 }
 
 export default function RefreshFilter({ onReset }: RefreshFilterProps) {
+  const t = useTranslations();
   return (
     <Button
       className="flex h-full items-center gap-[4px] p-0 hover:bg-transparent"
@@ -15,7 +18,7 @@ export default function RefreshFilter({ onReset }: RefreshFilterProps) {
       variant="ghost"
     >
       <RefreshIcon height={18} width={18} />
-      초기화
+      {t("reset")}
     </Button>
   );
 }

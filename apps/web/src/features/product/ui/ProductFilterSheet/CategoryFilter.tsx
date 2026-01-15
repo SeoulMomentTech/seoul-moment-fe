@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { useTranslations } from "next-intl";
+
 import type { Category } from "@shared/services/category";
 import type { Filter } from "@widgets/filter-sheet/ui/FilterSheet";
 
@@ -22,10 +24,11 @@ interface CategoryInterface {
 
 const CategoryFilter = ({ filter, handleFilter }: CategoryInterface) => {
   const { data: categories } = useCategories();
+  const t = useTranslations();
 
   return (
     <AccordionItem className="border-b-black/20" value="category">
-      <AccordionTrigger>카테고리</AccordionTrigger>
+      <AccordionTrigger>{t("category")}</AccordionTrigger>
       <AccordionContent className="flex flex-col pb-0">
         {categories.map((category) => (
           <ProductCategory
