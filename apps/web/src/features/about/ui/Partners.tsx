@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 
 import { UsersIcon } from "lucide-react";
 
+import { useTranslations } from "next-intl";
+
 import { cn } from "@shared/lib/style";
 
 import { PartnerCard } from "@entities/partner";
@@ -21,6 +23,7 @@ export function Partners() {
     id ?? 0,
     !isEmpty && !!id,
   );
+  const t = useTranslations();
 
   const partnerList = partners?.list ?? [];
   const shouldShowEmpty =
@@ -50,7 +53,7 @@ export function Partners() {
             "max-sm:text-title-3 max-sm:mb-[40px] max-sm:px-[20px]",
           )}
         >
-          협력사
+          {t("partners")}
         </h2>
 
         <div className="flex flex-col gap-[40px] max-sm:gap-[30px]">
@@ -77,7 +80,7 @@ export function Partners() {
           {shouldShowEmpty ? (
             <Empty
               className="h-[360px] w-full max-sm:px-[20px]"
-              description="등록된 협력사가 없습니다."
+              description={t("no_partners_found")}
               icon={
                 <UsersIcon className="text-black/30" height={24} width={24} />
               }

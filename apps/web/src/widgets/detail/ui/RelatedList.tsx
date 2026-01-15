@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@shared/lib/style";
 import type { LastNews } from "@shared/services/news";
@@ -13,6 +14,7 @@ interface RelatedListProps {
 }
 
 export function RelatedList({ lastNews, type }: RelatedListProps) {
+  const t = useTranslations();
   return (
     <div
       className={cn("mx-auto min-w-[1280px] bg-black/5", "max-sm:min-w-auto")}
@@ -25,7 +27,7 @@ export function RelatedList({ lastNews, type }: RelatedListProps) {
         label={
           <div className="mb-[30px] flex w-full items-end justify-between max-sm:mb-[20px]">
             <h3 className="text-title-2 max-sm:text-title-4">
-              <b>다른 글 보러가기</b>
+              <b>{t("explore_more_content")}</b>
             </h3>
             <Link
               className="text-body-3 max-sm:text-body-4 hover:underline"

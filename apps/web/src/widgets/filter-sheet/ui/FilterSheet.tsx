@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import { useState, type PropsWithChildren } from "react";
 
+import { useTranslations } from "next-intl";
+
 import useProductFilter from "@features/product/model/useProductFilter";
 import { cn } from "@shared/lib/style";
 import {
@@ -43,6 +45,7 @@ const FilterSheet = ({
     handleResetFilter,
   } = useProductFilter();
   const [filter, setFilter] = useState<Filter>(defaultFilter);
+  const t = useTranslations();
 
   const handleApplyFilter = () => {
     handleUpdateFilter(filter)();
@@ -80,7 +83,7 @@ const FilterSheet = ({
         side="top"
       >
         <SheetHeader className="flex pb-[30px] pt-[20px] text-center">
-          <span className="font-semibold">필터</span>
+          <span className="font-semibold">{t("select_filter")}</span>
           <SheetTitle className="sr-only" />
           <SheetDescription className="sr-only" />
         </SheetHeader>

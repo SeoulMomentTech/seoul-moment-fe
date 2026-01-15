@@ -1,6 +1,7 @@
 import { Share2Icon } from "lucide-react";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 import { useBrandBanner } from "@entities/brand/model/hooks/useBrandBanner";
 import { useLanguage } from "@shared/lib/hooks";
@@ -28,6 +29,7 @@ export default function ProductBrandBanner({ id }: ProductBrandBannerProps) {
       throwOnError: true,
     },
   });
+  const t = useTranslations();
 
   if (!data) return <BannerSkeleton />;
 
@@ -88,7 +90,7 @@ export default function ProductBrandBanner({ id }: ProductBrandBannerProps) {
             )}
             variant="outline"
           >
-            <Link href={`/brand/${id}`}>브랜드 소개 보기</Link>
+            <Link href={`/brand/${id}`}>{t("learn_more_brand")}</Link>
           </Button>
         </div>
       </div>
@@ -97,6 +99,8 @@ export default function ProductBrandBanner({ id }: ProductBrandBannerProps) {
 }
 
 const BannerSkeleton = () => {
+  const t = useTranslations();
+
   return (
     <div
       className={cn(
@@ -126,7 +130,7 @@ const BannerSkeleton = () => {
             )}
             variant="outline"
           >
-            브랜드 소개 보기
+            {t("learn_more_brand")}
           </Button>
         </div>
       </div>

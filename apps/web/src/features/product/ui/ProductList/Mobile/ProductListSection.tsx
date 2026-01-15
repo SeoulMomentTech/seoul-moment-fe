@@ -4,6 +4,8 @@ import { type ComponentProps, type RefObject } from "react";
 
 import { SearchIcon } from "lucide-react";
 
+import { useTranslations } from "next-intl";
+
 import { cn } from "@shared/lib/style";
 
 import { Link } from "@/i18n/navigation";
@@ -22,12 +24,14 @@ export default function ProductListSection({
   isEmpty,
   loadMoreRef,
 }: ProductListSectionProps) {
+  const t = useTranslations();
+
   if (isEmpty) {
     return (
       <div>
         <Empty
           className="h-[400px] w-full"
-          description="검색 결과가 없습니다."
+          description={t("no_search_result")}
           icon={<SearchIcon className="text-black/30" height={24} width={24} />}
         />
       </div>

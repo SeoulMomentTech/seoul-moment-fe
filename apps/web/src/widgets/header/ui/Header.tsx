@@ -175,11 +175,11 @@ function Mobile() {
               </ul>
               <div className="flex items-center pb-[33px]">
                 <Link href="ko" prefetch={false}>
-                  KOR
+                  한국어
                 </Link>
                 <Divider className="block bg-black/40" />
                 <Link href="en" prefetch={false}>
-                  ENG
+                  English
                 </Link>
                 <Divider className="block bg-black/40" />
                 <Link href="zh-TW" prefetch={false}>

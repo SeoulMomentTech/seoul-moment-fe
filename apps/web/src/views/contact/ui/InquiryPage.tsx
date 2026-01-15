@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@shared/lib/style";
 import Divider from "@shared/ui/divider";
@@ -6,6 +7,8 @@ import Divider from "@shared/ui/divider";
 import { InquiryForm } from "@features/inquiry";
 
 export function InquiryPage() {
+  const t = useTranslations();
+
   return (
     <div className="flex gap-[205px] pb-[100px] max-sm:pb-[50px]">
       <div
@@ -21,9 +24,7 @@ export function InquiryPage() {
             Our Moment
           </h2>
           <p className="text-body-3 mb-[30px] text-black/40 max-sm:mb-[20px]">
-            서울모먼트는 감각적인 연결을 만들어갑니다.
-            <br className="hidden max-sm:block" />
-            당신의 이야기를 기다리고 있습니다.
+            {t("contact_us_subtitle")}
           </p>
           <div
             className={cn(
@@ -32,11 +33,17 @@ export function InquiryPage() {
               "max-sm:items-start",
             )}
           >
-            <span>✉ 고객 응대 및 피드백</span>
+            <p className="flex items-center gap-[8px]">
+              <span>✉</span> {t("customer_support_feedback")}
+            </p>
             <Divider className="block bg-black/40 max-sm:hidden" />
-            <span>🤝 브랜드 제휴·유통 협력 (한/대만)</span>
+            <p className="flex items-center gap-[8px]">
+              <span>🤝</span> {t("partnerships_collaboration")}
+            </p>
             <Divider className="block bg-black/40 max-sm:hidden" />
-            <span>🎥 인플루언서 및 콘텐츠 파트너 제안</span>
+            <p className="flex items-center gap-[8px]">
+              <span>🎥</span> {t("partnerships_proposal")}
+            </p>
           </div>
         </div>
         <InquiryForm />

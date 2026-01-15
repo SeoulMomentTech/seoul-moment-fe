@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { cn } from "@shared/lib/style";
 
 import {
@@ -24,10 +26,13 @@ export default function BrandFilterSidebar({
   handleUpdateFilter,
 }: BrandFilterSidebarProps) {
   const { data: brandFilters } = useBrandFilter();
+  const t = useTranslations();
 
   return (
     <aside className="min-w-[197px] max-sm:hidden">
-      <h2 className="text-title-4 mb-[20px] font-bold max-sm:hidden">브랜드</h2>
+      <h2 className="text-title-4 mb-[20px] font-bold max-sm:hidden">
+        {t("product_brand")}
+      </h2>
       <Accordion collapsible type="single">
         {brandFilters.map((item) => (
           <AccordionItem hideBorder key={item.name} value={item.filter}>

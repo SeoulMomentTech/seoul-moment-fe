@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
 
@@ -30,6 +31,7 @@ export default function InquiryForm() {
   const [modalOpen, setModalOpen] = useState<ModalStatus | null>(null);
   const [emailSubject, setEmailSubject] = useState("");
 
+  const t = useTranslations();
   const {
     register,
     handleSubmit,
@@ -151,7 +153,7 @@ export default function InquiryForm() {
                 onClick={handleClickVerify}
                 type="button"
               >
-                인증
+                {t("verify")}
               </Button>
             </div>
             {errors.email && (
@@ -195,7 +197,7 @@ export default function InquiryForm() {
             <div className="flex h-[48px] gap-[8px]">
               <Select onValueChange={handleSelectSubject} value={emailSubject}>
                 <SelectTrigger className="h-full max-w-[150px]">
-                  {emailSubject.length === 0 ? "선택" : emailSubject}
+                  {emailSubject.length === 0 ? t("select") : emailSubject}
                 </SelectTrigger>
                 <SelectContent className="w-[150px]">
                   <SelectItem value="제휴문의">제휴문의</SelectItem>

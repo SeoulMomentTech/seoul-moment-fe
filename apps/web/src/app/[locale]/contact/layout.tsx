@@ -1,10 +1,14 @@
 import type { PropsWithChildren } from "react";
 
+import { useTranslations } from "next-intl";
+
 import { cn } from "@shared/lib/style";
 
 import { Link } from "@/i18n/navigation";
 
 export default function ContactLayout({ children }: PropsWithChildren) {
+  const t = useTranslations();
+
   return (
     <section
       className={cn(
@@ -30,7 +34,7 @@ export default function ContactLayout({ children }: PropsWithChildren) {
             )}
             href="/contact"
           >
-            문의하기(일반&제휴)
+            {t("contact_us")}
           </Link>
         </div>
       </aside>

@@ -1,31 +1,32 @@
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@shared/lib/style";
 
 const data = [
   {
     id: 1,
-    title: "서울의 감각과 스토리",
-    contents:
-      "Identity·Storyteller 요소 반영 (한남동·압구정·성수·홍대의 트렌드 감성)",
+    title: "mission_subtitle_1",
+    contents: "mission_subtitle_description_1",
   },
   {
     id: 2,
-    title: "데이터와 콘텐츠로 연결",
-    contents: "Data Analysis + Trend Magazine 전략을 통합",
+    title: "mission_subtitle_2",
+    contents: "mission_subtitle_description_2",
   },
   {
     id: 3,
-    title: "대만 소비자에게 가장 빠르고 진정성 있는 경험 제공",
-    contents: " Platform 목표와 글로벌 확장성 반영",
+    title: "mission_subtitle_3",
+    contents: "mission_subtitle_description_3",
   },
 ];
 
 export function Mission() {
+  const t = useTranslations();
   return (
     <section
       className={cn(
-        "relative h-[814px] min-w-[1280px] text-white",
+        "relative min-h-[814px] min-w-[1280px] text-white",
         "max-sm:h-auto max-sm:min-w-full",
       )}
     >
@@ -38,7 +39,7 @@ export function Mission() {
       />
       <div
         className={cn(
-          "relative z-[1] mx-auto max-w-[1280px] px-[20px] py-[140px] max-sm:py-[50px]",
+          "z-1 relative mx-auto max-w-[1280px] px-[20px] py-[140px] max-sm:py-[50px]",
         )}
       >
         <h2
@@ -61,8 +62,7 @@ export function Mission() {
               "max-sm:text-body-3 max-sm:w-auto",
             )}
           >
-            서울의 감각과 스토리를 데이터와 콘텐츠로 연결해, 대만 소비자에게
-            가장 빠르고 진정성 있는 K-라이프 스타일 경험을 제공한다.
+            {t("mission_description")}
           </h3>
           <div className="flex flex-col gap-[40px]">
             {data.map((item) => (
@@ -75,10 +75,10 @@ export function Mission() {
               >
                 <div className="text-title-3 max-sm:text-title-4 flex gap-[20px] font-bold">
                   <span>0{item.id}</span>
-                  <h4>{item.title}</h4>
+                  <h4>{t(item.title)}</h4>
                 </div>
                 <p className="text-title-4 max-sm:text-body-3">
-                  {item.contents}
+                  {t(item.contents)}
                 </p>
               </div>
             ))}
