@@ -92,6 +92,16 @@ export interface UpdateAdminArticleRequest {
   multilingualTextList?: UpdateAdminArticleInfoTextPayload[];
 }
 
+export interface V2UpdateAdminArticleRequest {
+  categoryId?: number;
+  brandId?: number;
+  writer?: string;
+  banner?: string;
+  profile?: string;
+  homeImage?: string;
+  multilingualTextList?: AdminArticleMultilingualText[];
+}
+
 export interface AdminArticleSectionContent {
   id: number;
   title: string;
@@ -131,6 +141,11 @@ export const updateAdminArticle = (
   articleId: AdminArticleId,
   payload: UpdateAdminArticleRequest,
 ) => fetcher.patch(`/admin/article/${articleId}`, payload);
+
+export const updateAdminArticleV2 = (
+  articleId: AdminArticleId,
+  payload: V2UpdateAdminArticleRequest,
+) => fetcher.patch(`/admin/article/v2/${articleId}`, payload);
 
 export const deleteAdminArticle = (articleId: AdminArticleId) =>
   fetcher.delete(`/admin/article/${articleId}`);
