@@ -2,6 +2,8 @@ import type { ProductOptionType } from "@shared/services/productOption";
 
 import { Label, Input } from "@seoul-moment/ui";
 
+import { OptionTypeSelector } from "./OptionTypeSelector";
+
 interface OptionTypeInputProps {
   optionType: ProductOptionType;
   isPending: boolean;
@@ -18,8 +20,9 @@ export function OptionTypeInput({
       <div className="flex items-center justify-between">
         <Label>옵션 분류 *</Label>
       </div>
+      <OptionTypeSelector />
       <Input
-        className="h-[36px] rounded-md border-black bg-white"
+        className="h-[36px] rounded-md bg-white"
         disabled={isPending}
         onChange={(e) => setOptionType(e.target.value)}
         placeholder="옵션 분류를 입력하세요"

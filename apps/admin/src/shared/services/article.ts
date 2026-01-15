@@ -82,14 +82,14 @@ export interface UpdateAdminArticleInfoTextPayload {
   section?: UpdateAdminArticleSectionPayload[];
 }
 
-export interface UpdateAdminArticleRequest {
+export interface V2UpdateAdminArticleRequest {
   categoryId?: number;
   brandId?: number;
   writer?: string;
   banner?: string;
   profile?: string;
   homeImage?: string;
-  multilingualTextList?: UpdateAdminArticleInfoTextPayload[];
+  multilingualTextList?: AdminArticleMultilingualText[];
 }
 
 export interface AdminArticleSectionContent {
@@ -127,10 +127,10 @@ export const getAdminArticleInfo = (articleId: AdminArticleId) =>
 export const createAdminArticle = (payload: CreateAdminArticleRequest) =>
   fetcher.post("/admin/article", payload);
 
-export const updateAdminArticle = (
+export const updateAdminArticleV2 = (
   articleId: AdminArticleId,
-  payload: UpdateAdminArticleRequest,
-) => fetcher.patch(`/admin/article/${articleId}`, payload);
+  payload: V2UpdateAdminArticleRequest,
+) => fetcher.patch(`/admin/article/v2/${articleId}`, payload);
 
 export const deleteAdminArticle = (articleId: AdminArticleId) =>
   fetcher.delete(`/admin/article/${articleId}`);

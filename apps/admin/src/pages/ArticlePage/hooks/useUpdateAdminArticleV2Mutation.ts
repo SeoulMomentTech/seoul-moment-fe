@@ -1,7 +1,7 @@
 import {
-  updateAdminArticle,
+  updateAdminArticleV2,
   type AdminArticleId,
-  type UpdateAdminArticleRequest,
+  type V2UpdateAdminArticleRequest,
 } from "@shared/services/article";
 
 import {
@@ -12,32 +12,32 @@ import {
 
 import { ARTICLE_QUERY_KEY, articleQueryKeys } from "./queryKeys";
 
-type UpdateAdminArticleResponse = Awaited<
-  ReturnType<typeof updateAdminArticle>
+type UpdateAdminArticleV2Response = Awaited<
+  ReturnType<typeof updateAdminArticleV2>
 >;
 
-interface UpdateAdminArticleVariables {
+interface UpdateAdminArticleV2Variables {
   articleId: AdminArticleId;
-  payload: UpdateAdminArticleRequest;
+  payload: V2UpdateAdminArticleRequest;
 }
 
-type UpdateAdminArticleOptions = Omit<
+type UpdateAdminArticleV2Options = Omit<
   UseMutationOptions<
-    UpdateAdminArticleResponse,
+    UpdateAdminArticleV2Response,
     unknown,
-    UpdateAdminArticleVariables
+    UpdateAdminArticleV2Variables
   >,
   "mutationFn"
 >;
 
-export const useUpdateAdminArticleMutation = (
-  options?: UpdateAdminArticleOptions,
+export const useUpdateAdminArticleV2Mutation = (
+  options?: UpdateAdminArticleV2Options,
 ) => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ articleId, payload }) =>
-      updateAdminArticle(articleId, payload),
+      updateAdminArticleV2(articleId, payload),
     ...options,
     onSuccess: async (data, variables, context, mutation) => {
       await queryClient.invalidateQueries({ queryKey: ARTICLE_QUERY_KEY });
