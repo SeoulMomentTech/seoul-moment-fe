@@ -152,10 +152,10 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
         writer: values.writer,
         banner,
         profile,
-        homeImage,
+        homeImage, //multilingualTextList
         multilingualTextList: values.list.map((item) => ({
           languageId: item.languageId,
-          name: item.title,
+          title: item.title,
           description: item.content,
           section: values.sectionList.map((section, sectionIndex) => {
             const sectionText = section.textList.find(
@@ -164,6 +164,7 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
             return {
               id: sectionIds[sectionIndex] ?? undefined,
               title: sectionText?.title ?? "",
+              subTitle: sectionText?.subTitle ?? "",
               content: sectionText?.content ?? "",
               imageList: section.imageUrlList,
             };
