@@ -156,7 +156,7 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
         multilingualTextList: values.list.map((item) => ({
           languageId: item.languageId,
           title: item.title,
-          description: item.content,
+          content: item.content,
           section: values.sectionList.map((section, sectionIndex) => {
             const sectionText = section.textList.find(
               (text) => text.languageId === item.languageId,
