@@ -70,15 +70,14 @@ export interface UpdateAdminNewsImagePayload {
 export interface UpdateAdminNewsSectionPayload {
   id: number;
   title?: string;
-  subTitle?: string;
   content?: string;
-  sectionImageList?: UpdateAdminNewsImagePayload[];
+  imageList?: string[];
 }
 
 export interface UpdateAdminNewsInfoTextPayload {
   languageId: number;
-  title?: string;
-  content?: string;
+  name?: string;
+  description?: string;
   section?: UpdateAdminNewsSectionPayload[];
 }
 
@@ -90,6 +89,30 @@ export interface UpdateAdminNewsRequest {
   profile?: string;
   homeImage?: string;
   multilingualTextList?: UpdateAdminNewsInfoTextPayload[];
+}
+
+export interface UpdateAdminNewsSectionPayloadV2 {
+  id?: number;
+  title?: string;
+  content?: string;
+  imageList?: string[];
+}
+
+export interface UpdateAdminNewsInfoTextPayloadV2 {
+  languageId: number;
+  title?: string;
+  content?: string;
+  section?: UpdateAdminNewsSectionPayloadV2[];
+}
+
+export interface UpdateAdminNewsRequestV2 {
+  categoryId?: number;
+  brandId?: number;
+  writer?: string;
+  banner?: string;
+  profile?: string;
+  homeImage?: string;
+  multilingualTextList?: UpdateAdminNewsInfoTextPayloadV2[];
 }
 
 export interface AdminNewsSectionContent {
@@ -131,6 +154,11 @@ export const updateAdminNews = (
   newsId: AdminNewsId,
   payload: UpdateAdminNewsRequest,
 ) => fetcher.patch(`/admin/news/${newsId}`, payload);
+
+export const updateAdminNewsV2 = (
+  newsId: AdminNewsId,
+  payload: UpdateAdminNewsRequestV2,
+) => fetcher.patch(`/admin/news/v2/${newsId}`, payload);
 
 export const deleteAdminNews = (newsId: AdminNewsId) =>
   fetcher.delete(`/admin/news/${newsId}`);

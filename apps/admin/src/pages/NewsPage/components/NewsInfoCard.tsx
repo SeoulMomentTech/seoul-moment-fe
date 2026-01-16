@@ -10,16 +10,12 @@ import {
   Textarea,
 } from "@seoul-moment/ui";
 
-import type { NewsFormErrors, NewsFormValues } from "../AddPage/types";
+import type { NewsFormErrors, NewsFormValues } from "../types";
 
 interface NewsInfoCardProps {
   values: NewsFormValues;
   errors: NewsFormErrors;
-  onChange(
-    languageId: number,
-    field: "title" | "content",
-    value: string,
-  ): void;
+  onChange(languageId: number, field: "title" | "content", value: string): void;
 }
 
 const getLanguageLabel = (languageCode: string) => {
@@ -61,7 +57,11 @@ export function NewsInfoCard({ values, errors, onChange }: NewsInfoCardProps) {
             const contentError = errors[`content_${language.id}`];
 
             return (
-              <TabsContent className="mt-6 space-y-6" key={language.id} value={language.code}>
+              <TabsContent
+                className="mt-6 space-y-6"
+                key={language.id}
+                value={language.code}
+              >
                 <div className="space-y-2">
                   <Label htmlFor={`title_${language.id}`}>
                     제목 ({getLanguageLabel(language.code)})
