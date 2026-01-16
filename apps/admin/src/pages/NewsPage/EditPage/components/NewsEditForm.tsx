@@ -15,8 +15,6 @@ import type {
 import { uploadImageFile } from "@shared/utils/image";
 import { useFormik } from "formik";
 
-import type { NewsFormErrors } from "../../AddPage/types";
-import { validateNewsForm } from "../../AddPage/utils";
 import {
   NewsDetailSections,
   NewsFormFooter,
@@ -25,6 +23,8 @@ import {
   NewsMetaFields,
 } from "../../components";
 import { useAdminNewsQuery, useUpdateAdminNewsV2Mutation } from "../../hooks";
+import type { NewsFormErrors } from "../../types";
+import { validateNewsForm } from "../../utils";
 
 interface NewsEditFormProps {
   newsId: AdminNewsId;

@@ -18,8 +18,8 @@ import {
   NewsMetaFields,
 } from "../../components";
 import { useCreateAdminNewsMutation } from "../../hooks";
-import type { NewsFormErrors } from "../types";
-import { createInitialValues, validateNewsForm } from "../utils";
+import type { NewsFormErrors } from "../../types";
+import { createInitialValues, validateNewsForm } from "../../utils";
 
 const INITIAL_FORM_VALUES: CreateAdminNewsRequest =
   createInitialValues(LANGUAGE_LIST);

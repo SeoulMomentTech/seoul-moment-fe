@@ -100,8 +100,8 @@ export interface UpdateAdminNewsSectionPayloadV2 {
 
 export interface UpdateAdminNewsInfoTextPayloadV2 {
   languageId: number;
-  name?: string;
-  description?: string;
+  title?: string;
+  content?: string;
   section?: UpdateAdminNewsSectionPayloadV2[];
 }
 
