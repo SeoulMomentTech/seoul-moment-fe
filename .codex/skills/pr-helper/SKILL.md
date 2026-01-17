@@ -27,6 +27,7 @@ description: 현재 git branch의 변경사항을 분석하여 Pull Request 템�
 1. 현재 branch의 변경사항 분석
    - `git status`
    - `git diff origin/<base-branch>...HEAD`
+   - base-branch는 사용자가 지정하거나, 로컬 기준 `origin/HEAD`가 있으면 해당 브랜치를 사용
 
 2. 변경 유형 분류
    - feat / fix / docs / style / refactor / test / chore
