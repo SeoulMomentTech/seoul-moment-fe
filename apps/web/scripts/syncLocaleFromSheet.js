@@ -1,9 +1,21 @@
 const fs = require("fs/promises");
 const path = require("path");
+const dotenv = require("dotenv");
+
+dotenv.config({ path: path.resolve(__dirname, "../.env.local") });
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 const { JWT } = require("google-auth-library");
 const { google } = require("googleapis");
-const account = require("./account.json");
+
+const serviceAccountJson = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+if (!serviceAccountJson) {
+  throw new Error("GOOGLE_SERVICE_ACCOUNT_JSON env is required");
+}
+const account = JSON.parse(serviceAccountJson);
+if (account.private_key) {
+  account.private_key = account.private_key.replace(/\\n/g, "\n");
+}
 
 const RANGE = "language-pack!A1:D"; // 필요 범위 지정
 const GOOGLE_SHEET_ID = "1oEXsVhu6U5HVLmwfR2LIQLc43yBgiGhn_bUpXBVNJiE"; //"YOUR_GOOGLE_SHEET_ID";
