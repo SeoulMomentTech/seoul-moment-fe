@@ -54,6 +54,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^16.6.1",
     "eslint": "^9",
     "google-auth-library": "^10.1.0",
     "googleapis": "^150.0.1",
