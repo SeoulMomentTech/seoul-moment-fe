@@ -22,7 +22,7 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         with:
-          model: openai/codex
+          model: openai/gpt-4.1-mini
           prompt: |
             Review this pull request:
             - Check for code quality issues
