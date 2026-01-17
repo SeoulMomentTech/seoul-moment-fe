@@ -37,8 +37,8 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
         navigation={true}
         spaceBetween={10}
         style={{
-          "--swiper-navigation-color": "#fff",
-          "--swiper-pagination-color": "#fff",
+          "--swiper-navigation-color": "var(--color-brand-foreground)",
+          "--swiper-pagination-color": "var(--color-brand-foreground)",
           "--swiper-navigation-sides-offset": "40px",
           "--swiper-navigation-size": "30px",
         }}

@@ -22,15 +22,30 @@
   --destructive-foreground: 0 0% 98%;
   --ring: 215 20.2% 65.1%;
   --radius: 0.5rem;
+  --brand-500: #f37b2a;
+  --neutral-900: #171717;
+  --neutral-600: #707070;
+  --neutral-200: #dddddd;
+  --neutral-0: #ffffff;
+  --surface-soft: #f0f6ff;
+  --info-500: #0088ff;
+  --danger-500: #ff383c;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-orange: #f37b2a;
-  --color-gray: #707070;
-  --color-error: #ff383c;
-  --color-sent: #0088ff;
+  --color-brand: var(--brand-500);
+  --color-brand-foreground: var(--neutral-0);
+  --color-neutral: var(--neutral-600);
+  --color-neutral-subtle: var(--neutral-200);
+  --color-surface-soft: var(--surface-soft);
+  --color-info: var(--info-500);
+  --color-danger: var(--danger-500);
+  --color-orange: var(--brand-500);
+  --color-gray: var(--neutral-600);
+  --color-error: var(--danger-500);
+  --color-sent: var(--info-500);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
