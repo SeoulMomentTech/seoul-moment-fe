@@ -52,7 +52,7 @@ function NewsContents({ data }: NewsContentsProps) {
               <FeaturedMainNewsCard
                 author={news.writer}
                 date={news.createDate}
-                imageUrl={news.image}
+                imageUrl={news.homeImage}
                 subTitle={news.content}
                 title={news.title}
               />
@@ -69,7 +69,7 @@ function NewsContents({ data }: NewsContentsProps) {
               <FeaturedSubNewsCard
                 author={news.writer}
                 date={news.createDate}
-                imageUrl={news.image}
+                imageUrl={news.homeImage}
                 subTitle={news.content}
                 title={news.title}
               />
@@ -80,3 +80,6 @@ function NewsContents({ data }: NewsContentsProps) {
     </div>
   );
 }
+
+// Removed leftover console.log(data); statement for cleaner production code
+

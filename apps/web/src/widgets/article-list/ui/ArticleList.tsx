@@ -21,7 +21,7 @@ export default function ArticleList({ className, data }: ArticleListProps) {
             author={article.writer}
             className="w-[407px] flex-none"
             date={article.createDate}
-            imageUrl={article.image}
+            imageUrl={article.homeImage}
             subTitle={article.content}
             title={article.title}
           />

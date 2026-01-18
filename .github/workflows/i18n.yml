@@ -1,0 +1,99 @@
+name: i18n synchronize
+
+on:
+  schedule:
+    - cron: "0 1 * * *"
+  workflow_dispatch:
+
+jobs:
+  i18n-sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.18.3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Prepare sync branch
+        run: |
+          set -euo pipefail
+          git fetch origin develop
+          git checkout -B docs/sync-i18n origin/develop
+      - name: Check secret presence
+        run: |
+          echo "GITHUB_REPOSITORY=$GITHUB_REPOSITORY"
+          if [ -z "${GOOGLE_SERVICE_ACCOUNT_JSON:-}" ]; then
+            echo "GOOGLE_SERVICE_ACCOUNT_JSON is missing"
+            exit 1
+          fi
+          echo "GOOGLE_SERVICE_ACCOUNT_JSON length: ${#GOOGLE_SERVICE_ACCOUNT_JSON}"
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+      - name: Sync i18n from sheet
+        run: pnpm -C apps/web i18n:sync
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+      - name: Commit and push changes
+        id: sync_commit
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          echo "changes=false" >> "$GITHUB_OUTPUT"
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add -A
+          git commit -m "chore(i18n): sync locales from sheet"
+
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force-with-lease origin docs/sync-i18n
+          echo "changes=true" >> "$GITHUB_OUTPUT"
+      - name: Create pull request
+        if: steps.sync_commit.outputs.changes == 'true'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const head = "docs/sync-i18n";
+            const base = "develop";
+            const { data: pulls } = await github.rest.pulls.list({
+              owner,
+              repo,
+              state: "open",
+              head: `${owner}:${head}`,
+              base,
+            });
+            if (pulls.length === 0) {
+              await github.rest.pulls.create({
+                owner,
+                repo,
+                head,
+                base,
+                title: "chore(i18n): sync locales from sheet",
+                body: "Automated daily sync of locale files from Google Sheet.",
+              });
+            } else {
+              core.info(`PR already exists: #${pulls[0].number}`);
+            }

@@ -12,6 +12,7 @@ export interface Article {
   writer: string;
   createDate: string;
   image: string;
+  homeImage: string;
 }
 
 interface GetArticleListRes {

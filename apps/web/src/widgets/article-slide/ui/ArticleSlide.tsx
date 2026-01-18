@@ -23,7 +23,7 @@ export default function ArticleSlide({ data }: ArticleSlideProps) {
             <ArticleCard
               author={article.writer}
               date={article.createDate}
-              imageUrl={article.image}
+              imageUrl={article.homeImage}
               subTitle={article.content}
               title={article.title}
             />

@@ -89,7 +89,7 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
                 <div className="flex items-center">
                   <StarIcon
                     className="text-transparent"
-                    fill="#F37B2A"
+                    fill="var(--color-brand)"
                     height={16}
                     strokeWidth={1}
                     width={16}
@@ -212,7 +212,7 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
             )}
             style={{
               background:
-                "linear-gradient(180deg, rgba(255, 255, 255, 0.00) 0%, #FFF 100%)",
+                "linear-gradient(180deg, transparent 0%, var(--color-brand-foreground) 100%)",
             }}
           >
             <Button
