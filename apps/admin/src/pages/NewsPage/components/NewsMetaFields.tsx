@@ -47,9 +47,7 @@ export function NewsMetaFields({
           <Select
             onValueChange={(value) => onChange("categoryId", value)}
             value={
-              values.categoryId !== undefined && values.categoryId !== null
-                ? values.categoryId.toString()
-                : ""
+              values.categoryId.toString()
             }
           >
             <SelectTrigger className="bg-white">
