@@ -9,6 +9,7 @@ import {
   Tag,
   Newspaper,
   BookOpenText,
+  Users,
 } from "lucide-react";
 
 import {
@@ -49,16 +50,12 @@ const menuItems: MenuItemConfig[] = [
     label: "대시보드",
     icon: <LayoutDashboard className="h-5 w-5" />,
   },
-  //{
-  //  id: "users",
-  //  label: "사용자 관리",
-  //  icon: <Users className="h-5 w-5" />,
-  //  subItems: [
-  //    { id: "users", label: "전체 사용자" },
-  //    { id: "user-roles", label: "권한 관리" },
-  //    { id: "user-groups", label: "그룹 관리" },
-  //  ],
-  //},
+  {
+    id: "users",
+    label: "사용자 관리",
+    icon: <Users className="h-5 w-5" />,
+    subItems: [{ id: "users", label: "유저 관리", path: "/users" }],
+  },
   {
     id: "banner",
     label: "배너 관리",

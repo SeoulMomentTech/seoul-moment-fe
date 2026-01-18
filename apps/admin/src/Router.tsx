@@ -31,6 +31,7 @@ import ProductOptionsPage from "@pages/ProductOptionsPage";
 import ProductsPage from "@pages/ProductPage";
 import ProductSubCategoriesPage from "@pages/ProductSubCategoriesPage";
 import SignUpPage from "@pages/SignUpPage";
+import UsersPage from "@pages/UserPage";
 
 const PublicRoute = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -151,6 +152,10 @@ const privateRoutes: RouteObject[] = [
       {
         path: PATH.BRAND_EDIT,
         element: <BrandEditPage />,
+      },
+      {
+        path: PATH.USERS,
+        element: <UsersPage />,
       },
     ],
   },
