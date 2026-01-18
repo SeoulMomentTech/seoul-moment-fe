@@ -182,9 +182,9 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
 
   const handleChangeMetaField = useCallback(
     (field: "categoryId" | "brandId" | "writer", value: string) => {
-      if(isCategoryLoading || isBrandLoading) return;
+      if(isCategoryLoading || isBrandLoading || !value) return;
 
-      if (field === "categoryId" && value) {
+      if (field === "categoryId") {
         setFieldValue("categoryId", Number(value)); 
         return;
       }
@@ -203,7 +203,7 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
 
       setFieldValue(field, value);
     },
-    [isBrandLoading,isCategoryLoading,setFieldValue],
+    [isBrandLoading, isCategoryLoading, setFieldValue],
   );
 
   useEffect(() => {
