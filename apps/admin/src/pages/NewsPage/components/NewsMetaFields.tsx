@@ -37,6 +37,7 @@ export function NewsMetaFields({
   errors,
   onChange,
 }: NewsMetaFieldsProps) {
+
   return (
     <div className="space-y-4">
       <div className="grid gap-4 md:grid-cols-3">
@@ -46,11 +47,7 @@ export function NewsMetaFields({
           </Label>
           <Select
             onValueChange={(value) => onChange("categoryId", value)}
-            value={
-              values.categoryId !== undefined && values.categoryId !== null
-                ? values.categoryId.toString()
-                : ""
-            }
+            value={values.categoryId.toString()}
           >
             <SelectTrigger className="bg-white">
               <SelectValue

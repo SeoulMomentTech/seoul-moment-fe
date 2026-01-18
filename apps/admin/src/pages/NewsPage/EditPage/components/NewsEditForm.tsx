@@ -178,19 +178,19 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
 
   const { setFieldValue, setValues } = formik;
 
+
+
   const handleChangeMetaField = useCallback(
     (field: "categoryId" | "brandId" | "writer", value: string) => {
+      if(isCategoryLoading || isBrandLoading || !value) return;
+
       if (field === "categoryId") {
-        setFieldValue("categoryId", Number(value));
+        setFieldValue("categoryId", Number(value)); 
         return;
       }
 
       if (field === "brandId") {
         if (value === "none") {
-          if (isBrandLoading) {
-            return;
-          }
-
           brandClearedRef.current = true;
           setFieldValue("brandId", undefined);
           return;
@@ -203,7 +203,7 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
 
       setFieldValue(field, value);
     },
-    [isBrandLoading, setFieldValue],
+    [isBrandLoading, isCategoryLoading, setFieldValue],
   );
 
   useEffect(() => {
@@ -223,9 +223,11 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
       ),
     );
 
-    setValues(nextValues, false);
+    setValues(nextValues, true);
     initializedRef.current = true;
   }, [detail, setValues]);
+
+
 
   useEffect(() => {
     if (!detail?.brandId) {
