@@ -80,3 +80,6 @@ function NewsContents({ data }: NewsContentsProps) {
     </div>
   );
 }
+
+// Removed leftover console.log(data); statement for cleaner production code
+
