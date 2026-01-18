@@ -43,7 +43,6 @@ interface NewsContentsProps {
 }
 
 function NewsContents({ data }: NewsContentsProps) {
-  console.log(data);
   return (
     <div className={cn("flex gap-[40px]", "max-sm:w-full max-sm:flex-col")}>
       {data.map((news, idx) => {
