@@ -43,6 +43,7 @@ interface NewsContentsProps {
 }
 
 function NewsContents({ data }: NewsContentsProps) {
+  console.log(data);
   return (
     <div className={cn("flex gap-[40px]", "max-sm:w-full max-sm:flex-col")}>
       {data.map((news, idx) => {
@@ -52,7 +53,7 @@ function NewsContents({ data }: NewsContentsProps) {
               <FeaturedMainNewsCard
                 author={news.writer}
                 date={news.createDate}
-                imageUrl={news.image}
+                imageUrl={news.homeImage}
                 subTitle={news.content}
                 title={news.title}
               />
@@ -69,7 +70,7 @@ function NewsContents({ data }: NewsContentsProps) {
               <FeaturedSubNewsCard
                 author={news.writer}
                 date={news.createDate}
-                imageUrl={news.image}
+                imageUrl={news.homeImage}
                 subTitle={news.content}
                 title={news.title}
               />
