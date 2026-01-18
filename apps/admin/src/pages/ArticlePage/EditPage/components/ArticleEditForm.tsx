@@ -186,17 +186,17 @@ export function ArticleEditForm({ articleId }: ArticleEditFormProps) {
 
   const handleChangeMetaField = useCallback(
     (field: "categoryId" | "brandId" | "writer", value: string) => {
-      if (field === "categoryId") {
+      if(isCategoryLoading || isBrandLoading) return;
+
+
+
+      if (field === "categoryId" && value) {
         setFieldValue("categoryId", Number(value));
         return;
       }
 
       if (field === "brandId") {
         if (value === "none") {
-          if (isBrandLoading) {
-            return;
-          }
-
           brandClearedRef.current = true;
           setFieldValue("brandId", undefined);
           return;
@@ -209,7 +209,7 @@ export function ArticleEditForm({ articleId }: ArticleEditFormProps) {
 
       setFieldValue(field, value);
     },
-    [isBrandLoading, setFieldValue],
+    [isBrandLoading, isCategoryLoading,setFieldValue],
   );
 
   useEffect(() => {
@@ -229,7 +229,7 @@ export function ArticleEditForm({ articleId }: ArticleEditFormProps) {
       ),
     );
 
-    setValues(nextValues, false);
+    setValues(nextValues, true);
     initializedRef.current = true;
   }, [detail, setValues]);
 
