@@ -142,9 +142,7 @@ export const getEditFormPayloadV2 = ({ data, values }: GetEditFormPayload) => {
         id: baseSections[sectionIndex]?.id ?? 0,
         title: sectionText?.title ?? "",
         content: sectionText?.content ?? "",
-        imageList: section.imageUrlList.map((imageUrl) =>
-          stripImageDomain(imageUrl),
-        ),
+        imageList: section.imageUrlList,
       };
     }),
   }));
@@ -152,11 +150,11 @@ export const getEditFormPayloadV2 = ({ data, values }: GetEditFormPayload) => {
   const payload: V2UpdateAdminBrandRequest = {
     categoryId: values.categoryId,
     englishName: values.englishName,
-    profileImage: stripImageDomain(values.profileImageUrl),
-    productBannerImage: stripImageDomain(values.productBannerImageUrl),
-    productMobileBannerImage: stripImageDomain(values.productMobileBannerImageUrl),
-    bannerList: values.bannerImageUrlList.map(stripImageDomain),
-    mobileBannerList: values.mobileBannerImageUrlList.map(stripImageDomain),
+    profileImage: values.profileImageUrl,
+    productBannerImage: values.productBannerImageUrl,
+    productMobileBannerImage: values.productMobileBannerImageUrl,
+    bannerList: values.bannerImageUrlList,
+    mobileBannerList: values.mobileBannerImageUrlList,
     multilingualTextList,
   };
 
