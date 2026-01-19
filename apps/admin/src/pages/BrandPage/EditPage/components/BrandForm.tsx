@@ -142,7 +142,7 @@ export default function BrandForm({ id }: BrandFormProps) {
       <div className="mt-6 flex gap-3">
         <Button
           className="flex-1"
-          disabled={isPending}
+          disabled={formik.isSubmitting || isPending}
           type="submit"
         >
           등록하기
