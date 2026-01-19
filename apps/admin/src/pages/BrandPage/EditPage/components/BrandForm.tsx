@@ -22,11 +22,11 @@ import { BannerImages } from "../../components/BannerImages";
 import { BasicInfo } from "../../components/BasicInfo";
 import { BrandSections } from "../../components/BrandSection";
 import {
-  useUpdateAdminBrandMutation,
+  useUpdateAdminBrandV2Mutation,
   useAdminBrandSuspenseQuery,
 } from "../../hooks";
 import {
-  getEditFormPayload,
+  getEditFormPayloadV2,
   createEmptySection,
   validateForm,
   getInitialValuesFromData,
@@ -41,6 +41,7 @@ const INITIAL_FORM_VALUES: CreateAdminBrandRequest = {
   categoryId: 1,
   profileImageUrl: "",
   productBannerImageUrl: "",
+  productMobileBannerImageUrl: "",
   textList: LANGUAGE_LIST.map((language) => ({
     languageId: language.id,
     name: "",
@@ -61,7 +62,7 @@ export default function BrandForm({ id }: BrandFormProps) {
   const navigate = useNavigate();
 
   const { data: brandData } = useAdminBrandSuspenseQuery(id);
-  const { mutate, isPending } = useUpdateAdminBrandMutation({
+  const { mutate, isPending } = useUpdateAdminBrandV2Mutation({
     onSuccess: () => navigate(PATH.BRAND),
   });
 
@@ -74,7 +75,7 @@ export default function BrandForm({ id }: BrandFormProps) {
       return validationErrors;
     },
     onSubmit: (values) => {
-      const payload = getEditFormPayload({ data: brandData.data, values });
+      const payload = getEditFormPayloadV2({ data: brandData.data, values });
       mutate({ brandId: id, payload });
     },
   });
@@ -138,7 +139,7 @@ export default function BrandForm({ id }: BrandFormProps) {
       <div className="mt-6 flex gap-3">
         <Button
           className="flex-1"
-          disabled={formik.isSubmitting || isPending}
+          disabled={isPending}
           type="submit"
         >
           등록하기
