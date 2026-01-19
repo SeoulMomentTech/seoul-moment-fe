@@ -28,6 +28,7 @@ const INITIAL_FORM_VALUES: CreateAdminBrandRequest = {
   categoryId: 1,
   profileImageUrl: "",
   productBannerImageUrl: "",
+  productMobileBannerImageUrl: "",
   textList: LANGUAGE_LIST.map((language) => ({
     languageId: language.id,
     name: "",
@@ -61,6 +62,7 @@ export default function BrandForm() {
     },
     onSubmit: async (values) => {
       const payload = getAddFormPayload(values);
+      console.log(payload);
       await createBrand(payload);
     },
   });
