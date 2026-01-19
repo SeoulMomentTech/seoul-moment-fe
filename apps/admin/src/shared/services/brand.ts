@@ -55,6 +55,7 @@ export interface CreateAdminBrandRequest {
   bannerImageUrlList: string[];
   mobileBannerImageUrlList: string[];
   productBannerImageUrl: string;
+  productMobileBannerImageUrl: string;
   englishName: string;
 }
 
