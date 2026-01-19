@@ -9,6 +9,8 @@ import {
   type CreateAdminBrandRequest,
 } from "@shared/services/brand";
 import { useFormik } from "formik";
+import { toast } from "sonner";
+
 
 import {
   Button,
@@ -64,6 +66,7 @@ export default function BrandForm({ id }: BrandFormProps) {
   const { data: brandData } = useAdminBrandSuspenseQuery(id);
   const { mutate, isPending } = useUpdateAdminBrandV2Mutation({
     onSuccess: () => navigate(PATH.BRAND),
+    onError: () => toast.error("수정에 실패했습니다.")
   });
 
   const formik = useFormik<CreateAdminBrandRequest>({
