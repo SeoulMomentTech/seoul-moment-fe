@@ -64,7 +64,6 @@ export default function BrandForm() {
     },
     onSubmit: async (values) => {
       const payload = getAddFormPayload(values);
-      console.log(payload);
       await createBrand(payload);
     },
   });
