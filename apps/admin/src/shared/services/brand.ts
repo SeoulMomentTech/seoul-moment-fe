@@ -55,6 +55,7 @@ export interface CreateAdminBrandRequest {
   bannerImageUrlList: string[];
   mobileBannerImageUrlList: string[];
   productBannerImageUrl: string;
+  productMobileBannerImageUrl: string;
   englishName: string;
 }
 
@@ -92,6 +93,17 @@ export interface UpdateAdminBrandRequest {
   sectionSortOrderList: UpdateAdminBrandSectionSortOrder[];
 }
 
+export interface V2UpdateAdminBrandRequest {
+  categoryId?: number;
+  englishName?: string;
+  profileImage?: string;
+  productBannerImage?: string;
+  productMobileBannerImage?: string;
+  bannerList?: string[];
+  mobileBannerList?: string[];
+  multilingualTextList?: AdminBrandMultilingualText[];
+}
+
 export interface AdminBrandSectionContent {
   id: number;
   title: string;
@@ -112,6 +124,7 @@ export interface AdminBrandDetail {
   englishName: string;
   profileImage: string;
   productBannerImage: string;
+  productMobileBannerImageUrl: string;
   bannerList: string[];
   mobileBannerList: string[];
   multilingualTextList: AdminBrandMultilingualText[];
@@ -132,6 +145,11 @@ export const updateAdminBrand = (
   brandId: BrandId,
   payload: UpdateAdminBrandRequest,
 ) => fetcher.patch(`/admin/brand/${brandId}`, payload);
+
+export const updateAdminBrandV2 = (
+  brandId: BrandId,
+  payload: V2UpdateAdminBrandRequest,
+) => fetcher.patch(`/admin/brand/${brandId}/v2`, payload);
 
 export const deleteAdminBrand = (brandId: BrandId) =>
   fetcher.delete(`/admin/brand/${brandId}`);

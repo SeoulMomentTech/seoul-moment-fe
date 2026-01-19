@@ -7,6 +7,7 @@ import type {
   UpdateAdminBrandSectionImageSortOrder,
   UpdateAdminBrandSectionPayload,
   UpdateAdminBrandSectionSortOrder,
+  V2UpdateAdminBrandRequest,
 } from "@shared/services/brand";
 import { stripImageDomain } from "@shared/utils/image";
 import type { FormikErrors } from "formik";
@@ -19,6 +20,9 @@ export const getAddFormPayload = (values: CreateAdminBrandRequest) => {
     ...values,
     profileImageUrl: stripImageDomain(values.profileImageUrl),
     productBannerImageUrl: stripImageDomain(values.productBannerImageUrl),
+    productMobileBannerImageUrl: stripImageDomain(
+      values.productMobileBannerImageUrl,
+    ),
     bannerImageUrlList: values.bannerImageUrlList.map(stripImageDomain),
     mobileBannerImageUrlList:
       values.mobileBannerImageUrlList.map(stripImageDomain),
@@ -122,6 +126,41 @@ export const getEditFormPayload = ({ data, values }: GetEditFormPayload) => {
   return payload;
 };
 
+export const getEditFormPayloadV2 = ({ data, values }: GetEditFormPayload) => {
+  const baseSections = data.multilingualTextList[0]?.section ?? [];
+
+  const multilingualTextList = values.textList.map((text) => ({
+    languageId: text.languageId,
+    name: text.name,
+    description: text.description,
+    section: values.sectionList.map((section, sectionIndex) => {
+      const sectionText = section.textList.find(
+        (item) => item.languageId === text.languageId,
+      );
+
+      return {
+        id: baseSections[sectionIndex]?.id ?? 0,
+        title: sectionText?.title ?? "",
+        content: sectionText?.content ?? "",
+        imageList: section.imageUrlList,
+      };
+    }),
+  }));
+
+  const payload: V2UpdateAdminBrandRequest = {
+    categoryId: values.categoryId,
+    englishName: values.englishName,
+    profileImage: values.profileImageUrl,
+    productBannerImage: values.productBannerImageUrl,
+    productMobileBannerImage: values.productMobileBannerImageUrl,
+    bannerList: values.bannerImageUrlList,
+    mobileBannerList: values.mobileBannerImageUrlList,
+    multilingualTextList,
+  };
+
+  return payload;
+};
+
 export const validateForm = (values: CreateAdminBrandRequest) => {
   const validationErrors: FormikErrors<CreateAdminBrandRequest> &
     Record<string, string> = {};
@@ -188,6 +227,7 @@ export const getInitialValuesFromData = (data: AdminBrandDetail) => {
     englishName,
     profileImage,
     productBannerImage,
+    productMobileBannerImageUrl,
   } = data;
 
   const textList = LANGUAGE_LIST.map((language) => {
@@ -244,6 +284,7 @@ export const getInitialValuesFromData = (data: AdminBrandDetail) => {
     categoryId,
     profileImageUrl: profileImage,
     productBannerImageUrl: productBannerImage,
+    productMobileBannerImageUrl,
     textList,
     sectionList,
     bannerImageUrlList: bannerList,

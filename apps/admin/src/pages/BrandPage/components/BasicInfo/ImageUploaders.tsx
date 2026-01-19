@@ -32,3 +32,15 @@ export function BannerImageUploader(props: SimpleImageUploaderProps) {
     />
   );
 }
+
+export function BannerMobileImageUploader(props: SimpleImageUploaderProps) {
+  return (
+    <ImageUploader
+      aspect="wide"
+      description="브랜드 페이지 상단에 노출되는 모바일 이미지"
+      label="대표 모바일 배너 이미지"
+      {...props}
+    />
+  );
+}
+

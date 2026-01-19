@@ -8,7 +8,7 @@ import { type FormikProps } from "formik";
 import { Input, Label } from "@seoul-moment/ui";
 
 import { CategorySelect } from "./CategorySelect";
-import { BannerImageUploader, ProfileImageUploader } from "./ImageUploaders";
+import { BannerImageUploader, BannerMobileImageUploader, ProfileImageUploader } from "./ImageUploaders";
 import { MultilingualFields } from "./MultilingualFields";
 
 interface BasicInfoProps {
@@ -42,7 +42,7 @@ export function BasicInfo({ formik }: BasicInfoProps) {
   const handleImageUpload = useCallback(
     async (
       file: File | undefined,
-      field: "profileImageUrl" | "productBannerImageUrl",
+      field: "profileImageUrl" | "productBannerImageUrl" | "productMobileBannerImageUrl",
     ) => {
       if (!file) return;
       try {
@@ -84,6 +84,11 @@ export function BasicInfo({ formik }: BasicInfoProps) {
             onClear={() => setFieldValue("productBannerImageUrl", "")}
             value={values.productBannerImageUrl}
           />
+          <BannerMobileImageUploader onChange={(file) =>
+            handleImageUpload(file, "productMobileBannerImageUrl")
+          }
+            onClear={() => setFieldValue("productMobileBannerImageUrl", "")}
+            value={values.productMobileBannerImageUrl} />
         </div>
       </div>
 
