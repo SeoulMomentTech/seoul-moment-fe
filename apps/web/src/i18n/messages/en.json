@@ -64,8 +64,15 @@
   "no_product_found": "No products found.",
   "no_article_found": "No articles found.",
   "no_partners_found": "No partners found.",
-  "close": "",
-  "apply": "",
-  "search_result": "",
-  "etc": ""
+  "unisex": "Unisex",
+  "free_to_contact": "If you have any questions, please feel free to contact us at any time.",
+  "view": "View",
+  "close": "Close",
+  "apply": "Apply",
+  "search_result": "Search Results",
+  "within_days": "Ships within {n} days",
+  "partnership_inquiry": "Partnership Inquiry",
+  "listing_inquiry": "Product Listing Inquiry",
+  "etc": "Others",
+  "subcategory_all": "All"
 }

@@ -64,8 +64,15 @@
   "no_product_found": "目前沒有商品",
   "no_article_found": "目前沒有內容",
   "no_partners_found": "目前沒有合作品牌",
-  "close": "",
-  "apply": "",
-  "search_result": "",
-  "etc": ""
+  "unisex": "男女適穿",
+  "free_to_contact": "如有任何疑問，歡迎隨時與我們聯繫。",
+  "view": "前往",
+  "close": "關閉",
+  "apply": "套用",
+  "search_result": "搜尋結果",
+  "within_days": "{n}日內出貨",
+  "partnership_inquiry": "合作洽詢",
+  "listing_inquiry": "入駐洽詢",
+  "etc": "其他",
+  "subcategory_all": "全部"
 }
