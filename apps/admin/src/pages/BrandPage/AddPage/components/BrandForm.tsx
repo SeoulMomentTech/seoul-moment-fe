@@ -4,7 +4,6 @@ import { LANGUAGE_LIST } from "@shared/constants/locale";
 import { PATH } from "@shared/constants/route";
 import { type CreateAdminBrandRequest } from "@shared/services/brand";
 import { useFormik } from "formik";
-import { toast } from "sonner";
 
 import {
   Button,
@@ -29,7 +28,6 @@ const INITIAL_FORM_VALUES: CreateAdminBrandRequest = {
   categoryId: 1,
   profileImageUrl: "",
   productBannerImageUrl: "",
-  productMobileBannerImageUrl: "",
   textList: LANGUAGE_LIST.map((language) => ({
     languageId: language.id,
     name: "",
@@ -51,7 +49,6 @@ export default function BrandForm() {
 
   const { mutateAsync: createBrand, isPending } = useCreateAdminBrandMutation({
     onSuccess: () => navigate(PATH.BRAND),
-    onError: () => toast.error("등록에 실패했습니다.")
   });
 
   const formik = useFormik<CreateAdminBrandRequest>({

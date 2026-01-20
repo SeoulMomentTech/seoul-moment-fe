@@ -9,8 +9,6 @@ import {
   type CreateAdminBrandRequest,
 } from "@shared/services/brand";
 import { useFormik } from "formik";
-import { toast } from "sonner";
-
 
 import {
   Button,
@@ -24,11 +22,11 @@ import { BannerImages } from "../../components/BannerImages";
 import { BasicInfo } from "../../components/BasicInfo";
 import { BrandSections } from "../../components/BrandSection";
 import {
-  useUpdateAdminBrandV2Mutation,
+  useUpdateAdminBrandMutation,
   useAdminBrandSuspenseQuery,
 } from "../../hooks";
 import {
-  getEditFormPayloadV2,
+  getEditFormPayload,
   createEmptySection,
   validateForm,
   getInitialValuesFromData,
@@ -43,7 +41,6 @@ const INITIAL_FORM_VALUES: CreateAdminBrandRequest = {
   categoryId: 1,
   profileImageUrl: "",
   productBannerImageUrl: "",
-  productMobileBannerImageUrl: "",
   textList: LANGUAGE_LIST.map((language) => ({
     languageId: language.id,
     name: "",
@@ -64,9 +61,8 @@ export default function BrandForm({ id }: BrandFormProps) {
   const navigate = useNavigate();
 
   const { data: brandData } = useAdminBrandSuspenseQuery(id);
-  const { mutate, isPending } = useUpdateAdminBrandV2Mutation({
+  const { mutate, isPending } = useUpdateAdminBrandMutation({
     onSuccess: () => navigate(PATH.BRAND),
-    onError: () => toast.error("수정에 실패했습니다.")
   });
 
   const formik = useFormik<CreateAdminBrandRequest>({
@@ -78,7 +74,7 @@ export default function BrandForm({ id }: BrandFormProps) {
       return validationErrors;
     },
     onSubmit: (values) => {
-      const payload = getEditFormPayloadV2({ data: brandData.data, values });
+      const payload = getEditFormPayload({ data: brandData.data, values });
       mutate({ brandId: id, payload });
     },
   });

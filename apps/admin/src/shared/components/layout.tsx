@@ -1,9 +1,6 @@
 import { useState, type PropsWithChildren } from "react";
 
-import { Toaster } from "sonner";
-
 import { Flex } from "@seoul-moment/ui";
-
 
 import Header from "./header";
 import Sidebar from "./sidebar";
@@ -43,10 +40,7 @@ export function Layout({ children }: PropsWithChildren) {
           isMobileMenuOpen={isMobileMenuOpen}
           onMobileMenuClose={() => setIsMobileMenuOpen(false)}
         />
-        <main className="ml-56 flex-1 max-lg:ml-0">
-          {children}
-          <Toaster />
-        </main>
+        <main className="ml-56 flex-1 max-lg:ml-0">{children}</main>
       </Flex>
     </div>
   );
