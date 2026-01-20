@@ -8,6 +8,7 @@ export type ProductBannerId = Branded<number, "ProductBannerId">;
 export interface AdminProductBannerListItem {
   id: ProductBannerId;
   imageUrl: string;
+  mobileImageUrl: string;
   sort: number;
   createDate: string;
   updateDate: string;
@@ -26,6 +27,7 @@ export interface AdminProductBannerListParams {
 
 export interface CreateAdminProductBannerRequest {
   imageUrl: string;
+  mobileImageUrl: string;
 }
 
 export interface UpdateAdminProductBannerSortOrder {
@@ -39,11 +41,13 @@ export interface UpdateAdminProductBannerSortOrderRequest {
 
 export interface UpdateAdminProductBannerRequest {
   imageUrl: string;
+  mobileImageUrl: string;
 }
 
 export interface AdminProductBannerDetail {
   id: ProductBannerId;
   imageUrl: string;
+  mobileImageUrl: string;
   sortOrder: number;
   createDate: string;
   updateDate: string;

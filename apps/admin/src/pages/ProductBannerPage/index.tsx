@@ -78,19 +78,23 @@ export function ProductBannerPage() {
     setEditingBanner(null);
   };
 
-  const handleSaveBanner = async (payload: { imageUrl: string }) => {
+  const handleSaveBanner = async (payload: { imageUrl: string, mobileImageUrl: string }) => {
+    const { imageUrl, mobileImageUrl } = payload;
+
+
     if (editingBanner) {
       await updateBanner({
         productBannerId: editingBanner.id,
         payload: {
-          imageUrl: payload.imageUrl,
+          imageUrl,
+          mobileImageUrl,
         },
       });
       alert("배너가 수정되었습니다.");
       return;
     }
 
-    await createBanner({ imageUrl: payload.imageUrl });
+    await createBanner({ imageUrl, mobileImageUrl });
     alert("배너가 등록되었습니다.");
   };
 
@@ -178,8 +182,10 @@ export function ProductBannerPage() {
 
       <ProductBannerModal
         initialImageUrl={editingBanner?.imageUrl}
+        initialMobileImageUrl={editingBanner?.mobileImageUrl}
         isOpen={isModalOpen}
         isSaving={isCreating || isUpdating}
+        mode={editingBanner ? "update" : "create"}
         onClose={closeModal}
         onSave={handleSaveBanner}
       />
