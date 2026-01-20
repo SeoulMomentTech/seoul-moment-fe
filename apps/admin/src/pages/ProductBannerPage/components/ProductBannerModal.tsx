@@ -35,20 +35,13 @@ export function ProductBannerModal({
   const [mobileImagePreview, setMobileImagePreview] = useState<string>(initialMobileImageUrl ?? "");
   const [isUploading, setIsUploading] = useState(false);
 
-  useEffect(() => {
-    if (isOpen) {
-      setImagePreview(initialImageUrl ?? "");
-      setImageFile(null);
-      setMobileImagePreview(initialMobileImageUrl ?? "");
-      setMobileImageFile(null);
-    }
-  }, [initialImageUrl, initialMobileImageUrl, isOpen]);
-
   const hasImage = useMemo(() => Boolean(imagePreview), [imagePreview]);
   const hasMobileImage = useMemo(() => Boolean(mobileImagePreview), [mobileImagePreview]);
 
-
-  if (!isOpen) return null;
+  const title = mode === "update" ? "배너 수정" : "배너 등록";
+  const description = mode === "update"
+    ? "배너 이미지를 수정합니다."
+    : "새로운 상품 배너를 등록합니다.";
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -68,7 +61,9 @@ export function ProductBannerModal({
 
   const resetState = () => {
     setImageFile(null);
+    setMobileImageFile(null)
     setImagePreview(initialImageUrl ?? "");
+    setMobileImagePreview(initialMobileImageUrl ?? "");
   };
 
   const handleClose = () => {
@@ -107,12 +102,25 @@ export function ProductBannerModal({
     }
   };
 
-  const title = mode === "update" ? "배너 수정" : "배너 등록";
-  const description = mode === "update"
-    ? "배너 이미지를 수정합니다."
-    : "새로운 상품 배너를 등록합니다.";
+  useEffect(() => {
+    if (isOpen) {
+      setImagePreview(initialImageUrl ?? "");
+      setImageFile(null);
+      setMobileImagePreview(initialMobileImageUrl ?? "");
+      setMobileImageFile(null);
+    }
+  }, [initialImageUrl, initialMobileImageUrl, isOpen]);
+
+  useEffect(() => {
+    return () => {
+      if (imagePreview) URL.revokeObjectURL(imagePreview);
+      if (mobileImagePreview) URL.revokeObjectURL(mobileImagePreview);
+    };
+  }, [imagePreview, mobileImagePreview])
 
   const isSaveDisabled = isSaving || isUploading || !hasImage || !hasMobileImage;
+
+  if (!isOpen) return null;
 
   return (
     <HStack align="center" className="fixed inset-0 z-50">
@@ -133,7 +141,6 @@ export function ProductBannerModal({
         </p>
 
         <div className="mb-6">
-          <input type="url" />
           <ImageUploader
             id="productBannerImage"
             label="배너 이미지 (권장: 1200x600px)"
@@ -147,7 +154,6 @@ export function ProductBannerModal({
         </div>
 
         <div className="mb-6">
-          <input type="url" />
           <ImageUploader
             id="productBannerMobileImage"
             label="모바일 배너 이미지"
