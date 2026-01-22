@@ -1,5 +1,9 @@
-import { Trash2 } from "lucide-react";
+import { Link } from "react-router";
 
+import { Edit, Trash2 } from "lucide-react";
+
+
+import { PATH } from "@shared/constants/route";
 import { type AdminProductItem } from "@shared/services/products";
 
 import {
@@ -122,7 +126,16 @@ export const ProductTable = ({
                   : "-"}
               </TableCell>
               <TableCell>
-                <Flex justify="center">
+                <Flex gap={2} justify="center">
+                  <Link
+                    className="flex items-center justify-center"
+                    to={PATH.PRODUCT_EDIT.replace(
+                      ":id",
+                      String(product.id),
+                    )}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Link>
                   <Button
                     disabled={isPending}
                     onClick={() => handleDelete(product.id)}
