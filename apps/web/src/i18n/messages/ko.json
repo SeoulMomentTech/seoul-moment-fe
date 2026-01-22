@@ -64,8 +64,15 @@
   "no_product_found": "등록된 상품이 없습니다.",
   "no_article_found": "등록된 글이 없습니다.",
   "no_partners_found": "등록된 협력사가 없습니다.",
+  "unisex": "남녀공용",
+  "free_to_contact": "문의사항이 필요하신 경우 언제든지 연락해주시기 바랍니다.",
+  "view": "바로가기",
   "close": "닫기",
   "apply": "적용하기",
   "search_result": "검색 결과",
-  "etc": "기타"
+  "within_days": "{n}일 이내 출고",
+  "partnership_inquiry": "제휴문의",
+  "listing_inquiry": "입점문의",
+  "etc": "기타",
+  "subcategory_all": "전체"
 }

@@ -1,6 +1,13 @@
+import { Link } from "react-router";
+
+import { Edit, Trash2 } from "lucide-react";
+
+
+import { PATH } from "@shared/constants/route";
 import { type AdminProductItem } from "@shared/services/products";
 
 import {
+  Button,
   Flex,
   Table,
   TableBody,
@@ -9,6 +16,8 @@ import {
   TableHeader,
   TableRow,
 } from "@seoul-moment/ui";
+
+import { useDeleteAdminProductItemMutation } from "../hooks";
 
 interface ProductTableProps {
   products: AdminProductItem[];
@@ -21,6 +30,22 @@ export const ProductTable = ({
   isLoading,
   formatPrice,
 }: ProductTableProps) => {
+  const { mutateAsync: deleteProductItem, isPending } =
+    useDeleteAdminProductItemMutation();
+
+  const handleDelete = async (productItemId: AdminProductItem["id"]) => {
+    if (!confirm("삭제 하시겠습니까?")) {
+      return;
+    }
+
+    try {
+      await deleteProductItem(productItemId);
+    } catch (error) {
+      console.error("상품 아이템 삭제 오류:", error);
+      alert("상품 아이템을 삭제하는 중 오류가 발생했습니다.");
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-12">
@@ -41,12 +66,13 @@ export const ProductTable = ({
           <TableHead>할인가</TableHead>
           <TableHead>등록일</TableHead>
           <TableHead>수정일</TableHead>
+          <TableHead className="w-24">액션</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {products.length === 0 ? (
           <TableRow>
-            <TableCell className="py-12 text-center text-gray-500" colSpan={8}>
+            <TableCell className="py-12 text-center text-gray-500" colSpan={9}>
               상품이 없습니다.
             </TableCell>
           </TableRow>
@@ -98,6 +124,27 @@ export const ProductTable = ({
                 {product.updateDate
                   ? new Date(product.updateDate).toLocaleDateString()
                   : "-"}
+              </TableCell>
+              <TableCell>
+                <Flex gap={2} justify="center">
+                  <Link
+                    className="flex items-center justify-center"
+                    to={PATH.PRODUCT_EDIT.replace(
+                      ":id",
+                      String(product.id),
+                    )}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Link>
+                  <Button
+                    disabled={isPending}
+                    onClick={() => handleDelete(product.id)}
+                    size="sm"
+                    variant="ghost"
+                  >
+                    <Trash2 className="h-4 w-4 text-red-500" />
+                  </Button>
+                </Flex>
               </TableCell>
             </TableRow>
           ))

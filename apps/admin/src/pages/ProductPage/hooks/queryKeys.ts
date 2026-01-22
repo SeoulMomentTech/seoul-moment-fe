@@ -1,4 +1,7 @@
-import { type AdminProductItemListParams } from "@shared/services/products";
+import {
+  type AdminProductItemId,
+  type AdminProductItemListParams,
+} from "@shared/services/products";
 
 export const PRODUCT_QUERY_KEY = ["admin", "products"] as const;
 
@@ -6,4 +9,6 @@ export const productQueryKeys = {
   all: PRODUCT_QUERY_KEY,
   list: (params?: AdminProductItemListParams) =>
     [...PRODUCT_QUERY_KEY, "list", params] as const,
+  detail: (productItemId: AdminProductItemId | number) =>
+    [...PRODUCT_QUERY_KEY, "detail", productItemId] as const,
 };

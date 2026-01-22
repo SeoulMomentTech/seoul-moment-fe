@@ -15,6 +15,8 @@ import NewsAddPage from "@pages/NewsPage/AddPage";
 import NewsEditPage from "@pages/NewsPage/EditPage";
 import ProductOptionAddPage from "@pages/ProductOptionsPage/AddPage";
 import ProductOptionEditPage from "@pages/ProductOptionsPage/EditPage";
+import ProductAddPage from "@pages/ProductPage/AddPage";
+import ProductEditPage from "@pages/ProductPage/EditPage";
 import { GlobalErrorBoundary } from "@shared/components/global-errorboundary";
 import { Layout } from "@shared/components/layout";
 import { PATH } from "@shared/constants/route";
@@ -87,6 +89,14 @@ const privateRoutes: RouteObject[] = [
       {
         path: PATH.PRODUCTS,
         element: <ProductsPage />,
+      },
+      {
+        path: PATH.PRODUCT_ADD,
+        element: <ProductAddPage />,
+      },
+      {
+        path: PATH.PRODUCT_EDIT,
+        element: <ProductEditPage />,
       },
       {
         path: PATH.PRODUCT_CATEGORIES,
