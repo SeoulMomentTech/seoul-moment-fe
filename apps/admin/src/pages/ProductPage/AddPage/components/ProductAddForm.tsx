@@ -48,7 +48,6 @@ export default function ProductAddForm() {
     validateOnBlur: false,
     validateOnChange: false,
     onSubmit: async (values) => {
-      console.log(values)
       const validationError = validateProductForm(values, mainImageFile);
       if (validationError) {
         alert(validationError);
@@ -153,15 +152,34 @@ export default function ProductAddForm() {
 
     formik.setFieldValue(
       "variants",
-      formik.values.variants.map((variant, index) =>
-        index === activeVariantIndex
-          ? {
-            ...variant,
-            optionValueIds: [...variant.optionValueIds, ...selectedValueIds,].join(", "),
-            optionValueBadgeList: [...variant.optionValueBadgeList ?? [], ...badges],
+      formik.values.variants.map((variant, index) => {
+        if (index !== activeVariantIndex) {
+          return variant;
+        }
+
+        const mergedValueIds = Array.from(
+          new Set([
+            ...parseOptionValueIds(variant.optionValueIds),
+            ...selectedValueIds,
+          ]),
+        );
+        const mergedBadges = [
+          ...(variant.optionValueBadgeList ?? []),
+          ...badges,
+        ].reduce<OptionValueBadge[]>((acc, badge) => {
+          if (acc.some((item) => item.id === badge.id)) {
+            return acc;
           }
-          : variant,
-      ),
+          acc.push(badge);
+          return acc;
+        }, []);
+
+        return {
+          ...variant,
+          optionValueIds: mergedValueIds.join(", "),
+          optionValueBadgeList: mergedBadges,
+        };
+      }),
     );
     handleCloseOptionModal();
   };
