@@ -1,18 +1,26 @@
 import { useState, type KeyboardEvent } from "react";
 
+import { useNavigate } from "react-router";
+
+import { Plus } from "lucide-react";
+
 import { Pagination } from "@shared/components/pagination";
 import {
   DEFAULT_PAGE,
   DEFAULT_PAGE_SIZE,
   DEFAULT_SORT,
 } from "@shared/constants/page";
+import { PATH } from "@shared/constants/route";
 
 import { PageHeader } from "@/shared/components/page-header";
+
+import { Button } from "@seoul-moment/ui";
 
 import { ProductFilters, ProductTable } from "./components";
 import { useAdminProductItemListQuery } from "./hooks";
 
 export default function ProductsPage() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [page, setPage] = useState(DEFAULT_PAGE);
@@ -55,7 +63,16 @@ export default function ProductsPage() {
 
   return (
     <div className="p-8 pt-24">
-      <PageHeader description="등록된 상품을 조회하세요." title="전체 상품" />
+      <PageHeader
+        description="등록된 상품을 조회하세요."
+        right={
+          <Button onClick={() => navigate(PATH.PRODUCT_ADD)}>
+            <Plus className="mr-2 h-4 w-4" />
+            상품 추가
+          </Button>
+        }
+        title="전체 상품"
+      />
       <div className="mb-6 rounded-lg border border-gray-200 bg-white">
         <div className="border-b border-gray-200 px-6 py-4">
           <p className="text-sm text-gray-600">총 {total}개의 상품</p>

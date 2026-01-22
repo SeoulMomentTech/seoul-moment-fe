@@ -1,12 +1,13 @@
 import { ImageIcon } from "lucide-react";
 
-import { Button, Label } from "@seoul-moment/ui";
+import { Button, cn, Label } from "@seoul-moment/ui";
 
 interface ImageUploaderProps {
   id: string;
   label: string;
   preview: string;
   required?: boolean;
+  imageClassName?: string;
   onChange(e: React.ChangeEvent<HTMLInputElement>): void;
   onClear(): void;
 }
@@ -15,6 +16,7 @@ export function ImageUploader({
   id,
   label,
   preview,
+  imageClassName,
   required = false,
   onChange,
   onClear,
@@ -30,7 +32,7 @@ export function ImageUploader({
           <div className="space-y-4">
             <img
               alt={`${label} 미리보기`}
-              className="h-48 w-full rounded-lg"
+              className={cn("h-48 w-full rounded-lg", imageClassName)}
               src={preview}
             />
             <Button onClick={onClear} size="sm" type="button" variant="outline">

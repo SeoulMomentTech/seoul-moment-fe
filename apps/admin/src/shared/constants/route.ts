@@ -4,6 +4,8 @@ export const PATH = {
   SIGNUP: "/signup",
   // Product
   PRODUCTS: "/products",
+  PRODUCT_ADD: "/products/add",
+  PRODUCT_EDIT: "/products/edit/:id",
   PRODUCT_CATEGORIES: "/products/categories",
   PRODUCT_SUB_CATEGORIES: "/products/sub-categories",
   PRODUCT_LIST: "/products/list",
