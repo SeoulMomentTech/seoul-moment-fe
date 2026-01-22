@@ -3,9 +3,11 @@ import { Navigate, useNavigate, useParams } from "react-router";
 import { ArrowLeft } from "lucide-react";
 
 import { PATH } from "@shared/constants/route";
+import type { AdminProductItemId } from "@shared/services/products";
 
 import { Button } from "@seoul-moment/ui";
 
+import ProductEditForm from "./components/ProductEditForm";
 
 export default function ProductEditPage() {
   const navigate = useNavigate();
@@ -27,12 +29,13 @@ export default function ProductEditPage() {
           <ArrowLeft className="mr-2 h-4 w-4" />
           목록으로 돌아가기
         </Button>
-        <div className="rounded-lg border border-gray-200 bg-white p-8">
+        <div className="mb-6">
           <h2 className="mb-2">상품 아이템 수정</h2>
           <p className="text-gray-600">
-            상품 아이템 상세 수정 화면은 준비 중입니다.
+            상품 아이템의 기본 정보와 옵션을 수정하세요.
           </p>
         </div>
+        <ProductEditForm productItemId={productItemId as AdminProductItemId} />
       </div>
     </div>
   );

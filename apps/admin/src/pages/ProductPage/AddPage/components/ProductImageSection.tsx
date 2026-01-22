@@ -29,6 +29,7 @@ export function ProductImageSection({
       <div className="space-y-6 px-6 py-5">
         <ImageUploader
           id="mainImage"
+          imageClassName="h-110"
           label="대표 이미지"
           onChange={onMainImageChange}
           onClear={onMainImageClear}
