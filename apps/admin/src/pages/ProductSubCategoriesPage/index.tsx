@@ -70,7 +70,7 @@ export default function ProductSubcategoriesPage() {
   };
 
   const handleAddSubcategory = async (values: SubCategoryFormValues) => {
-    if (!values.categoryId) return;
+    if (!values.categoryId || !values.imageUrl || !values.ko || !values.en || !values.zh) return;
     try {
       await createSubcategory({
         list: toNamePayload(values),

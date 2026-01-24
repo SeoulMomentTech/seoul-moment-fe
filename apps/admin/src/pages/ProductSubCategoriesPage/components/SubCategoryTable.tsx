@@ -30,8 +30,8 @@ const getCategoryName = (
   nameDto: AdminProductCategoryName[],
   languageCode: string = "ko",
 ): string => {
-  const name = nameDto.find((n) => n.languageCode === languageCode);
-  return name ? name.name : nameDto[0]?.name || "";
+  const name = nameDto.find((n) => n?.languageCode === languageCode);
+  return name ? name.name : '-';
 };
 
 export function SubCategoryTable({
@@ -78,10 +78,16 @@ export function SubCategoryTable({
               </TableCell>
               <TableCell>
                 <Flex gap={8}>
-                  <Button onClick={() => onEdit(subcategory)} size="sm" variant="ghost">
+                  <Button
+                    aria-label="수정"
+                    onClick={() => onEdit(subcategory)}
+                    size="sm"
+                    variant="ghost"
+                  >
                     <Edit className="h-4 w-4" />
                   </Button>
                   <Button
+                    aria-label="삭제"
                     disabled={isDeleting}
                     onClick={() => onDelete(subcategory.id)}
                     size="sm"

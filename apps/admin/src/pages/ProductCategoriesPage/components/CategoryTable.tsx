@@ -79,6 +79,7 @@ export function CategoryTable({
               <TableCell>
                 <Flex gap={8}>
                   <Button
+                    aria-label="수정"
                     onClick={() => onEdit(category)}
                     size="sm"
                     variant="ghost"
@@ -86,6 +87,7 @@ export function CategoryTable({
                     <Edit className="h-4 w-4" />
                   </Button>
                   <Button
+                    aria-label="삭제"
                     disabled={isDeleting}
                     onClick={() => onDelete(category.id)}
                     size="sm"

@@ -62,7 +62,7 @@ export const toSubCategoryFormValues = (
       ko: getNameFromDto(subcategory, "ko"),
       en: getNameFromDto(subcategory, "en"),
       zh: getNameFromDto(subcategory, "zh-TW"),
-      categoryId: Number(subcategory.id),
+      categoryId: "",
       imageUrl: subcategory.imageUrl ?? "",
     };
   }

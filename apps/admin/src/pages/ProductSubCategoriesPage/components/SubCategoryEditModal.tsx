@@ -89,9 +89,11 @@ export function SubCategoryEditModal({
   return (
     <VStack
       align="center"
+      aria-modal="true"
       as="form"
       className="fixed inset-0 z-50"
       onSubmit={handleSubmit(onValid)}
+      role="dialog"
     >
       <div className="fixed inset-0 bg-black/50" onClick={handleClose} />
       <div className="relative z-10 w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
@@ -217,7 +219,7 @@ export function SubCategoryEditModal({
           <Button onClick={handleClose} type="button" variant="outline">
             취소
           </Button>
-          <Button disabled={isSubmitting || !isValid} type="submit">
+          <Button aria-label="수정제출" disabled={isSubmitting || !isValid} type="submit">
             {isSubmitting ? "수정 중..." : "수정"}
           </Button>
         </div>

@@ -20,7 +20,7 @@ export default defineConfig([
     },
   },
   ...reactJsConfig,
-  globalIgnores(["dist", "eslint.config.mjs"]),
+  globalIgnores(["dist", "eslint.config.mjs", "playwright-report", "test-results"]),
   {
     files: ["**/*.{ts,tsx}"],
     extends: [
@@ -42,6 +42,12 @@ export default defineConfig([
       react: {
         version: "19.1",
       },
+    },
+  },
+  {
+    files: ["e2e/**/*.ts"],
+    rules: {
+      "react-hooks/rules-of-hooks": "off",
     },
   },
 ]);
