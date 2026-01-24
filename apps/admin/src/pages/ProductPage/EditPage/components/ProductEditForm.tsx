@@ -208,6 +208,10 @@ export default function ProductEditForm({
     if (!file) {
       return;
     }
+    // Revoke previous object URL if exists
+    if (formik.values.mainImagePreview.startsWith("blob:")) {
+      URL.revokeObjectURL(formik.values.mainImagePreview);
+    }
     setFieldValue("mainImageFile", file);
     setFieldValue("mainImagePreview", URL.createObjectURL(file));
   };
@@ -215,6 +219,10 @@ export default function ProductEditForm({
   const handleMainImageClear = () => {
     if (!confirm("대표 이미지를 삭제하시겠습니까?")) {
       return;
+    }
+    // Revoke previous object URL if exists
+    if (formik.values.mainImagePreview.startsWith("blob:")) {
+      URL.revokeObjectURL(formik.values.mainImagePreview);
     }
     setFieldValue("mainImageFile", null);
     setFieldValue("mainImagePreview", "");

@@ -147,11 +147,19 @@ export default function ProductAddForm() {
     if (!file) {
       return;
     }
+    // Revoke previous object URL if exists
+    if (formik.values.mainImagePreview.startsWith("blob:")) {
+      URL.revokeObjectURL(formik.values.mainImagePreview);
+    }
     formik.setFieldValue("mainImageFile", file);
     formik.setFieldValue("mainImagePreview", URL.createObjectURL(file));
   };
 
   const handleMainImageClear = () => {
+    // Revoke previous object URL if exists
+    if (formik.values.mainImagePreview.startsWith("blob:")) {
+      URL.revokeObjectURL(formik.values.mainImagePreview);
+    }
     formik.setFieldValue("mainImageFile", null);
     formik.setFieldValue("mainImagePreview", "");
   };
