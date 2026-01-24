@@ -15,17 +15,22 @@
     "lint-staged": "lint-staged",
     "lint:fix": "turbo run lint:fix --filter=@seoul-moment/web",
     "prepare": "husky",
-    "start": "turbo run start --filter=@seoul-moment/web"
+    "start": "turbo run start --filter=@seoul-moment/web",
+    "test:e2e": "turbo run test:e2e",
+    "test:admin-e2e": "turbo run test:e2e --filter=@seoul-moment/admin",
+    "test:admin-e2e:ui": "turbo run test:e2e:ui --filter=@seoul-moment/admin",
+    "test:web-e2e": "turbo run test:e2e --filter=@seoul-moment/web",
+    "test:web-e2e:ui": "turbo run test:e2e:ui --filter=@seoul-moment/web"
   },
   "devDependencies": {
+    "@next/eslint-plugin-next": "^15.3.1",
     "@seoul-moment/prettier-config": "workspace:*",
+    "eslint-plugin-react-hooks": "^5.2.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.1",
     "prettier": "^3.6.2",
     "prettier-plugin-packagejson": "^2.5.19",
     "prettier-plugin-tailwindcss": "^0.6.14",
-    "@next/eslint-plugin-next": "^15.3.1",
-    "eslint-plugin-react-hooks": "^5.2.0",
     "turbo": "^2.1.2"
   },
   "packageManager": "pnpm@10.18.3"

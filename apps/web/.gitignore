@@ -10,3 +10,4 @@ scripts/account.json
 
 # Sentry Config File
 .env.sentry-build-plugin
+\n# Playwright\ntest-results/\nplaywright-report/\nblob-report/\nplaywright/.cache/

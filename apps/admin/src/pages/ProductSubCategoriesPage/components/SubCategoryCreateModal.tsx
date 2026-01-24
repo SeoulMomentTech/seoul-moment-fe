@@ -67,9 +67,11 @@ export function SubCategoryCreateModal({
   return (
     <VStack
       align="center"
+      aria-modal="true"
       as="form"
       className="fixed inset-0 z-50"
       onSubmit={handleSubmit(onValid)}
+      role="dialog"
     >
       <div className="fixed inset-0 bg-black/50" onClick={handleClose} />
       <div className="relative z-10 w-full max-w-md rounded-lg bg-white p-6 shadow-lg">
@@ -109,7 +111,7 @@ export function SubCategoryCreateModal({
               className="h-[40px] rounded-md bg-white"
               id="subcategoryNameEn"
               placeholder="예: Men's Clothing"
-              {...register("en")}
+              {...register("en", { required: true })}
             />
           </div>
           <div className="space-y-2">
@@ -120,7 +122,7 @@ export function SubCategoryCreateModal({
               className="h-[40px] rounded-md bg-white"
               id="subcategoryNameZh"
               placeholder="예: 男装"
-              {...register("zh")}
+              {...register("zh", { required: true })}
             />
           </div>
           <div className="space-y-2">

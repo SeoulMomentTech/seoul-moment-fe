@@ -54,9 +54,11 @@ export function CategoryEditModal({
   return (
     <VStack
       align="center"
+      aria-modal="true"
       as="form"
       className="fixed inset-0 z-50"
       onSubmit={handleSubmit(onValid)}
+      role="dialog"
     >
       <div className="fixed inset-0 bg-black/50" onClick={handleClose} />
       <div className="relative z-10 w-full max-w-md rounded-lg bg-white p-6 shadow-lg">

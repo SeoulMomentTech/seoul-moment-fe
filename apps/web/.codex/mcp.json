@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "Figma": {
+      "url": "https://mcp.figma.com/mcp"
+    },
+    "Sentry": {
+      "url": "https://mcp.sentry.dev/mcp/seoulmoment/seoulmoment-service-fe"
+    }
+  }
+}
