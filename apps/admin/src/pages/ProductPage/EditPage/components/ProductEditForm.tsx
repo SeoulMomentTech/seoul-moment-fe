@@ -1,9 +1,8 @@
-import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useRef, type ChangeEvent } from "react";
 
 import { useNavigate } from "react-router";
 
 import { PATH } from "@shared/constants/route";
-import type { ProductOptionId } from "@shared/services/productOption";
 import type {
   AdminProductItemDetail,
   AdminProductItemId,
@@ -14,24 +13,23 @@ import { useFormik } from "formik";
 
 import { Button } from "@seoul-moment/ui";
 
-import { OptionValueModal } from "../../AddPage/components/OptionValueModal";
-import { ProductBasicInfoSection } from "../../AddPage/components/ProductBasicInfoSection";
-import { ProductImageSection } from "../../AddPage/components/ProductImageSection";
-import { ShippingInfoSection } from "../../AddPage/components/ShippingInfoSection";
-import { VariantSection } from "../../AddPage/components/VariantSection";
-import type {
-  OptionValueBadge,
-  ProductFormValues,
-  VariantForm,
-} from "../../AddPage/types";
-import {
-  createEmptyVariant,
-  parseOptionValueIds,
-} from "../../AddPage/utils";
+import { OptionValueModal } from "../../components/OptionValueModal";
+import { ProductBasicInfoSection } from "../../components/ProductBasicInfoSection";
+import { ProductImageSection } from "../../components/ProductImageSection";
+import { ShippingInfoSection } from "../../components/ShippingInfoSection";
+import { VariantSection } from "../../components/VariantSection";
 import {
   useAdminProductItemDetailQuery,
+  useOptionValueModal,
   useUpdateAdminProductItemMutation,
 } from "../../hooks";
+import type { OptionValueBadge, ProductFormValues, VariantForm } from "../../types";
+import {
+  createEmptyVariant,
+  createInitialValues,
+  parseOptionValueIds,
+  validateProductForm,
+} from "../../utils";
 
 interface ProductEditFormProps {
   productItemId: AdminProductItemId;
@@ -45,86 +43,34 @@ const buildInitialValues = (
   discountPrice: detail.discountPrice ? String(detail.discountPrice) : "",
   shippingCost: String(detail.shippingCost),
   shippingInfo: String(detail.shippingInfo),
+  mainImageFile: null,
+  mainImagePreview: detail.mainImageUrl ?? "",
   imageUrlList: detail.imageUrlList ?? [],
   variants:
     detail.variantList.length > 0
       ? detail.variantList.map((variant) => {
-        const badges: OptionValueBadge[] = variant.optionValueList.map(
-          (value) => ({
-            id: value.id,
-            label: value.value,
-          }),
-        );
+          const badges: OptionValueBadge[] = variant.optionValueList.map(
+            (value) => ({
+              id: value.id,
+              label: value.value,
+            }),
+          );
 
-        return {
-          sku: variant.sku,
-          stockQuantity: String(variant.stockQuantity),
-          optionValueIds: badges.map((badge) => badge.id).join(", "),
-          optionValueBadgeList: badges,
-        };
-      })
+          return {
+            sku: variant.sku,
+            stockQuantity: String(variant.stockQuantity),
+            optionValueIds: badges.map((badge) => badge.id).join(", "),
+            optionValueBadgeList: badges,
+          };
+        })
       : [createEmptyVariant()],
 });
-
-const validateEditProductForm = (
-  values: ProductFormValues,
-  hasMainImage: boolean,
-) => {
-  if (!values.productId || Number.isNaN(Number(values.productId))) {
-    return "상품 ID를 숫자로 입력해주세요.";
-  }
-
-  if (!hasMainImage) {
-    return "대표 이미지를 업로드해주세요.";
-  }
-
-  if (!values.price || Number.isNaN(Number(values.price))) {
-    return "가격을 입력해주세요.";
-  }
-
-  if (!values.shippingCost || Number.isNaN(Number(values.shippingCost))) {
-    return "배송비를 입력해주세요.";
-  }
-
-  if (!values.shippingInfo || Number.isNaN(Number(values.shippingInfo))) {
-    return "배송 정보를 입력해주세요.";
-  }
-
-  if (values.variants.length === 0) {
-    return "옵션(재고) 정보를 최소 1개 이상 입력해주세요.";
-  }
-
-  const invalidVariant = values.variants.find(
-    (variant) =>
-      !variant.sku.trim() ||
-      !variant.stockQuantity.trim() ||
-      Number.isNaN(Number(variant.stockQuantity)) ||
-      parseOptionValueIds(variant.optionValueIds).length === 0,
-  );
-
-  if (invalidVariant) {
-    return "옵션(재고) 정보를 모두 입력해주세요.";
-  }
-
-  return null;
-};
 
 export default function ProductEditForm({
   productItemId,
 }: ProductEditFormProps) {
   const navigate = useNavigate();
   const initializedRef = useRef(false);
-
-  const [mainImageFile, setMainImageFile] = useState<File | null>(null);
-  const [mainImagePreview, setMainImagePreview] = useState("");
-  const [existingMainImageUrl, setExistingMainImageUrl] = useState("");
-  const [isOptionModalOpen, setIsOptionModalOpen] = useState(false);
-  const [activeVariantIndex, setActiveVariantIndex] = useState<number | null>(
-    null,
-  );
-  const [selectedOptionId, setSelectedOptionId] =
-    useState<ProductOptionId | null>(null);
-  const [selectedValueIds, setSelectedValueIds] = useState<number[]>([]);
 
   const { data: detailResponse, isLoading } =
     useAdminProductItemDetailQuery(productItemId);
@@ -136,32 +82,28 @@ export default function ProductEditForm({
     });
 
   const formik = useFormik<ProductFormValues>({
-    initialValues: {
-      productId: "",
-      price: "",
-      discountPrice: "",
-      shippingCost: "",
-      shippingInfo: "",
-      imageUrlList: [],
-      variants: [createEmptyVariant()],
-    },
+    initialValues: createInitialValues(),
     validateOnBlur: false,
     validateOnChange: false,
+    validate: validateProductForm,
     onSubmit: async (values) => {
-      const validationError = validateEditProductForm(
-        values,
-        Boolean(mainImageFile || mainImagePreview),
-      );
-      if (validationError) {
-        alert(validationError);
-        return;
-      }
+      // validateProductForm에서 mainImageFile 또는 mainImagePreview가 없는 경우를 잡으므로
+      // 여기서는 둘 중 하나가 반드시 존재한다고 가정 가능
 
       try {
-        const mainImageUrl =
-          mainImageFile !== null
-            ? (await uploadImageFile(mainImageFile, "product")).imagePath
-            : stripImageDomain(existingMainImageUrl);
+        let mainImageUrl = "";
+
+        if (values.mainImageFile) {
+          // 새 파일이 업로드된 경우
+          const { imagePath } = await uploadImageFile(
+            values.mainImageFile,
+            "product",
+          );
+          mainImageUrl = stripImageDomain(imagePath);
+        } else if (values.mainImagePreview) {
+          // 기존 이미지가 유지된 경우 (preview URL 사용)
+          mainImageUrl = stripImageDomain(values.mainImagePreview);
+        }
 
         const payload: UpdateAdminProductItemRequest = {
           productId: Number(values.productId),
@@ -190,6 +132,29 @@ export default function ProductEditForm({
 
   const { setFieldValue, setValues } = formik;
 
+  const {
+    isOpen: isOptionModalOpen,
+    selectedOptionId,
+    selectedValueIds,
+    openModal: handleOpenOptionModal,
+    closeModal: handleCloseOptionModal,
+    selectOption: handleSelectOption,
+    toggleValue: handleToggleValue,
+    confirmSelection: handleConfirmOptionValues,
+  } = useOptionValueModal({
+    variants: formik.values.variants,
+    onUpdateVariants: (newVariants) => setFieldValue("variants", newVariants),
+  });
+
+  // Clean up object URL to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (formik.values.mainImagePreview.startsWith("blob:")) {
+        URL.revokeObjectURL(formik.values.mainImagePreview);
+      }
+    };
+  }, [formik.values.mainImagePreview]);
+
   useEffect(() => {
     if (!detail || initializedRef.current) {
       return;
@@ -197,8 +162,6 @@ export default function ProductEditForm({
 
     const nextValues = buildInitialValues(detail);
     setValues(nextValues, true);
-    setMainImagePreview(detail.mainImageUrl ?? "");
-    setExistingMainImageUrl(detail.mainImageUrl ?? "");
     initializedRef.current = true;
   }, [detail, setValues]);
 
@@ -240,85 +203,29 @@ export default function ProductEditForm({
     );
   };
 
-  const handleOpenOptionModal = (index: number) => {
-    setActiveVariantIndex(index);
-    setSelectedOptionId(null);
-    setSelectedValueIds(
-      parseOptionValueIds(formik.values.variants[index]?.optionValueIds ?? ""),
-    );
-    setIsOptionModalOpen(true);
-  };
-
-  const handleCloseOptionModal = () => {
-    setIsOptionModalOpen(false);
-    setActiveVariantIndex(null);
-    setSelectedOptionId(null);
-    setSelectedValueIds([]);
-  };
-
-  const handleConfirmOptionValues = (badges: OptionValueBadge[]) => {
-    if (!selectedOptionId) {
-      alert("옵션을 선택해주세요.");
-      return;
-    }
-
-    if (selectedValueIds.length === 0) {
-      alert("옵션 값을 선택해주세요.");
-      return;
-    }
-
-    if (activeVariantIndex === null) {
-      handleCloseOptionModal();
-      return;
-    }
-
-    setFieldValue(
-      "variants",
-      formik.values.variants.map((variant, index) => {
-        if (index !== activeVariantIndex) {
-          return variant;
-        }
-
-        const mergedValueIds = Array.from(
-          new Set([
-            ...parseOptionValueIds(variant.optionValueIds),
-            ...selectedValueIds,
-          ]),
-        );
-        const mergedBadges = [
-          ...(variant.optionValueBadgeList ?? []),
-          ...badges,
-        ].reduce<OptionValueBadge[]>((acc, badge) => {
-          if (acc.some((item) => item.id === badge.id)) {
-            return acc;
-          }
-          acc.push(badge);
-          return acc;
-        }, []);
-
-        return {
-          ...variant,
-          optionValueIds: mergedValueIds.join(", "),
-          optionValueBadgeList: mergedBadges,
-        };
-      }),
-    );
-    handleCloseOptionModal();
-  };
-
   const handleMainImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) {
       return;
     }
-    setMainImageFile(file);
-    setMainImagePreview(URL.createObjectURL(file));
+    // Revoke previous object URL if exists
+    if (formik.values.mainImagePreview.startsWith("blob:")) {
+      URL.revokeObjectURL(formik.values.mainImagePreview);
+    }
+    setFieldValue("mainImageFile", file);
+    setFieldValue("mainImagePreview", URL.createObjectURL(file));
   };
 
   const handleMainImageClear = () => {
-    setMainImageFile(null);
-    setMainImagePreview("");
-    setExistingMainImageUrl("");
+    if (!confirm("대표 이미지를 삭제하시겠습니까?")) {
+      return;
+    }
+    // Revoke previous object URL if exists
+    if (formik.values.mainImagePreview.startsWith("blob:")) {
+      URL.revokeObjectURL(formik.values.mainImagePreview);
+    }
+    setFieldValue("mainImageFile", null);
+    setFieldValue("mainImagePreview", "");
   };
 
   if (isLoading) {
@@ -342,14 +249,22 @@ export default function ProductEditForm({
       <form className="space-y-6" onSubmit={formik.handleSubmit}>
         <ProductBasicInfoSection formik={formik} isPending={isPending} />
         <ShippingInfoSection formik={formik} isPending={isPending} />
-        <ProductImageSection
-          imageUrlList={formik.values.imageUrlList}
-          mainImagePreview={mainImagePreview}
-          onImageUrlListChange={(urls) => setFieldValue("imageUrlList", urls)}
-          onMainImageChange={handleMainImageChange}
-          onMainImageClear={handleMainImageClear}
-        />
+        <div className="space-y-1">
+          <ProductImageSection
+            imageUrlList={formik.values.imageUrlList}
+            mainImagePreview={formik.values.mainImagePreview}
+            onImageUrlListChange={(urls) => setFieldValue("imageUrlList", urls)}
+            onMainImageChange={handleMainImageChange}
+            onMainImageClear={handleMainImageClear}
+          />
+          {formik.errors.mainImageFile && (
+            <p className="text-xs text-red-500">
+              {formik.errors.mainImageFile}
+            </p>
+          )}
+        </div>
         <VariantSection
+          error={formik.errors.variants as string | undefined}
           isPending={isPending}
           onAddVariant={handleAddVariant}
           onOpenOptionModal={handleOpenOptionModal}
@@ -379,17 +294,8 @@ export default function ProductEditForm({
         isOpen={isOptionModalOpen}
         onClose={handleCloseOptionModal}
         onConfirm={handleConfirmOptionValues}
-        onSelectOption={(optionId) => {
-          setSelectedOptionId(optionId);
-          setSelectedValueIds([]);
-        }}
-        onToggleValue={(valueId) => {
-          setSelectedValueIds((prev) =>
-            prev.includes(valueId)
-              ? prev.filter((item) => item !== valueId)
-              : [...prev, valueId],
-          );
-        }}
+        onSelectOption={handleSelectOption}
+        onToggleValue={handleToggleValue}
         selectedOptionId={selectedOptionId}
         selectedValueIds={selectedValueIds}
       />

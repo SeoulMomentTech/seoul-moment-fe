@@ -58,15 +58,15 @@ export const ProductTable = ({
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-20">ID</TableHead>
-          <TableHead>상품 ID</TableHead>
-          <TableHead>대표 이미지</TableHead>
+          <TableHead className="w-20 text-center">ID</TableHead>
+          <TableHead className="text-center">상품 ID</TableHead>
+          <TableHead className="text-center">대표 이미지</TableHead>
           <TableHead>색상 코드</TableHead>
           <TableHead>가격</TableHead>
           <TableHead>할인가</TableHead>
-          <TableHead>등록일</TableHead>
-          <TableHead>수정일</TableHead>
-          <TableHead className="w-24">액션</TableHead>
+          <TableHead className="text-center">등록일</TableHead>
+          <TableHead className="text-center">수정일</TableHead>
+          <TableHead className="w-24 text-center">액션</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -79,18 +79,20 @@ export const ProductTable = ({
         ) : (
           products.map((product) => (
             <TableRow key={product.id}>
-              <TableCell>{product.id}</TableCell>
-              <TableCell>{product.productId}</TableCell>
+              <TableCell className="text-center">{product.id}</TableCell>
+              <TableCell className="text-center">{product.productId}</TableCell>
               <TableCell>
-                {product.imageUrl ? (
-                  <img
-                    alt={`product-${product.id}`}
-                    className="h-12 w-12 rounded-lg object-cover"
-                    src={product.imageUrl}
-                  />
-                ) : (
-                  "-"
-                )}
+                <Flex align="center" justify="center">
+                  {product.imageUrl ? (
+                    <img
+                      alt={`product-${product.id}`}
+                      className="h-12 w-12 rounded-lg object-cover"
+                      src={product.imageUrl}
+                    />
+                  ) : (
+                    "-"
+                  )}
+                </Flex>
               </TableCell>
               <TableCell>
                 {product.colorCode ? (
@@ -115,19 +117,20 @@ export const ProductTable = ({
                   ? formatPrice(product.discountPrice)
                   : "-"}
               </TableCell>
-              <TableCell className="text-sm text-gray-600">
+              <TableCell className="text-sm text-gray-600 text-center">
                 {product.createDate
                   ? new Date(product.createDate).toLocaleDateString()
                   : "-"}
               </TableCell>
-              <TableCell className="text-sm text-gray-600">
+              <TableCell className="text-sm text-gray-600 text-center">
                 {product.updateDate
                   ? new Date(product.updateDate).toLocaleDateString()
                   : "-"}
               </TableCell>
               <TableCell>
-                <Flex gap={2} justify="center">
+                <Flex align="center" gap={10} justify="center">
                   <Link
+                    aria-label="상품 수정"
                     className="flex items-center justify-center"
                     to={PATH.PRODUCT_EDIT.replace(
                       ":id",
@@ -137,6 +140,8 @@ export const ProductTable = ({
                     <Edit className="h-4 w-4" />
                   </Link>
                   <Button
+                    aria-label="상품 삭제"
+                    className="px-0"
                     disabled={isPending}
                     onClick={() => handleDelete(product.id)}
                     size="sm"
@@ -150,6 +155,6 @@ export const ProductTable = ({
           ))
         )}
       </TableBody>
-    </Table>
+    </Table >
   );
 };

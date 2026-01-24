@@ -1,42 +1,35 @@
-import { useState, type ChangeEvent } from "react";
+import { useEffect, type ChangeEvent } from "react";
 
 import { useNavigate } from "react-router";
 
 
 
 import { PATH } from "@shared/constants/route";
-import type { ProductOptionId } from "@shared/services/productOption";
 import type { CreateAdminProductItemRequest } from "@shared/services/products";
 import { stripImageDomain, uploadImageFile } from "@shared/utils/image";
 import { useFormik } from "formik";
 
 import { Button } from "@seoul-moment/ui";
 
-import { useCreateAdminProductItemMutation } from "../../hooks";
-import type { OptionValueBadge, ProductFormValues, VariantForm } from "../types";
+import { OptionValueModal } from "../../components/OptionValueModal";
+import { ProductBasicInfoSection } from "../../components/ProductBasicInfoSection";
+import { ProductImageSection } from "../../components/ProductImageSection";
+import { ShippingInfoSection } from "../../components/ShippingInfoSection";
+import { VariantSection } from "../../components/VariantSection";
+import {
+  useCreateAdminProductItemMutation,
+  useOptionValueModal,
+} from "../../hooks";
+import type { ProductFormValues, VariantForm } from "../../types";
 import {
   createEmptyVariant,
   createInitialValues,
   parseOptionValueIds,
   validateProductForm,
-} from "../utils";
-import { OptionValueModal } from "./OptionValueModal";
-import { ProductBasicInfoSection } from "./ProductBasicInfoSection";
-import { ProductImageSection } from "./ProductImageSection";
-import { ShippingInfoSection } from "./ShippingInfoSection";
-import { VariantSection } from "./VariantSection";
+} from "../../utils";
 
 export default function ProductAddForm() {
   const navigate = useNavigate();
-  const [mainImageFile, setMainImageFile] = useState<File | null>(null);
-  const [mainImagePreview, setMainImagePreview] = useState("");
-  const [isOptionModalOpen, setIsOptionModalOpen] = useState(false);
-  const [activeVariantIndex, setActiveVariantIndex] = useState<number | null>(
-    null,
-  );
-  const [selectedOptionId, setSelectedOptionId] =
-    useState<ProductOptionId | null>(null);
-  const [selectedValueIds, setSelectedValueIds] = useState<number[]>([]);
 
   const { mutateAsync: createProductItem, isPending } =
     useCreateAdminProductItemMutation({
@@ -47,15 +40,22 @@ export default function ProductAddForm() {
     initialValues: createInitialValues(),
     validateOnBlur: false,
     validateOnChange: false,
+    validate: validateProductForm,
     onSubmit: async (values) => {
-      const validationError = validateProductForm(values, mainImageFile);
-      if (validationError) {
-        alert(validationError);
+      // mainImageFile이 없어도 mainImagePreview가 있으면 통과되지만,
+      // Add 모드에서는 mainImageFile이 필수이므로 validateProductForm이 잡아줌.
+      // (단, createInitialValues에서 preview가 ""이므로)
+
+      if (!values.mainImageFile) {
+        // 이론상 validate에서 걸러지므로 여기에 도달하지 않음
         return;
       }
 
       try {
-        const { imagePath } = await uploadImageFile(mainImageFile!, "product");
+        const { imagePath } = await uploadImageFile(
+          values.mainImageFile,
+          "product",
+        );
 
         const payload: CreateAdminProductItemRequest = {
           productId: Number(values.productId),
@@ -83,6 +83,30 @@ export default function ProductAddForm() {
       }
     },
   });
+
+  const {
+    isOpen: isOptionModalOpen,
+    selectedOptionId,
+    selectedValueIds,
+    openModal: handleOpenOptionModal,
+    closeModal: handleCloseOptionModal,
+    selectOption: handleSelectOption,
+    toggleValue: handleToggleValue,
+    confirmSelection: handleConfirmOptionValues,
+  } = useOptionValueModal({
+    variants: formik.values.variants,
+    onUpdateVariants: (newVariants) =>
+      formik.setFieldValue("variants", newVariants),
+  });
+
+  // Clean up object URL to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (formik.values.mainImagePreview.startsWith("blob:")) {
+        URL.revokeObjectURL(formik.values.mainImagePreview);
+      }
+    };
+  }, [formik.values.mainImagePreview]);
 
   const handleAddVariant = () =>
     formik.setFieldValue("variants", [
@@ -118,84 +142,26 @@ export default function ProductAddForm() {
     );
   };
 
-  const handleOpenOptionModal = (index: number) => {
-    setActiveVariantIndex(index);
-    setSelectedOptionId(null);
-    setSelectedValueIds(
-      parseOptionValueIds(formik.values.variants[index]?.optionValueIds ?? ""),
-    );
-    setIsOptionModalOpen(true);
-  };
-
-  const handleCloseOptionModal = () => {
-    setIsOptionModalOpen(false);
-    setActiveVariantIndex(null);
-    setSelectedOptionId(null);
-    setSelectedValueIds([]);
-  };
-
-  const handleConfirmOptionValues = (badges: OptionValueBadge[]) => {
-    if (!selectedOptionId) {
-      alert("옵션을 선택해주세요.");
-      return;
-    }
-
-    if (selectedValueIds.length === 0) {
-      alert("옵션 값을 선택해주세요.");
-      return;
-    }
-
-    if (activeVariantIndex === null) {
-      handleCloseOptionModal();
-      return;
-    }
-
-    formik.setFieldValue(
-      "variants",
-      formik.values.variants.map((variant, index) => {
-        if (index !== activeVariantIndex) {
-          return variant;
-        }
-
-        const mergedValueIds = Array.from(
-          new Set([
-            ...parseOptionValueIds(variant.optionValueIds),
-            ...selectedValueIds,
-          ]),
-        );
-        const mergedBadges = [
-          ...(variant.optionValueBadgeList ?? []),
-          ...badges,
-        ].reduce<OptionValueBadge[]>((acc, badge) => {
-          if (acc.some((item) => item.id === badge.id)) {
-            return acc;
-          }
-          acc.push(badge);
-          return acc;
-        }, []);
-
-        return {
-          ...variant,
-          optionValueIds: mergedValueIds.join(", "),
-          optionValueBadgeList: mergedBadges,
-        };
-      }),
-    );
-    handleCloseOptionModal();
-  };
-
   const handleMainImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) {
       return;
     }
-    setMainImageFile(file);
-    setMainImagePreview(URL.createObjectURL(file));
+    // Revoke previous object URL if exists
+    if (formik.values.mainImagePreview.startsWith("blob:")) {
+      URL.revokeObjectURL(formik.values.mainImagePreview);
+    }
+    formik.setFieldValue("mainImageFile", file);
+    formik.setFieldValue("mainImagePreview", URL.createObjectURL(file));
   };
 
   const handleMainImageClear = () => {
-    setMainImageFile(null);
-    setMainImagePreview("");
+    // Revoke previous object URL if exists
+    if (formik.values.mainImagePreview.startsWith("blob:")) {
+      URL.revokeObjectURL(formik.values.mainImagePreview);
+    }
+    formik.setFieldValue("mainImageFile", null);
+    formik.setFieldValue("mainImagePreview", "");
   };
 
   return (
@@ -203,16 +169,24 @@ export default function ProductAddForm() {
       <form className="space-y-6" onSubmit={formik.handleSubmit}>
         <ProductBasicInfoSection formik={formik} isPending={isPending} />
         <ShippingInfoSection formik={formik} isPending={isPending} />
-        <ProductImageSection
-          imageUrlList={formik.values.imageUrlList}
-          mainImagePreview={mainImagePreview}
-          onImageUrlListChange={(urls) =>
-            formik.setFieldValue("imageUrlList", urls)
-          }
-          onMainImageChange={handleMainImageChange}
-          onMainImageClear={handleMainImageClear}
-        />
+        <div className="space-y-1">
+          <ProductImageSection
+            imageUrlList={formik.values.imageUrlList}
+            mainImagePreview={formik.values.mainImagePreview}
+            onImageUrlListChange={(urls) =>
+              formik.setFieldValue("imageUrlList", urls)
+            }
+            onMainImageChange={handleMainImageChange}
+            onMainImageClear={handleMainImageClear}
+          />
+          {formik.errors.mainImageFile && (
+            <p className="text-xs text-red-500">
+              {formik.errors.mainImageFile}
+            </p>
+          )}
+        </div>
         <VariantSection
+          error={formik.errors.variants as string | undefined}
           isPending={isPending}
           onAddVariant={handleAddVariant}
           onOpenOptionModal={handleOpenOptionModal}
@@ -242,17 +216,8 @@ export default function ProductAddForm() {
         isOpen={isOptionModalOpen}
         onClose={handleCloseOptionModal}
         onConfirm={handleConfirmOptionValues}
-        onSelectOption={(optionId) => {
-          setSelectedOptionId(optionId);
-          setSelectedValueIds([]);
-        }}
-        onToggleValue={(valueId) => {
-          setSelectedValueIds((prev) =>
-            prev.includes(valueId)
-              ? prev.filter((item) => item !== valueId)
-              : [...prev, valueId],
-          );
-        }}
+        onSelectOption={handleSelectOption}
+        onToggleValue={handleToggleValue}
         selectedOptionId={selectedOptionId}
         selectedValueIds={selectedValueIds}
       />

@@ -33,6 +33,9 @@ export function ProductBasicInfoSection({
             type="number"
             value={values.productId}
           />
+          {formik.errors.productId && (
+            <p className="text-xs text-red-500">{formik.errors.productId}</p>
+          )}
         </div>
         <div className="space-y-2">
           <Label htmlFor="price">가격 *</Label>
@@ -46,6 +49,9 @@ export function ProductBasicInfoSection({
             type="number"
             value={values.price}
           />
+          {formik.errors.price && (
+            <p className="text-xs text-red-500">{formik.errors.price}</p>
+          )}
         </div>
         <div className="space-y-2">
           <Label htmlFor="discountPrice">할인가</Label>
