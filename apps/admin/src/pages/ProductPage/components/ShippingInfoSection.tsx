@@ -33,6 +33,9 @@ export function ShippingInfoSection({
             type="number"
             value={values.shippingCost}
           />
+          {formik.errors.shippingCost && (
+            <p className="text-xs text-red-500">{formik.errors.shippingCost}</p>
+          )}
         </div>
         <div className="space-y-2">
           <Label htmlFor="shippingInfo">배송 소요 예상일 *</Label>
@@ -46,6 +49,9 @@ export function ShippingInfoSection({
             type="number"
             value={values.shippingInfo}
           />
+          {formik.errors.shippingInfo && (
+            <p className="text-xs text-red-500">{formik.errors.shippingInfo}</p>
+          )}
         </div>
       </div>
     </div>

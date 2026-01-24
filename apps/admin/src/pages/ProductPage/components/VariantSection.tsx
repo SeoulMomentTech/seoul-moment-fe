@@ -7,6 +7,7 @@ import type { VariantForm } from "../types";
 import { parseOptionValueIds } from "../utils";
 
 interface VariantSectionProps {
+  error?: string;
   isPending: boolean;
   onAddVariant(): void;
   onOpenOptionModal(index: number): void;
@@ -21,6 +22,7 @@ interface VariantSectionProps {
 }
 
 export function VariantSection({
+  error,
   isPending,
   onAddVariant,
   onOpenOptionModal,
@@ -38,6 +40,7 @@ export function VariantSection({
             <p className="mt-1 text-sm text-gray-600">
               SKU, 재고, 옵션 조합을 설정하세요.
             </p>
+            {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
           </div>
           <Button
             className="bg-gray-900 text-white hover:bg-gray-800"

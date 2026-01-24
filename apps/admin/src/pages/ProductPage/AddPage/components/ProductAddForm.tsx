@@ -47,10 +47,10 @@ export default function ProductAddForm() {
     initialValues: createInitialValues(),
     validateOnBlur: false,
     validateOnChange: false,
+    validate: validateProductForm,
     onSubmit: async (values) => {
-      const validationError = validateProductForm(values, mainImageFile);
-      if (validationError) {
-        alert(validationError);
+      if (!mainImageFile) {
+        alert("대표 이미지를 업로드해주세요.");
         return;
       }
 
@@ -213,6 +213,7 @@ export default function ProductAddForm() {
           onMainImageClear={handleMainImageClear}
         />
         <VariantSection
+          error={formik.errors.variants as string | undefined}
           isPending={isPending}
           onAddVariant={handleAddVariant}
           onOpenOptionModal={handleOpenOptionModal}

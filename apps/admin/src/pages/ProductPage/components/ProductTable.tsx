@@ -130,6 +130,7 @@ export const ProductTable = ({
               <TableCell>
                 <Flex align="center" gap={10} justify="center">
                   <Link
+                    aria-label="상품 수정"
                     className="flex items-center justify-center"
                     to={PATH.PRODUCT_EDIT.replace(
                       ":id",
@@ -139,6 +140,7 @@ export const ProductTable = ({
                     <Edit className="h-4 w-4" />
                   </Link>
                   <Button
+                    aria-label="상품 삭제"
                     className="px-0"
                     disabled={isPending}
                     onClick={() => handleDelete(product.id)}
