@@ -1,11 +1,10 @@
-import { useState, type ChangeEvent } from "react";
+import { type ChangeEvent } from "react";
 
 import { useNavigate } from "react-router";
 
 
 
 import { PATH } from "@shared/constants/route";
-import type { ProductOptionId } from "@shared/services/productOption";
 import type { CreateAdminProductItemRequest } from "@shared/services/products";
 import { stripImageDomain, uploadImageFile } from "@shared/utils/image";
 import { useFormik } from "formik";
@@ -17,8 +16,11 @@ import { ProductBasicInfoSection } from "../../components/ProductBasicInfoSectio
 import { ProductImageSection } from "../../components/ProductImageSection";
 import { ShippingInfoSection } from "../../components/ShippingInfoSection";
 import { VariantSection } from "../../components/VariantSection";
-import { useCreateAdminProductItemMutation } from "../../hooks";
-import type { OptionValueBadge, ProductFormValues, VariantForm } from "../../types";
+import {
+  useCreateAdminProductItemMutation,
+  useOptionValueModal,
+} from "../../hooks";
+import type { ProductFormValues, VariantForm } from "../../types";
 import {
   createEmptyVariant,
   createInitialValues,
@@ -28,13 +30,6 @@ import {
 
 export default function ProductAddForm() {
   const navigate = useNavigate();
-  const [isOptionModalOpen, setIsOptionModalOpen] = useState(false);
-  const [activeVariantIndex, setActiveVariantIndex] = useState<number | null>(
-    null,
-  );
-  const [selectedOptionId, setSelectedOptionId] =
-    useState<ProductOptionId | null>(null);
-  const [selectedValueIds, setSelectedValueIds] = useState<number[]>([]);
 
   const { mutateAsync: createProductItem, isPending } =
     useCreateAdminProductItemMutation({
@@ -89,6 +84,21 @@ export default function ProductAddForm() {
     },
   });
 
+  const {
+    isOpen: isOptionModalOpen,
+    selectedOptionId,
+    selectedValueIds,
+    openModal: handleOpenOptionModal,
+    closeModal: handleCloseOptionModal,
+    selectOption: handleSelectOption,
+    toggleValue: handleToggleValue,
+    confirmSelection: handleConfirmOptionValues,
+  } = useOptionValueModal({
+    variants: formik.values.variants,
+    onUpdateVariants: (newVariants) =>
+      formik.setFieldValue("variants", newVariants),
+  });
+
   const handleAddVariant = () =>
     formik.setFieldValue("variants", [
       ...formik.values.variants,
@@ -121,72 +131,6 @@ export default function ProductAddForm() {
         idx === index ? nextVariant : variant,
       ),
     );
-  };
-
-  const handleOpenOptionModal = (index: number) => {
-    setActiveVariantIndex(index);
-    setSelectedOptionId(null);
-    setSelectedValueIds(
-      parseOptionValueIds(formik.values.variants[index]?.optionValueIds ?? ""),
-    );
-    setIsOptionModalOpen(true);
-  };
-
-  const handleCloseOptionModal = () => {
-    setIsOptionModalOpen(false);
-    setActiveVariantIndex(null);
-    setSelectedOptionId(null);
-    setSelectedValueIds([]);
-  };
-
-  const handleConfirmOptionValues = (badges: OptionValueBadge[]) => {
-    if (!selectedOptionId) {
-      alert("옵션을 선택해주세요.");
-      return;
-    }
-
-    if (selectedValueIds.length === 0) {
-      alert("옵션 값을 선택해주세요.");
-      return;
-    }
-
-    if (activeVariantIndex === null) {
-      handleCloseOptionModal();
-      return;
-    }
-
-    formik.setFieldValue(
-      "variants",
-      formik.values.variants.map((variant, index) => {
-        if (index !== activeVariantIndex) {
-          return variant;
-        }
-
-        const mergedValueIds = Array.from(
-          new Set([
-            ...parseOptionValueIds(variant.optionValueIds),
-            ...selectedValueIds,
-          ]),
-        );
-        const mergedBadges = [
-          ...(variant.optionValueBadgeList ?? []),
-          ...badges,
-        ].reduce<OptionValueBadge[]>((acc, badge) => {
-          if (acc.some((item) => item.id === badge.id)) {
-            return acc;
-          }
-          acc.push(badge);
-          return acc;
-        }, []);
-
-        return {
-          ...variant,
-          optionValueIds: mergedValueIds.join(", "),
-          optionValueBadgeList: mergedBadges,
-        };
-      }),
-    );
-    handleCloseOptionModal();
   };
 
   const handleMainImageChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -255,17 +199,8 @@ export default function ProductAddForm() {
         isOpen={isOptionModalOpen}
         onClose={handleCloseOptionModal}
         onConfirm={handleConfirmOptionValues}
-        onSelectOption={(optionId) => {
-          setSelectedOptionId(optionId);
-          setSelectedValueIds([]);
-        }}
-        onToggleValue={(valueId) => {
-          setSelectedValueIds((prev) =>
-            prev.includes(valueId)
-              ? prev.filter((item) => item !== valueId)
-              : [...prev, valueId],
-          );
-        }}
+        onSelectOption={handleSelectOption}
+        onToggleValue={handleToggleValue}
         selectedOptionId={selectedOptionId}
         selectedValueIds={selectedValueIds}
       />

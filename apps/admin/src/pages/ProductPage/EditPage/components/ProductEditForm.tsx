@@ -1,9 +1,8 @@
-import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useRef, type ChangeEvent } from "react";
 
 import { useNavigate } from "react-router";
 
 import { PATH } from "@shared/constants/route";
-import type { ProductOptionId } from "@shared/services/productOption";
 import type {
   AdminProductItemDetail,
   AdminProductItemId,
@@ -21,13 +20,10 @@ import { ShippingInfoSection } from "../../components/ShippingInfoSection";
 import { VariantSection } from "../../components/VariantSection";
 import {
   useAdminProductItemDetailQuery,
+  useOptionValueModal,
   useUpdateAdminProductItemMutation,
 } from "../../hooks";
-import type {
-  OptionValueBadge,
-  ProductFormValues,
-  VariantForm,
-} from "../../types";
+import type { OptionValueBadge, ProductFormValues, VariantForm } from "../../types";
 import {
   createEmptyVariant,
   createInitialValues,
@@ -75,14 +71,6 @@ export default function ProductEditForm({
 }: ProductEditFormProps) {
   const navigate = useNavigate();
   const initializedRef = useRef(false);
-
-  const [isOptionModalOpen, setIsOptionModalOpen] = useState(false);
-  const [activeVariantIndex, setActiveVariantIndex] = useState<number | null>(
-    null,
-  );
-  const [selectedOptionId, setSelectedOptionId] =
-    useState<ProductOptionId | null>(null);
-  const [selectedValueIds, setSelectedValueIds] = useState<number[]>([]);
 
   const { data: detailResponse, isLoading } =
     useAdminProductItemDetailQuery(productItemId);
@@ -144,6 +132,20 @@ export default function ProductEditForm({
 
   const { setFieldValue, setValues } = formik;
 
+  const {
+    isOpen: isOptionModalOpen,
+    selectedOptionId,
+    selectedValueIds,
+    openModal: handleOpenOptionModal,
+    closeModal: handleCloseOptionModal,
+    selectOption: handleSelectOption,
+    toggleValue: handleToggleValue,
+    confirmSelection: handleConfirmOptionValues,
+  } = useOptionValueModal({
+    variants: formik.values.variants,
+    onUpdateVariants: (newVariants) => setFieldValue("variants", newVariants),
+  });
+
   useEffect(() => {
     if (!detail || initializedRef.current) {
       return;
@@ -190,72 +192,6 @@ export default function ProductEditForm({
         idx === index ? nextVariant : variant,
       ),
     );
-  };
-
-  const handleOpenOptionModal = (index: number) => {
-    setActiveVariantIndex(index);
-    setSelectedOptionId(null);
-    setSelectedValueIds(
-      parseOptionValueIds(formik.values.variants[index]?.optionValueIds ?? ""),
-    );
-    setIsOptionModalOpen(true);
-  };
-
-  const handleCloseOptionModal = () => {
-    setIsOptionModalOpen(false);
-    setActiveVariantIndex(null);
-    setSelectedOptionId(null);
-    setSelectedValueIds([]);
-  };
-
-  const handleConfirmOptionValues = (badges: OptionValueBadge[]) => {
-    if (!selectedOptionId) {
-      alert("옵션을 선택해주세요.");
-      return;
-    }
-
-    if (selectedValueIds.length === 0) {
-      alert("옵션 값을 선택해주세요.");
-      return;
-    }
-
-    if (activeVariantIndex === null) {
-      handleCloseOptionModal();
-      return;
-    }
-
-    setFieldValue(
-      "variants",
-      formik.values.variants.map((variant, index) => {
-        if (index !== activeVariantIndex) {
-          return variant;
-        }
-
-        const mergedValueIds = Array.from(
-          new Set([
-            ...parseOptionValueIds(variant.optionValueIds),
-            ...selectedValueIds,
-          ]),
-        );
-        const mergedBadges = [
-          ...(variant.optionValueBadgeList ?? []),
-          ...badges,
-        ].reduce<OptionValueBadge[]>((acc, badge) => {
-          if (acc.some((item) => item.id === badge.id)) {
-            return acc;
-          }
-          acc.push(badge);
-          return acc;
-        }, []);
-
-        return {
-          ...variant,
-          optionValueIds: mergedValueIds.join(", "),
-          optionValueBadgeList: mergedBadges,
-        };
-      }),
-    );
-    handleCloseOptionModal();
   };
 
   const handleMainImageChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -341,17 +277,8 @@ export default function ProductEditForm({
         isOpen={isOptionModalOpen}
         onClose={handleCloseOptionModal}
         onConfirm={handleConfirmOptionValues}
-        onSelectOption={(optionId) => {
-          setSelectedOptionId(optionId);
-          setSelectedValueIds([]);
-        }}
-        onToggleValue={(valueId) => {
-          setSelectedValueIds((prev) =>
-            prev.includes(valueId)
-              ? prev.filter((item) => item !== valueId)
-              : [...prev, valueId],
-          );
-        }}
+        onSelectOption={handleSelectOption}
+        onToggleValue={handleToggleValue}
         selectedOptionId={selectedOptionId}
         selectedValueIds={selectedValueIds}
       />
