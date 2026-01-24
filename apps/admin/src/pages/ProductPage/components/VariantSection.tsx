@@ -2,6 +2,7 @@ import { Plus, Trash2 } from "lucide-react";
 
 import { Button, Input, Label } from "@seoul-moment/ui";
 
+import { OptionBadge } from "../../components/OptionBadge";
 import type { VariantForm } from "../types";
 import { parseOptionValueIds } from "../utils";
 
@@ -125,9 +126,10 @@ export function VariantSection({
                 <div className="space-y-2 pt-1">
                   <div className="flex flex-wrap gap-2">
                     {variant.optionValueBadgeList?.map((badge) => (
-                      <button
-                        className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs text-gray-700 transition hover:border-gray-400"
+                      <OptionBadge
+                        colorCode={badge.colorCode}
                         key={badge.id}
+                        label={badge.label}
                         onClick={() => {
                           const nextBadges =
                             variant.optionValueBadgeList?.filter(
@@ -141,16 +143,8 @@ export function VariantSection({
                               .join(", "),
                           });
                         }}
-                        type="button"
-                      >
-                        {badge.colorCode && (
-                          <span
-                            className="h-3 w-3 rounded-full border border-black/20"
-                            style={{ background: badge.colorCode }}
-                          />
-                        )}
-                        {badge.label}
-                      </button>
+
+                      />
                     ))}
                   </div>
                   <p className="text-xs text-gray-500">

@@ -14,11 +14,6 @@ import { useFormik } from "formik";
 
 import { Button } from "@seoul-moment/ui";
 
-import { OptionValueModal } from "../../AddPage/components/OptionValueModal";
-import { ProductBasicInfoSection } from "../../AddPage/components/ProductBasicInfoSection";
-import { ProductImageSection } from "../../AddPage/components/ProductImageSection";
-import { ShippingInfoSection } from "../../AddPage/components/ShippingInfoSection";
-import { VariantSection } from "../../AddPage/components/VariantSection";
 import type {
   OptionValueBadge,
   ProductFormValues,
@@ -28,6 +23,11 @@ import {
   createEmptyVariant,
   parseOptionValueIds,
 } from "../../AddPage/utils";
+import { OptionValueModal } from "../../components/OptionValueModal";
+import { ProductBasicInfoSection } from "../../components/ProductBasicInfoSection";
+import { ProductImageSection } from "../../components/ProductImageSection";
+import { ShippingInfoSection } from "../../components/ShippingInfoSection";
+import { VariantSection } from "../../components/VariantSection";
 import {
   useAdminProductItemDetailQuery,
   useUpdateAdminProductItemMutation,
