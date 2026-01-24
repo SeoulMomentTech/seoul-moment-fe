@@ -17,6 +17,8 @@ export interface ProductFormValues {
   discountPrice: string;
   shippingCost: string;
   shippingInfo: string;
+  mainImageFile: File | null;
+  mainImagePreview: string;
   imageUrlList: string[];
   variants: VariantForm[];
 }

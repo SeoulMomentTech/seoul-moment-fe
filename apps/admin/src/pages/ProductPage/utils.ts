@@ -18,6 +18,8 @@ export const createInitialValues = (): ProductFormValues => ({
   discountPrice: "",
   shippingCost: "",
   shippingInfo: "",
+  mainImageFile: null,
+  mainImagePreview: "",
   imageUrlList: [],
   variants: [createEmptyVariant()],
 });
@@ -43,6 +45,10 @@ export const validateProductForm = (values: ProductFormValues) => {
 
   if (!values.productId || Number.isNaN(Number(values.productId))) {
     errors.productId = "상품 ID를 숫자로 입력해주세요.";
+  }
+
+  if (!values.mainImageFile && !values.mainImagePreview) {
+    errors.mainImageFile = "대표 이미지를 업로드해주세요.";
   }
 
   if (!values.price || Number.isNaN(Number(values.price))) {
