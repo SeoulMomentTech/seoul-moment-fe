@@ -57,3 +57,4 @@ account.json
 packages/**/node_modules
 
 playwright-report
+test-results
