@@ -14,15 +14,6 @@ import { useFormik } from "formik";
 
 import { Button } from "@seoul-moment/ui";
 
-import type {
-  OptionValueBadge,
-  ProductFormValues,
-  VariantForm,
-} from "../../AddPage/types";
-import {
-  createEmptyVariant,
-  parseOptionValueIds,
-} from "../../AddPage/utils";
 import { OptionValueModal } from "../../components/OptionValueModal";
 import { ProductBasicInfoSection } from "../../components/ProductBasicInfoSection";
 import { ProductImageSection } from "../../components/ProductImageSection";
@@ -32,6 +23,15 @@ import {
   useAdminProductItemDetailQuery,
   useUpdateAdminProductItemMutation,
 } from "../../hooks";
+import type {
+  OptionValueBadge,
+  ProductFormValues,
+  VariantForm,
+} from "../../types";
+import {
+  createEmptyVariant,
+  parseOptionValueIds,
+} from "../../utils";
 
 interface ProductEditFormProps {
   productItemId: AdminProductItemId;

@@ -18,13 +18,13 @@ import { ProductImageSection } from "../../components/ProductImageSection";
 import { ShippingInfoSection } from "../../components/ShippingInfoSection";
 import { VariantSection } from "../../components/VariantSection";
 import { useCreateAdminProductItemMutation } from "../../hooks";
-import type { OptionValueBadge, ProductFormValues, VariantForm } from "../types";
+import type { OptionValueBadge, ProductFormValues, VariantForm } from "../../types";
 import {
   createEmptyVariant,
   createInitialValues,
   parseOptionValueIds,
   validateProductForm,
-} from "../utils";
+} from "../../utils";
 
 export default function ProductAddForm() {
   const navigate = useNavigate();

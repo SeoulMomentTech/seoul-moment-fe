@@ -2,7 +2,7 @@ import { Plus, Trash2 } from "lucide-react";
 
 import { Button, Input, Label } from "@seoul-moment/ui";
 
-import { OptionBadge } from "../../components/OptionBadge";
+import { OptionBadge } from "./OptionBadge";
 import type { VariantForm } from "../types";
 import { parseOptionValueIds } from "../utils";
 
