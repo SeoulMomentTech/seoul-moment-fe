@@ -12,19 +12,19 @@ import { useFormik } from "formik";
 
 import { Button } from "@seoul-moment/ui";
 
+import { OptionValueModal } from "../../components/OptionValueModal";
+import { ProductBasicInfoSection } from "../../components/ProductBasicInfoSection";
+import { ProductImageSection } from "../../components/ProductImageSection";
+import { ShippingInfoSection } from "../../components/ShippingInfoSection";
+import { VariantSection } from "../../components/VariantSection";
 import { useCreateAdminProductItemMutation } from "../../hooks";
-import type { OptionValueBadge, ProductFormValues, VariantForm } from "../types";
+import type { OptionValueBadge, ProductFormValues, VariantForm } from "../../types";
 import {
   createEmptyVariant,
   createInitialValues,
   parseOptionValueIds,
   validateProductForm,
-} from "../utils";
-import { OptionValueModal } from "./OptionValueModal";
-import { ProductBasicInfoSection } from "./ProductBasicInfoSection";
-import { ProductImageSection } from "./ProductImageSection";
-import { ShippingInfoSection } from "./ShippingInfoSection";
-import { VariantSection } from "./VariantSection";
+} from "../../utils";
 
 export default function ProductAddForm() {
   const navigate = useNavigate();
@@ -47,10 +47,10 @@ export default function ProductAddForm() {
     initialValues: createInitialValues(),
     validateOnBlur: false,
     validateOnChange: false,
+    validate: validateProductForm,
     onSubmit: async (values) => {
-      const validationError = validateProductForm(values, mainImageFile);
-      if (validationError) {
-        alert(validationError);
+      if (!mainImageFile) {
+        alert("대표 이미지를 업로드해주세요.");
         return;
       }
 
@@ -213,6 +213,7 @@ export default function ProductAddForm() {
           onMainImageClear={handleMainImageClear}
         />
         <VariantSection
+          error={formik.errors.variants as string | undefined}
           isPending={isPending}
           onAddVariant={handleAddVariant}
           onOpenOptionModal={handleOpenOptionModal}

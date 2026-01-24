@@ -14,24 +14,25 @@ import { useFormik } from "formik";
 
 import { Button } from "@seoul-moment/ui";
 
-import { OptionValueModal } from "../../AddPage/components/OptionValueModal";
-import { ProductBasicInfoSection } from "../../AddPage/components/ProductBasicInfoSection";
-import { ProductImageSection } from "../../AddPage/components/ProductImageSection";
-import { ShippingInfoSection } from "../../AddPage/components/ShippingInfoSection";
-import { VariantSection } from "../../AddPage/components/VariantSection";
-import type {
-  OptionValueBadge,
-  ProductFormValues,
-  VariantForm,
-} from "../../AddPage/types";
-import {
-  createEmptyVariant,
-  parseOptionValueIds,
-} from "../../AddPage/utils";
+import { OptionValueModal } from "../../components/OptionValueModal";
+import { ProductBasicInfoSection } from "../../components/ProductBasicInfoSection";
+import { ProductImageSection } from "../../components/ProductImageSection";
+import { ShippingInfoSection } from "../../components/ShippingInfoSection";
+import { VariantSection } from "../../components/VariantSection";
 import {
   useAdminProductItemDetailQuery,
   useUpdateAdminProductItemMutation,
 } from "../../hooks";
+import type {
+  OptionValueBadge,
+  ProductFormValues,
+  VariantForm,
+} from "../../types";
+import {
+  createEmptyVariant,
+  parseOptionValueIds,
+  validateProductForm,
+} from "../../utils";
 
 interface ProductEditFormProps {
   productItemId: AdminProductItemId;
@@ -65,49 +66,6 @@ const buildInitialValues = (
       })
       : [createEmptyVariant()],
 });
-
-const validateEditProductForm = (
-  values: ProductFormValues,
-  hasMainImage: boolean,
-) => {
-  if (!values.productId || Number.isNaN(Number(values.productId))) {
-    return "상품 ID를 숫자로 입력해주세요.";
-  }
-
-  if (!hasMainImage) {
-    return "대표 이미지를 업로드해주세요.";
-  }
-
-  if (!values.price || Number.isNaN(Number(values.price))) {
-    return "가격을 입력해주세요.";
-  }
-
-  if (!values.shippingCost || Number.isNaN(Number(values.shippingCost))) {
-    return "배송비를 입력해주세요.";
-  }
-
-  if (!values.shippingInfo || Number.isNaN(Number(values.shippingInfo))) {
-    return "배송 정보를 입력해주세요.";
-  }
-
-  if (values.variants.length === 0) {
-    return "옵션(재고) 정보를 최소 1개 이상 입력해주세요.";
-  }
-
-  const invalidVariant = values.variants.find(
-    (variant) =>
-      !variant.sku.trim() ||
-      !variant.stockQuantity.trim() ||
-      Number.isNaN(Number(variant.stockQuantity)) ||
-      parseOptionValueIds(variant.optionValueIds).length === 0,
-  );
-
-  if (invalidVariant) {
-    return "옵션(재고) 정보를 모두 입력해주세요.";
-  }
-
-  return null;
-};
 
 export default function ProductEditForm({
   productItemId,
@@ -147,13 +105,12 @@ export default function ProductEditForm({
     },
     validateOnBlur: false,
     validateOnChange: false,
+    validate: validateProductForm,
     onSubmit: async (values) => {
-      const validationError = validateEditProductForm(
-        values,
-        Boolean(mainImageFile || mainImagePreview),
-      );
-      if (validationError) {
-        alert(validationError);
+      const hasMainImage = Boolean(mainImageFile || mainImagePreview);
+
+      if (!hasMainImage) {
+        alert("대표 이미지를 업로드해주세요.");
         return;
       }
 
@@ -316,6 +273,9 @@ export default function ProductEditForm({
   };
 
   const handleMainImageClear = () => {
+    if (!confirm("대표 이미지를 삭제하시겠습니까?")) {
+      return;
+    }
     setMainImageFile(null);
     setMainImagePreview("");
     setExistingMainImageUrl("");
@@ -350,6 +310,7 @@ export default function ProductEditForm({
           onMainImageClear={handleMainImageClear}
         />
         <VariantSection
+          error={formik.errors.variants as string | undefined}
           isPending={isPending}
           onAddVariant={handleAddVariant}
           onOpenOptionModal={handleOpenOptionModal}
