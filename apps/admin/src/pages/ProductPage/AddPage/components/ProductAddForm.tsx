@@ -1,4 +1,4 @@
-import { type ChangeEvent } from "react";
+import { useEffect, type ChangeEvent } from "react";
 
 import { useNavigate } from "react-router";
 
@@ -98,6 +98,15 @@ export default function ProductAddForm() {
     onUpdateVariants: (newVariants) =>
       formik.setFieldValue("variants", newVariants),
   });
+
+  // Clean up object URL to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (formik.values.mainImagePreview.startsWith("blob:")) {
+        URL.revokeObjectURL(formik.values.mainImagePreview);
+      }
+    };
+  }, [formik.values.mainImagePreview]);
 
   const handleAddVariant = () =>
     formik.setFieldValue("variants", [

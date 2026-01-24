@@ -146,6 +146,15 @@ export default function ProductEditForm({
     onUpdateVariants: (newVariants) => setFieldValue("variants", newVariants),
   });
 
+  // Clean up object URL to prevent memory leaks
+  useEffect(() => {
+    return () => {
+      if (formik.values.mainImagePreview.startsWith("blob:")) {
+        URL.revokeObjectURL(formik.values.mainImagePreview);
+      }
+    };
+  }, [formik.values.mainImagePreview]);
+
   useEffect(() => {
     if (!detail || initializedRef.current) {
       return;
