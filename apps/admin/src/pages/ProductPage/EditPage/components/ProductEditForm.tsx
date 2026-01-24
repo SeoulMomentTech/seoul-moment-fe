@@ -30,6 +30,7 @@ import type {
 } from "../../types";
 import {
   createEmptyVariant,
+  createInitialValues,
   parseOptionValueIds,
   validateProductForm,
 } from "../../utils";
@@ -46,24 +47,26 @@ const buildInitialValues = (
   discountPrice: detail.discountPrice ? String(detail.discountPrice) : "",
   shippingCost: String(detail.shippingCost),
   shippingInfo: String(detail.shippingInfo),
+  mainImageFile: null,
+  mainImagePreview: detail.mainImageUrl ?? "",
   imageUrlList: detail.imageUrlList ?? [],
   variants:
     detail.variantList.length > 0
       ? detail.variantList.map((variant) => {
-        const badges: OptionValueBadge[] = variant.optionValueList.map(
-          (value) => ({
-            id: value.id,
-            label: value.value,
-          }),
-        );
+          const badges: OptionValueBadge[] = variant.optionValueList.map(
+            (value) => ({
+              id: value.id,
+              label: value.value,
+            }),
+          );
 
-        return {
-          sku: variant.sku,
-          stockQuantity: String(variant.stockQuantity),
-          optionValueIds: badges.map((badge) => badge.id).join(", "),
-          optionValueBadgeList: badges,
-        };
-      })
+          return {
+            sku: variant.sku,
+            stockQuantity: String(variant.stockQuantity),
+            optionValueIds: badges.map((badge) => badge.id).join(", "),
+            optionValueBadgeList: badges,
+          };
+        })
       : [createEmptyVariant()],
 });
 
@@ -73,9 +76,6 @@ export default function ProductEditForm({
   const navigate = useNavigate();
   const initializedRef = useRef(false);
 
-  const [mainImageFile, setMainImageFile] = useState<File | null>(null);
-  const [mainImagePreview, setMainImagePreview] = useState("");
-  const [existingMainImageUrl, setExistingMainImageUrl] = useState("");
   const [isOptionModalOpen, setIsOptionModalOpen] = useState(false);
   const [activeVariantIndex, setActiveVariantIndex] = useState<number | null>(
     null,
@@ -94,31 +94,28 @@ export default function ProductEditForm({
     });
 
   const formik = useFormik<ProductFormValues>({
-    initialValues: {
-      productId: "",
-      price: "",
-      discountPrice: "",
-      shippingCost: "",
-      shippingInfo: "",
-      imageUrlList: [],
-      variants: [createEmptyVariant()],
-    },
+    initialValues: createInitialValues(),
     validateOnBlur: false,
     validateOnChange: false,
     validate: validateProductForm,
     onSubmit: async (values) => {
-      const hasMainImage = Boolean(mainImageFile || mainImagePreview);
-
-      if (!hasMainImage) {
-        alert("대표 이미지를 업로드해주세요.");
-        return;
-      }
+      // validateProductForm에서 mainImageFile 또는 mainImagePreview가 없는 경우를 잡으므로
+      // 여기서는 둘 중 하나가 반드시 존재한다고 가정 가능
 
       try {
-        const mainImageUrl =
-          mainImageFile !== null
-            ? (await uploadImageFile(mainImageFile, "product")).imagePath
-            : stripImageDomain(existingMainImageUrl);
+        let mainImageUrl = "";
+
+        if (values.mainImageFile) {
+          // 새 파일이 업로드된 경우
+          const { imagePath } = await uploadImageFile(
+            values.mainImageFile,
+            "product",
+          );
+          mainImageUrl = stripImageDomain(imagePath);
+        } else if (values.mainImagePreview) {
+          // 기존 이미지가 유지된 경우 (preview URL 사용)
+          mainImageUrl = stripImageDomain(values.mainImagePreview);
+        }
 
         const payload: UpdateAdminProductItemRequest = {
           productId: Number(values.productId),
@@ -154,8 +151,6 @@ export default function ProductEditForm({
 
     const nextValues = buildInitialValues(detail);
     setValues(nextValues, true);
-    setMainImagePreview(detail.mainImageUrl ?? "");
-    setExistingMainImageUrl(detail.mainImageUrl ?? "");
     initializedRef.current = true;
   }, [detail, setValues]);
 
@@ -268,17 +263,16 @@ export default function ProductEditForm({
     if (!file) {
       return;
     }
-    setMainImageFile(file);
-    setMainImagePreview(URL.createObjectURL(file));
+    setFieldValue("mainImageFile", file);
+    setFieldValue("mainImagePreview", URL.createObjectURL(file));
   };
 
   const handleMainImageClear = () => {
     if (!confirm("대표 이미지를 삭제하시겠습니까?")) {
       return;
     }
-    setMainImageFile(null);
-    setMainImagePreview("");
-    setExistingMainImageUrl("");
+    setFieldValue("mainImageFile", null);
+    setFieldValue("mainImagePreview", "");
   };
 
   if (isLoading) {
@@ -302,13 +296,20 @@ export default function ProductEditForm({
       <form className="space-y-6" onSubmit={formik.handleSubmit}>
         <ProductBasicInfoSection formik={formik} isPending={isPending} />
         <ShippingInfoSection formik={formik} isPending={isPending} />
-        <ProductImageSection
-          imageUrlList={formik.values.imageUrlList}
-          mainImagePreview={mainImagePreview}
-          onImageUrlListChange={(urls) => setFieldValue("imageUrlList", urls)}
-          onMainImageChange={handleMainImageChange}
-          onMainImageClear={handleMainImageClear}
-        />
+        <div className="space-y-1">
+          <ProductImageSection
+            imageUrlList={formik.values.imageUrlList}
+            mainImagePreview={formik.values.mainImagePreview}
+            onImageUrlListChange={(urls) => setFieldValue("imageUrlList", urls)}
+            onMainImageChange={handleMainImageChange}
+            onMainImageClear={handleMainImageClear}
+          />
+          {formik.errors.mainImageFile && (
+            <p className="text-xs text-red-500">
+              {formik.errors.mainImageFile}
+            </p>
+          )}
+        </div>
         <VariantSection
           error={formik.errors.variants as string | undefined}
           isPending={isPending}

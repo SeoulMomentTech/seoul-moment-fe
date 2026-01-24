@@ -28,8 +28,6 @@ import {
 
 export default function ProductAddForm() {
   const navigate = useNavigate();
-  const [mainImageFile, setMainImageFile] = useState<File | null>(null);
-  const [mainImagePreview, setMainImagePreview] = useState("");
   const [isOptionModalOpen, setIsOptionModalOpen] = useState(false);
   const [activeVariantIndex, setActiveVariantIndex] = useState<number | null>(
     null,
@@ -49,13 +47,20 @@ export default function ProductAddForm() {
     validateOnChange: false,
     validate: validateProductForm,
     onSubmit: async (values) => {
-      if (!mainImageFile) {
-        alert("대표 이미지를 업로드해주세요.");
+      // mainImageFile이 없어도 mainImagePreview가 있으면 통과되지만,
+      // Add 모드에서는 mainImageFile이 필수이므로 validateProductForm이 잡아줌.
+      // (단, createInitialValues에서 preview가 ""이므로)
+
+      if (!values.mainImageFile) {
+        // 이론상 validate에서 걸러지므로 여기에 도달하지 않음
         return;
       }
 
       try {
-        const { imagePath } = await uploadImageFile(mainImageFile!, "product");
+        const { imagePath } = await uploadImageFile(
+          values.mainImageFile,
+          "product",
+        );
 
         const payload: CreateAdminProductItemRequest = {
           productId: Number(values.productId),
@@ -189,13 +194,13 @@ export default function ProductAddForm() {
     if (!file) {
       return;
     }
-    setMainImageFile(file);
-    setMainImagePreview(URL.createObjectURL(file));
+    formik.setFieldValue("mainImageFile", file);
+    formik.setFieldValue("mainImagePreview", URL.createObjectURL(file));
   };
 
   const handleMainImageClear = () => {
-    setMainImageFile(null);
-    setMainImagePreview("");
+    formik.setFieldValue("mainImageFile", null);
+    formik.setFieldValue("mainImagePreview", "");
   };
 
   return (
@@ -203,15 +208,22 @@ export default function ProductAddForm() {
       <form className="space-y-6" onSubmit={formik.handleSubmit}>
         <ProductBasicInfoSection formik={formik} isPending={isPending} />
         <ShippingInfoSection formik={formik} isPending={isPending} />
-        <ProductImageSection
-          imageUrlList={formik.values.imageUrlList}
-          mainImagePreview={mainImagePreview}
-          onImageUrlListChange={(urls) =>
-            formik.setFieldValue("imageUrlList", urls)
-          }
-          onMainImageChange={handleMainImageChange}
-          onMainImageClear={handleMainImageClear}
-        />
+        <div className="space-y-1">
+          <ProductImageSection
+            imageUrlList={formik.values.imageUrlList}
+            mainImagePreview={formik.values.mainImagePreview}
+            onImageUrlListChange={(urls) =>
+              formik.setFieldValue("imageUrlList", urls)
+            }
+            onMainImageChange={handleMainImageChange}
+            onMainImageClear={handleMainImageClear}
+          />
+          {formik.errors.mainImageFile && (
+            <p className="text-xs text-red-500">
+              {formik.errors.mainImageFile}
+            </p>
+          )}
+        </div>
         <VariantSection
           error={formik.errors.variants as string | undefined}
           isPending={isPending}
