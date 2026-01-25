@@ -88,6 +88,14 @@ export function UserTable({
 }: UserTableProps) {
   const isListLoading = isLoading || isFetching;
 
+  if (isListLoading) {
+    return (
+      <div className="flex w-full items-center justify-center p-12">
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900" />
+      </div>
+    );
+  }
+
   return (
     <div className="border-t border-gray-200">
       <Table>
