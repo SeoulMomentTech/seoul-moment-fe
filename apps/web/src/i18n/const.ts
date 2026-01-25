@@ -5,3 +5,9 @@ export const languageMap = {
   en: "en",
   "zh-TW": "zh-TW",
 };
+
+export const localeLabels: Record<LanguageType, string> = {
+  ko: "한국어",
+  en: "English",
+  "zh-TW": "繁體中文",
+};

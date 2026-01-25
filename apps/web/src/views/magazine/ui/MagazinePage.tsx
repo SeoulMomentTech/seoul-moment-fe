@@ -1,6 +1,6 @@
-import Link from "next/link";
-
 import { cn } from "@shared/lib/style";
+
+import { Link } from "@/i18n/navigation";
 
 import { LookbookSection } from "@widgets/lookbook-section";
 import { MagazineFeatured } from "@widgets/magazine-featured";

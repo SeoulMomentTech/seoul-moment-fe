@@ -2,28 +2,23 @@
 
 import { ChevronDown } from "lucide-react";
 
-import Link from "next/link";
 import { useLocale } from "next-intl";
 
 import { cn } from "@shared/lib/style";
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@shared/ui/dropdown-menu";
 
-type LanguageCode = keyof typeof locales;
-
-const locales = {
-  ko: "한국어",
-  en: "English",
-  "zh-TW": "繁體中文",
-};
+import { localeLabels, type LanguageType } from "@/i18n/const";
+import { Link, usePathname } from "@/i18n/navigation";
 
 export default function LanguageSupport() {
-  const currentLocale = useLocale() as LanguageCode;
+  const currentLocale = useLocale() as LanguageType;
+  const pathname = usePathname();
 
   return (
     <DropdownMenu>
@@ -36,7 +31,7 @@ export default function LanguageSupport() {
           )}
           type="button"
         >
-          {locales[currentLocale]}
+          {localeLabels[currentLocale]}
           <ChevronDown height={16} width={16} />
         </button>
       </DropdownMenuTrigger>
@@ -45,21 +40,17 @@ export default function LanguageSupport() {
         side="top"
       >
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <Link className="w-full" href="/ko">
-              한국어
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Link className="w-full" href="/en">
-              English
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Link className="w-full" href="/zh-TW">
-              繁體中文
-            </Link>
-          </DropdownMenuItem>
+          {Object.entries(localeLabels).map(([code, label]) => (
+            <DropdownMenuItem key={code}>
+              <Link
+                className="w-full"
+                href={pathname}
+                locale={code as LanguageType}
+              >
+                {label}
+              </Link>
+            </DropdownMenuItem>
+          ))}
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
