@@ -14,6 +14,8 @@ import {
   DropdownMenuItem,
 } from "@shared/ui/dropdown-menu";
 
+import { usePathname } from "@/i18n/navigation";
+
 type LanguageCode = keyof typeof locales;
 
 const locales = {
@@ -24,6 +26,7 @@ const locales = {
 
 export default function LanguageSupport() {
   const currentLocale = useLocale() as LanguageCode;
+  const pathname = usePathname();
 
   return (
     <DropdownMenu>
@@ -46,17 +49,17 @@ export default function LanguageSupport() {
       >
         <DropdownMenuGroup>
           <DropdownMenuItem>
-            <Link className="w-full" href="/ko">
+            <Link className="w-full" href={`/ko${pathname}`}>
               한국어
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
-            <Link className="w-full" href="/en">
+            <Link className="w-full" href={`/en${pathname}`}>
               English
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
-            <Link className="w-full" href="/zh-TW">
+            <Link className="w-full" href={`/zh-TW${pathname}`}>
               繁體中文
             </Link>
           </DropdownMenuItem>

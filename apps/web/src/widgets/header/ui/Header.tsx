@@ -5,6 +5,7 @@ import { lazy, useState } from "react";
 import { MenuIcon, ChevronRightIcon } from "lucide-react";
 
 import Image from "next/image";
+import NextLink from "next/link";
 import { useTranslations } from "next-intl";
 
 import { useModal } from "@shared/lib/hooks";
@@ -109,6 +110,7 @@ function Desktop() {
 function Mobile() {
   const [isOpen, setIsOpen] = useState(false);
   const t = useTranslations();
+  const pathname = usePathname();
 
   return (
     <div
@@ -174,17 +176,17 @@ function Mobile() {
                 </li>
               </ul>
               <div className="flex items-center pb-[33px]">
-                <Link href="ko" prefetch={false}>
+                <NextLink href={`/ko${pathname}`} prefetch={false}>
                   한국어
-                </Link>
+                </NextLink>
                 <Divider className="block bg-black/40" />
-                <Link href="en" prefetch={false}>
+                <NextLink href={`/en${pathname}`} prefetch={false}>
                   English
-                </Link>
+                </NextLink>
                 <Divider className="block bg-black/40" />
-                <Link href="zh-TW" prefetch={false}>
+                <NextLink href={`/zh-TW${pathname}`} prefetch={false}>
                   繁體中文
-                </Link>
+                </NextLink>
               </div>
             </div>
           </SheetContent>
