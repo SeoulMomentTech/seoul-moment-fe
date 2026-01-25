@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 import useProductCategory from "@features/product/model/useProductCategory";
 import useProductFilter from "@features/product/model/useProductFilter";
@@ -19,6 +20,7 @@ export function ProductCategoryFilter({
   const categoryId = filter.categoryId;
   const productCategoryId = filter.productCategoryId;
 
+  const t = useTranslations();
   const { data: categories } = useProductCategory(categoryId);
   const isValid = categories.find(
     (category) => category.id === productCategoryId,
@@ -55,7 +57,7 @@ export function ProductCategoryFilter({
         >
           ALL
         </div>
-        <span>전체</span>
+        <span>{t("subcategory_all")}</span>
       </button>
       {categories.map((category) => (
         <button

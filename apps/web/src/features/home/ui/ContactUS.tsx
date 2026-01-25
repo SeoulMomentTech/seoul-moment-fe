@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@shared/lib/style";
 
@@ -7,6 +8,8 @@ import { Link } from "@/i18n/navigation";
 import { Button } from "@seoul-moment/ui";
 
 export function ContactUS() {
+  const t = useTranslations();
+
   return (
     <section
       className={cn(
@@ -21,11 +24,7 @@ export function ContactUS() {
           <h2 className={cn("text-title-2 font-bold", "max-sm:text-title-3")}>
             Contact Us
           </h2>
-          <p>
-            문의사항이 필요하신 경우
-            <br className="hidden max-sm:block" /> 언제든지 연락해주시기
-            바랍니다.
-          </p>
+          <p>{t("free_to_contact")}</p>
         </div>
         <Link href="/contact">
           <Button
@@ -34,7 +33,7 @@ export function ContactUS() {
               "max-sm:bg-white max-sm:text-black",
             )}
           >
-            바로가기
+            {t("view")}
           </Button>
         </Link>
       </div>

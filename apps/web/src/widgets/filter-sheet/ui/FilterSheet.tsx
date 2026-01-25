@@ -90,7 +90,7 @@ const FilterSheet = ({
         <div className="flex h-full flex-col">
           <div className="border-b border-b-black/20 pb-[10px]">
             <div className="flex justify-between px-[20px]">
-              <span>검색 결과</span>
+              <span>{t("search_result")}</span>
               <Button
                 className="h-auto w-auto p-0"
                 onClick={handleRefresh}
@@ -122,10 +122,10 @@ const FilterSheet = ({
               onClick={handleCloseFilter}
               variant="outline"
             >
-              닫기
+              {t("close")}
             </Button>
             <Button className="flex-1" onClick={handleApplyFilter}>
-              적용하기
+              {t("apply")}
             </Button>
           </FixedBox>
         </div>
