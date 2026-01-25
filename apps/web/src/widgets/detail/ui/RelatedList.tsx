@@ -1,8 +1,9 @@
-import Link from "next/link";
 import { useTranslations } from "next-intl";
 
 import { cn } from "@shared/lib/style";
 import type { LastNews } from "@shared/services/news";
+
+import { Link } from "@/i18n/navigation";
 
 import { MegazineSlide } from "@widgets/megazine-slide";
 import { MoreMagazineList } from "@widgets/more-magazine";
