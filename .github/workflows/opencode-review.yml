@@ -6,7 +6,7 @@ on:
 
 jobs:
   review:
-    # ✅ Draft PR이면 job 실행 x
+    # Run review only for non-draft PRs without skip keywords in the title
     if: |
       github.event.pull_request.draft == false &&
       !contains(github.event.pull_request.title, '[skip review]') &&
