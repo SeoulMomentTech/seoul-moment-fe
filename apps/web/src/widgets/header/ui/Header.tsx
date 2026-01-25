@@ -1,11 +1,10 @@
 "use client";
 
-import { lazy, useState } from "react";
+import { lazy, useState, Fragment } from "react";
 
 import { MenuIcon, ChevronRightIcon } from "lucide-react";
 
 import Image from "next/image";
-import NextLink from "next/link";
 import { useTranslations } from "next-intl";
 
 import { useModal } from "@shared/lib/hooks";
@@ -20,6 +19,7 @@ import {
   SheetTrigger,
 } from "@shared/ui/sheet";
 
+import { localeLabels, type LanguageType } from "@/i18n/const";
 import { Link, usePathname } from "@/i18n/navigation";
 
 import { LanguageSupport } from "@widgets/language-support";
@@ -176,17 +176,22 @@ function Mobile() {
                 </li>
               </ul>
               <div className="flex items-center pb-[33px]">
-                <NextLink href={`/ko${pathname}`} prefetch={false}>
-                  한국어
-                </NextLink>
-                <Divider className="block bg-black/40" />
-                <NextLink href={`/en${pathname}`} prefetch={false}>
-                  English
-                </NextLink>
-                <Divider className="block bg-black/40" />
-                <NextLink href={`/zh-TW${pathname}`} prefetch={false}>
-                  繁體中文
-                </NextLink>
+                {Object.entries(localeLabels).map(
+                  ([code, label], index, array) => (
+                    <Fragment key={code}>
+                      <Link
+                        href={pathname}
+                        locale={code as LanguageType}
+                        prefetch={false}
+                      >
+                        {label}
+                      </Link>
+                      {index < array.length - 1 && (
+                        <Divider className="block bg-black/40" />
+                      )}
+                    </Fragment>
+                  ),
+                )}
               </div>
             </div>
           </SheetContent>
