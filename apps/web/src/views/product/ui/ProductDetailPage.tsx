@@ -148,35 +148,35 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
             >
               {data.origin && (
                 <div className={cn("text-body-3 flex", "text-body-4")}>
-                  <span className="min-w-[120px]">{t("place_of_origin")}</span>
+                  <span className="min-w-[130px]">{t("place_of_origin")}</span>
                   <span>{data.origin}</span>
                 </div>
               )}
               {data.shippingInfo && (
                 <div className={cn("text-body-3 flex", "text-body-4")}>
-                  <span className="min-w-[120px]">
+                  <span className="min-w-[130px]">
                     {t("shipping_information")}
                   </span>
-                  <span>{data.shippingInfo}일 이내 출고</span>
+                  <span>{t("within_days", { n: data.shippingInfo })}</span>
                 </div>
               )}
               {data.shippingCost && (
                 <div className={cn("text-body-3 flex", "text-body-4")}>
-                  <span className="min-w-[120px]">{t("shipping_fee")}</span>
+                  <span className="min-w-[130px]">{t("shipping_fee")}</span>
                   <span>{toNTCurrency(data.shippingCost)}</span>
                 </div>
               )}
               {/* 색상 정보 */}
               {data.option?.COLOR?.length > 0 && (
                 <div className={cn("text-body-3 flex", "text-body-4")}>
-                  <span className="min-w-[120px]">{t("color")}</span>
+                  <span className="min-w-[130px]">{t("color")}</span>
                   <span>{data.option.COLOR[0].value}</span>
                 </div>
               )}
               {/* 사이즈 */}
               {data.option?.SIZE?.length > 0 && (
                 <div className={cn("text-body-3 flex", "text-body-4")}>
-                  <span className="min-w-[120px]">{t("size")}</span>
+                  <span className="min-w-[130px]">{t("size")}</span>
                   <span>
                     {data.option.SIZE.map((item) => item.value).join("/")}
                   </span>

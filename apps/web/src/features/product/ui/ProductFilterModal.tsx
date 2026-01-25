@@ -149,10 +149,10 @@ export default function ProductFilterModal({
               onClick={handleCloseFilter}
               variant="outline"
             >
-              닫기
+              {t("close")}
             </Button>
             <Button className="flex-1" onClick={handleApplyFilter}>
-              적용하기
+              {t("apply")}
             </Button>
           </div>
         </div>

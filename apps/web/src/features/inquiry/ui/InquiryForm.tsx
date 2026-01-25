@@ -200,9 +200,13 @@ export default function InquiryForm() {
                   {emailSubject.length === 0 ? t("select") : emailSubject}
                 </SelectTrigger>
                 <SelectContent className="w-[150px]">
-                  <SelectItem value="제휴문의">제휴문의</SelectItem>
-                  <SelectItem value="입점문의">입점문의</SelectItem>
-                  <SelectItem value="기타">기타</SelectItem>
+                  <SelectItem value="제휴문의">
+                    {t("partnership_inquiry")}
+                  </SelectItem>
+                  <SelectItem value="입점문의">
+                    {t("listing_inquiry")}
+                  </SelectItem>
+                  <SelectItem value="기타">{t("etc")}</SelectItem>
                 </SelectContent>
               </Select>
               <Input
