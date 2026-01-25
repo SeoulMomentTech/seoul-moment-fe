@@ -33,4 +33,7 @@ export const PATH = {
   BRAND: "/brand",
   BRAND_ADD: "/brand/add",
   BRAND_EDIT: "/brand/edit/:id",
+
+  // User
+  USERS: "/users",
 } as const;
