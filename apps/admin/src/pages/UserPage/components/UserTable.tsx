@@ -102,7 +102,6 @@ export function UserTable({
         <TableHeader className="bg-white">
           <TableRow className="hover:bg-transparent">
             <TableHead className="w-[50px] font-medium text-black">ID</TableHead>
-            <TableHead className="w-[120px] font-medium text-black">이름</TableHead>
             <TableHead className="w-[200px] font-medium text-black">이메일</TableHead>
             <TableHead className="w-[100px] font-medium text-black">역할</TableHead>
             <TableHead className="w-[100px] font-medium text-black">상태</TableHead>
@@ -130,7 +129,6 @@ export function UserTable({
             users.map((user) => (
               <TableRow className="hover:bg-gray-50" key={user.id}>
                 <TableCell className="font-normal">{user.id}</TableCell>
-                <TableCell className="font-normal">{user.name}</TableCell>
                 <TableCell className="font-normal text-gray-600">
                   {user.email}
                 </TableCell>
