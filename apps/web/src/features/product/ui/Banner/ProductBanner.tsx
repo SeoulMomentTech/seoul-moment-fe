@@ -41,11 +41,20 @@ export default function ProductBanner() {
             <figure className="h-[480px] overflow-hidden bg-slate-300 max-sm:h-[240px] max-sm:rounded-[4px]">
               <Image
                 alt=""
-                className="h-full object-cover"
+                className="h-full object-cover max-sm:hidden"
                 height={1000}
                 src={item.banner}
                 width={1340}
               />
+              {item.mobileBanner && (
+                <Image
+                  alt=""
+                  className="hidden h-full object-cover max-sm:block"
+                  height={480}
+                  src={item.mobileBanner}
+                  width={640}
+                />
+              )}
             </figure>
           </SwiperSlide>
         ))}
