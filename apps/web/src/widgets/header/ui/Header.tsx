@@ -1,6 +1,6 @@
 "use client";
 
-import { lazy, useState } from "react";
+import { lazy, useState, Fragment } from "react";
 
 import { MenuIcon, ChevronRightIcon } from "lucide-react";
 
@@ -19,6 +19,7 @@ import {
   SheetTrigger,
 } from "@shared/ui/sheet";
 
+import { localeLabels, type LanguageType } from "@/i18n/const";
 import { Link, usePathname } from "@/i18n/navigation";
 
 import { LanguageSupport } from "@widgets/language-support";
@@ -109,6 +110,7 @@ function Desktop() {
 function Mobile() {
   const [isOpen, setIsOpen] = useState(false);
   const t = useTranslations();
+  const pathname = usePathname();
 
   return (
     <div
@@ -174,17 +176,22 @@ function Mobile() {
                 </li>
               </ul>
               <div className="flex items-center pb-[33px]">
-                <Link href="ko" prefetch={false}>
-                  한국어
-                </Link>
-                <Divider className="block bg-black/40" />
-                <Link href="en" prefetch={false}>
-                  English
-                </Link>
-                <Divider className="block bg-black/40" />
-                <Link href="zh-TW" prefetch={false}>
-                  繁體中文
-                </Link>
+                {Object.entries(localeLabels).map(
+                  ([code, label], index, array) => (
+                    <Fragment key={code}>
+                      <Link
+                        href={pathname}
+                        locale={code as LanguageType}
+                        prefetch={false}
+                      >
+                        {label}
+                      </Link>
+                      {index < array.length - 1 && (
+                        <Divider className="block bg-black/40" />
+                      )}
+                    </Fragment>
+                  ),
+                )}
               </div>
             </div>
           </SheetContent>

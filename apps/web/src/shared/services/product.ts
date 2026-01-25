@@ -5,6 +5,7 @@ import { api } from ".";
 
 interface Banner {
   banner: string;
+  mobileBanner: string | null;
 }
 
 interface GetProductBannerRes {
