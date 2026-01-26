@@ -38,4 +38,16 @@ describe('parseOptionValueIds', () => {
     const result = parseOptionValueIds(input);
     expect(result).toEqual([1, 2]);
   });
+
+  it('should filter out floating point numbers', () => {
+    const input = '1, 2.5, 3';
+    const result = parseOptionValueIds(input);
+    expect(result).toEqual([1, 3]);
+  });
+
+  it('should handle complex mixed input', () => {
+    const input = '1, 0, -5, 2.5, abc, 3, , ';
+    const result = parseOptionValueIds(input);
+    expect(result).toEqual([1, 3]);
+  });
 });

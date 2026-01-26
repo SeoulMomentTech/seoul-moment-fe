@@ -25,14 +25,23 @@ export const createInitialValues = (): ProductFormValues => ({
 });
 
 /**
- * Parse a comma-separated string of option value IDs into an array of positive numbers.
- * Filters out non-finite numbers, 0, and negative numbers.
+ * Parse a comma-separated string of option value IDs into an array of positive integers.
+ * 
+ * Rules:
+ * - Returns only finite, positive integers (value > 0).
+ * - Filters out 0 (invalid by business rule).
+ * - Filters out negative numbers.
+ * - Filters out non-numeric values (NaN).
+ * - Filters out floating point numbers (IDs must be integers).
+ * 
+ * @param raw - Comma-separated string of IDs (e.g., "1, 2, 3")
+ * @returns Array of valid positive integers
  */
 export const parseOptionValueIds = (raw: string) =>
   raw
     .split(",")
     .map((value) => Number(value.trim()))
-    .filter((value) => Number.isFinite(value) && value > 0);
+    .filter((value) => Number.isInteger(value) && value > 0);
 
 export const getOptionLabel = (nameDto?: AdminProductOptionName[]) =>
   nameDto?.find((name) => name.languageCode === "ko")?.name ??

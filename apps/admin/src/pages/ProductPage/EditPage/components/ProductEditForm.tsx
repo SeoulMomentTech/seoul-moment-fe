@@ -146,8 +146,6 @@ export default function ProductEditForm({
     onUpdateVariants: (newVariants) => setFieldValue("variants", newVariants),
   });
 
-
-
   // Clean up object URL to prevent memory leaks
   useEffect(() => {
     return () => {

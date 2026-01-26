@@ -27,6 +27,9 @@ export interface AdminProductItemVariantOptionValue {
 export interface AdminProductItemVariant {
   sku: string;
   stockQuantity: number;
+  /**
+   * @description 옵션 값 객체 리스트 (상세 정보 포함)
+   */
   optionValueList: AdminProductItemVariantOptionValue[];
 }
 
