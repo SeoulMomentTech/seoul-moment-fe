@@ -91,6 +91,10 @@ export interface AdminProductOptionDetail {
   nameDto: AdminProductOptionName[];
   isActive: boolean;
   uiType: ProductOptionUiType;
+  /**
+   * @description 옵션 값 객체 리스트
+   * ID만 있는 것이 아니라 상세 정보를 포함한 객체 리스트임.
+   */
   optionValueList: AdminProductOptionValue[];
   createDate: string;
   updateDate: string;
