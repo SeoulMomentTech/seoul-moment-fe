@@ -72,7 +72,7 @@ export default function ProductAddForm() {
           variantList: values.variants.map((variant) => ({
             sku: variant.sku.trim(),
             stockQuantity: Number(variant.stockQuantity),
-            optionValueList: parseOptionValueIds(variant.optionValueIds),
+            optionValueIdList: parseOptionValueIds(variant.optionValueIds),
           })),
         };
 
@@ -98,7 +98,7 @@ export default function ProductAddForm() {
     onUpdateVariants: (newVariants) =>
       formik.setFieldValue("variants", newVariants),
   });
-
+  console.log(formik.values.variants);
   // Clean up object URL to prevent memory leaks
   useEffect(() => {
     return () => {

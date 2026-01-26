@@ -37,7 +37,7 @@ export type AdminProductItemVariantOptionValueInput =
 export interface AdminProductItemVariantInput {
   sku: string;
   stockQuantity: number;
-  optionValueList: AdminProductItemVariantOptionValueInput[];
+  optionValueIdList: AdminProductItemVariantOptionValueInput[];
 }
 
 export interface AdminProductItemDetail {
