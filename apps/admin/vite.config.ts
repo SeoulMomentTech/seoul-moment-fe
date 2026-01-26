@@ -1,6 +1,7 @@
+/// <reference types="vitest" />
 import path from "node:path";
 
-import { defineConfig } from "vite";
+import { defineConfig } from "vitest/config";
 
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
@@ -14,5 +15,9 @@ export default defineConfig({
       "@shared": path.resolve(__dirname, "./src/shared"),
       "@pages": path.resolve(__dirname, "./src/pages"),
     },
+  },
+  test: {
+    include: ["src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
+    exclude: ["e2e/**/*", "node_modules/**/*"],
   },
 });

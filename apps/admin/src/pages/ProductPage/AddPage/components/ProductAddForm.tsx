@@ -72,7 +72,7 @@ export default function ProductAddForm() {
           variantList: values.variants.map((variant) => ({
             sku: variant.sku.trim(),
             stockQuantity: Number(variant.stockQuantity),
-            optionValueList: parseOptionValueIds(variant.optionValueIds),
+            optionValueIdList: parseOptionValueIds(variant.optionValueIds),
           })),
         };
 

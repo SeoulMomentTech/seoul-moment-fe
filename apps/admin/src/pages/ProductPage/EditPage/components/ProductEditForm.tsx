@@ -49,20 +49,20 @@ const buildInitialValues = (
   variants:
     detail.variantList.length > 0
       ? detail.variantList.map((variant) => {
-          const badges: OptionValueBadge[] = variant.optionValueList.map(
-            (value) => ({
-              id: value.id,
-              label: value.value,
-            }),
-          );
+        const badges: OptionValueBadge[] = variant.optionValueList.map(
+          (value) => ({
+            id: value.id,
+            label: value.value,
+          }),
+        );
 
-          return {
-            sku: variant.sku,
-            stockQuantity: String(variant.stockQuantity),
-            optionValueIds: badges.map((badge) => badge.id).join(", "),
-            optionValueBadgeList: badges,
-          };
-        })
+        return {
+          sku: variant.sku,
+          stockQuantity: String(variant.stockQuantity),
+          optionValueIds: badges.map((badge) => badge.id).join(", "),
+          optionValueBadgeList: badges,
+        };
+      })
       : [createEmptyVariant()],
 });
 
@@ -118,7 +118,7 @@ export default function ProductEditForm({
           variantList: values.variants.map((variant) => ({
             sku: variant.sku.trim(),
             stockQuantity: Number(variant.stockQuantity),
-            optionValueList: parseOptionValueIds(variant.optionValueIds),
+            optionValueIdList: parseOptionValueIds(variant.optionValueIds),
           })),
         };
 
