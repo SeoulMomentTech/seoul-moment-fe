@@ -146,7 +146,7 @@ export default function ProductEditForm({
     onUpdateVariants: (newVariants) => setFieldValue("variants", newVariants),
   });
 
-  console.log(formik.values.variants);
+
 
   // Clean up object URL to prevent memory leaks
   useEffect(() => {
