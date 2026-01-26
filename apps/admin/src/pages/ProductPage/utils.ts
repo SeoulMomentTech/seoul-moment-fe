@@ -28,7 +28,7 @@ export const parseOptionValueIds = (raw: string) =>
   raw
     .split(",")
     .map((value) => Number(value.trim()))
-    .filter((value) => Number.isFinite(value));
+    .filter((value) => Number.isFinite(value) && value !== 0);
 
 export const getOptionLabel = (nameDto?: AdminProductOptionName[]) =>
   nameDto?.find((name) => name.languageCode === "ko")?.name ??
