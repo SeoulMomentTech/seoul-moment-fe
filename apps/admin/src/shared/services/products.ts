@@ -30,13 +30,19 @@ export interface AdminProductItemVariant {
   optionValueList: AdminProductItemVariantOptionValue[];
 }
 
-export type AdminProductItemVariantOptionValueInput =
-  | number
-  | AdminProductItemVariantOptionValue;
+/**
+ * @description 상품 아이템 변형 옵션 값 입력 (ID만 허용)
+ * 이전에는 객체도 허용되었으나, optionValueIdList 명명 규칙에 맞춰 ID(number)만 사용하도록 제한함.
+ */
+export type AdminProductItemVariantOptionValueInput = number;
 
 export interface AdminProductItemVariantInput {
   sku: string;
   stockQuantity: number;
+  /**
+   * @description 옵션 값 ID 리스트
+   * ID(number) 배열만 전달해야 함.
+   */
   optionValueIdList: AdminProductItemVariantOptionValueInput[];
 }
 

@@ -33,10 +33,9 @@ describe('parseOptionValueIds', () => {
     expect(result).toEqual([]);
   });
 
-  it('should handle negative numbers', () => {
-    // Assuming negative numbers are valid or at least not filtered by the "0" check
+  it('should filter out negative numbers', () => {
     const input = '1,-5,2';
     const result = parseOptionValueIds(input);
-    expect(result).toEqual([1, -5, 2]);
+    expect(result).toEqual([1, 2]);
   });
 });

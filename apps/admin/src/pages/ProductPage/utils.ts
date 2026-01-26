@@ -25,14 +25,14 @@ export const createInitialValues = (): ProductFormValues => ({
 });
 
 /**
- * Parse a comma-separated string of option value IDs into an array of numbers.
- * Filters out non-finite numbers and 0 (which is considered an invalid ID).
+ * Parse a comma-separated string of option value IDs into an array of positive numbers.
+ * Filters out non-finite numbers, 0, and negative numbers.
  */
 export const parseOptionValueIds = (raw: string) =>
   raw
     .split(",")
     .map((value) => Number(value.trim()))
-    .filter((value) => Number.isFinite(value) && value !== 0);
+    .filter((value) => Number.isFinite(value) && value > 0);
 
 export const getOptionLabel = (nameDto?: AdminProductOptionName[]) =>
   nameDto?.find((name) => name.languageCode === "ko")?.name ??
