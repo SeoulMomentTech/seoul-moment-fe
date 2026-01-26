@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import path from "node:path";
 
 import { defineConfig } from "vite";
@@ -14,5 +15,9 @@ export default defineConfig({
       "@shared": path.resolve(__dirname, "./src/shared"),
       "@pages": path.resolve(__dirname, "./src/pages"),
     },
+  },
+  test: {
+    include: ["src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
+    exclude: ["e2e/**/*", "node_modules/**/*"],
   },
 });

@@ -24,6 +24,10 @@ export const createInitialValues = (): ProductFormValues => ({
   variants: [createEmptyVariant()],
 });
 
+/**
+ * Parse a comma-separated string of option value IDs into an array of numbers.
+ * Filters out non-finite numbers and 0 (which is considered an invalid ID).
+ */
 export const parseOptionValueIds = (raw: string) =>
   raw
     .split(",")
