@@ -126,20 +126,66 @@ export const productQueryKeys = {
 
 // pages/productPage/hooks/useProduct.ts
 
-export const useAdminProductOptionDetailQuery = (optionId: ProductOptionId) =>
+type AdminProductItemListQueryResponse = Awaited<
+  ReturnType<typeof getAdminProductItemList>
+>;
+
+type AdminProductItemListQueryOptions = Omit<
+  UseQueryOptions<
+    AdminProductItemListQueryResponse,
+    unknown,
+    AdminProductItemListQueryResponse,
+    ReturnType<typeof productQueryKeys.list>
+  >,
+  "queryKey" | "queryFn"
+>;
+
+export const useAdminProductItemListQuery = (
+  params?: AdminProductItemListParams,
+  options?: AdminProductItemListQueryOptions,
+) =>
   useQuery({
-    queryKey: ["adminProductOptionDetail", optionId],
-    queryFn: () => getAdminProductOptionDetail(optionId),
+    queryKey: productQueryKeys.list(params),
+    queryFn: () => getAdminProductItemList(params),
+    ...options,
   });
 
-export const useUpdateAdminProductOptionMutation = () =>
-  useMutation({
-    mutationFn: ({
-      optionId,
-      payload,
-    }: {
-      optionId: ProductOptionId;
-      payload: UpdateAdminProductOptionRequest;
-    }) => updateAdminProductOption(optionId, payload),
+type UpdateAdminProductItemResponse = Awaited<
+  ReturnType<typeof updateAdminProductItem>
+>;
+
+interface UpdateAdminProductItemParams {
+  productItemId: AdminProductItemId;
+  payload: UpdateAdminProductItemRequest;
+}
+
+type UpdateAdminProductItemOptions = Omit<
+  UseMutationOptions<
+    UpdateAdminProductItemResponse,
+    unknown,
+    UpdateAdminProductItemParams
+  >,
+  "mutationFn"
+>;
+
+export const useUpdateAdminProductItemMutation = (
+  options?: UpdateAdminProductItemOptions,
+) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ productItemId, payload }) =>
+      updateAdminProductItem(productItemId, payload),
+    ...options,
+    onSuccess: async (data, variables, context, mutation) => {
+      await queryClient.invalidateQueries({
+        queryKey: productQueryKeys.all,
+      });
+      await queryClient.invalidateQueries({
+        queryKey: productQueryKeys.detail(variables.productItemId),
+      });
+      await options?.onSuccess?.(data, variables, context, mutation);
+    },
   });
+};
 ```
