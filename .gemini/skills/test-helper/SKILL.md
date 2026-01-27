@@ -58,24 +58,10 @@ Vitest Helper는 **Vitest를 활용한 테스트 코드 작성 역량을 팀 내
 
 ---
 
-## 예제 (Example)
+## 예제
 
-> 아래 예제는 **Vitest Helper에서 권장하는 테스트 작성 패턴**을 보여줍니다.
+더 자세한 예제는 `examples/` 디렉토리를 참고하세요:
 
-```ts
-import { describe, it, expect } from "vitest";
-import { mockApiSuccess } from "@/test/helpers";
-
-describe("fetchUser", () => {
-  it("returns user data when api call succeeds", async () => {
-    // given
-    mockApiSuccess({ id: 1, name: "user" });
-
-    // when
-    const result = await fetchUser(1);
-
-    // then
-    expect(result.name).toBe("user");
-  });
-});
-```
+- `component-test.md` - 기본 컴포넌트 테스트
+- `hook-test.md` - 커스텀 훅 테스트
+- `util-test.md` - 유틸리티 테스트
