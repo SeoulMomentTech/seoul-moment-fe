@@ -1,17 +1,14 @@
 name: opencode-review
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+  pull_request_review_comment:
+    types: [created]
 
 jobs:
   review:
-    # Run review only for non-draft PRs without skip keywords in the title
     if: |
-      github.event.pull_request.draft == false &&
-      !contains(github.event.pull_request.title, '[skip review]') &&
-      !contains(github.event.pull_request.title, '[no review]') &&
-      !contains(github.event.pull_request.title, 'WIP')
+      contains(github.event.comment.body, '/oc') ||
+      contains(github.event.comment.body, '/opencode')
 
     runs-on: ubuntu-latest
     permissions:
