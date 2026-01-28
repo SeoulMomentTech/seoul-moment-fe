@@ -1,29 +1,20 @@
 import { useNavigate } from "react-router";
 
-import { ImageUploader } from "@shared/components/image-uploader";
+
 import { PATH } from "@shared/constants/route";
 import type {
   PostAdminProductLanguage,
   PostAdminProductRequest,
 } from "@shared/services/adminProduct";
-import { uploadImageFile } from "@shared/utils/image";
 import { useFormik, type FormikErrors } from "formik";
 
-import {
-  Button,
-  Input,
-  Label,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@seoul-moment/ui";
+import { Button } from "@seoul-moment/ui";
 
-
-import { useBrandListQuery } from "../hooks/useBrandListQuery";
-import { useCategoryListQuery } from "../hooks/useCategoryListQuery";
-import { useProductCategoryListQuery } from "../hooks/useProductCategoryListQuery";
+import { BrandSelector } from "./form/BrandSelector";
+import { CategorySelector } from "./form/CategorySelector";
+import { DetailImageUploader } from "./form/DetailImageUploader";
+import { MultiLanguageInputs } from "./form/MultiLanguageInputs";
+import { ProductCategorySelector } from "./form/ProductCategorySelector";
 
 interface FormError {
   brandId?: string;
@@ -45,10 +36,6 @@ export const ProductMasterForm = ({
   isEdit = false,
 }: ProductMasterFormProps) => {
   const navigate = useNavigate();
-
-  const { data: brands } = useBrandListQuery();
-  const { data: categories } = useCategoryListQuery();
-  const { data: productCategories } = useProductCategoryListQuery();
 
   const formik = useFormik<PostAdminProductRequest>({
     initialValues: initialValues || {
@@ -94,197 +81,51 @@ export const ProductMasterForm = ({
     onSubmit,
   });
 
-  const getLanguageLabel = (id: number) => {
-    switch (id) {
-      case 1:
-        return "한국어";
-      case 2:
-        return "영어";
-      case 3:
-        return "중국어";
-      default:
-        return `Language ${id}`;
-    }
-  };
-
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    try {
-      const { imageUrl } = await uploadImageFile(file, "product");
-      formik.setFieldValue("detailInfoImageUrl", imageUrl);
-    } catch (error) {
-      console.error(error);
-      alert("이미지 업로드에 실패했습니다.");
-    }
-  };
-
   const textErrors = formik.errors.text as
     | FormikErrors<PostAdminProductLanguage>[]
     | undefined;
-
-
 
   return (
     <form className="space-y-6" onSubmit={formik.handleSubmit}>
       <div className="rounded-lg border border-gray-200 bg-white p-6">
         <h3 className="mb-4 text-lg font-semibold">기본 정보</h3>
         <div className="grid grid-cols-3 gap-6">
-          <div className="space-y-2">
-            <Label className="flex" htmlFor="brandId">
-              브랜드 <span className="ml-1 text-red-500">*</span>
-            </Label>
-            <Select
-              onValueChange={(val) => formik.setFieldValue("brandId", Number(val))}
-              value={formik.values.brandId ? formik.values.brandId.toString() : ""}
-            >
-              <SelectTrigger className={formik.errors.brandId ? "border-red-500" : ""}>
-                <SelectValue placeholder="브랜드 선택" />
-              </SelectTrigger>
-              <SelectContent className="bg-white max-h-[300px]">
-                {brands?.map((brand) => (
-                  <SelectItem key={brand.id} value={brand.id.toString()}>
-                    {brand.nameDto.find((n) => n.languageCode === "ko")?.name ||
-                      brand.nameDto[0]?.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {formik.errors.brandId && (
-              <p className="text-xs text-red-500">{formik.errors.brandId}</p>
-            )}
-          </div>
+          <BrandSelector
+            error={formik.errors.brandId}
+            onChange={(val) => formik.setFieldValue("brandId", val)}
+            value={formik.values.brandId}
+          />
 
-          <div className="space-y-2">
-            <Label className="flex" htmlFor="categoryId">
-              카테고리 <span className="ml-1 text-red-500">*</span>
-            </Label>
-            <Select
-              onValueChange={(val) => formik.setFieldValue("categoryId", Number(val))}
-              value={formik.values.categoryId ? formik.values.categoryId.toString() : ""}
-            >
-              <SelectTrigger className={formik.errors.categoryId ? "border-red-500" : ""}>
-                <SelectValue placeholder="카테고리 선택" />
-              </SelectTrigger>
-              <SelectContent className="bg-white max-h-[300px]">
-                {categories?.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.id.toString()}>
-                    {cat.nameDto.find((n) => n.languageCode === "ko")?.name ||
-                      cat.nameDto[0]?.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {formik.errors.categoryId && (
-              <p className="text-xs text-red-500">{formik.errors.categoryId}</p>
-            )}
-          </div>
+          <CategorySelector
+            error={formik.errors.categoryId}
+            onChange={(val) => formik.setFieldValue("categoryId", val)}
+            value={formik.values.categoryId}
+          />
 
-          <div className="space-y-2">
-            <Label className="flex" htmlFor="productCategoryId">
-              상품 카테고리 <span className="ml-1 text-red-500">*</span>
-            </Label>
-            <Select
-              onValueChange={(val) =>
-                formik.setFieldValue("productCategoryId", Number(val))
-              }
-              value={
-                formik.values.productCategoryId
-                  ? formik.values.productCategoryId.toString()
-                  : ""
-              }
-            >
-              <SelectTrigger
-                className={formik.errors.productCategoryId ? "border-red-500" : ""}
-              >
-                <SelectValue placeholder="상품 카테고리 선택" />
-              </SelectTrigger>
-              <SelectContent className="bg-white max-h-[300px]">
-                {productCategories?.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.id.toString()}>
-                    {cat.nameDto.find((n) => n.languageCode === "ko")?.name ||
-                      cat.nameDto[0]?.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {formik.errors.productCategoryId && (
-              <p className="text-xs text-red-500">
-                {formik.errors.productCategoryId}
-              </p>
-            )}
-          </div>
+          <ProductCategorySelector
+            error={formik.errors.productCategoryId}
+            onChange={(val) => formik.setFieldValue("productCategoryId", val)}
+            value={formik.values.productCategoryId}
+          />
         </div>
       </div>
 
       <div className="rounded-lg border border-gray-200 bg-white p-6">
         <h3 className="mb-4 text-lg font-semibold">상세 정보 이미지</h3>
-        <div className="space-y-2">
-          <ImageUploader
-            id="detailInfoImageUrl"
-            label="이미지 업로드"
-            onChange={handleImageChange}
-            onClear={() => formik.setFieldValue("detailInfoImageUrl", "")}
-            preview={formik.values.detailInfoImageUrl}
-            required
-          />
-          {formik.errors.detailInfoImageUrl && (
-            <p className="text-xs text-red-500">
-              {formik.errors.detailInfoImageUrl}
-            </p>
-          )}
-        </div>
+        <DetailImageUploader
+          error={formik.errors.detailInfoImageUrl}
+          onChange={(url) => formik.setFieldValue("detailInfoImageUrl", url)}
+          value={formik.values.detailInfoImageUrl}
+        />
       </div>
 
       <div className="rounded-lg border border-gray-200 bg-white p-6">
         <h3 className="mb-4 text-lg font-semibold">다국어 정보</h3>
-        <div className="flex flex-col gap-6">
-          {formik.values.text.map((lang, index) => (
-            <div
-              className="rounded-lg border border-gray-200 bg-gray-50 p-4"
-              key={lang.languageId}
-            >
-              <h4 className="mb-4 font-medium">
-                {getLanguageLabel(lang.languageId)}
-              </h4>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="flex">
-                    이름 <span className="ml-1 text-red-500">*</span>
-                  </Label>
-                  <Input
-                    className={textErrors?.[index]?.name ? "border-red-500" : ""}
-                    name={`text[${index}].name`}
-                    onChange={formik.handleChange}
-                    placeholder={`이름 (${getLanguageLabel(lang.languageId)})`}
-                    value={lang.name}
-                  />
-                  {textErrors?.[index]?.name && (
-                    <p className="text-xs text-red-500">{textErrors[index]?.name}</p>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label className="flex">
-                    원산지 <span className="ml-1 text-red-500">*</span>
-                  </Label>
-                  <Input
-                    className={textErrors?.[index]?.origin ? "border-red-500" : ""}
-                    name={`text[${index}].origin`}
-                    onChange={formik.handleChange}
-                    placeholder={`원산지 (${getLanguageLabel(lang.languageId)})`}
-                    value={lang.origin}
-                  />
-                  {textErrors?.[index]?.origin && (
-                    <p className="text-xs text-red-500">
-                      {textErrors[index]?.origin}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <MultiLanguageInputs
+          errors={textErrors}
+          onChange={formik.handleChange}
+          values={formik.values.text}
+        />
       </div>
 
       <div className="flex justify-end gap-3 border-t border-gray-200 pt-6">
@@ -300,4 +141,3 @@ export const ProductMasterForm = ({
     </form>
   );
 };
-
