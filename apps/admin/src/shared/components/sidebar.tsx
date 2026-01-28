@@ -11,6 +11,8 @@ import {
   BookOpenText,
 } from "lucide-react";
 
+import { PATH } from "@shared/constants/route";
+
 import {
   Accordion,
   AccordionContent,
@@ -45,7 +47,7 @@ interface MenuItemConfig {
 const menuItems: MenuItemConfig[] = [
   {
     id: "dashboard",
-    path: "/",
+    path: PATH.INDEX,
     label: "대시보드",
     icon: <LayoutDashboard className="h-5 w-5" />,
   },
@@ -65,11 +67,11 @@ const menuItems: MenuItemConfig[] = [
     path: "",
     icon: <Image className="h-5 w-5" />,
     subItems: [
-      { id: "home-banner", label: "홈 배너", path: "/banner/home" },
+      { id: "home-banner", label: "홈 배너", path: PATH.HOME_BANNER },
       {
         id: "product-banner",
         label: "상품 배너",
-        path: "/banner/product",
+        path: PATH.PRODUCT_BANNER,
       },
     ],
   },
@@ -79,36 +81,37 @@ const menuItems: MenuItemConfig[] = [
     path: "",
     icon: <Package className="h-5 w-5" />,
     subItems: [
-      { id: "products", label: "전체 상품", path: "/products" },
-      { id: "categories", label: "카테고리", path: "/products/categories" },
+      { id: "products", label: "전체 상품", path: PATH.PRODUCTS },
+      { id: "product-master", label: "상품 대주제", path: PATH.PRODUCT_MASTER },
+      { id: "categories", label: "카테고리", path: PATH.PRODUCT_CATEGORIES },
       {
         id: "product-categories",
         label: "서브 카테고리",
-        path: "/products/sub-categories",
+        path: PATH.PRODUCT_SUB_CATEGORIES,
       },
       {
         id: "product-options",
         label: "상품 옵션",
-        path: "/products/options",
+        path: PATH.PRODUCT_OPTIONS,
       },
     ],
   },
   {
     id: "news",
     label: "뉴스 관리",
-    path: "/news",
+    path: PATH.NEWS,
     icon: <Newspaper className="h-5 w-5" />,
   },
   {
     id: "article",
     label: "아티클 관리",
-    path: "/article",
+    path: PATH.ARTICLE,
     icon: <BookOpenText className="h-5 w-5" />,
   },
   {
     id: "brand",
     label: "브랜드 관리",
-    path: "/brand",
+    path: PATH.BRAND,
     icon: <Tag className="h-5 w-5" />,
   },
 ];
@@ -177,7 +180,7 @@ export default function Sidebar({
                             "flex w-full items-center gap-3 rounded-lg px-4 py-2 text-sm transition-colors",
                             "text-gray-600 hover:bg-gray-50",
                             selectedMenu === subItem.id &&
-                              "bg-gray-100 text-gray-900",
+                            "bg-gray-100 text-gray-900",
                           )}
                           key={subItem.id}
                           to={subItem.path}
@@ -192,11 +195,10 @@ export default function Sidebar({
 
               return (
                 <Link
-                  className={`flex w-full items-center justify-between rounded-lg px-4 py-3 transition-colors ${
-                    isSelected
+                  className={`flex w-full items-center justify-between rounded-lg px-4 py-3 transition-colors ${isSelected
                       ? "bg-gray-900 text-white"
                       : "text-gray-700 hover:bg-gray-100"
-                  }`}
+                    }`}
                   key={item.id}
                   to={item.path ?? "/"}
                 >

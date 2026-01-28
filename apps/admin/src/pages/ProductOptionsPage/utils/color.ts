@@ -1,2 +1,2 @@
 export const isHexCode = (value: string) =>
-  value.startsWith("#") && value.length === 7;
+  /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(value);
