@@ -7,6 +7,7 @@ export type AdminProductStatus = "NORMAL" | "WAIT" | "BLOCK" | "DELETE";
 export interface GetAdminProductNameDto {
   languageCode: string;
   name: string;
+  origin?: string;
 }
 
 export interface GetAdminProductResponse {
