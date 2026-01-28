@@ -29,6 +29,11 @@ import LoginPage from "@pages/LoginPage";
 import NewsPage from "@pages/NewsPage";
 import { ProductBannerPage } from "@pages/ProductBannerPage";
 import ProductCategoriesPage from "@pages/ProductCategoriesPage";
+import {
+  ProductMasterAddPage,
+  ProductMasterEditPage,
+  ProductMasterListPage,
+} from "@pages/ProductMasterPage";
 import ProductOptionsPage from "@pages/ProductOptionsPage";
 import ProductsPage from "@pages/ProductPage";
 import ProductSubCategoriesPage from "@pages/ProductSubCategoriesPage";
@@ -98,6 +103,18 @@ const privateRoutes: RouteObject[] = [
       {
         path: PATH.PRODUCT_EDIT,
         element: <ProductEditPage />,
+      },
+      {
+        path: PATH.PRODUCT_MASTER,
+        element: <ProductMasterListPage />,
+      },
+      {
+        path: PATH.PRODUCT_MASTER_ADD,
+        element: <ProductMasterAddPage />,
+      },
+      {
+        path: PATH.PRODUCT_MASTER_EDIT,
+        element: <ProductMasterEditPage />,
       },
       {
         path: PATH.PRODUCT_CATEGORIES,
