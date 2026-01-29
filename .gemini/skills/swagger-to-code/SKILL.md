@@ -53,10 +53,13 @@ Rather than blindly generating code, you focus on:
    - Generate readable and predictable function names
    - Deduplicate shared schemas and types
 
-6. Generate API code
-   - Write API functions into `shared/services/[domain].ts`
-   - Generate request and response types as needed
-   - Apply sensible defaults for error handling and configuration
+6. **Generate API code**
+   - **Imports**:
+     - Use `import { fetcher } from '.';` to import the fetcher from `shared/services/index.ts`.
+   - **Function Signatures**:
+     - Generate clear JSDoc-style descriptions per function based on Swagger summaries.
+   - **Typing**:
+     - Create strict TypeScript interfaces for all request payloads and response data.
 
 ---
 
@@ -64,11 +67,11 @@ Rather than blindly generating code, you focus on:
 
 The skill generates API client code in the following structure:
 
-- `shared/services/[domain].ts`
-  - API call functions for the domain
-  - Clear JSDoc-style descriptions per function
-- Request / response type definitions
-- Optional shared API client setup (e.g. `fetcher`, `apiClient`)
+- **File Path**: `shared/services/[domain].ts`
+- **Content**:
+  - `import { fetcher } from '.';`
+  - Type definitions (Interfaces)
+  - API call functions using `fetcher`
 
 ---
 
@@ -76,6 +79,8 @@ The skill generates API client code in the following structure:
 
 ```ts
 // shared/services/product.ts
+
+import { fetcher } from ".";
 
 /**
  * @description 상품 옵션 상세 조회

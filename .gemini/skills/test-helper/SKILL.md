@@ -60,7 +60,7 @@ Vitest Helper는 **Vitest를 활용한 테스트 코드 작성 역량을 팀 내
 
 ## 예제
 
-더 자세한 예제는 `examples/` 디렉토리를 참고하세요:
+더 자세한 예제는 `references/` 디렉토리를 참고하세요:
 
 - `component-test.md` - 기본 컴포넌트 테스트
 - `hook-test.md` - 커스텀 훅 테스트

@@ -1,0 +1,34 @@
+# =================================================================
+# Name: test-helper
+# Description: Vitest 기반 테스트 코드 자동 생성기
+# 
+# [Usage Examples]
+# 1. 단일 파일 테스트: cat src/utils/math.ts | gemini test
+# 2. 커스텀 훅 테스트: cat src/hooks/useAd.ts | gemini test
+# 3. 추가 지시 포함: cat src/components/Btn.tsx | gemini test -- "Edge case 위주로"
+# =================================================================
+
+name = "test-helper"
+description = "Vitest 가이드에 기반한 유닛/컴포넌트/훅 테스트 코드 생성"
+
+prompt = """
+당신은 테스트 주도 개발(TDD)에 능숙한 시니어 엔지니어입니다.
+제공된 소스 코드를 분석하고, 'Vitest Helper' 가이드에 따라 완벽한 테스트 코드를 작성하세요.
+
+[핵심 지침]
+@{skills/test-helper/SKILL.md}
+
+[작업 가이드]
+1. 패턴: 반드시 Given / When / Then 패턴을 주석으로 명시하여 구조화하세요.
+2. 검증: 구현 상세가 아닌 '사용자 관점의 행동(Behavior)'을 검증하세요.
+3. 범위: 정상 케이스뿐만 아니라 예외(Edge case) 및 에러 핸들링 케이스를 반드시 포함하세요.
+4. 유틸: 가이드에 정의된 네이밍 규칙과 Vitest 유틸리티를 활용하세요.
+
+[분석할 소스 코드]
+{{args}}
+"""
+
+[settings]
+model = "gemini-1.5-pro"
+temperature = 0.2
+max_output_tokens = 8000
