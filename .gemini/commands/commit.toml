@@ -1,0 +1,17 @@
+name = "commit-helper"
+description = "SKILL.md 규칙 기반 Conventional Commits 생성기"
+
+prompt = """
+제공된 'SKILL.md' 파일의 지침에 따라 Git 변경 사항을 분석하고 커밋 메시지를 작성하세요.
+
+[핵심 지침]
+1. SKILL.md의 '수행 절차'를 엄격히 준수할 것.
+2. 결과물 외의 대화나 설명은 생략할 것.
+
+[참조 파일]
+{{skills/commit-helper/SKILL.md}}
+"""
+
+[settings]
+model = "gemini-1.5-pro"
+temperature = 0.2
