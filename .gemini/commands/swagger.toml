@@ -1,0 +1,26 @@
+name="swagger-to-code"
+description = "Swagger/OpenAPI 명세를 분석하여 shared/services 하위에 API 함수 생성"
+
+# Gemini CLI의 외부 파일 참조(@) 문법을 사용합니다.
+prompt = """
+당신은 Swagger/OpenAPI 명세서를 분석하여 최적의 API 클라이언트 코드를 설계하는 전문가입니다.
+아래 제공된 'SKILL.md'의 절차와 출력 형식을 반드시 준수하세요.
+
+[핵심 지침]
+@{skills/swagger-to-code/SKILL.md}
+
+[수행 가이드]
+1. 분석: 입력된 Swagger 데이터(JSON/URL)에서 경로, 메서드, 파라미터, 스키마를 정확히 추출하세요.
+2. 구조화: 도메인을 추론하여 'shared/services/[domain].ts' 경로에 코드를 배치하세요.
+3. 명명 규칙: 동사 위주의 명확하고 예측 가능한 함수 이름을 사용하세요.
+4. 타입 정의: 요청(Request)과 응답(Response)에 대한 TypeScript 인터페이스를 누락 없이 생성하세요.
+5. 결과물: 코드 블록 상단에 파일 경로를 명시하고, 바로 사용할 수 있는 상태의 코드를 출력하세요.
+
+[입력 데이터]
+{{args}}
+"""
+
+[settings]
+model = "gemini-1.5-pro"
+temperature = 0.1
+max_output_tokens = 5000
