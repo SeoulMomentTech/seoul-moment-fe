@@ -1,16 +1,19 @@
-import { useState } from "react";
+import { useState, type KeyboardEvent } from "react";
 
 import { useNavigate } from "react-router";
 
 import { Plus } from "lucide-react";
 
+import { Pagination } from "@shared/components/pagination";
 import { PATH } from "@shared/constants/route";
 import { useDebounceValue } from "@shared/hooks/useDebounceValue";
 import type { BrandId } from "@shared/services/brand";
 
+import { DEFAULT_PAGE } from "@/shared/constants/page";
+
 import { Button, HStack } from "@seoul-moment/ui";
 
-import { BrandFilters, BrandPagination, BrandTable } from "./components";
+import { BrandFilters, BrandTable } from "./components";
 import { useAdminBrandListQuery } from "./hooks";
 import { useDeleteAdminBrandMutation } from "../hooks/useDeleteAdminBrandMutation";
 
@@ -40,6 +43,7 @@ export function BrandListPage() {
 }
 
 function BrandListContents() {
+  const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -67,10 +71,17 @@ function BrandListContents() {
     setCurrentPage(Math.min(Math.max(1, page), totalPages));
   };
 
-  // Reset to page 1 when search changes
-  const handleSearchChange = (value: string) => {
-    setSearchQuery(value);
-    setCurrentPage(1);
+
+
+  const handleSearch = () => {
+    setSearchQuery(searchInput);
+    setCurrentPage(DEFAULT_PAGE);
+  }
+
+  const handleSearchKeyPress = (event: KeyboardEvent) => {
+    if (event.key === "Enter") {
+      handleSearch();
+    }
   };
 
   const handleItemsPerPageChange = (value: number) => {
@@ -89,8 +100,12 @@ function BrandListContents() {
   return (
     <>
       <BrandFilters
-        onSearchChange={handleSearchChange}
-        searchQuery={searchQuery}
+        onPageSizeChange={handleItemsPerPageChange}
+        onSearch={handleSearch}
+        onSearchChange={setSearchInput}
+        onSearchKeyPress={handleSearchKeyPress}
+        pageSize={itemsPerPage}
+        searchInput={searchInput}
       />
 
       <BrandTable
@@ -101,15 +116,17 @@ function BrandListContents() {
         onDelete={handleDelete}
       />
 
-      <BrandPagination
-        currentPage={currentPage}
-        isDisabled={isLoading || isFetching}
-        itemsPerPage={itemsPerPage}
-        onItemsPerPageChange={handleItemsPerPageChange}
-        onPageChange={handlePageChange}
-        totalItems={totalItems}
-        totalPages={totalPages}
-      />
+      <div className="border-t border-gray-200 p-4">
+        <Pagination
+          countOnPage={brands.length}
+          disableNext={currentPage >= totalPages}
+          disablePrev={currentPage <= 1}
+          onNext={() => handlePageChange(currentPage + 1)}
+          onPrev={() => handlePageChange(currentPage - 1)}
+          page={currentPage}
+          totalPages={totalPages}
+        />
+      </div>
     </>
   );
 }

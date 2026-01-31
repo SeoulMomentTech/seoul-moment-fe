@@ -22,7 +22,7 @@ export function ProductBasicInfoSection({
       </div>
       <div className="grid grid-cols-2 gap-4 px-6 py-5">
         <div className="space-y-2">
-          <Label htmlFor="productId">상품 ID *</Label>
+          <Label htmlFor="productId">상품 대주제 ID *</Label>
           <Input
             className="h-[40px] bg-white"
             disabled={isPending}
