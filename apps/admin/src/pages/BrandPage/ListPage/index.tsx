@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type KeyboardEvent } from "react";
 
 import { useNavigate } from "react-router";
 
@@ -8,6 +8,8 @@ import { Pagination } from "@shared/components/pagination";
 import { PATH } from "@shared/constants/route";
 import { useDebounceValue } from "@shared/hooks/useDebounceValue";
 import type { BrandId } from "@shared/services/brand";
+
+import { DEFAULT_PAGE } from "@/shared/constants/page";
 
 import { Button, HStack } from "@seoul-moment/ui";
 
@@ -41,6 +43,7 @@ export function BrandListPage() {
 }
 
 function BrandListContents() {
+  const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -68,10 +71,17 @@ function BrandListContents() {
     setCurrentPage(Math.min(Math.max(1, page), totalPages));
   };
 
-  // Reset to page 1 when search changes
-  const handleSearchChange = (value: string) => {
-    setSearchQuery(value);
-    setCurrentPage(1);
+
+
+  const handleSearch = () => {
+    setSearchQuery(searchInput);
+    setCurrentPage(DEFAULT_PAGE);
+  }
+
+  const handleSearchKeyPress = (event: KeyboardEvent) => {
+    if (event.key === "Enter") {
+      handleSearch();
+    }
   };
 
   const handleItemsPerPageChange = (value: number) => {
@@ -91,11 +101,11 @@ function BrandListContents() {
     <>
       <BrandFilters
         onPageSizeChange={handleItemsPerPageChange}
-        onSearch={() => {}}
-        onSearchChange={handleSearchChange}
-        onSearchKeyPress={() => {}}
+        onSearch={handleSearch}
+        onSearchChange={setSearchInput}
+        onSearchKeyPress={handleSearchKeyPress}
         pageSize={itemsPerPage}
-        searchQuery={searchQuery}
+        searchInput={searchInput}
       />
 
       <BrandTable

@@ -14,7 +14,7 @@ import {
 } from "@seoul-moment/ui";
 
 interface BrandFiltersProps {
-  searchQuery: string;
+  searchInput: string;
   pageSize: number;
   onSearchChange(value: string): void;
   onPageSizeChange(value: number): void;
@@ -23,7 +23,7 @@ interface BrandFiltersProps {
 }
 
 export function BrandFilters({
-  searchQuery,
+  searchInput,
   pageSize,
   onSearchChange,
   onPageSizeChange,
@@ -40,7 +40,7 @@ export function BrandFilters({
             onChange={(e) => onSearchChange(e.target.value)}
             onKeyDown={onSearchKeyPress}
             placeholder="브랜드명 검색"
-            value={searchQuery}
+            value={searchInput}
           />
         </div>
         <Button onClick={onSearch}>
