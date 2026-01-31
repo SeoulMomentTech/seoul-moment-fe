@@ -4,13 +4,14 @@ import { useNavigate } from "react-router";
 
 import { Plus } from "lucide-react";
 
+import { Pagination } from "@shared/components/pagination";
 import { PATH } from "@shared/constants/route";
 import { useDebounceValue } from "@shared/hooks/useDebounceValue";
 import type { BrandId } from "@shared/services/brand";
 
 import { Button, HStack } from "@seoul-moment/ui";
 
-import { BrandFilters, BrandPagination, BrandTable } from "./components";
+import { BrandFilters, BrandTable } from "./components";
 import { useAdminBrandListQuery } from "./hooks";
 import { useDeleteAdminBrandMutation } from "../hooks/useDeleteAdminBrandMutation";
 
@@ -89,7 +90,11 @@ function BrandListContents() {
   return (
     <>
       <BrandFilters
+        onPageSizeChange={handleItemsPerPageChange}
+        onSearch={() => {}}
         onSearchChange={handleSearchChange}
+        onSearchKeyPress={() => {}}
+        pageSize={itemsPerPage}
         searchQuery={searchQuery}
       />
 
@@ -101,15 +106,17 @@ function BrandListContents() {
         onDelete={handleDelete}
       />
 
-      <BrandPagination
-        currentPage={currentPage}
-        isDisabled={isLoading || isFetching}
-        itemsPerPage={itemsPerPage}
-        onItemsPerPageChange={handleItemsPerPageChange}
-        onPageChange={handlePageChange}
-        totalItems={totalItems}
-        totalPages={totalPages}
-      />
+      <div className="border-t border-gray-200 p-4">
+        <Pagination
+          countOnPage={brands.length}
+          disableNext={currentPage >= totalPages}
+          disablePrev={currentPage <= 1}
+          onNext={() => handlePageChange(currentPage + 1)}
+          onPrev={() => handlePageChange(currentPage - 1)}
+          page={currentPage}
+          totalPages={totalPages}
+        />
+      </div>
     </>
   );
 }
