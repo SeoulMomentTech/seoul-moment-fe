@@ -8,5 +8,8 @@
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
     }
+  },
+  "experimental": {
+    "enableAgents": true
   }
 }
