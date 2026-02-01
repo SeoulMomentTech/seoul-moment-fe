@@ -38,7 +38,7 @@ jobs:
 
             const botComments = comments.filter(c => 
               c.user.login === 'github-actions[bot]' && 
-              c.body.includes('🤖 **AI Code Review**')
+              (c.body.includes('🤖 **AI Code Review**') || c.body.includes('<!-- opencode-review -->') || c.body.includes('AI Code Review'))
             );
 
             for (const comment of botComments) {
