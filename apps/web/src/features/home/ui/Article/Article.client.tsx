@@ -20,7 +20,7 @@ interface ArticleProps {
 export function Article({ promise }: ArticleProps) {
   const res = use(promise);
   const list = res.data.list;
-  const shouldShowEmpty = list.length === 0;
+  const isEmpty = list.length === 0;
 
   return (
     <SectionWithLabel
@@ -38,12 +38,17 @@ export function Article({ promise }: ArticleProps) {
         </div>
       }
     >
-      {shouldShowEmpty ? (
+      {isEmpty ? (
         <Empty
           className="h-[360px] w-full max-sm:h-[240px]"
           description="등록된 아티클이 없습니다."
           icon={
-            <FileTextIcon className="text-black/30" height={24} width={24} />
+            <FileTextIcon
+              className="text-black/30"
+              height={24}
+              role="img"
+              width={24}
+            />
           }
         />
       ) : (

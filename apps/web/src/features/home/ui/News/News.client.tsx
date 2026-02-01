@@ -41,18 +41,25 @@ export function News({ promise }: NewsProps) {
   );
 }
 
-interface NewsContentsProps {
+export interface NewsContentsProps {
   data: News[];
 }
 
-function NewsContents({ data }: NewsContentsProps) {
-  if (data.length === 0) {
+export function NewsContents({ data }: NewsContentsProps) {
+  const isEmpty = data.length === 0;
+
+  if (isEmpty) {
     return (
       <Empty
         className="h-[360px] w-full max-sm:h-[240px]"
         description="등록된 뉴스가 없습니다."
         icon={
-          <NewspaperIcon className="text-black/30" height={24} width={24} />
+          <NewspaperIcon
+            className="text-black/30"
+            height={24}
+            role="img"
+            width={24}
+          />
         }
       />
     );
