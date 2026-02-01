@@ -2,12 +2,15 @@
 
 import { use } from "react";
 
+import { FileTextIcon } from "lucide-react";
+
 import { cn } from "@shared/lib/style";
 import type { getArticleList } from "@shared/services/article";
 
 import { Skeleton } from "@seoul-moment/ui";
 import { ArticleList } from "@widgets/article-list";
 import { ArticleSlide } from "@widgets/article-slide";
+import { Empty } from "@widgets/empty";
 import { SectionWithLabel } from "@widgets/section-with-label";
 
 interface ArticleProps {
@@ -17,6 +20,7 @@ interface ArticleProps {
 export function Article({ promise }: ArticleProps) {
   const res = use(promise);
   const list = res.data.list;
+  const shouldShowEmpty = list.length === 0;
 
   return (
     <SectionWithLabel
@@ -34,8 +38,20 @@ export function Article({ promise }: ArticleProps) {
         </div>
       }
     >
-      <ArticleList data={list} />
-      <ArticleSlide data={list} />
+      {shouldShowEmpty ? (
+        <Empty
+          className="h-[360px] w-full max-sm:h-[240px]"
+          description="등록된 아티클이 없습니다."
+          icon={
+            <FileTextIcon className="text-black/30" height={24} width={24} />
+          }
+        />
+      ) : (
+        <>
+          <ArticleList data={list} />
+          <ArticleSlide data={list} />
+        </>
+      )}
     </SectionWithLabel>
   );
 }

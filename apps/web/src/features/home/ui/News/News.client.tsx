@@ -2,12 +2,15 @@
 
 import { use } from "react";
 
+import { NewspaperIcon } from "lucide-react";
+
 import { FeaturedMainNewsCard, FeaturedSubNewsCard } from "@entities/news/ui";
 import { cn } from "@shared/lib/style";
 import type { getNewsList, News } from "@shared/services/news";
 
 import { Link } from "@/i18n/navigation";
 
+import { Empty } from "@widgets/empty";
 import { SectionWithLabel } from "@widgets/section-with-label";
 
 interface NewsProps {
@@ -43,6 +46,18 @@ interface NewsContentsProps {
 }
 
 function NewsContents({ data }: NewsContentsProps) {
+  if (data.length === 0) {
+    return (
+      <Empty
+        className="h-[360px] w-full max-sm:h-[240px]"
+        description="등록된 뉴스가 없습니다."
+        icon={
+          <NewspaperIcon className="text-black/30" height={24} width={24} />
+        }
+      />
+    );
+  }
+
   return (
     <div className={cn("flex gap-[40px]", "max-sm:w-full max-sm:flex-col")}>
       {data.map((news, idx) => {
@@ -82,4 +97,3 @@ function NewsContents({ data }: NewsContentsProps) {
 }
 
 // Removed leftover console.log(data); statement for cleaner production code
-
