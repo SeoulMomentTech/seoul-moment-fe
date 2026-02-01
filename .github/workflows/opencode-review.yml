@@ -28,19 +28,21 @@ jobs:
         with:
           script: |
             const { owner, repo } = context.repo;
-            const issue_number = context.issue.number;
+            const pull_number = context.payload.pull_request.number;
+            
             const { data: comments } = await github.rest.issues.listComments({
               owner,
               repo,
-              issue_number,
+              issue_number: pull_number,
             });
-            const botComments = comments.filter(c => c.body.includes('<!-- opencode-review -->'));
+            
+            const botComments = comments.filter(c => 
+              c.user.login === 'github-actions[bot]' && 
+              c.body.includes('🤖 **AI Code Review**')
+            );
+            
             for (const comment of botComments) {
-              await github.rest.issues.deleteComment({
-                owner,
-                repo,
-                comment_id: comment.id,
-              });
+              await github.rest.issues.deleteComment({ owner, repo, comment_id: comment.id });
             }
       - name: Run opencode
         uses: anomalyco/opencode/github@latest
@@ -50,7 +52,6 @@ jobs:
           model: openai/gpt-4.1-mini
           prompt: |
             You are performing an automated Pull Request code review.
-            IMPORTANT: Start your response with <!-- opencode-review -->
 
             ---
             name: code-review
@@ -94,6 +95,8 @@ jobs:
             ---
 
             # Output Format
+
+            **Start your entire response with: 🤖 **AI Code Review****
 
             For each review item, use the following format:
 
