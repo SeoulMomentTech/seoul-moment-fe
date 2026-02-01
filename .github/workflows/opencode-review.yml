@@ -37,7 +37,7 @@ jobs:
             });
 
             const botComments = comments.filter(c => 
-              c.user.login === 'github-actions[bot]' && 
+              c.user.login === 'opencode-agent[bot]' || 
               (c.body.includes('🤖 **AI Code Review**') || c.body.includes('<!-- opencode-review -->') || c.body.includes('AI Code Review'))
             );
 
@@ -97,7 +97,7 @@ jobs:
 
             # Output Format
 
-            **Start your entire response with: 🤖 **AI Code Review****
+            **Start your entire response with: 🤖 **AI Code Review**
 
             For each review item, use the following format:
 
