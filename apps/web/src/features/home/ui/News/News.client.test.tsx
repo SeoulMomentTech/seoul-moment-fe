@@ -13,8 +13,17 @@ vi.mock("@entities/news/ui", () => ({
 }));
 
 vi.mock("@widgets/empty", () => ({
-  Empty: ({ description }: { description: string }) => (
-    <div data-testid="empty-state">{description}</div>
+  Empty: ({
+    description,
+    icon,
+  }: {
+    description: string;
+    icon: React.ReactNode;
+  }) => (
+    <div data-testid="empty-state">
+      {icon}
+      <span>{description}</span>
+    </div>
   ),
 }));
 
@@ -26,7 +35,7 @@ vi.mock("@/i18n/navigation", () => ({
 }));
 
 describe("NewsContents", () => {
-  it("renders empty state when data is empty", () => {
+  it("renders empty state with correct icon and message when data is empty", () => {
     // given
     const data: News[] = [];
 
@@ -36,6 +45,7 @@ describe("NewsContents", () => {
     // then
     expect(screen.getByTestId("empty-state")).toBeInTheDocument();
     expect(screen.getByText("등록된 뉴스가 없습니다.")).toBeInTheDocument();
+    expect(screen.getByRole("img")).toBeInTheDocument();
   });
 
   it("renders news cards when data is provided", () => {
