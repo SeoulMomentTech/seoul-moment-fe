@@ -29,18 +29,18 @@ jobs:
           script: |
             const { owner, repo } = context.repo;
             const pull_number = context.payload.pull_request.number;
-            
+
             const { data: comments } = await github.rest.issues.listComments({
               owner,
               repo,
               issue_number: pull_number,
             });
-            
+
             const botComments = comments.filter(c => 
               c.user.login === 'github-actions[bot]' && 
               c.body.includes('🤖 **AI Code Review**')
             );
-            
+
             for (const comment of botComments) {
               await github.rest.issues.deleteComment({ owner, repo, comment_id: comment.id });
             }
@@ -48,6 +48,7 @@ jobs:
         uses: anomalyco/opencode/github@latest
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           model: openai/gpt-4.1-mini
           prompt: |
