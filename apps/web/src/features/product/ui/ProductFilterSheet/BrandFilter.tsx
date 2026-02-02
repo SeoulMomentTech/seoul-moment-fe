@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+
 import { useTranslations } from "next-intl";
 
 import type { Filter } from "@widgets/filter-sheet/ui/FilterSheet";
@@ -22,44 +24,47 @@ const BrandFilter = ({ filter, handleFilter }: BrandFilterProps) => {
   const { data: brandFilters } = useBrandFilter();
   const t = useTranslations();
 
+  const filteredBrandFilters = useMemo(
+    () => brandFilters.filter((item) => item.brandNameList.length > 0),
+    [brandFilters],
+  );
+
   return (
     <AccordionItem className="border-b-black/20" value="brand">
       <AccordionTrigger>{t("product_brand")}</AccordionTrigger>
       <AccordionContent>
         <Accordion collapsible type="single">
-          {brandFilters
-            .filter((item) => item.brandNameList.length > 0)
-            .map((item) => (
-              <AccordionItem
-                className="pl-[14px]"
-                hideBorder
-                key={item.name}
-                value={item.filter}
-              >
-                <AccordionTrigger className="font-semibold">
-                  {item.name}
-                </AccordionTrigger>
-                {item.brandNameList.length > 0 && (
-                  <AccordionContent className="flex flex-col pb-0 pl-[12px]">
-                    {item.brandNameList.map((brand) => (
-                      <Button
-                        className={cn(
-                          "justify-start px-0 py-[10px] text-start text-black/40",
-                          "hover:bg-transparent hover:text-black",
-                          filter.brandId === brand.id && "text-black",
-                        )}
-                        key={brand.id}
-                        onClick={() => handleFilter({ brandId: brand.id })}
-                        size="sm"
-                        variant="ghost"
-                      >
-                        {brand.name}
-                      </Button>
-                    ))}
-                  </AccordionContent>
-                )}
-              </AccordionItem>
-            ))}
+          {filteredBrandFilters.map((item) => (
+            <AccordionItem
+              className="pl-[14px]"
+              hideBorder
+              key={item.name}
+              value={item.filter}
+            >
+              <AccordionTrigger className="font-semibold">
+                {item.name}
+              </AccordionTrigger>
+              {item.brandNameList.length > 0 && (
+                <AccordionContent className="flex flex-col pb-0 pl-[12px]">
+                  {item.brandNameList.map((brand) => (
+                    <Button
+                      className={cn(
+                        "justify-start px-0 py-[10px] text-start text-black/40",
+                        "hover:bg-transparent hover:text-black",
+                        filter.brandId === brand.id && "text-black",
+                      )}
+                      key={brand.id}
+                      onClick={() => handleFilter({ brandId: brand.id })}
+                      size="sm"
+                      variant="ghost"
+                    >
+                      {brand.name}
+                    </Button>
+                  ))}
+                </AccordionContent>
+              )}
+            </AccordionItem>
+          ))}
         </Accordion>
       </AccordionContent>
     </AccordionItem>
