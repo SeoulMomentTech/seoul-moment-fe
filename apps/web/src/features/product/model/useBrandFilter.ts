@@ -23,10 +23,12 @@ const useBrandFilter = (categoryId?: number) => {
     queryKey: ["brand-filter", languageCode, categoryId],
     queryFn: () => getBrandFilter(categoryId),
     select: (res) =>
-      res.data.list.map((brand) => ({
-        name: filterName[brand.filter],
-        ...brand,
-      })),
+      res.data.list
+        .filter((brand) => brand.brandNameList.length > 0)
+        .map((brand) => ({
+          name: filterName[brand.filter],
+          ...brand,
+        })),
   });
 };
 
