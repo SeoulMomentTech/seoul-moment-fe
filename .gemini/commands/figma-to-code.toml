@@ -1,0 +1,20 @@
+name = "figma-to-code"
+description = "피그마 디자인을 분석하여 프로젝트 코드로 변환"
+
+prompt = """
+사용자가 제공한 Figma URL 또는 Node ID를 사용하여 코드를 생성하세요.
+
+[입력 정보]
+Figma Target: {{args}}
+
+[지침]
+@{skills/figma-to-code/SKILL.md}
+
+[실행 단계]
+1. `get_design_context` 도구를 사용하여 위 'Figma Target'의 디자인 정보를 조회하세요.
+2. 위 [지침]의 '워크플로우'와 '코드 변환 원칙'을 준수하여 코드를 생성하세요.
+"""
+
+[settings]
+model = "gemini-1.5-pro"
+temperature = 0.2

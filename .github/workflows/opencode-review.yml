@@ -1,16 +1,16 @@
 name: opencode-review
 
 on:
-  issue_comment:
-    types: [created]
-  pull_request_review_comment:
-    types: [created]
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
   review:
     if: |
-      contains(github.event.comment.body, '/oc') ||
-      contains(github.event.comment.body, '/opencode')
+      github.event.pull_request.draft == false &&
+      !contains(github.event.pull_request.title, '[skip review]') &&
+      !contains(github.event.pull_request.title, '[no review]') &&
+      !contains(github.event.pull_request.title, 'WIP')
 
     runs-on: ubuntu-latest
     permissions:
@@ -23,10 +23,32 @@ jobs:
         uses: actions/checkout@v6
         with:
           persist-credentials: false
+      - name: Delete previous review comments
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const pull_number = context.payload.pull_request.number;
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner,
+              repo,
+              issue_number: pull_number,
+            });
+
+            const botComments = comments.filter(c => 
+              c.user.login === 'opencode-agent[bot]' || 
+              (c.body.includes('🤖 **AI Code Review**') || c.body.includes('<!-- opencode-review -->') || c.body.includes('AI Code Review'))
+            );
+
+            for (const comment of botComments) {
+              await github.rest.issues.deleteComment({ owner, repo, comment_id: comment.id });
+            }
       - name: Run opencode
         uses: anomalyco/opencode/github@latest
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           model: openai/gpt-4.1-mini
           prompt: |
@@ -74,6 +96,8 @@ jobs:
             ---
 
             # Output Format
+
+            **Start your entire response with: 🤖 **AI Code Review**
 
             For each review item, use the following format:
 
