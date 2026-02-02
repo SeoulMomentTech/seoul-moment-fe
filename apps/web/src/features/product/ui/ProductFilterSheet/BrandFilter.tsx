@@ -1,5 +1,3 @@
-import { useMemo } from "react";
-
 import { useTranslations } from "next-intl";
 
 import type { Filter } from "@widgets/filter-sheet/ui/FilterSheet";
@@ -24,17 +22,12 @@ const BrandFilter = ({ filter, handleFilter }: BrandFilterProps) => {
   const { data: brandFilters } = useBrandFilter();
   const t = useTranslations();
 
-  const filteredBrandFilters = useMemo(
-    () => brandFilters.filter((item) => item.brandNameList.length > 0),
-    [brandFilters],
-  );
-
   return (
     <AccordionItem className="border-b-black/20" value="brand">
       <AccordionTrigger>{t("product_brand")}</AccordionTrigger>
       <AccordionContent>
         <Accordion collapsible type="single">
-          {filteredBrandFilters.map((item) => (
+          {brandFilters.map((item) => (
             <AccordionItem
               className="pl-[14px]"
               hideBorder
