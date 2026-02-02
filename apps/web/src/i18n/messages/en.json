@@ -74,5 +74,6 @@
   "partnership_inquiry": "Partnership Inquiry",
   "listing_inquiry": "Product Listing Inquiry",
   "etc": "Others",
-  "subcategory_all": "All"
+  "subcategory_all": "All",
+  "no_news_found": "No news found."
 }
