@@ -4,6 +4,8 @@ import { use } from "react";
 
 import { NewspaperIcon } from "lucide-react";
 
+import { useTranslations } from "next-intl";
+
 import { FeaturedMainNewsCard, FeaturedSubNewsCard } from "@entities/news/ui";
 import { cn } from "@shared/lib/style";
 import type { getNewsList, News } from "@shared/services/news";
@@ -46,13 +48,14 @@ export interface NewsContentsProps {
 }
 
 export function NewsContents({ data }: NewsContentsProps) {
+  const t = useTranslations();
   const isEmpty = data.length === 0;
 
   if (isEmpty) {
     return (
       <Empty
         className="h-[360px] w-full max-sm:h-[240px]"
-        description="등록된 뉴스가 없습니다."
+        description={t("no_news_found")}
         icon={
           <NewspaperIcon
             className="text-black/30"

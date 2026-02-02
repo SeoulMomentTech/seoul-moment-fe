@@ -4,6 +4,8 @@ import { use } from "react";
 
 import { FileTextIcon } from "lucide-react";
 
+import { useTranslations } from "next-intl";
+
 import { cn } from "@shared/lib/style";
 import type { Article, getArticleList } from "@shared/services/article";
 
@@ -47,6 +49,7 @@ interface ArticleContentsProps {
 }
 
 export function ArticleContents({ data }: ArticleContentsProps) {
+  const t = useTranslations();
   const isEmpty = data.length === 0;
 
   return (
@@ -54,7 +57,7 @@ export function ArticleContents({ data }: ArticleContentsProps) {
       {isEmpty ? (
         <Empty
           className="h-[360px] w-full max-sm:h-[240px]"
-          description="등록된 아티클이 없습니다."
+          description={t("no_article_found")}
           icon={
             <FileTextIcon
               className="text-black/30"
