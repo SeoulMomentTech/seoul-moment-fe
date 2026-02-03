@@ -1,12 +1,9 @@
 import { LANGUAGE_LIST } from "@shared/constants/locale";
 import type {
   AdminBrandDetail,
+  AdminBrandMultilingualTextV2,
   CreateAdminBrandRequest,
-  UpdateAdminBrandImagePayload,
-  UpdateAdminBrandRequest,
-  UpdateAdminBrandSectionImageSortOrder,
-  UpdateAdminBrandSectionPayload,
-  UpdateAdminBrandSectionSortOrder,
+  V2UpdateAdminBrandRequest,
 } from "@shared/services/brand";
 import { stripImageDomain } from "@shared/utils/image";
 import type { FormikErrors } from "formik";
@@ -36,87 +33,37 @@ interface GetEditFormPayload {
   data: AdminBrandDetail;
 }
 
-export const getEditFormPayload = ({ data, values }: GetEditFormPayload) => {
-  const sections = data.multilingualTextList[0].section;
-  const existingBannerList = data.bannerList ?? [];
-  const existingMobileBannerList = data.mobileBannerList ?? [];
-  const existingSectionImageLists = (() => {
-    const multilingualTextList = data.multilingualTextList;
-    if (!multilingualTextList?.length) return [];
+export const getEditFormPayload = ({ values }: GetEditFormPayload) => {
+  const multilingualTextList: AdminBrandMultilingualTextV2[] =
+    values.textList.map((text) => {
+      const section = values.sectionList.map((sectionItem) => {
+        const sectionText = sectionItem.textList.find(
+          (t) => t.languageId === text.languageId,
+        );
 
-    const sectionCount = multilingualTextList.reduce(
-      (max, text) => Math.max(max, text.section?.length ?? 0),
-      0,
-    );
-
-    return Array.from({ length: sectionCount }, (_, sectionIndex) => {
-      const sectionForImages = multilingualTextList.find(
-        (text) => text.section?.[sectionIndex]?.imageList.length,
-      );
-
-      return (
-        sectionForImages?.section?.[sectionIndex]?.imageList ??
-        multilingualTextList[0]?.section?.[sectionIndex]?.imageList ??
-        []
-      );
-    });
-  })();
-
-  const bannerImageUrlList: UpdateAdminBrandImagePayload[] =
-    values.bannerImageUrlList.map((imageUrl, index) => ({
-      oldImageUrl: stripImageDomain(existingBannerList[index] ?? imageUrl),
-      newImageUrl: stripImageDomain(imageUrl),
-    }));
-
-  const mobileBannerImageUrlList: UpdateAdminBrandImagePayload[] =
-    values.mobileBannerImageUrlList.map((imageUrl, index) => ({
-      oldImageUrl: stripImageDomain(
-        existingMobileBannerList[index] ?? imageUrl,
-      ),
-      newImageUrl: stripImageDomain(imageUrl),
-    }));
-
-  const sectionList: UpdateAdminBrandSectionPayload[] = values.sectionList.map(
-    (section, sectionIndex) => {
-      const imageUrlList: UpdateAdminBrandImagePayload[] =
-        section.imageUrlList.map((imageUrl, imageIndex) => ({
-          oldImageUrl: stripImageDomain(
-            existingSectionImageLists[sectionIndex]?.[imageIndex] ?? imageUrl,
-          ),
-          newImageUrl: stripImageDomain(imageUrl),
-        }));
-
-      const imageSortOrderList: UpdateAdminBrandSectionImageSortOrder[] =
-        section.imageUrlList.map((imageUrl, imageIndex) => ({
-          imageUrl: stripImageDomain(imageUrl),
-          sortOrder: imageIndex + 1,
-        }));
+        return {
+          title: sectionText?.title ?? "",
+          content: sectionText?.content ?? "",
+          imageList: sectionItem.imageUrlList.map(stripImageDomain),
+        };
+      });
 
       return {
-        id: sections[sectionIndex].id,
-        textList: section.textList,
-        imageUrlList,
-        imageSortOrderList,
+        languageId: text.languageId,
+        name: text.name,
+        description: text.description,
+        section,
       };
-    },
-  );
+    });
 
-  const sectionSortOrderList: UpdateAdminBrandSectionSortOrder[] =
-    sectionList.map((section, sectionIndex) => ({
-      sectionId: section.id,
-      sortOrder: sectionIndex + 1,
-    }));
-
-  const payload: UpdateAdminBrandRequest = {
-    textList: values.textList,
+  const payload: V2UpdateAdminBrandRequest = {
     categoryId: values.categoryId,
-    profileImageUrl: stripImageDomain(values.profileImageUrl),
-    sectionList,
-    bannerImageUrlList,
-    mobileBannerImageUrlList,
-    productBannerImage: stripImageDomain(values.productBannerImageUrl),
     englishName: values.englishName,
-    sectionSortOrderList,
+    profileImage: stripImageDomain(values.profileImageUrl),
+    productBannerImage: stripImageDomain(values.productBannerImageUrl),
+    bannerList: values.bannerImageUrlList.map(stripImageDomain),
+    mobileBannerList: values.mobileBannerImageUrlList.map(stripImageDomain),
+    multilingualTextList,
   };
 
   return payload;
