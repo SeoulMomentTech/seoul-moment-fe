@@ -1,4 +1,4 @@
-name: opencode-review
+name: code-review
 
 on:
   pull_request:
@@ -44,8 +44,6 @@ jobs:
             for (const comment of botComments) {
               await github.rest.issues.deleteComment({ owner, repo, comment_id: comment.id });
             }
-      - name: Install dependencies for script
-        run: npm install @octokit/rest
 
       - name: Run AI Code Review Script
         run: node scripts/ai-code-review.js

@@ -1,5 +1,3 @@
-const { Octokit } = require("@octokit/rest");
-
 async function run() {
   try {
     const token = process.env.GITHUB_TOKEN;
@@ -11,15 +9,22 @@ async function run() {
       throw new Error("Missing required environment variables.");
     }
 
-    const octokit = new Octokit({ auth: token });
-
     // 1. Get PR Diff
-    const { data: prDiff } = await octokit.pulls.get({
-      owner,
-      repo,
-      pull_number: pullNumber,
-      mediaType: { format: "diff" },
-    });
+    const diffResponse = await fetch(
+      `https://api.github.com/repos/${owner}/${repo}/pulls/${pullNumber}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/vnd.github.v3.diff",
+        },
+      }
+    );
+
+    if (!diffResponse.ok) {
+      throw new Error(`Failed to fetch PR diff: ${diffResponse.statusText}`);
+    }
+
+    const prDiff = await diffResponse.text();
 
     // Limit diff size to avoid token limits (simple truncation)
     const MAX_DIFF_LENGTH = 100000;
@@ -153,17 +158,28 @@ You must output a JSON object with the following structure:
       path: item.path,
       line: Number(item.line),
       side: "RIGHT",
-      body: `**[${item.severity}] ${item.type}**\n\n${item.description}\n\n**Suggestion:**\n\n${item.suggestion}\n\n***`, // Added triple backticks for code block
+      body: `**[${item.severity}] ${item.type}**\n\n${item.description}\n\n**Suggestion:**\n\`\`\`typescript\n${item.suggestion}\n\`\`\``,
     }));
 
     if (comments.length > 0) {
-      await octokit.pulls.createReview({
-        owner,
-        repo,
-        pull_number: pullNumber,
-        event: "COMMENT",
-        comments: comments,
-      });
+      const reviewResponse = await fetch(
+        `https://api.github.com/repos/${owner}/${repo}/pulls/${pullNumber}/reviews`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            event: "COMMENT",
+            comments: comments,
+          }),
+        }
+      );
+
+      if (!reviewResponse.ok) {
+        throw new Error(`Failed to post review: ${reviewResponse.statusText}`);
+      }
       console.log(`Posted ${comments.length} review comments.`);
     } else {
       console.log("No issues found by AI Reviewer.");
