@@ -34,6 +34,7 @@ description: 피그마 설계를 분석하여 프로젝트의 Tailwind v4 기반
 ### 2. 레이아웃 컨벤션
 - 마진(Margin) 대신 **Gap** 사용을 권장합니다 (`VStack`, `HStack`의 `gap` 속성 활용).
 - 패딩(Padding)은 컨테이너 컴포넌트에서 Tailwind 클래스로 처리합니다 (`p-4`, `px-6` 등).
+- **Absolute/Relative 지양**: `absolute` 및 `relative` 포지셔닝은 유지보수와 반응형 대응을 위해 꼭 필요한 경우(예: 오버레이, 배지 등)를 제외하고는 사용을 자제합니다. 대신 Flexbox (`VStack`, `HStack`)와 Grid 레이아웃을 우선적으로 활용하여 요소의 흐름을 구성합니다.
 
 ### 3. 스타일링 (Tailwind v4)
 - 하드코딩된 색상값 대신 Tailwind 테마 변수를 사용합니다.

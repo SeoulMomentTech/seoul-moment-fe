@@ -40,6 +40,9 @@ Avoid using arbitrary values like `w-[342px]` unless the design values absolutel
 ### Utilize Inline Theme
 The project follows the new CSS-first setup of `v4`. You can directly use CSS variables (`var(--token)`) if you need to extend styles dynamically inside components.
 
+### Minimize Absolute/Relative Positioning
+Avoid using `absolute` and `relative` positioning unless absolutely necessary (e.g., for overlays, floating icons, or badges). Rely on Flexbox (`VStack`, `HStack`) and Grid layouts to manage the document flow. This ensures better maintainability and responsiveness across different screen sizes.
+
 ### Component-First Approach
 Prioritize using components from the `@seoul-moment/ui` package over raw Tailwind class combinations.
 - **Button**: `<Button variant="primary">`
