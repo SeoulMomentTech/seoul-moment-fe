@@ -92,6 +92,29 @@ export interface UpdateAdminBrandRequest {
   sectionSortOrderList: UpdateAdminBrandSectionSortOrder[];
 }
 
+export interface AdminBrandSectionContentV2 {
+  title: string;
+  content: string;
+  imageList: string[];
+}
+
+export interface AdminBrandMultilingualTextV2 {
+  languageId: number;
+  name: string;
+  description: string;
+  section: AdminBrandSectionContentV2[];
+}
+
+export interface V2UpdateAdminBrandRequest {
+  categoryId: number;
+  englishName: string;
+  profileImage: string;
+  productBannerImage: string;
+  bannerList: string[];
+  mobileBannerList: string[];
+  multilingualTextList: AdminBrandMultilingualTextV2[];
+}
+
 export interface AdminBrandSectionContent {
   id: number;
   title: string;
@@ -132,6 +155,14 @@ export const updateAdminBrand = (
   brandId: BrandId,
   payload: UpdateAdminBrandRequest,
 ) => fetcher.patch(`/admin/brand/${brandId}`, payload);
+
+/**
+ * @description 브랜드 수정 V2 (전체 데이터 교체 방식)
+ */
+export const updateAdminBrandV2 = (
+  brandId: BrandId,
+  payload: V2UpdateAdminBrandRequest,
+) => fetcher.patch(`/admin/brand/${brandId}/v2`, payload);
 
 export const deleteAdminBrand = (brandId: BrandId) =>
   fetcher.delete(`/admin/brand/${brandId}`);
