@@ -46,7 +46,7 @@ jobs:
             }
 
       - name: Run AI Code Review Script
-        run: node scripts/ai-code-review.js
+        run: node .github/scripts/ai-code-review.js
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
