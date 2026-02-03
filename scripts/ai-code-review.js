@@ -2,12 +2,15 @@ async function run() {
   try {
     const token = process.env.GITHUB_TOKEN;
     const openaiApiKey = process.env.OPENAI_API_KEY;
-    const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
+    const githubRepository = process.env.GITHUB_REPOSITORY;
     const pullNumber = process.env.PR_NUMBER;
 
-    if (!token || !openaiApiKey || !pullNumber) {
-      throw new Error("Missing required environment variables.");
-    }
+    if (!token) throw new Error("Missing GITHUB_TOKEN environment variable.");
+    if (!openaiApiKey) throw new Error("Missing OPENAI_API_KEY environment variable.");
+    if (!githubRepository) throw new Error("Missing GITHUB_REPOSITORY environment variable.");
+    if (!pullNumber) throw new Error("Missing PR_NUMBER environment variable.");
+
+    const [owner, repo] = githubRepository.split("/");
 
     // 1. Get PR Diff
     const diffResponse = await fetch(
