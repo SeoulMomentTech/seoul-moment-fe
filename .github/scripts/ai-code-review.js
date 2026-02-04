@@ -1,3 +1,30 @@
+function annotateDiff(diff) {
+  const lines = diff.split("\n");
+  let currentNewLine = 0;
+  let annotatedDiff = [];
+
+  for (const line of lines) {
+    if (line.startsWith("+++ b/")) {
+      annotatedDiff.push(line);
+    } else if (line.startsWith("@@")) {
+      const match = line.match(/\+(\d+),/);
+      if (match) {
+        currentNewLine = parseInt(match[1], 10) - 1;
+      }
+      annotatedDiff.push(line);
+    } else if (line.startsWith("+")) {
+      currentNewLine++;
+      annotatedDiff.push(`${line} (line:${currentNewLine})`);
+    } else if (line.startsWith(" ")) {
+      currentNewLine++;
+      annotatedDiff.push(line);
+    } else {
+      annotatedDiff.push(line);
+    }
+  }
+  return annotatedDiff.join("\n");
+}
+
 async function run() {
   try {
     const token = process.env.GITHUB_TOKEN;
@@ -28,10 +55,11 @@ async function run() {
     }
 
     const prDiff = await diffResponse.text();
+    const annotatedDiff = annotateDiff(prDiff);
 
     // Limit diff size to avoid token limits (simple truncation)
     const MAX_DIFF_LENGTH = 100000;
-    const truncatedDiff = prDiff.substring(0, MAX_DIFF_LENGTH);
+    const truncatedDiff = annotatedDiff.substring(0, MAX_DIFF_LENGTH);
 
     // 2. Define Prompt
     const systemPrompt = `You are performing an automated Pull Request code review.
@@ -45,22 +73,13 @@ You review code not only for readability, but also for:
 - Maintainability
 - Team collaboration efficiency
 
-Use a constructive, professional, and collaboration-friendly tone.
-
 # Review Procedure
-1. Understand the full context of the Pull Request changes
-2. Identify issues related to:
-    - Bugs
-    - Security
-    - Performance
-    - Stability
-3. Suggest concrete improvements or alternatives
-4. Organize feedback by severity and priority
-
-# Severity Levels
-- High: Runtime errors, security vulnerabilities, user-facing failures
-- Medium: Performance issues, maintainability or scalability concerns
-- Low: Readability, style, or convention issues
+1. Understand the full context of the Pull Request changes.
+2. The provided diff has been annotated with line numbers for your convenience:
+   - Lines starting with "+" are added/modified.
+   - Lines starting with " " are context lines.
+   - Some lines have an extra marker like "(line:N)" at the end. **N is the absolute line number in the new file.**
+3. Identify issues and suggest concrete improvements.
 
 # Output Format
 You must output a JSON object with the following structure:
@@ -77,46 +96,20 @@ You must output a JSON object with the following structure:
     ]
 }
 
-- "path" must be the relative file path from the repository root (e.g., "src/index.ts"). **DO NOT** include "a/" or "b/" prefixes.
-- "line" must be the absolute line number in the **NEW version** of the file (the right side of the diff). 
-- To calculate the correct line number, use the hunk header \`@@ -old_start,old_count +new_start,new_count @@\`. The \`new_start\` is the line number of the first line in that hunk for the NEW file.
-- **IMPORTANT**: The line number MUST refer to a line that is actually present in the diff hunks (either a changed line `+` or a context line).
+- "path": Relative file path from the repository root (e.g., "src/index.ts"). DO NOT include "a/" or "b/".
+- "line": The absolute line number (N) from the "(line:N)" marker in the diff.
+- **CRITICAL**: You MUST only provide reviews for lines that have been **added or modified** (lines starting with "+"). 
+
+# Severity Levels
+- High: Runtime errors, security vulnerabilities, user-facing failures
+- Medium: Performance issues, maintainability or scalability concerns
+- Low: Readability, style, or convention issues
 
 # Review Rules
-- Always reference exact file paths and line numbers that exist within the provided diff.
-- Clearly distinguish required fixes from optional improvements
-- Do not only point out problems — propose actionable solutions
-
-# Additional Checks
-## Testing & Stability
-- Exception handling
-- Edge cases
-- Async error handling
-- Missing or insufficient tests
-
-## Security
-- Input validation
-- Authentication / Authorization
-- XSS / CSRF risks
-- Exposure of sensitive information
-
-## Performance
-- Unnecessary loops or computations
-- Caching or memoization opportunities
-- Frontend rendering inefficiencies
-
-## Style & Consistency
-- Naming
-- Structure
-- Conventions
-- Type safety
-
-## Frontend-specific Guidelines
-- Rendering and state management
-- TypeScript type safety
-- API error handling
-- Accessibility (A11y)
-- Design system / token usage
+- Always use the exact line number (N) from the "(line:N)" marker.
+- If a suggestion applies to multiple lines, provide the last line number of the range.
+- Clearly distinguish required fixes from optional improvements.
+- Do not only point out problems — propose actionable solutions.
 `;
 
     // 3. Call OpenAI
@@ -132,7 +125,7 @@ You must output a JSON object with the following structure:
           { role: "system", content: systemPrompt },
           {
             role: "user",
-            content: `Review the following git diff:\n\n${truncatedDiff}`,
+            content: `Review the following annotated git diff:\n\n${truncatedDiff}`,
           },
         ],
         response_format: { type: "json_object" },
@@ -160,7 +153,6 @@ You must output a JSON object with the following structure:
 
     // 4. Post Review Comments
     const comments = reviewData.reviews.map((item) => {
-      // Normalize path (remove 'b/' prefix if AI included it)
       const normalizedPath = item.path.replace(/^b\//, "");
       
       return {
@@ -173,8 +165,11 @@ You must output a JSON object with the following structure:
 
     if (comments.length > 0) {
       console.log(`Attempting to post ${comments.length} comments to PR #${pullNumber}...`);
-      // Log first few comments for debugging
-      console.log("Sample comment:", JSON.stringify(comments[0], null, 2));
+      
+      const payload = {
+        event: "COMMENT",
+        comments: comments,
+      };
 
       const reviewResponse = await fetch(
         `https://api.github.com/repos/${owner}/${repo}/pulls/${pullNumber}/reviews`,
@@ -184,19 +179,41 @@ You must output a JSON object with the following structure:
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            event: "COMMENT",
-            comments: comments,
-          }),
+          body: JSON.stringify(payload),
         }
       );
 
       if (!reviewResponse.ok) {
         const reviewError = await reviewResponse.text();
         console.error("GitHub API Error Details:", reviewError);
-        throw new Error(`Failed to post review: ${reviewResponse.status} ${reviewResponse.statusText}`);
+        console.warn("Bulk post failed. Attempting to post comments one by one...");
+        
+        for (const comment of comments) {
+            try {
+                const singleResponse = await fetch(
+                    `https://api.github.com/repos/${owner}/${repo}/pulls/${pullNumber}/comments`,
+                    {
+                        method: "POST",
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(comment),
+                    }
+                );
+                if (!singleResponse.ok) {
+                    const singleError = await singleResponse.text();
+                    console.error(`Failed to post comment at ${comment.path}:${comment.line}:`, singleError);
+                } else {
+                    console.log(`Posted comment at ${comment.path}:${comment.line}`);
+                }
+            } catch (singleErr) {
+                console.error("Error posting single comment:", singleErr);
+            }
+        }
+      } else {
+        console.log(`Successfully posted ${comments.length} review comments.`);
       }
-      console.log(`Successfully posted ${comments.length} review comments.`);
     } else {
       console.log("No issues found by AI Reviewer.");
     }
