@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { memo, useCallback, useRef } from "react";
 
 import { SearchIcon } from "lucide-react";
 
@@ -13,16 +13,20 @@ import type { GetProductListReq } from "@shared/services/product";
 import { Link } from "@/i18n/navigation";
 
 import { ProductCard } from "@entities/product";
-import { Skeleton } from "@seoul-moment/ui";
 import { Empty } from "@widgets/empty";
 
 import { useInfiniteProducts } from "../../../model/useInfiniteProducts";
+import { ProductCardSkeleton } from "../../ProductCardSkeleton";
 
 interface ProductCardListProps {
   filter: Omit<GetProductListReq, "languageCode" | "count" | "page">;
 }
 
-export default function ProductCardList({ filter }: ProductCardListProps) {
+const DESKTOP_PAGE_SIZE = 15;
+
+const ProductCardList = memo(function ProductCardList({
+  filter,
+}: ProductCardListProps) {
   const t = useTranslations();
   const languageCode = useLanguage();
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
@@ -50,24 +54,21 @@ export default function ProductCardList({ filter }: ProductCardListProps) {
 
   return (
     <div
+      aria-busy={isLoading}
       className={cn(
         "flex w-[1063px] flex-wrap gap-x-[20px] gap-y-[40px]",
         "min-h-[687px]",
       )}
+      role="status"
     >
       {isLoading ? (
-        Array.from({ length: 15 }).map((_, i) => (
-          <div
-            className="flex h-fit w-[196px] flex-col gap-3"
+        Array.from({ length: DESKTOP_PAGE_SIZE }).map((_, i) => (
+          <ProductCardSkeleton
+            className="h-fit w-[196px]"
+            imageClassName="h-[196px]"
             // eslint-disable-next-line react/no-array-index-key
             key={i}
-          >
-            <Skeleton className="h-[196px] w-[196px]" />
-            <div className="flex flex-col gap-1">
-              <Skeleton className="h-4 w-3/4" />
-              <Skeleton className="h-4 w-1/2" />
-            </div>
-          </div>
+          />
         ))
       ) : isEmpty ? (
         <Empty
@@ -90,9 +91,20 @@ export default function ProductCardList({ filter }: ProductCardListProps) {
               />
             </Link>
           ))}
+          {isFetchingNextPage &&
+            Array.from({ length: 5 }).map((_, i) => (
+              <ProductCardSkeleton
+                className="h-fit w-[196px]"
+                imageClassName="h-[196px]"
+                // eslint-disable-next-line react/no-array-index-key
+                key={`fetching-next-${i}`}
+              />
+            ))}
           <div className="h-px w-full" ref={loadMoreRef} />
         </>
       )}
     </div>
   );
-}
+});
+
+export default ProductCardList;

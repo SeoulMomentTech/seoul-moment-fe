@@ -13,14 +13,16 @@ import type { GetProductListReq } from "@shared/services/product";
 import { Link } from "@/i18n/navigation";
 
 import { ProductCard } from "@entities/product";
-import { Skeleton } from "@seoul-moment/ui";
 import { Empty } from "@widgets/empty";
 
 import { useInfiniteProducts } from "../../../model/useInfiniteProducts";
+import { ProductCardSkeleton } from "../../ProductCardSkeleton";
 
 interface ProductListSectionProps {
   filter: Omit<GetProductListReq, "languageCode" | "count" | "page">;
 }
+
+const MOBILE_PAGE_SIZE = 8;
 
 export default function ProductListSection({
   filter,
@@ -53,23 +55,21 @@ export default function ProductListSection({
   if (isLoading) {
     return (
       <div
+        aria-busy="true"
         className={cn(
           "gap-x-[20px] gap-y-[30px]",
           "min-h-[400px] w-full",
           "grid grid-cols-2",
         )}
+        role="status"
       >
-        {Array.from({ length: 8 }).map((_, i) => (
-          <div
-            className="flex flex-1 flex-col gap-3"
-            key={`mobile-product-skeleton-${i + 1}`}
-          >
-            <Skeleton className="h-[150px] w-full" />
-            <div className="flex flex-col gap-1">
-              <Skeleton className="h-4 w-3/4" />
-              <Skeleton className="h-4 w-1/2" />
-            </div>
-          </div>
+        {Array.from({ length: MOBILE_PAGE_SIZE }).map((_, i) => (
+          <ProductCardSkeleton
+            className="flex-1"
+            imageClassName="h-[150px]"
+            // eslint-disable-next-line react/no-array-index-key
+            key={i}
+          />
         ))}
       </div>
     );
@@ -111,6 +111,15 @@ export default function ProductListSection({
             />
           </Link>
         ))}
+        {isFetchingNextPage &&
+          Array.from({ length: 4 }).map((_, i) => (
+            <ProductCardSkeleton
+              className="flex-1"
+              imageClassName="h-[150px]"
+              // eslint-disable-next-line react/no-array-index-key
+              key={`mobile-fetching-next-${i}`}
+            />
+          ))}
       </div>
       <div className="h-px w-full" ref={loadMoreRef} />
     </>

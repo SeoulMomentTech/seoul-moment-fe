@@ -12,7 +12,12 @@ export function ProductCategoryFilterSkeleton({
   className,
 }: ProductCategoryFilterSkeletonProps) {
   return (
-    <div className={cn("flex items-center gap-[10px] max-sm:w-max", className)}>
+    <div
+      aria-busy="true"
+      aria-label="Loading categories"
+      className={cn("flex items-center gap-[10px] max-sm:w-max", className)}
+      role="status"
+    >
       {Array.from({ length: 6 }).map((_, i) => (
         <div
           className="flex flex-col items-center gap-[8px] px-[8px] py-2"
