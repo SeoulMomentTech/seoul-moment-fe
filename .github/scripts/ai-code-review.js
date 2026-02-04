@@ -77,11 +77,13 @@ You must output a JSON object with the following structure:
     ]
 }
 
-- "line" must be the line number in the NEW file.
-- If no issues are found, return { "reviews": [] }.
+- "path" must be the relative file path from the repository root (e.g., "src/index.ts"). **DO NOT** include "a/" or "b/" prefixes.
+- "line" must be the absolute line number in the **NEW version** of the file (the right side of the diff). 
+- To calculate the correct line number, use the hunk header \`@@ -old_start,old_count +new_start,new_count @@\`. The \`new_start\` is the line number of the first line in that hunk for the NEW file.
+- **IMPORTANT**: The line number MUST refer to a line that is actually present in the diff hunks (either a changed line `+` or a context line).
 
 # Review Rules
-- Always reference exact file paths and line numbers from the PR
+- Always reference exact file paths and line numbers that exist within the provided diff.
 - Clearly distinguish required fixes from optional improvements
 - Do not only point out problems — propose actionable solutions
 
@@ -157,14 +159,23 @@ You must output a JSON object with the following structure:
     }
 
     // 4. Post Review Comments
-    const comments = reviewData.reviews.map((item) => ({
-      path: item.path,
-      line: Number(item.line),
-      side: "RIGHT",
-      body: `**[${item.severity}] ${item.type}**\n\n${item.description}\n\n**Suggestion:**\n\`\`\`typescript\n${item.suggestion}\n\`\`\``,
-    }));
+    const comments = reviewData.reviews.map((item) => {
+      // Normalize path (remove 'b/' prefix if AI included it)
+      const normalizedPath = item.path.replace(/^b\//, "");
+      
+      return {
+        path: normalizedPath,
+        line: Number(item.line),
+        side: "RIGHT",
+        body: `**[${item.severity}] ${item.type}**\n\n${item.description}\n\n**Suggestion:**\n\`\`\`typescript\n${item.suggestion}\n\`\`\``,
+      };
+    });
 
     if (comments.length > 0) {
+      console.log(`Attempting to post ${comments.length} comments to PR #${pullNumber}...`);
+      // Log first few comments for debugging
+      console.log("Sample comment:", JSON.stringify(comments[0], null, 2));
+
       const reviewResponse = await fetch(
         `https://api.github.com/repos/${owner}/${repo}/pulls/${pullNumber}/reviews`,
         {
@@ -181,9 +192,11 @@ You must output a JSON object with the following structure:
       );
 
       if (!reviewResponse.ok) {
-        throw new Error(`Failed to post review: ${reviewResponse.statusText}`);
+        const reviewError = await reviewResponse.text();
+        console.error("GitHub API Error Details:", reviewError);
+        throw new Error(`Failed to post review: ${reviewResponse.status} ${reviewResponse.statusText}`);
       }
-      console.log(`Posted ${comments.length} review comments.`);
+      console.log(`Successfully posted ${comments.length} review comments.`);
     } else {
       console.log("No issues found by AI Reviewer.");
     }
