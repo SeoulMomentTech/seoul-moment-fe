@@ -1,11 +1,10 @@
 "use client";
 
-import { Suspense, useCallback, useRef } from "react";
+import { Suspense } from "react";
 
 import { useTranslations } from "next-intl";
 
-import { useLanguage } from "@shared/lib/hooks";
-import { useOpen, useIntersectionObserver } from "@shared/lib/hooks";
+import { useOpen } from "@shared/lib/hooks";
 import { cn } from "@shared/lib/style";
 import type { GetProductListReq } from "@shared/services/product";
 import { FilterIcon } from "@shared/ui/icon";
@@ -13,7 +12,6 @@ import { FilterIcon } from "@shared/ui/icon";
 import { Button } from "@seoul-moment/ui";
 
 import ProductListSection from "./ProductListSection";
-import { useInfiniteProducts } from "../../../model/useInfiniteProducts";
 import useProductFilter from "../../../model/useProductFilter";
 import FilterBar from "../../FilterBar";
 import ProductFilterSheet from "../../ProductFilterSheet";
@@ -28,30 +26,8 @@ interface MobileProps {
 
 export default function Mobile({ filter }: MobileProps) {
   const { isOpen, update } = useOpen();
-  const languageCode = useLanguage();
   const { count } = useProductFilter();
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteProducts({
-      ...filter,
-      languageCode,
-    });
   const t = useTranslations();
-
-  const handleIntersect = useCallback(() => {
-    if (!isFetchingNextPage) {
-      fetchNextPage();
-    }
-  }, [fetchNextPage, isFetchingNextPage]);
-
-  useIntersectionObserver({
-    target: loadMoreRef,
-    enabled: hasNextPage,
-    rootMargin: "200px",
-    onIntersect: handleIntersect,
-  });
-
-  const isEmpty = data?.length === 0;
 
   return (
     <div>
@@ -76,11 +52,7 @@ export default function Mobile({ filter }: MobileProps) {
             </Suspense>
           </div>
 
-          <ProductListSection
-            data={data}
-            isEmpty={isEmpty}
-            loadMoreRef={loadMoreRef}
-          />
+          <ProductListSection filter={filter} />
         </section>
       </div>
     </div>

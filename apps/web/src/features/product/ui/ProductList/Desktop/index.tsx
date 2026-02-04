@@ -1,9 +1,8 @@
 "use client";
 
-import { lazy, useCallback, useRef } from "react";
+import { lazy } from "react";
 
-import { useLanguage } from "@shared/lib/hooks";
-import { useOpen, useIntersectionObserver } from "@shared/lib/hooks";
+import { useOpen } from "@shared/lib/hooks";
 import { cn } from "@shared/lib/style";
 import type { GetProductListReq } from "@shared/services/product";
 
@@ -12,7 +11,6 @@ import { Tabs, TabsList, TabsTrigger } from "@seoul-moment/ui";
 import BrandFilterSidebar from "./BrandFilterSidebar";
 import ProductGridSection from "./ProductGridSection";
 import useCategories from "../../../model/useCategories";
-import { useInfiniteProducts } from "../../../model/useInfiniteProducts";
 import type { FilterKey } from "../../../model/useProductFilter";
 
 const ProductFilterModal = lazy(() => import("../../ProductFilterModal"));
@@ -30,32 +28,8 @@ export default function DeskTop({
   handleUpdateFilter,
   handleResetFilter,
 }: DesktopProps) {
-  const languageCode = useLanguage();
-
   const { isOpen, update } = useOpen();
   const { data: categories } = useCategories();
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
-
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useInfiniteProducts({
-      ...filter,
-      languageCode,
-    });
-
-  const handleIntersect = useCallback(() => {
-    if (!isFetchingNextPage) {
-      fetchNextPage();
-    }
-  }, [fetchNextPage, isFetchingNextPage]);
-
-  useIntersectionObserver({
-    target: loadMoreRef,
-    enabled: hasNextPage,
-    rootMargin: "200px",
-    onIntersect: handleIntersect,
-  });
-
-  const isEmpty = data?.length === 0;
 
   return (
     <>
@@ -98,10 +72,8 @@ export default function DeskTop({
             handleUpdateFilter={handleUpdateFilter}
           />
           <ProductGridSection
-            data={data}
+            filter={filter}
             handleResetFilter={handleResetFilter}
-            isEmpty={isEmpty}
-            loadMoreRef={loadMoreRef}
             onOpenFilterModal={() => update(true)}
           />
         </div>

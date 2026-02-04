@@ -18,13 +18,11 @@ import { Empty } from "@widgets/empty";
 
 import { useInfiniteProducts } from "../../../model/useInfiniteProducts";
 
-interface ProductListSectionProps {
+interface ProductCardListProps {
   filter: Omit<GetProductListReq, "languageCode" | "count" | "page">;
 }
 
-export default function ProductListSection({
-  filter,
-}: ProductListSectionProps) {
+export default function ProductCardList({ filter }: ProductCardListProps) {
   const t = useTranslations();
   const languageCode = useLanguage();
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
@@ -50,69 +48,51 @@ export default function ProductListSection({
 
   const isEmpty = data?.length === 0;
 
-  if (isLoading) {
-    return (
-      <div
-        className={cn(
-          "gap-x-[20px] gap-y-[30px]",
-          "min-h-[400px] w-full",
-          "grid grid-cols-2",
-        )}
-      >
-        {Array.from({ length: 8 }).map((_, i) => (
+  return (
+    <div
+      className={cn(
+        "flex w-[1063px] flex-wrap gap-x-[20px] gap-y-[40px]",
+        "min-h-[687px]",
+      )}
+    >
+      {isLoading ? (
+        Array.from({ length: 15 }).map((_, i) => (
           <div
-            className="flex flex-1 flex-col gap-3"
-            key={`mobile-product-skeleton-${i + 1}`}
+            className="flex h-fit w-[196px] flex-col gap-3"
+            // eslint-disable-next-line react/no-array-index-key
+            key={i}
           >
-            <Skeleton className="h-[150px] w-full" />
+            <Skeleton className="h-[196px] w-[196px]" />
             <div className="flex flex-col gap-1">
               <Skeleton className="h-4 w-3/4" />
               <Skeleton className="h-4 w-1/2" />
             </div>
           </div>
-        ))}
-      </div>
-    );
-  }
-
-  if (isEmpty) {
-    return (
-      <div>
+        ))
+      ) : isEmpty ? (
         <Empty
-          className="h-[400px] w-full"
+          className="h-[687px] w-full"
           description={t("no_search_result")}
           icon={<SearchIcon className="text-black/30" height={24} width={24} />}
         />
-      </div>
-    );
-  }
-
-  return (
-    <>
-      <div
-        className={cn(
-          "gap-x-[20px] gap-y-[30px]",
-          "min-h-[400px] w-full",
-          "grid grid-cols-2",
-        )}
-      >
-        {data?.map((product) => (
-          <Link
-            className="flex-1"
-            href={`/product/${product.id}`}
-            key={`mobile-product-${product.id}`}
-          >
-            <ProductCard
-              className="h-full flex-1"
-              contentClassName="h-full justify-between"
-              contentWrapperClassName="h-full justify-between"
-              data={product}
-              imageClassName="max-sm:w-full max-sm:max-h-[150px] max-sm:min-h-[150px]"
-            />
-          </Link>
-        ))}
-      </div>
-      <div className="h-px w-full" ref={loadMoreRef} />
-    </>
+      ) : (
+        <>
+          {data?.map((product) => (
+            <Link
+              className="h-fit w-[196px]"
+              href={`/product/${product.id}`}
+              key={product.id}
+            >
+              <ProductCard
+                className="max-sm:flex-1"
+                data={product}
+                imageClassName="w-[196px] h-[196px]"
+              />
+            </Link>
+          ))}
+          <div className="h-px w-full" ref={loadMoreRef} />
+        </>
+      )}
+    </div>
   );
 }
