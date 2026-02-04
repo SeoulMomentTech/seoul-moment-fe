@@ -52,74 +52,59 @@ export default function ProductListSection({
 
   const isEmpty = data?.length === 0;
 
-  if (isLoading) {
-    return (
-      <div
-        aria-busy="true"
-        className={cn(
-          "gap-x-[20px] gap-y-[30px]",
-          "min-h-[400px] w-full",
-          "grid grid-cols-2",
-        )}
-        role="status"
-      >
-        {Array.from({ length: MOBILE_PAGE_SIZE }).map((_, i) => (
+  return (
+    <div
+      aria-busy={isLoading}
+      className={cn(
+        "min-h-[400px] w-full",
+        !isEmpty || isLoading
+          ? "grid grid-cols-2 gap-x-[20px] gap-y-[30px]"
+          : "block",
+      )}
+      role="status"
+    >
+      {isLoading ? (
+        Array.from({ length: MOBILE_PAGE_SIZE }).map((_, i) => (
           <ProductCardSkeleton
             className="flex-1"
             imageClassName="h-[150px]"
             key={`mobile-product-skeleton-${i + 1}`}
           />
-        ))}
-      </div>
-    );
-  }
-
-  if (isEmpty) {
-    return (
-      <div>
+        ))
+      ) : isEmpty ? (
         <Empty
           className="h-[400px] w-full"
           description={t("no_search_result")}
           icon={<SearchIcon className="text-black/30" height={24} width={24} />}
         />
-      </div>
-    );
-  }
-
-  return (
-    <>
-      <div
-        className={cn(
-          "gap-x-[20px] gap-y-[30px]",
-          "min-h-[400px] w-full",
-          "grid grid-cols-2",
-        )}
-      >
-        {data?.map((product) => (
-          <Link
-            className="flex-1"
-            href={`/product/${product.id}`}
-            key={`mobile-product-${product.id}`}
-          >
-            <ProductCard
-              className="h-full flex-1"
-              contentClassName="h-full justify-between"
-              contentWrapperClassName="h-full justify-between"
-              data={product}
-              imageClassName="max-sm:w-full max-sm:max-h-[150px] max-sm:min-h-[150px]"
-            />
-          </Link>
-        ))}
-        {isFetchingNextPage &&
-          Array.from({ length: 4 }).map((_, i) => (
-            <ProductCardSkeleton
+      ) : (
+        <>
+          {data?.map((product) => (
+            <Link
               className="flex-1"
-              imageClassName="h-[150px]"
-              key={`mobile-fetching-next-${i + 1}`}
-            />
+              href={`/product/${product.id}`}
+              key={`mobile-product-${product.id}`}
+            >
+              <ProductCard
+                className="h-full flex-1"
+                contentClassName="h-full justify-between"
+                contentWrapperClassName="h-full justify-between"
+                data={product}
+                imageClassName="max-sm:w-full max-sm:max-h-[150px] max-sm:min-h-[150px]"
+              />
+            </Link>
           ))}
-      </div>
-      <div className="h-px w-full" ref={loadMoreRef} />
-    </>
+          {isFetchingNextPage &&
+            Array.from({ length: 4 }).map((_, i) => (
+              <ProductCardSkeleton
+                className="flex-1"
+                imageClassName="h-[150px]"
+                key={`mobile-fetching-next-${i + 1}`}
+              />
+            ))}
+          <div className="h-px w-full" ref={loadMoreRef} />
+        </>
+      )}
+    </div>
   );
 }
