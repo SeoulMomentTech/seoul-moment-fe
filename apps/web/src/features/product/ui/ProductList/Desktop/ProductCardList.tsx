@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { memo, useCallback, useRef } from "react";
 
 import { SearchIcon } from "lucide-react";
 
@@ -18,15 +18,15 @@ import { Empty } from "@widgets/empty";
 import { useInfiniteProducts } from "../../../model/useInfiniteProducts";
 import { ProductCardSkeleton } from "../../ProductCardSkeleton";
 
-interface ProductListSectionProps {
+interface ProductCardListProps {
   filter: Omit<GetProductListReq, "languageCode" | "count" | "page">;
 }
 
-const MOBILE_PAGE_SIZE = 8;
+const DESKTOP_PAGE_SIZE = 15;
 
-export default function ProductListSection({
+const ProductCardList = memo(function ProductCardList({
   filter,
-}: ProductListSectionProps) {
+}: ProductCardListProps) {
   const t = useTranslations();
   const languageCode = useLanguage();
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
@@ -56,24 +56,22 @@ export default function ProductListSection({
     <div
       aria-busy={isLoading}
       className={cn(
-        "min-h-[400px] w-full",
-        !isEmpty || isLoading
-          ? "grid grid-cols-2 gap-x-[20px] gap-y-[30px]"
-          : "block",
+        "flex w-[1063px] flex-wrap gap-x-[20px] gap-y-[40px]",
+        "min-h-[687px]",
       )}
       role="status"
     >
       {isLoading ? (
-        Array.from({ length: MOBILE_PAGE_SIZE }).map((_, i) => (
+        Array.from({ length: DESKTOP_PAGE_SIZE }).map((_, i) => (
           <ProductCardSkeleton
-            className="flex-1"
-            imageClassName="h-[150px]"
-            key={`mobile-product-skeleton-${i + 1}`}
+            className="h-fit w-[196px]"
+            imageClassName="h-[196px]"
+            key={`desktop-product-skeleton-${i + 1}`}
           />
         ))
       ) : isEmpty ? (
         <Empty
-          className="h-[400px] w-full"
+          className="h-[687px] w-full"
           description={t("no_search_result")}
           icon={<SearchIcon className="text-black/30" height={24} width={24} />}
         />
@@ -81,25 +79,23 @@ export default function ProductListSection({
         <>
           {data?.map((product) => (
             <Link
-              className="flex-1"
+              className="h-fit w-[196px]"
               href={`/product/${product.id}`}
-              key={`mobile-product-${product.id}`}
+              key={product.id}
             >
               <ProductCard
-                className="h-full flex-1"
-                contentClassName="h-full justify-between"
-                contentWrapperClassName="h-full justify-between"
+                className="max-sm:flex-1"
                 data={product}
-                imageClassName="max-sm:w-full max-sm:max-h-[150px] max-sm:min-h-[150px]"
+                imageClassName="w-[196px] h-[196px]"
               />
             </Link>
           ))}
           {isFetchingNextPage &&
-            Array.from({ length: 4 }).map((_, i) => (
+            Array.from({ length: 5 }).map((_, i) => (
               <ProductCardSkeleton
-                className="flex-1"
-                imageClassName="h-[150px]"
-                key={`mobile-fetching-next-${i + 1}`}
+                className="h-fit w-[196px]"
+                imageClassName="h-[196px]"
+                key={`desktop-fetching-next-${i + 1}`}
               />
             ))}
           <div className="h-px w-full" ref={loadMoreRef} />
@@ -107,4 +103,6 @@ export default function ProductListSection({
       )}
     </div>
   );
-}
+});
+
+export default ProductCardList;
