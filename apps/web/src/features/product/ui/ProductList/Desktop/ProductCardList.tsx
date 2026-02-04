@@ -66,8 +66,7 @@ const ProductCardList = memo(function ProductCardList({
           <ProductCardSkeleton
             className="h-fit w-[196px]"
             imageClassName="h-[196px]"
-            // eslint-disable-next-line react/no-array-index-key
-            key={i}
+            key={`desktop-product-skeleton-${i + 1}`}
           />
         ))
       ) : isEmpty ? (
@@ -96,8 +95,7 @@ const ProductCardList = memo(function ProductCardList({
               <ProductCardSkeleton
                 className="h-fit w-[196px]"
                 imageClassName="h-[196px]"
-                // eslint-disable-next-line react/no-array-index-key
-                key={`fetching-next-${i}`}
+                key={`desktop-fetching-next-${i + 1}`}
               />
             ))}
           <div className="h-px w-full" ref={loadMoreRef} />

@@ -21,8 +21,7 @@ export function ProductCategoryFilterSkeleton({
       {Array.from({ length: 6 }).map((_, i) => (
         <div
           className="flex flex-col items-center gap-[8px] px-[8px] py-2"
-          // eslint-disable-next-line react/no-array-index-key
-          key={i}
+          key={`product-category-filter-skeleton-${i + 1}`}
         >
           <Skeleton className="h-[50px] w-[50px] rounded-full" />
           <Skeleton className="h-4 w-12" />

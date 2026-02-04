@@ -67,8 +67,7 @@ export default function ProductListSection({
           <ProductCardSkeleton
             className="flex-1"
             imageClassName="h-[150px]"
-            // eslint-disable-next-line react/no-array-index-key
-            key={i}
+            key={`mobile-product-skeleton-${i + 1}`}
           />
         ))}
       </div>
@@ -116,8 +115,7 @@ export default function ProductListSection({
             <ProductCardSkeleton
               className="flex-1"
               imageClassName="h-[150px]"
-              // eslint-disable-next-line react/no-array-index-key
-              key={`mobile-fetching-next-${i}`}
+              key={`mobile-fetching-next-${i + 1}`}
             />
           ))}
       </div>
