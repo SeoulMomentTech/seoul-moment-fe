@@ -1,43 +1,57 @@
-# Seoul Moment Frontend Monorepo
+# Seoul Moment Frontend
 
-This repository now follows a pnpm-based monorepo layout. The existing Next.js application lives in `apps/web`, and additional apps or shared packages can be added under `apps/*` and `packages/*`.
+Seoul Moment 서비스의 프론트엔드 모노레포입니다.
 
-## Structure
+## 🏗 Repository Structure
 
-- `apps/web` – main service application
-- `apps/admin` - admin application
-- `packages/*` – (optional) shared libraries and utilities
-- Root configs – workspace-wide tooling such as Husky hooks and lint-staged rules
+본 프로젝트는 `pnpm` workspace와 `Turborepo`를 활용한 모노레포 구조로 관리됩니다.
 
-## Scripts
+### Apps
 
-Run commands from the repository root (all executed through Turborepo):
+- **[web](./apps/web)**: Next.js 15 기반의 웹 서비스
+- **[admin](./apps/admin)**: Vite + React 기반의 운영 관리용 백오피스 서비스
+
+### Packages
+
+- **[ui](./packages/ui)**: 전용 디자인 시스템 및 공통 UI 컴포넌트 라이브러리
+- **[tailwind-config](./packages/tailwind-config)**: 공유 Tailwind CSS v4 설정 및 스타일 자산
+- **[eslint-config](./packages/eslint-config)**: 워크스페이스 공통 Lint 규칙
+- **[prettier-config](./packages/prettier-config)**: 워크스페이스 공통 포맷팅 규칙
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) (v20 이상 권장)
+- [pnpm](https://pnpm.io/) (v9 이상 권장)
+
+### Installation
 
 ```bash
-pnpm dev         # start the web app in watch mode
-pnpm dev:admin   # start the Vite admin app
-pnpm build       # run builds for every package
-pnpm start       # launch the production Next.js server
-pnpm lint        # lint every package
-pnpm lint:fix    # lint web with --fix
-pnpm i18n:sync   # sync locale data for the web app
+pnpm install
 ```
 
-You can still `cd` into each app (`apps/web`, `apps/admin`) and run their scripts directly when you need more fine-grained control.
+### Development
 
-## Tooling
+루트에서 Turborepo를 통해 모든 앱을 동시에 또는 개별적으로 실행할 수 있습니다.
 
-- Husky git hooks live at the repository root (`.husky`)
-- lint-staged formats/lints staged files in `apps/web` and `apps/admin`
-- turborepo pipeline definition: `turbo.json`
-- pnpm workspace definition: `pnpm-workspace.yaml`
-- pnpm uses isolated `node_modules` per package (`.npmrc`)
+```bash
+pnpm dev:web      # 메인 웹 서비스 실행
+pnpm dev:admin    # 어드민 서비스 실행
+```
 
-## Adding More Packages
+## 🛠 Workspace Scripts
 
-1. Create a new folder under `apps/` or `packages/`
-2. Add its own `package.json`
-3. Install dependencies with `pnpm install`
-4. Reference the package using standard pnpm workspace tooling (`pnpm --filter` or package aliases)
+| Command          | Description                               |
+| :--------------- | :---------------------------------------- |
+| `pnpm build`     | 모든 패키지 및 애플리케이션 빌드          |
+| `pnpm lint`      | 전체 프로젝트 린트 검사                   |
+| `pnpm test`      | 전체 프로젝트 단위 테스트 실행            |
+| `pnpm i18n:sync` | 다국어 번역 데이터 동기화 (Google Sheets) |
 
-This setup keeps the Next.js app intact while making space for shared UI kits, server apps, or other tooling in the monorepo.
+## 📐 Standards & Tooling
+
+- **Turborepo**: 빌드 캐싱 및 파이프라인 최적화
+- **Changesets**: (예정) 패키지 버전 관리 및 배포 자동화
+- **Husky & lint-staged**: 커밋 전 코드 품질 검증 (`pre-commit`)
+- **FSD (Feature-Sliced Design)**: `apps/web`에 적용된 아키텍처 방법론
