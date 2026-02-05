@@ -75,5 +75,15 @@
   "listing_inquiry": "입점문의",
   "etc": "기타",
   "subcategory_all": "전체",
-  "no_news_found": "등록된 뉴스가 없습니다."
+  "no_news_found": "등록된 뉴스가 없습니다.",
+  "seo_main_title": "서울모먼트 | 세상 모든 트렌드 정보와 상품이 여기에 ",
+  "seo_main_description": "Seoul Moment는 한국의 트렌드 기반 브랜드와 상품을 큐레이션하고 판매하는 커머스 플랫폼입니다.",
+  "seo_shop_title": "Shop | Seoul Moment",
+  "seo_shop_description": "Seoul Moment에서 판매 중인 전체 상품을 한눈에 확인할 수 있는 상품 목록 페이지입니다.",
+  "seo_about_us_title": "About Us | Seoul Moment",
+  "seo_about_us_description": "Seoul Moment의 서비스 목적과 운영 방식, 브랜드 방향을 소개하는 페이지입니다.",
+  "seo_contact_us_title": "Contact Us | Seoul Moment",
+  "seo_contact_us_description": "Seoul Moment 서비스 이용, 입점, 협업 관련 문의를 접수하는 공식 연락 페이지입니다.",
+  "seo_policy_title": "Policy | Seoul Moment",
+  "seo_policy_description": "Seoul Moment 서비스 이용에 적용되는 약관과 개인정보 처리 기준을 안내하는 페이지입니다."
 }
