@@ -103,6 +103,7 @@ export default function ProductSubcategoriesPage() {
         payload: {
           list: toNamePayload(values),
           categoryId: Number(values.categoryId),
+          imageUrl: values.imageUrl,
         },
       });
       resetEditState();
