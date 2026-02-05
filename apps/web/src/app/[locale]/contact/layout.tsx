@@ -1,10 +1,24 @@
 import type { PropsWithChildren } from "react";
 
 import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 
 import { cn } from "@shared/lib/style";
 
 import { Link } from "@/i18n/navigation";
+
+export async function generateMetadata() {
+  try {
+    const t = await getTranslations();
+
+    return {
+      title: t("seo_contact_us_title"),
+      description: t("seo_contact_us_description"),
+    };
+  } catch {
+    return {};
+  }
+}
 
 export default function ContactLayout({ children }: PropsWithChildren) {
   const t = useTranslations();
