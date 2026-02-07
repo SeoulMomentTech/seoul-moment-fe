@@ -2,6 +2,7 @@ import { cache } from "react";
 
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
 import { getProductDetail } from "@shared/services/product";
 
@@ -19,6 +20,7 @@ export async function generateMetadata({
 }: PageParams<{ id: string }>): Promise<Metadata> {
   const { id, locale } = await params;
   const productId = parseInt(id);
+  const t = await getTranslations();
 
   if (!Number.isInteger(productId)) {
     return {};
@@ -28,10 +30,10 @@ export async function generateMetadata({
     const { data: product } = await fetchProductDetail(productId, locale);
 
     return {
-      title: product.name,
+      title: `${product.name} | ${t("title")}`,
       description: `${product.brand.name} - ${product.name}`,
       openGraph: {
-        title: product.name,
+        title: `${product.name} | ${t("title")}`,
         description: `${product.brand.name} - ${product.name}`,
         images: product.subImage?.[0] ? [{ url: product.subImage[0] }] : [],
       },

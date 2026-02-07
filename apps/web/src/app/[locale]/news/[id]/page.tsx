@@ -19,14 +19,27 @@ export async function generateMetadata({
   params,
 }: PageParams<{ id: string }>): Promise<Metadata> {
   const { id, locale } = await params;
+  const newsId = Number(id);
   const t = await getTranslations();
 
+  if (!Number.isInteger(newsId) || newsId <= 0) {
+    return {};
+  }
+
   try {
-    const { data: news } = await fetchNewsDetail(Number(id), locale);
+    const { data: news } = await fetchNewsDetail(newsId, locale);
+
+    const description = news.content.replace(/<[^>]*>/g, "").slice(0, 160);
 
     return {
       title: `${news.title} | ${t("title")}`,
-      description: news.content.replace(/<[^>]*>/g, "").slice(0, 160),
+      description,
+      openGraph: {
+        title: news.title,
+        description,
+        images: news.banner ? [{ url: news.banner }] : [],
+        type: "article",
+      },
     };
   } catch {
     return {};
@@ -36,11 +49,16 @@ export async function generateMetadata({
 export default async function NewsDetail({
   params,
 }: PageParams<{ id: string }>) {
-  const { id } = await params;
+  const { id, locale } = await params;
+  const newsId = Number(id);
 
-  if (id == null || isNaN(Number(id))) {
+  if (!Number.isInteger(newsId) || newsId <= 0) {
     notFound();
   }
 
-  return <NewsDetailPage id={Number(id)} />;
+  const promise = fetchNewsDetail(newsId, locale as LanguageType).catch(() =>
+    notFound(),
+  );
+
+  return <NewsDetailPage promise={promise} />;
 }

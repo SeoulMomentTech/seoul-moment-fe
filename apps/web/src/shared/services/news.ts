@@ -47,7 +47,7 @@ export interface NewsSection {
   imageList: string[];
 }
 
-interface GetNewsDetailRes {
+export interface GetNewsDetailRes {
   id: number;
   brandId: number;
   writer: string;
