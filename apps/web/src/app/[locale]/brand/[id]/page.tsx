@@ -1,12 +1,19 @@
+import { cache } from "react";
+
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
 import { getBrandDetail } from "@shared/services/brand";
 
+import type { LanguageType } from "@/i18n/const";
 import type { PageParams } from "@/types";
 
 import { BrandDetailPage } from "@views/brand";
+
+const fetchBrandDetail = cache((id: number, languageCode: LanguageType) => {
+  return getBrandDetail({ id, languageCode });
+});
 
 export async function generateMetadata({
   params,
@@ -20,10 +27,7 @@ export async function generateMetadata({
   }
 
   try {
-    const { data: brand } = await getBrandDetail({
-      id: brandId,
-      languageCode: locale,
-    });
+    const { data: brand } = await fetchBrandDetail(brandId, locale);
 
     return {
       title: `${brand.name} | ${t("title")}`,
@@ -44,10 +48,7 @@ export default async function BrandDetail({
     notFound();
   }
 
-  const promise = getBrandDetail({
-    id: brandId,
-    languageCode: locale,
-  }).catch(() => notFound());
+  const promise = fetchBrandDetail(brandId, locale).catch(() => notFound());
 
   return <BrandDetailPage promise={promise} />;
 }
