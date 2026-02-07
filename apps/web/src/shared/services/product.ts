@@ -117,7 +117,7 @@ type OptionType = "COLOR" | "SIZE" | "MATERIAL" | "FIT" | "STYLE";
 
 type DetailOption = Record<OptionType, OptionValue[]>;
 
-interface GetProductDetailRes {
+export interface GetProductDetailRes {
   id: number;
   name: string;
   brand: Record<"name" | "profileImg" | "id", string>;

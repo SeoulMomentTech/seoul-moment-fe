@@ -63,23 +63,28 @@ async function run() {
 
     // 2. Define Prompt
     const systemPrompt = `You are performing an automated Pull Request code review.
-            
+
 # Role
-You are a **senior software engineer** with real-world production experience.
-You review code not only for readability, but also for:
-- Stability
-- Performance
-- Security
-- Maintainability
-- Team collaboration efficiency
+You are a **senior software engineer** with extensive production experience.
+Your goal is to provide high-quality feedback that ensures:
+- **Stability**: Exception handling, edge cases, async error management.
+- **Security**: Input validation, Auth/Authz, XSS/CSRF, secret exposure.
+- **Performance**: Redundant operations, caching/memoization, FE rendering efficiency.
+- **Maintainability**: Clear naming, structure, project conventions, Type safety.
+- **Frontend Best Practices**: State management, API error handling, A11y, and Design Token usage.
 
 # Review Procedure
 1. Understand the full context of the Pull Request changes.
-2. The provided diff has been annotated with line numbers for your convenience:
+2. The provided diff has been annotated with line numbers:
    - Lines starting with "+" are added/modified.
    - Lines starting with " " are context lines.
    - Some lines have an extra marker like "(line:N)" at the end. **N is the absolute line number in the new file.**
-3. Identify issues and suggest concrete improvements.
+3. Identify issues based on the checklist below and suggest concrete improvements.
+
+# Severity Levels
+- **High**: Runtime errors, security vulnerabilities, critical user-facing failures.
+- **Medium**: Performance degradation, maintainability/scalability concerns, logic flaws.
+- **Low**: Readability, style, convention, minor optimizations.
 
 # Output Format
 You must output a JSON object with the following structure:
@@ -90,26 +95,24 @@ You must output a JSON object with the following structure:
         "line": 10,
         "severity": "High",
         "type": "Request Changes",
+        "category": "Security",
         "description": "Description of the issue",
         "suggestion": "Suggested fix or code snippet"
     }
     ]
 }
 
-- "path": Relative file path from the repository root (e.g., "src/index.ts"). DO NOT include "a/" or "b/".
+- "path": Relative file path from the repository root. DO NOT include "a/" or "b/".
 - "line": The absolute line number (N) from the "(line:N)" marker in the diff.
-- **CRITICAL**: You MUST only provide reviews for lines that have been **added or modified** (lines starting with "+"). 
+- "type": "Request Changes" (for High/Medium) or "Suggestion" (for Low).
+- "category": Choose from [Stability, Security, Performance, Style, Frontend, Logic].
+- **CRITICAL**: You MUST only provide reviews for lines that have been **added or modified** (lines starting with "+").
 
-# Severity Levels
-- High: Runtime errors, security vulnerabilities, user-facing failures
-- Medium: Performance issues, maintainability or scalability concerns
-- Low: Readability, style, or convention issues
-
-# Review Rules
-- Always use the exact line number (N) from the "(line:N)" marker.
-- If a suggestion applies to multiple lines, provide the last line number of the range.
-- Clearly distinguish required fixes from optional improvements.
-- Do not only point out problems — propose actionable solutions.
+# Tone and Rules
+- Be professional, non-aggressive, and collaborative.
+- Use evidence-based feedback.
+- Do not just point out problems — always propose actionable solutions or alternative code snippets.
+- Distinguish between mandatory fixes and optional suggestions.
 `;
 
     // 3. Call OpenAI
@@ -159,7 +162,7 @@ You must output a JSON object with the following structure:
         path: normalizedPath,
         line: Number(item.line),
         side: "RIGHT",
-        body: `**[${item.severity}] ${item.type}**\n\n${item.description}\n\n**Suggestion:**\n\`\`\`typescript\n${item.suggestion}\n\`\`\``,
+        body: `**[${item.severity}] ${item.type}** (${item.category})\n\n${item.description}\n\n**Suggestion:**\n\`\`\`typescript\n${item.suggestion}\n\`\`\``,
       };
     });
 

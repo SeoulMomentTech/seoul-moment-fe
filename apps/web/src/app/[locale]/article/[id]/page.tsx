@@ -1,12 +1,19 @@
+import { cache } from "react";
+
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
 import { getArticleDetail } from "@shared/services/article";
 
+import type { LanguageType } from "@/i18n/const";
 import type { PageParams } from "@/types";
 
 import { ArticleDetailPage } from "@views/article";
+
+const fetchArticleDetail = cache((id: number, languageCode: LanguageType) => {
+  return getArticleDetail({ id, languageCode });
+});
 
 export async function generateMetadata({
   params,
@@ -20,10 +27,7 @@ export async function generateMetadata({
   }
 
   try {
-    const { data: article } = await getArticleDetail({
-      id: articleId,
-      languageCode: locale,
-    });
+    const { data: article } = await fetchArticleDetail(articleId, locale);
 
     return {
       title: `${article.title} | ${t("title")}`,
@@ -44,9 +48,7 @@ export default async function ArticleDetail({
     notFound();
   }
 
-  const data = getArticleDetail({ id: articleId, languageCode: locale }).catch(
-    () => notFound(),
-  );
+  const data = fetchArticleDetail(articleId, locale).catch(() => notFound());
 
   return <ArticleDetailPage data={data} />;
 }

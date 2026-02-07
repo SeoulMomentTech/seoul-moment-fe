@@ -1,12 +1,19 @@
+import { cache } from "react";
+
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
 import { getNewsDetail } from "@shared/services/news";
 
+import type { LanguageType } from "@/i18n/const";
 import type { PageParams } from "@/types";
 
 import { NewsDetailPage } from "@views/news";
+
+const fetchNewsDetail = cache((id: number, languageCode: LanguageType) => {
+  return getNewsDetail({ id, languageCode });
+});
 
 export async function generateMetadata({
   params,
@@ -15,10 +22,7 @@ export async function generateMetadata({
   const t = await getTranslations();
 
   try {
-    const { data: news } = await getNewsDetail({
-      id: Number(id),
-      languageCode: locale,
-    });
+    const { data: news } = await fetchNewsDetail(Number(id), locale);
 
     return {
       title: `${news.title} | ${t("title")}`,

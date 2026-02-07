@@ -30,6 +30,7 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
     queryKey: ["product-detail", id, languageCode],
     queryFn: () => getProductDetail({ id, languageCode }),
     select: (res) => res.data,
+    enabled: !!id,
     throwOnError: true,
   });
 
