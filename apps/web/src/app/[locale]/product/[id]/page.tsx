@@ -36,7 +36,8 @@ export async function generateMetadata({
         images: product.subImage?.[0] ? [{ url: product.subImage[0] }] : [],
       },
     };
-  } catch {
+  } catch (error) {
+    console.error("Failed to fetch product details:", error);
     return {};
   }
 }
@@ -44,16 +45,12 @@ export async function generateMetadata({
 export default async function ProductDetail({
   params,
 }: PageParams<{ id: string }>) {
-  const { id, locale } = await params;
-  const productId = parseInt(id);
+  const { id } = await params;
+  const productId = Number(id);
 
-  if (!Number.isInteger(productId)) {
+  if (!Number.isInteger(productId) || !productId) {
     notFound();
   }
 
-  const initialData = await fetchProductDetail(productId, locale).catch(() =>
-    notFound(),
-  );
-
-  return <ProductDetailPage id={productId} initialData={initialData} />;
+  return <ProductDetailPage id={productId} />;
 }
