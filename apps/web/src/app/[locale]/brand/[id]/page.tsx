@@ -35,7 +35,7 @@ export async function generateMetadata({
       title: `${brand.name} | ${t("title")}`,
       description,
       openGraph: {
-        title: brand.name,
+        title: `${brand.name} | ${t("title")}`,
         description,
         images: brand.bannerList?.[0] ? [{ url: brand.bannerList[0] }] : [],
       },
