@@ -9,11 +9,15 @@ import { useTranslations } from "next-intl";
 import { useAppQuery, useLanguage } from "@shared/lib/hooks";
 import { cn } from "@shared/lib/style";
 import { setComma, toNTCurrency } from "@shared/lib/utils";
-import { getProductDetail } from "@shared/services/product";
+import {
+  getProductDetail,
+  type GetProductDetailRes,
+} from "@shared/services/product";
 import { AvatarBadge } from "@widgets/avatar-badge/ui/AvatarBadge";
 import { LikeCount } from "@widgets/like-count/ui/LikeCount";
 
 import { Link } from "@/i18n/navigation";
+import type { CommonRes } from "@/shared/services";
 
 import { BrandProductList } from "@features/product";
 import { Button, VStack } from "@seoul-moment/ui";
@@ -22,14 +26,20 @@ import { ProductGallery } from "@widgets/product-gallery";
 
 interface ProductDetailPageProps {
   id: number;
+  initialData: CommonRes<GetProductDetailRes>;
 }
 
-export default function ProductDetailPage({ id }: ProductDetailPageProps) {
+export default function ProductDetailPage({
+  id,
+  initialData,
+}: ProductDetailPageProps) {
   const languageCode = useLanguage();
   const { data } = useAppQuery({
     queryKey: ["product-detail", id, languageCode],
     queryFn: () => getProductDetail({ id, languageCode }),
+    initialData,
     select: (res) => res.data,
+    enabled: !!id,
     throwOnError: true,
   });
 
