@@ -1,37 +1,32 @@
 "use client";
 
-import { useLanguage } from "@shared/lib/hooks";
-import { getNewsDetail } from "@shared/services/news";
+import { use } from "react";
+
+import type { GetNewsDetailRes } from "@shared/services/news";
 
 import { NewsDetailContent, NewsDetailMain } from "@features/news";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import type { CommonRes } from "@shared/services";
 import { BrandProducts } from "@widgets/brand-products";
 import { RelatedList } from "@widgets/detail";
 
 interface NewsDetailPageProps {
-  id: number;
+  promise: Promise<CommonRes<GetNewsDetailRes>>;
 }
 
-export function NewsDetailPage({ id }: NewsDetailPageProps) {
-  const languageCode = useLanguage();
-  const { data } = useSuspenseQuery({
-    queryKey: ["newsDetail", id, languageCode],
-    queryFn: () => getNewsDetail({ languageCode, id }),
-    select: ({ data }) => {
-      return {
-        main: {
-          title: data.title,
-          category: data.category,
-          summary: data.content,
-          date: data.createDate,
-          author: data.writer,
-          avatarUrl: data.profileImage,
-          imageUrl: data.banner,
-        },
-        ...data,
-      };
+export function NewsDetailPage({ promise }: NewsDetailPageProps) {
+  const newsData = use(promise);
+  const data = {
+    main: {
+      title: newsData.data.title,
+      category: newsData.data.category,
+      summary: newsData.data.content,
+      date: newsData.data.createDate,
+      author: newsData.data.writer,
+      avatarUrl: newsData.data.profileImage,
+      imageUrl: newsData.data.banner,
     },
-  });
+    ...newsData.data,
+  };
 
   return (
     <>

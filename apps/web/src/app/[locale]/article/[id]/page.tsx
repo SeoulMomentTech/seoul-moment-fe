@@ -19,19 +19,27 @@ export async function generateMetadata({
   params,
 }: PageParams<{ id: string }>): Promise<Metadata> {
   const { id, locale } = await params;
-  const articleId = parseInt(id);
+  const articleId = Number(id);
   const t = await getTranslations();
 
-  if (!Number.isInteger(articleId)) {
+  if (!Number.isInteger(articleId) || articleId <= 0) {
     return {};
   }
 
   try {
     const { data: article } = await fetchArticleDetail(articleId, locale);
 
+    const description = article.content.replace(/<[^>]*>/g, "").slice(0, 160);
+
     return {
       title: `${article.title} | ${t("title")}`,
-      description: article.content.replace(/<[^>]*>/g, "").slice(0, 160),
+      description,
+      openGraph: {
+        title: article.title,
+        description,
+        images: article.banner ? [{ url: article.banner }] : [],
+        type: "article",
+      },
     };
   } catch {
     return {};
@@ -42,13 +50,15 @@ export default async function ArticleDetail({
   params,
 }: PageParams<{ id: string }>) {
   const { id, locale } = await params;
-  const articleId = parseInt(id);
+  const articleId = Number(id);
 
-  if (!Number.isInteger(articleId)) {
+  if (!Number.isInteger(articleId) || articleId <= 0) {
     notFound();
   }
 
-  const data = fetchArticleDetail(articleId, locale).catch(() => notFound());
+  const data = fetchArticleDetail(articleId, locale as LanguageType).catch(() =>
+    notFound(),
+  );
 
   return <ArticleDetailPage data={data} />;
 }

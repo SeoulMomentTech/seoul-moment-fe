@@ -19,19 +19,26 @@ export async function generateMetadata({
   params,
 }: PageParams<{ id: string }>): Promise<Metadata> {
   const { id, locale } = await params;
-  const brandId = parseInt(id);
+  const brandId = Number(id);
   const t = await getTranslations();
 
-  if (!Number.isInteger(brandId)) {
+  if (!Number.isInteger(brandId) || brandId <= 0) {
     return {};
   }
 
   try {
     const { data: brand } = await fetchBrandDetail(brandId, locale);
 
+    const description = brand.description.replace(/<[^>]*>/g, "").slice(0, 160);
+
     return {
       title: `${brand.name} | ${t("title")}`,
-      description: brand.description.replace(/<[^>]*>/g, "").slice(0, 160),
+      description,
+      openGraph: {
+        title: brand.name,
+        description,
+        images: brand.bannerList?.[0] ? [{ url: brand.bannerList[0] }] : [],
+      },
     };
   } catch {
     return {};
@@ -42,13 +49,15 @@ export default async function BrandDetail({
   params,
 }: PageParams<{ id: string }>) {
   const { id, locale } = await params;
-  const brandId = parseInt(id);
+  const brandId = Number(id);
 
-  if (!Number.isInteger(brandId)) {
+  if (!Number.isInteger(brandId) || brandId <= 0) {
     notFound();
   }
 
-  const promise = fetchBrandDetail(brandId, locale).catch(() => notFound());
+  const promise = fetchBrandDetail(brandId, locale as LanguageType).catch(() =>
+    notFound(),
+  );
 
   return <BrandDetailPage promise={promise} />;
 }
