@@ -15,8 +15,8 @@ import { LikeCount } from "@widgets/like-count/ui/LikeCount";
 
 import { Link } from "@/i18n/navigation";
 
-import { BrandProductList } from "@features/product";
-import { Button, VStack } from "@seoul-moment/ui";
+import { BrandProductList, ProductExternalGroup } from "@features/product";
+import { Button } from "@seoul-moment/ui";
 import { ProductDetailImage } from "@widgets/product-detail-image";
 import { ProductGallery } from "@widgets/product-gallery";
 
@@ -143,7 +143,7 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
             {/** 원산지, 배송 정보 */}
             <div
               className={cn(
-                "flex flex-col gap-[20px] pb-[30px] pt-[20px]",
+                "flex flex-col gap-[20px] pb-[50px] pt-[20px]",
                 "max-sm:gap-[16px] max-sm:pb-[16px]",
               )}
             >
@@ -184,22 +184,10 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
                 </div>
               )}
             </div>
-            {data.external.length > 0 && (
-              <VStack data-role="product-external-group" gap={8}>
-                {data.external.map((item) => (
-                  <Button
-                    className="w-full"
-                    key={item.id}
-                    onClick={() =>
-                      window.open(item.url, "_blank", "noreferrer")
-                    }
-                    role="link"
-                  >
-                    {item.name}
-                  </Button>
-                ))}
-              </VStack>
-            )}
+            <ProductExternalGroup
+              className="max-sm:hidden"
+              items={data.external}
+            />
           </div>
 
           <div />
