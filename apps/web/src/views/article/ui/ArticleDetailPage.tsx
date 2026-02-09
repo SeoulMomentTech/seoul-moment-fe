@@ -26,7 +26,7 @@ export default function ArticleDetailPage({ data }: ArticleDetailPageProps) {
   };
   const section = articleData.data.section ?? [];
   const brandId = articleData.data.brandId;
-  const lastNews = articleData.data.lastNews ?? [];
+  const lastNews = articleData.data.lastArticle ?? [];
 
   return (
     <>
