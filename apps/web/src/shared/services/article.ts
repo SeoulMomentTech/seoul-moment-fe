@@ -57,7 +57,7 @@ export interface GetArticleDetailRes {
   content: string;
   banner: string;
   profileImage: string;
-  lastNews: LastArticle[];
+  lastArticle: LastArticle[];
   section: ArticleSection[];
 }
 
