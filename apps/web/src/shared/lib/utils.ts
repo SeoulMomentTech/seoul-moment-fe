@@ -42,3 +42,7 @@ export async function throttledFetch(url: string, options?: Options) {
     throttleFetchMutex.release();
   }
 }
+
+export const isValidExternalUrl = (url: string) => {
+  return url.startsWith("http://") || url.startsWith("https://");
+};

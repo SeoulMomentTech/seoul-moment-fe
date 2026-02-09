@@ -3,6 +3,7 @@
 import Image from "next/image";
 
 import { cn } from "@shared/lib/style";
+import { isValidExternalUrl } from "@shared/lib/utils";
 
 import { Button } from "@seoul-moment/ui";
 
@@ -24,6 +25,12 @@ export default function ProductExternalGroup({
 }: ProductExternalGroupProps) {
   if (!items?.length) return null;
 
+  const handleOpenExternalUrl = (url: string) => {
+    if (isValidExternalUrl(url)) {
+      window.open(url, "_blank", "noreferrer");
+    }
+  };
+
   return (
     <div
       className={cn(
@@ -37,7 +44,7 @@ export default function ProductExternalGroup({
         <Button
           className="h-[46px] w-full"
           key={item.id}
-          onClick={() => window.open(item.url, "_blank", "noreferrer")}
+          onClick={() => handleOpenExternalUrl(item.url)}
           role="link"
           variant="outline"
         >
