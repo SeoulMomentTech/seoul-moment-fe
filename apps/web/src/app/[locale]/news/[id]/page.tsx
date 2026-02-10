@@ -4,7 +4,10 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
+import { BASE_URL } from "@shared/constants/env";
+import { stripHtml } from "@shared/lib/utils";
 import { getNewsDetail } from "@shared/services/news";
+import { StructuredDataScript } from "@shared/ui/structured-data-script";
 
 import type { LanguageType } from "@/i18n/const";
 import type { PageParams } from "@/types";
@@ -14,27 +17,6 @@ import { NewsDetailPage } from "@views/news";
 const fetchNewsDetail = cache((id: number, languageCode: LanguageType) => {
   return getNewsDetail({ id, languageCode });
 });
-
-const stripHtml = (value: string) => value.replace(/<[^>]*>/g, "").trim();
-
-interface StructuredDataScriptProps {
-  schemaPromise: Promise<Record<string, unknown>>;
-}
-
-async function StructuredDataScript({
-  schemaPromise,
-}: StructuredDataScriptProps) {
-  const schema = await schemaPromise;
-
-  return (
-    <script
-      dangerouslySetInnerHTML={{
-        __html: JSON.stringify(schema),
-      }}
-      type="application/ld+json"
-    />
-  );
-}
 
 export async function generateMetadata({
   params,
@@ -50,7 +32,7 @@ export async function generateMetadata({
   try {
     const { data: news } = await fetchNewsDetail(newsId, locale);
 
-    const description = news.content.replace(/<[^>]*>/g, "").slice(0, 160);
+    const description = stripHtml(news.content).slice(0, 160);
 
     return {
       title: `${news.title} | ${t("title")}`,
@@ -80,10 +62,8 @@ export default async function NewsDetail({
   const responsePromise = fetchNewsDetail(newsId, locale as LanguageType).catch(
     () => notFound(),
   );
-  const baseUrl =
-    process.env.NEXT_PUBLIC_WEB_URL?.replace(/\/$/, "") ??
-    "https://seoulmoment.com.tw";
-  const pageUrl = `${baseUrl}/${locale}/news/${newsId}`;
+
+  const pageUrl = `${BASE_URL}/${locale}/news/${newsId}`;
   const schemaPromise = responsePromise.then(({ data }) => {
     const content = stripHtml(data.content);
 
@@ -105,7 +85,7 @@ export default async function NewsDetail({
       publisher: {
         "@type": "Organization",
         name: "Seoul Moment",
-        url: baseUrl,
+        url: BASE_URL,
       },
       url: pageUrl,
     };

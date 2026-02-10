@@ -4,7 +4,10 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
+import { BASE_URL } from "@shared/constants/env";
+import { stripHtml } from "@shared/lib/utils";
 import { getArticleDetail } from "@shared/services/article";
+import { StructuredDataScript } from "@shared/ui/structured-data-script";
 
 import type { LanguageType } from "@/i18n/const";
 import type { PageParams } from "@/types";
@@ -14,27 +17,6 @@ import { ArticleDetailPage } from "@views/article";
 const fetchArticleDetail = cache((id: number, languageCode: LanguageType) => {
   return getArticleDetail({ id, languageCode });
 });
-
-const stripHtml = (value: string) => value.replace(/<[^>]*>/g, "").trim();
-
-interface StructuredDataScriptProps {
-  schemaPromise: Promise<Record<string, unknown>>;
-}
-
-async function StructuredDataScript({
-  schemaPromise,
-}: StructuredDataScriptProps) {
-  const schema = await schemaPromise;
-
-  return (
-    <script
-      dangerouslySetInnerHTML={{
-        __html: JSON.stringify(schema),
-      }}
-      type="application/ld+json"
-    />
-  );
-}
 
 export async function generateMetadata({
   params,
@@ -50,7 +32,7 @@ export async function generateMetadata({
   try {
     const { data: article } = await fetchArticleDetail(articleId, locale);
 
-    const description = article.content.replace(/<[^>]*>/g, "").slice(0, 160);
+    const description = stripHtml(article.content).slice(0, 160);
 
     return {
       title: `${article.title} | ${t("title")}`,
@@ -81,10 +63,8 @@ export default async function ArticleDetail({
     articleId,
     locale as LanguageType,
   ).catch(() => notFound());
-  const baseUrl =
-    process.env.NEXT_PUBLIC_WEB_URL?.replace(/\/$/, "") ??
-    "https://seoulmoment.com.tw";
-  const pageUrl = `${baseUrl}/${locale}/article/${articleId}`;
+
+  const pageUrl = `${BASE_URL}/${locale}/article/${articleId}`;
   const schemaPromise = responsePromise.then(({ data }) => {
     const content = stripHtml(data.content);
 
@@ -106,7 +86,7 @@ export default async function ArticleDetail({
       publisher: {
         "@type": "Organization",
         name: "Seoul Moment",
-        url: baseUrl,
+        url: BASE_URL,
       },
       url: pageUrl,
     };

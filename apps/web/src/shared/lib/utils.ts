@@ -27,6 +27,12 @@ export const toNTCurrency = (
   maximumFractionDigits?: number,
 ): string => `NT$${setComma(num, maximumFractionDigits)}`;
 
+export const stripHtml = (value: string) =>
+  value
+    .replace(/<[^>]*>?/gm, " ") // 태그를 공백으로 치환하여 단어 결합 방지
+    .replace(/\s+/g, " ") // 다중 공백 및 줄바꿈을 단일 공백으로 축소
+    .trim();
+
 const throttleFetchMutex = new Mutex();
 
 export async function throttledFetch(url: string, options?: Options) {
