@@ -28,7 +28,7 @@ interface DynamicRouteConfig {
   priority: number;
 }
 
-export const revalidate = 60 * 60;
+export const revalidate = 3600;
 
 let devSitemapCache: {
   expiresAt: number;
