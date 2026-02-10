@@ -1,4 +1,4 @@
-import { cache } from "react";
+import { cache, Suspense } from "react";
 
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -14,6 +14,27 @@ import { NewsDetailPage } from "@views/news";
 const fetchNewsDetail = cache((id: number, languageCode: LanguageType) => {
   return getNewsDetail({ id, languageCode });
 });
+
+const stripHtml = (value: string) => value.replace(/<[^>]*>/g, "").trim();
+
+interface StructuredDataScriptProps {
+  schemaPromise: Promise<Record<string, unknown>>;
+}
+
+async function StructuredDataScript({
+  schemaPromise,
+}: StructuredDataScriptProps) {
+  const schema = await schemaPromise;
+
+  return (
+    <script
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(schema),
+      }}
+      type="application/ld+json"
+    />
+  );
+}
 
 export async function generateMetadata({
   params,
@@ -56,9 +77,46 @@ export default async function NewsDetail({
     notFound();
   }
 
-  const promise = fetchNewsDetail(newsId, locale as LanguageType).catch(() =>
-    notFound(),
+  const responsePromise = fetchNewsDetail(newsId, locale as LanguageType).catch(
+    () => notFound(),
   );
+  const baseUrl =
+    process.env.NEXT_PUBLIC_WEB_URL?.replace(/\/$/, "") ??
+    "https://seoulmoment.com.tw";
+  const pageUrl = `${baseUrl}/${locale}/news/${newsId}`;
+  const schemaPromise = responsePromise.then(({ data }) => {
+    const content = stripHtml(data.content);
 
-  return <NewsDetailPage promise={promise} />;
+    return {
+      "@context": "https://schema.org",
+      "@type": "NewsArticle",
+      mainEntityOfPage: pageUrl,
+      headline: data.title,
+      description: content.slice(0, 160),
+      articleBody: content,
+      image: data.banner ? [data.banner] : [],
+      datePublished: data.createDate,
+      dateModified: data.createDate,
+      inLanguage: locale,
+      author: {
+        "@type": "Person",
+        name: data.writer,
+      },
+      publisher: {
+        "@type": "Organization",
+        name: "Seoul Moment",
+        url: baseUrl,
+      },
+      url: pageUrl,
+    };
+  });
+
+  return (
+    <>
+      <Suspense fallback={null}>
+        <StructuredDataScript schemaPromise={schemaPromise} />
+      </Suspense>
+      <NewsDetailPage promise={responsePromise} />
+    </>
+  );
 }
