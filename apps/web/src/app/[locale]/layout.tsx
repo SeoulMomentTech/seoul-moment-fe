@@ -2,6 +2,7 @@ import type { PropsWithChildren } from "react";
 
 import { Geist, Geist_Mono } from "next/font/google";
 import { notFound } from "next/navigation";
+import Script from "next/script";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
@@ -59,6 +60,28 @@ export default async function RootLayout({
 
   return (
     <html lang={locale ?? "ko"}>
+      <head>
+        {process.env.NODE_ENV === "production" && (
+          <>
+            <Script
+              src="https://www.googletagmanager.com/gtag/js?id=G-N4PST9C2ZV"
+              strategy="afterInteractive"
+            />
+            <Script
+              dangerouslySetInnerHTML={{
+                __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-N4PST9C2ZV');  
+            `,
+              }}
+              id="gtag-init"
+              strategy="afterInteractive"
+            />
+          </>
+        )}
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
