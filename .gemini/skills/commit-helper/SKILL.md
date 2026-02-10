@@ -14,7 +14,7 @@ description: Git 변경사항을 분석하여 Conventional Commits 형식의 커
 1. `git status`와 `git diff --staged`로 변경사항 확인
 2. 변경 유형 분류 (feat, fix, docs, style, refactor, test, chore)
 3. 영향 범위(scope) 파악
-4. Conventional Commits 형식으로 메시지 생성
+4. Conventional Commits 형식으로 메시지 생성 (한국어, 영어 포함)
 
 ## 커밋 메시지 형식
 
