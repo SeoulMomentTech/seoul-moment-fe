@@ -1,3 +1,5 @@
+import { PackageOpen } from "lucide-react";
+
 import { useTranslations } from "next-intl";
 
 import { cn } from "@shared/lib/style";
@@ -6,6 +8,7 @@ import type { ProductItem } from "@shared/services/product";
 import { Link } from "@/i18n/navigation";
 
 import { ProductCard } from "@entities/product";
+import { Empty } from "@widgets/empty";
 
 interface BrandProductListProps {
   data: ProductItem[];
@@ -13,6 +16,8 @@ interface BrandProductListProps {
 
 export default function BrandProductList({ data }: BrandProductListProps) {
   const t = useTranslations();
+  const isEmpty = !data || data.length === 0;
+
   return (
     <div
       className={cn(
@@ -27,26 +32,36 @@ export default function BrandProductList({ data }: BrandProductListProps) {
       >
         {t("more_from_this_brand")}
       </h3>
-      <div
-        className={cn(
-          "flex w-full gap-[30px]",
-          "max-sm:gap-[16px] max-sm:overflow-auto",
-        )}
-      >
-        {data.map((product) => (
-          <Link
-            className="max-w-[216px] flex-1 max-sm:max-w-[150px]"
-            href={`/product/${product.id}`}
-            key={`related-product-${product.id}`}
-          >
-            <ProductCard
-              data={product}
-              hideExtraInfo
-              imageClassName="w-full h-[216px] max-sm:w-[150px] max-sm:h-[150px]"
-            />
-          </Link>
-        ))}
-      </div>
+      {isEmpty ? (
+        <Empty
+          className="py-[40px]"
+          description={t("no_product_found")}
+          icon={
+            <PackageOpen className="text-black/20" height={24} width={24} />
+          }
+        />
+      ) : (
+        <div
+          className={cn(
+            "flex w-full gap-[30px]",
+            "max-sm:gap-[16px] max-sm:overflow-auto",
+          )}
+        >
+          {data.map((product) => (
+            <Link
+              className="max-w-[216px] flex-1 max-sm:max-w-[150px]"
+              href={`/product/${product.id}`}
+              key={`related-product-${product.id}`}
+            >
+              <ProductCard
+                data={product}
+                hideExtraInfo
+                imageClassName="w-full h-[216px] max-sm:w-[150px] max-sm:h-[150px]"
+              />
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
