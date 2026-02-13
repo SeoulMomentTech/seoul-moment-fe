@@ -184,13 +184,8 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
                 </div>
               )}
             </div>
-            <ProductExternalGroup
-              className="max-sm:hidden"
-              items={data.external}
-            />
+            <ProductExternalGroup items={data.external} />
           </div>
-
-          <div />
         </div>
         <BrandProductList data={data.relate} />
         <ProductDetailImage imageSrc={data.detailImg} showMore={showMore}>
