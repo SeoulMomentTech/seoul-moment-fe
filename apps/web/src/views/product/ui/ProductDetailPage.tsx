@@ -184,13 +184,6 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
                 </div>
               )}
             </div>
-            <ProductExternalGroup
-              className="max-sm:hidden"
-              items={data.external}
-            />
-          </div>
-
-          <div className={cn("hidden px-[20px]", "max-sm:block")}>
             <ProductExternalGroup items={data.external} />
           </div>
         </div>
