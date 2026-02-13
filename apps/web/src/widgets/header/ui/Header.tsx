@@ -24,6 +24,8 @@ import { Link, usePathname } from "@/i18n/navigation";
 
 import { LanguageSupport } from "@widgets/language-support";
 
+import { BrandMenuModal } from "./BrandMenuModal";
+
 const ShareModal = lazy(() =>
   import("@widgets/share-modal").then((module) => ({
     default: module.ShareModal,
@@ -109,6 +111,7 @@ function Desktop() {
 
 function Mobile() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isBrandModalOpen, setIsBrandModalOpen] = useState(false);
   const t = useTranslations();
   const pathname = usePathname();
 
@@ -122,16 +125,13 @@ function Mobile() {
       <div className="flex items-center gap-[10px]">
         <Sheet onOpenChange={(isOpen) => setIsOpen(isOpen)} open={isOpen}>
           <SheetTrigger asChild>
-            <button
-              className="cursor-pointer"
-              onClick={() => setIsOpen(true)}
-              type="button"
-            >
+            <button className="cursor-pointer" type="button">
               <MenuIcon />
             </button>
           </SheetTrigger>
           <SheetContent
-            className="sm:max-w-screen flex w-full px-[20px]"
+            animate={false}
+            className={cn("sm:max-w-screen flex w-full px-[20px]")}
             side="left"
           >
             <SheetHeader className="ml-[34px] flex min-h-[55px] justify-center px-0 py-0">
@@ -151,6 +151,19 @@ function Mobile() {
                     {t("product")}
                     <ChevronRightIcon height={16} width={16} />
                   </Link>
+                </li>
+                <li>
+                  <button
+                    className={cn(styleMap.mobile.menu, "w-full")}
+                    onClick={() => {
+                      setIsOpen(false);
+                      setIsBrandModalOpen(true);
+                    }}
+                    type="button"
+                  >
+                    {t("brand")}
+                    <ChevronRightIcon height={16} width={16} />
+                  </button>
                 </li>
                 <li>
                   <Link
@@ -200,6 +213,10 @@ function Mobile() {
           <Image alt="" height={16} src="/logo.png" width={133} />
         </Link>
       </div>
+      <BrandMenuModal
+        isOpen={isBrandModalOpen}
+        onOpenChange={setIsBrandModalOpen}
+      />
     </div>
   );
 }
