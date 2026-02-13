@@ -190,7 +190,9 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
             />
           </div>
 
-          <div />
+          <div className={cn("hidden px-[20px]", "max-sm:block")}>
+            <ProductExternalGroup items={data.external} />
+          </div>
         </div>
         <BrandProductList data={data.relate} />
         <ProductDetailImage imageSrc={data.detailImg} showMore={showMore}>
