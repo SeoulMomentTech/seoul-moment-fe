@@ -1,6 +1,7 @@
 export { default as useClickOutSideEffect } from "./useClickOutSideEffect";
 export { default as useCopyToClipboard } from "./useCopyToClipboard";
 export { default as useEventListener } from "./useEventListener";
+export { default as useDataLayerPush } from "./useDataLayerPush";
 export { default as useLanguage } from "./useLanguage";
 export { default as useMediaQuery } from "./useMediaQuery";
 export { default as useModal } from "./useModal";
