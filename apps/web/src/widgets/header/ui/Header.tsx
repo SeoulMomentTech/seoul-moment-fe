@@ -41,6 +41,8 @@ const styleMap = {
   },
 };
 
+const ENABLE_HEADER_PREFETCH = true;
+
 function Desktop() {
   const pathname = usePathname();
   const t = useTranslations();
@@ -53,7 +55,7 @@ function Desktop() {
       )}
     >
       <div className="flex items-center gap-[40px]">
-        <Link className="h-full" href="/">
+        <Link className="h-full" href="/" prefetch={ENABLE_HEADER_PREFETCH}>
           <Image
             alt=""
             className="h-full"
@@ -70,6 +72,7 @@ function Desktop() {
                 pathname === "/product" && "font-semibold",
               )}
               href="/product"
+              prefetch={ENABLE_HEADER_PREFETCH}
             >
               {t("product")}
             </Link>
@@ -85,6 +88,7 @@ function Desktop() {
                 pathname === "/about" && "font-semibold",
               )}
               href="/about"
+              prefetch={ENABLE_HEADER_PREFETCH}
             >
               {t("about")}
             </Link>
@@ -96,6 +100,7 @@ function Desktop() {
                 pathname === "/contact" && "font-semibold",
               )}
               href="/contact"
+              prefetch={ENABLE_HEADER_PREFETCH}
             >
               {t("contact")}
             </Link>
@@ -145,8 +150,10 @@ function Mobile() {
                   <Link
                     className={styleMap.mobile.menu}
                     href="/product"
-                    onClick={() => setIsOpen(false)}
-                    prefetch={false}
+                    onClick={() => {
+                      setIsOpen(false);
+                    }}
+                    prefetch={ENABLE_HEADER_PREFETCH}
                   >
                     {t("product")}
                     <ChevronRightIcon height={16} width={16} />
@@ -169,8 +176,10 @@ function Mobile() {
                   <Link
                     className={styleMap.mobile.menu}
                     href="/about"
-                    onClick={() => setIsOpen(false)}
-                    prefetch={false}
+                    onClick={() => {
+                      setIsOpen(false);
+                    }}
+                    prefetch={ENABLE_HEADER_PREFETCH}
                   >
                     {t("about")}
                     <ChevronRightIcon height={16} width={16} />
@@ -180,8 +189,10 @@ function Mobile() {
                   <Link
                     className={styleMap.mobile.menu}
                     href="/contact"
-                    onClick={() => setIsOpen(false)}
-                    prefetch={false}
+                    onClick={() => {
+                      setIsOpen(false);
+                    }}
+                    prefetch={ENABLE_HEADER_PREFETCH}
                   >
                     {t("contact")}
                     <ChevronRightIcon height={16} width={16} />
@@ -195,7 +206,7 @@ function Mobile() {
                       <Link
                         href={pathname}
                         locale={code as LanguageType}
-                        prefetch={false}
+                        prefetch={ENABLE_HEADER_PREFETCH}
                       >
                         {label}
                       </Link>
@@ -209,7 +220,7 @@ function Mobile() {
             </div>
           </SheetContent>
         </Sheet>
-        <Link className={cn()} href="/">
+        <Link className={cn()} href="/" prefetch={ENABLE_HEADER_PREFETCH}>
           <Image alt="" height={16} src="/logo.png" width={133} />
         </Link>
       </div>
