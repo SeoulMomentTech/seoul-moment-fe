@@ -39,7 +39,8 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "react-hook-form": "^7.66.0",
-    "tailwind-merge": "^2.5.5"
+    "tailwind-merge": "^2.5.5",
+    "vaul": "^1.1.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
