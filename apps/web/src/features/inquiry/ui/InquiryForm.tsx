@@ -29,7 +29,7 @@ import { AlertModal } from "@widgets/alert-modal";
 
 import { inquiryFormRezolver, type InquiryFormValues } from "../model/schema";
 
-const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
+const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? "";
 
 export default function InquiryForm() {
   const [isCodeSent, setIsCodeSent] = useState(false);
@@ -132,6 +132,7 @@ export default function InquiryForm() {
         type: "success",
         open: true,
       });
+      setRecaptchaToken(null);
     } catch {
       setModalOpen({
         type: "error",
