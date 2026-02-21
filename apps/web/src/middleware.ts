@@ -1,4 +1,3 @@
-// middleware.ts
 import { NextResponse, type NextRequest } from "next/server";
 import createMiddleware from "next-intl/middleware";
 

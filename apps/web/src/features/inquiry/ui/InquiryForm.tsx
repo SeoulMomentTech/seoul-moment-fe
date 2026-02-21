@@ -1,16 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import Image from "next/image";
 import { useTranslations } from "next-intl";
+import ReCAPTCHA from "react-google-recaptcha";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import {
   postEmail,
   postEmailCode,
   verifyEmailCode,
+  verifyRecaptcha,
 } from "@shared/services/inquiry";
 import {
   Select,
@@ -21,15 +24,19 @@ import {
 
 import type { ModalStatus } from "@/types";
 
-import { Button, Input, Textarea } from "@seoul-moment/ui";
+import { Button, cn, Input, Textarea } from "@seoul-moment/ui";
 import { AlertModal } from "@widgets/alert-modal";
 
 import { inquiryFormRezolver, type InquiryFormValues } from "../model/schema";
+
+const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? "";
 
 export default function InquiryForm() {
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [modalOpen, setModalOpen] = useState<ModalStatus | null>(null);
   const [emailSubject, setEmailSubject] = useState("");
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
 
   const t = useTranslations();
   const {
@@ -103,8 +110,17 @@ export default function InquiryForm() {
   };
 
   const onSubmit: SubmitHandler<InquiryFormValues> = async (data) => {
+    if (!recaptchaToken) {
+      toast.error("Please complete the reCAPTCHA.", {
+        position: "top-center",
+      });
+      return;
+    }
+
     try {
       const { message, name, subject } = data;
+
+      await verifyRecaptcha(recaptchaToken);
 
       await postEmail({
         to: "seoulmomenttw@gmail.com",
@@ -116,6 +132,7 @@ export default function InquiryForm() {
         type: "success",
         open: true,
       });
+      setRecaptchaToken(null);
     } catch {
       setModalOpen({
         type: "error",
@@ -242,6 +259,21 @@ export default function InquiryForm() {
             submitting, you agree to our use of your data to respond to your
             inquiry.
           </p>
+          <div
+            className={cn(
+              "flex justify-center",
+              "max-2xl:justify-start",
+              "max-md:justify-center",
+            )}
+          >
+            <ReCAPTCHA
+              onChange={setRecaptchaToken}
+              onError={() => setRecaptchaToken(null)}
+              ref={recaptchaRef}
+              sitekey={RECAPTCHA_SITE_KEY}
+              size="normal"
+            />
+          </div>
         </div>
       </form>
       {modalOpen?.type === "success" && (
