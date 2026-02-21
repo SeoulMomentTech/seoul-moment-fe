@@ -47,6 +47,7 @@ export default function InquiryForm() {
     setValue,
     setError,
     reset,
+    clearErrors,
     formState: { errors },
   } = useForm<InquiryFormValues>({
     resolver: inquiryFormRezolver,
@@ -61,9 +62,13 @@ export default function InquiryForm() {
   });
   const formValues = watch();
 
-  const isEmpty = Object.values(formValues).some(
-    (value) => value === "" || value == null || value === false,
-  );
+  const isEmpty = Object.entries(formValues).some(([key, value]) => {
+    if (key === "subject" && emailSubject !== "기타") {
+      return false;
+    }
+
+    return value === "" || value == null || value === false;
+  });
   const isDisabled = Object.keys(errors).length > 0 || isEmpty;
 
   const handleClickVerify = async () => {
@@ -91,6 +96,7 @@ export default function InquiryForm() {
     try {
       await verifyEmailCode({ email, code });
       setValue("isVerified", true);
+      clearErrors("code");
     } catch {
       setError("code", {
         message: "Code is incorrect, Please check again.",
@@ -100,6 +106,7 @@ export default function InquiryForm() {
 
   const handleSelectSubject = (value: string) => {
     setEmailSubject(value);
+    setValue("subject", "");
   };
 
   const handleOpen = (type: string) => (open: boolean) => {
@@ -126,7 +133,7 @@ export default function InquiryForm() {
         to: "seoulmomenttw@gmail.com",
         html: message,
         name,
-        subject,
+        subject: emailSubject === "기타" ? subject : emailSubject,
       });
       setModalOpen({
         type: "success",
@@ -163,6 +170,7 @@ export default function InquiryForm() {
               <Input
                 placeholder="Please enter your email"
                 {...register("email")}
+                disabled={isCodeSent}
               />
               <Button
                 className="h-[48px] w-[68px] font-semibold"
@@ -176,7 +184,7 @@ export default function InquiryForm() {
             {errors.email && (
               <span className="text-error">{errors.email.message}</span>
             )}
-            {isCodeSent && (
+            {!errors.email && isCodeSent && (
               <span className="text-sent">
                 Verification code has been sent.
               </span>
