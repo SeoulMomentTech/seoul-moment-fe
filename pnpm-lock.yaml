@@ -161,7 +161,7 @@ importers:
         version: 1.1.13(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       '@sentry/nextjs':
         specifier: ^10.32.1
-        version: 10.32.1(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(next@15.4.10(@opentelemetry/api@1.9.0)(@playwright/test@1.58.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0)(webpack@5.104.1)
+        version: 10.32.1(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(next@15.4.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.58.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0)(webpack@5.104.1)
       '@seoul-moment/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -188,13 +188,13 @@ importers:
         version: 0.511.0(react@19.2.0)
       next:
         specifier: 15.4.10
-        version: 15.4.10(@opentelemetry/api@1.9.0)(@playwright/test@1.58.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+        version: 15.4.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.58.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       next-intl:
         specifier: ^4.1.0
-        version: 4.4.0(next@15.4.10(@opentelemetry/api@1.9.0)(@playwright/test@1.58.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0)(typescript@5.9.3)
+        version: 4.4.0(next@15.4.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.58.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0)(typescript@5.9.3)
       nuqs:
         specifier: ^2.7.0
-        version: 2.7.2(next@15.4.10(@opentelemetry/api@1.9.0)(@playwright/test@1.58.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-router@7.9.5(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0)
+        version: 2.7.2(next@15.4.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.58.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-router@7.9.5(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0)
       overlay-kit:
         specifier: ^1.8.6
         version: 1.8.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -207,6 +207,9 @@ importers:
       react-error-boundary:
         specifier: ^6.0.0
         version: 6.0.0(react@19.2.0)
+      react-google-recaptcha:
+        specifier: ^3.1.0
+        version: 3.1.0(react@19.2.0)
       react-hook-form:
         specifier: ^7.56.4
         version: 7.66.0(react@19.2.0)
@@ -271,6 +274,9 @@ importers:
       '@types/react-dom':
         specifier: ^19
         version: 19.2.2(@types/react@19.2.2)
+      '@types/react-google-recaptcha':
+        specifier: ^2.1.9
+        version: 2.1.9
       '@vitejs/plugin-react':
         specifier: ^5.1.0
         version: 5.1.0(vite@7.1.12(@types/node@20.19.24)(jiti@2.6.1)(lightningcss@1.30.2)(terser@5.44.1)(yaml@2.8.1))
@@ -2367,6 +2373,9 @@ packages:
     peerDependencies:
       '@types/react': ^19.2.0
 
+  '@types/react-google-recaptcha@2.1.9':
+    resolution: {integrity: sha512-nT31LrBDuoSZJN4QuwtQSF3O89FVHC4jLhM+NtKEmVF5R1e8OY0Jo4//x2Yapn2aNHguwgX5doAq8Zo+Ehd0ug==}
+
   '@types/react@19.2.2':
     resolution: {integrity: sha512-6mDvHUFSjyT2B2yeNx2nUgMxh9LtOWvkhIU3uePn2I2oyNymUAX1NIsdgviM4CH+JSrp2D2hsMvJOkxY+0wNRA==}
 
@@ -4402,6 +4411,11 @@ packages:
   randombytes@2.1.0:
     resolution: {integrity: sha512-vYl3iOX+4CKUWuxGi9Ukhie6fsqXqS9FE2Zaic4tNFD2N2QQaXOMFbuKK4QmDHC0JO6B1Zp41J0LpT0oR68amQ==}
 
+  react-async-script@1.2.0:
+    resolution: {integrity: sha512-bCpkbm9JiAuMGhkqoAiC0lLkb40DJ0HOEJIku+9JDjxX3Rcs+ztEOG13wbrOskt3n2DTrjshhaQ/iay+SnGg5Q==}
+    peerDependencies:
+      react: '>=16.4.1'
+
   react-dom@19.2.0:
     resolution: {integrity: sha512-UlbRu4cAiGaIewkPyiRGJk0imDN2T3JjieT6spoL2UeSf5od4n5LB/mQ4ejmxhCFT1tYe8IvaFulzynWovsEFQ==}
     peerDependencies:
@@ -4414,6 +4428,11 @@ packages:
 
   react-fast-compare@2.0.4:
     resolution: {integrity: sha512-suNP+J1VU1MWFKcyt7RtjiSWUjvidmQSlqu+eHslq+342xCbGTYmC0mEhPCOHxlW0CywylOC1u2DFAT+bv4dBw==}
+
+  react-google-recaptcha@3.1.0:
+    resolution: {integrity: sha512-cYW2/DWas8nEKZGD7SCu9BSuVz8iOcOLHChHyi7upUuVhkpkhYG/6N3KDiTQ3XAiZ2UAZkfvYKMfAHOzBOcGEg==}
+    peerDependencies:
+      react: '>=16.4.1'
 
   react-hook-form@7.66.0:
     resolution: {integrity: sha512-xXBqsWGKrY46ZqaHDo+ZUYiMUgi8suYu5kdrS20EG8KiL7VRQitEbNjm+UcrDYrNi1YLyfpmAeGjCZYXLT9YBw==}
@@ -6776,7 +6795,7 @@ snapshots:
 
   '@sentry/core@10.32.1': {}
 
-  '@sentry/nextjs@10.32.1(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(next@15.4.10(@opentelemetry/api@1.9.0)(@playwright/test@1.58.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0)(webpack@5.104.1)':
+  '@sentry/nextjs@10.32.1(@opentelemetry/context-async-hooks@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/core@2.2.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@2.2.0(@opentelemetry/api@1.9.0))(next@15.4.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.58.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0)(webpack@5.104.1)':
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/semantic-conventions': 1.38.0
@@ -6789,7 +6808,7 @@ snapshots:
       '@sentry/react': 10.32.1(react@19.2.0)
       '@sentry/vercel-edge': 10.32.1
       '@sentry/webpack-plugin': 4.6.1(webpack@5.104.1)
-      next: 15.4.10(@opentelemetry/api@1.9.0)(@playwright/test@1.58.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      next: 15.4.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.58.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       resolve: 1.22.8
       rollup: 4.52.5
       stacktrace-parser: 0.1.11
@@ -7165,6 +7184,10 @@ snapshots:
       pg-types: 2.2.0
 
   '@types/react-dom@19.2.2(@types/react@19.2.2)':
+    dependencies:
+      '@types/react': 19.2.2
+
+  '@types/react-google-recaptcha@2.1.9':
     dependencies:
       '@types/react': 19.2.2
 
@@ -9108,17 +9131,17 @@ snapshots:
 
   neo-async@2.6.2: {}
 
-  next-intl@4.4.0(next@15.4.10(@opentelemetry/api@1.9.0)(@playwright/test@1.58.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0)(typescript@5.9.3):
+  next-intl@4.4.0(next@15.4.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.58.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0)(typescript@5.9.3):
     dependencies:
       '@formatjs/intl-localematcher': 0.5.10
       negotiator: 1.0.0
-      next: 15.4.10(@opentelemetry/api@1.9.0)(@playwright/test@1.58.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      next: 15.4.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.58.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       react: 19.2.0
       use-intl: 4.4.0(react@19.2.0)
     optionalDependencies:
       typescript: 5.9.3
 
-  next@15.4.10(@opentelemetry/api@1.9.0)(@playwright/test@1.58.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
+  next@15.4.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.58.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
     dependencies:
       '@next/env': 15.4.10
       '@swc/helpers': 0.5.15
@@ -9126,7 +9149,7 @@ snapshots:
       postcss: 8.4.31
       react: 19.2.0
       react-dom: 19.2.0(react@19.2.0)
-      styled-jsx: 5.1.6(react@19.2.0)
+      styled-jsx: 5.1.6(@babel/core@7.28.5)(react@19.2.0)
     optionalDependencies:
       '@next/swc-darwin-arm64': 15.4.8
       '@next/swc-darwin-x64': 15.4.8
@@ -9165,12 +9188,12 @@ snapshots:
     dependencies:
       path-key: 4.0.0
 
-  nuqs@2.7.2(next@15.4.10(@opentelemetry/api@1.9.0)(@playwright/test@1.58.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-router@7.9.5(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0):
+  nuqs@2.7.2(next@15.4.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.58.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-router@7.9.5(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0):
     dependencies:
       '@standard-schema/spec': 1.0.0
       react: 19.2.0
     optionalDependencies:
-      next: 15.4.10(@opentelemetry/api@1.9.0)(@playwright/test@1.58.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      next: 15.4.10(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.58.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       react-router: 7.9.5(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
 
   nwsapi@2.2.23: {}
@@ -9380,6 +9403,12 @@ snapshots:
     dependencies:
       safe-buffer: 5.2.1
 
+  react-async-script@1.2.0(react@19.2.0):
+    dependencies:
+      hoist-non-react-statics: 3.3.2
+      prop-types: 15.8.1
+      react: 19.2.0
+
   react-dom@19.2.0(react@19.2.0):
     dependencies:
       react: 19.2.0
@@ -9391,6 +9420,12 @@ snapshots:
       react: 19.2.0
 
   react-fast-compare@2.0.4: {}
+
+  react-google-recaptcha@3.1.0(react@19.2.0):
+    dependencies:
+      prop-types: 15.8.1
+      react: 19.2.0
+      react-async-script: 1.2.0(react@19.2.0)
 
   react-hook-form@7.66.0(react@19.2.0):
     dependencies:
@@ -9825,10 +9860,12 @@ snapshots:
 
   strip-json-comments@3.1.1: {}
 
-  styled-jsx@5.1.6(react@19.2.0):
+  styled-jsx@5.1.6(@babel/core@7.28.5)(react@19.2.0):
     dependencies:
       client-only: 0.0.1
       react: 19.2.0
+    optionalDependencies:
+      '@babel/core': 7.28.5
 
   supports-color@7.2.0:
     dependencies:
