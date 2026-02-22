@@ -6,7 +6,7 @@ import { useOpen } from "@shared/lib/hooks";
 import { cn } from "@shared/lib/style";
 import type { GetProductListReq } from "@shared/services/product";
 
-import { Tabs, TabsList, TabsTrigger } from "@seoul-moment/ui";
+import { Flex, SearchBar, Tabs, TabsList, TabsTrigger } from "@seoul-moment/ui";
 
 import BrandFilterSidebar from "./BrandFilterSidebar";
 import ProductGridSection from "./ProductGridSection";
@@ -36,34 +36,46 @@ export default function DeskTop({
       <div
         className={cn("flex flex-col gap-[40px] pb-[100px]", "max-sm:hidden")}
       >
-        <Tabs
+        <Flex
           className={cn(
             "border-b border-black/10 max-sm:border-t max-sm:pl-[20px]",
             "max-sm:hidden",
           )}
-          defaultValue="all"
-          value={filter.categoryId?.toString() ?? "all"}
+          justify="space-between"
         >
-          <TabsList className="flex h-[50px] items-center gap-[30px] max-sm:h-[40px]">
-            <TabsTrigger
-              className="text-body-1"
-              onClick={handleUpdateFilter({ categoryId: null })}
-              value="all"
-            >
-              All
-            </TabsTrigger>
-            {categories.map((category) => (
+          <Tabs
+            defaultValue="all"
+            value={filter.categoryId?.toString() ?? "all"}
+          >
+            <TabsList className="flex h-[50px] items-center gap-[30px] max-sm:h-[40px]">
               <TabsTrigger
                 className="text-body-1"
-                key={category.id}
-                onClick={handleUpdateFilter({ categoryId: category.id })}
-                value={category.id.toString()}
+                onClick={handleUpdateFilter({ categoryId: null })}
+                value="all"
               >
-                {category.name}
+                All
               </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
+              {categories.map((category) => (
+                <TabsTrigger
+                  className="text-body-1"
+                  key={category.id}
+                  onClick={handleUpdateFilter({ categoryId: category.id })}
+                  value={category.id.toString()}
+                >
+                  {category.name}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+          <SearchBar
+            className="h-[42px] w-[278px]"
+            defaultValue={filter.search ?? ""}
+            key={filter.search ?? "search-bar"}
+            onSearch={(value) =>
+              handleUpdateFilter({ search: value || null })()
+            }
+          />
+        </Flex>
         <div
           className={cn("flex gap-[20px]", "max-sm:flex-col max-sm:gap-[12px]")}
         >

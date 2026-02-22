@@ -31,7 +31,12 @@ export function NewsUpdate() {
       <h2 className="text-title-2 max-sm:text-title-4 font-bold">
         News Update
       </h2>
-      <div className="h-ful flex h-[428px] w-full flex-1 flex-col gap-[20px] overflow-auto">
+      <div
+        className={cn(
+          "h-ful flex h-[428px] w-full flex-1 flex-col gap-[20px] overflow-auto",
+          "scrollbar-thin scrollbar-color-transparent",
+        )}
+      >
         {MOCK_NEWS.map((news, index) => (
           <NewsCard key={`${news.title}-${index + 1}`} {...news} />
         ))}
