@@ -40,10 +40,7 @@ export function MegazineSlide({ magazines, type }: MegazineSlideProps) {
       <Swiper
         className="w-full"
         loop
-        onSlideChange={(s) => {
-          console.log(s.realIndex);
-          setActiveIndex(s.realIndex);
-        }}
+        onSlideChange={(s) => setActiveIndex(s.realIndex)}
         onSwiper={setSwiper}
       >
         {magazines.map((magazine) => (
