@@ -1,10 +1,12 @@
+import type { ReactNode } from "react";
+
 import { BaseImage } from "@shared/ui/base-image";
 import { Card } from "@shared/ui/card";
 
 import { cn } from "@seoul-moment/ui";
 
 interface MegazineCardProps {
-  title: string;
+  title: string | ReactNode;
   imageUrl: string;
 }
 
@@ -16,7 +18,7 @@ export function MegazineCard({ title, imageUrl }: MegazineCardProps) {
         <BaseImage
           alt=""
           className={cn(
-            "h-[260px] bg-slate-300",
+            "h-[260px] bg-slate-300 object-cover",
             "max-sm:h-[210px] max-sm:w-full",
           )}
           height={260}
@@ -25,10 +27,11 @@ export function MegazineCard({ title, imageUrl }: MegazineCardProps) {
         />
       }
       title={
-        <span className="max-sm:font-semibold">
-          {title}
-          {title}
-        </span>
+        typeof title === "string" ? (
+          <span className="max-sm:font-semibold">{title}</span>
+        ) : (
+          title
+        )
       }
     />
   );
