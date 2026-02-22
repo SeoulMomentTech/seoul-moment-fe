@@ -9,6 +9,8 @@ import { MegazineSlide } from "@widgets/megazine-slide";
 import { MoreMagazineList } from "@widgets/more-magazine";
 import { SectionWithLabel } from "@widgets/section-with-label";
 
+import { RelatedEmpty } from "./RelatedEmpty";
+
 interface RelatedListProps {
   lastNews: LastNews[];
   type: "news" | "article";
@@ -16,6 +18,8 @@ interface RelatedListProps {
 
 export function RelatedList({ lastNews, type }: RelatedListProps) {
   const t = useTranslations();
+  const isEmpty = lastNews.length === 0;
+
   return (
     <div
       className={cn("mx-auto min-w-[1280px] bg-black/5", "max-sm:min-w-auto")}
@@ -30,17 +34,25 @@ export function RelatedList({ lastNews, type }: RelatedListProps) {
             <h3 className="text-title-2 max-sm:text-title-4">
               <b>{t("explore_more_content")}</b>
             </h3>
-            <Link
-              className="text-body-3 max-sm:text-body-4 hover:underline"
-              href="/"
-            >
-              More
-            </Link>
+            {!isEmpty && (
+              <Link
+                className="text-body-3 max-sm:text-body-4 hover:underline"
+                href="/"
+              >
+                More
+              </Link>
+            )}
           </div>
         }
       >
-        <MoreMagazineList magazines={lastNews} type={type} />
-        <MegazineSlide magazines={lastNews} type={type} />
+        {isEmpty ? (
+          <RelatedEmpty type={type} />
+        ) : (
+          <>
+            <MoreMagazineList magazines={lastNews} type={type} />
+            <MegazineSlide magazines={lastNews} type={type} />
+          </>
+        )}
       </SectionWithLabel>
     </div>
   );
