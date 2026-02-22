@@ -16,7 +16,7 @@ export function MegazineCard({ title, imageUrl }: MegazineCardProps) {
         <BaseImage
           alt=""
           className={cn(
-            "h-[260px] bg-slate-300",
+            "h-[260px] bg-slate-300 object-cover",
             "max-sm:h-[210px] max-sm:w-full",
           )}
           height={260}
@@ -24,12 +24,7 @@ export function MegazineCard({ title, imageUrl }: MegazineCardProps) {
           width={400}
         />
       }
-      title={
-        <span className="max-sm:font-semibold">
-          {title}
-          {title}
-        </span>
-      }
+      title={<span className="max-sm:font-semibold">{title}</span>}
     />
   );
 }
