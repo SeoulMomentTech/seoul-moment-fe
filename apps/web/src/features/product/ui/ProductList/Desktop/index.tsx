@@ -12,6 +12,7 @@ import BrandFilterSidebar from "./BrandFilterSidebar";
 import ProductGridSection from "./ProductGridSection";
 import useCategories from "../../../model/useCategories";
 import type { FilterKey } from "../../../model/useProductFilter";
+import useProductSearch from "../../../model/useProductSearch";
 
 const ProductFilterModal = lazy(() => import("../../ProductFilterModal"));
 
@@ -30,6 +31,7 @@ export default function DeskTop({
 }: DesktopProps) {
   const { isOpen, update } = useOpen();
   const { data: categories } = useCategories();
+  const { handleSearch } = useProductSearch();
 
   return (
     <>
@@ -71,9 +73,7 @@ export default function DeskTop({
             className="h-[42px] w-[278px]"
             defaultValue={filter.search ?? ""}
             key={filter.search ?? "search-bar"}
-            onSearch={(value) =>
-              handleUpdateFilter({ search: value || null })()
-            }
+            onSearch={handleSearch}
           />
         </Flex>
         <div
