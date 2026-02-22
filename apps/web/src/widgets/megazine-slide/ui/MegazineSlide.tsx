@@ -61,7 +61,7 @@ export function MegazineSlide({ magazines, type }: MegazineSlideProps) {
       </Swiper>
 
       {/* Bottom Area: Progress Bar and Pagination */}
-      <div className="flex flex-col gap-[30px] px-[20px]">
+      <div className="flex flex-col gap-[30px]">
         {/* Progress Bar */}
         <div className="relative h-[2px] w-full bg-black/10">
           <div
