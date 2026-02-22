@@ -142,7 +142,7 @@ body {
 
 * {
   box-sizing: border-box;
-  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-0;
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-transparent focus-visible:ring-offset-0;
 }
 
 .swiper-button-prev,
