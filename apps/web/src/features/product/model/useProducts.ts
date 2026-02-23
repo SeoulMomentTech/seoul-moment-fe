@@ -20,7 +20,6 @@ const useProducts = ({
   return useAppQuery({
     ...options,
     queryFn: () => getProductList(params),
-    select: (res) => res.data,
   });
 };
 

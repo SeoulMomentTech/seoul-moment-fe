@@ -23,6 +23,7 @@ export function MegazineCard({ title, imageUrl }: MegazineCardProps) {
           )}
           height={260}
           src={imageUrl}
+          unoptimized
           width={400}
         />
       }
