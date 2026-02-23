@@ -52,6 +52,7 @@ export interface GetProductListReq extends PublicLanguageCode {
   optionIdList?: number[];
   sortColumn?: string; // creatDate, price
   sort?: string; // ASC, DESC
+  mainView?: boolean;
 }
 
 export interface ProductItem {
@@ -81,6 +82,7 @@ export interface GetProductListRes {
 
 export const getProductList = ({
   optionIdList,
+  mainView,
   ...params
 }: GetProductListReq) => {
   const searchParams: Array<Array<string | number | boolean>> = Object.entries(
@@ -95,6 +97,10 @@ export const getProductList = ({
     optionIdList.forEach((id) => {
       searchParams.push(["optionIdList", id]);
     });
+  }
+
+  if (mainView != null) {
+    searchParams.push(["mainView", mainView]);
   }
 
   return api
