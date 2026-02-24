@@ -1,10 +1,9 @@
-import Image from "next/image";
 import { useTranslations } from "next-intl";
 
 import { cn } from "@shared/lib/style";
 import Divider from "@shared/ui/divider";
 
-import { InquiryForm } from "@features/inquiry";
+import { InquiryForm, KakaoQR, LineQR } from "@features/inquiry";
 
 export function InquiryPage() {
   const t = useTranslations();
@@ -49,12 +48,8 @@ export function InquiryPage() {
         <InquiryForm />
       </div>
       <div className="flex w-[120px] flex-col gap-[16px] max-sm:hidden">
-        <figure>
-          <Image alt="" height={120} src="/qr/line.png" width={120} />
-        </figure>
-        <figure>
-          <Image alt="" height={300} src="/qr/kakao.png" width={300} />
-        </figure>
+        <LineQR />
+        <KakaoQR />
       </div>
     </div>
   );
