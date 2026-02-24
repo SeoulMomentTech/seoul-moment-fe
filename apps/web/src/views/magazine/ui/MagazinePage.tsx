@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+
 import { cn } from "@shared/lib/style";
 
 import { Link } from "@/i18n/navigation";
@@ -29,14 +31,16 @@ export function MagazinePage() {
                 "text-[14px] hover:underline",
                 "max-sm:text-[13px]",
               )}
-              href="/"
+              href="/news"
             >
               More
             </Link>
           </div>
         }
       >
-        <NewsList />
+        <Suspense fallback={<div>Loading...</div>}>
+          <NewsList />
+        </Suspense>
       </SectionWithLabel>
     </section>
   );

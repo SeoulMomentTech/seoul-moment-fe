@@ -3,6 +3,8 @@ import { EyeIcon, HeartIcon } from "lucide-react";
 import { cn } from "@shared/lib/style";
 import Divider from "@shared/ui/divider";
 
+import { Flex } from "@seoul-moment/ui";
+
 // 추후 데이터 연동시 props 확장 필요
 interface MagazineCardInfoProps {
   className?: string;
@@ -36,27 +38,28 @@ export function MagazineCardInfo({
     <div
       className={cn(
         "flex w-[275px] flex-col justify-center gap-[20px]",
+        "max-sm:w-full",
         textColor === "white" ? "text-white" : "text-black",
         className,
       )}
     >
       <div className="flex items-center justify-between">
         <span className={styleMap[size].category}>SNEAKERS</span>
-        <div className="flex items-center">
-          <div className="flex items-center gap-[4px]">
+        <div className={cn("flex items-center")}>
+          <Flex align="center" gap={4}>
             <HeartIcon height={14} width={14} />
             <span>100</span>
-          </div>
+          </Flex>
           <Divider
             className={cn(
               "mx-[8px] block",
               textColor === "white" ? "bg-white/40" : "bg-black/40",
             )}
           />
-          <div className="flex gap-[4px]">
+          <Flex align="center" gap={4}>
             <EyeIcon height={14} width={14} />
             <span>100</span>
-          </div>
+          </Flex>
         </div>
       </div>
       <h3 className={styleMap[size].title}>

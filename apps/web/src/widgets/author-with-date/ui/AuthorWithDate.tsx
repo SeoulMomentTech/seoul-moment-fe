@@ -18,8 +18,8 @@ export default function AuthorWithDate({
   return (
     <div
       className={cn(
-        "text-[14px] text-black/40",
-        "max-sm:text-[12px]",
+        "text-body-3 text-black/40",
+        "max-sm:text-body-5",
         textColor === "white" && "text-white",
         className,
       )}
