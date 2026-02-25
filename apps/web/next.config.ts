@@ -17,6 +17,11 @@ const nextConfig: NextConfig = {
         hostname: "image-dev.seoulmoment.com.tw",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "www.figma.com",
+        pathname: "/**",
+      },
     ],
     minimumCacheTTL: 86400,
   },
