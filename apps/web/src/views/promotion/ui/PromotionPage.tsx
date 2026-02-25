@@ -9,6 +9,7 @@ import {
   BrandLookbook,
   BrandSpecialEvent,
   BrandOfflinePopup,
+  BrandOnlineEvent,
 } from "@/features/promotion";
 
 export default function PromotionPage() {
@@ -22,6 +23,7 @@ export default function PromotionPage() {
       <BrandLookbook />
       <BrandSpecialEvent />
       <BrandOfflinePopup />
+      <BrandOnlineEvent />
     </>
   );
 }
