@@ -7,6 +7,7 @@ import {
   BrandTab,
   BrandIntroduction,
   BrandLookbook,
+  BrandSpecialEvent,
 } from "@/features/promotion";
 
 export default function PromotionPage() {
@@ -18,6 +19,7 @@ export default function PromotionPage() {
       <BrandTab onSelect={setSelectedBrandId} selectedId={selectedBrandId} />
       <BrandIntroduction />
       <BrandLookbook />
+      <BrandSpecialEvent />
     </>
   );
 }
