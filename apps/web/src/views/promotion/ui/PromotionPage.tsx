@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 import {
   MainBanner,
   BrandTab,
@@ -12,13 +10,15 @@ import {
   BrandOnlineEvent,
 } from "@/features/promotion";
 
-export default function PromotionPage() {
-  const [selectedBrandId, setSelectedBrandId] = useState("1");
+interface PromotionPageProps {
+  promotionId: number;
+}
 
+export default function PromotionPage({ promotionId }: PromotionPageProps) {
   return (
     <>
       <MainBanner />
-      <BrandTab onSelect={setSelectedBrandId} selectedId={selectedBrandId} />
+      <BrandTab selectedId={promotionId} />
       <BrandIntroduction />
       <BrandLookbook />
       <BrandSpecialEvent />
