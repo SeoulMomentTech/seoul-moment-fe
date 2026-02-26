@@ -61,7 +61,7 @@ export default async function RootLayout({
   return (
     <html lang={locale ?? "ko"}>
       <head>
-        {process.env.NODE_ENV === "production" && (
+        {process.env.NEXT_PUBLIC_ENV === "production" && (
           <>
             <Script
               src="https://www.googletagmanager.com/gtag/js?id=G-N4PST9C2ZV"
