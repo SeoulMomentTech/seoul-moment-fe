@@ -9,7 +9,7 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Toaster } from "sonner";
 
 import { ReactQueryProvider } from "@shared/lib/providers";
-import ScrollToTop from "@shared/ui/scroll-to-top";
+import ScrollRestoration from "@shared/ui/scroll-restoration";
 
 import { routing } from "@/i18n/routing";
 
@@ -94,7 +94,7 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ScrollToTop />
+        <ScrollRestoration />
         <NuqsAdapter>
           <NextIntlClientProvider messages={messages}>
             <ReactQueryProvider>

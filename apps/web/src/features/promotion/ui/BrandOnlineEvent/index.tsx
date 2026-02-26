@@ -53,7 +53,6 @@ export function BrandOnlineEvent() {
           </Flex>
         </div>
       </VStack>
-
       <NoticeSection />
       <BrandLinksSection />
     </section>
