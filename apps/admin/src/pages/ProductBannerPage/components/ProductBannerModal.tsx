@@ -5,6 +5,7 @@ import { X } from "lucide-react";
 import { ImageUploader } from "@shared/components/image-uploader";
 import type { CreateAdminProductBannerRequest } from "@shared/services/productBanner";
 import { stripImageDomain, uploadImageFile } from "@shared/utils/image";
+import { isValidUrl } from "@shared/utils/url";
 
 import { Button, Flex, HStack, Input, Label } from "@seoul-moment/ui";
 
@@ -99,7 +100,7 @@ export function ProductBannerModal({
       return;
     }
 
-    if (url && !url.startsWith("https://")) {
+    if (url && !isValidUrl(url)) {
       alert("배너 링크는 https로 시작해야 합니다.");
       return;
     }
@@ -130,7 +131,7 @@ export function ProductBannerModal({
       setImageFile(null);
       setMobileImagePreview(initialMobileImageUrl ?? "");
       setMobileImageFile(null);
-      setUrl(initialUrl);
+      setUrl(initialUrl ?? "");
     }
   }, [initialImageUrl, initialMobileImageUrl, initialUrl, isOpen]);
 
