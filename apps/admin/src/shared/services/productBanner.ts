@@ -9,6 +9,7 @@ export interface AdminProductBannerListItem {
   id: ProductBannerId;
   imageUrl: string;
   mobileImageUrl: string;
+  url: string;
   sort: number;
   createDate: string;
   updateDate: string;
@@ -28,6 +29,7 @@ export interface AdminProductBannerListParams {
 export interface CreateAdminProductBannerRequest {
   imageUrl: string;
   mobileImageUrl: string;
+  url?: string;
 }
 
 export interface UpdateAdminProductBannerSortOrder {
@@ -42,6 +44,7 @@ export interface UpdateAdminProductBannerSortOrderRequest {
 export interface UpdateAdminProductBannerRequest {
   imageUrl: string;
   mobileImageUrl: string;
+  url?: string;
 }
 
 export interface AdminProductBannerDetail {
