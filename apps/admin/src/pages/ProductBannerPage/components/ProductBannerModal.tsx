@@ -3,18 +3,21 @@ import { useEffect, useMemo, useState } from "react";
 import { X } from "lucide-react";
 
 import { ImageUploader } from "@shared/components/image-uploader";
+import type { CreateAdminProductBannerRequest } from "@shared/services/productBanner";
 import { stripImageDomain, uploadImageFile } from "@shared/utils/image";
+import { isValidUrl } from "@shared/utils/url";
 
-import { Button, Flex, HStack } from "@seoul-moment/ui";
+import { Button, Flex, HStack, Input, Label } from "@seoul-moment/ui";
 
 interface ProductBannerModalProps {
   isOpen: boolean;
   isSaving: boolean;
   initialImageUrl?: string;
   initialMobileImageUrl?: string;
-  mode: 'create' | 'update';
+  initialUrl?: string;
+  mode: "create" | "update";
   onClose(): void;
-  onSave(payload: { imageUrl: string, mobileImageUrl: string }): Promise<void>;
+  onSave(payload: CreateAdminProductBannerRequest): Promise<void>;
 }
 
 export function ProductBannerModal({
@@ -22,26 +25,41 @@ export function ProductBannerModal({
   isSaving,
   initialImageUrl,
   initialMobileImageUrl,
+  initialUrl,
   mode,
   onClose,
   onSave,
 }: ProductBannerModalProps) {
+  const [url, setUrl] = useState<string | undefined>(initialUrl);
+
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>(
     initialImageUrl ?? "",
   );
 
   const [mobileImageFile, setMobileImageFile] = useState<File | null>(null);
-  const [mobileImagePreview, setMobileImagePreview] = useState<string>(initialMobileImageUrl ?? "");
+  const [mobileImagePreview, setMobileImagePreview] = useState<string>(
+    initialMobileImageUrl ?? "",
+  );
   const [isUploading, setIsUploading] = useState(false);
 
   const hasImage = useMemo(() => Boolean(imagePreview), [imagePreview]);
-  const hasMobileImage = useMemo(() => Boolean(mobileImagePreview), [mobileImagePreview]);
+  const hasMobileImage = useMemo(
+    () => Boolean(mobileImagePreview),
+    [mobileImagePreview],
+  );
+
+  console.log("initialUrl:", url, initialUrl);
 
   const title = mode === "update" ? "배너 수정" : "배너 등록";
-  const description = mode === "update"
-    ? "배너 이미지를 수정합니다."
-    : "새로운 상품 배너를 등록합니다.";
+  const description =
+    mode === "update"
+      ? "배너 이미지를 수정합니다."
+      : "새로운 상품 배너를 등록합니다.";
+
+  const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUrl(e.target.value);
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -61,7 +79,7 @@ export function ProductBannerModal({
 
   const resetState = () => {
     setImageFile(null);
-    setMobileImageFile(null)
+    setMobileImageFile(null);
     setImagePreview(initialImageUrl ?? "");
     setMobileImagePreview(initialMobileImageUrl ?? "");
   };
@@ -82,6 +100,11 @@ export function ProductBannerModal({
       return;
     }
 
+    if (url && !isValidUrl(url)) {
+      alert("배너 링크는 https로 시작해야 합니다.");
+      return;
+    }
+
     try {
       setIsUploading(true);
       const imageUrl = imageFile
@@ -92,7 +115,7 @@ export function ProductBannerModal({
         ? (await uploadImageFile(mobileImageFile, "banner")).imagePath
         : stripImageDomain(mobileImagePreview);
 
-      await onSave({ imageUrl, mobileImageUrl });
+      await onSave({ imageUrl, mobileImageUrl, url });
       handleClose();
     } catch (error) {
       console.error("배너 저장 오류:", error);
@@ -108,17 +131,19 @@ export function ProductBannerModal({
       setImageFile(null);
       setMobileImagePreview(initialMobileImageUrl ?? "");
       setMobileImageFile(null);
+      setUrl(initialUrl ?? "");
     }
-  }, [initialImageUrl, initialMobileImageUrl, isOpen]);
+  }, [initialImageUrl, initialMobileImageUrl, initialUrl, isOpen]);
 
   useEffect(() => {
     return () => {
       if (imagePreview) URL.revokeObjectURL(imagePreview);
       if (mobileImagePreview) URL.revokeObjectURL(mobileImagePreview);
     };
-  }, [imagePreview, mobileImagePreview])
+  }, [imagePreview, mobileImagePreview]);
 
-  const isSaveDisabled = isSaving || isUploading || !hasImage || !hasMobileImage;
+  const isSaveDisabled =
+    isSaving || isUploading || !hasImage || !hasMobileImage;
 
   if (!isOpen) return null;
 
@@ -136,9 +161,7 @@ export function ProductBannerModal({
             <X className="h-4 w-4" />
           </button>
         </HStack>
-        <p className="mb-6 text-sm text-gray-500">
-          {description}
-        </p>
+        <p className="mb-6 text-sm text-gray-500">{description}</p>
 
         <div className="mb-6">
           <ImageUploader
@@ -165,6 +188,17 @@ export function ProductBannerModal({
             preview={mobileImagePreview}
           />
         </div>
+
+        <Flex className="mb-6" direction="column" gap={6}>
+          <Label>배너 링크</Label>
+          <Input
+            className="h-10"
+            onChange={handleUrlChange}
+            placeholder="배너 링크를 입력하세요."
+            type="url"
+            value={url}
+          />
+        </Flex>
 
         <Flex gap={8} justify="flex-end">
           <Button onClick={handleClose} variant="outline">

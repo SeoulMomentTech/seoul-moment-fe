@@ -4,6 +4,7 @@ import { Pagination } from "@shared/components/pagination";
 import { DEFAULT_PAGE } from "@shared/constants/page";
 import type {
   AdminProductBannerListItem,
+  CreateAdminProductBannerRequest,
   ProductBannerId,
 } from "@shared/services/productBanner";
 
@@ -69,6 +70,8 @@ export function ProductBannerPage() {
   };
 
   const openEditModal = (banner: AdminProductBannerListItem) => {
+    console.log(banner);
+
     setEditingBanner(banner);
     setIsModalOpen(true);
   };
@@ -78,9 +81,8 @@ export function ProductBannerPage() {
     setEditingBanner(null);
   };
 
-  const handleSaveBanner = async (payload: { imageUrl: string, mobileImageUrl: string }) => {
-    const { imageUrl, mobileImageUrl } = payload;
-
+  const handleSaveBanner = async (payload: CreateAdminProductBannerRequest) => {
+    const { imageUrl, mobileImageUrl, url } = payload;
 
     if (editingBanner) {
       await updateBanner({
@@ -88,13 +90,14 @@ export function ProductBannerPage() {
         payload: {
           imageUrl,
           mobileImageUrl,
+          url,
         },
       });
       alert("배너가 수정되었습니다.");
       return;
     }
 
-    await createBanner({ imageUrl, mobileImageUrl });
+    await createBanner({ imageUrl, mobileImageUrl, url });
     alert("배너가 등록되었습니다.");
   };
 
@@ -183,6 +186,7 @@ export function ProductBannerPage() {
       <ProductBannerModal
         initialImageUrl={editingBanner?.imageUrl}
         initialMobileImageUrl={editingBanner?.mobileImageUrl}
+        initialUrl={editingBanner?.url}
         isOpen={isModalOpen}
         isSaving={isCreating || isUpdating}
         mode={editingBanner ? "update" : "create"}

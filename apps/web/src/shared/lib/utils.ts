@@ -52,3 +52,7 @@ export async function throttledFetch(url: string, options?: Options) {
 export const isValidExternalUrl = (url: string) => {
   return url.startsWith("http://") || url.startsWith("https://");
 };
+
+export const isInternalUrl = (url: string) => {
+  return url.startsWith("https://seoulmoment.com.tw/");
+};
