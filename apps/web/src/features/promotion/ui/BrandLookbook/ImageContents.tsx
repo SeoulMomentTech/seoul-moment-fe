@@ -11,7 +11,7 @@ interface ImageTypeProps {
   imageList: string[];
 }
 
-const ImageTypeA = ({ imageList }: ImageTypeProps) => {
+const SingleImageContent = ({ imageList }: ImageTypeProps) => {
   return (
     <div className="relative h-[944px] w-[630px] max-sm:h-[540px] max-sm:w-full">
       <Image
@@ -24,7 +24,7 @@ const ImageTypeA = ({ imageList }: ImageTypeProps) => {
   );
 };
 
-const ImageTypeB = ({ imageList }: ImageTypeProps) => {
+const PairImageContent = ({ imageList }: ImageTypeProps) => {
   const isMobile = useMediaQuery("(max-width: 40rem)", false);
   const id = useId();
 
@@ -49,7 +49,7 @@ const ImageTypeB = ({ imageList }: ImageTypeProps) => {
   );
 };
 
-const ImageTypeC = ({ imageList }: ImageTypeProps) => {
+const StripImageContent = ({ imageList }: ImageTypeProps) => {
   const id = useId();
 
   return (
@@ -77,7 +77,7 @@ const ImageTypeC = ({ imageList }: ImageTypeProps) => {
   );
 };
 
-const ImageTypeD = ({ imageList }: ImageTypeProps) => {
+const BottomSmallContent = ({ imageList }: ImageTypeProps) => {
   const isMobile = useMediaQuery("(max-width: 40rem)", false);
 
   return (
@@ -103,7 +103,7 @@ const ImageTypeD = ({ imageList }: ImageTypeProps) => {
   );
 };
 
-const ImageTypeE = ({ imageList }: ImageTypeProps) => {
+const BottomFullContent = ({ imageList }: ImageTypeProps) => {
   return (
     <Flex
       align="center"
@@ -131,11 +131,11 @@ export function ImageContents({ imageList, type }: ImageContentsProps) {
   return (
     <SwitchCase
       caseBy={{
-        1: <ImageTypeA imageList={imageList} />,
-        2: <ImageTypeB imageList={imageList} />,
-        3: <ImageTypeC imageList={imageList} />,
-        4: <ImageTypeD imageList={imageList} />,
-        5: <ImageTypeE imageList={imageList} />,
+        1: <SingleImageContent imageList={imageList} />,
+        2: <PairImageContent imageList={imageList} />,
+        3: <StripImageContent imageList={imageList} />,
+        4: <BottomSmallContent imageList={imageList} />,
+        5: <BottomFullContent imageList={imageList} />,
       }}
       defaultComponent={null}
       value={type}
