@@ -26,7 +26,7 @@ export function Mission() {
   return (
     <section
       className={cn(
-        "relative min-h-[814px] min-w-[1280px] text-white",
+        "min-w-7xl relative min-h-[814px] text-white",
         "max-sm:h-auto max-sm:min-w-full",
       )}
     >
@@ -39,13 +39,13 @@ export function Mission() {
       />
       <div
         className={cn(
-          "z-1 relative mx-auto max-w-[1280px] px-[20px] py-[140px] max-sm:py-[50px]",
+          "z-1 relative mx-auto max-w-7xl px-5 py-[140px] max-sm:py-[50px]",
         )}
       >
         <h2
           className={cn(
-            "text-title-2 mb-[80px] font-bold",
-            "max-sm:text-title-3 max-sm:mb-[40px]",
+            "text-title-2 mb-20 font-bold",
+            "max-sm:text-title-3 max-sm:mb-10",
           )}
         >
           Mission
@@ -64,16 +64,16 @@ export function Mission() {
           >
             {t("mission_description")}
           </h3>
-          <div className="flex flex-col gap-[40px]">
+          <div className="flex flex-col gap-10">
             {data.map((item) => (
               <div
                 className={cn(
-                  "flex w-[570px] flex-col gap-[30px] border-b border-b-white/20 pb-[40px]",
+                  "flex w-[570px] flex-col gap-[30px] border-b border-b-white/20 pb-10",
                   "max-sm:w-auto",
                 )}
                 key={`mission-${item.id}`}
               >
-                <div className="text-title-3 max-sm:text-title-4 flex gap-[20px] font-bold">
+                <div className="text-title-3 max-sm:text-title-4 flex gap-5 font-bold">
                   <span>0{item.id}</span>
                   <h4>{t(item.title)}</h4>
                 </div>

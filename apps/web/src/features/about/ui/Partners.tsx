@@ -38,28 +38,28 @@ export function Partners() {
   return (
     <section
       className={cn(
-        "relative h-[754px] min-w-[1280px] px-[20px]",
+        "min-w-7xl relative h-[754px] px-5",
         "max-sm:h-auto max-sm:min-w-full",
       )}
     >
       <div
         className={cn(
-          "z-1 relative mx-auto max-w-[1280px] pb-[100px] pt-[140px] max-sm:py-[50px]",
+          "z-1 relative mx-auto max-w-7xl pb-[100px] pt-[140px] max-sm:py-[50px]",
         )}
       >
         <h2
           className={cn(
-            "text-title-2 mb-[40px] font-bold",
-            "max-sm:text-title-3 max-sm:mb-[40px] max-sm:px-[20px]",
+            "text-title-2 mb-10 font-bold",
+            "max-sm:text-title-3 max-sm:mb-10 max-sm:px-5",
           )}
         >
           {t("partners")}
         </h2>
 
-        <div className="flex flex-col gap-[40px] max-sm:gap-[30px]">
+        <div className="flex flex-col gap-10 max-sm:gap-[30px]">
           {id && (
             <Tabs
-              className="border-b border-b-black/10 max-sm:pl-[20px]"
+              className="border-b border-b-black/10 max-sm:pl-5"
               defaultValue={id.toString()}
               onValueChange={(value) => setId(Number(value))}
             >
@@ -79,7 +79,7 @@ export function Partners() {
 
           {shouldShowEmpty ? (
             <Empty
-              className="h-[360px] w-full max-sm:px-[20px]"
+              className="h-[360px] w-full max-sm:px-5"
               description={t("no_partners_found")}
               icon={
                 <UsersIcon className="text-black/30" height={24} width={24} />
@@ -88,7 +88,7 @@ export function Partners() {
           ) : (
             <div
               className={cn(
-                "inline-flex gap-[40px] max-sm:px-[20px]",
+                "inline-flex gap-10 max-sm:px-5",
                 "max-sm:flex-col max-sm:items-center max-sm:gap-[30px]",
               )}
             >

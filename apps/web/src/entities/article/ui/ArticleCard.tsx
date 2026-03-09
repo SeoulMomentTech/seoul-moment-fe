@@ -60,7 +60,7 @@ export default function ArticleCard({
       subTitle={
         <p
           className={cn(
-            "line-clamp-2 min-h-[40px]",
+            "line-clamp-2 min-h-10",
             "max-sm:text-body-3 max-sm:min-h-auto",
           )}
         >

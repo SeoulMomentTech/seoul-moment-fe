@@ -27,7 +27,7 @@ export default function ProductCard({
 }: ProductCardProps) {
   return (
     <Card
-      className={cn("gap-[10px]", className)}
+      className={cn("gap-2.5", className)}
       contentWrapperClassName={cn(
         "gap-[16px] max-sm:gap-[20px]",
         contentWrapperClassName,
@@ -36,12 +36,12 @@ export default function ProductCard({
         hideExtraInfo ? (
           <></>
         ) : (
-          <div className="text-body-4 flex gap-[10px] text-black/40">
-            <div className="flex items-center gap-[4px]">
+          <div className="text-body-4 flex gap-2.5 text-black/40">
+            <div className="flex items-center gap-1">
               <HeartIcon height={14} width={14} />
               <span>{setComma(data?.like ?? 0)}</span>
             </div>
-            <div className="flex items-center gap-[4px]">
+            <div className="flex items-center gap-1">
               <StarIcon height={14} width={14} />
               <span>
                 {data?.reviewAverage ?? 0}({setComma(data?.review ?? 0)})
@@ -54,7 +54,7 @@ export default function ProductCard({
         <figure
           className={cn(
             "h-[305px] w-[305px]",
-            "max-sm:h-[208px] max-sm:w-[208px]",
+            "max-sm:size-52",
             imageClassName,
           )}
         >
@@ -69,18 +69,18 @@ export default function ProductCard({
         </figure>
       }
       subTitle={
-        <div className="text-body-3 flex flex-col gap-[4px]">
+        <div className="text-body-3 flex flex-col gap-1">
           <span className="font-semibold">
             {toNTCurrency(data?.price ?? 0)}
           </span>
           <div
             className={cn(
-              "flex min-h-[21px] items-center gap-[4px]",
+              "flex min-h-[21px] items-center gap-1",
               !data.colorCode && "invisible",
             )}
           >
             <Badge
-              className="h-[12px] w-[24px] rounded-none border-black/20 p-0"
+              className="h-3 w-6 rounded-none border-black/20 p-0"
               style={{
                 backgroundColor: data.colorCode,
               }}
@@ -90,7 +90,7 @@ export default function ProductCard({
         </div>
       }
       title={
-        <div className="flex flex-col gap-[8px]">
+        <div className="flex flex-col gap-2">
           <span className="text-body-5 font-semibold">
             {data?.brandName ?? ""}
           </span>

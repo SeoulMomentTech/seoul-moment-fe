@@ -76,8 +76,8 @@ export function FeaturedSubNewsCard({
   return (
     <div
       className={cn(
-        "flex h-[596px] w-[370px] flex-col gap-[20px]",
-        "max-sm:flex max-sm:h-[435px] max-sm:w-[264px] max-sm:justify-end max-sm:px-[20px]",
+        "flex h-[596px] w-[370px] flex-col gap-5",
+        "max-sm:flex max-sm:h-[435px] max-sm:w-[264px] max-sm:justify-end max-sm:px-5",
         className,
       )}
     >

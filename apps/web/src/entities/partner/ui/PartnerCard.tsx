@@ -27,7 +27,7 @@ export default function PartnerCard({
   return (
     <Card
       className={cn(
-        "h-[365px] flex-1 justify-between gap-[20px]",
+        "h-[365px] flex-1 justify-between gap-5",
         "max-sm:h-[390px] max-sm:w-full",
         className,
       )}
@@ -35,7 +35,7 @@ export default function PartnerCard({
       extraInfo={
         <a
           className={cn(
-            "max-sm:text-body-3 inline-flex w-fit items-center gap-[4px] border-b",
+            "max-sm:text-body-3 inline-flex w-fit items-center gap-1 border-b",
             !link && "hidden",
           )}
           href={link}
@@ -49,7 +49,7 @@ export default function PartnerCard({
       image={
         <div
           className={cn(
-            "h-[240px] w-full bg-slate-300 max-sm:h-[220px]",
+            "h-60 w-full bg-slate-300 max-sm:h-[220px]",
             imageClassName,
           )}
         >
@@ -76,7 +76,7 @@ export default function PartnerCard({
       title={
         <div
           className={cn(
-            "flex flex-col gap-[20px]",
+            "flex flex-col gap-5",
             textColor === "white" && "text-white",
           )}
         >
