@@ -13,14 +13,14 @@ export function ContactUS() {
   return (
     <section
       className={cn(
-        "flex h-[600px] w-[1280px] pb-[92px] pt-[108px]",
+        "w-7xl flex h-[600px] pb-[92px] pt-[108px]",
         "items-center justify-between",
-        "max-sm:h-[537px] max-sm:w-auto max-sm:bg-black max-sm:px-[20px] max-sm:text-white",
-        "max-sm:flex-col-reverse max-sm:gap-[40px] max-sm:px-[20px] max-sm:py-[50px]",
+        "max-sm:h-[537px] max-sm:w-auto max-sm:bg-black max-sm:px-5 max-sm:text-white",
+        "max-sm:flex-col-reverse max-sm:gap-10 max-sm:px-5 max-sm:py-[50px]",
       )}
     >
-      <div className={cn("flex flex-col gap-[40px]", "max-sm:w-full")}>
-        <div className="flex flex-col gap-[20px]">
+      <div className={cn("flex flex-col gap-10", "max-sm:w-full")}>
+        <div className="flex flex-col gap-5">
           <h2 className={cn("text-title-2 font-bold", "max-sm:text-title-3")}>
             Contact Us
           </h2>
@@ -29,7 +29,7 @@ export function ContactUS() {
         <Link href="/contact">
           <Button
             className={cn(
-              "h-[48px] w-fit px-[20px] py-[16px] font-semibold",
+              "h-12 w-fit px-5 py-4 font-semibold",
               "max-sm:bg-white max-sm:text-black",
             )}
           >

@@ -29,7 +29,7 @@ export default function StyleCard({
   return (
     <Card
       className={cn(
-        "h-[365px] flex-1 justify-between gap-[20px]",
+        "h-[365px] flex-1 justify-between gap-5",
         "max-sm:h-[390px] max-sm:w-full",
         className,
       )}
@@ -59,7 +59,7 @@ export default function StyleCard({
       title={
         <div
           className={cn(
-            "flex flex-col gap-[10px]",
+            "flex flex-col gap-2.5",
             textColor === "white" && "text-white",
           )}
         >

@@ -4,11 +4,11 @@ import { cn } from "@shared/lib/style";
 
 export function MainBanner() {
   return (
-    <section className="relative h-[600px] min-w-[1280px] pt-[56px] max-sm:min-w-full">
+    <section className="min-w-7xl relative h-[600px] pt-14 max-sm:min-w-full">
       <figure
         className={cn(
           "absolute flex h-full w-full items-center justify-center",
-          "max-sm:px-[20px]",
+          "max-sm:px-5",
         )}
       >
         <Image

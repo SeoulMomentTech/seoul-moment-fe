@@ -25,12 +25,12 @@ export function Article({ promise }: ArticleProps) {
 
   return (
     <SectionWithLabel
-      className="w-[1280px] py-[100px] max-sm:w-full max-sm:px-[20px]"
+      className="w-7xl py-[100px] max-sm:w-full max-sm:px-5"
       label={
         <div
           className={cn(
             "mb-[30px] flex w-full items-end justify-between",
-            "max-sm:mb-[20px]",
+            "max-sm:mb-5",
           )}
         >
           <h3 className="text-title-2 max-sm:text-title-4">
@@ -56,7 +56,7 @@ export function ArticleContents({ data }: ArticleContentsProps) {
     <>
       {isEmpty ? (
         <Empty
-          className="h-[360px] w-full max-sm:h-[240px]"
+          className="h-[360px] w-full max-sm:h-60"
           description={t("no_article_found")}
           icon={
             <FileTextIcon
@@ -80,12 +80,12 @@ export function ArticleContents({ data }: ArticleContentsProps) {
 export function ArticleSkeleton() {
   return (
     <SectionWithLabel
-      className="w-[1280px] py-[100px] max-sm:w-full max-sm:px-[20px]"
+      className="w-7xl py-[100px] max-sm:w-full max-sm:px-5"
       label={
         <div
           className={cn(
             "mb-[30px] flex w-full items-end justify-between",
-            "max-sm:mb-[20px]",
+            "max-sm:mb-5",
           )}
         >
           <h3 className="text-title-2 max-sm:text-title-4">
@@ -94,7 +94,7 @@ export function ArticleSkeleton() {
         </div>
       }
     >
-      <div className="flex gap-[40px] max-sm:hidden">
+      <div className="flex gap-10 max-sm:hidden">
         <ArticleCardSkeleton />
         <ArticleCardSkeleton />
       </div>
@@ -113,26 +113,22 @@ function ArticleCardSkeleton({ isMobile }: ArticleCardSkeletonProps) {
   return (
     <div
       className={cn(
-        "flex h-[500px] w-[625px] flex-col gap-[16px]",
+        "flex h-[500px] w-[625px] flex-col gap-4",
         "max-sm:h-[403px] max-sm:w-full",
         isMobile && "h-[403px] w-full",
       )}
     >
       <Skeleton
-        className={cn(
-          "h-[460px] w-full",
-          "max-sm:h-[320px]",
-          isMobile && "h-[320px]",
-        )}
+        className={cn("h-[460px] w-full", "max-sm:h-80", isMobile && "h-80")}
       />
       <Skeleton
-        className={cn("h-[22px] w-[320px]", "max-sm:h-[20px] max-sm:w-[240px]")}
+        className={cn("h-[22px] w-[320px]", "max-sm:h-5 max-sm:w-60")}
       />
       <Skeleton
-        className={cn("h-[16px] w-[420px]", "max-sm:h-[14px] max-sm:w-[260px]")}
+        className={cn("h-4 w-[420px]", "max-sm:h-3.5 max-sm:w-[260px]")}
       />
-      <div className="flex gap-[12px]">
-        <Skeleton className="h-[14px] w-[120px]" />
+      <div className="flex gap-3">
+        <Skeleton className="h-3.5 w-[120px]" />
       </div>
     </div>
   );

@@ -25,12 +25,12 @@ export function NowOnSale({ promise }: NowOnSaleProps) {
 
   return (
     <SectionWithLabel
-      className={cn("w-[1280px] py-[100px]", "max-sm:w-full max-sm:py-[50px]")}
+      className={cn("w-7xl py-[100px]", "max-sm:w-full max-sm:py-[50px]")}
       label={
         <div
           className={cn(
             "mb-[30px] flex w-full items-end justify-between",
-            "max-sm:mb-[20px] max-sm:px-[20px]",
+            "max-sm:mb-5 max-sm:px-5",
           )}
         >
           <h3 className="text-title-2 max-sm:text-title-4">
@@ -55,7 +55,7 @@ export function NowOnSaleContents({ data }: NowOnSaleContentsProps) {
   if (isEmpty) {
     return (
       <Empty
-        className="h-[360px] w-full max-sm:h-[240px]"
+        className="h-[360px] w-full max-sm:h-60"
         description={t("no_product_found")}
         icon={
           <PackageSearchIcon
@@ -73,13 +73,13 @@ export function NowOnSaleContents({ data }: NowOnSaleContentsProps) {
     <div
       className={cn(
         "flex flex-col items-center gap-[60px]",
-        "max-sm:gap-[40px] max-sm:px-[20px]",
+        "max-sm:gap-10 max-sm:px-5",
       )}
     >
       <div
         className={cn(
-          "grid w-full grid-cols-6 gap-x-[22px] gap-y-[40px]",
-          "max-sm:scrollbar-hide max-sm:grid-cols-2 max-sm:gap-[20px] max-sm:overflow-x-auto",
+          "grid w-full grid-cols-6 gap-x-[22px] gap-y-10",
+          "max-sm:scrollbar-hide max-sm:grid-cols-2 max-sm:gap-5 max-sm:overflow-x-auto",
         )}
       >
         {data.map((product) => (
@@ -99,7 +99,7 @@ export function NowOnSaleContents({ data }: NowOnSaleContentsProps) {
       <Link className="max-sm:w-full" href="/product">
         <Button
           className={cn(
-            "text-body-2 h-[48px] w-[116px] border-black/20 font-semibold",
+            "text-body-2 h-12 w-[116px] border-black/20 font-semibold",
             "max-sm:w-full",
           )}
           variant="outline"

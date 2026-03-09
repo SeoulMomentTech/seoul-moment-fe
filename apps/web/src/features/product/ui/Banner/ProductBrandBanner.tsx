@@ -36,8 +36,8 @@ export default function ProductBrandBanner({ id }: ProductBrandBannerProps) {
   return (
     <div
       className={cn(
-        "mb-[40px] flex gap-[40px]",
-        "max-sm:min-h-[400px] max-sm:flex-col max-sm:gap-[20px]",
+        "mb-10 flex gap-10",
+        "max-sm:min-h-[400px] max-sm:flex-col max-sm:gap-5",
       )}
     >
       <div
@@ -54,7 +54,7 @@ export default function ProductBrandBanner({ id }: ProductBrandBannerProps) {
           width={600}
         />
       </div>
-      <div className="flex flex-1 flex-col gap-[20px] px-[20px]">
+      <div className="flex flex-1 flex-col gap-5 px-5">
         <div
           className={cn(
             "flex items-center justify-between",
@@ -64,7 +64,7 @@ export default function ProductBrandBanner({ id }: ProductBrandBannerProps) {
           <div>
             <h2
               className={cn(
-                "text-title-2 mb-[12px] font-bold",
+                "text-title-2 mb-3 font-bold",
                 "max-sm:text-title-3",
               )}
             >
@@ -81,7 +81,7 @@ export default function ProductBrandBanner({ id }: ProductBrandBannerProps) {
             <Share2Icon height={20} width={20} />
           </Button>
         </div>
-        <div className={cn("flex flex-col gap-[40px]", "max-sm:gap-[20px]")}>
+        <div className={cn("flex flex-col gap-10", "max-sm:gap-5")}>
           <p className="text-body-3">{data?.description ?? ""}</p>
           <Button
             className={cn(
@@ -104,8 +104,8 @@ const BannerSkeleton = () => {
   return (
     <div
       className={cn(
-        "mb-[40px] flex gap-[40px]",
-        "max-sm:min-h-[400px] max-sm:flex-col max-sm:gap-[20px]",
+        "mb-10 flex gap-10",
+        "max-sm:min-h-[400px] max-sm:flex-col max-sm:gap-5",
       )}
     >
       <div
@@ -114,14 +114,14 @@ const BannerSkeleton = () => {
           "max-sm:h-[207px] max-sm:min-w-full max-sm:max-w-full",
         )}
       />
-      <div className="flex w-full flex-col gap-[20px]">
+      <div className="flex w-full flex-col gap-5">
         <div
           className={cn(
-            "h-[40px] w-[500px] bg-slate-300",
+            "h-10 w-[500px] bg-slate-300",
             "max-sm:h-[30px] max-sm:w-full",
           )}
         />
-        <div className={cn("flex flex-col gap-[40px]", "max-sm:gap-[20px]")}>
+        <div className={cn("flex flex-col gap-10", "max-sm:gap-5")}>
           <div className="h-[17.5px] w-[500px] bg-slate-300 max-sm:w-full" />
           <Button
             className={cn(

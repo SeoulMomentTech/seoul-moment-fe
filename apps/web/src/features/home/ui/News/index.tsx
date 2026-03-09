@@ -26,12 +26,12 @@ export default async function News() {
 function NewsSkeleton() {
   return (
     <SectionWithLabel
-      className={cn("w-[1280px] py-[100px]", "max-sm:w-full max-sm:py-[50px]")}
+      className={cn("w-7xl py-[100px]", "max-sm:w-full max-sm:py-[50px]")}
       label={
         <div
           className={cn(
             "mb-[30px] flex w-full items-end justify-between",
-            "max-sm:mb-[20px] max-sm:px-[20px]",
+            "max-sm:mb-5 max-sm:px-5",
           )}
         >
           <h3 className="text-title-2 max-sm:text-title-4">
@@ -42,7 +42,7 @@ function NewsSkeleton() {
     >
       <div
         className={cn(
-          "flex justify-between gap-[40px]",
+          "flex justify-between gap-10",
           "max-sm:w-full max-sm:flex-col",
         )}
       >
@@ -54,56 +54,50 @@ function NewsSkeleton() {
         >
           <Skeleton className="h-full w-full" />
           <div className="absolute bottom-0 left-0 right-0 px-[30px] pb-[50px]">
-            <div className="flex flex-col gap-[16px]">
+            <div className="flex flex-col gap-4">
               <Skeleton
-                className={cn(
-                  "h-[24px] w-[260px]",
-                  "max-sm:h-[20px] max-sm:w-[220px]",
-                )}
+                className={cn("h-6 w-[260px]", "max-sm:h-5 max-sm:w-[220px]")}
               />
               <Skeleton
-                className={cn(
-                  "h-[16px] w-[320px]",
-                  "max-sm:h-[14px] max-sm:w-[240px]",
-                )}
+                className={cn("h-4 w-[320px]", "max-sm:h-3.5 max-sm:w-60")}
               />
-              <Skeleton className={cn("h-[16px] w-[280px]", "max-sm:hidden")} />
+              <Skeleton className={cn("h-4 w-[280px]", "max-sm:hidden")} />
             </div>
-            <div className="mt-[20px] flex gap-[12px]">
-              <Skeleton className="h-[14px] w-[140px]" />
+            <div className="mt-5 flex gap-3">
+              <Skeleton className="h-3.5 w-[140px]" />
             </div>
           </div>
         </div>
         <div className="flex justify-start max-sm:justify-end">
           <div
             className={cn(
-              "flex h-[596px] w-[370px] flex-col gap-[20px]",
-              "max-sm:flex max-sm:h-[435px] max-sm:w-[264px] max-sm:justify-end max-sm:px-[20px]",
+              "flex h-[596px] w-[370px] flex-col gap-5",
+              "max-sm:flex max-sm:h-[435px] max-sm:w-[264px] max-sm:justify-end max-sm:px-5",
             )}
           >
             <Skeleton className={cn("h-[498px] w-full", "max-sm:h-[342px]")} />
-            <div className="flex flex-col gap-[12px]">
-              <Skeleton className="h-[20px] w-[220px] max-sm:w-[200px]" />
-              <Skeleton className="h-[16px] w-[280px] max-sm:w-[220px]" />
-              <Skeleton className="h-[16px] w-[200px] max-sm:w-[180px]" />
+            <div className="flex flex-col gap-3">
+              <Skeleton className="h-5 w-[220px] max-sm:w-[200px]" />
+              <Skeleton className="h-4 w-[280px] max-sm:w-[220px]" />
+              <Skeleton className="h-4 w-[200px] max-sm:w-[180px]" />
             </div>
-            <Skeleton className="h-[14px] w-[120px]" />
+            <Skeleton className="h-3.5 w-[120px]" />
           </div>
         </div>
         <div>
           <div
             className={cn(
-              "flex h-[596px] w-[370px] flex-col gap-[20px]",
-              "max-sm:flex max-sm:h-[435px] max-sm:w-[264px] max-sm:justify-end max-sm:px-[20px]",
+              "flex h-[596px] w-[370px] flex-col gap-5",
+              "max-sm:flex max-sm:h-[435px] max-sm:w-[264px] max-sm:justify-end max-sm:px-5",
             )}
           >
             <Skeleton className={cn("h-[498px] w-full", "max-sm:h-[342px]")} />
-            <div className="flex flex-col gap-[12px]">
-              <Skeleton className="h-[20px] w-[220px] max-sm:w-[200px]" />
-              <Skeleton className="h-[16px] w-[280px] max-sm:w-[220px]" />
-              <Skeleton className="h-[16px] w-[200px] max-sm:w-[180px]" />
+            <div className="flex flex-col gap-3">
+              <Skeleton className="h-5 w-[220px] max-sm:w-[200px]" />
+              <Skeleton className="h-4 w-[280px] max-sm:w-[220px]" />
+              <Skeleton className="h-4 w-[200px] max-sm:w-[180px]" />
             </div>
-            <Skeleton className="h-[14px] w-[120px]" />
+            <Skeleton className="h-3.5 w-[120px]" />
           </div>
         </div>
       </div>

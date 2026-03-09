@@ -24,7 +24,7 @@ export function Vision() {
   return (
     <section
       className={cn(
-        "relative h-[880px] w-full min-w-[1280px] bg-black py-[140px]",
+        "min-w-7xl relative h-[880px] w-full bg-black py-[140px]",
         "max-sm:h-auto max-sm:min-w-full max-sm:py-[50px]",
         "text-white",
       )}
@@ -35,11 +35,11 @@ export function Vision() {
           "max-sm:hidden",
         )}
       />
-      <div className={cn("z-1 relative px-[20px]", "mx-auto max-w-[1280px]")}>
+      <div className={cn("z-1 relative px-5", "mx-auto max-w-7xl")}>
         <h2
           className={cn(
             "text-title-2 mb-[60px] font-bold",
-            "max-sm:text-title-3 max-sm:mb-[40px]",
+            "max-sm:text-title-3 max-sm:mb-10",
           )}
         >
           VISION
@@ -57,14 +57,14 @@ export function Vision() {
         <div
           className={cn(
             "flex justify-center gap-[30px]",
-            "max-sm:flex-col max-sm:items-center max-sm:gap-[16px]",
+            "max-sm:flex-col max-sm:items-center max-sm:gap-4",
           )}
         >
           {data.map((item) => (
             <div
               className={cn(
                 "flex flex-col items-center justify-center rounded-full border border-white/50",
-                "h-[300px] w-[300px] gap-[50px] px-[24px]",
+                "h-[300px] w-[300px] gap-[50px] px-6",
                 "max-sm:px-[18px]] max-sm:h-[250px] max-sm:w-[250px] max-sm:gap-[30px]",
               )}
               key={item.title}

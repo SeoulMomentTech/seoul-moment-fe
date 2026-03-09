@@ -33,7 +33,7 @@ export default function ProductBanner() {
   };
 
   return (
-    <div className="mb-[40px] max-sm:mb-[20px]">
+    <div className="mb-10 max-sm:mb-5">
       <Swiper
         autoplay={{
           delay: 5000,
@@ -58,7 +58,7 @@ export default function ProductBanner() {
           <SwiperSlide key={item.banner}>
             <figure
               className={cn(
-                "h-[480px] overflow-hidden bg-slate-300 max-sm:h-[240px] max-sm:rounded-[4px]",
+                "h-[480px] overflow-hidden bg-slate-300 max-sm:h-60 max-sm:rounded-sm",
                 item.url && "cursor-pointer",
               )}
               onClick={() => handleClick(item.url)}
