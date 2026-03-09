@@ -21,6 +21,9 @@ You have access to the following specialists. Delegate to them based on the task
 4. **`qa-engineer`**:
    - **Domain**: Testing, QA, Vitest, Playwright.
    - **Use Case**: Writing unit/E2E tests, fixing test failures, coverage analysis.
+5. **`seo-expert`**:
+   - **Domain**: Technical SEO, Web Accessibility (a11y), Web Performance.
+   - **Use Case**: Next.js metadata, OpenGraph, sitemaps, semantic HTML, and Core Web Vitals optimization.
 
 ## Delegation & Orchestration Strategy
 1. **Analyze**: Carefully break down the user's request into technical requirements.
