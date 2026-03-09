@@ -1,12 +1,7 @@
 "use client";
 
-import { useCallback, useRef } from "react";
-
 import { SearchIcon } from "lucide-react";
 
-import { useTranslations } from "next-intl";
-
-import { useIntersectionObserver, useLanguage } from "@shared/lib/hooks";
 import { cn } from "@shared/lib/style";
 import type { GetProductListReq } from "@shared/services/product";
 
@@ -15,7 +10,7 @@ import { Link } from "@/i18n/navigation";
 import { ProductCard } from "@entities/product";
 import { Empty } from "@widgets/empty";
 
-import { useInfiniteProducts } from "../../../model/useInfiniteProducts";
+import { useProductListLogic } from "../../../model/useProductListLogic";
 import { ProductCardSkeleton } from "../../ProductCardSkeleton";
 
 interface ProductListSectionProps {
@@ -27,30 +22,8 @@ const MOBILE_PAGE_SIZE = 8;
 export default function ProductListSection({
   filter,
 }: ProductListSectionProps) {
-  const t = useTranslations();
-  const languageCode = useLanguage();
-  const loadMoreRef = useRef<HTMLDivElement | null>(null);
-
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useInfiniteProducts({
-      ...filter,
-      languageCode,
-    });
-
-  const handleIntersect = useCallback(() => {
-    if (!isFetchingNextPage) {
-      fetchNextPage();
-    }
-  }, [fetchNextPage, isFetchingNextPage]);
-
-  useIntersectionObserver({
-    target: loadMoreRef,
-    enabled: hasNextPage,
-    rootMargin: "200px",
-    onIntersect: handleIntersect,
-  });
-
-  const isEmpty = data?.length === 0;
+  const { data, isEmpty, isFetchingNextPage, isLoading, loadMoreRef, t } =
+    useProductListLogic(filter);
 
   return (
     <div
