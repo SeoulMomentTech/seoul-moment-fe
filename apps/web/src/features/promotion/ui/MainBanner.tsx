@@ -1,12 +1,22 @@
 import Image from "next/image";
 
+import { useMediaQuery } from "@/shared/lib/hooks";
+import type { GetBrandPromotionBannerResponse } from "@/shared/services/brandPromotion";
+
 import { cn } from "@seoul-moment/ui";
 
-export function MainBanner() {
+interface MainBannerProps {
+  bannerList: GetBrandPromotionBannerResponse[];
+}
+
+export function MainBanner({ bannerList }: MainBannerProps) {
+  const isMobile = useMediaQuery("(max-width: 40rem)", false);
+  const banner = bannerList?.[0] ?? {};
+
   return (
     <section
       className={cn(
-        "relative h-[556px] min-w-[1280px] pt-[56px]",
+        "min-w-7xl relative h-[556px] pt-14",
         "max-sm:h-[656px] max-sm:min-w-full",
       )}
     >
@@ -15,7 +25,7 @@ export function MainBanner() {
         className="h-full object-cover"
         height={727}
         priority
-        src="/about/seoul.webp"
+        src={isMobile ? banner.mobileImageUrl : banner.imageUrl}
         width={4000}
       />
     </section>

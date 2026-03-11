@@ -28,17 +28,20 @@ export default function PromotionPage({
 }: PromotionPageProps) {
   const { data } = use(promise);
 
-  console.log(data);
-
   return (
     <>
-      <MainBanner />
+      <MainBanner bannerList={data.bannerList} />
       <BrandTab selectedId={promotionId} />
-      <BrandIntroduction />
-      <BrandLookbook />
-      <BrandSpecialEvent />
-      <BrandOfflinePopup />
-      <BrandOnlineEvent />
+      <BrandIntroduction brand={data.brand} />
+      <BrandLookbook sectionList={data.sectionList} />
+      <BrandSpecialEvent products={data.productList} />
+      <BrandOfflinePopup popupList={data.popupList} />
+      <BrandOnlineEvent
+        colorCode={data.brand.colorCode}
+        eventList={data.eventList}
+        logoImage={data.brand.profileImageUrl}
+        noticeList={data.noticsList}
+      />
       <ScrollToTop className="bottom-20 right-[5%] z-50 mx-auto size-10 shadow-2xl" />
     </>
   );

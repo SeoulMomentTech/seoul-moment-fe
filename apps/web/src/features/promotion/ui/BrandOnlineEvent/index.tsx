@@ -1,5 +1,10 @@
 "use client";
 
+import type {
+  GetBrandPromotionEventAndCouponResponse,
+  GetBrandPromotionNoticsResponse,
+} from "@/shared/services/brandPromotion";
+
 import { Flex, cn, VStack } from "@seoul-moment/ui";
 
 import { BrandLinksSection } from "./BrandLinksSection";
@@ -26,14 +31,25 @@ const ONLINE_EVENTS: OnlineEvent[] = [
   },
 ];
 
-export function BrandOnlineEvent() {
+interface BrandOnlineEventProps {
+  eventList: GetBrandPromotionEventAndCouponResponse[];
+  noticeList: GetBrandPromotionNoticsResponse[];
+  colorCode: string;
+  logoImage: string;
+}
+
+export function BrandOnlineEvent({
+  noticeList,
+  colorCode,
+  logoImage,
+}: BrandOnlineEventProps) {
   return (
     <section className={cn("w-full bg-white")}>
       <VStack
         align="center"
         className={cn(
-          "mx-auto w-full min-w-[1280px] pb-[50px] pt-[140px]",
-          "max-sm:min-w-full max-sm:pb-[20px] max-sm:pt-[50px]",
+          "min-w-7xl mx-auto w-full pb-[50px] pt-[140px]",
+          "max-sm:min-w-full max-sm:pb-5 max-sm:pt-[50px]",
         )}
         gap={40}
       >
@@ -53,8 +69,8 @@ export function BrandOnlineEvent() {
           </Flex>
         </div>
       </VStack>
-      <NoticeSection />
-      <BrandLinksSection />
+      <NoticeSection noticeList={noticeList} />
+      <BrandLinksSection colorCode={colorCode} logoImage={logoImage} />
     </section>
   );
 }
