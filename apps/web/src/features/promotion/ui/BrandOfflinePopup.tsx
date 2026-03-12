@@ -5,8 +5,9 @@ import { useState } from "react";
 import { ChevronLeftIcon, ChevronRightIcon, MapPinIcon } from "lucide-react";
 
 import Image from "next/image";
+import { toast } from "sonner";
 
-import { useMediaQuery } from "@shared/lib/hooks";
+import { useCopyToClipboard, useMediaQuery } from "@shared/lib/hooks";
 import type { GetBrandPromotionPopupResponse } from "@shared/services/brandPromotion";
 
 import { VStack, HStack, cn, Flex } from "@seoul-moment/ui";
@@ -18,9 +19,15 @@ interface BrandOnlineEventProps {
 export function BrandOfflinePopup({ popupList }: BrandOnlineEventProps) {
   const [selectedId, setSelectedId] = useState(popupList[0].id);
   const isMobile = useMediaQuery("(max-width: 40rem)", false);
+  const { copy } = useCopyToClipboard();
 
   const activeEvent =
     popupList.find((e) => e.id === selectedId) || popupList[0];
+
+  const handleCopy = async () => {
+    await copy(activeEvent.address);
+    toast.success("URL Copied");
+  };
 
   return (
     <section
@@ -119,6 +126,7 @@ export function BrandOfflinePopup({ popupList }: BrandOnlineEventProps) {
                     {isMobile && (
                       <button
                         className="flex size-8 items-center justify-center rounded-full border border-black/20 bg-white outline-none"
+                        onClick={handleCopy}
                         type="button"
                       >
                         <MapPinIcon className="text-black" size={18} />
