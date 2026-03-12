@@ -19,6 +19,8 @@ export function BrandTab({ selectedId }: BrandTabProps) {
   const navigate = useRouter();
   const { data } = useBrandPromotionListQuery();
 
+  console.log(selectedId, data);
+
   return (
     <nav className="border-b border-black/10 bg-white">
       <Flex className={cn("w-7xl mx-auto", "max-sm:w-full")}>
@@ -31,7 +33,7 @@ export function BrandTab({ selectedId }: BrandTabProps) {
           gap={isMobile ? 20 : 50}
         >
           {data?.list.map((brand) => {
-            const isActive = brand.id === selectedId;
+            const isActive = brand.brandId === selectedId;
             return (
               <button
                 className={cn(

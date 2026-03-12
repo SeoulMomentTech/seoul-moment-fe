@@ -1,67 +1,66 @@
 import Image from "next/image";
 
+import type { GetBrandPromotionEventCouponResponse } from "@shared/services/brandPromotion";
+
 import { Flex, cn, VStack } from "@seoul-moment/ui";
 
-export interface OnlineEvent {
-  id: string;
-  title: string;
-  description: string;
-  imageUrl: string;
-  isExpired?: boolean;
-}
-
 interface EventCardProps {
-  event: OnlineEvent;
+  coupon: GetBrandPromotionEventCouponResponse;
 }
 
-export function EventCard({ event }: EventCardProps) {
+export function EventCard({ coupon }: EventCardProps) {
+  const isExpired = coupon.status === "EXPIRED";
+
   return (
     <VStack
       className={cn(
-        "relative w-[320px] shrink-0 border border-solid px-[16px] py-[30px] transition-all",
-        event.isExpired ? "border-black/10 bg-white" : "border-black bg-white",
+        "relative h-[586px] w-[620px] shrink-0 border border-solid bg-white px-4 py-[30px] transition-all",
+        "max-sm:h-auto max-sm:w-[320px]",
+        isExpired ? "border-black/10" : "border-black",
       )}
       gap={30}
     >
       <Flex
         align="center"
-        className="w-full border-b border-solid border-black/10 pb-[20px]"
+        className="w-full border-b border-solid border-black/10 pb-5"
         justify="center"
       >
         <h4
           className={cn(
             "text-body-1 text-center font-semibold leading-none",
-            event.isExpired ? "text-black/20" : "text-black",
+            isExpired ? "text-black/20" : "text-black",
           )}
         >
-          {event.title}
+          {coupon.title}
         </h4>
       </Flex>
       <VStack align="center" className="w-full" gap={30}>
         <p
           className={cn(
             "text-body-3 text-center leading-none",
-            event.isExpired ? "text-black/20" : "text-black/80",
+            isExpired ? "text-black/20" : "text-black/80",
           )}
         >
-          {event.description}
+          {coupon.description}
         </p>
-        <div className="relative h-[200px] w-full border border-solid border-black/10">
+        <div className="relative h-[386px] w-full border border-solid border-black/10 max-sm:h-[200px]">
           <Image
-            alt={event.title}
-            className={cn("object-cover", event.isExpired && "opacity-50")}
+            alt={coupon.title}
+            className={cn("object-cover", isExpired && "opacity-50")}
             fill
-            src={event.imageUrl}
+            src={coupon.imageUrl}
           />
         </div>
       </VStack>
-
-      {event.isExpired && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/50">
-          <div className="flex h-[126px] items-center justify-center rounded-[999px] bg-[#f33e2a] px-[20px]">
-            <span className="text-title-3 text-center font-semibold uppercase text-white">
-              Expired
-            </span>
+      {isExpired && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/70">
+          <div className="relative h-[70px] w-[214px] max-sm:h-[90px] max-sm:w-[180px]">
+            <Image
+              alt="expired"
+              className="object-contain"
+              fill
+              src="/promotion/expired.png"
+            />
           </div>
         </div>
       )}

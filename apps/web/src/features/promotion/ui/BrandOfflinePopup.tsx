@@ -6,8 +6,8 @@ import { ChevronLeftIcon, ChevronRightIcon, MapPinIcon } from "lucide-react";
 
 import Image from "next/image";
 
-import { useMediaQuery } from "@/shared/lib/hooks";
-import type { GetBrandPromotionPopupResponse } from "@/shared/services/brandPromotion";
+import { useMediaQuery } from "@shared/lib/hooks";
+import type { GetBrandPromotionPopupResponse } from "@shared/services/brandPromotion";
 
 import { VStack, HStack, cn, Flex } from "@seoul-moment/ui";
 
@@ -50,7 +50,10 @@ export function BrandOfflinePopup({ popupList }: BrandOnlineEventProps) {
                   onClick={() => setSelectedId(event.id)}
                   type="button"
                 >
-                  {event.startDate}
+                  {new Date(event.startDate).toLocaleDateString("en-US", {
+                    month: "2-digit",
+                    day: "2-digit",
+                  })}
                 </button>
               ))}
             </Flex>
@@ -108,7 +111,7 @@ export function BrandOfflinePopup({ popupList }: BrandOnlineEventProps) {
                   <DetailRow label="장소" value={activeEvent.place} />
                   <DetailRow
                     label="날짜"
-                    value={`${activeEvent.startDate} ~ ${activeEvent.endDate}}`}
+                    value={`${new Date(activeEvent.startDate).toLocaleDateString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit" })} ~ ${new Date(activeEvent.endDate ?? activeEvent.startDate).toLocaleDateString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit" })}`}
                   />
                   <DetailRow label="시간" value={"09:00 ~ 16:30"} />
                   <div className="flex w-full items-center justify-between">
@@ -123,7 +126,7 @@ export function BrandOfflinePopup({ popupList }: BrandOnlineEventProps) {
                     )}
                   </div>
 
-                  <Flex className="mt-2 w-full" direction="column" gap={16}>
+                  <Flex className="w-full" direction="column" gap={16}>
                     <span className="text-body-3 text-black/40">
                       Description
                     </span>
@@ -137,16 +140,14 @@ export function BrandOfflinePopup({ popupList }: BrandOnlineEventProps) {
           </div>
 
           {/* Map Section - Only Desktop */}
-          {!isMobile && (
-            <div className="relative h-[300px] w-full overflow-hidden border border-black/10">
-              <Image
-                alt="Event Map"
-                className="object-cover"
-                fill
-                src={activeEvent.imageUrlList[0]}
-              />
-            </div>
-          )}
+
+          <iframe
+            className="w-full max-sm:h-[130px]"
+            height="300"
+            loading="lazy"
+            src={`https://maps.google.com/maps?q=${activeEvent.latitude},${activeEvent.longitude}&z=16&output=embed`}
+            width="600"
+          />
         </VStack>
       </div>
     </section>

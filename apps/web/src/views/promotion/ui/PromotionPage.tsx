@@ -37,6 +37,7 @@ export default function PromotionPage({
       <BrandSpecialEvent products={data.productList} />
       <BrandOfflinePopup popupList={data.popupList} />
       <BrandOnlineEvent
+        brand={data.brand}
         colorCode={data.brand.colorCode}
         eventList={data.eventList}
         logoImage={data.brand.profileImageUrl}

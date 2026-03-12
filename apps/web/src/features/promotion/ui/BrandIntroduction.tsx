@@ -4,9 +4,11 @@ import { HeartIcon, Share2Icon } from "lucide-react";
 
 import Image from "next/image";
 
-import type { GetBrandPromotionBrandDetailResponse } from "@/shared/services/brandPromotion";
+import type { GetBrandPromotionBrandDetailResponse } from "@shared/services/brandPromotion";
 
-import { VStack, HStack, Button, cn } from "@seoul-moment/ui";
+import { Link } from "@/i18n/navigation";
+
+import { VStack, HStack, cn, Flex } from "@seoul-moment/ui";
 
 interface BrandIntroductionProps {
   brand: GetBrandPromotionBrandDetailResponse;
@@ -75,17 +77,28 @@ export function BrandIntroduction({ brand }: BrandIntroductionProps) {
           </VStack>
 
           {/* Actions */}
-          <HStack className="max-sm:w-full" gap={10}>
-            <Button
-              className="text-body-2 h-12 w-[120px] border-neutral-200 font-semibold max-sm:flex-1"
-              variant="outline"
+          <Flex className="max-sm:w-full" gap={10}>
+            <Link
+              className={cn(
+                "flex items-center justify-center rounded-sm border",
+                "text-body-2 h-12 w-[124px] border-neutral-200 font-semibold max-sm:flex-1",
+                "max-sm:text-body-3 max-sm:h-[38px] max-sm:w-[155px]",
+              )}
+              href={`/brand/${brand.id}`}
             >
               브랜드 소개
-            </Button>
-            <Button className="text-body-2 h-12 w-[120px] bg-black font-semibold text-white max-sm:flex-1">
+            </Link>
+            <Link
+              className={cn(
+                "flex items-center justify-center rounded-sm border",
+                "text-body-2 h-12 w-[124px] border-neutral-200 font-semibold max-sm:flex-1",
+                "max-sm:text-body-3 max-sm:h-[38px] max-sm:w-[155px]",
+              )}
+              href={`/product?brandId=${brand.id}`}
+            >
               Shop
-            </Button>
-          </HStack>
+            </Link>
+          </Flex>
         </VStack>
       </div>
     </section>

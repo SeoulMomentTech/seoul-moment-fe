@@ -1,37 +1,19 @@
 "use client";
 
 import type {
+  GetBrandPromotionBrandDetailResponse,
   GetBrandPromotionEventAndCouponResponse,
   GetBrandPromotionNoticsResponse,
-} from "@/shared/services/brandPromotion";
+} from "@shared/services/brandPromotion";
 
 import { Flex, cn, VStack } from "@seoul-moment/ui";
 
 import { BrandLinksSection } from "./BrandLinksSection";
-import { EventCard, type OnlineEvent } from "./EventCard";
+import { EventCard } from "./EventCard";
 import { NoticeSection } from "./NoticeSection";
 
-const ONLINE_EVENTS: OnlineEvent[] = [
-  {
-    id: "1",
-    title: "Musinsa 25 F/W",
-    description:
-      "이번 무신사 가을 팝업 이벤트는 25시즌 트랜트에 맞춰 남녀 신상 상품들을 선보인다.",
-    imageUrl:
-      "https://www.figma.com/api/mcp/asset/7606ee33-a881-448a-b0e1-0bca47ed9e2e",
-  },
-  {
-    id: "2",
-    title: "Musinsa 25 F/W",
-    description:
-      "이번 무신사 가을 팝업 이벤트는 25시즌 트랜트에 맞춰 남녀 신상 상품들을 선보인다.",
-    imageUrl:
-      "https://www.figma.com/api/mcp/asset/7606ee33-a881-448a-b0e1-0bca47ed9e2e",
-    isExpired: true,
-  },
-];
-
 interface BrandOnlineEventProps {
+  brand: GetBrandPromotionBrandDetailResponse;
   eventList: GetBrandPromotionEventAndCouponResponse[];
   noticeList: GetBrandPromotionNoticsResponse[];
   colorCode: string;
@@ -39,10 +21,14 @@ interface BrandOnlineEventProps {
 }
 
 export function BrandOnlineEvent({
+  brand,
   noticeList,
+  eventList,
   colorCode,
   logoImage,
 }: BrandOnlineEventProps) {
+  const event = eventList[0];
+
   return (
     <section className={cn("w-full bg-white")}>
       <VStack
@@ -54,7 +40,7 @@ export function BrandOnlineEvent({
         gap={40}
       >
         <h2 className="text-title-2 max-sm:text-title-4 text-center font-bold text-black">
-          Musinsa 25 F/W Event
+          {event.title}
         </h2>
 
         <div className="no-scrollbar w-full overflow-x-auto max-sm:px-5">
@@ -63,14 +49,18 @@ export function BrandOnlineEvent({
             gap={10}
             justify="center"
           >
-            {ONLINE_EVENTS.map((event) => (
-              <EventCard event={event} key={event.id} />
+            {event.couponList.map((coupon) => (
+              <EventCard coupon={coupon} key={coupon.id} />
             ))}
           </Flex>
         </div>
       </VStack>
       <NoticeSection noticeList={noticeList} />
-      <BrandLinksSection colorCode={colorCode} logoImage={logoImage} />
+      <BrandLinksSection
+        brand={brand}
+        colorCode={colorCode}
+        logoImage={logoImage}
+      />
     </section>
   );
 }

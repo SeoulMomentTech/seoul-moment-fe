@@ -13,6 +13,8 @@ interface BrandSpecialEventProps {
 }
 
 export function BrandSpecialEvent({ products }: BrandSpecialEventProps) {
+  if (!products.length) return null;
+
   return (
     <section className="w-full border-b border-black/10 bg-white py-[100px] max-sm:py-[60px]">
       <div className="max-sm:min-w-auto min-w-7xl mx-auto max-w-[1920px] px-4 max-sm:px-5">

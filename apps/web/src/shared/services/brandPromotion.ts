@@ -14,7 +14,9 @@ export interface GetBrandPromotionBrandResponse {
 }
 
 export interface GetBrandPromotionBrandListResponse {
+  /** 전체 개수 */
   total: number;
+  /** 브랜드 프로모션 목록 */
   list: GetBrandPromotionBrandResponse[];
 }
 
@@ -87,8 +89,12 @@ export interface GetBrandPromotionPopupResponse {
   longitude: string;
   /** 시작일 */
   startDate: string;
+  /** 시작 시간 */
+  startTime: string;
   /** 종료일, null일 경우 상시 진행 */
   endDate?: string;
+  /** 종료 시간 */
+  endTime?: string;
   /** 제목 */
   title: string;
   /** 설명 */
@@ -106,6 +112,8 @@ export interface GetBrandPromotionEventCouponResponse {
   title: string;
   /** 설명 */
   description: string;
+  /** 쿠폰 상태 */
+  status: string;
 }
 
 export interface GetBrandPromotionEventAndCouponResponse {
