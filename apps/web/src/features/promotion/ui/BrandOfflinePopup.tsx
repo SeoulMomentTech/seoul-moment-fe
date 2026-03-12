@@ -142,7 +142,7 @@ export function BrandOfflinePopup({ popupList }: BrandOnlineEventProps) {
           {/* Map Section - Only Desktop */}
 
           <iframe
-            className="w-full max-sm:h-[130px]"
+            className="w-full max-sm:h-[130px] max-sm:px-5"
             height="300"
             loading="lazy"
             src={`https://maps.google.com/maps?q=${activeEvent.latitude},${activeEvent.longitude}&z=16&output=embed`}
