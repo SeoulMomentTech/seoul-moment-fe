@@ -4,6 +4,7 @@ import { HeartIcon, Share2Icon } from "lucide-react";
 
 import Image from "next/image";
 
+import { useModal } from "@shared/lib/hooks";
 import type { GetBrandPromotionBrandDetailResponse } from "@shared/services/brandPromotion";
 
 import { Link } from "@/i18n/navigation";
@@ -15,6 +16,8 @@ interface BrandIntroductionProps {
 }
 
 export function BrandIntroduction({ brand }: BrandIntroductionProps) {
+  const { openModal } = useModal();
+
   return (
     <section
       className={cn(
@@ -36,7 +39,11 @@ export function BrandIntroduction({ brand }: BrandIntroductionProps) {
                   {brand.likeCount > 999 ? "999+" : brand.likeCount}
                 </span>
               </HStack>
-              <button className="text-black outline-none" type="button">
+              <button
+                className="text-black outline-none"
+                onClick={() => openModal("share")}
+                type="button"
+              >
                 <Share2Icon size={24} />
               </button>
             </HStack>

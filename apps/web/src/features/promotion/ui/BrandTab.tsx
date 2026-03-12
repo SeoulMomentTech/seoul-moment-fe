@@ -19,8 +19,6 @@ export function BrandTab({ selectedId }: BrandTabProps) {
   const navigate = useRouter();
   const { data } = useBrandPromotionListQuery();
 
-  console.log(selectedId, data);
-
   return (
     <nav className="border-b border-black/10 bg-white">
       <Flex className={cn("w-7xl mx-auto", "max-sm:w-full")}>
