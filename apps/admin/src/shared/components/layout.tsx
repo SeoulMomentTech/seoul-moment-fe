@@ -22,6 +22,7 @@ export type MenuItem =
   | "home-banner"
   | "product-banner"
   | "brand"
+  | "brand-promotion"
   | "product-options"
   | "article"
   | "article-add"
