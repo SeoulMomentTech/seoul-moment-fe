@@ -2,15 +2,16 @@
 
 import { useState } from "react";
 
-import { ChevronLeftIcon, ChevronRightIcon, MapPinIcon } from "lucide-react";
+import { MapPinIcon } from "lucide-react";
 
-import Image from "next/image";
 import { toast } from "sonner";
 
 import { useCopyToClipboard, useMediaQuery } from "@shared/lib/hooks";
 import type { GetBrandPromotionPopupResponse } from "@shared/services/brandPromotion";
 
 import { VStack, HStack, cn, Flex } from "@seoul-moment/ui";
+
+import { BrandOfflinePopupSlider } from "./BrandOfflinePopupSlider";
 
 interface BrandOnlineEventProps {
   popupList: GetBrandPromotionPopupResponse[];
@@ -70,37 +71,10 @@ export function BrandOfflinePopup({ popupList }: BrandOnlineEventProps) {
           <div className="w-full max-sm:px-0">
             <div className="flex w-full flex-row gap-10 max-sm:flex-col max-sm:gap-[30px]">
               {/* Image Section */}
-              <div className="relative h-[400px] w-[630px] shrink-0 overflow-hidden border border-black/10 max-sm:h-[230px] max-sm:w-full">
-                <Image
-                  alt={activeEvent.title}
-                  className="object-cover"
-                  fill
-                  src={activeEvent.imageUrlList[0]}
-                />
-                {!isMobile && (
-                  <div className="absolute inset-x-5 top-1/2 flex -translate-y-1/2 justify-between">
-                    <button
-                      className="flex size-10 items-center justify-center rounded-full bg-black/20 text-white outline-none hover:bg-black/40"
-                      type="button"
-                    >
-                      <ChevronLeftIcon size={24} />
-                    </button>
-                    <button
-                      className="flex size-10 items-center justify-center rounded-full bg-black/20 text-white outline-none hover:bg-black/40"
-                      type="button"
-                    >
-                      <ChevronRightIcon size={24} />
-                    </button>
-                  </div>
-                )}
-                {isMobile && (
-                  <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-1.5">
-                    <div className="h-0.5 w-10 bg-black" />
-                    <div className="h-0.5 w-10 bg-white/40" />
-                    <div className="h-0.5 w-10 bg-white/40" />
-                  </div>
-                )}
-              </div>
+              <BrandOfflinePopupSlider
+                imageUrlList={activeEvent.imageUrlList}
+                title={activeEvent.title}
+              />
 
               {/* Info Section */}
               <Flex
