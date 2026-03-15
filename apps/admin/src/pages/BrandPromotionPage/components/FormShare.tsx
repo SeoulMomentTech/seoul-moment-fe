@@ -38,6 +38,14 @@ export function FieldLabel({ children }: { children: ReactNode }) {
   return <label className="mb-2 block text-sm font-medium">{children}</label>;
 }
 
+export function FieldError({ message }: { message?: string }) {
+  if (!message) {
+    return null;
+  }
+
+  return <p className="mt-1 text-sm text-red-500">{message}</p>;
+}
+
 export function SingleImageField({
   folder = "brand",
   id,

@@ -22,6 +22,10 @@ import {
   createEmptySection,
   getLanguageCode,
 } from "../utils/form";
+import {
+  getBrandPromotionFormErrors,
+  getIsBrandPromotionSubmitEnabled,
+} from "../utils/validation";
 
 type TabId = "basic" | "banner" | "section" | "popup" | "notice" | "event";
 
@@ -33,6 +37,7 @@ export function useBrandPromotionForm({
   initialState,
 }: UseBrandPromotionFormOptions = {}) {
   const [activeTab, setActiveTab] = useState<TabId>("basic");
+  const [isSubmitAttempted, setIsSubmitAttempted] = useState(false);
   const [values, setValues] = useState<BrandPromotionFormValues>(
     initialState?.values ?? EMPTY_VALUES,
   );
@@ -62,62 +67,23 @@ export function useBrandPromotionForm({
       : [createEmptyEvent()]),
   ]);
 
-  const hasText = (value: string) => (value ?? '').trim().length > 0;
+  const errors = getBrandPromotionFormErrors({
+    banners,
+    events,
+    notices,
+    popups,
+    sections,
+    values,
+  });
 
-  const isBasicValid =
-    Boolean(values.brandId) &&
-    Object.values(values.descriptions).every(hasText);
-
-  const isBannerValid = banners.every(
-    (banner) =>
-      hasText(banner.imagePath) &&
-      hasText(banner.mobileImagePath) &&
-      hasText(banner.linkUrl) &&
-      Object.values(banner.titles).every(hasText),
-  );
-
-  const isSectionValid = sections.every(
-    (section) => section.imagePathList.filter(Boolean).length > 0,
-  );
-
-  const isPopupValid = popups.every(
-    (popup) =>
-      hasText(popup.place) &&
-      hasText(popup.address) &&
-      hasText(popup.latitude) &&
-      hasText(popup.longitude) &&
-      hasText(popup.startDate) &&
-      hasText(popup.startTime) &&
-      hasText(popup.endTime) &&
-      popup.imagePathList.filter(Boolean).length > 0 &&
-      Object.values(popup.content).every(
-        (content) => hasText(content.title) && hasText(content.description),
-      ),
-  );
-
-  const isNoticeValid = notices.every((notice) =>
-    Object.values(notice.content).every(hasText),
-  );
-
-  const isEventValid = events.every(
-    (event) =>
-      Object.values(event.titles).every(hasText) &&
-      event.coupons.every(
-        (coupon) =>
-          hasText(coupon.imagePath) &&
-          Object.values(coupon.content).every(
-            (content) => hasText(content.title) && hasText(content.description),
-          ),
-      ),
-  );
-
-  const isSubmitEnabled =
-    isBasicValid &&
-    isBannerValid &&
-    isSectionValid &&
-    isPopupValid &&
-    isNoticeValid &&
-    isEventValid;
+  const isSubmitEnabled = getIsBrandPromotionSubmitEnabled({
+    banners,
+    events,
+    notices,
+    popups,
+    sections,
+    values,
+  });
 
   const createPayload = (): PostAdminBrandPromotionRequest | null => {
     if (!values.brandId) {
@@ -199,8 +165,10 @@ export function useBrandPromotionForm({
     activeTab,
     banners,
     createPayload,
+    errors,
     events,
     isSubmitEnabled,
+    isSubmitAttempted,
     notices,
     popups,
     sections,
@@ -210,6 +178,7 @@ export function useBrandPromotionForm({
     setNotices,
     setPopups,
     setSections,
+    setIsSubmitAttempted,
     setValues,
     values,
   };

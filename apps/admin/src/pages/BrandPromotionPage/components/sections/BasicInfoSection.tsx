@@ -9,12 +9,16 @@ import {
   Textarea,
 } from "@seoul-moment/ui";
 
-import type { BrandPromotionFormValues } from "../../types";
+import type {
+  BrandPromotionFormErrors,
+  BrandPromotionFormValues,
+} from "../../types";
 import { getLanguageCode } from "../../utils/form";
-import { Card, FieldLabel } from "../FormShare";
+import { Card, FieldError, FieldLabel } from "../FormShare";
 
 interface BasicInfoSectionProps {
   brandOptions: Array<{ value: string; label: string }>;
+  errors?: BrandPromotionFormErrors["values"];
   isBrandLoading: boolean;
   onChange(values: BrandPromotionFormValues): void;
   values: BrandPromotionFormValues;
@@ -22,6 +26,7 @@ interface BasicInfoSectionProps {
 
 export function BasicInfoSection({
   brandOptions,
+  errors,
   isBrandLoading,
   onChange,
   values,
@@ -56,6 +61,7 @@ export function BasicInfoSection({
             ))}
           </SelectContent>
         </Select>
+        <FieldError message={errors?.brandId} />
       </div>
 
       <div className="mb-6 flex items-center gap-3">
@@ -101,6 +107,7 @@ export function BasicInfoSection({
                 }
                 value={values.descriptions[code]}
               />
+              <FieldError message={errors?.descriptions?.[code]} />
             </Card>
           );
         })}

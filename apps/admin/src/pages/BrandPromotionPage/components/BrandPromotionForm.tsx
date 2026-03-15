@@ -61,6 +61,12 @@ export function BrandPromotionForm({
     })) ?? [];
 
   const handleSubmit = () => {
+    form.setIsSubmitAttempted(true);
+
+    if (!form.isSubmitEnabled) {
+      return;
+    }
+
     const payload = form.createPayload();
 
     if (!onSubmit || !payload) {
@@ -108,6 +114,7 @@ export function BrandPromotionForm({
           {form.activeTab === "basic" && (
             <BasicInfoSection
               brandOptions={brandOptions}
+              errors={form.isSubmitAttempted ? form.errors.values : undefined}
               isBrandLoading={isBrandLoading}
               onChange={
                 form.setValues as (values: BrandPromotionFormValues) => void
@@ -118,6 +125,7 @@ export function BrandPromotionForm({
           {form.activeTab === "banner" && (
             <BannerSection
               banners={form.banners}
+              errors={form.isSubmitAttempted ? form.errors.banners : undefined}
               onAdd={() =>
                 form.setBanners((current) => [...current, createEmptyBanner()])
               }
@@ -139,6 +147,7 @@ export function BrandPromotionForm({
           )}
           {form.activeTab === "section" && (
             <SectionListSection
+              errors={form.isSubmitAttempted ? form.errors.sections : undefined}
               onAdd={() =>
                 form.setSections((current) => [
                   ...current,
@@ -164,6 +173,7 @@ export function BrandPromotionForm({
           )}
           {form.activeTab === "popup" && (
             <PopupSection
+              errors={form.isSubmitAttempted ? form.errors.popups : undefined}
               onAdd={() =>
                 form.setPopups((current) => [...current, createEmptyPopup()])
               }
@@ -186,6 +196,7 @@ export function BrandPromotionForm({
           )}
           {form.activeTab === "notice" && (
             <NoticeSection
+              errors={form.isSubmitAttempted ? form.errors.notices : undefined}
               notices={form.notices}
               onAdd={() =>
                 form.setNotices((current) => [...current, createEmptyNotice()])
@@ -209,6 +220,7 @@ export function BrandPromotionForm({
           {form.activeTab === "event" && (
             <EventSection
               createCoupon={createEmptyCoupon}
+              errors={form.isSubmitAttempted ? form.errors.events : undefined}
               events={form.events}
               onAdd={() =>
                 form.setEvents((current) => [...current, createEmptyEvent()])
@@ -243,7 +255,7 @@ export function BrandPromotionForm({
           </Button>
           <Button
             className="h-[36px] rounded-[8px] px-4 text-sm"
-            disabled={!onSubmit || !form.isSubmitEnabled}
+            disabled={!onSubmit}
             isLoading={isLoading}
             onClick={handleSubmit}
             size="sm"

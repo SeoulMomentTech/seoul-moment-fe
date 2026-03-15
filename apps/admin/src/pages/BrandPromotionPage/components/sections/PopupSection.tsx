@@ -6,11 +6,12 @@ import { LANGUAGE_LIST } from "@shared/constants/locale";
 import { Button, Input, Textarea } from "@seoul-moment/ui";
 
 import { FORM_INPUT_CLASS, FORM_TEXTAREA_CLASS } from "../../constants/form";
-import type { PopupFormValue } from "../../types";
+import type { BrandPromotionFormErrors, PopupFormValue } from "../../types";
 import { getLanguageCode, getLanguageLabel } from "../../utils/form";
-import { Card, FieldLabel, SectionHeader } from "../FormShare";
+import { Card, FieldError, FieldLabel, SectionHeader } from "../FormShare";
 
 interface PopupSectionProps {
+  errors?: BrandPromotionFormErrors["popups"];
   onAdd(): void;
   onChange(index: number, nextValue: PopupFormValue): void;
   onRemove(index: number): void;
@@ -18,6 +19,7 @@ interface PopupSectionProps {
 }
 
 export function PopupSection({
+  errors,
   onAdd,
   onChange,
   onRemove,
@@ -71,6 +73,7 @@ export function PopupSection({
                     }
                     value={popup[key]}
                   />
+                  <FieldError message={errors?.[index]?.[key]} />
                 </div>
               ))}
               <div>
@@ -83,6 +86,7 @@ export function PopupSection({
                   type="date"
                   value={popup.startDate}
                 />
+                <FieldError message={errors?.[index]?.startDate} />
               </div>
               <div>
                 <FieldLabel>시작 시간</FieldLabel>
@@ -94,6 +98,7 @@ export function PopupSection({
                   type="time"
                   value={popup.startTime}
                 />
+                <FieldError message={errors?.[index]?.startTime} />
               </div>
               <div>
                 <FieldLabel>종료 날짜</FieldLabel>
@@ -116,6 +121,7 @@ export function PopupSection({
                   type="time"
                   value={popup.endTime}
                 />
+                <FieldError message={errors?.[index]?.endTime} />
               </div>
             </div>
             <div className="mt-4 flex items-center gap-3">
@@ -143,6 +149,7 @@ export function PopupSection({
                 }
                 value={popup.imagePathList.filter(Boolean)}
               />
+              <FieldError message={errors?.[index]?.imagePathList} />
             </div>
             <div className="mt-4">
               <FieldLabel>팝업 정보 (다국어)</FieldLabel>
@@ -172,6 +179,9 @@ export function PopupSection({
                           }
                           value={popup.content[code].title}
                         />
+                        <FieldError
+                          message={errors?.[index]?.content?.[code]?.title}
+                        />
                       </div>
                       <FieldLabel>설명</FieldLabel>
                       <Textarea
@@ -189,6 +199,9 @@ export function PopupSection({
                           })
                         }
                         value={popup.content[code].description}
+                      />
+                      <FieldError
+                        message={errors?.[index]?.content?.[code]?.description}
                       />
                     </Card>
                   );

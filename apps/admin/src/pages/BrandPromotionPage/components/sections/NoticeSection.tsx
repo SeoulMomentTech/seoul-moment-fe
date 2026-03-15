@@ -5,11 +5,12 @@ import { LANGUAGE_LIST } from "@shared/constants/locale";
 import { Button, Textarea } from "@seoul-moment/ui";
 
 import { FORM_TEXTAREA_CLASS } from "../../constants/form";
-import type { NoticeFormValue } from "../../types";
+import type { BrandPromotionFormErrors, NoticeFormValue } from "../../types";
 import { getLanguageCode, getLanguageLabel } from "../../utils/form";
-import { Card, FieldLabel, SectionHeader } from "../FormShare";
+import { Card, FieldError, FieldLabel, SectionHeader } from "../FormShare";
 
 interface NoticeSectionProps {
+  errors?: BrandPromotionFormErrors["notices"];
   notices: NoticeFormValue[];
   onAdd(): void;
   onChange(index: number, nextValue: NoticeFormValue): void;
@@ -17,6 +18,7 @@ interface NoticeSectionProps {
 }
 
 export function NoticeSection({
+  errors,
   notices,
   onAdd,
   onChange,
@@ -73,6 +75,7 @@ export function NoticeSection({
                       }
                       value={notice.content[code]}
                     />
+                    <FieldError message={errors?.[index]?.content?.[code]} />
                   </div>
                 );
               })}

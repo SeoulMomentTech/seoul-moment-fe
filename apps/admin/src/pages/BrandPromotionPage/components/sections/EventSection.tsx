@@ -16,27 +16,35 @@ import {
 } from "@seoul-moment/ui";
 
 import { FORM_INPUT_CLASS, FORM_TEXTAREA_CLASS } from "../../constants/form";
-import type { CouponFormValue, EventFormValue, EventStatus } from "../../types";
+import type {
+  BrandPromotionFormErrors,
+  CouponFormValue,
+  EventFormValue,
+  EventStatus,
+} from "../../types";
 import { getLanguageCode, getLanguageLabel } from "../../utils/form";
 import {
   Card,
+  FieldError,
   FieldLabel,
   SectionHeader,
   SingleImageField,
 } from "../FormShare";
 
 interface EventSectionProps {
+  createCoupon(): CouponFormValue;
+  errors?: BrandPromotionFormErrors["events"];
   events: EventFormValue[];
   onAdd(): void;
   onChange(index: number, nextValue: EventFormValue): void;
   onRemove(index: number): void;
-  createCoupon(): CouponFormValue;
 }
 
 interface CouponCardProps {
   activeLanguage: "ko" | "en" | "zh";
   coupon: CouponFormValue;
   couponIndex: number;
+  error?: BrandPromotionFormErrors["events"][number]["coupons"][number];
   event: EventFormValue;
   eventIndex: number;
   onChange(index: number, nextValue: EventFormValue): void;
@@ -76,6 +84,7 @@ function CouponCard({
   activeLanguage,
   coupon,
   couponIndex,
+  error,
   event,
   eventIndex,
   onChange,
@@ -116,6 +125,7 @@ function CouponCard({
         }
         preview={coupon.imagePath}
       />
+      <FieldError message={error?.imagePath} />
 
       <div className="mt-4 space-y-3">
         <div>
@@ -143,6 +153,7 @@ function CouponCard({
             }
             value={coupon.content[activeLanguage].title}
           />
+          <FieldError message={error?.content?.[activeLanguage]?.title} />
         </div>
 
         <div>
@@ -170,6 +181,7 @@ function CouponCard({
             }
             value={coupon.content[activeLanguage].description}
           />
+          <FieldError message={error?.content?.[activeLanguage]?.description} />
         </div>
       </div>
     </Card>
@@ -178,6 +190,7 @@ function CouponCard({
 
 export function EventSection({
   createCoupon,
+  errors,
   events,
   onAdd,
   onChange,
@@ -261,6 +274,7 @@ export function EventSection({
                         }
                         value={event.titles[code]}
                       />
+                      <FieldError message={errors?.[index]?.titles?.[code]} />
                     </div>
                   );
                 })}
@@ -310,6 +324,7 @@ export function EventSection({
                           activeLanguage={activeCouponLanguage}
                           coupon={coupon}
                           couponIndex={couponIndex}
+                          error={errors?.[index]?.coupons?.[couponIndex]}
                           event={event}
                           eventIndex={index}
                           key={`coupon-${index + 1}-${couponIndex + 1}`}
