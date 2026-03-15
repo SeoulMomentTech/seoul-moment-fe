@@ -129,8 +129,6 @@ interface ImageContentsProps {
 }
 
 export function ImageContents({ imageList, type }: ImageContentsProps) {
-  console.log(type);
-
   return (
     <SwitchCase
       caseBy={{
