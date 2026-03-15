@@ -11,6 +11,7 @@ import ArticleEditPage from "@pages/ArticlePage/EditPage";
 import { BrandAddPage } from "@pages/BrandPage/AddPage";
 import { BrandEditPage } from "@pages/BrandPage/EditPage";
 import { BrandListPage } from "@pages/BrandPage/ListPage";
+import { BrandPromotionAddPage } from "@pages/BrandPromotionPage/AddPage";
 import { BrandPromotionEditPage } from "@pages/BrandPromotionPage/EditPage";
 import NewsAddPage from "@pages/NewsPage/AddPage";
 import NewsEditPage from "@pages/NewsPage/EditPage";
@@ -185,6 +186,10 @@ const privateRoutes: RouteObject[] = [
       {
         path: PATH.BRAND_PROMOTION,
         element: <BrandPromotionPage />,
+      },
+      {
+        path: PATH.BRAND_PROMOTION_ADD,
+        element: <BrandPromotionAddPage />,
       },
       {
         path: PATH.BRAND_PROMOTION_EDIT,
