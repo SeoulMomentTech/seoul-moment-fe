@@ -7,6 +7,7 @@ import { stripImageDomain } from "@shared/utils/image";
 import { EMPTY_VALUES } from "../constants/form";
 import type {
   BannerFormValue,
+  BrandPromotionFormInitialState,
   BrandPromotionFormValues,
   EventFormValue,
   NoticeFormValue,
@@ -25,29 +26,43 @@ import {
 type TabId = "basic" | "banner" | "section" | "popup" | "notice" | "event";
 
 interface UseBrandPromotionFormOptions {
-  initialValues?: BrandPromotionFormValues;
+  initialState?: BrandPromotionFormInitialState;
 }
 
 export function useBrandPromotionForm({
-  initialValues,
+  initialState,
 }: UseBrandPromotionFormOptions = {}) {
   const [activeTab, setActiveTab] = useState<TabId>("basic");
   const [values, setValues] = useState<BrandPromotionFormValues>(
-    initialValues ?? EMPTY_VALUES,
+    initialState?.values ?? EMPTY_VALUES,
   );
   const [banners, setBanners] = useState<BannerFormValue[]>([
-    createEmptyBanner(),
+    ...(initialState?.banners?.length
+      ? initialState.banners
+      : [createEmptyBanner()]),
   ]);
   const [sections, setSections] = useState<SectionFormValue[]>([
-    createEmptySection(),
+    ...(initialState?.sections?.length
+      ? initialState.sections
+      : [createEmptySection()]),
   ]);
-  const [popups, setPopups] = useState<PopupFormValue[]>([createEmptyPopup()]);
+  const [popups, setPopups] = useState<PopupFormValue[]>([
+    ...(initialState?.popups?.length
+      ? initialState.popups
+      : [createEmptyPopup()]),
+  ]);
   const [notices, setNotices] = useState<NoticeFormValue[]>([
-    createEmptyNotice(),
+    ...(initialState?.notices?.length
+      ? initialState.notices
+      : [createEmptyNotice()]),
   ]);
-  const [events, setEvents] = useState<EventFormValue[]>([createEmptyEvent()]);
+  const [events, setEvents] = useState<EventFormValue[]>([
+    ...(initialState?.events?.length
+      ? initialState.events
+      : [createEmptyEvent()]),
+  ]);
 
-  const hasText = (value: string) => value.trim().length > 0;
+  const hasText = (value: string) => (value ?? '').trim().length > 0;
 
   const isBasicValid =
     Boolean(values.brandId) &&

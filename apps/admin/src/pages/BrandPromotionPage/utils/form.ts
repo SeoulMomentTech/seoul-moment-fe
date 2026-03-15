@@ -59,7 +59,7 @@ export const createEmptyEvent = (): EventFormValue => ({
 
 export function getLanguageCode(code: string): LanguageCode {
   if (code === "en") return "en";
-  if (code === "zh") return "zh";
+  if (code === "zh" || code.startsWith("zh")) return "zh";
   return "ko";
 }
 
