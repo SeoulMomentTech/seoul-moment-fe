@@ -18,13 +18,22 @@ export default async function Promotion({
   const { id, locale } = await params;
   const promotionId = Number(id);
 
-  if (!Number.isInteger(promotionId) || promotionId <= 0) {
+  const isValidId = Number.isInteger(promotionId) && promotionId > 0;
+
+  if (!isValidId) {
     notFound();
   }
+
   const promise = fetchBrandPromotion(
     promotionId,
     locale as LanguageType,
-  ).catch(() => notFound());
+  ).catch((error) => {
+    console.error(
+      `[PromotionPage] Failed to fetch promotion ${promotionId}:`,
+      error,
+    );
+    notFound();
+  });
 
   return <PromotionPage promise={promise} promotionId={promotionId} />;
 }

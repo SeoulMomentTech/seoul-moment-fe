@@ -11,7 +11,11 @@ interface MainBannerProps {
 
 export function MainBanner({ bannerList }: MainBannerProps) {
   const isMobile = useMediaQuery("(max-width: 40rem)", false);
-  const banner = bannerList?.[0] ?? {};
+
+  if (!bannerList || bannerList.length === 0) return null;
+
+  const banner = bannerList[0];
+  const imageUrl = isMobile ? banner.mobileImageUrl : banner.imageUrl;
 
   return (
     <section
@@ -25,7 +29,7 @@ export function MainBanner({ bannerList }: MainBannerProps) {
         className="h-full object-cover"
         height={727}
         priority
-        src={isMobile ? banner.mobileImageUrl : banner.imageUrl}
+        src={imageUrl}
         width={4000}
       />
     </section>
