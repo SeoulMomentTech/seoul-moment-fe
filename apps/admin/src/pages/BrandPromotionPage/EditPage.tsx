@@ -1,7 +1,10 @@
 import { useParams } from "react-router";
 
+import type { GetAdminBrandPromotionDetailResponse } from "@shared/services/brandPromotion";
+
 import { BrandPromotionForm } from "./components";
-import { useBrandPromotionDetailQuery } from "./hooks";
+import { useBrandPromotionDetailQuery, } from "./hooks";
+import { useBrandPromotionForm } from "./hooks/useBrandPromotionForm";
 
 export function BrandPromotionEditPage() {
   const { id } = useParams<{ id: string }>();
@@ -27,27 +30,36 @@ export function BrandPromotionEditPage() {
     );
   }
 
+  return <BrandPromotionEditContent detail={detailResponse.data} />;
+}
+
+function BrandPromotionEditContent({
+  detail,
+}: {
+  detail: GetAdminBrandPromotionDetailResponse;
+}) {
+  const form = useBrandPromotionForm({
+    initialValues: {
+      brandId: detail.brandDto.id,
+      descriptions: {
+        ko:
+          detail.brandDto.language.find((item) => item.languageCode === "ko")
+            ?.description ?? "",
+        en:
+          detail.brandDto.language.find((item) => item.languageCode === "en")
+            ?.description ?? "",
+        zh:
+          detail.brandDto.language.find((item) => item.languageCode === "zh-TW")
+            ?.description ?? "",
+      },
+      isActive: detail.isActive,
+    },
+  });
+
   return (
     <BrandPromotionForm
       description="등록된 브랜드 프로모션을 상세 확인 및 수정할 수 있습니다."
-      initialValues={{
-        brandId: detailResponse.data.brandDto.id,
-        descriptions: {
-          ko:
-            detailResponse.data.brandDto.language.find(
-              (item) => item.languageCode === "ko",
-            )?.description ?? "",
-          en:
-            detailResponse.data.brandDto.language.find(
-              (item) => item.languageCode === "en",
-            )?.description ?? "",
-          zh:
-            detailResponse.data.brandDto.language.find(
-              (item) => item.languageCode === "zh-TW",
-            )?.description ?? "",
-        },
-        isActive: detailResponse.data.isActive,
-      }}
+      form={form}
       submitLabel="수정"
       title="브랜드 프로모션 수정"
     />
