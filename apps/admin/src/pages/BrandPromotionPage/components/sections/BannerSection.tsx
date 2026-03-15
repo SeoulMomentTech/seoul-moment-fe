@@ -5,17 +5,19 @@ import { LANGUAGE_LIST } from "@shared/constants/locale";
 import { Button, Input } from "@seoul-moment/ui";
 
 import { FORM_INPUT_CLASS } from "../../constants/form";
-import type { BannerFormValue } from "../../types";
+import type { BannerFormValue, BrandPromotionFormErrors } from "../../types";
 import { getLanguageCode, getLanguageLabel } from "../../utils/form";
 import {
   Card,
+  FieldError,
   FieldLabel,
   SectionHeader,
   SingleImageField,
-} from '../FormShare';
+} from "../FormShare";
 
 interface BannerSectionProps {
   banners: BannerFormValue[];
+  errors?: BrandPromotionFormErrors["banners"];
   onAdd(): void;
   onChange(index: number, nextValue: BannerFormValue): void;
   onRemove(index: number): void;
@@ -23,6 +25,7 @@ interface BannerSectionProps {
 
 export function BannerSection({
   banners,
+  errors,
   onAdd,
   onChange,
   onRemove,
@@ -58,22 +61,28 @@ export function BannerSection({
               </button>
             </div>
             <div className="grid gap-4 md:grid-cols-2">
-              <SingleImageField
-                id={`banner-pc-${index}`}
-                label="배너 이미지 (PC)"
-                onChange={(url) =>
-                  onChange(index, { ...banner, imagePath: url })
-                }
-                preview={banner.imagePath}
-              />
-              <SingleImageField
-                id={`banner-mobile-${index}`}
-                label="배너 이미지 (모바일)"
-                onChange={(url) =>
-                  onChange(index, { ...banner, mobileImagePath: url })
-                }
-                preview={banner.mobileImagePath}
-              />
+              <div>
+                <SingleImageField
+                  id={`banner-pc-${index}`}
+                  label="배너 이미지 (PC)"
+                  onChange={(url) =>
+                    onChange(index, { ...banner, imagePath: url })
+                  }
+                  preview={banner.imagePath}
+                />
+                <FieldError message={errors?.[index]?.imagePath} />
+              </div>
+              <div>
+                <SingleImageField
+                  id={`banner-mobile-${index}`}
+                  label="배너 이미지 (모바일)"
+                  onChange={(url) =>
+                    onChange(index, { ...banner, mobileImagePath: url })
+                  }
+                  preview={banner.mobileImagePath}
+                />
+                <FieldError message={errors?.[index]?.mobileImagePath} />
+              </div>
             </div>
             <div className="mt-4">
               <FieldLabel>링크 URL</FieldLabel>
@@ -85,6 +94,7 @@ export function BannerSection({
                 placeholder="https://example.com"
                 value={banner.linkUrl}
               />
+              <FieldError message={errors?.[index]?.linkUrl} />
             </div>
             <div className="mt-4">
               <FieldLabel>배너 제목 (다국어)</FieldLabel>
@@ -109,6 +119,7 @@ export function BannerSection({
                         }
                         value={banner.titles[code]}
                       />
+                      <FieldError message={errors?.[index]?.titles?.[code]} />
                     </div>
                   );
                 })}

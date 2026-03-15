@@ -12,10 +12,15 @@ import {
 } from "@seoul-moment/ui";
 
 import { SECTION_OPTIONS } from "../../constants/form";
-import type { SectionFormValue, SectionType } from "../../types";
-import { Card, FieldLabel, SectionHeader } from "../FormShare";
+import type {
+  BrandPromotionFormErrors,
+  SectionFormValue,
+  SectionType,
+} from "../../types";
+import { Card, FieldError, FieldLabel, SectionHeader } from "../FormShare";
 
 interface SectionListSectionProps {
+  errors?: BrandPromotionFormErrors["sections"];
   onAdd(): void;
   onChange(index: number, nextValue: SectionFormValue): void;
   onRemove(index: number): void;
@@ -23,6 +28,7 @@ interface SectionListSectionProps {
 }
 
 export function SectionListSection({
+  errors,
   onAdd,
   onChange,
   onRemove,
@@ -87,6 +93,7 @@ export function SectionListSection({
               }
               value={section.imagePathList.filter(Boolean)}
             />
+            <FieldError message={errors?.[index]?.imagePathList} />
           </Card>
         ))}
       </div>

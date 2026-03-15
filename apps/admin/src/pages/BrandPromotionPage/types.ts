@@ -59,3 +59,44 @@ export interface BrandPromotionFormInitialState {
   sections?: SectionFormValue[];
   values?: BrandPromotionFormValues;
 }
+
+export interface BrandPromotionFormErrors {
+  banners: Array<{
+    imagePath?: string;
+    linkUrl?: string;
+    mobileImagePath?: string;
+    titles: Partial<Record<LanguageCode, string>>;
+  }>;
+  events: Array<{
+    coupons: Array<{
+      content: Partial<
+        Record<LanguageCode, { description?: string; title?: string }>
+      >;
+      imagePath?: string;
+    }>;
+    titles: Partial<Record<LanguageCode, string>>;
+  }>;
+  notices: Array<{
+    content: Partial<Record<LanguageCode, string>>;
+  }>;
+  popups: Array<{
+    address?: string;
+    content: Partial<
+      Record<LanguageCode, { description?: string; title?: string }>
+    >;
+    endTime?: string;
+    imagePathList?: string;
+    latitude?: string;
+    longitude?: string;
+    place?: string;
+    startDate?: string;
+    startTime?: string;
+  }>;
+  sections: Array<{
+    imagePathList?: string;
+  }>;
+  values: {
+    brandId?: string;
+    descriptions: Partial<Record<LanguageCode, string>>;
+  };
+}
