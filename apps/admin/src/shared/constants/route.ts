@@ -37,6 +37,7 @@ export const PATH = {
   BRAND_ADD: "/brand/add",
   BRAND_EDIT: "/brand/edit/:id",
   BRAND_PROMOTION: "/brand/promotion",
+  BRAND_PROMOTION_ADD: "/brand/promotion/add",
   BRAND_PROMOTION_EDIT: "/brand/promotion/edit/:id",
 
   // User
