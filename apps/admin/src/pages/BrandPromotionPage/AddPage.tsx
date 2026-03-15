@@ -6,9 +6,11 @@ import { toast } from "sonner";
 
 import { BrandPromotionForm } from "./components";
 import { useCreateBrandPromotionMutation } from "./hooks";
+import { useBrandPromotionForm } from "./hooks/useBrandPromotionForm";
 
 export function BrandPromotionAddPage() {
   const navigate = useNavigate();
+  const form = useBrandPromotionForm();
   const { mutateAsync: createPromotion, isPending } =
     useCreateBrandPromotionMutation();
 
@@ -26,6 +28,7 @@ export function BrandPromotionAddPage() {
   return (
     <BrandPromotionForm
       description="새로운 브랜드 프로모션을 등록합니다."
+      form={form}
       isLoading={isPending}
       onSubmit={handleSubmit}
       submitLabel="등록"
