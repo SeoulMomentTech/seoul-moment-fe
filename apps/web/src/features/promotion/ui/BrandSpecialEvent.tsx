@@ -6,13 +6,19 @@ import Image from "next/image";
 
 import type { GetBrandPromotionProductResponse } from "@shared/services/brandPromotion";
 
-import { VStack, HStack, Button, cn, Flex } from "@seoul-moment/ui";
+import { Link } from "@/i18n/navigation";
+
+import { VStack, HStack, cn, Flex } from "@seoul-moment/ui";
 
 interface BrandSpecialEventProps {
+  brandId: number;
   products: GetBrandPromotionProductResponse[];
 }
 
-export function BrandSpecialEvent({ products }: BrandSpecialEventProps) {
+export function BrandSpecialEvent({
+  products,
+  brandId,
+}: BrandSpecialEventProps) {
   if (!products.length) return null;
 
   return (
@@ -30,19 +36,22 @@ export function BrandSpecialEvent({ products }: BrandSpecialEventProps) {
             )}
           >
             {products.map((product) => (
-              <SpecialProductCard key={product.id} {...product} />
+              <Link href={`/product/${product.id}`} key={product.id}>
+                <SpecialProductCard {...product} />
+              </Link>
             ))}
           </div>
 
-          <Button
+          <Link
             className={cn(
+              "flex items-center justify-center rounded-md border",
               "text-body-2 h-12 border-neutral-200 px-10 font-semibold",
               "max-sm:w-full",
             )}
-            variant="outline"
+            href={`/product?brandId=${brandId}`}
           >
             더보기
-          </Button>
+          </Link>
         </VStack>
       </div>
     </section>
