@@ -48,11 +48,20 @@ export interface GetBrandPromotionBrandDetailResponse {
   colorCode: string;
 }
 
+export type BrandSectionType =
+  | "TYPE_1"
+  | "TYPE_2"
+  | "TYPE_3"
+  | "TYPE_4"
+  | "TYPE_5";
+
 export interface GetBrandPromotionSectionResponse {
   /** 브랜드 프로모션 섹션 아이디 */
   id: number;
-  /** 브랜드 프로모션 섹션 타입 아이디 */
-  typeId: string;
+  /** 브랜드 프로모션 섹션 타입 */
+  type: BrandSectionType;
+  /** 제목 */
+  title: string;
   /** 브랜드 프로모션 섹션 이미지 경로 리스트 */
   imageUrlList: string[];
 }

@@ -2,8 +2,9 @@ import { useId } from "react";
 
 import Image from "next/image";
 
-import { useMediaQuery } from "@/shared/lib/hooks";
-import SwitchCase from "@/shared/ui/switch-case";
+import { useMediaQuery } from "@shared/lib/hooks";
+import type { BrandSectionType } from "@shared/services/brandPromotion";
+import SwitchCase from "@shared/ui/switch-case";
 
 import { cn, Flex, HStack } from "@seoul-moment/ui";
 
@@ -124,18 +125,20 @@ const BottomFullContent = ({ imageList }: ImageTypeProps) => {
 
 interface ImageContentsProps {
   imageList: string[];
-  type: 1 | 2 | 3 | 4 | 5;
+  type: BrandSectionType;
 }
 
 export function ImageContents({ imageList, type }: ImageContentsProps) {
+  console.log(type);
+
   return (
     <SwitchCase
       caseBy={{
-        1: <SingleImageContent imageList={imageList} />,
-        2: <PairImageContent imageList={imageList} />,
-        3: <StripImageContent imageList={imageList} />,
-        4: <BottomSmallContent imageList={imageList} />,
-        5: <BottomFullContent imageList={imageList} />,
+        TYPE_1: <SingleImageContent imageList={imageList} />,
+        TYPE_2: <PairImageContent imageList={imageList} />,
+        TYPE_3: <StripImageContent imageList={imageList} />,
+        TYPE_4: <BottomSmallContent imageList={imageList} />,
+        TYPE_5: <BottomFullContent imageList={imageList} />,
       }}
       defaultComponent={null}
       value={type}

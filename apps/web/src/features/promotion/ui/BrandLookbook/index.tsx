@@ -27,7 +27,7 @@ export function BrandLookbook({ sectionList }: BrandLookbookProps) {
           <ImageContents
             imageList={section.imageUrlList}
             key={section.id}
-            type={1}
+            type={section.type}
           />
         ))}
       </VStack>
