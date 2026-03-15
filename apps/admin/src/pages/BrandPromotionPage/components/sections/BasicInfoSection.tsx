@@ -48,7 +48,7 @@ export function BasicInfoSection({
               }
             />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-white">
             {brandOptions.map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 {option.label}
