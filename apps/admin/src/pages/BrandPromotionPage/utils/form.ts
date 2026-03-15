@@ -68,3 +68,33 @@ export function getLanguageLabel(languageId: number) {
   if (languageId === 2) return "영어";
   return "중국어";
 }
+
+export function normalizeDateInputValue(value?: string | null) {
+  if (!value) {
+    return "";
+  }
+
+  const trimmedValue = value.trim();
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmedValue)) {
+    return trimmedValue;
+  }
+
+  const dateMatch = trimmedValue.match(/^(\d{4}-\d{2}-\d{2})/);
+  return dateMatch?.[1] ?? "";
+}
+
+export function normalizeTimeInputValue(value?: string | null) {
+  if (!value) {
+    return "";
+  }
+
+  const trimmedValue = value.trim();
+
+  if (/^\d{2}:\d{2}$/.test(trimmedValue)) {
+    return trimmedValue;
+  }
+
+  const timeMatch = trimmedValue.match(/(\d{2}:\d{2})/);
+  return timeMatch?.[1] ?? "";
+}
