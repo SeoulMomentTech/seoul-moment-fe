@@ -50,3 +50,12 @@ export interface EventFormValue {
   titles: Record<LanguageCode, string>;
   coupons: CouponFormValue[];
 }
+
+export interface BrandPromotionFormInitialState {
+  banners?: BannerFormValue[];
+  events?: EventFormValue[];
+  notices?: NoticeFormValue[];
+  popups?: PopupFormValue[];
+  sections?: SectionFormValue[];
+  values?: BrandPromotionFormValues;
+}
