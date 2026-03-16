@@ -5,7 +5,7 @@ import { type CreateAdminBrandRequest } from "@shared/services/brand";
 import { uploadImageFile } from "@shared/utils/image";
 import { type FormikProps } from "formik";
 
-import { Input, Label } from "@seoul-moment/ui";
+import { Flex, Input, Label } from "@seoul-moment/ui";
 
 import { CategorySelect } from "./CategorySelect";
 import { BannerImageUploader, ProfileImageUploader } from "./ImageUploaders";
@@ -90,21 +90,52 @@ export function BasicInfo({ formik }: BasicInfoProps) {
       <div className="space-y-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
         <h3 className="mb-4 font-semibold">기본 정보</h3>
 
-        <div className="space-y-2">
-          <Label htmlFor="englishName">
-            영어 이름 <span className="text-red-500">*</span>
-          </Label>
-          <Input
-            className={errors.englishName ? "border-red-500" : ""}
-            id="englishName"
-            name="englishName"
-            onChange={handleChange}
-            placeholder="Seoul Moment"
-            value={values.englishName}
-          />
-          {errors.englishName && (
-            <p className="text-sm text-red-500">{errors.englishName}</p>
-          )}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="englishName">
+              영어 이름 <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              className={errors.englishName ? "border-red-500" : ""}
+              id="englishName"
+              name="englishName"
+              onChange={handleChange}
+              placeholder="Seoul Moment"
+              value={values.englishName}
+            />
+            {errors.englishName && (
+              <p className="text-sm text-red-500">{errors.englishName}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="colorCode">
+              브랜드 컬러 <span className="text-red-500">*</span>
+            </Label>
+            <Flex align="center" gap={8}>
+              <Input
+                className="w-12 h-10 p-1 cursor-pointer"
+                id="colorCodePicker"
+                name="colorCode"
+                onChange={handleChange}
+                type="color"
+                value={values.colorCode}
+
+              />
+              <Input
+                className={errors.colorCode ? "border-red-500 flex-1" : "flex-1"}
+                disabled
+                id="colorCode"
+                name="colorCode"
+                onChange={handleChange}
+                placeholder="#000000"
+                value={values.colorCode}
+              />
+            </Flex>
+            {errors.colorCode && (
+              <p className="text-sm text-red-500">{errors.colorCode}</p>
+            )}
+          </div>
         </div>
 
         <CategorySelect
