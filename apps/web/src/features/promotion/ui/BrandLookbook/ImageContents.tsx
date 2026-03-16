@@ -19,6 +19,7 @@ const SingleImageContent = ({ imageList }: ImageTypeProps) => {
         alt="Lookbook Top"
         className="object-cover"
         fill
+        sizes="(max-width: 640px) 100vw, 630px"
         src={imageList[0]}
       />
     </div>
@@ -41,6 +42,7 @@ const PairImageContent = ({ imageList }: ImageTypeProps) => {
               alt="Lookbook Pair"
               className="object-cover"
               fill
+              sizes="(max-width: 640px) 50vw, 517px"
               src={src}
             />
           </div>
@@ -69,6 +71,7 @@ const StripImageContent = ({ imageList }: ImageTypeProps) => {
               alt="Lookbook Strip"
               className="object-cover"
               fill
+              sizes="(max-width: 640px) 25vw, 480px"
               src={src}
             />
           </div>
@@ -96,6 +99,7 @@ const BottomSmallContent = ({ imageList }: ImageTypeProps) => {
             alt="Lookbook Bottom 1"
             className="object-cover"
             fill
+            sizes="(max-width: 640px) 288px, 847px"
             src={imageList[0]}
           />
         </div>
@@ -116,6 +120,7 @@ const BottomFullContent = ({ imageList }: ImageTypeProps) => {
           alt="Lookbook Bottom 2"
           className="object-cover"
           fill
+          sizes="(max-width: 1280px) 100vw, 1280px"
           src={imageList[0]}
         />
       </div>

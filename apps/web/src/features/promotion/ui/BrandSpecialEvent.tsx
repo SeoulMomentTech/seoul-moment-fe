@@ -4,11 +4,14 @@ import { HeartIcon, StarIcon } from "lucide-react";
 
 import Image from "next/image";
 
+import { toNTCurrency } from "@shared/lib/utils";
 import type { GetBrandPromotionProductResponse } from "@shared/services/brandPromotion";
 
+import { useProductListLogic } from "@/features/product/model/useProductListLogic";
 import { Link } from "@/i18n/navigation";
+import type { ProductItem } from "@/shared/services/product";
 
-import { VStack, HStack, cn, Flex } from "@seoul-moment/ui";
+import { VStack, HStack, cn, Flex, Button } from "@seoul-moment/ui";
 
 interface BrandSpecialEventProps {
   brandId: number;
@@ -19,7 +22,13 @@ export function BrandSpecialEvent({
   products,
   brandId,
 }: BrandSpecialEventProps) {
-  if (!products.length) return null;
+  const { data, hasNextPage, fetchNextPage } = useProductListLogic({
+    brandId,
+  });
+
+  const productList = data ?? products;
+
+  if (!productList.length) return null;
 
   return (
     <section className="w-full border-b border-black/10 bg-white py-[100px] max-sm:py-[60px]">
@@ -35,30 +44,37 @@ export function BrandSpecialEvent({
               "max-sm:grid-cols-2 max-sm:gap-y-5",
             )}
           >
-            {products.map((product) => (
+            {productList.map((product) => (
               <Link href={`/product/${product.id}`} key={product.id}>
                 <SpecialProductCard {...product} />
               </Link>
             ))}
           </div>
 
-          <Link
-            className={cn(
-              "flex items-center justify-center rounded-md border",
-              "text-body-2 h-12 border-neutral-200 px-10 font-semibold",
-              "max-sm:w-full",
-            )}
-            href={`/product?brandId=${brandId}`}
-          >
-            더보기
-          </Link>
+          {hasNextPage && (
+            <Button
+              className={cn(
+                "flex items-center justify-center rounded-md border",
+                "text-body-2 h-12 border-neutral-200 px-10 font-semibold",
+                "max-sm:w-full",
+              )}
+              onClick={() => fetchNextPage()}
+              variant="outline"
+            >
+              더보기
+            </Button>
+          )}
         </VStack>
       </div>
     </section>
   );
 }
 
-function SpecialProductCard(props: GetBrandPromotionProductResponse) {
+function SpecialProductCard(
+  props: GetBrandPromotionProductResponse | ProductItem,
+) {
+  const isProductItem = "image" in props;
+
   return (
     <VStack className="w-full" gap={16}>
       <div
@@ -71,7 +87,8 @@ function SpecialProductCard(props: GetBrandPromotionProductResponse) {
           alt={props.productName}
           className="object-cover"
           fill
-          src={props.imageUrl}
+          sizes="(max-width: 640px) 50vw, 305px"
+          src={isProductItem ? props.image : props.imageUrl}
         />
         <button
           className="absolute right-3 top-3 z-10 p-1 outline-none"
@@ -94,7 +111,7 @@ function SpecialProductCard(props: GetBrandPromotionProductResponse) {
             </p>
           </Flex>
           <span className="text-body-2 max-sm:text-body-3 font-semibold text-black">
-            {props.price}
+            {toNTCurrency(props.price)}
           </span>
         </Flex>
 

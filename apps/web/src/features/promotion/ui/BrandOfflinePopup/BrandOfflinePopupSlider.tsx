@@ -44,7 +44,13 @@ export function BrandOfflinePopupSlider({
       >
         {imageUrlList.map((url, index) => (
           <SwiperSlide key={`${url}-${url}-${index + 1}`}>
-            <Image alt={title} className="object-cover" fill src={url} />
+            <Image
+              alt={title}
+              className="object-cover"
+              fill
+              sizes="(max-width: 640px) 100vw, 630px"
+              src={url}
+            />
           </SwiperSlide>
         ))}
       </Swiper>

@@ -63,6 +63,7 @@ export function BrandIntroduction({ brand }: BrandIntroductionProps) {
                 alt={brand.name}
                 className="object-contain"
                 fill
+                sizes="153px"
                 src={brand.profileImageUrl}
               />
             </div>

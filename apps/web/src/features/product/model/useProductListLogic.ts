@@ -42,5 +42,7 @@ export function useProductListLogic(filter: FilterProps) {
     isLoading,
     isFetchingNextPage,
     isEmpty,
+    hasNextPage,
+    fetchNextPage,
   };
 }

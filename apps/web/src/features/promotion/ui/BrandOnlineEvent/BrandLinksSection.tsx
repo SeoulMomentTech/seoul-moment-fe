@@ -30,6 +30,7 @@ export function BrandLinksSection({
           alt="Brand Logo"
           className="object-contain"
           fill
+          sizes="(max-width: 640px) 288px, 413px"
           src={logoImage}
         />
       </div>

@@ -49,6 +49,7 @@ export function BrandTab({ selectedId }: BrandTabProps) {
                     alt={brand.name}
                     className="object-cover"
                     fill
+                    sizes="(max-width: 640px) 40px, 50px"
                     src={brand.profileImageUrl}
                   />
                 </div>

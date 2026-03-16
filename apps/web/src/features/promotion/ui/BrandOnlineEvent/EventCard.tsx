@@ -48,6 +48,7 @@ export function EventCard({ coupon }: EventCardProps) {
             alt={coupon.title}
             className={cn("object-cover", isExpired && "opacity-50")}
             fill
+            sizes="(max-width: 640px) 320px, 620px"
             src={coupon.imageUrl}
           />
         </div>
@@ -59,6 +60,7 @@ export function EventCard({ coupon }: EventCardProps) {
               alt="expired"
               className="object-contain"
               fill
+              sizes="(max-width: 640px) 180px, 214px"
               src="/promotion/expired.png"
             />
           </div>
