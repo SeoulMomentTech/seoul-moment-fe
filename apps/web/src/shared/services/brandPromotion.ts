@@ -155,7 +155,7 @@ export interface GetBrandPromotionResponse {
   /** 브랜드 프로모션 이벤트 목록 */
   eventList: GetBrandPromotionEventAndCouponResponse[];
   /** 브랜드 프로모션 공지 목록 */
-  noticsList: GetBrandPromotionNoticsResponse[];
+  noticeList: GetBrandPromotionNoticsResponse[];
 }
 
 /**

@@ -41,7 +41,7 @@ export default function PromotionPage({
         colorCode={data.brand.colorCode}
         eventList={data.eventList}
         logoImage={data.brand.profileImageUrl}
-        noticeList={data.noticsList}
+        noticeList={data.noticeList}
       />
       <ScrollToTop className="bottom-20 right-[5%] z-50 mx-auto size-10 shadow-2xl" />
     </>
