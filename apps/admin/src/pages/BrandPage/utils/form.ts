@@ -64,6 +64,7 @@ export const getEditFormPayload = ({ values }: GetEditFormPayload) => {
     bannerList: values.bannerImageUrlList.map(stripImageDomain),
     mobileBannerList: values.mobileBannerImageUrlList.map(stripImageDomain),
     multilingualTextList,
+    colorCode: values.colorCode,
   };
 
   return payload;
@@ -75,6 +76,12 @@ export const validateForm = (values: CreateAdminBrandRequest) => {
 
   if (!values.englishName.trim()) {
     validationErrors.englishName = "영어 이름을 입력해주세요.";
+  }
+
+  if (!values.colorCode.trim()) {
+    validationErrors.colorCode = "브랜드 컬러를 입력해주세요.";
+  } else if (!/^#[0-9A-Fa-f]{6}$/.test(values.colorCode)) {
+    validationErrors.colorCode = "올바른 헥사 코드 형식이 아닙니다. (#000000)";
   }
 
   if (!values.profileImageUrl) {
@@ -135,6 +142,7 @@ export const getInitialValuesFromData = (data: AdminBrandDetail) => {
     englishName,
     profileImage,
     productBannerImage,
+    colorCode,
   } = data;
 
   const textList = LANGUAGE_LIST.map((language) => {
@@ -195,5 +203,6 @@ export const getInitialValuesFromData = (data: AdminBrandDetail) => {
     sectionList,
     bannerImageUrlList: bannerList,
     mobileBannerImageUrlList: mobileBannerList,
+    colorCode,
   };
 };
