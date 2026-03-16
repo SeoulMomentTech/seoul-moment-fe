@@ -5,7 +5,7 @@ import { type CreateAdminBrandRequest } from "@shared/services/brand";
 import { uploadImageFile } from "@shared/utils/image";
 import { type FormikProps } from "formik";
 
-import { Input, Label } from "@seoul-moment/ui";
+import { Flex, Input, Label } from "@seoul-moment/ui";
 
 import { CategorySelect } from "./CategorySelect";
 import { BannerImageUploader, ProfileImageUploader } from "./ImageUploaders";
@@ -112,7 +112,7 @@ export function BasicInfo({ formik }: BasicInfoProps) {
             <Label htmlFor="colorCode">
               브랜드 컬러 <span className="text-red-500">*</span>
             </Label>
-            <div className="flex gap-2">
+            <Flex align="center" gap={8}>
               <Input
                 className="w-12 h-10 p-1 cursor-pointer"
                 id="colorCodePicker"
@@ -120,16 +120,18 @@ export function BasicInfo({ formik }: BasicInfoProps) {
                 onChange={handleChange}
                 type="color"
                 value={values.colorCode}
+
               />
               <Input
                 className={errors.colorCode ? "border-red-500 flex-1" : "flex-1"}
+                disabled
                 id="colorCode"
                 name="colorCode"
                 onChange={handleChange}
                 placeholder="#000000"
                 value={values.colorCode}
               />
-            </div>
+            </Flex>
             {errors.colorCode && (
               <p className="text-sm text-red-500">{errors.colorCode}</p>
             )}
