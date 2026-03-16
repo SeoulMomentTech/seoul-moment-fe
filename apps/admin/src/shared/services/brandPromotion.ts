@@ -204,6 +204,7 @@ export interface GetAdminBrandPromotionDetailResponse {
   bannerList: GetAdminBrandPromotionBannerResponse[];
   sectionList: GetAdminBrandPromotionSectionResponse[];
   popupList: GetAdminBrandPromotionPopupResponse[];
+  noticeList?: GetAdminBrandPromotionNoticsResponse[];
   eventAndCouponList?: GetAdminBrandPromotionEventAndCouponDto[];
   isActive: boolean;
 }
@@ -378,7 +379,9 @@ export interface PatchAdminBrandPromotionEventCouponRequest {
 /**
  * @description 브랜드 프로모션 등록
  */
-export const createBrandPromotion = (payload: PostAdminBrandPromotionRequest) => {
+export const createBrandPromotion = (
+  payload: PostAdminBrandPromotionRequest,
+) => {
   return fetcher.post<ApiResponse<void>>(`/admin/brand/promotion`, payload);
 };
 
@@ -391,10 +394,9 @@ export const getBrandPromotionList = (params?: {
   search?: string;
   sort?: string;
 }) => {
-  return fetcher.get<ApiResponse<PaginatedData<GetAdminBrandPromotionResponse>>>(
-    `/admin/brand/promotion`,
-    { params },
-  );
+  return fetcher.get<
+    ApiResponse<PaginatedData<GetAdminBrandPromotionResponse>>
+  >(`/admin/brand/promotion`, { params });
 };
 
 /**
@@ -419,7 +421,10 @@ export const deleteBrandPromotion = (id: number) => {
 export const createBrandPromotionSection = (
   payload: PostAdminBrandPromotionSectionRequest,
 ) => {
-  return fetcher.post<ApiResponse<void>>(`/admin/brand/promotion/section`, payload);
+  return fetcher.post<ApiResponse<void>>(
+    `/admin/brand/promotion/section`,
+    payload,
+  );
 };
 
 /**
@@ -463,7 +468,9 @@ export const updateBrandPromotionSection = (
  * @description 브랜드 프로모션 섹션 삭제
  */
 export const deleteBrandPromotionSection = (id: number) => {
-  return fetcher.delete<ApiResponse<void>>(`/admin/brand/promotion/section/${id}`);
+  return fetcher.delete<ApiResponse<void>>(
+    `/admin/brand/promotion/section/${id}`,
+  );
 };
 
 /**
@@ -472,7 +479,10 @@ export const deleteBrandPromotionSection = (id: number) => {
 export const createBrandPromotionBanner = (
   payload: PostAdminBrandPromotionBannerRequest,
 ) => {
-  return fetcher.post<ApiResponse<void>>(`/admin/brand/promotion/banner`, payload);
+  return fetcher.post<ApiResponse<void>>(
+    `/admin/brand/promotion/banner`,
+    payload,
+  );
 };
 
 /**
@@ -516,7 +526,9 @@ export const patchBrandPromotionBanner = (
  * @description 브랜드 프로모션 배너 삭제
  */
 export const deleteBrandPromotionBanner = (id: number) => {
-  return fetcher.delete<ApiResponse<void>>(`/admin/brand/promotion/banner/${id}`);
+  return fetcher.delete<ApiResponse<void>>(
+    `/admin/brand/promotion/banner/${id}`,
+  );
 };
 
 /**
@@ -525,7 +537,10 @@ export const deleteBrandPromotionBanner = (id: number) => {
 export const createBrandPromotionNotics = (
   payload: PostAdminBrandPromotionNoticsRequest,
 ) => {
-  return fetcher.post<ApiResponse<void>>(`/admin/brand/promotion/notics`, payload);
+  return fetcher.post<ApiResponse<void>>(
+    `/admin/brand/promotion/notics`,
+    payload,
+  );
 };
 
 /**
@@ -568,7 +583,9 @@ export const updateBrandPromotionNotics = (
  * @description 브랜드 프로모션 공지 삭제
  */
 export const deleteBrandPromotionNotics = (id: number) => {
-  return fetcher.delete<ApiResponse<void>>(`/admin/brand/promotion/notics/${id}`);
+  return fetcher.delete<ApiResponse<void>>(
+    `/admin/brand/promotion/notics/${id}`,
+  );
 };
 
 /**
@@ -577,7 +594,10 @@ export const deleteBrandPromotionNotics = (id: number) => {
 export const createBrandPromotionPopup = (
   payload: PostAdminBrandPromotionPopupRequest,
 ) => {
-  return fetcher.post<ApiResponse<void>>(`/admin/brand/promotion/popup`, payload);
+  return fetcher.post<ApiResponse<void>>(
+    `/admin/brand/promotion/popup`,
+    payload,
+  );
 };
 
 /**
@@ -621,7 +641,9 @@ export const patchBrandPromotionPopup = (
  * @description 브랜드 프로모션 팝업 삭제
  */
 export const deleteBrandPromotionPopup = (id: number) => {
-  return fetcher.delete<ApiResponse<void>>(`/admin/brand/promotion/popup/${id}`);
+  return fetcher.delete<ApiResponse<void>>(
+    `/admin/brand/promotion/popup/${id}`,
+  );
 };
 
 /**
@@ -630,7 +652,10 @@ export const deleteBrandPromotionPopup = (id: number) => {
 export const createBrandPromotionEvent = (
   payload: PostAdminBrandPromotionEventRequest,
 ) => {
-  return fetcher.post<ApiResponse<void>>(`/admin/brand/promotion/event`, payload);
+  return fetcher.post<ApiResponse<void>>(
+    `/admin/brand/promotion/event`,
+    payload,
+  );
 };
 
 /**
