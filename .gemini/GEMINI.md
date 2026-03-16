@@ -1,43 +1,23 @@
 # Seoul Moment Frontend Monorepo
 
-This repository now follows a pnpm-based monorepo layout. The existing Next.js application lives in `apps/web`, and additional apps or shared packages can be added under `apps/*` and `packages/*`.
+This repository uses a pnpm-based monorepo layout.
+For detailed guidelines on structure, commands, and tooling, refer to:
+- @.gemini/docs/monorepo.md
 
-## Structure
+## Core Applications
 
-- `apps/web` – main service application
-- `apps/admin` - admin application
-- `packages/*` – (optional) shared libraries and utilities
-- Root configs – workspace-wide tooling such as Husky hooks and lint-staged rules
+- **Web (Next.js)**: 메인 서비스 애플리케이션
+  - 가이드: @apps/web/.gemini/GEMINI.md
+- **Admin (Vite/React)**: 어드민 백오피스
+  - 가이드: @apps/admin/.gemini/GEMINI.md
 
-## Scripts
+## AI Commands & Workflows
 
-Run commands from the repository root (all executed through Turborepo):
+이 프로젝트에는 반복 작업을 자동화하기 위한 커스텀 Gemini 명령어가 설정되어 있습니다.
 
-```bash
-pnpm dev         # start the web app in watch mode
-pnpm dev:admin   # start the Vite admin app
-pnpm build       # run builds for every package
-pnpm start       # launch the production Next.js server
-pnpm lint        # lint every package
-pnpm lint:fix    # lint web with --fix
-pnpm i18n:sync   # sync locale data for the web app
-```
+- `gemini swagger-gen "[요청]"`: OpenAPI 명세를 읽어 API 서비스 코드를 자동 생성합니다.
+- `gemini code-review`: PR 생성 전 변경 사항에 대한 시니어급 코드 리뷰를 수행합니다.
+- `gemini apply-review`: 코드 리뷰 피드백을 실제 코드에 반영합니다.
+- `gemini figma-to-code "[URL]"`: 피그마 설계를 Tailwind V4 코드로 변환합니다.
 
-You can still `cd` into each app (`apps/web`, `apps/admin`) and run their scripts directly when you need more fine-grained control.
-
-## Tooling
-
-- Husky git hooks live at the repository root (`.husky`)
-- lint-staged formats/lints staged files in `apps/web` and `apps/admin`
-- turborepo pipeline definition: `turbo.json`
-- pnpm workspace definition: `pnpm-workspace.yaml`
-- pnpm uses isolated `node_modules` per package (`.npmrc`)
-
-## Adding More Packages
-
-1. Create a new folder under `apps/` or `packages/`
-2. Add its own `package.json`
-3. Install dependencies with `pnpm install`
-4. Reference the package using standard pnpm workspace tooling (`pnpm --filter` or package aliases)
-
-This setup keeps the Next.js app intact while making space for shared UI kits, server apps, or other tooling in the monorepo.
+자세한 스킬 및 커맨드 설정은 `.gemini/commands` 및 `.gemini/skills` 디렉토리를 참조하세요.
