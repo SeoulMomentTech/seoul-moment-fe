@@ -5,8 +5,8 @@ import type { PostAdminBrandPromotionRequest } from "@shared/services/brandPromo
 import { toast } from "sonner";
 
 import { BrandPromotionForm } from "./components";
-import { useCreateBrandPromotionMutation } from "./hooks";
-import { useBrandPromotionForm } from "./hooks/useBrandPromotionForm";
+import { useCreateBrandPromotionMutation, useBrandPromotionForm } from "./hooks";
+
 
 export function BrandPromotionAddPage() {
   const navigate = useNavigate();

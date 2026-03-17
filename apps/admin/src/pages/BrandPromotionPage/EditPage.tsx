@@ -3,8 +3,7 @@ import { useParams } from "react-router";
 import type { GetAdminBrandPromotionDetailResponse } from "@shared/services/brandPromotion";
 
 import { BrandPromotionForm } from "./components";
-import { useBrandPromotionDetailQuery } from "./hooks";
-import { useBrandPromotionForm } from "./hooks/useBrandPromotionForm";
+import { useBrandPromotionDetailQuery, useBrandPromotionForm } from "./hooks";
 import { getBrandPromotionInitialState } from "./utils/form";
 
 export function BrandPromotionEditPage() {

@@ -5,10 +5,10 @@ import { useNavigate } from "react-router";
 import { Plus } from "lucide-react";
 
 import { Pagination } from "@shared/components/pagination";
+import { DEFAULT_PAGE } from "@shared/constants/page";
 import { PATH } from "@shared/constants/route";
 import { useDebounceValue } from "@shared/hooks/useDebounceValue";
 
-import { DEFAULT_PAGE } from "@/shared/constants/page";
 
 import { Button, HStack } from "@seoul-moment/ui";
 
