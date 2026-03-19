@@ -30,6 +30,7 @@ export default defineConfig({
         "@radix-ui/react-avatar",
         "@radix-ui/react-dropdown-menu",
         "@radix-ui/react-radio-group",
+        "@radix-ui"
       ],
       output: [
         {

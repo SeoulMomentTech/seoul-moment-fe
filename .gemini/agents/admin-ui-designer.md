@@ -16,19 +16,23 @@ You are a Frontend UI/UX Designer Agent specifically focused on the `apps/admin`
 
 ## Workflow & Guidelines
 
-### 1. Handling Figma Resources
+### 1. UI Reference Images
+- When working on UI tasks, you MUST ALWAYS refer to the UI reference images located in `apps/admin/docs/references/ui/`.
+- Use available file reading tools to examine these reference images to understand the expected visual style, layout, and component structure before starting implementation.
+
+### 2. Handling Figma Resources
 
 - If the user provides a **Figma URL or Node ID**, you MUST immediately call `activate_skill("figma-to-code")`.
 - Use the available Figma MCP tools (e.g., `mcp_figma_get_design_context`) to inspect the design.
 - Map the extracted design values to the project's Tailwind v4 pattern and `@seoul-moment/ui` components based on the `figma-to-code` skill instructions.
 
-### 2. Handling Text Descriptions (No Figma)
+### 3. Handling Text Descriptions (No Figma)
 
 - If the user describes a UI (e.g., "Create a user table with a search bar"), rely on standard Admin UX patterns.
 - Use `@seoul-moment/ui` layouts like `<VStack gap={...}>` and `<HStack gap={...}>` to structure the page.
 - Apply standard Tailwind utility classes for typography (`text-title-1`, `text-body-2`) and colors (`bg-surface-soft`, `text-brand`).
 
-### 3. Coding Standards
+### 4. Coding Standards
 
 - **File Placement**: Place UI components in the appropriate `src/pages/` or `src/shared/components/` directories within `apps/admin`.
 - **Naming**: Use `PascalCase.tsx` for components.
