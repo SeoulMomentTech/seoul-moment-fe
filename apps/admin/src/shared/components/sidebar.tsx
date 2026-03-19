@@ -9,6 +9,7 @@ import {
   Tag,
   Newspaper,
   BookOpenText,
+  Ticket,
 } from "lucide-react";
 
 import { PATH } from "@shared/constants/route";
@@ -117,6 +118,12 @@ const menuItems: MenuItemConfig[] = [
       { id: "brand", label: "전체 브랜드", path: PATH.BRAND },
       { id: "brand-promotion", label: "이벤트 관리", path: PATH.BRAND_PROMOTION },
     ],
+  },
+  {
+    id: "promotion",
+    label: "프로모션 관리",
+    path: PATH.PROMOTION,
+    icon: <Ticket className="h-5 w-5" />,
   },
 ];
 

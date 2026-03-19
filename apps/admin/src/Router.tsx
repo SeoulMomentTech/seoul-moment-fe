@@ -19,6 +19,8 @@ import ProductOptionAddPage from "@pages/ProductOptionsPage/AddPage";
 import ProductOptionEditPage from "@pages/ProductOptionsPage/EditPage";
 import ProductAddPage from "@pages/ProductPage/AddPage";
 import ProductEditPage from "@pages/ProductPage/EditPage";
+import PromotionAddPage from "@pages/PromotionPage/AddPage";
+import PromotionEditPage from "@pages/PromotionPage/EditPage";
 import { GlobalErrorBoundary } from "@shared/components/global-errorboundary";
 import { Layout } from "@shared/components/layout";
 import { PATH } from "@shared/constants/route";
@@ -40,6 +42,7 @@ import {
 import ProductOptionsPage from "@pages/ProductOptionsPage";
 import ProductsPage from "@pages/ProductPage";
 import ProductSubCategoriesPage from "@pages/ProductSubCategoriesPage";
+import PromotionPage from "@pages/PromotionPage";
 import SignUpPage from "@pages/SignUpPage";
 import UserPage from "@pages/UserPage";
 
@@ -198,6 +201,18 @@ const privateRoutes: RouteObject[] = [
       {
         path: PATH.USERS,
         element: <UserPage />,
+      },
+      {
+        path: PATH.PROMOTION,
+        element: <PromotionPage />,
+      },
+      {
+        path: PATH.PROMOTION_ADD,
+        element: <PromotionAddPage />,
+      },
+      {
+        path: PATH.PROMOTION_EDIT,
+        element: <PromotionEditPage />,
       },
     ],
   },

@@ -29,7 +29,10 @@ export type MenuItem =
   | "article-edit"
   | "news"
   | "news-add"
-  | "news-edit";
+  | "news-edit"
+  | "promotion"
+  | "promotion-add"
+  | "promotion-edit";
 
 export function Layout({ children }: PropsWithChildren) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

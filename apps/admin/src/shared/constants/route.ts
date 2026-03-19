@@ -42,4 +42,9 @@ export const PATH = {
 
   // User
   USERS: "/users",
+
+  // Promotion
+  PROMOTION: "/promotion",
+  PROMOTION_ADD: "/promotion/add",
+  PROMOTION_EDIT: "/promotion/edit/:id",
 } as const;
