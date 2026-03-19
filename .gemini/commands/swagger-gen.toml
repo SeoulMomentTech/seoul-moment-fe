@@ -1,14 +1,13 @@
 # =================================================================
-# Name: swagger-gen (또는 swagger)
+# Name: swagger-gen
 # Description: Swagger/OpenAPI 명세를 분석하여 shared/services/ 하위에 API 함수 생성
 # 
 # [Usage Examples]
-# 1. Swagger UI URL로 생성: gemini swagger "https://api.example.com/swagger/index.html"
-# 2. 로컬 JSON 파일로 생성: cat swagger.json | gemini swagger
-# 3. 특정 도메인만 생성: gemini swagger "URL" -- "User 도메인 서비스 코드만 작성해줘"
+# 1. 전체 생성: gemini swagger-gen
+# 2. 특정 도메인만 생성: gemini swagger-gen "User 도메인 서비스 코드만 작성해줘"
 # =================================================================
 
-name="swagger-to-code"
+name="swagger-gen"
 description = "Swagger/OpenAPI 명세를 분석하여 shared/services 하위에 API 함수 생성"
 
 # Gemini CLI의 외부 파일 참조(@) 문법을 사용합니다.
@@ -27,7 +26,8 @@ prompt = """
 5. 결과물: 코드 블록 상단에 파일 경로를 명시하고, 바로 사용할 수 있는 상태의 코드를 출력하세요.
 
 [입력 데이터]
-{{args}}
+Swagger URL: https://api.seoulmoment.com.tw/docs-json
+추가 요청사항: {{args}}
 """
 
 [settings]

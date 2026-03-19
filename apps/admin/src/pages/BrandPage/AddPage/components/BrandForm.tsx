@@ -28,6 +28,7 @@ const INITIAL_FORM_VALUES: CreateAdminBrandRequest = {
   categoryId: 1,
   profileImageUrl: "",
   productBannerImageUrl: "",
+  colorCode: "#000000",
   textList: LANGUAGE_LIST.map((language) => ({
     languageId: language.id,
     name: "",

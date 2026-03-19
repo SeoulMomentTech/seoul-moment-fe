@@ -20,3 +20,4 @@ export * from "./hstack";
 export * from './spinner';
 export * from './drawer';
 export * from './search-bar';
+export * from './switch';

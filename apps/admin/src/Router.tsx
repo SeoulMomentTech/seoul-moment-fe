@@ -11,18 +11,23 @@ import ArticleEditPage from "@pages/ArticlePage/EditPage";
 import { BrandAddPage } from "@pages/BrandPage/AddPage";
 import { BrandEditPage } from "@pages/BrandPage/EditPage";
 import { BrandListPage } from "@pages/BrandPage/ListPage";
+import { BrandPromotionAddPage } from "@pages/BrandPromotionPage/AddPage";
+import { BrandPromotionEditPage } from "@pages/BrandPromotionPage/EditPage";
 import NewsAddPage from "@pages/NewsPage/AddPage";
 import NewsEditPage from "@pages/NewsPage/EditPage";
 import ProductOptionAddPage from "@pages/ProductOptionsPage/AddPage";
 import ProductOptionEditPage from "@pages/ProductOptionsPage/EditPage";
 import ProductAddPage from "@pages/ProductPage/AddPage";
 import ProductEditPage from "@pages/ProductPage/EditPage";
+import PromotionAddPage from "@pages/PromotionPage/AddPage";
+import PromotionEditPage from "@pages/PromotionPage/EditPage";
 import { GlobalErrorBoundary } from "@shared/components/global-errorboundary";
 import { Layout } from "@shared/components/layout";
 import { PATH } from "@shared/constants/route";
 import { useAuthStore } from "@shared/hooks/useAuth";
 
 import ArticlePage from "@pages/ArticlePage";
+import { BrandPromotionPage } from "@pages/BrandPromotionPage";
 import { HomeBannersPage } from "@pages/HomeBannerPage";
 import HomePage from "@pages/HomePage";
 import LoginPage from "@pages/LoginPage";
@@ -37,6 +42,7 @@ import {
 import ProductOptionsPage from "@pages/ProductOptionsPage";
 import ProductsPage from "@pages/ProductPage";
 import ProductSubCategoriesPage from "@pages/ProductSubCategoriesPage";
+import PromotionPage from "@pages/PromotionPage";
 import SignUpPage from "@pages/SignUpPage";
 import UserPage from "@pages/UserPage";
 
@@ -181,8 +187,32 @@ const privateRoutes: RouteObject[] = [
         element: <BrandEditPage />,
       },
       {
+        path: PATH.BRAND_PROMOTION,
+        element: <BrandPromotionPage />,
+      },
+      {
+        path: PATH.BRAND_PROMOTION_ADD,
+        element: <BrandPromotionAddPage />,
+      },
+      {
+        path: PATH.BRAND_PROMOTION_EDIT,
+        element: <BrandPromotionEditPage />,
+      },
+      {
         path: PATH.USERS,
         element: <UserPage />,
+      },
+      {
+        path: PATH.PROMOTION,
+        element: <PromotionPage />,
+      },
+      {
+        path: PATH.PROMOTION_ADD,
+        element: <PromotionAddPage />,
+      },
+      {
+        path: PATH.PROMOTION_EDIT,
+        element: <PromotionEditPage />,
       },
     ],
   },

@@ -22,13 +22,17 @@ export type MenuItem =
   | "home-banner"
   | "product-banner"
   | "brand"
+  | "brand-promotion"
   | "product-options"
   | "article"
   | "article-add"
   | "article-edit"
   | "news"
   | "news-add"
-  | "news-edit";
+  | "news-edit"
+  | "promotion"
+  | "promotion-add"
+  | "promotion-edit";
 
 export function Layout({ children }: PropsWithChildren) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

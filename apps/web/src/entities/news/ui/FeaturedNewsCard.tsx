@@ -87,7 +87,12 @@ export function FeaturedSubNewsCard({
           "max-sm:h-[342px]",
         )}
       >
-        <BaseImage alt="" fill src={imageUrl} />
+        <BaseImage
+          alt=""
+          fill
+          sizes="(max-width: 640px) 264px, 370px"
+          src={imageUrl}
+        />
       </figure>
       <Card
         contentWrapperClassName="gap-[20px]"
