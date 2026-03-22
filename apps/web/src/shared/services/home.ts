@@ -9,7 +9,7 @@ interface HomeSection {
   image: string[];
 }
 
-interface HomePromotion {
+export interface HomePromotion {
   id: number;
   thumbnailImageUrl: string;
   title: string;

@@ -12,7 +12,9 @@ interface MainBannerProps {
 
 export function MainBanner({ promise }: MainBannerProps) {
   const res = use(promise);
-  const { mobileImage, image } = res.data.banner?.[0] ?? {};
+  const { mobileImage, image } = res.data?.banner?.[0] ?? {};
+
+  if (!image) return null;
 
   return (
     <section

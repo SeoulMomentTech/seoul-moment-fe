@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useRef } from "react";
+import { use, useId, useRef } from "react";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -9,7 +9,7 @@ import type { SwiperRef } from "swiper/react";
 import { Swiper, SwiperSlide } from "swiper/react";
 
 import { cn } from "@shared/lib/style";
-import type { getHome } from "@shared/services/home";
+import type { getHome, HomePromotion } from "@shared/services/home";
 import { BaseImage } from "@shared/ui/base-image";
 
 import { Link } from "@/i18n/navigation";
@@ -24,9 +24,10 @@ interface PromotionListProps {
 }
 
 export function PromotionList({ promise }: PromotionListProps) {
+  const id = useId();
   const swiperRef = useRef<SwiperRef>(null);
   const res = use(promise);
-  const promotionList =
+  const promotionList: HomePromotion[] =
     res.data?.promotionList?.length > 1 ? res.data.promotionList.slice(1) : [];
 
   if (!promotionList || promotionList.length < 2) return null;
@@ -51,7 +52,7 @@ export function PromotionList({ promise }: PromotionListProps) {
             {promotionList.map((promotion) => (
               <SwiperSlide
                 className="max-sm:w-[305px]! w-auto!"
-                key={promotion.id}
+                key={`promotion-${promotion.id}-${id}`}
               >
                 <Link
                   className="group/item block w-[305px]"
