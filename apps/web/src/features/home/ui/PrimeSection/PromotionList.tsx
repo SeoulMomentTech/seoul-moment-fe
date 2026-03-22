@@ -29,8 +29,9 @@ export function PromotionList({ promise }: PromotionListProps) {
   const res = use(promise);
   const promotionList: HomePromotion[] =
     res.data?.promotionList?.length > 1 ? res.data.promotionList.slice(1) : [];
+  const isEmpty = !promotionList.length;
 
-  if (!promotionList || promotionList.length < 2) return null;
+  if (isEmpty) return null;
 
   return (
     <section className="w-7xl mx-auto overflow-hidden bg-white py-[140px] max-sm:w-auto max-sm:py-[50px]">
