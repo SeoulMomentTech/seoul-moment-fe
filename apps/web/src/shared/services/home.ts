@@ -9,8 +9,16 @@ interface HomeSection {
   image: string[];
 }
 
+export interface HomePromotion {
+  id: number;
+  thumbnailImageUrl: string;
+  title: string;
+  description: string;
+}
+
 export interface GetHomeRes {
   banner: Array<Record<"image" | "mobileImage", string>>;
+  promotionList: Array<HomePromotion>;
   section: HomeSection[];
 }
 

@@ -19,9 +19,11 @@ interface SeasonCollectionProps {
 export function SeasonCollection({ promise }: SeasonCollectionProps) {
   const id = useId();
   const res = use(promise);
-  const section = res.data?.section;
+  const promotionList = res.data?.promotionList ?? [];
 
-  if (!section || section.length === 0) return null;
+  if (!promotionList || promotionList.length === 0) return null;
+
+  const { title, description, thumbnailImageUrl } = promotionList[0];
 
   return (
     <section
@@ -40,15 +42,13 @@ export function SeasonCollection({ promise }: SeasonCollectionProps) {
           <h3
             className={cn("text-title-2 font-semibold", "max-sm:text-title-4")}
           >
-            {section?.[0]?.title}
+            {title}
           </h3>
-          <span className="max-sm:text-body-3">
-            {section?.[0]?.description}
-          </span>
+          <span className="max-sm:text-body-3">{description}</span>
         </div>
         <Link
           className={cn("text-body-3 flex items-center", "max-sm:text-body-4")}
-          href="/product"
+          href={`/promotion/${id}`}
         >
           <div className="inline-flex gap-1 border-b">
             Product detail
@@ -62,23 +62,23 @@ export function SeasonCollection({ promise }: SeasonCollectionProps) {
           "max-sm:h-[199px] max-sm:gap-4",
         )}
       >
-        {section[0]?.image?.map((src, idx) => (
+        {thumbnailImageUrl && (
           <figure
             className={cn(
-              "w-[354px] bg-gray-300",
+              "w-[708px] bg-gray-300",
               "max-sm:w-auto max-sm:flex-1",
             )}
-            key={`${id}-${src}-${idx + 1}`}
           >
             <BaseImage
               alt=""
               className="h-full object-cover"
               height={600}
-              src={src}
-              width={360}
+              key={id}
+              src={thumbnailImageUrl}
+              width={708}
             />
           </figure>
-        ))}
+        )}
       </div>
     </section>
   );
@@ -118,10 +118,7 @@ export function SeasonCollectionSkeleton() {
         )}
       >
         <Skeleton
-          className={cn("h-full w-[354px]", "max-sm:w-auto max-sm:flex-1")}
-        />
-        <Skeleton
-          className={cn("h-full w-[354px]", "max-sm:w-auto max-sm:flex-1")}
+          className={cn("h-full w-[708px]", "max-sm:w-auto max-sm:flex-1")}
         />
       </div>
     </section>
