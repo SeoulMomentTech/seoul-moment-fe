@@ -19,11 +19,13 @@ import type { CommonRes } from "@shared/services";
 
 interface PromotionPageProps {
   promotionId: number;
+  brandId: number;
   promise: Promise<CommonRes<GetBrandPromotionResponse>>;
 }
 
 export default function PromotionPage({
   promotionId,
+  brandId,
   promise,
 }: PromotionPageProps) {
   const { data } = use(promise);
@@ -31,7 +33,7 @@ export default function PromotionPage({
   return (
     <>
       <MainBanner bannerList={data.bannerList} />
-      <BrandTab selectedId={promotionId} />
+      <BrandTab promotionId={promotionId} selectedId={brandId} />
       <BrandIntroduction brand={data.brand} />
       <BrandLookbook sectionList={data.sectionList} />
       <BrandSpecialEvent brandId={data.brand.id} products={data.productList} />
