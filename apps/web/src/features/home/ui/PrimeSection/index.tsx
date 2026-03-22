@@ -9,6 +9,8 @@ import type { LanguageType } from "@/i18n/const";
 import { cn, Skeleton } from "@seoul-moment/ui";
 
 import { MainBanner } from "./MainBanner";
+import { PromotionList, PromotionListSkeleton } from "./PromotionList";
+import { SeasonCollection, SeasonCollectionSkeleton } from "./SeasonCollection";
 
 export default async function PrimeSection() {
   const locale = (await getLocale()) as LanguageType;
@@ -28,7 +30,12 @@ export default async function PrimeSection() {
       >
         <MainBanner promise={promise} />
       </Suspense>
-      {/* 추후 백엔드 측 작업 완료후 SeasonCollection 재추가*/}
+      <Suspense fallback={<SeasonCollectionSkeleton />}>
+        <SeasonCollection promise={promise} />
+      </Suspense>
+      <Suspense fallback={<PromotionListSkeleton />}>
+        <PromotionList promise={promise} />
+      </Suspense>
     </>
   );
 }
