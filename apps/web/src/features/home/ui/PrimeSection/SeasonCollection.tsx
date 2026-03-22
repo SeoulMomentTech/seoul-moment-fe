@@ -48,7 +48,7 @@ export function SeasonCollection({ promise }: SeasonCollectionProps) {
         </div>
         <Link
           className={cn("text-body-3 flex items-center", "max-sm:text-body-4")}
-          href={`/promotion/${id}`}
+          href={`/promotion/${id}/brand`}
         >
           <div className="inline-flex gap-1 border-b">
             Product detail
