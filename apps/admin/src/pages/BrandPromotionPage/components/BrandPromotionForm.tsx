@@ -75,8 +75,7 @@ export function BrandPromotionForm({
       return;
     }
 
-    console.log(payload);
-    //onSubmit(payload);
+    onSubmit(payload);
   };
 
   return (
