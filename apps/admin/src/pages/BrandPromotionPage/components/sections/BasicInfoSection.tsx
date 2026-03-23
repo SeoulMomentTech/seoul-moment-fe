@@ -18,21 +18,56 @@ import { Card, FieldError, FieldLabel } from "../FormShare";
 
 interface BasicInfoSectionProps {
   brandOptions: Array<{ value: string; label: string }>;
+  promotionOptions: Array<{ value: string; label: string }>;
   errors?: BrandPromotionFormErrors["values"];
   isBrandLoading: boolean;
+  isPromotionLoading: boolean;
   onChange(values: BrandPromotionFormValues): void;
   values: BrandPromotionFormValues;
 }
 
 export function BasicInfoSection({
   brandOptions,
+  promotionOptions,
   errors,
   isBrandLoading,
+  isPromotionLoading,
   onChange,
   values,
 }: BasicInfoSectionProps) {
   return (
     <>
+      <div className="mb-6">
+        <FieldLabel>
+          프로모션 <span className="text-black">*</span>
+        </FieldLabel>
+        <Select
+          onValueChange={(value) =>
+            onChange({
+              ...values,
+              promotionId: Number(value),
+            })
+          }
+          value={values.promotionId ? String(values.promotionId) : undefined}
+        >
+          <SelectTrigger className="h-[48px] rounded-[10px] border-black/15 bg-white text-left">
+            <SelectValue
+              placeholder={
+                isPromotionLoading ? "프로모션 불러오는 중..." : "프로모션 선택"
+              }
+            />
+          </SelectTrigger>
+          <SelectContent className="bg-white">
+            {promotionOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <FieldError message={errors?.promotionId} />
+      </div>
+
       <div className="mb-6">
         <FieldLabel>
           브랜드 <span className="text-black">*</span>

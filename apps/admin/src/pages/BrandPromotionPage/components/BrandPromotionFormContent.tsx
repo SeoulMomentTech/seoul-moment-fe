@@ -17,8 +17,10 @@ import { SectionListSection } from "./sections/SectionListSection";
 
 interface BrandPromotionFormContentProps {
   brandOptions: Array<{ value: string; label: string }>;
+  promotionOptions: Array<{ value: string; label: string }>;
   form: BrandPromotionFormState;
   isBrandLoading: boolean;
+  isPromotionLoading: boolean;
 }
 
 function assertUnreachable(x: never): never {
@@ -27,8 +29,10 @@ function assertUnreachable(x: never): never {
 
 export function BrandPromotionFormContent({
   brandOptions,
+  promotionOptions,
   form,
   isBrandLoading,
+  isPromotionLoading,
 }: BrandPromotionFormContentProps) {
   switch (form.activeTab) {
     case "basic":
@@ -37,9 +41,11 @@ export function BrandPromotionFormContent({
           brandOptions={brandOptions}
           errors={form.isSubmitAttempted ? form.errors.values : undefined}
           isBrandLoading={isBrandLoading}
+          isPromotionLoading={isPromotionLoading}
           onChange={
             form.setValues as (values: BrandPromotionFormValues) => void
           }
+          promotionOptions={promotionOptions}
           values={form.values}
         />
       );

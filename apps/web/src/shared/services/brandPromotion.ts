@@ -134,7 +134,7 @@ export interface GetBrandPromotionEventAndCouponResponse {
   couponList: GetBrandPromotionEventCouponResponse[];
 }
 
-export interface GetBrandPromotionNoticsResponse {
+export interface GetBrandPromotionNoticeResponse {
   /** 브랜드 프로모션 공지 아이디 */
   id: number;
   /** 내용 */
@@ -155,7 +155,7 @@ export interface GetBrandPromotionResponse {
   /** 브랜드 프로모션 이벤트 목록 */
   eventList: GetBrandPromotionEventAndCouponResponse[];
   /** 브랜드 프로모션 공지 목록 */
-  noticeList: GetBrandPromotionNoticsResponse[];
+  noticeList: GetBrandPromotionNoticeResponse[];
 }
 
 /**

@@ -40,7 +40,7 @@ export default function PromotionAddPage() {
         description="새로운 프로모션을 등록합니다."
         title="프로모션 등록"
       />
-      <PromotionForm isSubmitting={isPending} onSubmit={handleSubmit} />
+      <PromotionForm isSubmitting={isPending} mode="add" onSubmit={handleSubmit} />
     </div>
   );
 }

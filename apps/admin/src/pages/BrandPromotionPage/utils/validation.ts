@@ -166,6 +166,7 @@ export function getBrandPromotionFormErrors({
           : "섹션 이미지를 업로드해주세요.",
     })),
     values: {
+      promotionId: values.promotionId ? undefined : "프로모션을 선택해주세요.",
       brandId: values.brandId ? undefined : "브랜드를 선택해주세요.",
       descriptions: {
         ko: hasText(values.descriptions.ko)
@@ -198,6 +199,7 @@ export function getIsBrandPromotionSubmitEnabled({
   values: BrandPromotionFormValues;
 }) {
   const isBasicValid =
+    Boolean(values.promotionId) &&
     Boolean(values.brandId) &&
     Object.values(values.descriptions).every(hasText);
 

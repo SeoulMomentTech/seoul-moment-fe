@@ -210,6 +210,7 @@ export function getBrandPromotionInitialState(
           }))
         : [],
     values: {
+      promotionId: detail.promotionId,
       brandId: detail.brandDto.id,
       descriptions: {
         ko:
