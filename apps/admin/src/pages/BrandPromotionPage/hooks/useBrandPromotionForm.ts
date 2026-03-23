@@ -86,11 +86,12 @@ export function useBrandPromotionForm({
   });
 
   const createPayload = (): PostAdminBrandPromotionRequest | null => {
-    if (!values.brandId) {
+    if (!values.brandId || !values.promotionId) {
       return null;
     }
 
     return {
+      promotionId: values.promotionId,
       brandId: values.brandId,
       brandDescriptionLanguage: LANGUAGE_LIST.map((language) => ({
         description: values.descriptions[getLanguageCode(language.code)] ?? "",

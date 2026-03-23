@@ -45,6 +45,7 @@ interface PromotionFormProps {
   defaultValues?: GetAdminPromotionDetailResponse;
   isEditMode?: boolean;
   isSubmitting: boolean;
+  mode: 'add' | 'edit';
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onSubmit(data: any): void;
 }
@@ -58,6 +59,7 @@ const getLanguageLabel = (languageCode: string | undefined) => {
 export function PromotionForm({
   defaultValues,
   isSubmitting,
+  mode,
   onSubmit,
 }: PromotionFormProps) {
   const navigate = useNavigate();
@@ -108,16 +110,16 @@ export function PromotionForm({
         language:
           defaultValues.language.length > 0
             ? defaultValues.language.map((lang, index) => ({
-                languageId: index + 1, // API doesn't provide ID in Get, so we map by index or keep it for form
-                languageCode: lang.languageCode === "zh-TW" ? "zh" : lang.languageCode as "ko" | "en" | "zh",
-                title: lang.title,
-                description: lang.description,
-              }))
+              languageId: index + 1, // API doesn't provide ID in Get, so we map by index or keep it for form
+              languageCode: lang.languageCode === "zh-TW" ? "zh" : lang.languageCode as "ko" | "en" | "zh",
+              title: lang.title,
+              description: lang.description,
+            }))
             : [
-                { languageCode: "ko", languageId: 1, title: "", description: "" },
-                { languageCode: "en", languageId: 2, title: "", description: "" },
-                { languageCode: "zh", languageId: 3, title: "", description: "" },
-              ],
+              { languageCode: "ko", languageId: 1, title: "", description: "" },
+              { languageCode: "en", languageId: 2, title: "", description: "" },
+              { languageCode: "zh", languageId: 3, title: "", description: "" },
+            ],
       });
       setBannerPreview(defaultValues.bannerImageUrl || "");
       setMobileBannerPreview(defaultValues.bannerMobileImageUrl || "");
@@ -151,20 +153,28 @@ export function PromotionForm({
       }
 
       // Map internal 'zh' back to 'zh-TW' and prepare payloads for Create or Update
-      const languagePayload = values.language.map((lang) => ({
+      const languagePayload = mode === "add" ? values.language.map((lang) => ({
         languageId: lang.languageId ?? 0,
+        title: lang.title,
+        description: lang.description,
+      })) : values.language.map((lang) => ({
         languageCode: (lang.languageCode === "zh" ? "zh-TW" : lang.languageCode) as "ko" | "en" | "zh-TW",
         title: lang.title,
         description: lang.description,
       }));
 
-      const submitData = {
-        bannerImageUrl: banner,
-        bannerMobileImageUrl: mobileBanner,
-        thumbnailImageUrl: thumbnail,
+      const imageUrls = mode === 'add' ? {
         bannerImagePath: banner,
         bannerMobileImagePath: mobileBanner,
         thumbnailImagePath: thumbnail,
+      } : {
+        bannerImageUrl: banner,
+        bannerMobileImageUrl: mobileBanner,
+        thumbnailImageUrl: thumbnail,
+      }
+
+      const submitData = {
+        ...imageUrls,
         startDate: new Date(values.startDate).toISOString(),
         endDate: new Date(values.endDate).toISOString(),
         isActive: values.isActive,

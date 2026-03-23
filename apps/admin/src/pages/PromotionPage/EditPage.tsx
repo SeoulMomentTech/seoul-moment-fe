@@ -14,7 +14,7 @@ import { useAdminPromotionDetailQuery, useUpdateAdminPromotionMutation } from ".
 export default function PromotionEditPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  
+
   const promotionId = Number(id);
   const { data: response, isLoading } = useAdminPromotionDetailQuery(promotionId, {
     enabled: !Number.isNaN(promotionId) && promotionId > 0,
@@ -56,6 +56,7 @@ export default function PromotionEditPage() {
       <PromotionForm
         defaultValues={defaultValues}
         isSubmitting={isPending}
+        mode="edit"
         onSubmit={handleSubmit}
       />
     </div>

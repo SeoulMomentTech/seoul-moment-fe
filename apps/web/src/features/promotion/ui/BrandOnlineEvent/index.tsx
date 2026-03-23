@@ -3,7 +3,7 @@
 import type {
   GetBrandPromotionBrandDetailResponse,
   GetBrandPromotionEventAndCouponResponse,
-  GetBrandPromotionNoticsResponse,
+  GetBrandPromotionNoticeResponse,
 } from "@shared/services/brandPromotion";
 
 import { Flex, cn, VStack } from "@seoul-moment/ui";
@@ -15,7 +15,7 @@ import { NoticeSection } from "./NoticeSection";
 interface BrandOnlineEventProps {
   brand: GetBrandPromotionBrandDetailResponse;
   eventList: GetBrandPromotionEventAndCouponResponse[];
-  noticeList: GetBrandPromotionNoticsResponse[];
+  noticeList: GetBrandPromotionNoticeResponse[];
   colorCode: string;
   logoImage: string;
 }

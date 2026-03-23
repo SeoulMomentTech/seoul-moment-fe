@@ -1,9 +1,9 @@
-import type { GetBrandPromotionNoticsResponse } from "@/shared/services/brandPromotion";
+import type { GetBrandPromotionNoticeResponse } from "@/shared/services/brandPromotion";
 
 import { Flex, cn } from "@seoul-moment/ui";
 
 interface NoticeSectionProps {
-  noticeList: GetBrandPromotionNoticsResponse[];
+  noticeList: GetBrandPromotionNoticeResponse[];
 }
 
 export function NoticeSection({ noticeList }: NoticeSectionProps) {

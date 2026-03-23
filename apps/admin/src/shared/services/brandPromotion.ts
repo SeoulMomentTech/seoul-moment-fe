@@ -49,13 +49,13 @@ export interface PostAdminBrandPromotionPopupBaseDto {
   imagePathList: string[];
 }
 
-export interface PostAdminBrandPromotionNoticsLanguageDto {
+export interface PostAdminBrandPromotionNoticeLanguageDto {
   languageId: number;
   content: string;
 }
 
-export interface PostAdminBrandPromotionNoticsBaseDto {
-  language: PostAdminBrandPromotionNoticsLanguageDto[];
+export interface PostAdminBrandPromotionNoticeBaseDto {
+  language: PostAdminBrandPromotionNoticeLanguageDto[];
 }
 
 export interface PostAdminBrandPromotionEventLanguageDto {
@@ -85,18 +85,20 @@ export interface PostAdminBrandPromotionEventAndCouponDto {
 }
 
 export interface PostAdminBrandPromotionRequest {
+  promotionId: number;
   brandId: number;
   brandDescriptionLanguage: PostAdminBrandPromotionLanguageDto[];
   isActive?: boolean;
   bannerList: PostAdminBrandPromotionBannerBaseDto[];
   sectionList: PostAdminBrandPromotionSectionBaseDto[];
   popupList: PostAdminBrandPromotionPopupBaseDto[];
-  noticeList?: PostAdminBrandPromotionNoticsBaseDto[];
+  noticeList?: PostAdminBrandPromotionNoticeBaseDto[];
   eventAndCouponList?: PostAdminBrandPromotionEventAndCouponDto[];
 }
 
 export interface GetAdminBrandPromotionResponse {
   id: number;
+  promotionId: number;
   brandId: number;
   isActive: boolean;
   createDate: string;
@@ -200,11 +202,12 @@ export interface GetAdminBrandPromotionEventAndCouponDto {
 
 export interface GetAdminBrandPromotionDetailResponse {
   id: number;
+  promotionId: number;
   brandDto: GetAdminBrandPromotionDetailBrandDto;
   bannerList: GetAdminBrandPromotionBannerResponse[];
   sectionList: GetAdminBrandPromotionSectionResponse[];
   popupList: GetAdminBrandPromotionPopupResponse[];
-  noticeList?: GetAdminBrandPromotionNoticsResponse[];
+  noticeList?: GetAdminBrandPromotionNoticeResponse[];
   eventAndCouponList?: GetAdminBrandPromotionEventAndCouponDto[];
   isActive: boolean;
 }
@@ -255,35 +258,35 @@ export interface PatchAdminBrandPromotionBannerRequest {
   language: AdminBrandPromotionBannerLanguageDto[];
 }
 
-export interface PostAdminBrandPromotionNoticsRequest {
-  language: PostAdminBrandPromotionNoticsLanguageDto[];
+export interface PostAdminBrandPromotionNoticeRequest {
+  language: PostAdminBrandPromotionNoticeLanguageDto[];
   brandPromotionId: number;
 }
 
-export interface GetAdminBrandPromotionNoticsLanguageDto {
+export interface GetAdminBrandPromotionNoticeLanguageDto {
   languageCode: "ko" | "en" | "zh-TW";
   content: string;
 }
 
-export interface GetAdminBrandPromotionNoticsResponse {
+export interface GetAdminBrandPromotionNoticeResponse {
   id: number;
   brandPromotionId: number;
-  language: GetAdminBrandPromotionNoticsLanguageDto[];
+  language: GetAdminBrandPromotionNoticeLanguageDto[];
   createDate: string;
   updateDate: string;
 }
 
-export interface GetAdminBrandPromotionNoticsDetailResponse {
+export interface GetAdminBrandPromotionNoticeDetailResponse {
   id: number;
   brandPromotionId: number;
-  language: GetAdminBrandPromotionNoticsLanguageDto[];
+  language: GetAdminBrandPromotionNoticeLanguageDto[];
   createDate: string;
   updateDate: string;
 }
 
-export interface PatchAdminBrandPromotionNoticsRequest {
+export interface PatchAdminBrandPromotionNoticeRequest {
   brandPromotionId: number;
-  language: GetAdminBrandPromotionNoticsLanguageDto[];
+  language: GetAdminBrandPromotionNoticeLanguageDto[];
 }
 
 export interface PostAdminBrandPromotionPopupRequest {
@@ -534,11 +537,11 @@ export const deleteBrandPromotionBanner = (id: number) => {
 /**
  * @description 브랜드 프로모션 공지 등록
  */
-export const createBrandPromotionNotics = (
-  payload: PostAdminBrandPromotionNoticsRequest,
+export const createBrandPromotionNotice = (
+  payload: PostAdminBrandPromotionNoticeRequest,
 ) => {
   return fetcher.post<ApiResponse<void>>(
-    `/admin/brand/promotion/notics`,
+    `/admin/brand/promotion/notice`,
     payload,
   );
 };
@@ -546,35 +549,35 @@ export const createBrandPromotionNotics = (
 /**
  * @description 브랜드 프로모션 공지 리스트 조회
  */
-export const getBrandPromotionNoticsList = (params?: {
+export const getBrandPromotionNoticeList = (params?: {
   page?: number;
   count?: number;
   search?: string;
   sort?: string;
 }) => {
   return fetcher.get<
-    ApiResponse<PaginatedData<GetAdminBrandPromotionNoticsResponse>>
-  >(`/admin/brand/promotion/notics`, { params });
+    ApiResponse<PaginatedData<GetAdminBrandPromotionNoticeResponse>>
+  >(`/admin/brand/promotion/notice`, { params });
 };
 
 /**
  * @description 브랜드 프로모션 공지 상세 조회
  */
-export const getBrandPromotionNoticsDetail = (id: number) => {
-  return fetcher.get<ApiResponse<GetAdminBrandPromotionNoticsDetailResponse>>(
-    `/admin/brand/promotion/notics/${id}`,
+export const getBrandPromotionNoticeDetail = (id: number) => {
+  return fetcher.get<ApiResponse<GetAdminBrandPromotionNoticeDetailResponse>>(
+    `/admin/brand/promotion/notice/${id}`,
   );
 };
 
 /**
  * @description 브랜드 프로모션 공지 수정
  */
-export const updateBrandPromotionNotics = (
+export const updateBrandPromotionNotice = (
   id: number,
-  payload: PatchAdminBrandPromotionNoticsRequest,
+  payload: PatchAdminBrandPromotionNoticeRequest,
 ) => {
   return fetcher.patch<ApiResponse<void>>(
-    `/admin/brand/promotion/notics/${id}`,
+    `/admin/brand/promotion/notice/${id}`,
     payload,
   );
 };
@@ -582,9 +585,9 @@ export const updateBrandPromotionNotics = (
 /**
  * @description 브랜드 프로모션 공지 삭제
  */
-export const deleteBrandPromotionNotics = (id: number) => {
+export const deleteBrandPromotionNotice = (id: number) => {
   return fetcher.delete<ApiResponse<void>>(
-    `/admin/brand/promotion/notics/${id}`,
+    `/admin/brand/promotion/notice/${id}`,
   );
 };
 

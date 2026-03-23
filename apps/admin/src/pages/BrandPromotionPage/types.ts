@@ -5,6 +5,7 @@ export type SectionType = PostAdminBrandPromotionSectionBaseDto["type"];
 export type EventStatus = "NORMAL" | "DELETE";
 
 export interface BrandPromotionFormValues {
+  promotionId?: number;
   brandId?: number;
   isActive: boolean;
   descriptions: Record<LanguageCode, string>;
@@ -96,6 +97,7 @@ export interface BrandPromotionFormErrors {
     imagePathList?: string;
   }>;
   values: {
+    promotionId?: string;
     brandId?: string;
     descriptions: Partial<Record<LanguageCode, string>>;
   };

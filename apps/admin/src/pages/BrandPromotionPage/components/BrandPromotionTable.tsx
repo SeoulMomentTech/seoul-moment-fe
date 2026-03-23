@@ -42,6 +42,7 @@ export function BrandPromotionTable({
       <TableHeader>
         <TableRow>
           <TableHead>ID</TableHead>
+          <TableHead>Promotion ID</TableHead>
           <TableHead>Brand ID</TableHead>
           <TableHead>상태</TableHead>
           <TableHead>생성일</TableHead>
@@ -52,13 +53,13 @@ export function BrandPromotionTable({
       <TableBody>
         {isListLoading ? (
           <TableRow>
-            <TableCell className="py-8 text-center text-gray-500" colSpan={6}>
+            <TableCell className="py-8 text-center text-gray-500" colSpan={7}>
               이벤트를 불러오는 중입니다.
             </TableCell>
           </TableRow>
         ) : promotions.length === 0 ? (
           <TableRow>
-            <TableCell className="py-8 text-center text-gray-500" colSpan={6}>
+            <TableCell className="py-8 text-center text-gray-500" colSpan={7}>
               {emptyMessage}
             </TableCell>
           </TableRow>
@@ -66,6 +67,7 @@ export function BrandPromotionTable({
           promotions.map((promotion) => (
             <TableRow key={promotion.id}>
               <TableCell>{promotion.id}</TableCell>
+              <TableCell>{promotion.promotionId}</TableCell>
               <TableCell>{promotion.brandId}</TableCell>
               <TableCell>
                 <span

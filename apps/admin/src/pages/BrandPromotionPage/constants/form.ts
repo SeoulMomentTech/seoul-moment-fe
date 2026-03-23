@@ -10,6 +10,7 @@ export const TAB_ITEMS = [
 ] as const;
 
 export const EMPTY_VALUES: BrandPromotionFormValues = {
+  promotionId: undefined,
   brandId: undefined,
   isActive: true,
   descriptions: { ko: "", en: "", zh: "" },

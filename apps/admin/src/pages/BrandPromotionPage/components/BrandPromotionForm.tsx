@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { ArrowLeft } from "lucide-react";
 
 import { useAdminBrandListQuery } from "@pages/BrandPage/ListPage/hooks";
+import { useAdminPromotionListQuery } from "@pages/PromotionPage/hooks";
 import { PATH } from "@shared/constants/route";
 import type { PostAdminBrandPromotionRequest } from "@shared/services/brandPromotion";
 
@@ -38,12 +39,27 @@ export function BrandPromotionForm({
       sort: "DESC",
     });
 
+  const { data: promotionResponse, isLoading: isPromotionLoading } =
+    useAdminPromotionListQuery({
+      page: 1,
+      count: 100,
+      sort: "DESC",
+    });
+
   const brandOptions =
     brandResponse?.data.list.map((brand) => ({
       value: String(brand.id),
       label:
         brand.nameDto.find((item) => item.languageCode === "ko")?.name ??
         `ID ${brand.id}`,
+    })) ?? [];
+
+  const promotionOptions =
+    promotionResponse?.data.list.map((promotion) => ({
+      value: String(promotion.id),
+      label:
+        promotion.language.find((item) => item.languageCode === "ko")?.title ??
+        `ID ${promotion.id}`,
     })) ?? [];
 
   const handleSubmit = () => {
@@ -59,7 +75,8 @@ export function BrandPromotionForm({
       return;
     }
 
-    onSubmit(payload);
+    console.log(payload);
+    //onSubmit(payload);
   };
 
   return (
@@ -101,6 +118,8 @@ export function BrandPromotionForm({
             brandOptions={brandOptions}
             form={form}
             isBrandLoading={isBrandLoading}
+            isPromotionLoading={isPromotionLoading}
+            promotionOptions={promotionOptions}
           />
         </div>
 
