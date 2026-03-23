@@ -18,7 +18,7 @@ interface BrandTabProps {
 export function BrandTab({ promotionId, selectedId }: BrandTabProps) {
   const isMobile = useMediaQuery("(max-width: 40rem)", false);
   const navigate = useRouter();
-  const { data } = useBrandPromotionListQuery();
+  const { data } = useBrandPromotionListQuery({ id: promotionId });
 
   return (
     <nav className="border-b border-black/10 bg-white">
