@@ -11,13 +11,14 @@ import { Flex, HStack, cn } from "@seoul-moment/ui";
 import { useBrandPromotionListQuery } from "../model/useBrandPromotionListQuery";
 
 interface BrandTabProps {
+  promotionId: number;
   selectedId: number;
 }
 
-export function BrandTab({ selectedId }: BrandTabProps) {
+export function BrandTab({ promotionId, selectedId }: BrandTabProps) {
   const isMobile = useMediaQuery("(max-width: 40rem)", false);
   const navigate = useRouter();
-  const { data } = useBrandPromotionListQuery();
+  const { data } = useBrandPromotionListQuery({ id: promotionId });
 
   return (
     <nav className="border-b border-black/10 bg-white">
@@ -40,7 +41,9 @@ export function BrandTab({ selectedId }: BrandTabProps) {
                 )}
                 key={brand.id}
                 onClick={() =>
-                  navigate.push(`/brand/promotion/${brand.brandId}`)
+                  navigate.push(
+                    `/promotion/${promotionId}/brand/${brand.brandId}`,
+                  )
                 }
                 type="button"
               >

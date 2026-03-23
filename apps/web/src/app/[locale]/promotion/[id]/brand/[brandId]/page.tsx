@@ -12,28 +12,35 @@ const fetchBrandPromotion = cache((id: number, languageCode: LanguageType) => {
   return getBrandPromotionDetail(id, languageCode);
 });
 
-export default async function Promotion({
+export default async function PromotionBrand({
   params,
-}: PageParams<{ id: string }>) {
-  const { id, locale } = await params;
+}: PageParams<{ id: string; brandId: string }>) {
+  const { id, brandId, locale } = await params;
   const promotionId = Number(id);
+  const parsedBrandId = Number(brandId);
 
-  const isValidId = Number.isInteger(promotionId) && promotionId > 0;
+  const isValidId = Number.isInteger(parsedBrandId) && parsedBrandId > 0;
 
   if (!isValidId) {
     notFound();
   }
 
   const promise = fetchBrandPromotion(
-    promotionId,
+    parsedBrandId,
     locale as LanguageType,
   ).catch((error) => {
     console.error(
-      `[PromotionPage] Failed to fetch promotion ${promotionId}:`,
+      `[PromotionPage] Failed to fetch promotion with brandId: ${parsedBrandId}:`,
       error,
     );
     notFound();
   });
 
-  return <PromotionPage promise={promise} promotionId={promotionId} />;
+  return (
+    <PromotionPage
+      brandId={parsedBrandId}
+      promise={promise}
+      promotionId={promotionId}
+    />
+  );
 }
