@@ -86,5 +86,16 @@
   "seo_contact_us_description": "Seoul Moment 서비스 이용, 입점, 협업 관련 문의를 접수하는 공식 연락 페이지입니다.",
   "seo_policy_title": "Policy | Seoul Moment",
   "seo_policy_description": "Seoul Moment 서비스 이용에 적용되는 약관과 개인정보 처리 기준을 안내하는 페이지입니다.",
-  "more": "더보기"
+  "more": "더보기",
+  "location": "장소",
+  "date": "날짜",
+  "time": "시간",
+  "promotion_address": "주소",
+  "promotion_description": "설명",
+  "promotion_notice": "주의사항",
+  "promotion_brand": "브랜드소개",
+  "shop": "Shop",
+  "offline_popup_event": "오프라인 및 팝업 이벤트",
+  "promotion_brand_notice": "*기획전 운영 상품의 최대 할인율은 품절 또는 상황에 따라 변동 될 수 있습니다.",
+  "promotion_special_event": "브랜드 판매 상품"
 }
