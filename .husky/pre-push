@@ -1,11 +1,9 @@
-# .husky/pre-commit
+# .husky/pre-push
 
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 if [ "$BRANCH" = "develop" ]; then
-  echo "❌ Error: You cannot commit directly to the 'develop' branch."
+  echo "❌ Error: You cannot push directly to the 'develop' branch."
   echo "Please create a new branch and submit a Pull Request."
   exit 1
 fi
-
-pnpm lint-staged
