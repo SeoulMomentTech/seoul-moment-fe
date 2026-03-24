@@ -1,6 +1,9 @@
 "use client";
 
+import { useLayoutEffect } from "react";
+
 import Image from "next/image";
+import { notFound } from "next/navigation";
 
 import { useMediaQuery } from "@shared/lib/hooks";
 
@@ -19,6 +22,17 @@ export function BrandTab({ promotionId, selectedId }: BrandTabProps) {
   const isMobile = useMediaQuery("(max-width: 40rem)", false);
   const navigate = useRouter();
   const { data } = useBrandPromotionListQuery({ id: promotionId });
+
+  useLayoutEffect(() => {
+    if (!data) return;
+
+    const isValidBrandId = data.list.some(
+      (brand) => brand.brandId === selectedId,
+    );
+    if (!isValidBrandId) {
+      notFound();
+    }
+  }, [data, selectedId]);
 
   return (
     <nav className="border-b border-black/10 bg-white">
