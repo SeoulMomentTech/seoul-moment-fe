@@ -86,5 +86,16 @@
   "seo_contact_us_description": "本頁為首爾映像服務、品牌合作與入駐相關諮詢的官方聯絡頁面。",
   "seo_policy_title": "隱私權政策 | 首爾映像",
   "seo_policy_description": "本頁說明適用於首爾映像服務的相關條款與個人資料保護政策。",
-  "more": "更多"
+  "more": "更多",
+  "location": "活動地點",
+  "date": "活動日期",
+  "time": "活動時間",
+  "promotion_address": "地址",
+  "promotion_description": "活動說明",
+  "promotion_notice": "注意事項",
+  "promotion_brand": "品牌介紹",
+  "shop": "瀏覽商品",
+  "offline_popup_event": "實體活動與快閃活動",
+  "promotion_brand_notice": "※活動商品之最高折扣，可能因商品售完或實際狀況而有所調整。",
+  "promotion_special_event": "品牌商品"
 }
