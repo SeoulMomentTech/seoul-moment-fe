@@ -3,6 +3,7 @@
 import { HeartIcon, StarIcon } from "lucide-react";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 import { toNTCurrency } from "@shared/lib/utils";
 import type { GetBrandPromotionProductResponse } from "@shared/services/brandPromotion";
@@ -22,6 +23,7 @@ export function BrandSpecialEvent({
   products,
   brandId,
 }: BrandSpecialEventProps) {
+  const t = useTranslations();
   const { data, hasNextPage, fetchNextPage } = useProductListLogic({
     brandId,
   });
@@ -35,7 +37,7 @@ export function BrandSpecialEvent({
       <div className="max-sm:min-w-auto min-w-7xl mx-auto max-w-[1920px] px-4 max-sm:px-5">
         <VStack align="center" className="w-full" gap={50}>
           <h2 className="text-title-2 max-sm:text-title-3 text-center font-bold text-black">
-            스페셜 이벤트
+            {t("promotion_special_event")}
           </h2>
 
           <div
@@ -61,7 +63,7 @@ export function BrandSpecialEvent({
               onClick={() => fetchNextPage()}
               variant="outline"
             >
-              더보기
+              {t("more")}
             </Button>
           )}
         </VStack>

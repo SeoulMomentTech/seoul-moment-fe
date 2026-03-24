@@ -3,6 +3,7 @@
 import { HeartIcon, Share2Icon } from "lucide-react";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 import { useModal } from "@shared/lib/hooks";
 import type { GetBrandPromotionBrandDetailResponse } from "@shared/services/brandPromotion";
@@ -17,6 +18,7 @@ interface BrandIntroductionProps {
 
 export function BrandIntroduction({ brand }: BrandIntroductionProps) {
   const { openModal } = useModal();
+  const t = useTranslations();
 
   return (
     <section
@@ -79,8 +81,7 @@ export function BrandIntroduction({ brand }: BrandIntroductionProps) {
               {brand.description}
             </p>
             <p className="text-body-5 w-full leading-normal text-neutral-400">
-              *기획전 운영 상품의 최대 할인율은 품절 또는 상황에 따라 변동 될 수
-              있습니다.
+              {t("promotion_brand_notice")}
             </p>
           </VStack>
 
@@ -94,7 +95,7 @@ export function BrandIntroduction({ brand }: BrandIntroductionProps) {
               )}
               href={`/brand/${brand.id}`}
             >
-              브랜드 소개
+              {t("promotion_brand")}
             </Link>
             <Link
               className={cn(
@@ -104,7 +105,7 @@ export function BrandIntroduction({ brand }: BrandIntroductionProps) {
               )}
               href={`/product?brandId=${brand.id}`}
             >
-              Shop
+              {t("shop")}
             </Link>
           </Flex>
         </VStack>

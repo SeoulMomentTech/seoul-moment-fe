@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 import { useCopyToClipboard, useMediaQuery } from "@shared/lib/hooks";
@@ -22,6 +23,7 @@ export function BrandOfflinePopup({ popupList }: BrandOnlineEventProps) {
   const [selectedId, setSelectedId] = useState(popupList[0].id);
   const isMobile = useMediaQuery("(max-width: 40rem)", false);
   const { copy } = useCopyToClipboard();
+  const t = useTranslations();
 
   const activeEvent =
     popupList.find((e) => e.id === selectedId) || popupList[0];
@@ -41,7 +43,7 @@ export function BrandOfflinePopup({ popupList }: BrandOnlineEventProps) {
       <div className="mx-auto max-w-7xl px-4 max-sm:px-0">
         <VStack align="center" className="w-full" gap={isMobile ? 30 : 60}>
           <h2 className="text-title-2 max-sm:text-title-4 text-center font-bold text-black">
-            오프라인 팝업 이벤트
+            {t("offline_popup_event")}
           </h2>
 
           <BrandOfflinePopupTabs

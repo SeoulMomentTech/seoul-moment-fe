@@ -2,6 +2,8 @@
 
 import { MapPinIcon } from "lucide-react";
 
+import { useTranslations } from "next-intl";
+
 import type { GetBrandPromotionPopupResponse } from "@shared/services/brandPromotion";
 
 import { VStack, HStack, Flex } from "@seoul-moment/ui";
@@ -17,6 +19,8 @@ export function BrandOfflinePopupInfo({
   isMobile,
   onCopy,
 }: BrandOfflinePopupInfoProps) {
+  const t = useTranslations();
+
   return (
     <Flex
       align="center"
@@ -30,14 +34,20 @@ export function BrandOfflinePopupInfo({
       </h3>
 
       <VStack className="w-full" gap={isMobile ? 8 : 30}>
-        <DetailRow label="장소" value={activeEvent.place} />
+        <DetailRow label={t("location")} value={activeEvent.place} />
         <DetailRow
-          label="날짜"
+          label={t("date")}
           value={`${new Date(activeEvent.startDate).toLocaleDateString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit" })} ~ ${new Date(activeEvent.endDate ?? activeEvent.startDate).toLocaleDateString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit" })}`}
         />
-        <DetailRow label="시간" value={"09:00 ~ 16:30"} />
+        <DetailRow
+          label={t("time")}
+          value={`${activeEvent.startTime} ~ ${activeEvent.endTime}`}
+        />
         <div className="flex w-full items-center justify-between">
-          <DetailRow label="주소" value={activeEvent.address} />
+          <DetailRow
+            label={t("promotion_address")}
+            value={activeEvent.address}
+          />
           {isMobile && (
             <button
               className="flex size-8 items-center justify-center rounded-full border border-black/20 bg-white outline-none"
@@ -50,7 +60,9 @@ export function BrandOfflinePopupInfo({
         </div>
 
         <Flex className="w-full" direction="column" gap={16}>
-          <span className="text-body-3 text-black/40">Description</span>
+          <span className="text-body-3 text-black/40">
+            {t("promotion_description")}
+          </span>
           <p className="text-body-3 whitespace-pre-wrap leading-relaxed text-black/80">
             {activeEvent.description}
           </p>

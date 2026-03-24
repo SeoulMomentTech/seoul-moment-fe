@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 import type { GetBrandPromotionBrandDetailResponse } from "@shared/services/brandPromotion";
 
@@ -16,6 +17,8 @@ export function BrandLinksSection({
   brand,
   logoImage,
 }: BrandLinksSectionProps) {
+  const t = useTranslations();
+
   return (
     <VStack
       align="center"
@@ -47,7 +50,7 @@ export function BrandLinksSection({
           )}
           href={`/brand/${brand.id}`}
         >
-          브랜드 소개
+          {t("promotion_brand")}
         </Link>
         <Link
           className={cn(
@@ -57,7 +60,7 @@ export function BrandLinksSection({
           )}
           href={`/product?brandId=${brand.id}`}
         >
-          Shop
+          {t("shop")}
         </Link>
       </Flex>
     </VStack>
