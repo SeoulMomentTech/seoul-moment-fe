@@ -12,9 +12,11 @@ description: Git 변경사항을 분석하여 Conventional Commits 형식의 커
 ## 수행 절차
 
 1. `git status`와 `git diff --staged`로 변경사항 확인
-2. 변경 유형 분류 (feat, fix, docs, style, refactor, test, chore)
-3. 영향 범위(scope) 파악
-4. Conventional Commits 형식으로 메시지 생성 (한국어, 영어 포함)
+2. 현재 브랜치 확인
+   - 만약 현재 브랜치가 `develop`이라면, 작업 내용에 맞는 적절한 새 브랜치명을 생성하여 브랜치를 이동합니다 (`git checkout -b <new-branch-name>`).
+3. 변경 유형 분류 (feat, fix, docs, style, refactor, test, chore) 및 영향 범위(scope) 파악
+4. Conventional Commits 형식으로 **영문(English)** 커밋 메시지 작성
+5. 작성된 영문 커밋 메시지로 커밋을 실행하여 반영합니다 (`git commit -m "..."`).
 
 ## 커밋 메시지 형식
 
