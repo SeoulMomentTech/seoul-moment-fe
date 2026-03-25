@@ -86,10 +86,6 @@ export function PromotionForm({
     name: "language",
   });
 
-  const [bannerFile, setBannerFile] = useState<File | null>(null);
-  const [mobileBannerFile, setMobileBannerFile] = useState<File | null>(null);
-  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
-
   const [bannerPreview, setBannerPreview] = useState("");
   const [mobileBannerPreview, setMobileBannerPreview] = useState("");
   const [thumbnailPreview, setThumbnailPreview] = useState("");
@@ -129,23 +125,10 @@ export function PromotionForm({
 
   const handleSubmit = async (values: PromotionFormValues) => {
     try {
-      let banner = values.bannerImagePath || "";
-      if (bannerFile) {
-        const res = await uploadImageFile(bannerFile, "promotion");
-        banner = res.imagePath;
-      }
+      const banner = values.bannerImagePath || "";
+      const mobileBanner = values.bannerMobileImagePath || "";
+      const thumbnail = values.thumbnailImagePath || "";
 
-      let mobileBanner = values.bannerMobileImagePath || "";
-      if (mobileBannerFile) {
-        const res = await uploadImageFile(mobileBannerFile, "promotion");
-        mobileBanner = res.imagePath;
-      }
-
-      let thumbnail = values.thumbnailImagePath || "";
-      if (thumbnailFile) {
-        const res = await uploadImageFile(thumbnailFile, "promotion");
-        thumbnail = res.imagePath;
-      }
 
       if (!banner || !mobileBanner || !thumbnail) {
         alert("모든 이미지를 업로드해주세요.");
@@ -190,38 +173,37 @@ export function PromotionForm({
 
   const handleFileChange =
     (field: "banner" | "mobileBanner" | "thumbnail") =>
-      (e: React.ChangeEvent<HTMLInputElement>) => {
+      async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        const previewUrl = URL.createObjectURL(file);
+        try {
+          const previewUrl = URL.createObjectURL(file);
+          const { imagePath } = await uploadImageFile(file, "promotion");
 
-        if (field === "banner") {
-          setBannerFile(file);
-          setBannerPreview(previewUrl);
-          form.setValue("bannerImagePath", previewUrl);
-        } else if (field === "mobileBanner") {
-          setMobileBannerFile(file);
-          setMobileBannerPreview(previewUrl);
-          form.setValue("bannerMobileImagePath", previewUrl);
-        } else if (field === "thumbnail") {
-          setThumbnailFile(file);
-          setThumbnailPreview(previewUrl);
-          form.setValue("thumbnailImagePath", previewUrl);
+          if (field === "banner") {
+            setBannerPreview(previewUrl);
+            form.setValue("bannerImagePath", imagePath);
+          } else if (field === "mobileBanner") {
+            setMobileBannerPreview(previewUrl);
+            form.setValue("bannerMobileImagePath", imagePath);
+          } else if (field === "thumbnail") {
+            setThumbnailPreview(previewUrl);
+            form.setValue("thumbnailImagePath", imagePath);
+          }
+        } catch {
+          alert("이미지 업로드 중 오류가 발생했습니다.");
         }
       };
 
   const handleFileClear = (field: "banner" | "mobileBanner" | "thumbnail") => () => {
     if (field === "banner") {
-      setBannerFile(null);
       setBannerPreview("");
       form.setValue("bannerImagePath", "");
     } else if (field === "mobileBanner") {
-      setMobileBannerFile(null);
       setMobileBannerPreview("");
       form.setValue("bannerMobileImagePath", "");
     } else if (field === "thumbnail") {
-      setThumbnailFile(null);
       setThumbnailPreview("");
       form.setValue("thumbnailImagePath", "");
     }
