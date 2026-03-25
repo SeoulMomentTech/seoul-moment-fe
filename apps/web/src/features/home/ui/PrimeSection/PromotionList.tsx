@@ -28,7 +28,7 @@ export function PromotionList({ promise }: PromotionListProps) {
   const swiperRef = useRef<SwiperRef>(null);
   const res = use(promise);
   const promotionList: HomePromotion[] =
-    res.data?.promotionList?.length > 1 ? res.data.promotionList.slice(1) : [];
+    res.data?.promotion?.length > 1 ? res.data.promotion.slice(1) : [];
   const isEmpty = !promotionList.length;
 
   if (isEmpty) return null;
@@ -65,7 +65,7 @@ export function PromotionList({ promise }: PromotionListProps) {
                         alt={promotion.title}
                         className="object-cover transition-transform duration-300 group-hover/item:scale-105"
                         fill
-                        src={promotion.thumbnailImageUrl}
+                        src={promotion.imageUrl}
                       />
                     </div>
                     <div className="flex flex-col gap-2.5">
