@@ -6,6 +6,7 @@ import { LANGUAGE_LIST } from "@shared/constants/locale";
 
 import {
   Button,
+  cn,
   Input,
   Select,
   SelectContent,
@@ -65,8 +66,7 @@ function CouponLanguageTabs({
 
         return (
           <button
-            className={`rounded-[12px] px-3 py-[8px] text-sm font-medium transition ${isActive ? "bg-white text-black shadow-sm" : "text-black/80"
-              }`}
+            className={cn("rounded-[12px] px-3 py-[8px] text-sm font-medium transition", isActive ? "bg-white text-black shadow-sm" : "text-black/80")}
             key={language.id}
             onClick={() => onLanguageChange(code)}
             type="button"

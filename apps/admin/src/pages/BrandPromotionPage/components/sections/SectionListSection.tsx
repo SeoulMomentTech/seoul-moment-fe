@@ -27,10 +27,15 @@ interface SectionListSectionProps {
   sections: SectionFormValue[];
 }
 
-const getMaxImages = (type: SectionType) => {
-  if (type === 'TYPE_2') return 2;
-  if (type === 'TYPE_3') return 4;
-  return 1
+
+
+
+const maxImages = {
+  TYPE_1: 1,
+  TYPE_2: 2,
+  TYPE_3: 4,
+  TYPE_4: 1,
+  TYPE_5: 1,
 }
 
 export function SectionListSection({
@@ -93,11 +98,11 @@ export function SectionListSection({
             <MultipleImageUpload
               folder="brand"
               label="섹션 이미지 (다중 선택)"
-              maxImages={getMaxImages(section.type)}
+              maxImages={maxImages[section.type]}
               onChange={(urls) =>
                 onChange(index, { ...section, imagePathList: urls })
               }
-              value={section.imagePathList.slice(0, getMaxImages(section.type)).filter(Boolean)}
+              value={section.imagePathList.slice(0, maxImages[section.type]).filter(Boolean)}
             />
             <FieldError message={errors?.[index]?.imagePathList} />
           </Card>

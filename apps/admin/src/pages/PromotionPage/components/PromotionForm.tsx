@@ -177,18 +177,22 @@ export function PromotionForm({
         const file = e.target.files?.[0];
         if (!file) return;
 
-        const previewUrl = URL.createObjectURL(file);
-        const { imagePath } = await uploadImageFile(file, "promotion");
+        try {
+          const previewUrl = URL.createObjectURL(file);
+          const { imagePath } = await uploadImageFile(file, "promotion");
 
-        if (field === "banner") {
-          setBannerPreview(previewUrl);
-          form.setValue("bannerImagePath", imagePath);
-        } else if (field === "mobileBanner") {
-          setMobileBannerPreview(previewUrl);
-          form.setValue("bannerMobileImagePath", imagePath);
-        } else if (field === "thumbnail") {
-          setThumbnailPreview(previewUrl);
-          form.setValue("thumbnailImagePath", imagePath);
+          if (field === "banner") {
+            setBannerPreview(previewUrl);
+            form.setValue("bannerImagePath", imagePath);
+          } else if (field === "mobileBanner") {
+            setMobileBannerPreview(previewUrl);
+            form.setValue("bannerMobileImagePath", imagePath);
+          } else if (field === "thumbnail") {
+            setThumbnailPreview(previewUrl);
+            form.setValue("thumbnailImagePath", imagePath);
+          }
+        } catch {
+          alert("이미지 업로드 중 오류가 발생했습니다.");
         }
       };
 
