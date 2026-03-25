@@ -2,6 +2,7 @@ import { cache } from "react";
 
 import { notFound } from "next/navigation";
 
+import { isValidId } from "@shared/lib/utils";
 import { getBrandPromotionDetail } from "@shared/services/brandPromotion";
 import PromotionPage from "@views/promotion/ui/PromotionPage";
 
@@ -11,10 +12,6 @@ import type { PageParams } from "@/types";
 const fetchBrandPromotion = cache((id: number, languageCode: LanguageType) => {
   return getBrandPromotionDetail(id, languageCode);
 });
-
-const isValidId = (id: number) => {
-  return Number.isInteger(id) && id > 0;
-};
 
 export default async function PromotionBrand({
   params,

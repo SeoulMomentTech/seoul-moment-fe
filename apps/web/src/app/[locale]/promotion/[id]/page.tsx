@@ -2,6 +2,7 @@ import { cache } from "react";
 
 import { notFound } from "next/navigation";
 
+import { isValidId } from "@shared/lib/utils";
 import { getBrandPromotionListById } from "@shared/services/brandPromotion";
 
 import type { LanguageType } from "@/i18n/const";
@@ -18,9 +19,7 @@ export default async function Promotion({
   const { id, locale } = await params;
   const promotionId = Number(id);
 
-  const isValidId = Number.isInteger(promotionId) && promotionId > 0;
-
-  if (!isValidId) {
+  if (!isValidId(promotionId)) {
     notFound();
   }
 
