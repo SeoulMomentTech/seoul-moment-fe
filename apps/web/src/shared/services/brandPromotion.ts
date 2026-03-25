@@ -142,6 +142,8 @@ export interface GetBrandPromotionNoticeResponse {
 }
 
 export interface GetBrandPromotionResponse {
+  /** 프로모션 아이디 */
+  promotionId: number;
   /** 브랜드 프로모션 배너 목록 */
   bannerList: GetBrandPromotionBannerResponse[];
   /** 브랜드 정보 */
@@ -161,9 +163,9 @@ export interface GetBrandPromotionResponse {
 /**
  * @description 브랜드 프로모션 리스트 조회
  */
-export const getBrandPromotionList = () =>
+export const getBrandPromotionListById = (id: number) =>
   api
-    .get("brand/promotion/brand")
+    .get(`brand/promotion/${id}/brand`)
     .json<CommonRes<GetBrandPromotionBrandListResponse>>();
 
 /**

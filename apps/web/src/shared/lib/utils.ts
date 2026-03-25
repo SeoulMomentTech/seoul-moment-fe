@@ -56,3 +56,7 @@ export const isValidExternalUrl = (url: string) => {
 export const isInternalUrl = (url: string) => {
   return url.startsWith("https://seoulmoment.com.tw/");
 };
+
+export const isValidId = (id: number) => {
+  return Number.isInteger(id) && id > 0;
+};

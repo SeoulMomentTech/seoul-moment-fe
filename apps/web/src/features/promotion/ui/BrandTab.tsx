@@ -11,13 +11,19 @@ import { Flex, HStack, cn } from "@seoul-moment/ui";
 import { useBrandPromotionListQuery } from "../model/useBrandPromotionListQuery";
 
 interface BrandTabProps {
+  promotionId: number;
   selectedId: number;
 }
 
-export function BrandTab({ selectedId }: BrandTabProps) {
+export function BrandTab({ promotionId, selectedId }: BrandTabProps) {
   const isMobile = useMediaQuery("(max-width: 40rem)", false);
   const navigate = useRouter();
-  const { data } = useBrandPromotionListQuery();
+  const { data } = useBrandPromotionListQuery({ id: promotionId });
+
+  // If there's no data or the list is empty, don't render the tab navigation
+  if (!data || data.list.length === 0) {
+    return null;
+  }
 
   return (
     <nav className="border-b border-black/10 bg-white">
@@ -30,7 +36,7 @@ export function BrandTab({ selectedId }: BrandTabProps) {
           )}
           gap={isMobile ? 20 : 50}
         >
-          {data?.list.map((brand) => {
+          {data.list.map((brand) => {
             const isActive = brand.brandId === selectedId;
             return (
               <button
@@ -40,7 +46,9 @@ export function BrandTab({ selectedId }: BrandTabProps) {
                 )}
                 key={brand.id}
                 onClick={() =>
-                  navigate.push(`/brand/promotion/${brand.brandId}`)
+                  navigate.push(
+                    `/promotion/${promotionId}/brand/${brand.brandId}`,
+                  )
                 }
                 type="button"
               >

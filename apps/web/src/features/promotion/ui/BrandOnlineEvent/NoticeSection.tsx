@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl";
+
 import type { GetBrandPromotionNoticeResponse } from "@/shared/services/brandPromotion";
 
 import { Flex, cn } from "@seoul-moment/ui";
@@ -7,6 +9,7 @@ interface NoticeSectionProps {
 }
 
 export function NoticeSection({ noticeList }: NoticeSectionProps) {
+  const t = useTranslations();
   return (
     <Flex
       align="flex-start"
@@ -18,7 +21,9 @@ export function NoticeSection({ noticeList }: NoticeSectionProps) {
       direction="column"
     >
       <div className={cn("mx-auto flex w-full max-w-7xl flex-col gap-5")}>
-        <p className="text-body-3 font-semibold text-black/80">NOTICE</p>
+        <p className="text-body-3 font-semibold text-black/80">
+          {t("promotion_notice")}
+        </p>
         <ul className="list-inside list-disc flex-col gap-3 pl-2">
           {noticeList.map((notice) => (
             <li className="gap-2.5" key={notice.id}>

@@ -19,11 +19,11 @@ interface SeasonCollectionProps {
 export function SeasonCollection({ promise }: SeasonCollectionProps) {
   const id = useId();
   const res = use(promise);
-  const promotionList = res.data?.promotionList ?? [];
+  const promotionList = res.data?.promotion ?? [];
 
   if (!promotionList || promotionList.length === 0) return null;
 
-  const { title, description, thumbnailImageUrl } = promotionList[0];
+  const { title, description, imageUrl } = promotionList[0];
 
   return (
     <section
@@ -48,7 +48,7 @@ export function SeasonCollection({ promise }: SeasonCollectionProps) {
         </div>
         <Link
           className={cn("text-body-3 flex items-center", "max-sm:text-body-4")}
-          href={`/promotion/${id}`}
+          href={`/promotion/${id}/brand`}
         >
           <div className="inline-flex gap-1 border-b">
             Product detail
@@ -62,7 +62,7 @@ export function SeasonCollection({ promise }: SeasonCollectionProps) {
           "max-sm:h-[199px] max-sm:gap-4",
         )}
       >
-        {thumbnailImageUrl && (
+        {imageUrl && (
           <figure
             className={cn(
               "w-[708px] bg-gray-300",
@@ -74,7 +74,7 @@ export function SeasonCollection({ promise }: SeasonCollectionProps) {
               className="h-full object-cover"
               height={600}
               key={id}
-              src={thumbnailImageUrl}
+              src={imageUrl}
               width={708}
             />
           </figure>

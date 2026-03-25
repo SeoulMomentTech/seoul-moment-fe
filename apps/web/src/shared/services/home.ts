@@ -11,14 +11,14 @@ interface HomeSection {
 
 export interface HomePromotion {
   id: number;
-  thumbnailImageUrl: string;
+  imageUrl: string;
   title: string;
   description: string;
 }
 
 export interface GetHomeRes {
   banner: Array<Record<"image" | "mobileImage", string>>;
-  promotionList: Array<HomePromotion>;
+  promotion: Array<HomePromotion>;
   section: HomeSection[];
 }
 
