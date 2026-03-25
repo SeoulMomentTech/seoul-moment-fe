@@ -65,9 +65,8 @@ function CouponLanguageTabs({
 
         return (
           <button
-            className={`rounded-[12px] px-3 py-[8px] text-sm font-medium transition ${
-              isActive ? "bg-white text-black shadow-sm" : "text-black/80"
-            }`}
+            className={`rounded-[12px] px-3 py-[8px] text-sm font-medium transition ${isActive ? "bg-white text-black shadow-sm" : "text-black/80"
+              }`}
             key={language.id}
             onClick={() => onLanguageChange(code)}
             type="button"
@@ -138,15 +137,15 @@ function CouponCard({
                 coupons: event.coupons.map((couponItem, itemCouponIndex) =>
                   itemCouponIndex === couponIndex
                     ? {
-                        ...couponItem,
-                        content: {
-                          ...couponItem.content,
-                          [activeLanguage]: {
-                            ...couponItem.content[activeLanguage],
-                            title: eventInput.target.value,
-                          },
+                      ...couponItem,
+                      content: {
+                        ...couponItem.content,
+                        [activeLanguage]: {
+                          ...couponItem.content[activeLanguage],
+                          title: eventInput.target.value,
                         },
-                      }
+                      },
+                    }
                     : couponItem,
                 ),
               })
@@ -166,15 +165,15 @@ function CouponCard({
                 coupons: event.coupons.map((couponItem, itemCouponIndex) =>
                   itemCouponIndex === couponIndex
                     ? {
-                        ...couponItem,
-                        content: {
-                          ...couponItem.content,
-                          [activeLanguage]: {
-                            ...couponItem.content[activeLanguage],
-                            description: eventInput.target.value,
-                          },
+                      ...couponItem,
+                      content: {
+                        ...couponItem.content,
+                        [activeLanguage]: {
+                          ...couponItem.content[activeLanguage],
+                          description: eventInput.target.value,
                         },
-                      }
+                      },
+                    }
                     : couponItem,
                 ),
               })
@@ -246,9 +245,9 @@ export function EventSection({
                   <SelectTrigger className="h-[48px] rounded-[10px] border-black/15 bg-white text-left">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white">
                     <SelectItem value="NORMAL">일반</SelectItem>
-                    <SelectItem value="DELETE">삭제</SelectItem>
+                    <SelectItem value="DELETE">만료</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

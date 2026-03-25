@@ -27,6 +27,12 @@ interface SectionListSectionProps {
   sections: SectionFormValue[];
 }
 
+const getMaxImages = (type: SectionType) => {
+  if (type === 'TYPE_2') return 2;
+  if (type === 'TYPE_3') return 4;
+  return 1
+}
+
 export function SectionListSection({
   errors,
   onAdd,
@@ -75,7 +81,7 @@ export function SectionListSection({
                 <SelectTrigger className="h-[48px] rounded-[10px] border-black/15 bg-white text-left">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white">
                   {SECTION_OPTIONS.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
@@ -87,11 +93,11 @@ export function SectionListSection({
             <MultipleImageUpload
               folder="brand"
               label="섹션 이미지 (다중 선택)"
-              maxImages={10}
+              maxImages={getMaxImages(section.type)}
               onChange={(urls) =>
                 onChange(index, { ...section, imagePathList: urls })
               }
-              value={section.imagePathList.filter(Boolean)}
+              value={section.imagePathList.slice(0, getMaxImages(section.type)).filter(Boolean)}
             />
             <FieldError message={errors?.[index]?.imagePathList} />
           </Card>

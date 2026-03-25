@@ -50,7 +50,7 @@ export function BasicInfoSection({
           }
           value={values.promotionId ? String(values.promotionId) : undefined}
         >
-          <SelectTrigger className="h-[48px] rounded-[10px] border-black/15 bg-white text-left">
+          <SelectTrigger className="h-[48px] rounded-[10px] border-black/15 bg-white text-left" disabled={isPromotionLoading || promotionOptions.length === 0}>
             <SelectValue
               placeholder={
                 isPromotionLoading ? "프로모션 불러오는 중..." : "프로모션 선택"
