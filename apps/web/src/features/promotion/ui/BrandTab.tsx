@@ -1,9 +1,6 @@
 "use client";
 
-import { useLayoutEffect } from "react";
-
 import Image from "next/image";
-import { notFound } from "next/navigation";
 
 import { useMediaQuery } from "@shared/lib/hooks";
 
@@ -23,16 +20,10 @@ export function BrandTab({ promotionId, selectedId }: BrandTabProps) {
   const navigate = useRouter();
   const { data } = useBrandPromotionListQuery({ id: promotionId });
 
-  useLayoutEffect(() => {
-    if (!data) return;
-
-    const isValidBrandId = data.list.some(
-      (brand) => brand.brandId === selectedId,
-    );
-    if (!isValidBrandId) {
-      notFound();
-    }
-  }, [data, selectedId]);
+  // If there's no data or the list is empty, don't render the tab navigation
+  if (!data || data.list.length === 0) {
+    return null;
+  }
 
   return (
     <nav className="border-b border-black/10 bg-white">
@@ -45,7 +36,7 @@ export function BrandTab({ promotionId, selectedId }: BrandTabProps) {
           )}
           gap={isMobile ? 20 : 50}
         >
-          {data?.list.map((brand) => {
+          {data.list.map((brand) => {
             const isActive = brand.brandId === selectedId;
             return (
               <button
