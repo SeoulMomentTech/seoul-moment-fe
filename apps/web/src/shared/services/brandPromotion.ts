@@ -142,6 +142,8 @@ export interface GetBrandPromotionNoticeResponse {
 }
 
 export interface GetBrandPromotionResponse {
+  /** 프로모션 아이디 */
+  promotionId: number;
   /** 브랜드 프로모션 배너 목록 */
   bannerList: GetBrandPromotionBannerResponse[];
   /** 브랜드 정보 */

@@ -2,6 +2,7 @@ import { cache } from "react";
 
 import { notFound } from "next/navigation";
 
+import { isValidId } from "@shared/lib/utils";
 import { getBrandPromotionDetail } from "@shared/services/brandPromotion";
 import PromotionPage from "@views/promotion/ui/PromotionPage";
 
@@ -19,22 +20,24 @@ export default async function PromotionBrand({
   const promotionId = Number(id);
   const parsedBrandId = Number(brandId);
 
-  const isValidId = Number.isInteger(parsedBrandId) && parsedBrandId > 0;
-
-  if (!isValidId) {
+  if (!isValidId(parsedBrandId) || !isValidId(promotionId)) {
     notFound();
   }
 
-  const promise = fetchBrandPromotion(
-    parsedBrandId,
-    locale as LanguageType,
-  ).catch((error) => {
-    console.error(
-      `[PromotionPage] Failed to fetch promotion with brandId: ${parsedBrandId}:`,
-      error,
-    );
-    notFound();
-  });
+  const promise = fetchBrandPromotion(parsedBrandId, locale as LanguageType)
+    .then((res) => {
+      if (res.data.promotionId !== promotionId) {
+        notFound();
+      }
+      return res;
+    })
+    .catch((error) => {
+      console.error(
+        `[PromotionPage] Failed to fetch promotion with brandId: ${parsedBrandId}:`,
+        error,
+      );
+      notFound();
+    });
 
   return (
     <PromotionPage

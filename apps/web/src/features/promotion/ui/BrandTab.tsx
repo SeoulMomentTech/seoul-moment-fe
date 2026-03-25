@@ -20,6 +20,11 @@ export function BrandTab({ promotionId, selectedId }: BrandTabProps) {
   const navigate = useRouter();
   const { data } = useBrandPromotionListQuery({ id: promotionId });
 
+  // If there's no data or the list is empty, don't render the tab navigation
+  if (!data || data.list.length === 0) {
+    return null;
+  }
+
   return (
     <nav className="border-b border-black/10 bg-white">
       <Flex className={cn("w-7xl mx-auto", "max-sm:w-full")}>
@@ -31,7 +36,7 @@ export function BrandTab({ promotionId, selectedId }: BrandTabProps) {
           )}
           gap={isMobile ? 20 : 50}
         >
-          {data?.list.map((brand) => {
+          {data.list.map((brand) => {
             const isActive = brand.brandId === selectedId;
             return (
               <button
