@@ -31,6 +31,10 @@ export default async function Promotion({
     notFound();
   });
 
+  if (!res.data.list.length) {
+    notFound();
+  }
+
   const brand = res.data.list[0];
 
   redirect({
