@@ -53,11 +53,11 @@ export function PromotionList({ promise }: PromotionListProps) {
             {promotionList.map((promotion) => (
               <SwiperSlide
                 className="max-sm:w-[305px]! w-auto!"
-                key={`promotion-${promotion.id}-${id}`}
+                key={`promotion-${promotion.promotionId}-${id}`}
               >
                 <Link
                   className="group/item block w-[305px]"
-                  href={`/promotion/${promotion.id}/brand`}
+                  href={`/promotion/${promotion.promotionId}`}
                 >
                   <div className="flex flex-col gap-5">
                     <div className="relative aspect-square overflow-hidden bg-gray-100">
@@ -72,7 +72,7 @@ export function PromotionList({ promise }: PromotionListProps) {
                       <h4 className="text-body-2 font-semibold leading-none text-black underline-offset-4 group-hover/item:underline">
                         {promotion.title}
                       </h4>
-                      <p className="text-body-3 leading-none text-black opacity-80">
+                      <p className="text-body-3 line-clamp-3 leading-none text-black opacity-80">
                         {promotion.description}
                       </p>
                     </div>
