@@ -10,7 +10,7 @@ interface HomeSection {
 }
 
 export interface HomePromotion {
-  id: number;
+  promotionId: number;
   imageUrl: string;
   title: string;
   description: string;

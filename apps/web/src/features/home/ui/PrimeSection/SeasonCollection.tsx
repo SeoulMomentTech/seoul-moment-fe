@@ -23,7 +23,7 @@ export function SeasonCollection({ promise }: SeasonCollectionProps) {
 
   if (!promotionList || promotionList.length === 0) return null;
 
-  const { title, description, imageUrl } = promotionList[0];
+  const { title, description, imageUrl, promotionId } = promotionList[0];
 
   return (
     <section
@@ -48,7 +48,7 @@ export function SeasonCollection({ promise }: SeasonCollectionProps) {
         </div>
         <Link
           className={cn("text-body-3 flex items-center", "max-sm:text-body-4")}
-          href={`/promotion/${id}/brand`}
+          href={`/promotion/${promotionId}`}
         >
           <div className="inline-flex gap-1 border-b">
             Product detail
