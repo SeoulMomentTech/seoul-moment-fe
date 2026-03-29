@@ -1,10 +1,9 @@
-import { useAppQuery } from "@shared/hooks/useAppQuery";
+import { useAppQuery, type UseAppQueryOptions } from "@shared/hooks/useAppQuery";
 import {
   getAdminBrandList,
   type AdminBrandListParams,
 } from "@shared/services/brand";
 
-import { type UseQueryOptions } from "@tanstack/react-query";
 
 import { brandQueryKeys } from "./queryKeys";
 
@@ -13,7 +12,7 @@ type AdminBrandListQueryResponse = Awaited<
 >;
 
 type AdminBrandListQueryOptions = Omit<
-  UseQueryOptions<
+  UseAppQueryOptions<
     AdminBrandListQueryResponse,
     unknown,
     AdminBrandListQueryResponse,

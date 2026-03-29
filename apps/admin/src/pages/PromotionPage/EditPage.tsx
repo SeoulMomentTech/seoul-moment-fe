@@ -20,6 +20,7 @@ export default function PromotionEditPage() {
 
   const { data: response, isLoading, isError } = useAdminPromotionDetailQuery(promotionId, {
     enabled: isValidId,
+    toastOnError: '존재하지 않는 프로모션입니다.'
   });
 
   const { mutateAsync: updatePromotion, isPending } = useUpdateAdminPromotionMutation();

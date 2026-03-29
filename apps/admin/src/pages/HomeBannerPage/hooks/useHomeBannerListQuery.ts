@@ -1,14 +1,13 @@
-import { useAppQuery } from "@shared/hooks/useAppQuery";
+import { useAppQuery, type UseAppQueryOptions } from "@shared/hooks/useAppQuery";
 import { getHomeBannerList } from "@shared/services/banner";
 
-import { type UseQueryOptions } from "@tanstack/react-query";
 
 import { homeBannerQueryKeys } from "./queryKeys";
 
 type HomeBannerListQueryResponse = Awaited<ReturnType<typeof getHomeBannerList>>;
 
 type HomeBannerListQueryOptions = Omit<
-  UseQueryOptions<
+  UseAppQueryOptions<
     HomeBannerListQueryResponse,
     unknown,
     HomeBannerListQueryResponse,

@@ -25,6 +25,7 @@ export const ProductMasterEditPage = () => {
 
   const { data: productData, isLoading } = useAdminProductDetailQuery(productId, {
     enabled: isValidId,
+    toastOnError: "상품을 불러오지 못했습니다.",
   });
 
   const { mutate: updateProduct } = useUpdateAdminProductMutation({

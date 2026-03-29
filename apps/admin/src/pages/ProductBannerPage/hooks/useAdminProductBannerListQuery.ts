@@ -1,10 +1,9 @@
-import { useAppQuery } from "@shared/hooks/useAppQuery";
+import { useAppQuery, type UseAppQueryOptions } from "@shared/hooks/useAppQuery";
 import {
   getAdminProductBannerList,
   type AdminProductBannerListParams,
 } from "@shared/services/productBanner";
 
-import { type UseQueryOptions } from "@tanstack/react-query";
 
 import { productBannerQueryKeys } from "./queryKeys";
 
@@ -13,7 +12,7 @@ type AdminProductBannerListQueryResponse = Awaited<
 >;
 
 type AdminProductBannerListQueryOptions = Omit<
-  UseQueryOptions<
+  UseAppQueryOptions<
     AdminProductBannerListQueryResponse,
     unknown,
     AdminProductBannerListQueryResponse,

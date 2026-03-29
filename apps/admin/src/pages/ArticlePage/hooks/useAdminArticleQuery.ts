@@ -1,10 +1,9 @@
-import { useAppQuery } from "@shared/hooks/useAppQuery";
+import { useAppQuery, type UseAppQueryOptions } from "@shared/hooks/useAppQuery";
 import {
   getAdminArticleInfo,
   type AdminArticleId,
 } from "@shared/services/article";
 
-import { type UseQueryOptions } from "@tanstack/react-query";
 
 
 import { articleQueryKeys } from "./queryKeys";
@@ -14,7 +13,7 @@ type AdminArticleQueryResponse = Awaited<
 >;
 
 type AdminArticleQueryOptions = Omit<
-  UseQueryOptions<
+  UseAppQueryOptions<
     AdminArticleQueryResponse,
     unknown,
     AdminArticleQueryResponse,
