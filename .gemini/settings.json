@@ -15,5 +15,20 @@
   "experimental": {
     "plan": true,
     "enableAgents": true
+  },
+  "hooks": {
+    "AfterAgent": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "name": "auto-lint-fix",
+            "type": "command",
+            "command": "bash .gemini/scripts/lint-fix.sh",
+            "timeout": 10000
+          }
+        ]
+      }
+    ]
   }
 }
