@@ -73,7 +73,9 @@ export default function ProductEditForm({
   const initializedRef = useRef(false);
 
   const { data: detailResponse, isLoading, isError } =
-    useAdminProductItemDetailQuery(productItemId);
+    useAdminProductItemDetailQuery(productItemId, {
+      toastOnError: "상품 아이템을 불러오지 못했습니다.",
+    });
   const detail = detailResponse?.data;
 
   const { mutateAsync: updateProductItem, isPending } =

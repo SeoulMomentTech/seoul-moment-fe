@@ -1,17 +1,16 @@
-import { useAppQuery } from "@shared/hooks/useAppQuery";
+import { useAppQuery, type UseAppQueryOptions } from "@shared/hooks/useAppQuery";
 import {
   getAdminNewsList,
   type AdminNewsListParams,
 } from "@shared/services/news";
 
-import { type UseQueryOptions } from "@tanstack/react-query";
 
 import { newsQueryKeys } from "./queryKeys";
 
 type AdminNewsListQueryResponse = Awaited<ReturnType<typeof getAdminNewsList>>;
 
 type AdminNewsListQueryOptions = Omit<
-  UseQueryOptions<
+  UseAppQueryOptions<
     AdminNewsListQueryResponse,
     unknown,
     AdminNewsListQueryResponse,

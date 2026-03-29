@@ -110,7 +110,9 @@ export function ArticleEditForm({ articleId }: ArticleEditFormProps) {
       sort: "DESC",
     });
 
-  const { data: articleResponse, isLoading, isError } = useAdminArticleQuery(articleId);
+  const { data: articleResponse, isLoading, isError } = useAdminArticleQuery(articleId, {
+    toastOnError: '존재하지 않는 아티클입니다.'
+  });
   const detail = articleResponse?.data;
 
   const { mutateAsync: updateArticle, isPending } =

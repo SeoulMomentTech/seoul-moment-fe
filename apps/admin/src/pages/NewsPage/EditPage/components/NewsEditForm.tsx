@@ -107,7 +107,9 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
       sort: "DESC",
     });
 
-  const { data: newsResponse, isLoading, isError } = useAdminNewsQuery(newsId);
+  const { data: newsResponse, isLoading, isError } = useAdminNewsQuery(newsId, {
+    toastOnError: '존재하지 않는 뉴스입니다.'
+  });
   const detail = newsResponse?.data;
 
   const { mutateAsync: updateNews, isPending } = useUpdateAdminNewsV2Mutation({
