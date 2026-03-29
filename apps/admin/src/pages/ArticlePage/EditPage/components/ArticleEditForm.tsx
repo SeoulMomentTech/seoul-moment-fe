@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { useNavigate } from "react-router";
+import { Navigate, useNavigate } from "react-router";
 
 import { useAdminBrandListQuery } from "@pages/BrandPage/ListPage/hooks";
 import { useAdminCategoryListQuery } from "@pages/ProductCategoriesPage/hooks";
@@ -110,7 +110,7 @@ export function ArticleEditForm({ articleId }: ArticleEditFormProps) {
       sort: "DESC",
     });
 
-  const { data: articleResponse, isLoading } = useAdminArticleQuery(articleId);
+  const { data: articleResponse, isLoading, isError } = useAdminArticleQuery(articleId);
   const detail = articleResponse?.data;
 
   const { mutateAsync: updateArticle, isPending } =
@@ -186,7 +186,7 @@ export function ArticleEditForm({ articleId }: ArticleEditFormProps) {
 
   const handleChangeMetaField = useCallback(
     (field: "categoryId" | "brandId" | "writer", value: string) => {
-      if(isCategoryLoading || isBrandLoading || !value) return;
+      if (isCategoryLoading || isBrandLoading || !value) return;
 
       if (field === "categoryId") {
         setFieldValue("categoryId", Number(value));
@@ -267,13 +267,17 @@ export function ArticleEditForm({ articleId }: ArticleEditFormProps) {
   const selectedBrandId = formik.values.brandId;
   const brandOptions =
     selectedBrandId !== undefined &&
-    selectedBrandId !== null &&
-    !baseBrandOptions.some((option) => option.value === selectedBrandId)
+      selectedBrandId !== null &&
+      !baseBrandOptions.some((option) => option.value === selectedBrandId)
       ? [
-          { value: selectedBrandId, label: `ID ${selectedBrandId}` },
-          ...baseBrandOptions,
-        ]
+        { value: selectedBrandId, label: `ID ${selectedBrandId}` },
+        ...baseBrandOptions,
+      ]
       : baseBrandOptions;
+
+  if (isError) {
+    return <Navigate replace to={PATH.ARTICLE} />;
+  }
 
   if (isLoading || !detail) {
     return (

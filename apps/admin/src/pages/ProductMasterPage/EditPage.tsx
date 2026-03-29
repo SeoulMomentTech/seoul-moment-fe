@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { useNavigate, useParams } from "react-router";
+import { Navigate, useNavigate, useParams } from "react-router";
 
 import { ChevronLeft } from "lucide-react";
 
@@ -21,8 +21,10 @@ export const ProductMasterEditPage = () => {
   const navigate = useNavigate();
   const productId = Number(id);
 
+  const isValidId = Number.isInteger(productId) && productId > 0;
+
   const { data: productData, isLoading } = useAdminProductDetailQuery(productId, {
-    enabled: !!productId,
+    enabled: isValidId,
   });
 
   const { mutate: updateProduct } = useUpdateAdminProductMutation({
@@ -83,6 +85,10 @@ export const ProductMasterEditPage = () => {
       },
     });
   };
+
+  if (!isValidId) {
+    return <Navigate replace to={PATH.PRODUCT_MASTER} />;
+  }
 
   if (isLoading) {
     return (
