@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router";
+import { Navigate, useNavigate, useParams } from "react-router";
 
 import { ArrowLeft } from "lucide-react";
 
@@ -16,8 +16,10 @@ export default function PromotionEditPage() {
   const navigate = useNavigate();
 
   const promotionId = Number(id);
-  const { data: response, isLoading } = useAdminPromotionDetailQuery(promotionId, {
-    enabled: !Number.isNaN(promotionId) && promotionId > 0,
+  const isValidId = !Number.isNaN(promotionId) && promotionId > 0;
+
+  const { data: response, isLoading, isError } = useAdminPromotionDetailQuery(promotionId, {
+    enabled: isValidId,
   });
 
   const { mutateAsync: updatePromotion, isPending } = useUpdateAdminPromotionMutation();
@@ -32,6 +34,10 @@ export default function PromotionEditPage() {
       alert("프로모션 수정에 실패했습니다.");
     }
   };
+
+  if (!isValidId || isError) {
+    return <Navigate replace to={PATH.PROMOTION} />
+  }
 
   if (isLoading) {
     return <div className="p-8 pt-24 text-center">로딩 중...</div>;
