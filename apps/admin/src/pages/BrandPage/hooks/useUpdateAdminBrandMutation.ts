@@ -1,3 +1,4 @@
+import { useAppMutation } from "@shared/hooks/useAppMutation";
 import {
   updateAdminBrandV2,
   type BrandId,
@@ -5,7 +6,6 @@ import {
 } from "@shared/services/brand";
 
 import {
-  useMutation,
   useQueryClient,
   type UseMutationOptions,
 } from "@tanstack/react-query";
@@ -33,7 +33,7 @@ export const useUpdateAdminBrandMutation = (
 ) => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useAppMutation({
     mutationFn: ({ brandId, payload }) => updateAdminBrandV2(brandId, payload),
     ...options,
     onSuccess: async (data, variables, context, mutation) => {

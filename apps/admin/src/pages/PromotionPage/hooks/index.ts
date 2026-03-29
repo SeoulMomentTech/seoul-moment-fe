@@ -1,4 +1,5 @@
-
+import { useAppMutation } from "@shared/hooks/useAppMutation";
+import { useAppQuery } from "@shared/hooks/useAppQuery";
 import {
   createAdminPromotion,
   deleteAdminPromotion,
@@ -12,7 +13,7 @@ import type {
   PostAdminPromotionRequest,
 } from "@shared/services/promotion";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const promotionKeys = {
   all: ["promotions"] as const,
@@ -24,14 +25,14 @@ export const promotionKeys = {
 };
 
 export const useAdminPromotionListQuery = (params?: GetAdminPromotionListParams) => {
-  return useQuery({
+  return useAppQuery({
     queryKey: promotionKeys.list(params),
     queryFn: () => getAdminPromotionList(params),
   });
 };
 
 export const useAdminPromotionDetailQuery = (id: number, options?: { enabled?: boolean }) => {
-  return useQuery({
+  return useAppQuery({
     queryKey: promotionKeys.detail(id),
     queryFn: () => getAdminPromotionDetail(id),
     enabled: options?.enabled,
@@ -41,7 +42,7 @@ export const useAdminPromotionDetailQuery = (id: number, options?: { enabled?: b
 export const useCreateAdminPromotionMutation = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useAppMutation({
     mutationFn: (data: PostAdminPromotionRequest) => createAdminPromotion(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: promotionKeys.lists() });
@@ -52,7 +53,7 @@ export const useCreateAdminPromotionMutation = () => {
 export const useUpdateAdminPromotionMutation = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useAppMutation({
     mutationFn: ({ id, data }: { id: number; data: PatchAdminPromotionRequest }) =>
       updateAdminPromotion(id, data),
     onSuccess: (_, variables) => {
@@ -65,7 +66,7 @@ export const useUpdateAdminPromotionMutation = () => {
 export const useDeleteAdminPromotionMutation = () => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useAppMutation({
     mutationFn: (id: number) => deleteAdminPromotion(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: promotionKeys.lists() });

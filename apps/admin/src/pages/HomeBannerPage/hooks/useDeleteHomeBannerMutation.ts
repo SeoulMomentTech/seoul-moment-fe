@@ -1,7 +1,7 @@
+import { useAppMutation } from "@shared/hooks/useAppMutation";
 import { deleteHomeBanner, type HomeBannerId } from "@shared/services/banner";
 
 import {
-  useMutation,
   useQueryClient,
   type UseMutationOptions,
 } from "@tanstack/react-query";
@@ -20,7 +20,7 @@ export const useDeleteHomeBannerMutation = (
 ) => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useAppMutation({
     mutationFn: (bannerId) => deleteHomeBanner(bannerId),
     ...options,
     onSuccess: async (data, variables, context, mutation) => {

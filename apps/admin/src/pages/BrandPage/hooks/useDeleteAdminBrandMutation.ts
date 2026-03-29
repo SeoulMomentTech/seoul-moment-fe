@@ -1,11 +1,12 @@
+import { useAppMutation } from "@shared/hooks/useAppMutation";
 import { deleteAdminBrand } from "@shared/services/brand";
 import { type BrandId } from "@shared/services/brand";
 
 import {
-  useMutation,
   useQueryClient,
   type UseMutationOptions,
 } from "@tanstack/react-query";
+
 
 import { BRAND_QUERY_KEY, brandQueryKeys } from "../hooks/queryKeys";
 
@@ -29,7 +30,7 @@ export const useDeleteAdminBrandMutation = (
 ) => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useAppMutation({
     mutationFn: ({ brandId }) => deleteAdminBrand(brandId),
     ...options,
     onSuccess: async (data, variables, context, mutation) => {

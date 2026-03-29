@@ -1,9 +1,10 @@
+import { useAppQuery } from "@shared/hooks/useAppQuery";
 import {
   getAdminProductBannerDetail,
   type ProductBannerId,
 } from "@shared/services/productBanner";
 
-import { useQuery, type UseQueryOptions } from "@tanstack/react-query";
+import { type UseQueryOptions } from "@tanstack/react-query";
 
 import { productBannerQueryKeys } from "./queryKeys";
 
@@ -25,7 +26,7 @@ export const useAdminProductBannerDetailQuery = (
   bannerId: ProductBannerId | number,
   options?: AdminProductBannerDetailQueryOptions,
 ) =>
-  useQuery({
+  useAppQuery({
     queryKey: productBannerQueryKeys.detail(bannerId),
     queryFn: () => getAdminProductBannerDetail(bannerId as ProductBannerId),
     enabled: Boolean(bannerId),

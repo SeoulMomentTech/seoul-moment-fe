@@ -50,4 +50,22 @@ export default defineConfig([
       "react-hooks/rules-of-hooks": "off",
     },
   },
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: ["src/shared/hooks/useAppQuery.ts", "src/shared/hooks/useAppMutation.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "@tanstack/react-query",
+              importNames: ["useQuery", "useMutation"],
+              message: "Please use useAppQuery or useAppMutation from @shared/hooks instead.",
+            },
+          ],
+        },
+      ],
+    },
+  },
 ]);

@@ -1,6 +1,7 @@
+import { useAppQuery } from "@shared/hooks/useAppQuery";
 import { getAdminNewsInfo, type AdminNewsId } from "@shared/services/news";
 
-import { useQuery, type UseQueryOptions } from "@tanstack/react-query";
+import { type UseQueryOptions } from "@tanstack/react-query";
 
 import { newsQueryKeys } from "./queryKeys";
 
@@ -20,7 +21,7 @@ export const useAdminNewsQuery = (
   newsId: AdminNewsId | number,
   options?: AdminNewsQueryOptions,
 ) =>
-  useQuery({
+  useAppQuery({
     queryKey: newsQueryKeys.detail(newsId),
     queryFn: () => getAdminNewsInfo(newsId as AdminNewsId),
     ...options,

@@ -1,10 +1,10 @@
+import { useAppMutation } from "@shared/hooks/useAppMutation";
 import {
   deleteAdminProductCategory,
   type ProductCategoryId,
 } from "@shared/services/productCategory";
 
 import {
-  useMutation,
   useQueryClient,
   type UseMutationOptions,
 } from "@tanstack/react-query";
@@ -32,7 +32,7 @@ export const useDeleteAdminProductCategoryMutation = (
 ) => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useAppMutation({
     mutationFn: (productCategoryId) =>
       deleteAdminProductCategory(productCategoryId),
     ...options,

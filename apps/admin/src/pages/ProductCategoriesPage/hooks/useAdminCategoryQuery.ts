@@ -1,6 +1,7 @@
+import { useAppQuery } from "@shared/hooks/useAppQuery";
 import { getAdminCategory, type CategoryId } from "@shared/services/category";
 
-import { useQuery, type UseQueryOptions } from "@tanstack/react-query";
+import { type UseQueryOptions } from "@tanstack/react-query";
 
 import { categoryQueryKeys } from "./queryKeys";
 
@@ -20,7 +21,7 @@ export const useAdminCategoryQuery = (
   categoryId: CategoryId | number,
   options?: AdminCategoryQueryOptions,
 ) =>
-  useQuery({
+  useAppQuery({
     queryKey: categoryQueryKeys.detail(categoryId),
     queryFn: () => getAdminCategory(categoryId),
     ...options,
