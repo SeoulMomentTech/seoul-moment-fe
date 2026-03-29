@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$(git rev-parse --show-toplevel)/.codex/scripts/lint-fix.sh\"",
+            "timeout": 120,
+            "statusMessage": "Running lint fixes for web and admin"
+          }
+        ]
+      }
+    ]
+  }
+}
