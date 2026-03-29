@@ -11,7 +11,7 @@ import {
   Textarea,
 } from "@seoul-moment/ui";
 
-import type { PromotionFormValues } from "../../hooks/usePromotionForm";
+import type { PromotionFormValues } from "./usePromotionForm";
 
 const getLanguageLabel = (languageCode: string | undefined) => {
   if (languageCode === "en") return "영어";
