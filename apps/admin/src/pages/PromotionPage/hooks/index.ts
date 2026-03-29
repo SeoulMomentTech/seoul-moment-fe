@@ -31,11 +31,12 @@ export const useAdminPromotionListQuery = (params?: GetAdminPromotionListParams)
   });
 };
 
-export const useAdminPromotionDetailQuery = (id: number, options?: { enabled?: boolean }) => {
+export const useAdminPromotionDetailQuery = (id: number, options?: { enabled?: boolean, toastOnError?: boolean | string }) => {
   return useAppQuery({
     queryKey: promotionKeys.detail(id),
     queryFn: () => getAdminPromotionDetail(id),
     enabled: options?.enabled,
+    toastOnError: options?.toastOnError
   });
 };
 

@@ -13,7 +13,7 @@ type AdminProductItemListQueryResponse = Awaited<
 >;
 
 type AdminProductItemListQueryOptions = Omit<
-  UseQueryOptions<
+  UseAppQueryOptions<
     AdminProductItemListQueryResponse,
     unknown,
     AdminProductItemListQueryResponse,
@@ -26,7 +26,7 @@ export const useAdminProductItemListQuery = (
   params?: AdminProductItemListParams,
   options?: AdminProductItemListQueryOptions,
 ) =>
-  useQuery({
+  useAppQuery({
     queryKey: productQueryKeys.list(params),
     queryFn: () => getAdminProductItemList(params),
     ...options,

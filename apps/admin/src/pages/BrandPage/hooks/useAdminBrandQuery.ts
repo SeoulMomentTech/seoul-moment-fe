@@ -1,9 +1,8 @@
-import { useAppQuery } from "@shared/hooks/useAppQuery";
+import { useAppQuery, type UseAppQueryOptions } from "@shared/hooks/useAppQuery";
 import { getAdminBrandInfo, type BrandId } from "@shared/services/brand";
 
 import {
   useSuspenseQuery,
-  type UseQueryOptions,
   type UseSuspenseQueryOptions,
 } from "@tanstack/react-query";
 
@@ -12,7 +11,7 @@ import { brandQueryKeys } from "./queryKeys";
 type AdminBrandQueryResponse = Awaited<ReturnType<typeof getAdminBrandInfo>>;
 
 type AdminBrandQueryOptions = Omit<
-  UseQueryOptions<
+  UseAppQueryOptions<
     AdminBrandQueryResponse,
     unknown,
     AdminBrandQueryResponse,

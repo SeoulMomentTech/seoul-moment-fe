@@ -1,10 +1,9 @@
-import { useAppQuery } from "@shared/hooks/useAppQuery";
+import { useAppQuery, type UseAppQueryOptions } from "@shared/hooks/useAppQuery";
 import {
   getAdminProductCategoryList,
   type AdminProductCategoryListParams,
 } from "@shared/services/productCategory";
 
-import { type UseQueryOptions } from "@tanstack/react-query";
 
 import { productCategoryQueryKeys } from "./queryKeys";
 
@@ -13,7 +12,7 @@ type AdminProductCategoryListQueryResponse = Awaited<
 >;
 
 type AdminProductCategoryListQueryOptions = Omit<
-  UseQueryOptions<
+  UseAppQueryOptions<
     AdminProductCategoryListQueryResponse,
     unknown,
     AdminProductCategoryListQueryResponse,

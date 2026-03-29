@@ -33,7 +33,7 @@ export default function Providers({ children }: PropsWithChildren) {
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      <Toaster closeButton position="top-right" richColors />
+      <Toaster closeButton position="top-center" richColors />
     </QueryClientProvider>
   );
 }
