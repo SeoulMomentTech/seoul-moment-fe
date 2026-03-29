@@ -36,6 +36,11 @@
 
 # 추가 안내
 
+- Codex hooks
+  - 레포 로컬 훅 설정은 `.codex/hooks.json`에 정의합니다.
+  - `Stop` hook은 각 작업 종료 시 `pnpm run lint:fix:all`을 실행하여 `apps/web`, `apps/admin`의 lint fix를 수행합니다.
+  - 사용 전 개인 환경 `~/.codex/config.toml`의 `[features]`에 `codex_hooks = true`가 설정되어 있어야 합니다.
+
 - 상태/데이터 흐름
 
   - URL 쿼리 기반 필터는 `nuqs`의 `useQueryStates`로 관리합니다. `optionIdList`처럼 배열 파라미터는 `parseAsArrayOf`를 사용해야 합니다.
