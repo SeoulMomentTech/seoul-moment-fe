@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from "react";
 
-import type { AxiosError } from "axios";
-import { toast, Toaster } from "sonner";
+import { handleAppQueryError } from "@shared/utils/query-error-handler";
+import { Toaster } from "sonner";
 
 import {
   MutationCache,
@@ -10,16 +10,6 @@ import {
   QueryClientProvider,
 } from "@tanstack/react-query";
 
-const handleQueryError = (err: Error, meta?: Record<string, unknown>) => {
-  if (meta?.toastOnError) {
-    const message =
-      typeof meta.toastOnError === "string"
-        ? meta.toastOnError
-        : (err as AxiosError<{ message?: string }>)?.response?.data?.message ||
-        err.message;
-    toast.error(message);
-  }
-};
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -31,11 +21,11 @@ const queryClient = new QueryClient({
     },
   },
   queryCache: new QueryCache({
-    onError: (err, query) => handleQueryError(err, query.meta),
+    onError: (err, query) => handleAppQueryError(err, query.meta),
   }),
   mutationCache: new MutationCache({
     onError: (err, _variables, _context, mutation) =>
-      handleQueryError(err, mutation.meta),
+      handleAppQueryError(err, mutation.meta),
   }),
 });
 
