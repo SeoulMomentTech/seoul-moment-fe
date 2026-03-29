@@ -1,6 +1,6 @@
 import { useEffect, useRef, type ChangeEvent } from "react";
 
-import { useNavigate } from "react-router";
+import { Navigate, useNavigate } from "react-router";
 
 import { PATH } from "@shared/constants/route";
 import type {
@@ -72,7 +72,7 @@ export default function ProductEditForm({
   const navigate = useNavigate();
   const initializedRef = useRef(false);
 
-  const { data: detailResponse, isLoading } =
+  const { data: detailResponse, isLoading, isError } =
     useAdminProductItemDetailQuery(productItemId);
   const detail = detailResponse?.data;
 
@@ -227,6 +227,10 @@ export default function ProductEditForm({
     setFieldValue("mainImageFile", null);
     setFieldValue("mainImagePreview", "");
   };
+
+  if (isError) {
+    return <Navigate replace to={PATH.PRODUCTS} />;
+  }
 
   if (isLoading) {
     return (

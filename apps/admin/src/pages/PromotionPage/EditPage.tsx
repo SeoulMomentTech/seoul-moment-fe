@@ -16,7 +16,7 @@ export default function PromotionEditPage() {
   const navigate = useNavigate();
 
   const promotionId = Number(id);
-  const isValidId = !Number.isNaN(promotionId) && promotionId > 0;
+  const isValidId = Number.isInteger(promotionId) && promotionId > 0;
 
   const { data: response, isLoading, isError } = useAdminPromotionDetailQuery(promotionId, {
     enabled: isValidId,

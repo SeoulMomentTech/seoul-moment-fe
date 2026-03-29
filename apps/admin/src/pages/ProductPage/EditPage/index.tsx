@@ -14,7 +14,7 @@ export default function ProductEditPage() {
   const params = useParams();
   const productItemId = Number(params.id);
 
-  if (Number.isNaN(productItemId)) {
+  if (!Number.isInteger(productItemId) || productItemId <= 0) {
     return <Navigate replace to={PATH.PRODUCTS} />;
   }
 

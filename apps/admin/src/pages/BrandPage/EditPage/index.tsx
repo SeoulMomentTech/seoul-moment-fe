@@ -16,8 +16,8 @@ export function BrandEditPage() {
   const params = useParams();
   const id = Number(params.id);
 
-  if (!Number.isInteger(id)) {
-    return <Navigate replace to="/brand" />;
+  if (!Number.isInteger(id) || id <= 0) {
+    return <Navigate replace to={PATH.BRAND} />;
   }
 
   return (
