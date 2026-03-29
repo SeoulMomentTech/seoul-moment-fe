@@ -1,9 +1,10 @@
+import { useAppQuery } from "@shared/hooks/useAppQuery";
 import {
   getAdminProductItemDetail,
   type AdminProductItemId,
 } from "@shared/services/products";
 
-import { useQuery, type UseQueryOptions } from "@tanstack/react-query";
+import { type UseQueryOptions } from "@tanstack/react-query";
 
 import { productQueryKeys } from "./queryKeys";
 
@@ -25,7 +26,7 @@ export const useAdminProductItemDetailQuery = (
   productItemId: AdminProductItemId | number,
   options?: AdminProductItemDetailQueryOptions,
 ) =>
-  useQuery({
+  useAppQuery({
     queryKey: productQueryKeys.detail(productItemId),
     queryFn: () => getAdminProductItemDetail(productItemId as AdminProductItemId),
     enabled: Boolean(productItemId),

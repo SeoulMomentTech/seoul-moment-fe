@@ -1,10 +1,10 @@
+import { useAppMutation } from "@shared/hooks/useAppMutation";
 import {
   createAdminProductOption,
   type CreateAdminProductOptionRequest,
 } from "@shared/services/productOption";
 
 import {
-  useMutation,
   useQueryClient,
   type UseMutationOptions,
 } from "@tanstack/react-query";
@@ -29,7 +29,7 @@ export const useCreateAdminProductOptionMutation = (
 ) => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useAppMutation({
     mutationFn: createAdminProductOption,
     ...options,
     onSuccess: async (data, variables, context, mutation) => {

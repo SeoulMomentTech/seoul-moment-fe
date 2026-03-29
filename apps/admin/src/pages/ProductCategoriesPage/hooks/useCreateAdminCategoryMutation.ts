@@ -1,10 +1,10 @@
+import { useAppMutation } from "@shared/hooks/useAppMutation";
 import {
   createAdminCategory,
   type CreateAdminCategoryRequest,
 } from "@shared/services/category";
 
 import {
-  useMutation,
   useQueryClient,
   type UseMutationOptions,
 } from "@tanstack/react-query";
@@ -29,7 +29,7 @@ export const useCreateAdminCategoryMutation = (
 ) => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useAppMutation({
     mutationFn: createAdminCategory,
     ...options,
     onSuccess: async (data, variables, context, mutation) => {

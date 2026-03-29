@@ -2,7 +2,8 @@ import { useFormContext } from "react-hook-form";
 
 import { Input, Label } from "@seoul-moment/ui";
 
-import type { PromotionFormValues } from "../../hooks/usePromotionForm";
+import type { PromotionFormValues } from "./usePromotionForm";
+
 
 export function PromotionBasicInfo() {
   const { register, formState: { errors } } = useFormContext<PromotionFormValues>();

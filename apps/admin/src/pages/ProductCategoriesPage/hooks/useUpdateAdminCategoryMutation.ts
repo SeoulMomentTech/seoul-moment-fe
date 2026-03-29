@@ -1,3 +1,4 @@
+import { useAppMutation } from "@shared/hooks/useAppMutation";
 import {
   updateAdminCategory,
   type CategoryId,
@@ -5,7 +6,6 @@ import {
 } from "@shared/services/category";
 
 import {
-  useMutation,
   useQueryClient,
   type UseMutationOptions,
 } from "@tanstack/react-query";
@@ -35,7 +35,7 @@ export const useUpdateAdminCategoryMutation = (
 ) => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useAppMutation({
     mutationFn: ({ categoryId, payload }) =>
       updateAdminCategory(categoryId, payload),
     ...options,

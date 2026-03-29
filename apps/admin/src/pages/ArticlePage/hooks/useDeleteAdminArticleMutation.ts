@@ -1,13 +1,14 @@
+import { useAppMutation } from "@shared/hooks/useAppMutation";
 import {
   deleteAdminArticle,
   type AdminArticleId,
 } from "@shared/services/article";
 
 import {
-  useMutation,
   useQueryClient,
   type UseMutationOptions,
 } from "@tanstack/react-query";
+
 
 import { ARTICLE_QUERY_KEY, articleQueryKeys } from "./queryKeys";
 
@@ -25,7 +26,7 @@ export const useDeleteAdminArticleMutation = (
 ) => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useAppMutation({
     mutationFn: (articleId) => deleteAdminArticle(articleId),
     ...options,
     onSuccess: async (data, variables, context, mutation) => {

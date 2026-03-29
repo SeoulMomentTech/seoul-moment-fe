@@ -1,10 +1,10 @@
+import { useAppMutation } from "@shared/hooks/useAppMutation";
 import {
   updateHomeBanner,
   type UpdateHomeBannerRequest,
 } from "@shared/services/banner";
 
 import {
-  useMutation,
   useQueryClient,
   type UseMutationOptions,
 } from "@tanstack/react-query";
@@ -27,7 +27,7 @@ export const useUpdateHomeBannerMutation = (
 ) => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useAppMutation({
     mutationFn: updateHomeBanner,
     ...options,
     onSuccess: async (data, variables, context, mutation) => {

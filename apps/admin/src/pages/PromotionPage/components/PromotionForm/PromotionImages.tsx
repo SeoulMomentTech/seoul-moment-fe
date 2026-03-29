@@ -1,7 +1,7 @@
 import { ImageUploader } from "@shared/components/image-uploader";
 import { useFormContext } from "react-hook-form";
 
-import type { PromotionFormValues } from "../../hooks/usePromotionForm";
+import type { PromotionFormValues } from "./usePromotionForm";
 
 interface PromotionImagesProps {
   bannerPreview: string;

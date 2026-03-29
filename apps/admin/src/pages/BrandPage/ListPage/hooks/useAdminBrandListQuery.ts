@@ -1,9 +1,10 @@
+import { useAppQuery } from "@shared/hooks/useAppQuery";
 import {
   getAdminBrandList,
   type AdminBrandListParams,
 } from "@shared/services/brand";
 
-import { useQuery, type UseQueryOptions } from "@tanstack/react-query";
+import { type UseQueryOptions } from "@tanstack/react-query";
 
 import { brandQueryKeys } from "./queryKeys";
 
@@ -25,7 +26,7 @@ export const useAdminBrandListQuery = (
   params?: AdminBrandListParams,
   options?: AdminBrandListQueryOptions,
 ) =>
-  useQuery({
+  useAppQuery({
     queryKey: brandQueryKeys.list(params),
     queryFn: () => getAdminBrandList(params),
     ...options,

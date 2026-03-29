@@ -1,6 +1,7 @@
+import { useAppQuery } from "@shared/hooks/useAppQuery";
 import { getHomeBannerList } from "@shared/services/banner";
 
-import { useQuery, type UseQueryOptions } from "@tanstack/react-query";
+import { type UseQueryOptions } from "@tanstack/react-query";
 
 import { homeBannerQueryKeys } from "./queryKeys";
 
@@ -17,7 +18,7 @@ type HomeBannerListQueryOptions = Omit<
 >;
 
 export const useHomeBannerListQuery = (options?: HomeBannerListQueryOptions) =>
-  useQuery({
+  useAppQuery({
     queryKey: homeBannerQueryKeys.list(),
     queryFn: getHomeBannerList,
     ...options,

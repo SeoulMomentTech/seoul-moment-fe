@@ -2,7 +2,7 @@ import { useNavigate } from "react-router";
 
 import { PATH } from "@shared/constants/route";
 import type { PostAdminBrandPromotionRequest } from "@shared/services/brandPromotion";
-import { toast } from "sonner";
+import { notification } from "@shared/utils/notification";
 
 import { BrandPromotionForm } from "./components";
 import { useCreateBrandPromotionMutation, useBrandPromotionForm } from "./hooks";
@@ -11,18 +11,16 @@ import { useCreateBrandPromotionMutation, useBrandPromotionForm } from "./hooks"
 export function BrandPromotionAddPage() {
   const navigate = useNavigate();
   const form = useBrandPromotionForm();
-  const { mutateAsync: createPromotion, isPending } =
+  const { mutate: createPromotion, isPending } =
     useCreateBrandPromotionMutation();
 
-  const handleSubmit = async (data: PostAdminBrandPromotionRequest) => {
-    try {
-      await createPromotion(data);
-      toast.success("이벤트가 성공적으로 등록되었습니다.");
-      navigate(PATH.BRAND_PROMOTION);
-    } catch (error) {
-      console.error(error);
-      toast.error("이벤트 등록에 실패했습니다.");
-    }
+  const handleSubmit = (data: PostAdminBrandPromotionRequest) => {
+    createPromotion(data, {
+      onSuccess: () => {
+        notification.success("브랜드 프로모션이 성공적으로 등록되었습니다.");
+        navigate(PATH.BRAND_PROMOTION);
+      },
+    });
   };
 
   return (

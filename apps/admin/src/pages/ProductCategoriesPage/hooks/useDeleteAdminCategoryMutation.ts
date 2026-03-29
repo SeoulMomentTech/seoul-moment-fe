@@ -1,10 +1,10 @@
+import { useAppMutation } from "@shared/hooks/useAppMutation";
 import {
   deleteAdminCategory,
   type CategoryId,
 } from "@shared/services/category";
 
 import {
-  useMutation,
   useQueryClient,
   type UseMutationOptions,
 } from "@tanstack/react-query";
@@ -25,7 +25,7 @@ export const useDeleteAdminCategoryMutation = (
 ) => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useAppMutation({
     mutationFn: (categoryId) => deleteAdminCategory(categoryId),
     ...options,
     onSuccess: async (data, variables, context, mutation) => {

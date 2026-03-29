@@ -1,9 +1,10 @@
+import { useAppQuery } from "@shared/hooks/useAppQuery";
 import {
   getAdminCategoryList,
   type AdminCategoryListParams,
 } from "@shared/services/category";
 
-import { useQuery, type UseQueryOptions } from "@tanstack/react-query";
+import { type UseQueryOptions } from "@tanstack/react-query";
 
 import { categoryQueryKeys } from "./queryKeys";
 
@@ -25,7 +26,7 @@ export const useAdminCategoryListQuery = (
   params?: AdminCategoryListParams,
   options?: AdminCategoryListQueryOptions,
 ) =>
-  useQuery({
+  useAppQuery({
     queryKey: categoryQueryKeys.list(params),
     queryFn: () => getAdminCategoryList(params),
     ...options,

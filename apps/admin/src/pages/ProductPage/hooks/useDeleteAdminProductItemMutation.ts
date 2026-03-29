@@ -1,10 +1,10 @@
+import { useAppMutation } from "@shared/hooks/useAppMutation";
 import {
   deleteAdminProductItem,
   type AdminProductItemId,
 } from "@shared/services/products";
 
 import {
-  useMutation,
   useQueryClient,
   type UseMutationOptions,
 } from "@tanstack/react-query";
@@ -29,7 +29,7 @@ export const useDeleteAdminProductItemMutation = (
 ) => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useAppMutation({
     mutationFn: (productItemId) => deleteAdminProductItem(productItemId),
     ...options,
     onSuccess: async (data, variables, context, mutation) => {

@@ -1,9 +1,10 @@
+import { useAppQuery } from "@shared/hooks/useAppQuery";
 import {
   getAdminUserList,
   type GetAdminUserListParams,
 } from "@shared/services/user";
 
-import { useQuery, type UseQueryOptions } from "@tanstack/react-query";
+import { type UseQueryOptions } from "@tanstack/react-query";
 
 import { userQueryKeys } from "./queryKeys";
 
@@ -23,7 +24,7 @@ export const useAdminUserListQuery = (
   params?: GetAdminUserListParams,
   options?: AdminUserListQueryOptions,
 ) =>
-  useQuery({
+  useAppQuery({
     queryKey: userQueryKeys.list(params),
     queryFn: () => getAdminUserList(params),
     ...options,

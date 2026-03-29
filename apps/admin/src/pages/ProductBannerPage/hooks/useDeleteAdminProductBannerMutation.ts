@@ -1,10 +1,10 @@
+import { useAppMutation } from "@shared/hooks/useAppMutation";
 import {
   deleteAdminProductBanner,
   type ProductBannerId,
 } from "@shared/services/productBanner";
 
 import {
-  useMutation,
   useQueryClient,
   type UseMutationOptions,
 } from "@tanstack/react-query";
@@ -25,7 +25,7 @@ export const useDeleteAdminProductBannerMutation = (
 ) => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useAppMutation({
     mutationFn: (bannerId) => deleteAdminProductBanner(bannerId),
     ...options,
     onSuccess: async (data, variables, context, mutation) => {

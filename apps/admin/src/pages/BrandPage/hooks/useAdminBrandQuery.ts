@@ -1,7 +1,7 @@
+import { useAppQuery } from "@shared/hooks/useAppQuery";
 import { getAdminBrandInfo, type BrandId } from "@shared/services/brand";
 
 import {
-  useQuery,
   useSuspenseQuery,
   type UseQueryOptions,
   type UseSuspenseQueryOptions,
@@ -35,7 +35,7 @@ export const useAdminBrandQuery = (
   brandId: BrandId,
   options?: AdminBrandQueryOptions,
 ) =>
-  useQuery({
+  useAppQuery({
     queryKey: brandQueryKeys.detail(brandId),
     queryFn: () => getAdminBrandInfo(brandId),
     ...options,

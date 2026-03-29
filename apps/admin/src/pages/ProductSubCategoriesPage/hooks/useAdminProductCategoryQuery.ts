@@ -1,9 +1,10 @@
+import { useAppQuery } from "@shared/hooks/useAppQuery";
 import {
   getAdminProductCategoryInfo,
   type ProductCategoryId,
 } from "@shared/services/productCategory";
 
-import { useQuery, type UseQueryOptions } from "@tanstack/react-query";
+import { type UseQueryOptions } from "@tanstack/react-query";
 
 import { productCategoryQueryKeys } from "./queryKeys";
 
@@ -25,7 +26,7 @@ export const useAdminProductCategoryQuery = (
   productCategoryId: ProductCategoryId,
   options?: AdminProductCategoryQueryOptions,
 ) =>
-  useQuery({
+  useAppQuery({
     queryKey: productCategoryQueryKeys.detail(productCategoryId),
     queryFn: () => getAdminProductCategoryInfo(productCategoryId),
     ...options,
