@@ -1,3 +1,4 @@
+import { useAppMutation } from "@shared/hooks/useAppMutation";
 import {
   updateAdminProductItem,
   type AdminProductItemId,
@@ -5,7 +6,6 @@ import {
 } from "@shared/services/products";
 
 import {
-  useMutation,
   useQueryClient,
   type UseMutationOptions,
 } from "@tanstack/react-query";
@@ -35,7 +35,7 @@ export const useUpdateAdminProductItemMutation = (
 ) => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useAppMutation({
     mutationFn: ({ productItemId, payload }) =>
       updateAdminProductItem(productItemId, payload),
     ...options,

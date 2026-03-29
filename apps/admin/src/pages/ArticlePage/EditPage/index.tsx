@@ -14,7 +14,7 @@ export default function ArticleEditPage() {
   const params = useParams();
   const id = Number(params.id);
 
-  if (!Number.isInteger(id)) {
+  if (!Number.isInteger(id) || id <= 0) {
     return <Navigate replace to={PATH.ARTICLE} />;
   }
 

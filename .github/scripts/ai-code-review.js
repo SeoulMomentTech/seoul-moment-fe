@@ -66,12 +66,13 @@ async function run() {
 
 # Role
 You are a **senior software engineer** with extensive production experience.
-Your goal is to provide high-quality feedback that ensures:
-- **Stability**: Exception handling, edge cases, async error management.
-- **Security**: Input validation, Auth/Authz, XSS/CSRF, secret exposure.
-- **Performance**: Redundant operations, caching/memoization, FE rendering efficiency.
-- **Maintainability**: Clear naming, structure, project conventions, Type safety.
-- **Frontend Best Practices**: State management, API error handling, A11y, and Design Token usage.
+Your goal is to provide high-quality feedback that ensures stability, security, performance, and maintainability.
+
+# Core Principles
+1. **Skip Trivial Issues**: Ignore simple typos, formatting, subjective nitpicks, or very minor refactors (Low severity). Focus ONLY on Medium to High severity issues (bugs, performance bottlenecks, security risks, architectural flaws).
+2. **No Duplicate Reviews**: Do not leave the same comment on multiple lines. If a bad pattern is repeated, comment on the first occurrence and mention it applies globally. Do not review code that was not modified in this PR.
+3. **Actionable & Concise**: Be direct. Do not add fluff. Always provide a concrete code snippet or clear instruction.
+4. **English Language**: All review comments and the summary must be written in **English**.
 
 # Review Procedure
 1. Understand the full context of the Pull Request changes.
@@ -79,16 +80,16 @@ Your goal is to provide high-quality feedback that ensures:
    - Lines starting with "+" are added/modified.
    - Lines starting with " " are context lines.
    - Some lines have an extra marker like "(line:N)" at the end. **N is the absolute line number in the new file.**
-3. Identify issues based on the checklist below and suggest concrete improvements.
+3. Identify significant issues based on the Core Principles.
 
 # Severity Levels
 - **High**: Runtime errors, security vulnerabilities, critical user-facing failures.
-- **Medium**: Performance degradation, maintainability/scalability concerns, logic flaws.
-- **Low**: Readability, style, convention, minor optimizations.
+- **Medium**: Performance degradation, maintainability/scalability concerns, significant logic flaws.
 
 # Output Format
 You must output a JSON object with the following structure:
 {
+    "summary": "A comprehensive summary of the PR changes and key evaluations (in English)",
     "reviews": [
     {
         "path": "path/to/file.ts",
@@ -96,23 +97,18 @@ You must output a JSON object with the following structure:
         "severity": "High",
         "type": "Request Changes",
         "category": "Security",
-        "description": "Description of the issue",
+        "description": "Clear and concise description of the issue (in English)",
         "suggestion": "Suggested fix or code snippet"
     }
     ]
 }
 
+- "summary": A high-level summary of the PR's impact, overall quality, and main areas of concern.
 - "path": Relative file path from the repository root. DO NOT include "a/" or "b/".
 - "line": The absolute line number (N) from the "(line:N)" marker in the diff.
-- "type": "Request Changes" (for High/Medium) or "Suggestion" (for Low).
-- "category": Choose from [Stability, Security, Performance, Style, Frontend, Logic].
+- "type": "Request Changes" or "Suggestion".
+- "category": Choose from [Stability, Security, Performance, Logic, Architecture].
 - **CRITICAL**: You MUST only provide reviews for lines that have been **added or modified** (lines starting with "+").
-
-# Tone and Rules
-- Be professional, non-aggressive, and collaborative.
-- Use evidence-based feedback.
-- Do not just point out problems — always propose actionable solutions or alternative code snippets.
-- Distinguish between mandatory fixes and optional suggestions.
 `;
 
     // 3. Call OpenAI
@@ -123,7 +119,7 @@ You must output a JSON object with the following structure:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: "gpt-4o",
         messages: [
           { role: "system", content: systemPrompt },
           {
@@ -166,13 +162,17 @@ You must output a JSON object with the following structure:
       };
     });
 
-    if (comments.length > 0) {
-      console.log(`Attempting to post ${comments.length} comments to PR #${pullNumber}...`);
+    if (comments.length > 0 || reviewData.summary) {
+      console.log(`Attempting to post review to PR #${pullNumber}...`);
       
       const payload = {
+        body: `## 🤖 AI Code Review Summary\n\n${reviewData.summary || "변경 사항에 대한 특이사항이 발견되지 않았습니다."}`,
         event: "COMMENT",
-        comments: comments,
       };
+
+      if (comments.length > 0) {
+        payload.comments = comments;
+      }
 
       const reviewResponse = await fetch(
         `https://api.github.com/repos/${owner}/${repo}/pulls/${pullNumber}/reviews`,
@@ -189,36 +189,39 @@ You must output a JSON object with the following structure:
       if (!reviewResponse.ok) {
         const reviewError = await reviewResponse.text();
         console.error("GitHub API Error Details:", reviewError);
-        console.warn("Bulk post failed. Attempting to post comments one by one...");
         
-        for (const comment of comments) {
-            try {
-                const singleResponse = await fetch(
-                    `https://api.github.com/repos/${owner}/${repo}/pulls/${pullNumber}/comments`,
-                    {
-                        method: "POST",
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify(comment),
-                    }
-                );
-                if (!singleResponse.ok) {
-                    const singleError = await singleResponse.text();
-                    console.error(`Failed to post comment at ${comment.path}:${comment.line}:`, singleError);
-                } else {
-                    console.log(`Posted comment at ${comment.path}:${comment.line}`);
-                }
-            } catch (singleErr) {
-                console.error("Error posting single comment:", singleErr);
-            }
+        if (comments.length > 0) {
+          console.warn("Bulk post failed. Attempting to post comments one by one...");
+          
+          for (const comment of comments) {
+              try {
+                  const singleResponse = await fetch(
+                      `https://api.github.com/repos/${owner}/${repo}/pulls/${pullNumber}/comments`,
+                      {
+                          method: "POST",
+                          headers: {
+                              Authorization: `Bearer ${token}`,
+                              "Content-Type": "application/json",
+                          },
+                          body: JSON.stringify(comment),
+                      }
+                  );
+                  if (!singleResponse.ok) {
+                      const singleError = await singleResponse.text();
+                      console.error(`Failed to post comment at ${comment.path}:${comment.line}:`, singleError);
+                  } else {
+                      console.log(`Posted comment at ${comment.path}:${comment.line}`);
+                  }
+              } catch (singleErr) {
+                  console.error("Error posting single comment:", singleErr);
+              }
+          }
         }
       } else {
-        console.log(`Successfully posted ${comments.length} review comments.`);
+        console.log(`Successfully posted review with ${comments.length} comments.`);
       }
     } else {
-      console.log("No issues found by AI Reviewer.");
+      console.log("No issues and no summary found by AI Reviewer.");
     }
   } catch (error) {
     console.error("Workflow failed:", error);

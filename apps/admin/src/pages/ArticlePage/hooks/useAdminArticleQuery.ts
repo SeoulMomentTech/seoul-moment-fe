@@ -1,9 +1,11 @@
+import { useAppQuery } from "@shared/hooks/useAppQuery";
 import {
   getAdminArticleInfo,
   type AdminArticleId,
 } from "@shared/services/article";
 
-import { useQuery, type UseQueryOptions } from "@tanstack/react-query";
+import { type UseQueryOptions } from "@tanstack/react-query";
+
 
 import { articleQueryKeys } from "./queryKeys";
 
@@ -25,7 +27,7 @@ export const useAdminArticleQuery = (
   articleId: AdminArticleId | number,
   options?: AdminArticleQueryOptions,
 ) =>
-  useQuery({
+  useAppQuery({
     queryKey: articleQueryKeys.detail(articleId),
     queryFn: () => getAdminArticleInfo(articleId as AdminArticleId),
     ...options,

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { useNavigate } from "react-router";
+import { Navigate, useNavigate } from "react-router";
 
 import { useAdminBrandListQuery } from "@pages/BrandPage/ListPage/hooks";
 import { useAdminCategoryListQuery } from "@pages/ProductCategoriesPage/hooks";
@@ -107,7 +107,7 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
       sort: "DESC",
     });
 
-  const { data: newsResponse, isLoading } = useAdminNewsQuery(newsId);
+  const { data: newsResponse, isLoading, isError } = useAdminNewsQuery(newsId);
   const detail = newsResponse?.data;
 
   const { mutateAsync: updateNews, isPending } = useUpdateAdminNewsV2Mutation({
@@ -182,10 +182,10 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
 
   const handleChangeMetaField = useCallback(
     (field: "categoryId" | "brandId" | "writer", value: string) => {
-      if(isCategoryLoading || isBrandLoading || !value) return;
+      if (isCategoryLoading || isBrandLoading || !value) return;
 
       if (field === "categoryId") {
-        setFieldValue("categoryId", Number(value)); 
+        setFieldValue("categoryId", Number(value));
         return;
       }
 
@@ -265,13 +265,17 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
   const selectedBrandId = formik.values.brandId;
   const brandOptions =
     selectedBrandId !== undefined &&
-    selectedBrandId !== null &&
-    !baseBrandOptions.some((option) => option.value === selectedBrandId)
+      selectedBrandId !== null &&
+      !baseBrandOptions.some((option) => option.value === selectedBrandId)
       ? [
-          { value: selectedBrandId, label: `ID ${selectedBrandId}` },
-          ...baseBrandOptions,
-        ]
+        { value: selectedBrandId, label: `ID ${selectedBrandId}` },
+        ...baseBrandOptions,
+      ]
       : baseBrandOptions;
+
+  if (isError) {
+    return <Navigate replace to={PATH.NEWS} />;
+  }
 
   if (isLoading || !detail) {
     return (

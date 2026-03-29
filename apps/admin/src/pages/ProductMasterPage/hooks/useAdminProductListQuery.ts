@@ -1,9 +1,10 @@
+import { useAppQuery } from "@shared/hooks/useAppQuery";
 import {
   type GetAdminProductListParams,
   getAdminProductList,
 } from "@shared/services/adminProduct";
 
-import { useQuery, type UseQueryOptions } from "@tanstack/react-query";
+import { type UseQueryOptions } from "@tanstack/react-query";
 
 import { adminProductQueryKeys } from "./queryKeys";
 
@@ -25,7 +26,7 @@ export const useAdminProductListQuery = (
   params: GetAdminProductListParams,
   options?: AdminProductListQueryOptions,
 ) => {
-  return useQuery({
+  return useAppQuery({
     queryKey: adminProductQueryKeys.list(params),
     queryFn: () => getAdminProductList(params),
     ...options,

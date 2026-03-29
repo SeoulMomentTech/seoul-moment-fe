@@ -1,10 +1,10 @@
+import { useAppMutation } from "@shared/hooks/useAppMutation";
 import {
   createAdminNews,
   type CreateAdminNewsRequest,
 } from "@shared/services/news";
 
 import {
-  useMutation,
   useQueryClient,
   type UseMutationOptions,
 } from "@tanstack/react-query";
@@ -23,7 +23,7 @@ export const useCreateAdminNewsMutation = (
 ) => {
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useAppMutation({
     mutationFn: createAdminNews,
     ...options,
     onSuccess: async (data, variables, context, mutation) => {
