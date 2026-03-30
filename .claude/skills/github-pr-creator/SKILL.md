@@ -28,11 +28,35 @@ You understand how to analyze local changes, compare them with a target branch (
      - **Details**: Specific technical changes, implementation details, or migrations.
      - **Notes**: Related issues, context, or any additional information for reviewers.
 
-3. **PR Creation**
-   - Propose or execute the `gh` command to create the PR:
+3. **Auto-Label Detection**
+   - Detect labels from commit type and changed file paths, then apply them to the PR.
+   - Run `gh label list --json name` to verify labels exist in the repository before applying.
+
+   **Commit type → Label mapping:**
+
+   | Commit Type              | Label           |
+   | ------------------------ | --------------- |
+   | `feat`                   | `feature`       |
+   | `fix`                    | `bug`           |
+   | `refactor`               | `refactor`      |
+   | `docs`                   | `documentation` |
+   | `chore`, `style`, `test` | _(no label)_    |
+
+   **Changed file path → Label mapping:**
+
+   | Path Pattern                        | Label   |
+   | ----------------------------------- | ------- |
+   | `apps/admin/**`                     | `admin` |
+   | `messages/**` or i18n-related files | `i18n`  |
+
+   Combine all detected labels into a comma-separated string (e.g., `refactor,admin`).
+
+4. **PR Creation**
+   - Propose or execute the `gh` command to create the PR with labels:
      ```bash
-     gh pr create --base <target-branch> --head <current-branch> --title "<title>" --body "<generated-body>"
+     gh pr create --base <target-branch> --head <current-branch> --title "<title>" --body "<generated-body>" --label "<detected-labels>"
      ```
+   - If no labels were detected, omit the `--label` flag.
    - **Environment Note**: If the `gh` CLI is not installed (e.g., `command not found`), generate the PR content clearly so the user can copy-paste it into the GitHub web UI.
    - If the PR is successfully created, provide the link to the user.
 
@@ -50,4 +74,4 @@ You understand how to analyze local changes, compare them with a target branch (
 ## Example Interaction
 
 **User**: "Create a PR for this feature branch."
-**Gemini**: "I'll create a PR from `feat/search-api` to `develop`. I've analyzed the changes and prepared the following PR content based on our template..." [Shows content] "...Shall I proceed with `gh pr create`?"
+**Assistant**: "I'll create a PR from `feat/search-api` to `develop`. I've analyzed the changes and prepared the following PR content based on our template. Detected labels: `feature`, `admin`. Shall I proceed with `gh pr create`?"
