@@ -62,30 +62,6 @@ export interface CreateAdminBrandRequest {
   colorCode: string;
 }
 
-export interface UpdateAdminBrandImagePayload {
-  oldImageUrl: string;
-  newImageUrl: string;
-}
-
-export interface UpdateAdminBrandSectionImageSortOrder {
-  imageUrl: string;
-  sortOrder: number;
-}
-
-export interface UpdateAdminBrandSectionSortOrder {
-  sectionId: number;
-  sortOrder: number;
-}
-
-export interface UpdateAdminBrandSectionPayload {
-  id: number;
-  textList: AdminBrandSectionTextPayload[];
-  imageUrlList: UpdateAdminBrandImagePayload[];
-  imageSortOrderList: UpdateAdminBrandSectionImageSortOrder[];
-}
-
-
-
 export interface AdminBrandSectionContentV2 {
   title: string;
   content: string;
