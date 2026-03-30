@@ -58,3 +58,6 @@ packages/**/node_modules
 
 playwright-report
 test-results
+
+# claude code local settings
+.claude/settings.local.json
