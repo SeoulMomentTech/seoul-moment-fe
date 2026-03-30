@@ -62,35 +62,6 @@ export interface CreateAdminNewsRequest {
   homeImage: string;
 }
 
-export interface UpdateAdminNewsImagePayload {
-  oldImageUrl: string;
-  newImageUrl: string;
-}
-
-export interface UpdateAdminNewsSectionPayload {
-  id: number;
-  title?: string;
-  content?: string;
-  imageList?: string[];
-}
-
-export interface UpdateAdminNewsInfoTextPayload {
-  languageId: number;
-  name?: string;
-  description?: string;
-  section?: UpdateAdminNewsSectionPayload[];
-}
-
-export interface UpdateAdminNewsRequest {
-  categoryId?: number;
-  brandId?: number;
-  writer?: string;
-  banner?: string;
-  profile?: string;
-  homeImage?: string;
-  multilingualTextList?: UpdateAdminNewsInfoTextPayload[];
-}
-
 export interface UpdateAdminNewsSectionPayloadV2 {
   id?: number;
   title?: string;
@@ -149,11 +120,6 @@ export const getAdminNewsInfo = (newsId: AdminNewsId) =>
 
 export const createAdminNews = (payload: CreateAdminNewsRequest) =>
   fetcher.post("/admin/news", payload);
-
-export const updateAdminNews = (
-  newsId: AdminNewsId,
-  payload: UpdateAdminNewsRequest,
-) => fetcher.patch(`/admin/news/${newsId}`, payload);
 
 export const updateAdminNewsV2 = (
   newsId: AdminNewsId,

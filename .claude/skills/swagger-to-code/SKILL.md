@@ -21,13 +21,15 @@ You understand how to read and interpret Swagger (OpenAPI) specifications and co
    - **Do not** attempt to read or pass the entire Swagger JSON directly into your context.
    - Use the provided extraction script (`.gemini/skills/swagger-to-code/scripts/extract-swagger.js`) to filter the Swagger JSON based on the user's requested path or domain tag (e.g., `Product`, `Auth`).
    - Example usage:
+
      ```bash
      # Filter by URL path keyword
-     node .gemini/skills/swagger-to-code/scripts/extract-swagger.js "https://api.example.com/v3/api-docs" "/admin/product" > .gemini/tmp/filtered-swagger.json
-     
+     node .gemini/skills/swagger-to-code/scripts/extract-swagger.js "https://api.seoulmoment.com.tw/docs-json" "/admin/product" > .gemini/tmp/filtered-swagger.json
+
      # Filter by Swagger Tag
-     node .gemini/skills/swagger-to-code/scripts/extract-swagger.js "https://api.example.com/v3/api-docs" "Product" > .gemini/tmp/filtered-swagger.json
+     node .gemini/skills/swagger-to-code/scripts/extract-swagger.js "https://api.seoulmoment.com.tw/docs-json" "Product" > .gemini/tmp/filtered-swagger.json
      ```
+
    - If the script fails, create a small temporary Node.js script to download and filter the JSON paths and referenced `components.schemas` recursively, then run it.
 
 3. **Read the filtered data**
