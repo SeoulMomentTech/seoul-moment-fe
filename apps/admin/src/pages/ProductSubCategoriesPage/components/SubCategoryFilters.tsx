@@ -2,16 +2,10 @@ import type { KeyboardEvent } from "react";
 
 import { Search } from "lucide-react";
 
-import {
-  Button,
-  HStack,
-  Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@seoul-moment/ui";
+import { PageSizeSelect } from "@/shared/components/page-size-select";
+
+import { Button, HStack, Input } from "@seoul-moment/ui";
+
 
 interface SubCategoryFiltersProps {
   searchInput: string;
@@ -47,21 +41,7 @@ export function SubCategoryFilters({
           <Search className="mr-2 h-4 w-4" />
           검색
         </Button>
-        <Select
-          onValueChange={(value) => {
-            onPageSizeChange(Number(value));
-          }}
-          value={pageSize.toString()}
-        >
-          <SelectTrigger className="w-32 bg-white">
-            <SelectValue className="h-10" />
-          </SelectTrigger>
-          <SelectContent className="**:cursor-pointer bg-white">
-            <SelectItem value="10">10개씩</SelectItem>
-            <SelectItem value="20">20개씩</SelectItem>
-            <SelectItem value="50">50개씩</SelectItem>
-          </SelectContent>
-        </Select>
+        <PageSizeSelect onChange={onPageSizeChange} value={pageSize} />
       </HStack>
     </div>
   );
