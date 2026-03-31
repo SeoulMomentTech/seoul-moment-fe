@@ -62,26 +62,6 @@ export interface CreateAdminArticleRequest {
   homeImage: string;
 }
 
-export interface UpdateAdminArticleImagePayload {
-  oldImageUrl: string;
-  newImageUrl: string;
-}
-
-export interface UpdateAdminArticleSectionPayload {
-  id: number;
-  title?: string;
-  subTitle?: string;
-  content?: string;
-  sectionImageList?: UpdateAdminArticleImagePayload[];
-}
-
-export interface UpdateAdminArticleInfoTextPayload {
-  languageId: number;
-  title?: string;
-  content?: string;
-  section?: UpdateAdminArticleSectionPayload[];
-}
-
 export interface V2UpdateAdminArticleRequest {
   categoryId?: number;
   brandId?: number;

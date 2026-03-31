@@ -2,15 +2,10 @@ import type { KeyboardEvent } from "react";
 
 import { Search } from "lucide-react";
 
-import {
-  Button,
-  Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@seoul-moment/ui";
+import { PageSizeSelect } from "@/shared/components/page-size-select";
+
+import { Button, Input } from "@seoul-moment/ui";
+
 
 interface ProductMasterFiltersProps {
   pageSize: number;
@@ -48,21 +43,11 @@ export const ProductMasterFilters = ({
         </Button>
       </div>
 
-      <Select
-        onValueChange={(value) => onPageSizeChange(Number(value))}
-        value={pageSize.toString()}
-      >
-        <SelectTrigger className="w-[120px] bg-white">
-          <SelectValue placeholder="개수 선택" />
-        </SelectTrigger>
-        <SelectContent className="bg-white">
-          {[10, 20, 50, 100].map((size) => (
-            <SelectItem key={size} value={size.toString()}>
-              {size}개씩
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <PageSizeSelect
+        onChange={onPageSizeChange}
+        options={[10, 20, 50, 100]}
+        value={pageSize}
+      />
     </div>
   );
 };
