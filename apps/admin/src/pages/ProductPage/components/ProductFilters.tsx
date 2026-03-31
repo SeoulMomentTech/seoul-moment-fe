@@ -2,15 +2,10 @@ import { type KeyboardEvent } from "react";
 
 import { Search, ArrowUpDown } from "lucide-react";
 
-import {
-  Button,
-  Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@seoul-moment/ui";
+import { PageSizeSelect } from "@/shared/components/page-size-select";
+
+import { Button, Input } from "@seoul-moment/ui";
+
 
 interface ProductFiltersProps {
   searchInput: string;
@@ -53,21 +48,7 @@ export const ProductFilters = ({
         <ArrowUpDown className="mr-2 h-4 w-4" />
         {sort === "ASC" ? "오름차순" : "내림차순"}
       </Button>
-      <Select
-        onValueChange={(value) => {
-          onPageSizeChange(Number(value));
-        }}
-        value={pageSize.toString()}
-      >
-        <SelectTrigger className="w-32 bg-white">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent className="bg-white">
-          <SelectItem value="10">10개씩</SelectItem>
-          <SelectItem value="20">20개씩</SelectItem>
-          <SelectItem value="50">50개씩</SelectItem>
-        </SelectContent>
-      </Select>
+      <PageSizeSelect onChange={onPageSizeChange} value={pageSize} />
     </div>
   </div>
 );
