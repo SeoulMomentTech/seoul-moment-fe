@@ -71,7 +71,8 @@ const beforeErrorHandler = async (error: HTTPError) => {
 };
 
 export const api = ky.create({
-  prefixUrl: "https://api.seoulmoment.com.tw",
+  prefixUrl:
+    process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://api.seoulmoment.com.tw",
   headers: {
     "Content-Type": "application/json",
   },
