@@ -40,22 +40,22 @@ export function HomeBannersPage() {
   const closeModal = () => setIsModalOpen(false);
 
   const handleSaveBanner = async (payload: {
-    image: string;
-    mobileImage: string;
+    imageUrl: string;
+    mobileImageUrl: string;
   }) => {
     if (banner) {
       await updateBanner({
         bannerId: banner.id,
-        image: payload.image,
-        mobileImage: payload.mobileImage,
+        imageUrl: payload.imageUrl,
+        mobileImageUrl: payload.mobileImageUrl,
       });
       alert("배너가 수정되었습니다.");
       return;
     }
 
     await createBanner({
-      image: payload.image,
-      mobileImage: payload.mobileImage,
+      imageUrl: payload.imageUrl,
+      mobileImageUrl: payload.mobileImageUrl,
     });
     alert("배너가 등록되었습니다.");
   };
@@ -109,8 +109,8 @@ export function HomeBannersPage() {
 
       {/* 배너 추가/수정 모달 */}
       <BannerModal
-        initialMobileImageUrl={banner?.mobileImage}
-        initialPcImageUrl={banner?.image}
+        initialMobileImageUrl={banner?.mobileImageUrl}
+        initialPcImageUrl={banner?.imageUrl}
         isOpen={isModalOpen}
         isSaving={isSaving}
         onClose={closeModal}

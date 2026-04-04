@@ -12,7 +12,7 @@ interface BannerModalProps {
   initialPcImageUrl?: string;
   initialMobileImageUrl?: string;
   onClose(): void;
-  onSave(payload: { image: string; mobileImage: string }): Promise<void>;
+  onSave(payload: { imageUrl: string; mobileImageUrl: string }): Promise<void>;
 }
 
 export function BannerModal({
@@ -86,15 +86,15 @@ export function BannerModal({
     try {
       setIsUploading(true);
       const pcImageUrl = pcImageFile
-        ? (await uploadImageFile(pcImageFile, "banner")).imagePath
+        ? (await uploadImageFile(pcImageFile, "banner")).imageUrl
         : pcImagePreview;
       const mobileImageUrl = mobileImageFile
-        ? (await uploadImageFile(mobileImageFile, "banner")).imagePath
+        ? (await uploadImageFile(mobileImageFile, "banner")).imageUrl
         : mobileImagePreview;
 
       await onSave({
-        image: pcImageUrl,
-        mobileImage: mobileImageUrl,
+        imageUrl: pcImageUrl,
+        mobileImageUrl: mobileImageUrl,
       });
       handleClose();
     } catch (error) {

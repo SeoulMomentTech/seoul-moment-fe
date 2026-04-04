@@ -6,8 +6,8 @@ export type HomeBannerId = Branded<number, "HomeBannerId">;
 
 export interface HomeBanner {
   id: HomeBannerId;
-  image: string;
-  mobileImage: string;
+  imageUrl: string;
+  mobileImageUrl: string;
 }
 
 interface HomeBannerListData {
@@ -16,27 +16,27 @@ interface HomeBannerListData {
 }
 
 export interface CreateHomeBannerRequest {
-  image: string;
-  mobileImage: string;
+  imageUrl: string;
+  mobileImageUrl: string;
 }
 
 export interface UpdateHomeBannerRequest {
   bannerId: HomeBannerId;
-  image?: string;
-  mobileImage?: string;
+  imageUrl?: string;
+  mobileImageUrl?: string;
 }
 
 export const getHomeBannerList = () =>
-  fetcher.get<ApiResponse<HomeBannerListData>>("/admin/home/banner");
+  fetcher.get<ApiResponse<HomeBannerListData>>("/admin/home/v1/banner");
 
 export const createHomeBanner = (payload: CreateHomeBannerRequest) =>
-  fetcher.post("/admin/home/banner", payload);
+  fetcher.post("/admin/home/v1/banner", payload);
 
 export const updateHomeBanner = ({
   bannerId,
   ...payload
 }: UpdateHomeBannerRequest) =>
-  fetcher.patch(`/admin/home/banner/${bannerId}`, payload);
+  fetcher.patch(`/admin/home/v1/banner/${bannerId}`, payload);
 
 export const deleteHomeBanner = (bannerId: HomeBannerId) =>
   fetcher.delete(`/admin/home/banner/${bannerId}`);
