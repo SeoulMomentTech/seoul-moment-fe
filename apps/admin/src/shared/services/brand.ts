@@ -50,6 +50,7 @@ export interface AdminBrandSectionPayload {
   imageUrlList: string[];
 }
 
+/** Form model — used internally for Formik state */
 export interface CreateAdminBrandRequest {
   textList: AdminBrandTextPayload[];
   categoryId: number;
@@ -60,6 +61,38 @@ export interface CreateAdminBrandRequest {
   productBannerImageUrl: string;
   englishName: string;
   colorCode: string;
+}
+
+export type AdminBrandLanguageCode = "ko" | "en" | "zh-TW";
+
+export interface V1AdminBrandLanguagePayload {
+  languageCode: AdminBrandLanguageCode;
+  name: string;
+  description: string;
+}
+
+export interface V1AdminBrandSectionLanguagePayload {
+  languageCode: AdminBrandLanguageCode;
+  title: string;
+  content: string;
+}
+
+export interface V1AdminBrandSectionPayload {
+  languageList: V1AdminBrandSectionLanguagePayload[];
+  imageUrlList: string[];
+}
+
+/** V1 API request payload for brand creation */
+export interface V1CreateAdminBrandRequest {
+  languageList: V1AdminBrandLanguagePayload[];
+  categoryId: number;
+  profileImageUrl?: string;
+  sectionList: V1AdminBrandSectionPayload[];
+  bannerImageUrlList: string[];
+  mobileBannerImageUrlList: string[];
+  productBannerImageUrl: string;
+  englishName: string;
+  colorCode?: string;
 }
 
 export interface AdminBrandSectionContentV2 {
@@ -127,10 +160,10 @@ export const getAdminBrandInfo = (brandId: BrandId) =>
   fetcher.get<ApiResponse<AdminBrandDetail>>(`/admin/brand/${brandId}`);
 
 /**
- * @description 브랜드 다국어 등록
+ * @description 브랜드 다국어 등록 V1
  */
-export const createAdminBrand = (payload: CreateAdminBrandRequest) =>
-  fetcher.post("/admin/brand", payload);
+export const createAdminBrand = (payload: V1CreateAdminBrandRequest) =>
+  fetcher.post("/admin/brand/v1", payload);
 
 
 /**

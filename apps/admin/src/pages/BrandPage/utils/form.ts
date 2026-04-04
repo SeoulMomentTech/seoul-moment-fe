@@ -1,8 +1,10 @@
 import { LANGUAGE_LIST } from "@shared/constants/locale";
 import type {
   AdminBrandDetail,
+  AdminBrandLanguageCode,
   AdminBrandMultilingualTextV2,
   CreateAdminBrandRequest,
+  V1CreateAdminBrandRequest,
   V2UpdateAdminBrandRequest,
 } from "@shared/services/brand";
 import { stripImageDomain } from "@shared/utils/image";
@@ -11,22 +13,36 @@ import type { FormikErrors } from "formik";
 import { createEmptySection } from "./section";
 import { BANNER_REQUIRED_COUNT } from "../constants";
 
-export const getAddFormPayload = (values: CreateAdminBrandRequest) => {
-  const payload: CreateAdminBrandRequest = {
-    ...values,
-    profileImageUrl: stripImageDomain(values.profileImageUrl),
-    productBannerImageUrl: stripImageDomain(values.productBannerImageUrl),
-    bannerImageUrlList: values.bannerImageUrlList.map(stripImageDomain),
-    mobileBannerImageUrlList:
-      values.mobileBannerImageUrlList.map(stripImageDomain),
-    sectionList: values.sectionList.map((section) => ({
-      ...section,
-      imageUrlList: section.imageUrlList.map(stripImageDomain),
-    })),
-  };
-
-  return payload;
+const LANGUAGE_ID_TO_CODE: Record<number, AdminBrandLanguageCode> = {
+  1: "ko",
+  2: "en",
+  3: "zh-TW",
 };
+
+export const getAddFormPayload = (
+  values: CreateAdminBrandRequest,
+): V1CreateAdminBrandRequest => ({
+  languageList: values.textList.map((text) => ({
+    languageCode: LANGUAGE_ID_TO_CODE[text.languageId],
+    name: text.name,
+    description: text.description,
+  })),
+  categoryId: values.categoryId,
+  profileImageUrl: values.profileImageUrl || undefined,
+  sectionList: values.sectionList.map((section) => ({
+    languageList: section.textList.map((text) => ({
+      languageCode: LANGUAGE_ID_TO_CODE[text.languageId],
+      title: text.title,
+      content: text.content,
+    })),
+    imageUrlList: section.imageUrlList,
+  })),
+  bannerImageUrlList: values.bannerImageUrlList,
+  mobileBannerImageUrlList: values.mobileBannerImageUrlList,
+  productBannerImageUrl: values.productBannerImageUrl,
+  englishName: values.englishName,
+  colorCode: values.colorCode || undefined,
+});
 
 interface GetEditFormPayload {
   values: CreateAdminBrandRequest;

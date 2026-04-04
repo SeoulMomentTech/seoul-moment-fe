@@ -1,7 +1,7 @@
 import { useAppMutation } from "@shared/hooks/useAppMutation";
 import {
   createAdminBrand,
-  type CreateAdminBrandRequest,
+  type V1CreateAdminBrandRequest,
 } from "@shared/services/brand";
 
 import {
@@ -17,7 +17,7 @@ type CreateAdminBrandOptions = Omit<
   UseMutationOptions<
     CreateAdminBrandResponse,
     unknown,
-    CreateAdminBrandRequest
+    V1CreateAdminBrandRequest
   >,
   "mutationFn"
 >;

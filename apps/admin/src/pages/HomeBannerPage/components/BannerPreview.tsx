@@ -51,7 +51,7 @@ export function BannerPreview({
               alt="홈 배너 PC"
               className="h-[600px] w-full max-w-[1920px] rounded-lg border border-gray-200 object-cover"
               height={600}
-              src={banner.image}
+              src={banner.imageUrl}
               width={1920}
             />
           </div>
@@ -61,7 +61,7 @@ export function BannerPreview({
               alt="홈 배너 모바일"
               className="h-[400px] w-full max-w-[700px] rounded-lg border border-gray-200 object-cover"
               height={400}
-              src={banner.mobileImage}
+              src={banner.mobileImageUrl}
               width={700}
             />
           </div>
