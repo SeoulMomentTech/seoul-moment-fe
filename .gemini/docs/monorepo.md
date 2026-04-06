@@ -1,43 +1,75 @@
 # Seoul Moment Frontend Monorepo
 
-This repository now follows a pnpm-based monorepo layout. The existing Next.js application lives in `apps/web`, and additional apps or shared packages can be added under `apps/*` and `packages/*`.
+다국어 e-commerce/content 플랫폼의 프론트엔드 모노레포.
 
 ## Structure
 
-- `apps/web` – main service application
-- `apps/admin` - admin application
-- `packages/*` – (optional) shared libraries and utilities
-- Root configs – workspace-wide tooling such as Husky hooks and lint-staged rules
+- `apps/web` — Next.js 15 메인 서비스 (i18n: ko, en, zh-TW)
+- `apps/admin` — Vite 7 + React Router v7 admin backoffice
+- `packages/ui` — 공유 Radix UI 컴포넌트 라이브러리 (@seoul-moment/ui)
+- `packages/tailwind-config` — 공유 Tailwind CSS v4 config
+- `packages/eslint-config` — 공유 ESLint v9 config
+- `packages/prettier-config` — 공유 Prettier config
 
-## Scripts
-
-Run commands from the repository root (all executed through Turborepo):
+## Commands
 
 ```bash
-pnpm dev         # start the web app in watch mode
-pnpm dev:admin   # start the Vite admin app
-pnpm build       # run builds for every package
-pnpm start       # launch the production Next.js server
-pnpm lint        # lint every package
-pnpm lint:fix    # lint web with --fix
-pnpm i18n:sync   # sync locale data for the web app
+# Install
+pnpm install
+
+# Dev servers
+pnpm dev:web          # Next.js on localhost:3000
+pnpm dev:admin        # Vite on localhost:5173
+
+# Build
+pnpm build            # All packages & apps
+pnpm build:web        # Web only
+pnpm build:admin      # Admin only
+
+# Lint
+pnpm lint             # All workspaces
+pnpm lint:fix:web     # Auto-fix web
+pnpm lint:fix:admin   # Auto-fix admin
+
+# Test (E2E via Playwright)
+pnpm test:web-e2e     # Web e2e headless
+pnpm test:web-e2e:ui  # Web e2e with UI
+pnpm test:admin-e2e   # Admin e2e headless
+pnpm test:admin-e2e:ui
+
+# i18n
+pnpm i18n:sync        # Google Sheets에서 번역 동기화
 ```
 
-You can still `cd` into each app (`apps/web`, `apps/admin`) and run their scripts directly when you need more fine-grained control.
+Unit tests는 Vitest 사용. 각 앱에서 직접 실행:
+```bash
+cd apps/web && pnpm vitest run           # 전체 unit tests
+cd apps/web && pnpm vitest run src/path  # 단일 파일
+```
 
-## Tooling
+## Monorepo Tooling
 
-- Husky git hooks live at the repository root (`.husky`)
-- lint-staged formats/lints staged files in `apps/web` and `apps/admin`
-- turborepo pipeline definition: `turbo.json`
-- pnpm workspace definition: `pnpm-workspace.yaml`
-- pnpm uses isolated `node_modules` per package (`.npmrc`)
+- **pnpm workspaces** (v10) + **Turborepo**로 task orchestration 및 caching
+- **Husky** pre-commit hooks → lint-staged (ESLint + Prettier on staged files)
+- 패키지 참조: `workspace:*` protocol
+- Pipeline 정의: `turbo.json`
+- Workspace 정의: `pnpm-workspace.yaml`
 
-## Adding More Packages
+## Code Conventions
 
-1. Create a new folder under `apps/` or `packages/`
-2. Add its own `package.json`
-3. Install dependencies with `pnpm install`
-4. Reference the package using standard pnpm workspace tooling (`pnpm --filter` or package aliases)
+- **Named exports only** — default export 금지
+- **PascalCase** — 컴포넌트, **camelCase** — functions/hooks
+- **Icons**: `lucide-react` 전용
+- **No `any`** — 명시적 TypeScript interface 사용
+- **Tailwind utility classes inline** — CSS modules 사용 금지
+- **next/image**: 반드시 `sizes` prop 제공
+- **API responses**: service 파일에 typed interface 정의; admin은 `ApiResponse<T>` 래퍼 사용
+- **Forms**: react-hook-form + zod
+- **Toasts**: `sonner`
+- **URL state**: web은 `nuqs`, admin은 React Router params
 
-This setup keeps the Next.js app intact while making space for shared UI kits, server apps, or other tooling in the monorepo.
+## Environment Variables
+
+- **apps/web** (Next.js `process.env` / `NEXT_PUBLIC_*`): `NEXT_PUBLIC_ENV`, `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`, `GOOGLE_SERVICE_ACCOUNT_JSON` (server-only)
+- **apps/admin** (Vite `import.meta.env.VITE_*`): `VITE_ADMIN_API_BASE_URL`, `VITE_API_BASE_URL`
+- **CI/Build**: `SENTRY_AUTH_TOKEN` (turbo.json 경유 source map upload)
