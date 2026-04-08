@@ -138,9 +138,7 @@ export function BrandPromotionFormContent({
           }
           onRemove={(index) =>
             form.setNotices((current) =>
-              current.length === 1
-                ? current
-                : current.filter((_, itemIndex) => itemIndex !== index),
+              current.filter((_, itemIndex) => itemIndex !== index),
             )
           }
         />
@@ -163,9 +161,7 @@ export function BrandPromotionFormContent({
           }
           onRemove={(index) =>
             form.setEvents((current) =>
-              current.length === 1
-                ? current
-                : current.filter((_, itemIndex) => itemIndex !== index),
+              current.filter((_, itemIndex) => itemIndex !== index),
             )
           }
         />

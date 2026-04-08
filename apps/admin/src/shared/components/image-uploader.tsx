@@ -1,3 +1,5 @@
+import { useRef, useState } from "react";
+
 import { ImageIcon } from "lucide-react";
 
 import { Button, cn, Label } from "@seoul-moment/ui";
@@ -21,13 +23,53 @@ export function ImageUploader({
   onChange,
   onClear,
 }: ImageUploaderProps) {
+  const [isDragging, setIsDragging] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+
+    const file = e.dataTransfer.files[0];
+    if (!file?.type.startsWith("image/")) return;
+
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(file);
+
+    const input = inputRef.current;
+    if (!input) return;
+
+    input.files = dataTransfer.files;
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  };
+
   return (
     <div className="space-y-2">
       <Label htmlFor={id}>
         {label}
         {required && <span className="text-red-500"> *</span>}
       </Label>
-      <div className="rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
+      <div
+        className={cn(
+          "rounded-lg border-2 border-dashed p-6 text-center transition-colors",
+          isDragging
+            ? "border-blue-500 bg-blue-50"
+            : "border-gray-300",
+        )}
+        onDragLeave={handleDragLeave}
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+      >
         {preview ? (
           <div className="space-y-4">
             <img
@@ -54,6 +96,7 @@ export function ImageUploader({
                 className="hidden"
                 id={id}
                 onChange={onChange}
+                ref={inputRef}
                 type="file"
               />
             </div>

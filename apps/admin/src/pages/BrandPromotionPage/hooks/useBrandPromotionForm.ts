@@ -16,8 +16,6 @@ import type {
 } from "../types";
 import {
   createEmptyBanner,
-  createEmptyEvent,
-  createEmptyNotice,
   createEmptyPopup,
   createEmptySection,
   getLanguageCode,
@@ -59,12 +57,12 @@ export function useBrandPromotionForm({
   const [notices, setNotices] = useState<NoticeFormValue[]>([
     ...(initialState?.notices?.length
       ? initialState.notices
-      : [createEmptyNotice()]),
+      : []),
   ]);
   const [events, setEvents] = useState<EventFormValue[]>([
     ...(initialState?.events?.length
       ? initialState.events
-      : [createEmptyEvent()]),
+      : []),
   ]);
 
   const errors = getBrandPromotionFormErrors({
@@ -133,32 +131,36 @@ export function useBrandPromotionForm({
           };
         }),
       })),
-      noticeList: notices.map((notice) => ({
-        language: LANGUAGE_LIST.map((language) => ({
-          languageId: language.id,
-          content: notice.content[getLanguageCode(language.code)] ?? "",
-        })),
-      })),
-      eventAndCouponList: events.map((event) => ({
-        event: {
-          status: event.status,
+      ...(notices.length > 0 && {
+        noticeList: notices.map((notice) => ({
           language: LANGUAGE_LIST.map((language) => ({
             languageId: language.id,
-            title: event.titles[getLanguageCode(language.code)] ?? "",
+            content: notice.content[getLanguageCode(language.code)] ?? "",
           })),
-        },
-        coupon: event.coupons.map((coupon) => ({
-          imagePath: stripImageDomain(coupon.imagePath),
-          language: LANGUAGE_LIST.map((language) => {
-            const code = getLanguageCode(language.code);
-            return {
-              languageId: language.id,
-              title: coupon.content[code].title,
-              description: coupon.content[code].description,
-            };
-          }),
         })),
-      })),
+      }),
+      ...(events.length > 0 && {
+        eventAndCouponList: events.map((event) => ({
+          event: {
+            status: event.status,
+            language: LANGUAGE_LIST.map((language) => ({
+              languageId: language.id,
+              title: event.titles[getLanguageCode(language.code)] ?? "",
+            })),
+          },
+          coupon: event.coupons.map((coupon) => ({
+            imagePath: stripImageDomain(coupon.imagePath),
+            language: LANGUAGE_LIST.map((language) => {
+              const code = getLanguageCode(language.code);
+              return {
+                languageId: language.id,
+                title: coupon.content[code].title,
+                description: coupon.content[code].description,
+              };
+            }),
+          })),
+        })),
+      }),
     };
   };
 
