@@ -28,34 +28,38 @@ export function BrandOnlineEvent({
   logoImage,
 }: BrandOnlineEventProps) {
   const event = eventList[0];
+  const hasCoupons = (event?.couponList?.length ?? 0) > 0;
+  const hasNotices = (noticeList?.length ?? 0) > 0;
 
   return (
     <section className={cn("w-full bg-white")}>
-      <VStack
-        align="center"
-        className={cn(
-          "min-w-7xl mx-auto w-full pb-[50px] pt-[140px]",
-          "max-sm:min-w-full max-sm:pb-5 max-sm:pt-[50px]",
-        )}
-        gap={40}
-      >
-        <h2 className="text-title-2 max-sm:text-title-4 text-center font-bold text-black">
-          {event.title}
-        </h2>
+      {hasCoupons && (
+        <VStack
+          align="center"
+          className={cn(
+            "min-w-7xl mx-auto w-full pb-[50px] pt-[140px]",
+            "max-sm:min-w-full max-sm:pb-5 max-sm:pt-[50px]",
+          )}
+          gap={40}
+        >
+          <h2 className="text-title-2 max-sm:text-title-4 text-center font-bold text-black">
+            {event.title}
+          </h2>
 
-        <div className="no-scrollbar w-full overflow-x-auto max-sm:px-5">
-          <Flex
-            className="mx-auto w-fit max-sm:w-max max-sm:justify-start"
-            gap={10}
-            justify="center"
-          >
-            {event.couponList.map((coupon) => (
-              <EventCard coupon={coupon} key={coupon.id} />
-            ))}
-          </Flex>
-        </div>
-      </VStack>
-      <NoticeSection noticeList={noticeList} />
+          <div className="no-scrollbar w-full overflow-x-auto max-sm:px-5">
+            <Flex
+              className="mx-auto w-fit max-sm:w-max max-sm:justify-start"
+              gap={10}
+              justify="center"
+            >
+              {event.couponList.map((coupon) => (
+                <EventCard coupon={coupon} key={coupon.id} />
+              ))}
+            </Flex>
+          </div>
+        </VStack>
+      )}
+      {hasNotices && <NoticeSection noticeList={noticeList} />}
       <BrandLinksSection
         brand={brand}
         colorCode={colorCode}
