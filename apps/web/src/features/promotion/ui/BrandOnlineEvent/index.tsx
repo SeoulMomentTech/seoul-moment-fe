@@ -28,10 +28,12 @@ export function BrandOnlineEvent({
   logoImage,
 }: BrandOnlineEventProps) {
   const event = eventList[0];
+  const hasCoupons = (event?.couponList?.length ?? 0) > 0;
+  const hasNotices = (noticeList?.length ?? 0) > 0;
 
   return (
     <section className={cn("w-full bg-white")}>
-      {event && (
+      {hasCoupons && (
         <VStack
           align="center"
           className={cn(
@@ -57,7 +59,7 @@ export function BrandOnlineEvent({
           </div>
         </VStack>
       )}
-      {noticeList.length > 0 && <NoticeSection noticeList={noticeList} />}
+      {hasNotices && <NoticeSection noticeList={noticeList} />}
       <BrandLinksSection
         brand={brand}
         colorCode={colorCode}
