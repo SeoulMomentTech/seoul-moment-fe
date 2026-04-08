@@ -1,7 +1,7 @@
-export const LANGUAGE_IDS = {
-  ko: 1,
-  en: 2,
-  zh: 3,
+const LANGUAGE_CODES = {
+  ko: "ko",
+  en: "en",
+  zh: "zh-TW",
 } as const;
 
 export interface CategoryNames {
@@ -15,7 +15,7 @@ export const EMPTY_NAMES: CategoryNames = { ko: "", en: "", zh: "" };
 export const toNamePayload = (names: CategoryNames) =>
   (Object.entries(names) as [keyof CategoryNames, string][]).map(
     ([code, name]) => ({
-      languageId: LANGUAGE_IDS[code],
+      languageCode: LANGUAGE_CODES[code],
       name: name.trim(),
     }),
   );

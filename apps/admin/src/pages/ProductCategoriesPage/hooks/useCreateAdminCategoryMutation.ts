@@ -1,8 +1,5 @@
 import { useAppMutation } from "@shared/hooks/useAppMutation";
-import {
-  createAdminCategory,
-  type CreateAdminCategoryRequest,
-} from "@shared/services/category";
+import { createAdminCategory } from "@shared/services/category";
 
 import {
   useQueryClient,
@@ -19,7 +16,7 @@ type CreateAdminCategoryOptions = Omit<
   UseMutationOptions<
     CreateAdminCategoryResponse,
     unknown,
-    CreateAdminCategoryRequest
+    { name: string }
   >,
   "mutationFn"
 >;

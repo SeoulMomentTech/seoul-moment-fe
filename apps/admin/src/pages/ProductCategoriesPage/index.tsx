@@ -108,7 +108,8 @@ export default function ProductCategoriesPage() {
       await updateCategory({
         categoryId: editingCategory.id,
         payload: {
-          list: toNamePayload(values),
+          languageList: toNamePayload(values),
+          sortOrder: 0,
         },
       });
       resetEditState();
@@ -125,7 +126,8 @@ export default function ProductCategoriesPage() {
     }
 
     const getName = (code: string) =>
-      editingCategory.nameDto.find((n) => n.languageCode === code)?.name ?? "";
+      editingCategory.languageList.find((n) => n.languageCode === code)?.name ??
+      "";
 
     return {
       ko: getName("ko"),
