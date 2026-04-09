@@ -50,7 +50,7 @@ export function BrandPromotionForm({
     brandResponse?.data.list.map((brand) => ({
       value: String(brand.id),
       label:
-        brand.nameDto.find((item) => item.languageCode === "ko")?.name ??
+        brand.nameList.find((item) => item.languageCode === "ko")?.name ??
         `ID ${brand.id}`,
     })) ?? [];
 

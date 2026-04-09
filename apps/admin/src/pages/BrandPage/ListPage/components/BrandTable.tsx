@@ -23,7 +23,7 @@ interface BrandTableProps {
 }
 
 const getNameByLanguage = (brand: AdminBrandListItem, languageCode: string) =>
-  brand.nameDto.find((name) => name.languageCode === languageCode)?.name ?? "";
+  brand.nameList.find((name) => name.languageCode === languageCode)?.name ?? "";
 
 export function BrandTable({
   brands,
