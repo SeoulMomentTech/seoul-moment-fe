@@ -12,8 +12,8 @@ interface CategorySelectProps {
 }
 
 const getCategoryName = (category: AdminCategory) =>
-  category.nameDto.find((name) => name.languageCode === "ko")?.name ??
-  category.nameDto[0]?.name ??
+  category.languageList.find((name) => name.languageCode === "ko")?.name ??
+  category.languageList[0]?.name ??
   `카테고리 ${category.id}`;
 
 export function CategorySelect({

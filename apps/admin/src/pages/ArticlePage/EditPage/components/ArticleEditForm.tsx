@@ -256,14 +256,14 @@ export function ArticleEditForm({ articleId }: ArticleEditFormProps) {
     categoryResponse?.data.list.map((category) => ({
       value: category.id,
       label:
-        category.nameDto.find((item) => item.languageCode === "ko")?.name ??
-        `ID ${category.id}`,
+        category.languageList.find((item) => item.languageCode === "ko")
+          ?.name ?? `ID ${category.id}`,
     })) ?? [];
   const baseBrandOptions =
     brandResponse?.data.list.map((brand) => ({
       value: brand.id,
       label:
-        brand.nameDto.find((item) => item.languageCode === "ko")?.name ??
+        brand.nameList.find((item) => item.languageCode === "ko")?.name ??
         `ID ${brand.id}`,
     })) ?? [];
   const selectedBrandId = formik.values.brandId;

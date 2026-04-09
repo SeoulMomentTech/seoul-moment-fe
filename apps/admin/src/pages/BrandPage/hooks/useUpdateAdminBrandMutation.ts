@@ -1,8 +1,8 @@
 import { useAppMutation } from "@shared/hooks/useAppMutation";
 import {
-  updateAdminBrandV2,
+  updateAdminBrand,
   type BrandId,
-  type V2UpdateAdminBrandRequest,
+  type V1UpdateAdminBrandRequest,
 } from "@shared/services/brand";
 
 import {
@@ -12,11 +12,11 @@ import {
 
 import { BRAND_QUERY_KEY, brandQueryKeys } from "../hooks/queryKeys";
 
-type UpdateAdminBrandResponse = Awaited<ReturnType<typeof updateAdminBrandV2>>;
+type UpdateAdminBrandResponse = Awaited<ReturnType<typeof updateAdminBrand>>;
 
 interface UpdateAdminBrandVariables {
   brandId: BrandId;
-  payload: V2UpdateAdminBrandRequest;
+  payload: V1UpdateAdminBrandRequest;
 }
 
 type UpdateAdminBrandOptions = Omit<
@@ -34,7 +34,7 @@ export const useUpdateAdminBrandMutation = (
   const queryClient = useQueryClient();
 
   return useAppMutation({
-    mutationFn: ({ brandId, payload }) => updateAdminBrandV2(brandId, payload),
+    mutationFn: ({ brandId, payload }) => updateAdminBrand(brandId, payload),
     ...options,
     onSuccess: async (data, variables, context, mutation) => {
       await queryClient.invalidateQueries({ queryKey: BRAND_QUERY_KEY });

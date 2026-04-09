@@ -37,8 +37,8 @@ export const BrandSelector = ({
         <SelectContent className="max-h-[300px] bg-white">
           {brands?.map((brand) => (
             <SelectItem key={brand.id} value={brand.id.toString()}>
-              {brand.nameDto.find((n) => n.languageCode === "ko")?.name ||
-                brand.nameDto[0]?.name}
+              {brand.nameList.find((n) => n.languageCode === "ko")?.name ||
+                brand.nameList[0]?.name}
             </SelectItem>
           ))}
         </SelectContent>

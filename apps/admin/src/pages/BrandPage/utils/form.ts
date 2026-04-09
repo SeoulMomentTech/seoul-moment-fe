@@ -1,13 +1,12 @@
 import { LANGUAGE_LIST } from "@shared/constants/locale";
 import type {
-  AdminBrandDetail,
   AdminBrandLanguageCode,
-  AdminBrandMultilingualTextV2,
   CreateAdminBrandRequest,
+  V1AdminBrandDetail,
   V1CreateAdminBrandRequest,
-  V2UpdateAdminBrandRequest,
+  V1UpdateAdminBrandInfoText,
+  V1UpdateAdminBrandRequest,
 } from "@shared/services/brand";
-import { stripImageDomain } from "@shared/utils/image";
 import type { FormikErrors } from "formik";
 
 import { createEmptySection } from "./section";
@@ -44,46 +43,45 @@ export const getAddFormPayload = (
   colorCode: values.colorCode || undefined,
 });
 
-interface GetEditFormPayload {
+export const getEditFormPayload = ({
+  values,
+}: {
   values: CreateAdminBrandRequest;
-  data: AdminBrandDetail;
-}
+  data: V1AdminBrandDetail;
+}): V1UpdateAdminBrandRequest => {
+  const languageList: V1UpdateAdminBrandInfoText[] = values.textList.map((text) => {
+    const languageCode = LANGUAGE_ID_TO_CODE[text.languageId];
 
-export const getEditFormPayload = ({ values }: GetEditFormPayload) => {
-  const multilingualTextList: AdminBrandMultilingualTextV2[] =
-    values.textList.map((text) => {
-      const section = values.sectionList.map((sectionItem) => {
-        const sectionText = sectionItem.textList.find(
-          (t) => t.languageId === text.languageId,
-        );
-
-        return {
-          title: sectionText?.title ?? "",
-          content: sectionText?.content ?? "",
-          imageList: sectionItem.imageUrlList.map(stripImageDomain),
-        };
-      });
+    const section = values.sectionList.map((sectionItem) => {
+      const sectionText = sectionItem.textList.find(
+        (t) => t.languageId === text.languageId,
+      );
 
       return {
-        languageId: text.languageId,
-        name: text.name,
-        description: text.description,
-        section,
+        title: sectionText?.title ?? "",
+        content: sectionText?.content ?? "",
+        imageUrlList: sectionItem.imageUrlList,
       };
     });
 
-  const payload: V2UpdateAdminBrandRequest = {
+    return {
+      languageCode,
+      name: text.name,
+      description: text.description,
+      section,
+    };
+  });
+
+  return {
     categoryId: values.categoryId,
     englishName: values.englishName,
-    profileImage: stripImageDomain(values.profileImageUrl),
-    productBannerImage: stripImageDomain(values.productBannerImageUrl),
-    bannerList: values.bannerImageUrlList.map(stripImageDomain),
-    mobileBannerList: values.mobileBannerImageUrlList.map(stripImageDomain),
-    multilingualTextList,
+    profileImageUrl: values.profileImageUrl,
+    productBannerImageUrl: values.productBannerImageUrl,
+    bannerImageUrlList: values.bannerImageUrlList,
+    mobileBannerImageUrlList: values.mobileBannerImageUrlList,
+    languageList,
     colorCode: values.colorCode,
   };
-
-  return payload;
 };
 
 export const validateForm = (values: CreateAdminBrandRequest) => {
@@ -149,22 +147,21 @@ export const validateForm = (values: CreateAdminBrandRequest) => {
   return validationErrors;
 };
 
-export const getInitialValuesFromData = (data: AdminBrandDetail) => {
+export const getInitialValuesFromData = (data: V1AdminBrandDetail) => {
   const {
-    bannerList,
-    mobileBannerList,
-    multilingualTextList,
+    bannerImageUrlList,
+    mobileBannerImageUrlList,
+    languageList,
     categoryId,
     englishName,
-    profileImage,
-    productBannerImage,
+    profileImageUrl,
+    productBannerImageUrl,
     colorCode,
   } = data;
 
   const textList = LANGUAGE_LIST.map((language) => {
-    const text = multilingualTextList.find(
-      (item) => item.languageId === language.id,
-    );
+    const langCode = LANGUAGE_ID_TO_CODE[language.id];
+    const text = languageList.find((item) => item.languageCode === langCode);
 
     return {
       languageId: language.id,
@@ -173,7 +170,7 @@ export const getInitialValuesFromData = (data: AdminBrandDetail) => {
     };
   });
 
-  const sectionCount = multilingualTextList.reduce(
+  const sectionCount = languageList.reduce(
     (max: number, text) => Math.max(max, text.section?.length ?? 0),
     0,
   );
@@ -181,44 +178,45 @@ export const getInitialValuesFromData = (data: AdminBrandDetail) => {
   const sectionList =
     sectionCount > 0
       ? Array.from({ length: sectionCount }, (_, sectionIndex) => {
-          const baseSection = createEmptySection();
-          const sectionForImages = multilingualTextList.find(
-            (text) => text.section?.[sectionIndex]?.imageList.length,
-          );
-          const imageUrlList =
-            sectionForImages?.section?.[sectionIndex]?.imageList ??
-            multilingualTextList[0]?.section?.[sectionIndex]?.imageList ??
-            [];
+        const baseSection = createEmptySection();
+        const sectionForImages = languageList.find(
+          (text) => text.section?.[sectionIndex]?.imageUrlList.length,
+        );
+        const imageUrlList =
+          sectionForImages?.section?.[sectionIndex]?.imageUrlList ??
+          languageList[0]?.section?.[sectionIndex]?.imageUrlList ??
+          [];
 
-          const sectionTextList = LANGUAGE_LIST.map((language) => {
-            const section = multilingualTextList.find(
-              (text) => text.languageId === language.id,
-            )?.section?.[sectionIndex];
-
-            return {
-              languageId: language.id,
-              title: section?.title ?? "",
-              content: section?.content ?? "",
-            };
-          });
+        const sectionTextList = LANGUAGE_LIST.map((language) => {
+          const langCode = LANGUAGE_ID_TO_CODE[language.id];
+          const section = languageList.find(
+            (text) => text.languageCode === langCode,
+          )?.section?.[sectionIndex];
 
           return {
-            ...baseSection,
-            imageUrlList,
-            textList: sectionTextList,
+            languageId: language.id,
+            title: section?.title ?? "",
+            content: section?.content ?? "",
           };
-        })
+        });
+
+        return {
+          ...baseSection,
+          imageUrlList,
+          textList: sectionTextList,
+        };
+      })
       : [createEmptySection()];
 
   return {
     englishName,
     categoryId,
-    profileImageUrl: profileImage,
-    productBannerImageUrl: productBannerImage,
+    profileImageUrl,
+    productBannerImageUrl,
     textList,
     sectionList,
-    bannerImageUrlList: bannerList,
-    mobileBannerImageUrlList: mobileBannerList,
+    bannerImageUrlList,
+    mobileBannerImageUrlList,
     colorCode,
   };
 };
