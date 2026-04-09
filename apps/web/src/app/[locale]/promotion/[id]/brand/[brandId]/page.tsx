@@ -35,6 +35,7 @@ export async function generateMetadata({
     );
 
     const description = stripHtml(promotion.brand.description).slice(0, 160);
+    const ogImage = promotion.sectionList?.[0]?.imageUrlList?.[0];
 
     return {
       title: `${promotion.brand.name} | ${t("title")}`,
@@ -42,7 +43,7 @@ export async function generateMetadata({
       openGraph: {
         title: `${promotion.brand.name} | ${t("title")}`,
         description,
-        images: [{ url: promotion.sectionList[0].imageUrlList[0] }],
+        ...(ogImage && { images: [{ url: ogImage }] }),
         type: "article",
       },
     };
