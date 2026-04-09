@@ -47,7 +47,8 @@ export async function generateMetadata({
         type: "article",
       },
     };
-  } catch {
+  } catch (error) {
+    console.error("Failed to fetch brand promotion:", error);
     return {};
   }
 }
