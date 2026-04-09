@@ -1,27 +1,103 @@
-# Seoul Moment Web (AI Engineering Guide)
+# Seoul Moment Web (apps/web)
 
-메인 웹 서비스의 아키텍처 및 코딩 규약 가이드입니다.
+`@seoul-moment/web` — Next.js 15 (App Router, Turbopack) 기반 다국어 e-commerce/content 메인 서비스 (ko, en, zh-TW).
 
-## Tech Stack & Conventions
-- **Framework**: Next.js 15 (App Router)
-- **Styling**: Tailwind CSS v4 (Inline utility classes 우선 사용)
-- **State**: Zustand (Store는 `shared/model` 또는 각 feature의 `model`에 배치)
-- **API**: `shared/services`의 `fetcher` 활용. API 함수 생성 시 `swagger-gen` 스킬 우선 활용.
+## Commands
 
-## FSD Layering Rules (AI 필수 준수)
-- **app**: 전역 설정, Provider, 라우팅. (로직 최소화)
-- **views**: 페이지 단위 구성. 데이터 페칭은 가급적 여기서 시작하여 props로 전달.
-- **widgets**: 여러 페이지에서 공통으로 쓰이는 큰 단위 UI 블록.
-- **features**: 사용자 인터랙션이 포함된 기능 단위. (예: `AuthForm`, `SearchProduct`)
-- **entities**: 비즈니스 모델, 상태, 최소 단위 UI. (예: `UserCard`, `ProductItem`)
-- **shared**: 가장 하위 레이어. UI 컴포넌트(`@seoul-moment/ui`), 유틸리티, API Fetcher.
+```bash
+pnpm dev:web              # Dev server (localhost:3000), i18n 자동 동기화 후 실행
+pnpm build:web            # Production build
+pnpm lint:fix:web         # ESLint auto-fix
 
-## Coding Standards for AI
-1. **Component**: 모든 컴포넌트는 `export function` 형태를 사용하며, PascalCase를 준수합니다.
-2. **Icons**: `lucide-react` 아이콘을 우선 사용합니다.
-3. **Images**: `next/image` 사용 시 반드시 `sizes` 속성을 정의하여 최적화합니다.
-4. **Types**: 명시적인 Interface 정의를 권장하며, `any` 사용을 금지합니다.
+# Unit tests (Vitest)
+cd apps/web
+pnpm vitest run                    # 전체 테스트
+pnpm vitest run src/path/to/file   # 단일 파일
 
-## Scripts
-- `pnpm dev`: i18n 싱크를 포함한 개발 서버 실행
-- `pnpm i18n:sync`: 번역 데이터 동기화 (번역 키 누락 시 실행 제안)
+# E2E tests (Playwright)
+pnpm test:web-e2e         # Headless
+pnpm test:web-e2e:ui      # With UI
+
+# i18n
+pnpm i18n:sync            # Google Sheets에서 번역 동기화
+```
+
+## Architecture — FSD (Feature-Sliced Design)
+
+엄격한 하향식 import 계층 구조. **상위 레이어에서 import 금지.**
+
+```
+app/ → views/ → widgets/ → features/ → entities/ → shared/
+```
+
+- **app/** — Next.js App Router 라우트 (`[locale]/` prefix), providers, global config
+- **views/** — 페이지 단위 구성 (라우트당 하나)
+- **widgets/** — 재사용 블록 (Header, Footer)
+- **features/** — 사용자 인터랙션 모듈 (About, Article, Home, Inquiry, News, Product, Promotion, Search)
+- **entities/** — 도메인 모델 (Article, Brand, Lookbook, Magazine, News, Partner, Product)
+- **shared/** — Services, hooks, constants, UI re-exports
+
+### Path Aliases
+
+```
+@/*         → src/*
+@shared/*   → src/shared/*
+@entities/* → src/entities/*
+@features/* → src/features/*
+@views/*    → src/views/*
+@widgets/*  → src/widgets/*
+```
+
+## API Layer — ky
+
+**Location**: `src/shared/services/`
+
+- HTTP client: `ky` (base URL: `https://api.seoulmoment.com.tw`, 10s timeout)
+- Response type: `CommonRes<T>` (`{ result: boolean; data: T }`)
+- i18n: `languageCode` query param을 전달하면 `beforeRequest` hook이 `Accept-Language` 헤더로 자동 변환
+- Errors: 500+ HTTP 에러는 `beforeError` hook으로 Sentry 자동 리포트
+- Service 파일은 typed arrow function을 export하며 `.json<CommonRes<T>>()`로 체이닝
+
+### Query Hooks
+
+**Location**: `src/shared/lib/hooks/query/`
+
+`@tanstack/react-query` 직접 사용은 **ESLint로 금지**. 래퍼 사용 필수:
+
+| Wrapper              | Extra Option                |
+| -------------------- | --------------------------- |
+| `useAppQuery`        | `logOnError: boolean`       |
+| `useAppMutation`     | `toastOnError: string`      |
+| `useAppInfiniteQuery`| `logOnError: boolean`       |
+
+## i18n — next-intl v4
+
+- Middleware 기반 locale 감지 (`src/middleware.ts`)
+- 메시지 파일: `messages/{locale}.json`
+- Google Sheets 동기화: `scripts/syncLocaleFromSheet.js`
+- Request interface에 `PublicLanguageCode` extend로 locale 전달
+
+## State Management
+
+- **Zustand** — client state (modals via `useModal`)
+- **TanStack React Query v5** — server state (5min stale time)
+- **nuqs** — URL search params state
+- **overlay-kit** — overlay/modal 관리
+
+## Coding Standards
+
+1. **Component**: `export function` 형태, PascalCase
+2. **Icons**: `lucide-react` 전용
+3. **Images**: `next/image` 사용 시 반드시 `sizes` 속성 정의
+4. **Types**: 명시적 Interface 정의, `any` 금지
+5. **Styling**: Tailwind utility classes inline, CSS modules 사용 금지
+
+## Key Dependencies
+
+- `@sentry/nextjs` — error monitoring (`instrumentation.ts` / `instrumentation-client.ts`)
+- `react-error-boundary` — error boundaries
+- `date-fns` — date formatting
+- `es-toolkit` — utility functions
+- `react-hook-form` + `zod` — form validation
+- `sonner` — toast notifications
+- `lucide-react` — icons (exclusive)

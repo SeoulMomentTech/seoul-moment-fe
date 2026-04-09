@@ -2,7 +2,6 @@ import { Edit, Trash2 } from "lucide-react";
 
 import type {
   AdminCategory,
-  AdminCategoryName,
   CategoryId,
 } from "@shared/services/category";
 
@@ -27,11 +26,11 @@ interface CategoryTableProps {
 }
 
 const getCategoryName = (
-  nameDto: AdminCategoryName[],
+  languageList: AdminCategory["languageList"],
   languageCode: string = "ko",
 ): string => {
-  const name = nameDto.find((n) => n.languageCode === languageCode);
-  return name ? name.name : nameDto[0]?.name || "";
+  const name = languageList.find((n) => n.languageCode === languageCode);
+  return name ? name.name : languageList[0]?.name || "";
 };
 
 export function CategoryTable({
@@ -71,10 +70,10 @@ export function CategoryTable({
           categories.map((category) => (
             <TableRow key={category.id}>
               <TableCell>{category.id}</TableCell>
-              <TableCell>{getCategoryName(category.nameDto, "ko")}</TableCell>
-              <TableCell>{getCategoryName(category.nameDto, "en")}</TableCell>
+              <TableCell>{getCategoryName(category.languageList, "ko")}</TableCell>
+              <TableCell>{getCategoryName(category.languageList, "en")}</TableCell>
               <TableCell>
-                {getCategoryName(category.nameDto, "zh-TW")}
+                {getCategoryName(category.languageList, "zh-TW")}
               </TableCell>
               <TableCell>
                 <Flex gap={8}>

@@ -20,6 +20,17 @@ export function BrandOfflinePopupInfo({
   onCopy,
 }: BrandOfflinePopupInfoProps) {
   const t = useTranslations();
+  const isEndless = new Date(activeEvent.endDate ?? "").getFullYear() >= 2300;
+  const startDate = new Date(activeEvent.startDate).toLocaleDateString(
+    "ko-KR",
+    { year: "numeric", month: "2-digit", day: "2-digit" },
+  );
+  const endDate = isEndless
+    ? ""
+    : new Date(activeEvent.endDate ?? activeEvent.startDate).toLocaleDateString(
+        "ko-KR",
+        { year: "numeric", month: "2-digit", day: "2-digit" },
+      );
 
   return (
     <Flex
@@ -35,10 +46,7 @@ export function BrandOfflinePopupInfo({
 
       <VStack className="w-full" gap={isMobile ? 8 : 30}>
         <DetailRow label={t("location")} value={activeEvent.place} />
-        <DetailRow
-          label={t("date")}
-          value={`${new Date(activeEvent.startDate).toLocaleDateString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit" })} ~ ${new Date(activeEvent.endDate ?? activeEvent.startDate).toLocaleDateString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit" })}`}
-        />
+        <DetailRow label={t("date")} value={`${startDate} ~ ${endDate}`} />
         <DetailRow
           label={t("time")}
           value={`${activeEvent.startTime} ~ ${activeEvent.endTime}`}

@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/scripts/lint-fix.sh",
+            "timeout": 120,
+            "statusMessage": "Running lint fix..."
+          }
+        ]
+      }
+    ]
+  }
+}

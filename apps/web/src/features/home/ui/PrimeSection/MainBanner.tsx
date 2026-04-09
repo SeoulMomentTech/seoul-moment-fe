@@ -12,9 +12,9 @@ interface MainBannerProps {
 
 export function MainBanner({ promise }: MainBannerProps) {
   const res = use(promise);
-  const { mobileImage, image } = res.data?.banner?.[0] ?? {};
+  const { mobileImageUrl, imageUrl } = res.data?.banner?.[0] ?? {};
 
-  if (!image) return null;
+  if (!imageUrl) return null;
 
   return (
     <section
@@ -27,12 +27,12 @@ export function MainBanner({ promise }: MainBannerProps) {
       <picture>
         <source
           media="(max-width: 680px)"
-          srcSet={mobileImage}
+          srcSet={mobileImageUrl}
           type="image/webp"
         />
         <source
           media="(max-width: 680px)"
-          srcSet={mobileImage}
+          srcSet={mobileImageUrl}
           type="image/png"
         />
         <BaseImage
@@ -40,7 +40,7 @@ export function MainBanner({ promise }: MainBannerProps) {
           className="h-full object-cover object-top"
           height={600}
           priority
-          src={image}
+          src={imageUrl}
           width={4000}
         />
       </picture>

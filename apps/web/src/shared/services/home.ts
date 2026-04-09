@@ -1,12 +1,11 @@
 import type { CommonRes, PublicLanguageCode } from "./";
 import { api } from "./";
 
-interface HomeSection {
+export interface HomePromotionListItem {
+  id: number;
+  thumbnailImageUrl: string;
   title: string;
   description: string;
-  url: string;
-  urlName: string;
-  image: string[];
 }
 
 export interface HomePromotion {
@@ -17,14 +16,14 @@ export interface HomePromotion {
 }
 
 export interface GetHomeRes {
-  banner: Array<Record<"image" | "mobileImage", string>>;
+  banner: Array<Record<"imageUrl" | "mobileImageUrl", string>>;
+  promotionList: Array<HomePromotionListItem>;
   promotion: Array<HomePromotion>;
-  section: HomeSection[];
 }
 
 export const getHome = ({ languageCode }: PublicLanguageCode) =>
   api
-    .get("home", {
+    .get("home/v1", {
       searchParams: {
         languageCode,
       },

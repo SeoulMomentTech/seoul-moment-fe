@@ -37,8 +37,8 @@ export const CategorySelector = ({
         <SelectContent className="max-h-[300px] bg-white">
           {categories?.map((cat) => (
             <SelectItem key={cat.id} value={cat.id.toString()}>
-              {cat.nameDto.find((n) => n.languageCode === "ko")?.name ||
-                cat.nameDto[0]?.name}
+              {cat.languageList.find((n) => n.languageCode === "ko")?.name ||
+                cat.languageList[0]?.name}
             </SelectItem>
           ))}
         </SelectContent>

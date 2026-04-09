@@ -1,39 +1,110 @@
-# 프로젝트 개요
+# Admin App (apps/admin)
 
-- Vite 기반 React SPA
-- 언어: TypeScript
-- 라우팅: `react-router`
-- 스타일링: TailwindCSS (루트 패키지의 `@seoul-moment/tailwind-config` 활용)
-- 전역 상태: `zustand`
-- 공용 UI: `@seoul-moment/ui`
+`@seoul-moment/admin` — Vite 7 + React Router v7 SPA admin backoffice.
 
-# 프로젝트 구조
+## Commands
 
-- `src/main.tsx`: 애플리케이션 진입점
-- `src/App.tsx`: 최상위 컴포넌트, 내부에서 Router 로직만 위임
-- `src/Router.tsx`: `react-router` 설정 및 Public/Private Route 가드
-- `src/pages`: 화면 단위 컴포넌트
-- `src/shared/components`: 재사용 가능한 UI
-- `src/shared/constants`: 경로, 공통 상수
-- `src/shared/hooks`: 커스텀 훅 (zustand 스토어 등)
+```bash
+pnpm dev:admin            # Dev server (localhost:5173)
+pnpm build:admin          # Production build (tsc + vite build)
+pnpm lint:fix:admin       # ESLint auto-fix
 
-# 명령어
+# Unit tests (Vitest)
+cd apps/admin
+pnpm vitest run                    # 전체 테스트
+pnpm vitest run src/path/to/file   # 단일 파일
 
-- `pnpm run dev`: 개발 서버 실행
-- `pnpm run build`: 타입체크 + 프로덕션 번들 생성
-- `pnpm run preview`: build 산출물 미리보기
-- `pnpm run lint`: ESLint 검사
+# E2E tests (Playwright)
+pnpm test:admin-e2e       # Headless
+pnpm test:admin-e2e:ui    # With UI
+```
 
-# 코딩 스타일 및 가이드
+## Architecture
 
-- eslint 설정(`apps/admin/eslint.config.mjs`)을 준수하고, 미사용 코드/콘솔은 제거합니다.
-- 컴포넌트 파일은 PascalCase, 폴더는 kebab-case 또는 기존 구조와 일관되게 유지합니다.
-- 라우트 정의는 `src/shared/constants/route.ts`에서 관리하며 Router에서는 import만 사용합니다.
-- 공용 UI는 `@seoul-moment/ui` 컴포넌트를 우선 사용하고, Tailwind 유틸 클래스를 보조로 사용합니다.
-- Zustand 스토어는 `src/shared/hooks` 아래에 정의하고 필요한 곳에서만 import 하여 사용합니다.
-- 매직 넘버/문자열은 `src/shared/constants`에 상수로 분리해 재사용합니다.
+전통적 page-based SPA 구조 (FSD 아님).
 
-# 추가 안내
+```
+src/
+  pages/          # 18개 페이지 모듈 (User, Product, Article, News, Brand, etc.)
+  shared/
+    services/     # API layer (Axios)
+    hooks/        # useAppQuery, useAppMutation, useAuth
+  Router.tsx      # PublicRoute / PrivateRoute guards
+  App.tsx         # Root component
+  main.tsx        # Entry point
+  types/          # Shared type definitions
+```
 
-- Public/Private Route 가드 로직은 `Router.tsx`에 작성되어 있으므로 인증 흐름 변경 시 해당 파일을 수정합니다.
-- UI 변경 시 디자인 시스템(`@seoul-moment/ui`)과 Tailwind 토큰을 우선 참고하여 일관성을 유지합니다.
+### Path Aliases
+
+```
+@/*        → src/*
+@shared/*  → src/shared/*
+@pages/*   → src/pages/*
+```
+
+## Routing & Auth
+
+- **React Router v7**: `PublicRoute` (Login, SignUp) / `PrivateRoute` guards
+- Auth state: `useAuthStore` (Zustand + localStorage persistence)
+- 401: interceptor로 자동 토큰 갱신; 403: 강제 로그아웃
+
+## API Layer — Axios
+
+**Location**: `src/shared/services/`
+
+- HTTP client: Axios (base: `VITE_ADMIN_API_BASE_URL`, 10s timeout)
+- Response type: `ApiResponse<T>` (`{ result: boolean; data: T }`)
+- `fetcher` object 사용 (`fetcher.get`, `fetcher.post`, etc.) — `res.data` 자동 unwrap
+- **Branded types**으로 type-safe ID: `Branded<number, "AdminArticleId">`
+
+### Token Refresh Flow
+
+1. **401** 발생: `refreshToken`으로 `/admin/auth/one-time-token` 호출
+2. 동시 401은 단일 refresh 요청 공유 (promise queue dedup)
+3. 성공 시: `accessToken` 갱신 후 원본 요청 재시도
+4. 재시도 후 2번째 401: 강제 로그아웃
+5. **403**: 즉시 강제 로그아웃
+
+### Query Hooks
+
+**Location**: `src/shared/hooks/`
+
+`@tanstack/react-query` 직접 사용은 **ESLint로 금지**. 래퍼 사용 필수:
+
+| Wrapper          | Extra Option                          |
+| ---------------- | ------------------------------------- |
+| `useAppQuery`    | `toastOnError: boolean \| string`     |
+| `useAppMutation` | `toastOnError: boolean \| string`     |
+
+## Coding Standards
+
+- 컴포넌트 파일은 PascalCase, 폴더는 kebab-case 또는 기존 구조와 일관 유지
+- 라우트 정의는 `src/shared/constants/route.ts`에서 관리
+- `@seoul-moment/ui` 컴포넌트 우선 사용, Tailwind utility classes 보조
+- Zustand 스토어는 `src/shared/hooks` 하위에 정의
+- 매직 넘버/문자열은 `src/shared/constants`에 상수로 분리
+
+## Key Dependencies
+
+- `react-hook-form` + `zod` — form validation (legacy `formik` 사용도 존재)
+- `sonner` — toast notifications
+- `zustand` — client state (auth store + localStorage)
+- `@tanstack/react-query` — server state (`useAppQuery`/`useAppMutation` 래퍼 경유)
+- `lucide-react` — icons (exclusive)
+- `es-toolkit` — utility functions
+- `react-error-boundary` — error boundaries
+
+## Environment Variables
+
+Vite `import.meta.env.VITE_*`:
+
+- `VITE_ADMIN_API_BASE_URL` — Admin API base URL
+- `VITE_API_BASE_URL` — Public API base URL
+
+## TypeScript
+
+공유 설정 외 추가 strict 옵션:
+- `noUnusedLocals: true`
+- `noUnusedParameters: true`
+- `erasableSyntaxOnly: true`
