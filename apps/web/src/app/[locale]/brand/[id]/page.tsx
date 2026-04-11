@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
+import { reportMetadataError } from "@shared/lib/utils/log/report-metadata-error";
 import { getBrandDetail } from "@shared/services/brand";
 
 import type { LanguageType } from "@/i18n/const";
@@ -40,7 +41,8 @@ export async function generateMetadata({
         images: brand.bannerList?.[0] ? [{ url: brand.bannerList[0] }] : [],
       },
     };
-  } catch {
+  } catch (error) {
+    reportMetadataError("fetch-brand-detail", error, { brandId });
     return {};
   }
 }

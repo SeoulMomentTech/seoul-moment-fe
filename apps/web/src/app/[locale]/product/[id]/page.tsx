@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
+import { reportMetadataError } from "@shared/lib/utils/log/report-metadata-error";
 import { getProductDetail } from "@shared/services/product";
 
 import type { LanguageType } from "@/i18n/const";
@@ -39,7 +40,7 @@ export async function generateMetadata({
       },
     };
   } catch (error) {
-    console.error("Failed to fetch product details:", error);
+    reportMetadataError("fetch-product-detail", error, { productId });
     return {};
   }
 }
