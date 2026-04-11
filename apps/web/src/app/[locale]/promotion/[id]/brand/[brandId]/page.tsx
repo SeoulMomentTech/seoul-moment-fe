@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
 import { isValidId, stripHtml } from "@shared/lib/utils";
+import { reportMetadataError } from "@shared/lib/utils/log/report-metadata-error";
 import { getBrandPromotionDetail } from "@shared/services/brandPromotion";
 import PromotionPage from "@views/promotion/ui/PromotionPage";
 
@@ -48,7 +49,10 @@ export async function generateMetadata({
       },
     };
   } catch (error) {
-    console.error("Failed to fetch brand promotion:", error);
+    reportMetadataError("fetch-brand-promotion-detail", error, {
+      promotionId,
+      brandId: parsedBrandId,
+    });
     return {};
   }
 }
