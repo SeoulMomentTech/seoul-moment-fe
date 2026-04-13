@@ -37,12 +37,13 @@ export async function generateMetadata({
 
     const description = stripHtml(promotion.brand.description).slice(0, 160);
     const ogImage = promotion.sectionList?.[0]?.imageUrlList?.[0];
+    const title = `${t("seo_brand_promotion_title", { Brand: promotion.brand.name })}`;
 
     return {
-      title: `${promotion.brand.name} | ${t("title")}`,
+      title,
       description,
       openGraph: {
-        title: `${promotion.brand.name} | ${t("title")}`,
+        title,
         description,
         ...(ogImage && { images: [{ url: ogImage }] }),
         type: "article",

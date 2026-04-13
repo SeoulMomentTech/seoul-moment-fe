@@ -97,5 +97,6 @@
   "shop": "Shop",
   "offline_popup_event": "Offline & Pop-up Events",
   "promotion_brand_notice": " *Maximum discounts on promotional items may vary depending on stock availability and conditions.*",
-  "promotion_special_event": " Brand Products"
+  "promotion_special_event": " Brand Products",
+  "seo_brand_promotion_title": "{Brand} Promotion | Seoul Moment"
 }
