@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
 import { isValidId, stripHtml } from "@shared/lib/utils";
+import { reportMetadataError } from "@shared/lib/utils/log/report-metadata-error";
 import { getBrandPromotionDetail } from "@shared/services/brandPromotion";
 import PromotionPage from "@views/promotion/ui/PromotionPage";
 
@@ -36,19 +37,23 @@ export async function generateMetadata({
 
     const description = stripHtml(promotion.brand.description).slice(0, 160);
     const ogImage = promotion.sectionList?.[0]?.imageUrlList?.[0];
+    const title = `${t("seo_brand_promotion_title", { Brand: promotion.brand.name })}`;
 
     return {
-      title: `${promotion.brand.name} | ${t("title")}`,
+      title,
       description,
       openGraph: {
-        title: `${promotion.brand.name} | ${t("title")}`,
+        title,
         description,
         ...(ogImage && { images: [{ url: ogImage }] }),
         type: "article",
       },
     };
   } catch (error) {
-    console.error("Failed to fetch brand promotion:", error);
+    reportMetadataError("fetch-brand-promotion-detail", error, {
+      promotionId,
+      brandId: parsedBrandId,
+    });
     return {};
   }
 }

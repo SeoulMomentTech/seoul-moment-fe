@@ -6,6 +6,7 @@ import { getTranslations } from "next-intl/server";
 
 import { BASE_URL } from "@shared/constants/env";
 import { stripHtml } from "@shared/lib/utils";
+import { reportMetadataError } from "@shared/lib/utils/log/report-metadata-error";
 import { getArticleDetail } from "@shared/services/article";
 import { StructuredDataScript } from "@shared/ui/structured-data-script";
 
@@ -44,7 +45,8 @@ export async function generateMetadata({
         type: "article",
       },
     };
-  } catch {
+  } catch (error) {
+    reportMetadataError("fetch-article-detail", error, { articleId });
     return {};
   }
 }
