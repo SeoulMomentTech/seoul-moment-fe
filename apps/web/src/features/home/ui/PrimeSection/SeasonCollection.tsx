@@ -28,8 +28,8 @@ export function SeasonCollection({ promise }: SeasonCollectionProps) {
   return (
     <section
       className={cn(
-        "w-7xl mx-auto flex justify-between py-[140px]",
-        "max-sm:w-auto max-sm:flex-col-reverse max-sm:gap-10 max-sm:px-5 max-sm:py-[90px]",
+        "w-7xl mx-auto flex justify-between pt-[100px]",
+        "max-sm:w-auto max-sm:flex-col-reverse max-sm:gap-10 max-sm:px-5 max-sm:pt-[90px]",
       )}
     >
       <div
