@@ -25,7 +25,7 @@ export function Article({ promise }: ArticleProps) {
 
   return (
     <SectionWithLabel
-      className="w-7xl pt-[100px] max-sm:w-full max-sm:px-5"
+      className="w-7xl pt-[100px] max-sm:w-full max-sm:px-5 max-sm:py-[50px]"
       label={
         <div
           className={cn(

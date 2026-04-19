@@ -25,7 +25,7 @@ export function NowOnSale({ promise }: NowOnSaleProps) {
 
   return (
     <SectionWithLabel
-      className={cn("w-7xl pt-[100px]", "max-sm:w-full max-sm:pt-[50px]")}
+      className={cn("w-7xl pt-[100px]", "max-sm:w-full max-sm:pt-[90px]")}
       label={
         <div
           className={cn(
