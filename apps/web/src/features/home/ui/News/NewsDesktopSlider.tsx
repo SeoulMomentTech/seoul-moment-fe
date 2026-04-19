@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useRef } from "react";
+import { useId, useRef, useState } from "react";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -26,12 +26,22 @@ export function NewsDesktopSlider({ data }: NewsDesktopSliderProps) {
   const id = useId();
   const swiperRef = useRef<SwiperRef>(null);
   const pages = chunk(data, 3);
+  const [isBeginning, setIsBeginning] = useState(true);
+  const [isEnd, setIsEnd] = useState(pages.length <= 1);
 
   return (
     <div className="group relative max-sm:hidden">
       <Swiper
         className="overflow-hidden! w-full"
         modules={[Navigation]}
+        onSlideChange={(swiper) => {
+          setIsBeginning(swiper.isBeginning);
+          setIsEnd(swiper.isEnd);
+        }}
+        onSwiper={(swiper) => {
+          setIsBeginning(swiper.isBeginning);
+          setIsEnd(swiper.isEnd);
+        }}
         ref={swiperRef}
         slidesPerView={1}
         spaceBetween={40}
@@ -81,7 +91,9 @@ export function NewsDesktopSlider({ data }: NewsDesktopSliderProps) {
           "flex h-8 w-8 items-center justify-center rounded-full border border-black/20 bg-white",
           "shadow-[0_0_4px_rgba(0,0,0,0.16)] transition-opacity",
           "hover:bg-gray-50",
+          "disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-white",
         )}
+        disabled={isBeginning}
         onClick={() => swiperRef.current?.swiper.slidePrev()}
         type="button"
       >
@@ -94,7 +106,9 @@ export function NewsDesktopSlider({ data }: NewsDesktopSliderProps) {
           "flex h-8 w-8 items-center justify-center rounded-full border border-black/20 bg-white",
           "shadow-[0_0_4px_rgba(0,0,0,0.16)] transition-opacity",
           "hover:bg-gray-50",
+          "disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-white",
         )}
+        disabled={isEnd}
         onClick={() => swiperRef.current?.swiper.slideNext()}
         type="button"
       >
