@@ -6,14 +6,14 @@ import { NewspaperIcon } from "lucide-react";
 
 import { useTranslations } from "next-intl";
 
-import { FeaturedMainNewsCard, FeaturedSubNewsCard } from "@entities/news/ui";
 import { cn } from "@shared/lib/style";
 import type { getNewsList, News } from "@shared/services/news";
 
-import { Link } from "@/i18n/navigation";
-
 import { Empty } from "@widgets/empty";
 import { SectionWithLabel } from "@widgets/section-with-label";
+
+import { NewsDesktopSlider } from "./NewsDesktopSlider";
+import { NewsMobileSlider } from "./NewsMobileSlider";
 
 interface NewsProps {
   promise: ReturnType<typeof getNewsList>;
@@ -69,41 +69,9 @@ export function NewsContents({ data }: NewsContentsProps) {
   }
 
   return (
-    <div className={cn("flex gap-[40px]", "max-sm:w-full max-sm:flex-col")}>
-      {data.map((news, idx) => {
-        if (idx === 0) {
-          return (
-            <Link href={`/news/${news.id}`} key={`main-${news.id}`}>
-              <FeaturedMainNewsCard
-                author={news.writer}
-                date={news.createDate}
-                imageUrl={news.homeImage}
-                subTitle={news.content}
-                title={news.title}
-              />
-            </Link>
-          );
-        }
-
-        return (
-          <div
-            className={cn(idx === 1 && "flex justify-start max-sm:justify-end")}
-            key={`sub-${news.id}`}
-          >
-            <Link href={`/news/${news.id}`}>
-              <FeaturedSubNewsCard
-                author={news.writer}
-                date={news.createDate}
-                imageUrl={news.homeImage}
-                subTitle={news.content}
-                title={news.title}
-              />
-            </Link>
-          </div>
-        );
-      })}
-    </div>
+    <>
+      <NewsDesktopSlider data={data} />
+      <NewsMobileSlider data={data} />
+    </>
   );
 }
-
-// Removed leftover console.log(data); statement for cleaner production code

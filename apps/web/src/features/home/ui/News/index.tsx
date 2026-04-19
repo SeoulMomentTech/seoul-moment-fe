@@ -14,7 +14,7 @@ import { News as NewsClient } from "./News.client";
 
 export default async function News() {
   const locale = (await getLocale()) as LanguageType;
-  const promise = getNewsList({ count: 3, languageCode: locale });
+  const promise = getNewsList({ count: 9, languageCode: locale });
 
   return (
     <Suspense fallback={<NewsSkeleton />}>
