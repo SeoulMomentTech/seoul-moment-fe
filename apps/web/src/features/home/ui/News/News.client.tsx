@@ -24,7 +24,7 @@ export function News({ promise }: NewsProps) {
 
   return (
     <SectionWithLabel
-      className={cn("w-[1280px] py-[100px]", "max-sm:w-full max-sm:py-[50px]")}
+      className={cn("w-[1280px] pt-[100px]", "max-sm:w-full max-sm:pt-[50px]")}
       label={
         <div
           className={cn(

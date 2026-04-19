@@ -20,7 +20,7 @@ export function MainBanner({ promise }: MainBannerProps) {
     <section
       className={cn(
         "flex justify-center",
-        "min-w-7xl h-[600px] pt-14",
+        "min-w-7xl mx-auto h-[600px] max-w-7xl pt-14",
         "max-sm:h-[350px] max-sm:min-w-full",
       )}
     >
@@ -41,7 +41,7 @@ export function MainBanner({ promise }: MainBannerProps) {
           height={600}
           priority
           src={imageUrl}
-          width={4000}
+          width={1280}
         />
       </picture>
     </section>
