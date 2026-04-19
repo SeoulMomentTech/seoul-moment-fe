@@ -31,7 +31,7 @@ export default async function NowOnSale() {
 function NowOnSaleSkeleton() {
   return (
     <SectionWithLabel
-      className={cn("w-7xl py-[100px]", "max-sm:w-full max-sm:py-[50px]")}
+      className={cn("w-7xl pt-[100px]", "max-sm:w-full max-sm:pt-[50px]")}
       label={
         <div
           className={cn(

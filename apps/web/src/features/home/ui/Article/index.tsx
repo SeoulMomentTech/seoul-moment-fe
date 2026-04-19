@@ -10,7 +10,7 @@ import { Article as ArticleClient, ArticleSkeleton } from "./Article.client";
 
 export default async function Article() {
   const locale = (await getLocale()) as LanguageType;
-  const promise = getArticleList({ count: 3, languageCode: locale });
+  const promise = getArticleList({ count: 9, languageCode: locale });
 
   return (
     <Suspense fallback={<ArticleSkeleton />}>

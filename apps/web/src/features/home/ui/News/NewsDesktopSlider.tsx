@@ -1,35 +1,36 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
+import { chunk } from "es-toolkit";
 import { Navigation } from "swiper/modules";
 import type { SwiperRef } from "swiper/react";
 import { Swiper, SwiperSlide } from "swiper/react";
 
+import { FeaturedMainNewsCard, FeaturedSubNewsCard } from "@entities/news/ui";
 import { cn } from "@shared/lib/style";
-import type { Article } from "@shared/services/article";
+import type { News } from "@shared/services/news";
 
 import { Link } from "@/i18n/navigation";
-
-import { ArticleCard } from "@entities/article";
 
 import "swiper/css";
 import "swiper/css/navigation";
 
-interface ArticleListProps {
-  className?: string;
-  data: Article[];
+interface NewsDesktopSliderProps {
+  data: News[];
 }
 
-export default function ArticleList({ className, data }: ArticleListProps) {
+export function NewsDesktopSlider({ data }: NewsDesktopSliderProps) {
+  const id = useId();
   const swiperRef = useRef<SwiperRef>(null);
+  const pages = chunk(data, 3);
   const [isBeginning, setIsBeginning] = useState(true);
-  const [isEnd, setIsEnd] = useState(data.length <= 3);
+  const [isEnd, setIsEnd] = useState(pages.length <= 1);
 
   return (
-    <div className={cn("group relative max-sm:hidden", className)}>
+    <div className="group relative max-sm:hidden">
       <Swiper
         className="overflow-hidden! w-full"
         modules={[Navigation]}
@@ -42,31 +43,51 @@ export default function ArticleList({ className, data }: ArticleListProps) {
           setIsEnd(swiper.isEnd);
         }}
         ref={swiperRef}
-        slidesPerGroup={3}
-        slidesPerView={3}
-        spaceBetween={30}
+        slidesPerView={1}
+        spaceBetween={40}
         watchOverflow
       >
-        {data.map((article) => (
-          <SwiperSlide key={article.id}>
-            <Link href={`/article/${article.id}`}>
-              <ArticleCard
-                author={article.writer}
-                className="w-[407px] flex-none"
-                date={article.createDate}
-                imageUrl={article.homeImage}
-                subTitle={article.content}
-                title={article.title}
-              />
-            </Link>
-          </SwiperSlide>
-        ))}
+        {pages.map((page) => {
+          const [main, ...subs] = page;
+          const pageKey = page.map((news) => news.id).join("-");
+
+          return (
+            <SwiperSlide key={`news-page-${pageKey}-${id}`}>
+              <div className="flex gap-[40px]">
+                {main && (
+                  <Link href={`/news/${main.id}`}>
+                    <FeaturedMainNewsCard
+                      author={main.writer}
+                      date={main.createDate}
+                      imageUrl={main.homeImage}
+                      subTitle={main.content}
+                      title={main.title}
+                    />
+                  </Link>
+                )}
+                {subs.map((news) => (
+                  <div className="flex justify-start" key={`sub-${news.id}`}>
+                    <Link href={`/news/${news.id}`}>
+                      <FeaturedSubNewsCard
+                        author={news.writer}
+                        date={news.createDate}
+                        imageUrl={news.homeImage}
+                        subTitle={news.content}
+                        title={news.title}
+                      />
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            </SwiperSlide>
+          );
+        })}
       </Swiper>
 
       <button
         aria-label="Previous slide"
         className={cn(
-          "absolute left-[10px] top-[250px] z-10 -translate-y-1/2",
+          "absolute left-[10px] top-[298px] z-10 -translate-y-1/2",
           "flex h-8 w-8 items-center justify-center rounded-full border border-black/20 bg-white",
           "shadow-[0_0_4px_rgba(0,0,0,0.16)] transition-opacity",
           "hover:bg-gray-50",
@@ -81,7 +102,7 @@ export default function ArticleList({ className, data }: ArticleListProps) {
       <button
         aria-label="Next slide"
         className={cn(
-          "absolute right-[10px] top-[250px] z-10 -translate-y-1/2",
+          "absolute right-[10px] top-[298px] z-10 -translate-y-1/2",
           "flex h-8 w-8 items-center justify-center rounded-full border border-black/20 bg-white",
           "shadow-[0_0_4px_rgba(0,0,0,0.16)] transition-opacity",
           "hover:bg-gray-50",
