@@ -379,6 +379,63 @@ export interface PatchAdminBrandPromotionEventCouponRequest {
   status: "NORMAL" | "DELETE";
 }
 
+export interface PatchAdminBrandPromotionBannerDto {
+  imageUrl: string;
+  mobileImageUrl: string;
+  linkUrl: string;
+  language: AdminBrandPromotionBannerLanguageDto[];
+}
+
+export interface PatchAdminBrandPromotionSectionDto {
+  type: "TYPE_1" | "TYPE_2" | "TYPE_3" | "TYPE_4" | "TYPE_5";
+  imageUrlList: string[];
+}
+
+export interface PatchAdminBrandPromotionPopupDto {
+  place: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  startDate: string;
+  startTime: string;
+  endDate?: string;
+  endTime: string;
+  isActive: boolean;
+  language: GetAdminBrandPromotionPopupLanguageDto[];
+  imageUrlList: string[];
+}
+
+export interface PatchAdminBrandPromotionNoticeDto {
+  language: GetAdminBrandPromotionNoticeLanguageDto[];
+}
+
+export interface PatchAdminBrandPromotionEventDto {
+  status: "NORMAL" | "DELETE";
+  language: GetAdminBrandPromotionEventLanguageDto[];
+}
+
+export interface PatchAdminBrandPromotionEventCouponDto {
+  imageUrl: string;
+  language: GetAdminBrandPromotionEventCouponLanguageDto[];
+}
+
+export interface PatchAdminBrandPromotionEventAndCouponDto {
+  event: PatchAdminBrandPromotionEventDto;
+  coupon: PatchAdminBrandPromotionEventCouponDto[];
+}
+
+export interface PatchAdminBrandPromotionRequest {
+  promotionId: number;
+  brandId: number;
+  brandDescriptionLanguage: GetAdminBrandPromotionLanguageDto[];
+  isActive: boolean;
+  bannerList: PatchAdminBrandPromotionBannerDto[];
+  sectionList: PatchAdminBrandPromotionSectionDto[];
+  popupList: PatchAdminBrandPromotionPopupDto[];
+  noticeList?: PatchAdminBrandPromotionNoticeDto[];
+  eventAndCouponList?: PatchAdminBrandPromotionEventAndCouponDto[];
+}
+
 /**
  * @description 브랜드 프로모션 등록
  */
@@ -408,6 +465,19 @@ export const getBrandPromotionList = (params?: {
 export const getBrandPromotionDetail = (id: number) => {
   return fetcher.get<ApiResponse<GetAdminBrandPromotionDetailResponse>>(
     `/admin/brand/promotion/${id}`,
+  );
+};
+
+/**
+ * @description 브랜드 프로모션 수정
+ */
+export const updateBrandPromotion = (
+  id: number,
+  payload: PatchAdminBrandPromotionRequest,
+) => {
+  return fetcher.patch<ApiResponse<void>>(
+    `/admin/brand/promotion/${id}`,
+    payload,
   );
 };
 

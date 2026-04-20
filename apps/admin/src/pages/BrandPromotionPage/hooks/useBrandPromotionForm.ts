@@ -1,7 +1,10 @@
 import { useState } from "react";
 
 import { LANGUAGE_LIST } from "@shared/constants/locale";
-import type { PostAdminBrandPromotionRequest } from "@shared/services/brandPromotion";
+import type {
+  PatchAdminBrandPromotionRequest,
+  PostAdminBrandPromotionRequest,
+} from "@shared/services/brandPromotion";
 import { stripImageDomain } from "@shared/utils/image";
 
 import { EMPTY_VALUES } from "../constants/form";
@@ -10,6 +13,7 @@ import type {
   BrandPromotionFormInitialState,
   BrandPromotionFormValues,
   EventFormValue,
+  LanguageCode,
   NoticeFormValue,
   PopupFormValue,
   SectionFormValue,
@@ -26,6 +30,13 @@ import {
 } from "../utils/validation";
 
 type TabId = "basic" | "banner" | "section" | "popup" | "notice" | "event";
+
+type ApiLanguageCode = "ko" | "en" | "zh-TW";
+
+function toApiLanguageCode(code: LanguageCode): ApiLanguageCode {
+  if (code === "zh") return "zh-TW";
+  return code;
+}
 
 interface UseBrandPromotionFormOptions {
   initialState?: BrandPromotionFormInitialState;
@@ -55,14 +66,10 @@ export function useBrandPromotionForm({
       : [createEmptyPopup()]),
   ]);
   const [notices, setNotices] = useState<NoticeFormValue[]>([
-    ...(initialState?.notices?.length
-      ? initialState.notices
-      : []),
+    ...(initialState?.notices?.length ? initialState.notices : []),
   ]);
   const [events, setEvents] = useState<EventFormValue[]>([
-    ...(initialState?.events?.length
-      ? initialState.events
-      : []),
+    ...(initialState?.events?.length ? initialState.events : []),
   ]);
 
   const errors = getBrandPromotionFormErrors({
@@ -164,10 +171,102 @@ export function useBrandPromotionForm({
     };
   };
 
+  const createPatchPayload = (): PatchAdminBrandPromotionRequest | null => {
+    if (!values.brandId || !values.promotionId) {
+      return null;
+    }
+
+    return {
+      promotionId: values.promotionId,
+      brandId: values.brandId,
+      brandDescriptionLanguage: LANGUAGE_LIST.map((language) => {
+        const code = getLanguageCode(language.code);
+        return {
+          languageCode: toApiLanguageCode(code),
+          description: values.descriptions[code] ?? "",
+        };
+      }),
+      isActive: values.isActive,
+      bannerList: banners.map((banner) => ({
+        imageUrl: banner.imagePath,
+        mobileImageUrl: banner.mobileImagePath,
+        linkUrl: banner.linkUrl,
+        language: LANGUAGE_LIST.map((language) => {
+          const code = getLanguageCode(language.code);
+          return {
+            languageCode: toApiLanguageCode(code),
+            title: banner.titles[code] ?? "",
+          };
+        }),
+      })),
+      sectionList: sections.map((section) => ({
+        type: section.type,
+        imageUrlList: section.imagePathList,
+      })),
+      popupList: popups.map((popup) => ({
+        place: popup.place,
+        address: popup.address,
+        latitude: Number(popup.latitude) || 0,
+        longitude: Number(popup.longitude) || 0,
+        startDate: popup.startDate,
+        startTime: popup.startTime,
+        endDate: popup.endDate || undefined,
+        endTime: popup.endTime,
+        isActive: popup.isActive,
+        imageUrlList: popup.imagePathList.filter(Boolean),
+        language: LANGUAGE_LIST.map((language) => {
+          const code = getLanguageCode(language.code);
+          return {
+            languageCode: toApiLanguageCode(code),
+            title: popup.content[code].title,
+            description: popup.content[code].description,
+          };
+        }),
+      })),
+      ...(notices.length > 0 && {
+        noticeList: notices.map((notice) => ({
+          language: LANGUAGE_LIST.map((language) => {
+            const code = getLanguageCode(language.code);
+            return {
+              languageCode: toApiLanguageCode(code),
+              content: notice.content[code] ?? "",
+            };
+          }),
+        })),
+      }),
+      ...(events.length > 0 && {
+        eventAndCouponList: events.map((event) => ({
+          event: {
+            status: event.status,
+            language: LANGUAGE_LIST.map((language) => {
+              const code = getLanguageCode(language.code);
+              return {
+                languageCode: toApiLanguageCode(code),
+                title: event.titles[code] ?? "",
+              };
+            }),
+          },
+          coupon: event.coupons.map((coupon) => ({
+            imageUrl: coupon.imagePath,
+            language: LANGUAGE_LIST.map((language) => {
+              const code = getLanguageCode(language.code);
+              return {
+                languageCode: toApiLanguageCode(code),
+                title: coupon.content[code].title,
+                description: coupon.content[code].description,
+              };
+            }),
+          })),
+        })),
+      }),
+    };
+  };
+
   return {
     activeTab,
     banners,
     createPayload,
+    createPatchPayload,
     errors,
     events,
     isSubmitEnabled,
