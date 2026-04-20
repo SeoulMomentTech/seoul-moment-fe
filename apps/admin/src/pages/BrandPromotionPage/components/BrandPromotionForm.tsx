@@ -5,7 +5,10 @@ import { ArrowLeft } from "lucide-react";
 import { useAdminBrandListQuery } from "@pages/BrandPage/ListPage/hooks";
 import { useAdminPromotionListQuery } from "@pages/PromotionPage/hooks";
 import { PATH } from "@shared/constants/route";
-import type { PostAdminBrandPromotionRequest } from "@shared/services/brandPromotion";
+import type {
+  PatchAdminBrandPromotionRequest,
+  PostAdminBrandPromotionRequest,
+} from "@shared/services/brandPromotion";
 
 import { Button } from "@seoul-moment/ui";
 
@@ -13,13 +16,18 @@ import { BrandPromotionFormContent } from "./BrandPromotionFormContent";
 import { TAB_ITEMS } from "../constants/form";
 import type { BrandPromotionFormState } from "../hooks/useBrandPromotionForm";
 
+type BrandPromotionFormSubmitPayload =
+  | PostAdminBrandPromotionRequest
+  | PatchAdminBrandPromotionRequest;
+
 interface BrandPromotionFormProps {
   title: string;
   description: string;
   submitLabel: string;
   form: BrandPromotionFormState;
   isLoading?: boolean;
-  onSubmit?(payload: PostAdminBrandPromotionRequest): Promise<void> | void;
+  payloadMode?: "create" | "patch";
+  onSubmit?(payload: BrandPromotionFormSubmitPayload): Promise<void> | void;
 }
 
 export function BrandPromotionForm({
@@ -28,6 +36,7 @@ export function BrandPromotionForm({
   submitLabel,
   form,
   isLoading = false,
+  payloadMode = "create",
   onSubmit,
 }: BrandPromotionFormProps) {
   const navigate = useNavigate();
@@ -69,7 +78,10 @@ export function BrandPromotionForm({
       return;
     }
 
-    const payload = form.createPayload();
+    const payload =
+      payloadMode === "patch"
+        ? form.createPatchPayload()
+        : form.createPayload();
 
     if (!onSubmit || !payload) {
       return;
