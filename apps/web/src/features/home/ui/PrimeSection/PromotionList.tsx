@@ -34,7 +34,7 @@ export function PromotionList({ promise }: PromotionListProps) {
   if (isEmpty) return null;
 
   return (
-    <section className="w-7xl mx-auto overflow-hidden bg-white py-[140px] max-sm:w-auto max-sm:py-[50px]">
+    <section className="w-7xl mx-auto overflow-hidden bg-white pt-[140px] max-sm:w-auto max-sm:pt-[50px]">
       <div className="w-7xl relative mx-auto max-sm:w-full">
         <div className="group relative max-sm:px-5">
           <Swiper
