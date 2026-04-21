@@ -38,7 +38,7 @@ export default async function Promotion({
   const brand = res.data.list[0];
 
   redirect({
-    href: `/promotion/${id}/brand/${brand.brandId}`,
+    href: `/promotion/${id}/brand/${brand.id}`,
     locale: locale as LanguageType,
   });
 }

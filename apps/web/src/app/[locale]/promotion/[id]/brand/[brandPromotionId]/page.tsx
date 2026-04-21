@@ -6,32 +6,32 @@ import { getTranslations } from "next-intl/server";
 
 import { isValidId, stripHtml } from "@shared/lib/utils";
 import { reportMetadataError } from "@shared/lib/utils/log/report-metadata-error";
-import { getBrandPromotionDetail } from "@shared/services/brandPromotion";
+import { getBrandPromotionDetailV1 } from "@shared/services/brandPromotion";
 import PromotionPage from "@views/promotion/ui/PromotionPage";
 
 import type { LanguageType } from "@/i18n/const";
 import type { PageParams } from "@/types";
 
 const fetchBrandPromotion = cache((id: number, languageCode: LanguageType) => {
-  return getBrandPromotionDetail(id, languageCode);
+  return getBrandPromotionDetailV1(id, languageCode);
 });
 
 export async function generateMetadata({
   params,
-}: PageParams<{ id: string; brandId: string }>): Promise<Metadata> {
-  const { id, brandId, locale } = await params;
+}: PageParams<{ id: string; brandPromotionId: string }>): Promise<Metadata> {
+  const { id, brandPromotionId, locale } = await params;
   const promotionId = Number(id);
-  const parsedBrandId = Number(brandId);
+  const parsedBrandPromotionId = Number(brandPromotionId);
 
   const t = await getTranslations();
 
-  if (!isValidId(parsedBrandId) || !isValidId(promotionId)) {
+  if (!isValidId(parsedBrandPromotionId) || !isValidId(promotionId)) {
     return {};
   }
 
   try {
     const { data: promotion } = await fetchBrandPromotion(
-      parsedBrandId,
+      parsedBrandPromotionId,
       locale,
     );
 
@@ -52,7 +52,7 @@ export async function generateMetadata({
   } catch (error) {
     reportMetadataError("fetch-brand-promotion-detail", error, {
       promotionId,
-      brandId: parsedBrandId,
+      brandPromotionId: parsedBrandPromotionId,
     });
     return {};
   }
@@ -60,10 +60,10 @@ export async function generateMetadata({
 
 export default async function PromotionBrand({
   params,
-}: PageParams<{ id: string; brandId: string }>) {
-  const { id, brandId, locale } = await params;
+}: PageParams<{ id: string; brandPromotionId: string }>) {
+  const { id, brandPromotionId, locale } = await params;
   const promotionId = Number(id);
-  const parsedBrandId = Number(brandId);
+  const parsedBrandId = Number(brandPromotionId);
 
   if (!isValidId(parsedBrandId) || !isValidId(promotionId)) {
     notFound();
@@ -86,7 +86,7 @@ export default async function PromotionBrand({
 
   return (
     <PromotionPage
-      brandId={parsedBrandId}
+      brandPromotionId={parsedBrandId}
       promise={promise}
       promotionId={promotionId}
     />
