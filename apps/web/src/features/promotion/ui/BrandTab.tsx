@@ -37,7 +37,7 @@ export function BrandTab({ promotionId, selectedId }: BrandTabProps) {
           gap={isMobile ? 20 : 50}
         >
           {data.list.map((brand) => {
-            const isActive = brand.brandId === selectedId;
+            const isActive = brand.id === selectedId;
             return (
               <button
                 className={cn(
@@ -46,9 +46,7 @@ export function BrandTab({ promotionId, selectedId }: BrandTabProps) {
                 )}
                 key={brand.id}
                 onClick={() =>
-                  navigate.push(
-                    `/promotion/${promotionId}/brand/${brand.brandId}`,
-                  )
+                  navigate.push(`/promotion/${promotionId}/brand/${brand.id}`)
                 }
                 type="button"
               >

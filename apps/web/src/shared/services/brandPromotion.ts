@@ -169,14 +169,14 @@ export const getBrandPromotionListById = (id: number) =>
     .json<CommonRes<GetBrandPromotionBrandListResponse>>();
 
 /**
- * @description 브랜드 프로모션 상세 조회
+ * @description 브랜드 프로모션 상세 조회 V1
  */
-export const getBrandPromotionDetail = (
-  brandId: number,
+export const getBrandPromotionDetailV1 = (
+  brandPromotionId: number,
   languageCode: LanguageType,
 ) =>
   api
-    .get(`brand/promotion/${brandId}`, {
+    .get(`brand/promotion/v1/${brandPromotionId}`, {
       headers: {
         "Accept-language": languageCode,
       },
