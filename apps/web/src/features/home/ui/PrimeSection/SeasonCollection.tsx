@@ -49,6 +49,7 @@ export function SeasonCollection({ promise }: SeasonCollectionProps) {
         <Link
           className={cn("text-body-2 flex items-center", "max-sm:text-body-4")}
           href={`/promotion/${promotionId}`}
+          prefetch
         >
           <div className="inline-flex items-center gap-1 border-b">
             View detail
