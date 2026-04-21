@@ -30,7 +30,7 @@ export function BrandOfflinePopup({ popupList }: BrandOnlineEventProps) {
 
   const handleCopy = async () => {
     await copy(activeEvent.address);
-    toast.success("URL Copied");
+    toast.success("Address Copied");
   };
 
   return (

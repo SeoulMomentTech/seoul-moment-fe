@@ -24,7 +24,7 @@ export default async function PrimeSection() {
           fallback={
             <Skeleton
               className={cn(
-                "min-w-7xl h-[600px] max-w-7xl pt-14",
+                "min-w-7xl mx-auto h-[600px] max-w-7xl pt-14",
                 "max-sm:h-[350px] max-sm:min-w-full",
               )}
             />
