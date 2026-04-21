@@ -170,6 +170,7 @@ export const getBrandPromotionListById = (id: number) =>
 
 /**
  * @description 브랜드 프로모션 상세 조회
+ * @deprecated `getBrandPromotionDetailV1`을 사용하세요.
  */
 export const getBrandPromotionDetail = (
   brandId: number,
@@ -177,6 +178,21 @@ export const getBrandPromotionDetail = (
 ) =>
   api
     .get(`brand/promotion/${brandId}`, {
+      headers: {
+        "Accept-language": languageCode,
+      },
+    })
+    .json<CommonRes<GetBrandPromotionResponse>>();
+
+/**
+ * @description 브랜드 프로모션 상세 조회 V1
+ */
+export const getBrandPromotionDetailV1 = (
+  brandPromotionId: number,
+  languageCode: LanguageType,
+) =>
+  api
+    .get(`brand/promotion/v1/${brandPromotionId}`, {
       headers: {
         "Accept-language": languageCode,
       },
