@@ -1,5 +1,7 @@
 "use client";
 
+import { useRef } from "react";
+
 import Image from "next/image";
 
 import { useMediaQuery } from "@shared/lib/hooks";
@@ -19,11 +21,18 @@ export function BrandTab({ promotionId, selectedId }: BrandTabProps) {
   const isMobile = useMediaQuery("(max-width: 40rem)", false);
   const navigate = useRouter();
   const { data } = useBrandPromotionListQuery({ id: promotionId });
+  const prefetchedRef = useRef<Set<number>>(new Set());
 
   // If there's no data or the list is empty, don't render the tab navigation
   if (!data || data.list.length === 0) {
     return null;
   }
+
+  const prefetchBrand = (brandId: number) => {
+    if (brandId === selectedId || prefetchedRef.current.has(brandId)) return;
+    navigate.prefetch(`/promotion/${promotionId}/brand/${brandId}`);
+    prefetchedRef.current.add(brandId);
+  };
 
   return (
     <nav className="border-b border-black/10 bg-white">
@@ -48,6 +57,8 @@ export function BrandTab({ promotionId, selectedId }: BrandTabProps) {
                 onClick={() =>
                   navigate.push(`/promotion/${promotionId}/brand/${brand.id}`)
                 }
+                onFocus={() => prefetchBrand(brand.id)}
+                onMouseEnter={() => prefetchBrand(brand.id)}
                 type="button"
               >
                 <div className="relative h-[50px] w-[50px] overflow-hidden rounded-full border border-black/10 max-sm:size-10">
