@@ -36,7 +36,7 @@ export function PromotionList({ promise }: PromotionListProps) {
   return (
     <section className="w-7xl mx-auto overflow-hidden bg-white py-[140px] max-sm:w-auto max-sm:py-[50px]">
       <div className="w-7xl relative mx-auto max-sm:w-full">
-        <div className="group relative">
+        <div className="group relative max-sm:px-5">
           <Swiper
             breakpoints={{
               1024: {
@@ -44,7 +44,7 @@ export function PromotionList({ promise }: PromotionListProps) {
                 spaceBetween: 20,
               },
             }}
-            className="overflow-visible! w-full max-sm:px-5"
+            className="overflow-visible! w-full"
             modules={[Navigation]}
             ref={swiperRef}
             slidesPerView="auto"
@@ -52,11 +52,11 @@ export function PromotionList({ promise }: PromotionListProps) {
           >
             {promotionList.map((promotion) => (
               <SwiperSlide
-                className="max-sm:w-[305px]! w-auto!"
+                className="max-sm:w-[calc(100vw-40px)]! w-auto!"
                 key={`promotion-${promotion.promotionId}-${id}`}
               >
                 <Link
-                  className="group/item block w-[305px]"
+                  className="group/item block w-[305px] max-sm:w-full"
                   href={`/promotion/${promotion.promotionId}`}
                 >
                   <div className="flex flex-col gap-5">
@@ -122,7 +122,7 @@ export function PromotionListSkeleton() {
         <div className="flex gap-5 overflow-hidden">
           {Array.from({ length: 4 }).map((_, i) => (
             <div
-              className="flex w-[305px] shrink-0 flex-col gap-5"
+              className="flex w-[305px] shrink-0 flex-col gap-5 max-sm:w-[calc(100vw-60px)]"
               key={`promotion-skeleton-${i + 1}`}
             >
               <Skeleton className="aspect-square w-full" />

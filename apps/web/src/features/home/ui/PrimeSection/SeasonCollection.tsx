@@ -47,11 +47,11 @@ export function SeasonCollection({ promise }: SeasonCollectionProps) {
           <span className="max-sm:text-body-3">{description}</span>
         </div>
         <Link
-          className={cn("text-body-3 flex items-center", "max-sm:text-body-4")}
+          className={cn("text-body-2 flex items-center", "max-sm:text-body-4")}
           href={`/promotion/${promotionId}`}
         >
-          <div className="inline-flex gap-1 border-b">
-            Product detail
+          <div className="inline-flex items-center gap-1 border-b">
+            View detail
             <ArrowRightIcon height={16} width={16} />
           </div>
         </Link>
