@@ -169,22 +169,6 @@ export const getBrandPromotionListById = (id: number) =>
     .json<CommonRes<GetBrandPromotionBrandListResponse>>();
 
 /**
- * @description 브랜드 프로모션 상세 조회
- * @deprecated `getBrandPromotionDetailV1`을 사용하세요.
- */
-export const getBrandPromotionDetail = (
-  brandId: number,
-  languageCode: LanguageType,
-) =>
-  api
-    .get(`brand/promotion/${brandId}`, {
-      headers: {
-        "Accept-language": languageCode,
-      },
-    })
-    .json<CommonRes<GetBrandPromotionResponse>>();
-
-/**
  * @description 브랜드 프로모션 상세 조회 V1
  */
 export const getBrandPromotionDetailV1 = (
