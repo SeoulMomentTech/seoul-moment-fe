@@ -58,6 +58,7 @@ export function PromotionList({ promise }: PromotionListProps) {
                 <Link
                   className="group/item block w-[305px] max-sm:w-full"
                   href={`/promotion/${promotion.promotionId}`}
+                  prefetch
                 >
                   <div className="flex flex-col gap-5">
                     <div className="relative aspect-square overflow-hidden bg-gray-100">
