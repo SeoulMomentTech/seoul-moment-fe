@@ -1,5 +1,7 @@
 "use client";
 
+import { format } from "date-fns";
+
 import type { GetBrandPromotionPopupResponse } from "@shared/services/brandPromotion";
 
 import { Flex, cn } from "@seoul-moment/ui";
@@ -30,10 +32,7 @@ export function BrandOfflinePopupTabs({
             onClick={() => onSelect(event.id)}
             type="button"
           >
-            {new Date(event.startDate).toLocaleDateString("en-US", {
-              month: "2-digit",
-              day: "2-digit",
-            })}
+            {format(new Date(event.startDate), "yy/MM/dd")}
           </button>
         ))}
       </Flex>
