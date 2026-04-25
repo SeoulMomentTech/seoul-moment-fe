@@ -1,18 +1,14 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-
 import { cn, HStack, Input, VStack } from "@seoul-moment/ui";
 
 export default function LoginForm() {
-  const t = useTranslations();
-
   return (
     <>
       <VStack className="w-full pt-[34px]" gap={14}>
         <Input
           className="max-sm:h-12"
-          placeholder={t("請輸入手機號碼 或 Email")}
+          placeholder="請輸入手機號碼 或 Email"
           type="text"
         />
         <HStack align="between" className="w-full">
@@ -20,19 +16,17 @@ export default function LoginForm() {
             <input
               className={cn(
                 "size-[14px] appearance-none rounded-full border border-black/40 bg-white",
-                "checked:border-[4px] checked:border-black checked:bg-white",
+                "checked:border-4 checked:border-black checked:bg-white",
               )}
               type="checkbox"
             />
-            <span className="text-body-3 leading-none text-black">
-              {t("記住帳號")}
-            </span>
+            <span className="text-body-3 leading-none text-black">帳號</span>
           </label>
           <button
             className="text-body-3 cursor-pointer leading-none text-black/60 underline"
             type="button"
           >
-            {t("忘記密碼")}
+            忘記密碼
           </button>
         </HStack>
       </VStack>
@@ -46,7 +40,7 @@ export default function LoginForm() {
           )}
           type="button"
         >
-          {t("로그인")}
+          로그인
         </button>
       </div>
     </>

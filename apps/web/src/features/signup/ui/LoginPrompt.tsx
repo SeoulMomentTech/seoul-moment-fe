@@ -2,7 +2,7 @@ import { Link } from "@/i18n/navigation";
 
 import { cn } from "@seoul-moment/ui";
 
-export default function Register() {
+export default function LoginPrompt() {
   return (
     <div
       className={cn(
@@ -10,9 +10,9 @@ export default function Register() {
         "max-md:mt-0 max-md:border-t-0 max-md:pt-[50px]",
       )}
     >
-      <span>沒有 PChome 24h購物帳號？</span>
-      <Link className="text-black/60" href="/signup">
-        立即註冊
+      <span>已經擁有 PChome 24h購物帳號嗎？</span>
+      <Link className="text-black/60 underline" href="/login">
+        立即登入
       </Link>
     </div>
   );
