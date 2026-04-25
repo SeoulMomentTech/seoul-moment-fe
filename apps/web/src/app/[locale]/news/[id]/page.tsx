@@ -7,13 +7,16 @@ import { getTranslations } from "next-intl/server";
 import { BASE_URL } from "@shared/constants/env";
 import { stripHtml } from "@shared/lib/utils";
 import { reportMetadataError } from "@shared/lib/utils/log/report-metadata-error";
-import { getNewsDetail } from "@shared/services/news";
+import { getNewsDetail, getNewsList } from "@shared/services/news";
 import { StructuredDataScript } from "@shared/ui/structured-data-script";
 
 import type { LanguageType } from "@/i18n/const";
+import { routing } from "@/i18n/routing";
 import type { PageParams } from "@/types";
 
 import { NewsDetailPage } from "@views/news";
+
+const PRERENDER_NEWS_COUNT = 30;
 
 const fetchNewsDetail = cache((id: number, languageCode: LanguageType) => {
   return getNewsDetail({ id, languageCode });
@@ -22,7 +25,21 @@ const fetchNewsDetail = cache((id: number, languageCode: LanguageType) => {
 export const revalidate = 1800;
 
 export async function generateStaticParams() {
-  return [];
+  try {
+    const { data } = await getNewsList({
+      count: PRERENDER_NEWS_COUNT,
+      languageCode: routing.defaultLocale,
+    });
+
+    return routing.locales.flatMap((locale) =>
+      data.list.map((news) => ({
+        locale,
+        id: String(news.id),
+      })),
+    );
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({
