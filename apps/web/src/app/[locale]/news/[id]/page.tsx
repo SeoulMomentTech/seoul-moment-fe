@@ -21,6 +21,10 @@ const fetchNewsDetail = cache((id: number, languageCode: LanguageType) => {
 
 export const revalidate = 1800;
 
+export async function generateStaticParams() {
+  return [];
+}
+
 export async function generateMetadata({
   params,
 }: PageParams<{ id: string }>): Promise<Metadata> {
