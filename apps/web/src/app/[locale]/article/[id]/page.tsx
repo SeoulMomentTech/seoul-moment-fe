@@ -7,17 +7,40 @@ import { getTranslations } from "next-intl/server";
 import { BASE_URL } from "@shared/constants/env";
 import { stripHtml } from "@shared/lib/utils";
 import { reportMetadataError } from "@shared/lib/utils/log/report-metadata-error";
-import { getArticleDetail } from "@shared/services/article";
+import { getArticleDetail, getArticleList } from "@shared/services/article";
 import { StructuredDataScript } from "@shared/ui/structured-data-script";
 
 import type { LanguageType } from "@/i18n/const";
+import { routing } from "@/i18n/routing";
 import type { PageParams } from "@/types";
 
 import { ArticleDetailPage } from "@views/article";
 
+const PRERENDER_ARTICLE_COUNT = 30;
+
 const fetchArticleDetail = cache((id: number, languageCode: LanguageType) => {
   return getArticleDetail({ id, languageCode });
 });
+
+export const revalidate = 1800;
+
+export async function generateStaticParams() {
+  try {
+    const { data } = await getArticleList({
+      count: PRERENDER_ARTICLE_COUNT,
+      languageCode: routing.defaultLocale,
+    });
+
+    return routing.locales.flatMap((locale) =>
+      data.list.map((article) => ({
+        locale,
+        id: String(article.id),
+      })),
+    );
+  } catch {
+    return [];
+  }
+}
 
 export async function generateMetadata({
   params,
