@@ -203,11 +203,7 @@ function Mobile() {
                 {Object.entries(localeLabels).map(
                   ([code, label], index, array) => (
                     <Fragment key={code}>
-                      <Link
-                        href={pathname}
-                        locale={code as LanguageType}
-                        prefetch={ENABLE_HEADER_PREFETCH}
-                      >
+                      <Link href={pathname} locale={code as LanguageType}>
                         {label}
                       </Link>
                       {index < array.length - 1 && (
