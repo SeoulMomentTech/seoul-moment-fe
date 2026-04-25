@@ -1,4 +1,4 @@
-import { cache, Suspense } from "react";
+import { cache } from "react";
 
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -84,44 +84,40 @@ export default async function NewsDetail({
     notFound();
   }
 
-  const responsePromise = fetchNewsDetail(newsId, locale as LanguageType).catch(
+  const response = await fetchNewsDetail(newsId, locale as LanguageType).catch(
     () => notFound(),
   );
 
+  const news = response.data;
   const pageUrl = `${BASE_URL}/${locale}/news/${newsId}`;
-  const schemaPromise = responsePromise.then(({ data }) => {
-    const content = stripHtml(data.content);
-
-    return {
-      "@context": "https://schema.org",
-      "@type": "NewsArticle",
-      mainEntityOfPage: pageUrl,
-      headline: data.title,
-      description: content.slice(0, 160),
-      articleBody: content,
-      image: data.banner ? [data.banner] : [],
-      datePublished: data.createDate,
-      dateModified: data.createDate,
-      inLanguage: locale,
-      author: {
-        "@type": "Person",
-        name: data.writer,
-      },
-      publisher: {
-        "@type": "Organization",
-        name: "Seoul Moment",
-        url: BASE_URL,
-      },
-      url: pageUrl,
-    };
-  });
+  const content = stripHtml(news.content);
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    mainEntityOfPage: pageUrl,
+    headline: news.title,
+    description: content.slice(0, 160),
+    articleBody: content,
+    image: news.banner ? [news.banner] : [],
+    datePublished: news.createDate,
+    dateModified: news.createDate,
+    inLanguage: locale,
+    author: {
+      "@type": "Person",
+      name: news.writer,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Seoul Moment",
+      url: BASE_URL,
+    },
+    url: pageUrl,
+  };
 
   return (
     <>
-      <Suspense fallback={null}>
-        <StructuredDataScript schemaPromise={schemaPromise} />
-      </Suspense>
-      <NewsDetailPage promise={responsePromise} />
+      <StructuredDataScript schemaPromise={Promise.resolve(schema)} />
+      <NewsDetailPage data={news} />
     </>
   );
 }
