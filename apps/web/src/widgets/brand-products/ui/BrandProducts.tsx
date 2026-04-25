@@ -2,6 +2,8 @@
 
 import { PackageSearchIcon } from "lucide-react";
 
+import { useTranslations } from "next-intl";
+
 import { useAppQuery, useLanguage } from "@shared/lib/hooks";
 import { getProductList } from "@shared/services/product";
 
@@ -16,6 +18,7 @@ interface BrandProductsProps {
 }
 
 export default function BrandProducts({ id }: BrandProductsProps) {
+  const t = useTranslations();
   const languageCode = useLanguage();
   const { data: products = [], isPending } = useAppQuery({
     queryKey: ["brand-products", id],
@@ -42,7 +45,7 @@ export default function BrandProducts({ id }: BrandProductsProps) {
       {shouldShowEmpty ? (
         <Empty
           className="h-[360px] w-full max-sm:h-[240px]"
-          description="등록된 상품이 없습니다."
+          description={t("no_product_found")}
           icon={
             <PackageSearchIcon
               className="text-black/30"
