@@ -1,13 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useTranslations } from "next-intl";
 
 import { Button, cn, VStack } from "@seoul-moment/ui";
 
 export default function SocialLoginButtons() {
-  const t = useTranslations();
-
   return (
     <VStack className="w-full pt-[38px] max-md:pt-[120px]" gap={8}>
       <Button
@@ -26,7 +23,7 @@ export default function SocialLoginButtons() {
           width={24}
         />
         <span className="flex-1 text-center font-semibold text-black">
-          {t("구글로 로그인")}
+          구글로 로그인
         </span>
       </Button>
       <Button
@@ -45,7 +42,7 @@ export default function SocialLoginButtons() {
           width={24}
         />
         <span className="flex-1 text-center font-semibold text-black">
-          {t("라인으로 로그인")}
+          라인으로 로그인
         </span>
       </Button>
     </VStack>

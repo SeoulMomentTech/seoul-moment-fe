@@ -108,6 +108,18 @@ function Desktop() {
           <li className="text-body-3 h-[56px] py-[20px]">
             <LanguageSupport />
           </li>
+          <li>
+            <Link
+              className={cn(
+                styleMap.deskTop.menu,
+                pathname === "/login" && "font-semibold",
+              )}
+              href="/login"
+              prefetch={ENABLE_HEADER_PREFETCH}
+            >
+              Login
+            </Link>
+          </li>
         </ul>
       </div>
     </div>

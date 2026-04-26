@@ -13,17 +13,7 @@ export default function LoginForm() {
           placeholder="請輸入手機號碼 或 Email"
           type="text"
         />
-        <HStack align="between" className="w-full">
-          <label className="flex cursor-pointer items-center gap-[4px]">
-            <input
-              className={cn(
-                "size-[14px] appearance-none rounded-full border border-black/40 bg-white",
-                "checked:border-4 checked:border-black checked:bg-white",
-              )}
-              type="checkbox"
-            />
-            <span className="text-body-3 leading-none text-black">帳號</span>
-          </label>
+        <HStack align="end" className="w-full">
           <Link
             className="text-body-3 cursor-pointer leading-none text-black/60 underline"
             href="/find-password"

@@ -1,12 +1,8 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-
 import { cn, VStack } from "@seoul-moment/ui";
 
 export default function LoginTerms() {
-  const t = useTranslations();
-
   return (
     <VStack className="w-full pt-[20px]" gap={10}>
       <p
@@ -15,7 +11,7 @@ export default function LoginTerms() {
           "max-md:text-body-4",
         )}
       >
-        {t("登入帳號，即表示您已閱讀並同意 SEOUL MOMONET")}
+        登入帳號，即表示您已閱讀並同意 SEOUL MOMONET
       </p>
       <button
         className={cn(
