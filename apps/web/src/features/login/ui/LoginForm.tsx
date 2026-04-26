@@ -1,5 +1,7 @@
 "use client";
 
+import { Link } from "@/i18n/navigation";
+
 import { cn, HStack, Input, VStack } from "@seoul-moment/ui";
 
 export default function LoginForm() {
@@ -22,12 +24,12 @@ export default function LoginForm() {
             />
             <span className="text-body-3 leading-none text-black">帳號</span>
           </label>
-          <button
+          <Link
             className="text-body-3 cursor-pointer leading-none text-black/60 underline"
-            type="button"
+            href="/find-password"
           >
             忘記密碼
-          </button>
+          </Link>
         </HStack>
       </VStack>
 
