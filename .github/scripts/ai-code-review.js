@@ -52,6 +52,60 @@ function filePriority(filePath) {
   return 1;
 }
 
+const CHANGED_FILES_TABLE_LIMIT = 30;
+const DROPPED_DESCRIPTION_LIMIT = 200;
+
+function truncate(text, limit) {
+  if (!text) return "";
+  return text.length > limit ? `${text.slice(0, limit - 1)}…` : text;
+}
+
+function buildChangedFilesTable(files) {
+  const reviewable = files.filter((f) => !shouldSkip(f.filename));
+  if (reviewable.length === 0) return "";
+
+  const sorted = [...reviewable].sort((a, b) => {
+    const pa = filePriority(a.filename);
+    const pb = filePriority(b.filename);
+    if (pa !== pb) return pa - pb;
+    return (b.additions + b.deletions) - (a.additions + a.deletions);
+  });
+
+  const visible = sorted.slice(0, CHANGED_FILES_TABLE_LIMIT);
+  const overflow = sorted.length - visible.length;
+
+  const rows = visible.map(
+    (f) => `| \`${f.filename}\` | +${f.additions}/-${f.deletions} | ${f.status} |`
+  );
+  const lines = [
+    "| File | +/- | Status |",
+    "| --- | --- | --- |",
+    ...rows,
+  ];
+  if (overflow > 0) {
+    lines.push("", `_…and ${overflow} more file(s)_`);
+  }
+  return lines.join("\n");
+}
+
+function buildDroppedDetailsBlock(droppedReviews) {
+  if (!droppedReviews || droppedReviews.length === 0) return "";
+  const items = droppedReviews
+    .map((r) => {
+      const desc = truncate(r.description ?? "", DROPPED_DESCRIPTION_LIMIT);
+      const meta = `_${r.severity ?? "?"} / ${r.category ?? "?"}_`;
+      return `- **${r.path}:${r.line}** — ${meta}: ${desc}`;
+    })
+    .join("\n");
+  return [
+    "<details>",
+    `<summary>${droppedReviews.length} inline comment(s) could not be posted (line outside diff hunk)</summary>`,
+    "",
+    items,
+    "</details>",
+  ].join("\n");
+}
+
 function readIfExists(absPath) {
   try {
     return fs.readFileSync(absPath, "utf8");
@@ -478,13 +532,22 @@ async function runFull({ owner, repo, pullNumber, token, openaiApiKey, files, ch
     const normalizedPath = item.path.replace(/^[ab]\//, "");
     const allowedLines = lineWhitelist.get(normalizedPath);
     if (!allowedLines || !allowedLines.has(Number(item.line))) {
-      droppedReviews.push(`${normalizedPath}:${item.line}`);
+      droppedReviews.push({
+        path: normalizedPath,
+        line: Number(item.line),
+        severity: item.severity,
+        category: item.category,
+        description: item.description,
+      });
       continue;
     }
     validReviews.push({ ...item, path: normalizedPath });
   }
   if (droppedReviews.length > 0) {
-    console.warn(`Dropped ${droppedReviews.length} out-of-range reviews:`, droppedReviews);
+    console.warn(
+      `Dropped ${droppedReviews.length} out-of-range reviews:`,
+      droppedReviews.map((r) => `${r.path}:${r.line}`)
+    );
   }
 
   const comments = validReviews.map((item) => ({
@@ -498,8 +561,9 @@ async function runFull({ owner, repo, pullNumber, token, openaiApiKey, files, ch
     summary: reviewData.summary,
     skipped,
     overflow,
-    droppedCount: droppedReviews.length,
+    droppedReviews,
     reviewCount: comments.length,
+    files,
   });
 
   if (comments.length === 0) {
@@ -590,27 +654,50 @@ Do NOT review for bugs or suggest changes. Do NOT use bullet points. Be concise.
 
   const summaryText = result.choices[0].message.content.trim();
 
-  const body = `${MARKER_SUMMARY}\n## AI Code Review (incremental)\n\n${summaryText}\n\n---\n\n- ${changedPaths.length} file(s) changed in this push.\n- Run \`/review\` in a comment for a full convention-aware review.`;
+  const filesTable = buildChangedFilesTable(files);
+  const sections = [
+    MARKER_SUMMARY,
+    "## AI Code Review (incremental)",
+    "",
+    summaryText,
+  ];
+  if (filesTable) {
+    sections.push("", "## Changed Files", "", filesTable);
+  }
+  sections.push("", "---", "", "- Run `/review` in a comment for a full convention-aware review.");
+  const body = sections.join("\n");
 
   await postIssueComment({ owner, repo, pullNumber, token, body });
   console.log("Posted incremental summary comment.");
 }
 
-function buildFullSummaryBody({ summary, skipped, overflow, droppedCount, reviewCount }) {
+function buildFullSummaryBody({ summary, skipped, overflow, droppedReviews = [], reviewCount, files = [] }) {
   const parts = [
     MARKER_FULL,
     "## AI Code Review",
     "",
     summary || "No significant issues found.",
   ];
+
+  const filesTable = buildChangedFilesTable(files);
+  if (filesTable) {
+    parts.push("", "## Changed Files", "", filesTable);
+  }
+
   const notes = [];
   if (reviewCount > 0) notes.push(`Posted ${reviewCount} inline comment(s).`);
   if (skipped.length > 0) notes.push(`Skipped ${skipped.length} file(s) (lock/generated/docs).`);
   if (overflow.length > 0) notes.push(`${overflow.length} file(s) omitted due to size limit: ${overflow.slice(0, 5).join(", ")}${overflow.length > 5 ? "…" : ""}`);
-  if (droppedCount > 0) notes.push(`Dropped ${droppedCount} review(s) targeting non-modified lines.`);
+  if (droppedReviews.length > 0) notes.push(`Dropped ${droppedReviews.length} review(s) targeting non-modified lines (details below).`);
   if (notes.length > 0) {
     parts.push("", "---", "", ...notes.map((n) => `- ${n}`));
   }
+
+  const droppedBlock = buildDroppedDetailsBlock(droppedReviews);
+  if (droppedBlock) {
+    parts.push("", droppedBlock);
+  }
+
   return parts.join("\n");
 }
 
