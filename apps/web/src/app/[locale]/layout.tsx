@@ -1,6 +1,5 @@
 import type { PropsWithChildren } from "react";
 
-import { Geist, Geist_Mono } from "next/font/google";
 import { notFound } from "next/navigation";
 import Script from "next/script";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
@@ -23,16 +22,6 @@ interface Props {
     locale?: string;
   }>;
 }
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export async function generateMetadata() {
   try {
@@ -106,9 +95,7 @@ export default async function RootLayout({
           </>
         )}
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className="antialiased">
         <ScrollRestoration />
         <NuqsAdapter>
           <NextIntlClientProvider messages={messages}>

@@ -105,7 +105,7 @@ function Desktop() {
               {t("contact")}
             </Link>
           </li>
-          <li className="text-body-3 h-[56px] py-[20px]">
+          <li className="text-body-3 h-full py-[20px]">
             <LanguageSupport />
           </li>
         </ul>
