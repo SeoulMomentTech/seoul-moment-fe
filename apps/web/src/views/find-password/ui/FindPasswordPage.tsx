@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import GuestOnly from "@shared/lib/components/GuestOnly";
+
 import {
   FindPasswordHeader,
   RequestCodeForm,
@@ -21,15 +23,17 @@ export function FindPasswordPage() {
   };
 
   return (
-    <VStack className="w-full px-4 pb-[122px] pt-[136px] max-md:pb-[90px] max-md:pt-[136px]">
-      <VStack className="w-full max-w-[414px]">
-        <FindPasswordHeader maskedAccount={maskedAccount} step={step} />
-        {step === "request" ? (
-          <RequestCodeForm onSent={handleSent} />
-        ) : (
-          <VerifyCodeForm />
-        )}
+    <GuestOnly>
+      <VStack className="w-full px-4 pb-[122px] pt-[136px] max-md:pb-[90px] max-md:pt-[136px]">
+        <VStack className="w-full max-w-[414px]">
+          <FindPasswordHeader maskedAccount={maskedAccount} step={step} />
+          {step === "request" ? (
+            <RequestCodeForm onSent={handleSent} />
+          ) : (
+            <VerifyCodeForm />
+          )}
+        </VStack>
       </VStack>
-    </VStack>
+    </GuestOnly>
   );
 }

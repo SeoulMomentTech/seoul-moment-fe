@@ -1,5 +1,7 @@
 "use client";
 
+import GuestOnly from "@shared/lib/components/GuestOnly";
+
 import {
   LoginForm,
   LoginHeader,
@@ -11,14 +13,16 @@ import { VStack } from "@seoul-moment/ui";
 
 export function LoginPage() {
   return (
-    <VStack className="w-full px-4 pb-[122px] pt-[136px] max-md:pb-[50px] max-md:pt-[106px]">
-      <VStack className="w-full max-w-[414px]">
-        <LoginHeader />
-        <LoginForm />
-        <LoginTerms />
-        <SocialLoginButtons />
-        <Register />
+    <GuestOnly>
+      <VStack className="w-full px-4 pb-[122px] pt-[136px] max-md:pb-[50px] max-md:pt-[106px]">
+        <VStack className="w-full max-w-[414px]">
+          <LoginHeader />
+          <LoginForm />
+          <LoginTerms />
+          <SocialLoginButtons />
+          <Register />
+        </VStack>
       </VStack>
-    </VStack>
+    </GuestOnly>
   );
 }
