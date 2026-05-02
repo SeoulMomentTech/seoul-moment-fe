@@ -25,6 +25,7 @@ import { Link, usePathname } from "@/i18n/navigation";
 import { LanguageSupport } from "@widgets/language-support";
 
 import { BrandMenuModal } from "./BrandMenuModal";
+import LoginStatus from "./LoginStatus";
 
 const ShareModal = lazy(() =>
   import("@widgets/share-modal").then((module) => ({
@@ -109,16 +110,7 @@ function Desktop() {
             <LanguageSupport />
           </li>
           <li>
-            <Link
-              className={cn(
-                styleMap.deskTop.menu,
-                pathname === "/login" && "font-semibold",
-              )}
-              href="/login"
-              prefetch={ENABLE_HEADER_PREFETCH}
-            >
-              Login
-            </Link>
+            <LoginStatus />
           </li>
         </ul>
       </div>
