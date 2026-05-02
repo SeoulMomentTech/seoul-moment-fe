@@ -21,7 +21,9 @@ const passwordSchema = z
 
 export const signupSchema = z
   .object({
-    account: z.string().min(1),
+    email: z.string().email(),
+    phone: z.string().min(1),
+    verificationCode: z.string().min(1),
     password: passwordSchema,
     passwordConfirm: z.string(),
   })

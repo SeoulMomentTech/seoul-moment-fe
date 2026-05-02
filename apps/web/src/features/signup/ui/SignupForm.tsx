@@ -3,7 +3,7 @@
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
 
-import { cn, Input, VStack } from "@seoul-moment/ui";
+import { Button, cn, HStack, Input, VStack } from "@seoul-moment/ui";
 
 import PasswordField from "./PasswordField";
 import { signupFormResolver, type SignupFormValues } from "../model/schema";
@@ -17,14 +17,25 @@ export default function SignupForm() {
   } = useForm<SignupFormValues>({
     resolver: signupFormResolver,
     mode: "onChange",
-    defaultValues: { account: "", password: "", passwordConfirm: "" },
+    defaultValues: {
+      email: "",
+      phone: "",
+      verificationCode: "",
+      password: "",
+      passwordConfirm: "",
+    },
   });
 
   const password = watch("password");
   const passwordConfirm = watch("passwordConfirm");
+  const phone = watch("phone");
 
   const onSubmit: SubmitHandler<SignupFormValues> = () => {
     // TODO: API 연동
+  };
+
+  const handleSendCode = () => {
+    // TODO: API 연동 — 휴대폰 인증번호 발송
   };
 
   return (
@@ -32,9 +43,35 @@ export default function SignupForm() {
       <VStack className="w-full pt-[64px]" gap={16}>
         <Input
           className="max-sm:h-12"
-          placeholder="請輸入手機號碼"
+          placeholder="請輸入電子信箱"
+          type="email"
+          {...register("email")}
+        />
+        <HStack className="w-full" gap={8}>
+          <Input
+            className="flex-1 max-sm:h-12"
+            placeholder="請輸入手機號碼"
+            type="tel"
+            {...register("phone")}
+          />
+          <Button
+            className={cn(
+              "text-body-3 h-[58.5px] shrink-0 rounded-[4px] py-[16px] font-semibold text-white",
+              "max-sm:h-12 max-sm:py-0",
+            )}
+            disabled={!phone}
+            onClick={handleSendCode}
+            type="button"
+          >
+            發送驗證碼
+          </Button>
+        </HStack>
+        <Input
+          className="max-sm:h-12"
+          inputMode="numeric"
+          placeholder="請輸入驗證碼"
           type="text"
-          {...register("account")}
+          {...register("verificationCode")}
         />
         <PasswordField
           placeholder="請輸入密碼"
