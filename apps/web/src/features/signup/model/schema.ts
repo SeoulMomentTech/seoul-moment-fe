@@ -1,6 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
+export const RESEND_INITIAL_SECONDS = 28;
+
 export const PASSWORD_RULES = {
   minLength: (value: string) => value.length >= 8,
   hasUpper: (value: string) => /[A-Z]/.test(value),
@@ -22,8 +24,8 @@ const passwordSchema = z
 export const signupSchema = z
   .object({
     email: z.string().email(),
-    phone: z.string().min(1),
     verificationCode: z.string().min(1),
+    isVerified: z.boolean().refine((value) => value === true),
     password: passwordSchema,
     passwordConfirm: z.string(),
   })

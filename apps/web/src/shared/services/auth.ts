@@ -4,7 +4,7 @@ import { api } from ".";
 export interface UserSignUpPayload {
   email: string;
   password: string;
-  phone: string;
+  phone?: string;
   /** 개인정보 수집 동의 일시. 예: "2025-01-01 12:00:00" */
   personalInfoAgreeDate: string;
   /** 광고성 이메일 수신 동의 일시 */
@@ -13,6 +13,11 @@ export interface UserSignUpPayload {
   recommendEmailDate?: string;
   /** 추천 문자 수신 동의 일시 */
   recommendPhoneDate?: string;
+}
+
+interface VerifyEmailCodePayload {
+  email: string;
+  code: string;
 }
 
 export interface UserLoginPayload {
@@ -52,3 +57,23 @@ export const getUserOneTimeToken = () =>
   api
     .get("user/auth/one-time-token")
     .json<CommonRes<UserOneTimeTokenResponse>>();
+
+/**
+ * @description 이메일 인증번호 발송
+ */
+export const postEmailCode = (email: string) =>
+  api
+    .post("auth/email/code", {
+      json: { email },
+    })
+    .json<{ success: boolean }>();
+
+/**
+ * @description 이메일 인증번호 검증
+ */
+export const verifyEmailCode = ({ email, code }: VerifyEmailCodePayload) =>
+  api
+    .post("auth/email/verify", {
+      json: { email, code },
+    })
+    .json<{ success: boolean }>();
