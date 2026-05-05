@@ -1,3 +1,3 @@
-export { default as FindPasswordHeader } from "./ui/FindPasswordHeader";
-export { default as RequestCodeForm } from "./ui/RequestCodeForm";
-export { default as VerifyCodeForm } from "./ui/VerifyCodeForm";
+export { FindPasswordHeader } from "./ui/FindPasswordHeader";
+export { RequestCodeForm } from "./ui/RequestCodeForm";
+export { VerifyCodeForm } from "./ui/VerifyCodeForm";

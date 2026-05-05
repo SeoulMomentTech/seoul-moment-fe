@@ -7,7 +7,7 @@ interface FindPasswordHeaderProps {
   maskedAccount?: string;
 }
 
-export default function FindPasswordHeader({
+export function FindPasswordHeader({
   step,
   maskedAccount,
 }: FindPasswordHeaderProps) {

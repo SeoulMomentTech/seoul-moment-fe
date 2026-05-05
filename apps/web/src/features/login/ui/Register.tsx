@@ -2,7 +2,7 @@ import { Link } from "@/i18n/navigation";
 
 import { cn } from "@seoul-moment/ui";
 
-export default function Register() {
+export function Register() {
   return (
     <div
       className={cn(

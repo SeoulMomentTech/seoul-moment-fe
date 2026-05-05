@@ -16,7 +16,7 @@ interface UseUserLoginMutationOptions {
   onError?(error: HTTPError): void;
 }
 
-export default function useUserLoginMutation({
+export function useUserLoginMutation({
   onSuccess,
   onError,
 }: UseUserLoginMutationOptions = {}) {

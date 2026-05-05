@@ -10,7 +10,7 @@ import { RESEND_INITIAL_SECONDS, VERIFY_CODE_LENGTH } from "../model/schema";
 const EMPTY_CODE = Array<string>(VERIFY_CODE_LENGTH).fill("");
 const SLOT_IDS = ["a", "b", "c", "d", "e", "f"] as const;
 
-export default function VerifyCodeForm() {
+export function VerifyCodeForm() {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [code, setCode] = useState<string[]>(EMPTY_CODE);
   const [seconds, setSeconds] = useState(RESEND_INITIAL_SECONDS);

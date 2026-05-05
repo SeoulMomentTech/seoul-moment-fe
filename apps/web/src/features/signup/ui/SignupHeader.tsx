@@ -2,7 +2,7 @@
 
 import { VStack } from "@seoul-moment/ui";
 
-export default function SignupHeader() {
+export function SignupHeader() {
   return (
     <VStack className="w-full">
       <h1 className="text-title-3 text-center font-semibold leading-none text-black">

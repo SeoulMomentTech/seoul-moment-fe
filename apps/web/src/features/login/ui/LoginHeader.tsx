@@ -4,7 +4,7 @@ import Image from "next/image";
 
 import { VStack } from "@seoul-moment/ui";
 
-export default function LoginHeader() {
+export function LoginHeader() {
   return (
     <VStack gap={16}>
       <Image

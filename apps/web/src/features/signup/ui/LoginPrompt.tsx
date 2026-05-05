@@ -2,7 +2,7 @@ import { Link } from "@/i18n/navigation";
 
 import { cn } from "@seoul-moment/ui";
 
-export default function LoginPrompt() {
+export function LoginPrompt() {
   return (
     <div
       className={cn(

@@ -9,7 +9,7 @@ interface UseUserSignUpMutationOptions {
   onError?(error: HTTPError): void;
 }
 
-export default function useUserSignUpMutation({
+export function useUserSignUpMutation({
   onSuccess,
   onError,
 }: UseUserSignUpMutationOptions = {}) {

@@ -20,7 +20,7 @@ interface TermsModalProps extends PropsWithChildren {
   title: string;
 }
 
-export default function TermsModal({
+export function TermsModal({
   open,
   onOpenChange,
   title,

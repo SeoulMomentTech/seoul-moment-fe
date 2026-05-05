@@ -6,14 +6,14 @@ import { Eye, EyeOff } from "lucide-react";
 
 import { cn, Input, VStack } from "@seoul-moment/ui";
 
-import PasswordChecklist from "./PasswordChecklist";
+import { PasswordChecklist } from "./PasswordChecklist";
 
 type Props = Omit<React.ComponentProps<"input">, "type" | "value"> & {
   value: string;
   showChecklist?: boolean;
 };
 
-export default function PasswordField({
+export function PasswordField({
   value,
   showChecklist = false,
   className,

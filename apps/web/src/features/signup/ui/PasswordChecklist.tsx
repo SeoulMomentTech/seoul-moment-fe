@@ -19,7 +19,7 @@ const RULE_ORDER: { key: PasswordRuleKey; label: string }[] = [
   { key: "hasSpecial", label: "특수 문자 하나 이상 포함 : ~#@$%&!*_?-<>등" },
 ];
 
-export default function PasswordChecklist({ value }: Props) {
+export function PasswordChecklist({ value }: Props) {
   const status = usePasswordRules(value);
 
   return (

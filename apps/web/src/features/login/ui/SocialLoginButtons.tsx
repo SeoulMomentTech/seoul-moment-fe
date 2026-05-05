@@ -4,7 +4,7 @@ import Image from "next/image";
 
 import { Button, cn, VStack } from "@seoul-moment/ui";
 
-export default function SocialLoginButtons() {
+export function SocialLoginButtons() {
   return (
     <VStack className="w-full pt-[38px] max-md:pt-[120px]" gap={8}>
       <Button

@@ -5,7 +5,7 @@ import { useState } from "react";
 import { cn, VStack } from "@seoul-moment/ui";
 import { TermsModal } from "@widgets/terms-modal";
 
-export default function SignupTerms() {
+export function SignupTerms() {
   const [open, setOpen] = useState(false);
 
   return (

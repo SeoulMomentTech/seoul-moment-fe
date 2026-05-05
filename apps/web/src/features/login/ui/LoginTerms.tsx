@@ -2,7 +2,7 @@
 
 import { cn, VStack } from "@seoul-moment/ui";
 
-export default function LoginTerms() {
+export function LoginTerms() {
   return (
     <VStack className="w-full pt-[20px]" gap={10}>
       <p

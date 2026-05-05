@@ -10,10 +10,10 @@ import { useRouter } from "@/i18n/navigation";
 
 import { Button, cn, Flex, HStack, Input, VStack } from "@seoul-moment/ui";
 
-import PasswordField from "./PasswordField";
-import usePostEmailCodeMutation from "../api/usePostEmailCodeMutation";
-import useUserSignUpMutation from "../api/useUserSignUpMutation";
-import useVerifyEmailCodeMutation from "../api/useVerifyEmailCodeMutation";
+import { PasswordField } from "./PasswordField";
+import { usePostEmailCodeMutation } from "../api/usePostEmailCodeMutation";
+import { useUserSignUpMutation } from "../api/useUserSignUpMutation";
+import { useVerifyEmailCodeMutation } from "../api/useVerifyEmailCodeMutation";
 import {
   RESEND_INITIAL_SECONDS,
   signupFormResolver,
@@ -22,7 +22,7 @@ import {
 
 const AGREE_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-export default function SignupForm() {
+export function SignupForm() {
   const router = useRouter();
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [verifyError, setVerifyError] = useState<string | null>(null);

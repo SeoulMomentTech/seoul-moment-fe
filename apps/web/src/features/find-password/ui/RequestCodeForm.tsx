@@ -26,7 +26,7 @@ function maskAccount(value: string): string {
   return trimmed;
 }
 
-export default function RequestCodeForm({ onSent }: RequestCodeFormProps) {
+export function RequestCodeForm({ onSent }: RequestCodeFormProps) {
   const {
     register,
     handleSubmit,

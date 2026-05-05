@@ -14,7 +14,7 @@ interface UseVerifyEmailCodeMutationOptions {
   onError?(error: HTTPError): void;
 }
 
-export default function useVerifyEmailCodeMutation({
+export function useVerifyEmailCodeMutation({
   onSuccess,
   onError,
 }: UseVerifyEmailCodeMutationOptions = {}) {

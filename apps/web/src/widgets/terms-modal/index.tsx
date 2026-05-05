@@ -1,1 +1,1 @@
-export { default as TermsModal } from "./ui/TermsModal";
+export { TermsModal } from "./ui/TermsModal";

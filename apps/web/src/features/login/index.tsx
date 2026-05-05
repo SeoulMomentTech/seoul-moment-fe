@@ -1,6 +1,6 @@
-export { default as useUserLoginMutation } from "./api/useUserLoginMutation";
-export { default as LoginForm } from "./ui/LoginForm";
-export { default as LoginHeader } from "./ui/LoginHeader";
-export { default as LoginTerms } from "./ui/LoginTerms";
-export { default as SocialLoginButtons } from "./ui/SocialLoginButtons";
-export { default as Register } from "./ui/Register";
+export { useUserLoginMutation } from "./api/useUserLoginMutation";
+export { LoginForm } from "./ui/LoginForm";
+export { LoginHeader } from "./ui/LoginHeader";
+export { LoginTerms } from "./ui/LoginTerms";
+export { SocialLoginButtons } from "./ui/SocialLoginButtons";
+export { Register } from "./ui/Register";

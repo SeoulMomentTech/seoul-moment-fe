@@ -8,12 +8,12 @@ import { Link, useRouter } from "@/i18n/navigation";
 
 import { cn, HStack, Input, VStack } from "@seoul-moment/ui";
 
-import useUserLoginMutation from "../api/useUserLoginMutation";
+import { useUserLoginMutation } from "../api/useUserLoginMutation";
 import { loginFormResolver, type LoginFormValues } from "../model/schema";
 
 const ERROR_MESSAGE = "Please check your email or password";
 
-export default function LoginForm() {
+export function LoginForm() {
   const router = useRouter();
   const {
     register,

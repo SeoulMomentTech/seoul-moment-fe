@@ -9,7 +9,7 @@ interface UsePostEmailCodeMutationOptions {
   onError?(error: HTTPError): void;
 }
 
-export default function usePostEmailCodeMutation({
+export function usePostEmailCodeMutation({
   onSuccess,
   onError,
 }: UsePostEmailCodeMutationOptions = {}) {
