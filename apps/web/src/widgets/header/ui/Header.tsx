@@ -2,7 +2,7 @@
 
 import { lazy, useState, Fragment } from "react";
 
-import { MenuIcon, ChevronRightIcon } from "lucide-react";
+import { MenuIcon, ChevronRightIcon, LogIn, LogOut } from "lucide-react";
 
 import Image from "next/image";
 import { useTranslations } from "next-intl";
@@ -145,6 +145,7 @@ function Mobile() {
   const t = useTranslations();
   const pathname = usePathname();
   const isAuthenticated = useUserAuthStore((s) => s.isAuthenticated);
+  const logout = useUserAuthStore((s) => s.logout);
   const hasHydrated = useUserAuthHydrated();
   const showMypage = hasHydrated && isAuthenticated;
 
@@ -263,6 +264,26 @@ function Mobile() {
           <Image alt="" height={16} src="/logo.png" width={133} />
         </Link>
       </div>
+      {hasHydrated &&
+        (isAuthenticated ? (
+          <button
+            aria-label="Logout"
+            className="flex cursor-pointer items-center"
+            onClick={logout}
+            type="button"
+          >
+            <LogOut className="size-5" />
+          </button>
+        ) : (
+          <Link
+            aria-label="Login"
+            className="flex items-center"
+            href="/login"
+            prefetch={ENABLE_HEADER_PREFETCH}
+          >
+            <LogIn className="size-5" />
+          </Link>
+        ))}
       <BrandMenuModal
         isOpen={isBrandModalOpen}
         onOpenChange={setIsBrandModalOpen}
