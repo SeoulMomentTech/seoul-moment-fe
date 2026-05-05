@@ -2,12 +2,16 @@
 
 import { lazy, useState, Fragment } from "react";
 
-import { MenuIcon, ChevronRightIcon } from "lucide-react";
+import { MenuIcon, ChevronRightIcon, LogIn, LogOut } from "lucide-react";
 
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 
 import { useModal } from "@shared/lib/hooks";
+import {
+  useUserAuthHydrated,
+  useUserAuthStore,
+} from "@shared/lib/hooks/useUserAuthStore";
 import { cn } from "@shared/lib/style";
 import Divider from "@shared/ui/divider";
 import {
@@ -47,6 +51,9 @@ const ENABLE_HEADER_PREFETCH = true;
 function Desktop() {
   const pathname = usePathname();
   const t = useTranslations();
+  const isAuthenticated = useUserAuthStore((s) => s.isAuthenticated);
+  const hasHydrated = useUserAuthHydrated();
+  const showMypage = hasHydrated && isAuthenticated;
 
   return (
     <div
@@ -106,6 +113,20 @@ function Desktop() {
               {t("contact")}
             </Link>
           </li>
+          {showMypage && (
+            <li>
+              <Link
+                className={cn(
+                  styleMap.deskTop.menu,
+                  pathname === "/mypage" && "font-semibold",
+                )}
+                href="/mypage"
+                prefetch={ENABLE_HEADER_PREFETCH}
+              >
+                MyPage
+              </Link>
+            </li>
+          )}
           <li className="text-body-3 h-full py-[20px]">
             <LanguageSupport />
           </li>
@@ -123,6 +144,10 @@ function Mobile() {
   const [isBrandModalOpen, setIsBrandModalOpen] = useState(false);
   const t = useTranslations();
   const pathname = usePathname();
+  const isAuthenticated = useUserAuthStore((s) => s.isAuthenticated);
+  const logout = useUserAuthStore((s) => s.logout);
+  const hasHydrated = useUserAuthHydrated();
+  const showMypage = hasHydrated && isAuthenticated;
 
   return (
     <div
@@ -202,6 +227,21 @@ function Mobile() {
                     <ChevronRightIcon height={16} width={16} />
                   </Link>
                 </li>
+                {showMypage && (
+                  <li>
+                    <Link
+                      className={styleMap.mobile.menu}
+                      href="/mypage"
+                      onClick={() => {
+                        setIsOpen(false);
+                      }}
+                      prefetch={ENABLE_HEADER_PREFETCH}
+                    >
+                      MyPage
+                      <ChevronRightIcon height={16} width={16} />
+                    </Link>
+                  </li>
+                )}
               </ul>
               <div className="flex items-center pb-[33px]">
                 {Object.entries(localeLabels).map(
@@ -224,6 +264,26 @@ function Mobile() {
           <Image alt="" height={16} src="/logo.png" width={133} />
         </Link>
       </div>
+      {hasHydrated &&
+        (isAuthenticated ? (
+          <button
+            aria-label="Logout"
+            className="flex cursor-pointer items-center"
+            onClick={logout}
+            type="button"
+          >
+            <LogOut className="size-5" />
+          </button>
+        ) : (
+          <Link
+            aria-label="Login"
+            className="flex items-center"
+            href="/login"
+            prefetch={ENABLE_HEADER_PREFETCH}
+          >
+            <LogIn className="size-5" />
+          </Link>
+        ))}
       <BrandMenuModal
         isOpen={isBrandModalOpen}
         onOpenChange={setIsBrandModalOpen}
