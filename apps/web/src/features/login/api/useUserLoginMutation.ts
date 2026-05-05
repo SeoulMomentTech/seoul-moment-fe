@@ -28,7 +28,6 @@ export default function useUserLoginMutation({
     UserLoginPayload
   >({
     mutationFn: postUserLogin,
-    toastOnError: true,
     onSuccess: (res) => {
       const { token, refreshToken } = res.data;
       login({ accessToken: token, refreshToken });

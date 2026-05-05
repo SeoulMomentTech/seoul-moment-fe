@@ -2,6 +2,7 @@
 
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import { Link, useRouter } from "@/i18n/navigation";
 
@@ -9,6 +10,8 @@ import { cn, HStack, Input, VStack } from "@seoul-moment/ui";
 
 import useUserLoginMutation from "../api/useUserLoginMutation";
 import { loginFormResolver, type LoginFormValues } from "../model/schema";
+
+const ERROR_MESSAGE = "Please check your email or password";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -31,6 +34,9 @@ export default function LoginForm() {
         router.replace("/");
       }
     },
+    onError: () => {
+      toast.error(ERROR_MESSAGE);
+    },
   });
 
   const onSubmit: SubmitHandler<LoginFormValues> = ({ account, password }) =>
@@ -41,7 +47,7 @@ export default function LoginForm() {
       <VStack className="w-full pt-[34px]" gap={14}>
         <Input
           className="max-sm:h-12"
-          placeholder="請輸入手機號碼 或 Email"
+          placeholder="請輸入電子信箱"
           type="text"
           {...register("account")}
         />
