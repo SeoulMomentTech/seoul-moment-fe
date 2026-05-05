@@ -25,6 +25,7 @@ import { Link, usePathname } from "@/i18n/navigation";
 import { LanguageSupport } from "@widgets/language-support";
 
 import { BrandMenuModal } from "./BrandMenuModal";
+import LoginStatus from "./LoginStatus";
 
 const ShareModal = lazy(() =>
   import("@widgets/share-modal").then((module) => ({
@@ -107,6 +108,9 @@ function Desktop() {
           </li>
           <li className="text-body-3 h-full py-[20px]">
             <LanguageSupport />
+          </li>
+          <li>
+            <LoginStatus />
           </li>
         </ul>
       </div>
