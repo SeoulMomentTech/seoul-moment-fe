@@ -1,3 +1,6 @@
 export { FindPasswordHeader } from "./ui/FindPasswordHeader";
-export { RequestCodeForm } from "./ui/RequestCodeForm";
-export { VerifyCodeForm } from "./ui/VerifyCodeForm";
+export {
+  FindPasswordTabs,
+  type FindPasswordMethod,
+} from "./ui/FindPasswordTabs";
+export { VerificationForm } from "./ui/VerificationForm";
