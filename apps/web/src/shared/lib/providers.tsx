@@ -60,8 +60,14 @@ const queryClient = new QueryClient({
             .clone()
             .json()
             .then((data) => {
-              toast.error(data.message);
+              const message = (data as { message?: string } | null)?.message;
+              toast.error(message ?? err.message);
+            })
+            .catch(() => {
+              toast.error(err.message);
             });
+        } else {
+          toast.error(err.message);
         }
       }
     },
