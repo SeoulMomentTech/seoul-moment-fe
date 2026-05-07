@@ -15,7 +15,7 @@ export interface UserSignUpPayload {
   recommendPhoneDate?: string;
 }
 
-interface VerifyEmailCodePayload {
+export interface VerifyEmailCodePayload {
   email: string;
   code: string;
 }
@@ -32,6 +32,17 @@ export interface UserLoginResponse {
 
 export interface UserOneTimeTokenResponse {
   oneTimeToken: string;
+}
+
+export interface PasswordEmailVerifyResponse {
+  /** 비밀번호 변경 시 Authorization 헤더로 사용하는 one time token */
+  token: string;
+}
+
+export interface PatchPasswordPayload {
+  password: string;
+  /** 비밀번호 찾기 검증으로 발급된 one time token */
+  token: string;
 }
 
 /**
@@ -77,3 +88,32 @@ export const verifyEmailCode = ({ email, code }: VerifyEmailCodePayload) =>
       json: { email, code },
     })
     .json<{ success: boolean }>();
+
+/**
+ * @description 비밀번호 찾기 이메일 인증 코드 발송
+ */
+export const postPasswordEmailCode = (email: string) =>
+  api.post("user/auth/password/email/code", {
+    json: { email },
+  });
+
+/**
+ * @description 비밀번호 찾기 이메일 인증 코드 검증 (one time token 반환)
+ */
+export const postPasswordEmailVerify = (data: VerifyEmailCodePayload) =>
+  api
+    .post("user/auth/password/email/verify", {
+      json: data,
+    })
+    .json<CommonRes<PasswordEmailVerifyResponse>>();
+
+/**
+ * @description 비밀번호 변경 (검증 단계에서 발급된 one time token 필요)
+ */
+export const patchPassword = ({ password, token }: PatchPasswordPayload) =>
+  api.patch("user/auth/password", {
+    json: { password },
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });

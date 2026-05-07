@@ -1,17 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
+import { PASSWORD_RULES } from "@shared/lib/hooks/usePasswordRules";
+
 export const RESEND_INITIAL_SECONDS = 28;
-
-export const PASSWORD_RULES = {
-  minLength: (value: string) => value.length >= 8,
-  hasUpper: (value: string) => /[A-Z]/.test(value),
-  hasLower: (value: string) => /[a-z]/.test(value),
-  hasNumber: (value: string) => /\d/.test(value),
-  hasSpecial: (value: string) => /[~#@$%&!*_?\-<>]/.test(value),
-} as const;
-
-export type PasswordRuleKey = keyof typeof PASSWORD_RULES;
 
 const passwordSchema = z
   .string()

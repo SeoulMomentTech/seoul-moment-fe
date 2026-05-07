@@ -6,7 +6,7 @@ import { Eye, EyeOff } from "lucide-react";
 
 import { cn, Input, VStack } from "@seoul-moment/ui";
 
-import { PasswordChecklist } from "./PasswordChecklist";
+import { PasswordChecklist } from "./password-checklist";
 
 type Props = Omit<React.ComponentProps<"input">, "type" | "value"> & {
   value: string;
