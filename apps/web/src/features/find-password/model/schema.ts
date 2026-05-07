@@ -8,6 +8,8 @@ export const RESEND_INITIAL_SECONDS = 28;
 export const PHONE_CODE_DURATION_SECONDS = 30;
 export const DEFAULT_COUNTRY_CODE = "+886";
 
+export type FindPasswordMethod = "email" | "phone";
+
 export const verificationSchema = z.object({
   account: z.string().min(1),
   verifyCode: z.string(),

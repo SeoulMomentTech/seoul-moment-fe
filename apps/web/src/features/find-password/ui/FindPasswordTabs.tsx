@@ -2,7 +2,9 @@
 
 import { cn, Tabs, TabsList, TabsTrigger } from "@seoul-moment/ui";
 
-export type FindPasswordMethod = "email" | "phone";
+import type { FindPasswordMethod } from "../model/schema";
+
+export type { FindPasswordMethod };
 
 interface FindPasswordTabsProps {
   value: FindPasswordMethod;
