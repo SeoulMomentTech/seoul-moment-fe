@@ -7,8 +7,8 @@ import { useForm } from "react-hook-form";
 import { Button, cn, HStack, Input, VStack } from "@seoul-moment/ui";
 
 import type { FindPasswordMethod } from "./FindPasswordTabs";
-import { usePostEmailCodeMutation } from "../api/usePostEmailCodeMutation";
-import { useVerifyEmailCodeMutation } from "../api/useVerifyEmailCodeMutation";
+import { usePostPasswordEmailCodeMutation } from "../api/usePostPasswordEmailCodeMutation";
+import { usePostPasswordEmailVerifyMutation } from "../api/usePostPasswordEmailVerifyMutation";
 import {
   DEFAULT_COUNTRY_CODE,
   PHONE_CODE_DURATION_SECONDS,
@@ -22,7 +22,7 @@ type MessageTone = "info" | "error";
 
 interface VerificationFormProps {
   method: FindPasswordMethod;
-  onVerified(maskedAccount: string): void;
+  onVerified(payload: { maskedAccount: string; token: string }): void;
 }
 
 const ACCOUNT_PLACEHOLDER_BY_METHOD: Record<FindPasswordMethod, string> = {
@@ -109,15 +109,18 @@ export function VerificationForm({
     }
   }, [status, secondsLeft]);
 
-  const postEmailCodeMutation = usePostEmailCodeMutation({
+  const [resetToken, setResetToken] = useState<string | null>(null);
+
+  const postEmailCodeMutation = usePostPasswordEmailCodeMutation({
     onSuccess: () => {
       setStatus("sent");
       setSecondsLeft(PHONE_CODE_DURATION_SECONDS);
     },
   });
 
-  const verifyEmailCodeMutation = useVerifyEmailCodeMutation({
-    onSuccess: () => {
+  const verifyEmailCodeMutation = usePostPasswordEmailVerifyMutation({
+    onSuccess: (token) => {
+      setResetToken(token);
       setStatus("verified");
     },
     onError: () => {
@@ -145,6 +148,7 @@ export function VerificationForm({
     }
     // TODO: 폰 인증 API 연동 (현재 mock)
     if (verifyCode === "123456") {
+      setResetToken("mock-phone-token");
       setStatus("verified");
     } else {
       setStatus("failed");
@@ -152,7 +156,11 @@ export function VerificationForm({
   };
 
   const handleProceed = () => {
-    onVerified(maskAccount(account, method));
+    if (!resetToken) return;
+    onVerified({
+      maskedAccount: maskAccount(account, method),
+      token: resetToken,
+    });
   };
 
   const canRequestCode = account.trim().length > 0;

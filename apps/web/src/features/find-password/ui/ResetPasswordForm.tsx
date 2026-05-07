@@ -8,16 +8,21 @@ import { PasswordField } from "@shared/ui/password-field";
 
 import { Button, VStack } from "@seoul-moment/ui";
 
+import { usePatchPasswordMutation } from "../api/usePatchPasswordMutation";
 import {
   type ResetPasswordFormValues,
   resetPasswordFormResolver,
 } from "../model/schema";
 
 interface ResetPasswordFormProps {
+  token: string;
   onSuccess(): void;
 }
 
-export function ResetPasswordForm({ onSuccess }: ResetPasswordFormProps) {
+export function ResetPasswordForm({
+  token,
+  onSuccess,
+}: ResetPasswordFormProps) {
   const {
     register,
     handleSubmit,
@@ -32,10 +37,17 @@ export function ResetPasswordForm({ onSuccess }: ResetPasswordFormProps) {
   const password = watch("password");
   const passwordConfirm = watch("passwordConfirm");
 
-  const onSubmit: SubmitHandler<ResetPasswordFormValues> = () => {
-    // TODO: API 연동 — 비밀번호 재설정
-    onSuccess();
+  const patchPasswordMutation = usePatchPasswordMutation({
+    onSuccess,
+  });
+
+  const onSubmit: SubmitHandler<ResetPasswordFormValues> = ({
+    password: newPassword,
+  }) => {
+    patchPasswordMutation.mutate({ password: newPassword, token });
   };
+
+  const isSubmitDisabled = !isValid || patchPasswordMutation.isPending;
 
   return (
     <form className="w-full" onSubmit={handleSubmit(onSubmit)}>
@@ -55,7 +67,7 @@ export function ResetPasswordForm({ onSuccess }: ResetPasswordFormProps) {
         </VStack>
         <Button
           className="text-body-2 h-auto w-full rounded-[4px] px-[20px] py-[16px] font-semibold text-white"
-          disabled={!isValid}
+          disabled={isSubmitDisabled}
           type="submit"
         >
           변경하기
