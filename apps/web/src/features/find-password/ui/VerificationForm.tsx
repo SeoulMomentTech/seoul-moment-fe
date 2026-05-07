@@ -26,7 +26,7 @@ interface VerificationFormProps {
 }
 
 const ACCOUNT_PLACEHOLDER_BY_METHOD: Record<FindPasswordMethod, string> = {
-  email: "請輸入手機號碼 或 Email",
+  email: "請輸入Email",
   phone: DEFAULT_COUNTRY_CODE,
 };
 
