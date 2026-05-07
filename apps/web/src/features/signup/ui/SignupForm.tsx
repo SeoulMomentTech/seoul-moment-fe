@@ -6,11 +6,12 @@ import { format } from "date-fns";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
 
+import { PasswordField } from "@shared/ui/password-field";
+
 import { useRouter } from "@/i18n/navigation";
 
 import { Button, cn, Flex, HStack, Input, VStack } from "@seoul-moment/ui";
 
-import { PasswordField } from "./PasswordField";
 import { usePostEmailCodeMutation } from "../api/usePostEmailCodeMutation";
 import { useUserSignUpMutation } from "../api/useUserSignUpMutation";
 import { useVerifyEmailCodeMutation } from "../api/useVerifyEmailCodeMutation";

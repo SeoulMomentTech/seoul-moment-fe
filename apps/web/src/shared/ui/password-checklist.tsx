@@ -4,8 +4,10 @@ import { Check } from "lucide-react";
 
 import { cn, HStack, VStack } from "@seoul-moment/ui";
 
-import type { PasswordRuleKey } from "../model/schema";
-import { usePasswordRules } from "../model/usePasswordRules";
+import {
+  type PasswordRuleKey,
+  usePasswordRules,
+} from "../lib/hooks/usePasswordRules";
 
 interface Props {
   value: string;
