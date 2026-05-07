@@ -71,8 +71,12 @@ Direct use of `@tanstack/react-query` hooks is **banned by ESLint**. Use wrapper
 | Wrapper              | Extra Option                |
 | -------------------- | --------------------------- |
 | `useAppQuery`        | `logOnError: boolean`       |
-| `useAppMutation`     | `toastOnError: string`      |
+| `useAppMutation`     | `toastOnError: boolean`     |
 | `useAppInfiniteQuery`| `logOnError: boolean`       |
+
+On `toastOnError: true`, the global `MutationCache.onError` reads the
+server-side `message` field from the ky error response body when
+available, falling back to `err.message` otherwise.
 
 ## i18n — next-intl v4
 
@@ -80,6 +84,12 @@ Direct use of `@tanstack/react-query` hooks is **banned by ESLint**. Use wrapper
 - Messages in `messages/{locale}.json`
 - Translations sync from Google Sheets via `scripts/syncLocaleFromSheet.js`
 - Request interfaces extend `PublicLanguageCode` when locale-aware
+
+### Routing
+
+Always import `useRouter`, `Link`, `redirect`, `usePathname` from
+`@/i18n/navigation` — never from `next/navigation`. The localized
+wrapper preserves the `[locale]` segment when navigating.
 
 ## State Management
 
@@ -97,3 +107,27 @@ Direct use of `@tanstack/react-query` hooks is **banned by ESLint**. Use wrapper
 - `react-hook-form` + `zod` — form validation
 - `sonner` — toast notifications
 - `lucide-react` — icons (exclusive, no other icon libraries)
+
+## Shared UI Primitives
+
+`src/shared/ui/` hosts web-only primitives shared across features.
+Notable entries (kebab-case file names, named exports):
+
+- `password-field.tsx` / `password-checklist.tsx` — password input with
+  eye toggle and 5-rule live checklist (used by signup, find-password)
+- `divider.tsx`, `chip.tsx`, `bottom-sheet.tsx`, `select.tsx`, ...
+
+`src/shared/lib/hooks/usePasswordRules.ts` exports `PASSWORD_RULES`,
+`PasswordRuleKey`, and the `usePasswordRules` hook used by both apps'
+password flows.
+
+## Gotchas
+
+- **ESLint import order is strict.** The `import/order` plugin treats
+  `@shared/*` and `@/*` as different groups; running `pnpm lint:fix:web`
+  after refactors is the safest path. Linter will block commits via
+  husky/lint-staged otherwise.
+- **Auth flows.** Find-password verification + reset uses the
+  `user/auth/password/email/{code,verify}` and `PATCH user/auth/password`
+  endpoints (one-time token in `Authorization` header). Signup uses the
+  legacy `auth/email/{code,verify}` until the swagger gap is filled.
