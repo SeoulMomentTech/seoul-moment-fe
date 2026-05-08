@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 
-import { format } from "date-fns";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
 
@@ -12,7 +11,7 @@ import { useRouter } from "@/i18n/navigation";
 
 import { Button, cn, Flex, HStack, Input, VStack } from "@seoul-moment/ui";
 
-import { usePostEmailCodeMutation } from "../api/usePostEmailCodeMutation";
+import { usePostUserEmailCodeMutation } from "../api/usePostUserEmailCodeMutation";
 import { useUserSignUpMutation } from "../api/useUserSignUpMutation";
 import { useVerifyEmailCodeMutation } from "../api/useVerifyEmailCodeMutation";
 import {
@@ -20,8 +19,6 @@ import {
   signupFormResolver,
   type SignupFormValues,
 } from "../model/schema";
-
-const AGREE_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 export function SignupForm() {
   const router = useRouter();
@@ -52,6 +49,7 @@ export function SignupForm() {
       email: "",
       verificationCode: "",
       isVerified: false,
+      nickname: "",
       password: "",
       passwordConfirm: "",
     },
@@ -63,7 +61,7 @@ export function SignupForm() {
   const password = watch("password");
   const passwordConfirm = watch("passwordConfirm");
 
-  const postEmailCodeMutation = usePostEmailCodeMutation({
+  const postUserEmailCodeMutation = usePostUserEmailCodeMutation({
     onSuccess: () => {
       setIsCodeSent(true);
       setResendSeconds(RESEND_INITIAL_SECONDS);
@@ -94,7 +92,7 @@ export function SignupForm() {
     setVerifyError(null);
     setValue("verificationCode", "", { shouldValidate: true });
     setValue("isVerified", false, { shouldValidate: true });
-    postEmailCodeMutation.mutate(email);
+    postUserEmailCodeMutation.mutate(email);
   };
 
   const handleVerifyCode = () => {
@@ -106,13 +104,13 @@ export function SignupForm() {
     signUpMutation.mutate({
       email: values.email,
       password: values.password,
-      personalInfoAgreeDate: format(new Date(), AGREE_DATE_FORMAT),
+      nickname: values.nickname,
     });
   };
 
   const isSubmitDisabled = !isValid || signUpMutation.isPending;
   const isResendDisabled =
-    !email || postEmailCodeMutation.isPending || resendSeconds > 0;
+    !email || postUserEmailCodeMutation.isPending || resendSeconds > 0;
   const sendButtonLabel = isCodeSent
     ? resendSeconds > 0
       ? `重新發送 (${resendSeconds}s)`
@@ -192,6 +190,13 @@ export function SignupForm() {
             <span className="text-body-4 text-sent">電子信箱驗證成功。</span>
           )}
         </Flex>
+        <Input
+          className="max-sm:h-12"
+          maxLength={20}
+          placeholder="請輸入暱稱 (2~20 字)"
+          type="text"
+          {...register("nickname")}
+        />
         <PasswordField
           placeholder="請輸入密碼"
           showChecklist={password.length > 0}

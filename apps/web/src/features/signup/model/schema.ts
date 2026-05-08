@@ -18,6 +18,7 @@ export const signupSchema = z
     email: z.string().email(),
     verificationCode: z.string().min(1),
     isVerified: z.boolean().refine((value) => value === true),
+    nickname: z.string().min(2).max(20),
     password: passwordSchema,
     passwordConfirm: z.string(),
   })
