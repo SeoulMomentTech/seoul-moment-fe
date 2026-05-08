@@ -4,15 +4,14 @@ import { api } from ".";
 export interface UserSignUpPayload {
   email: string;
   password: string;
-  phone?: string;
-  /** 개인정보 수집 동의 일시. 예: "2025-01-01 12:00:00" */
-  personalInfoAgreeDate: string;
-  /** 광고성 이메일 수신 동의 일시 */
-  adAgreeEmailDate?: string;
-  /** 추천 이메일 수신 동의 일시 */
-  recommendEmailDate?: string;
-  /** 추천 문자 수신 동의 일시 */
-  recommendPhoneDate?: string;
+  /** 닉네임 */
+  nickname: string;
+  /** 신상품 및 기획전 출시 알림 */
+  newProductAgreed?: boolean;
+  /** 광고 및 이벤트 할인 이메일 */
+  adAgreed?: boolean;
+  /** 개인 맞춤 상품 추천 알림 */
+  recommendAgreed?: boolean;
 }
 
 export interface VerifyEmailCodePayload {
@@ -78,6 +77,14 @@ export const postEmailCode = (email: string) =>
       json: { email },
     })
     .json<{ success: boolean }>();
+
+/**
+ * @description 회원 가입용 이메일 인증 코드 발송 (응답 없음 / 409: 이미 가입된 이메일)
+ */
+export const postUserEmailCode = (email: string) =>
+  api.post("user/auth/email/code", {
+    json: { email },
+  });
 
 /**
  * @description 이메일 인증번호 검증

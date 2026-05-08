@@ -129,5 +129,9 @@ password flows.
   husky/lint-staged otherwise.
 - **Auth flows.** Find-password verification + reset uses the
   `user/auth/password/email/{code,verify}` and `PATCH user/auth/password`
-  endpoints (one-time token in `Authorization` header). Signup uses the
-  legacy `auth/email/{code,verify}` until the swagger gap is filled.
+  endpoints (one-time token in `Authorization` header). Signup send-code
+  now uses `user/auth/email/code` (`postUserEmailCode`); verify still uses
+  legacy `auth/email/verify` (`verifyEmailCode`) until the matching
+  `user/auth/email/verify` swagger entry is published. The legacy
+  `postEmailCode` (`auth/email/code`) function is kept as a fallback but
+  no longer wired to signup.

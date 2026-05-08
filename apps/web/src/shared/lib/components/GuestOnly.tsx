@@ -34,5 +34,6 @@ export default function GuestOnly({ children, redirectTo = "/" }: Props) {
   }, [hasHydrated, isAuthenticated, redirectTo, router]);
 
   if (!hasHydrated || isAuthenticated) return null;
+
   return <>{children}</>;
 }
