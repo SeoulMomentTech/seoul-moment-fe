@@ -7,11 +7,11 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { PasswordField } from "@shared/ui/password-field";
+import { TermsConsent } from "@shared/ui/terms-consent";
 
 import { useRouter } from "@/i18n/navigation";
 
 import { Button, cn, Flex, HStack, Input, VStack } from "@seoul-moment/ui";
-import { TermsConsent } from "@widgets/terms-consent";
 
 import { usePostUserEmailCodeMutation } from "../api/usePostUserEmailCodeMutation";
 import { useUserSignUpMutation } from "../api/useUserSignUpMutation";

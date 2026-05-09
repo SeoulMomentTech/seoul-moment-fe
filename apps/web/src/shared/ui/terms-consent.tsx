@@ -4,8 +4,9 @@ import { useState } from "react";
 
 import { Check, ChevronRight } from "lucide-react";
 
+import { TermsModal } from "@shared/ui/terms-modal";
+
 import { cn, HStack, VStack } from "@seoul-moment/ui";
-import { TermsModal } from "@widgets/terms-modal";
 
 type TermKey = "termsOfService" | "privacyPolicy";
 
