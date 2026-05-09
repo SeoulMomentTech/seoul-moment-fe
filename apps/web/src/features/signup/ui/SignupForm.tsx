@@ -11,8 +11,8 @@ import { PasswordField } from "@shared/ui/password-field";
 import { useRouter } from "@/i18n/navigation";
 
 import { Button, cn, Flex, HStack, Input, VStack } from "@seoul-moment/ui";
+import { TermsConsent } from "@widgets/terms-consent";
 
-import { SignupTerms } from "./SignupTerms";
 import { usePostUserEmailCodeMutation } from "../api/usePostUserEmailCodeMutation";
 import { useUserSignUpMutation } from "../api/useUserSignUpMutation";
 import { useVerifyEmailCodeMutation } from "../api/useVerifyEmailCodeMutation";
@@ -221,7 +221,7 @@ export function SignupForm() {
         />
       </VStack>
 
-      <SignupTerms
+      <TermsConsent
         onChange={(key, next) => setValue(key, next, { shouldValidate: true })}
         privacyPolicy={privacyPolicy}
         termsOfService={termsOfService}

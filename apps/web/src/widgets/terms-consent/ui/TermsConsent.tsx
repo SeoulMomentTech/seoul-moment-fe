@@ -14,17 +14,17 @@ const TERM_ITEMS: { key: TermKey; label: string }[] = [
   { key: "privacyPolicy", label: "Privacy Policy" },
 ];
 
-interface SignupTermsProps {
+interface TermsConsentProps {
   termsOfService: boolean;
   privacyPolicy: boolean;
   onChange(key: TermKey, next: boolean): void;
 }
 
-export function SignupTerms({
+export function TermsConsent({
   termsOfService,
   privacyPolicy,
   onChange,
-}: SignupTermsProps) {
+}: TermsConsentProps) {
   const [openKey, setOpenKey] = useState<TermKey | null>(null);
 
   const values: Record<TermKey, boolean> = { termsOfService, privacyPolicy };
