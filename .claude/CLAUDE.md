@@ -21,8 +21,23 @@ App-specific guides (commands, architecture, API layer, conventions):
 ## Monorepo Tooling
 
 - **pnpm workspaces** (v10) with **Turborepo** for task orchestration and caching
-- **Husky** pre-commit hooks run lint-staged (ESLint + Prettier on staged files)
+- **Husky** pre-commit hooks run lint-staged (ESLint + Prettier on staged files); the formatter may reorder/remove imports during commit, so re-read modified files before chained edits
 - Package references use `workspace:*` protocol
+
+## Root Commands
+
+Common monorepo-wide tasks (filtered variants live in sub-CLAUDE.md files):
+
+```bash
+pnpm dev                  # Run dev for every workspace (turbo run dev)
+pnpm build                # Build every workspace
+pnpm lint                 # Lint every workspace
+pnpm lint:fix:all         # Auto-fix web + admin
+pnpm test:e2e             # Run all Playwright e2e suites
+pnpm i18n:sync            # Sync web translations from Google Sheets
+```
+
+App-scoped shortcuts (`dev:web`, `dev:admin`, `build:ui`, `test:web-e2e`, etc.) are also exposed at root via Turborepo `--filter`.
 
 ## Detailed References
 
