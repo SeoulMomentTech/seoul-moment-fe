@@ -21,6 +21,8 @@ export const signupSchema = z
     nickname: z.string().min(2).max(20),
     password: passwordSchema,
     passwordConfirm: z.string(),
+    termsOfService: z.boolean().refine((value) => value === true),
+    privacyPolicy: z.boolean().refine((value) => value === true),
   })
   .refine((data) => data.password === data.passwordConfirm, {
     path: ["passwordConfirm"],
