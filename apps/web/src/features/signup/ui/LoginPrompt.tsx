@@ -10,9 +10,9 @@ export function LoginPrompt() {
         "max-md:mt-0 max-md:border-t-0 max-md:pt-[50px]",
       )}
     >
-      <span>已經擁有 PChome 24h購物帳號嗎？</span>
+      <span>이미 계정이 있으신가요?</span>
       <Link className="text-black/60 underline" href="/login">
-        立即登入
+        로그인
       </Link>
     </div>
   );

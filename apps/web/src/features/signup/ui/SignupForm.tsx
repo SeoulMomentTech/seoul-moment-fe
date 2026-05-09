@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import { PasswordField } from "@shared/ui/password-field";
 
@@ -11,6 +12,7 @@ import { useRouter } from "@/i18n/navigation";
 
 import { Button, cn, Flex, HStack, Input, VStack } from "@seoul-moment/ui";
 
+import { SignupTerms } from "./SignupTerms";
 import { usePostUserEmailCodeMutation } from "../api/usePostUserEmailCodeMutation";
 import { useUserSignUpMutation } from "../api/useUserSignUpMutation";
 import { useVerifyEmailCodeMutation } from "../api/useVerifyEmailCodeMutation";
@@ -52,6 +54,8 @@ export function SignupForm() {
       nickname: "",
       password: "",
       passwordConfirm: "",
+      termsOfService: false,
+      privacyPolicy: false,
     },
   });
 
@@ -60,6 +64,8 @@ export function SignupForm() {
   const isVerified = watch("isVerified");
   const password = watch("password");
   const passwordConfirm = watch("passwordConfirm");
+  const termsOfService = watch("termsOfService");
+  const privacyPolicy = watch("privacyPolicy");
 
   const postUserEmailCodeMutation = usePostUserEmailCodeMutation({
     onSuccess: () => {
@@ -75,12 +81,15 @@ export function SignupForm() {
     },
     onError: () => {
       setValue("isVerified", false, { shouldValidate: true });
-      setVerifyError("驗證碼錯誤,請重新確認。");
+      setVerifyError("인증코드가 일치하지 않습니다. 다시 확인해주세요.");
     },
   });
 
   const signUpMutation = useUserSignUpMutation({
     onSuccess: () => {
+      toast.success("가입이 완료되었습니다. 로그인해주세요.", {
+        position: "top-center",
+      });
       router.replace("/login");
     },
   });
@@ -113,16 +122,16 @@ export function SignupForm() {
     !email || postUserEmailCodeMutation.isPending || resendSeconds > 0;
   const sendButtonLabel = isCodeSent
     ? resendSeconds > 0
-      ? `重新發送 (${resendSeconds}s)`
-      : "重新發送"
-    : "發送驗證碼";
+      ? `재발송 (${resendSeconds}s)`
+      : "재발송"
+    : "인증코드 발송";
 
   return (
     <form className="w-full" onSubmit={handleSubmit(onSubmit)}>
       <VStack className="w-full pt-[64px]" gap={16}>
         <Input
           className="max-sm:h-12"
-          placeholder="請輸入電子信箱"
+          placeholder="이메일을 입력해주세요"
           type="email"
           {...register("email", {
             onChange: () => {
@@ -138,7 +147,7 @@ export function SignupForm() {
             <Input
               className="flex-1 max-sm:h-12"
               inputMode="numeric"
-              placeholder="請輸入驗證碼"
+              placeholder="인증코드를 입력해주세요"
               type="text"
               {...register("verificationCode", {
                 onChange: () => {
@@ -174,41 +183,49 @@ export function SignupForm() {
                 onClick={handleVerifyCode}
                 type="button"
               >
-                {isVerified ? "已驗證" : "確認"}
+                {isVerified ? "인증 완료" : "확인"}
               </Button>
             )}
           </HStack>
           {isCodeSent && !isVerified && !verifyError && (
             <span className="text-body-4 text-black/60">
-              驗證碼已發送至您的電子信箱。
+              인증코드가 이메일로 발송되었습니다.
             </span>
           )}
           {verifyError && (
             <span className="text-body-4 text-error">{verifyError}</span>
           )}
           {isVerified && (
-            <span className="text-body-4 text-sent">電子信箱驗證成功。</span>
+            <span className="text-body-4 text-sent">
+              이메일 인증이 완료되었습니다.
+            </span>
           )}
         </Flex>
         <Input
           className="max-sm:h-12"
           maxLength={20}
-          placeholder="請輸入暱稱 (2~20 字)"
+          placeholder="닉네임을 입력해주세요 (2~20자)"
           type="text"
           {...register("nickname")}
         />
         <PasswordField
-          placeholder="請輸入密碼"
+          placeholder="비밀번호를 입력해주세요"
           showChecklist={password.length > 0}
           value={password}
           {...register("password")}
         />
         <PasswordField
-          placeholder="確認密碼"
+          placeholder="비밀번호 확인"
           value={passwordConfirm}
           {...register("passwordConfirm")}
         />
       </VStack>
+
+      <SignupTerms
+        onChange={(key, next) => setValue(key, next, { shouldValidate: true })}
+        privacyPolicy={privacyPolicy}
+        termsOfService={termsOfService}
+      />
 
       <div className="w-full pt-[30px]">
         <button
@@ -221,7 +238,7 @@ export function SignupForm() {
           disabled={isSubmitDisabled}
           type="submit"
         >
-          立即註冊
+          회원가입
         </button>
       </div>
     </form>

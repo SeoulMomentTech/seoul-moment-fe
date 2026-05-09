@@ -2,12 +2,7 @@
 
 import GuestOnly from "@shared/lib/components/GuestOnly";
 
-import {
-  LoginPrompt,
-  SignupForm,
-  SignupHeader,
-  SignupTerms,
-} from "@features/signup";
+import { LoginPrompt, SignupForm, SignupHeader } from "@features/signup";
 import { VStack } from "@seoul-moment/ui";
 
 export function SignupPage() {
@@ -17,7 +12,6 @@ export function SignupPage() {
         <VStack className="w-full max-w-[414px]">
           <SignupHeader />
           <SignupForm />
-          <SignupTerms />
           <LoginPrompt />
         </VStack>
       </VStack>
