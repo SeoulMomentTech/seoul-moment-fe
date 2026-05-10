@@ -190,7 +190,7 @@ export function PhoneVerificationModal({
                   </Button>
                 </HStack>
                 {showSentMessage && (
-                  <p className="text-body-3 text-sent w-full leading-none">
+                  <p className="text-body-3 text-info w-full leading-none">
                     인증코드가 SMS로 발송되었습니다.
                   </p>
                 )}
@@ -236,12 +236,12 @@ export function PhoneVerificationModal({
                   </Button>
                 </HStack>
                 {errorMessage && (
-                  <p className="text-body-3 text-error w-full leading-none">
+                  <p className="text-body-3 text-danger w-full leading-none">
                     {errorMessage}
                   </p>
                 )}
                 {isVerified && (
-                  <p className="text-body-3 text-sent w-full leading-none">
+                  <p className="text-body-3 text-info w-full leading-none">
                     휴대폰 인증이 완료되었습니다.
                   </p>
                 )}

@@ -98,7 +98,7 @@ export function PhoneVerificationResultModal(
                     strokeWidth={2.5}
                   />
                 ) : (
-                  <span className="text-error text-body-1 font-bold leading-none">
+                  <span className="text-danger text-body-1 font-bold leading-none">
                     !
                   </span>
                 )}
