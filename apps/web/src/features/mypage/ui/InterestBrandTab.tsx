@@ -9,6 +9,10 @@ import { Skeleton } from "@seoul-moment/ui";
 
 import { InterestBrandCard } from "./InterestBrandCard";
 import { useGetUserLikeBrandListQuery } from "../api/useGetUserLikeBrandListQuery";
+import {
+  IS_DEV_MYPAGE_MOCK,
+  MOCK_INTEREST_BRAND_ITEMS,
+} from "../mocks/interest";
 
 interface InterestBrandTabProps {
   className?: string;
@@ -16,19 +20,23 @@ interface InterestBrandTabProps {
 
 export function InterestBrandTab({ className }: InterestBrandTabProps) {
   const { data, isLoading } = useGetUserLikeBrandListQuery({ count: 20 });
-  const brands = data?.list ?? [];
+  const brands = data?.list?.length
+    ? data.list
+    : IS_DEV_MYPAGE_MOCK
+      ? MOCK_INTEREST_BRAND_ITEMS
+      : [];
 
   if (isLoading) {
     return (
       <div
         className={cn(
-          "grid grid-cols-2 gap-[20px] max-sm:grid-cols-1",
+          "grid grid-cols-2 gap-[17px] max-sm:grid-cols-1 max-sm:gap-0",
           className,
         )}
       >
         {Array.from({ length: 2 }).map((_, i) => (
           <Skeleton
-            className="h-[260px] rounded-[12px]"
+            className="h-[300px] max-sm:h-[260px] max-sm:rounded-none"
             key={`mypage-like-brand-skel-${i + 1}`}
           />
         ))}
@@ -49,7 +57,7 @@ export function InterestBrandTab({ className }: InterestBrandTabProps) {
   return (
     <div
       className={cn(
-        "grid grid-cols-2 gap-[20px] max-sm:grid-cols-1",
+        "grid grid-cols-2 gap-[17px] max-sm:grid-cols-1 max-sm:gap-0",
         className,
       )}
     >

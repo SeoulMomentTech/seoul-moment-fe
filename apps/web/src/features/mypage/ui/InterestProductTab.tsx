@@ -11,6 +11,10 @@ import { InterestCategoryChips } from "./InterestCategoryChips";
 import { InterestProductRow } from "./InterestProductRow";
 import { useDeleteUserProductLikeMutation } from "../api/useDeleteUserProductLikeMutation";
 import { useGetUserLikeProductListQuery } from "../api/useGetUserLikeProductListQuery";
+import {
+  IS_DEV_MYPAGE_MOCK,
+  MOCK_INTEREST_PRODUCT_ITEMS,
+} from "../mocks/interest";
 import { useInterestProductCategory } from "../model/useInterestProductCategory";
 
 interface InterestProductTabProps {
@@ -27,7 +31,11 @@ export function InterestProductTab({ className }: InterestProductTabProps) {
   const { mutate: deleteLike, isPending: isDeleting } =
     useDeleteUserProductLikeMutation();
 
-  const items = data?.list ?? [];
+  const items = data?.list?.length
+    ? data.list
+    : IS_DEV_MYPAGE_MOCK
+      ? MOCK_INTEREST_PRODUCT_ITEMS
+      : [];
 
   return (
     <div className={cn("flex flex-col gap-6", className)}>

@@ -1,6 +1,6 @@
 "use client";
 
-import { HeartIcon } from "lucide-react";
+import { ChevronRight, HeartIcon } from "lucide-react";
 
 import Image from "next/image";
 
@@ -8,9 +8,9 @@ import { cn } from "@shared/lib/style";
 import { toNTCurrency } from "@shared/lib/utils";
 import type { UserBrandLike } from "@shared/services/userLike";
 
-import { Link, useRouter } from "@/i18n/navigation";
+import { Link } from "@/i18n/navigation";
 
-import { Avatar, AvatarFallback, Button } from "@seoul-moment/ui";
+import { Avatar, AvatarFallback } from "@seoul-moment/ui";
 
 import { useDeleteUserBrandLikeMutation } from "../api/useDeleteUserBrandLikeMutation";
 import { formatLikeCount } from "../lib/formatLikeCount";
@@ -23,7 +23,6 @@ interface InterestBrandCardProps {
 const SLOT_COUNT = 4;
 
 export function InterestBrandCard({ data, className }: InterestBrandCardProps) {
-  const router = useRouter();
   const { mutate: deleteLike, isPending } = useDeleteUserBrandLikeMutation();
 
   const products = data.recentProductList.slice(0, SLOT_COUNT);
@@ -33,22 +32,27 @@ export function InterestBrandCard({ data, className }: InterestBrandCardProps) {
   return (
     <article
       className={cn(
-        "flex flex-col gap-[20px] rounded-[12px] border border-black/10 p-[20px]",
+        "flex flex-col gap-[30px] border border-black/10 px-[20px] py-[24px]",
+        "max-sm:border-x-0 max-sm:border-t-0 max-sm:px-0",
         className,
       )}
     >
-      <header className="flex items-center justify-between gap-3">
-        <Link className="flex min-w-0 items-center gap-3" href={brandHref}>
+      <header className="flex items-center justify-between gap-[20px]">
+        <Link className="flex min-w-0 items-center gap-[10px]" href={brandHref}>
           <Avatar className="size-10 border border-black/10">
-            <AvatarFallback className="text-[14px] font-semibold">
+            <AvatarFallback className="text-body-3 font-semibold">
               {data.englishBrandName.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          <div className="flex min-w-0 flex-col">
-            <span className="text-body-3 truncate font-semibold text-black">
+          <div className="flex h-10 min-w-0 flex-col gap-2">
+            <span className="text-body-3 sm:text-body-2 flex items-center gap-1 truncate font-semibold text-black">
               {data.englishBrandName}
+              <ChevronRight
+                className="size-[14px] shrink-0 text-black/40 sm:hidden"
+                strokeWidth={1.5}
+              />
             </span>
-            <span className="text-body-4 truncate text-black/50">
+            <span className="text-body-5 truncate text-black/40">
               {data.brandName} | 관심 {formatLikeCount(data.totalLikeCount)}
             </span>
           </div>
@@ -64,24 +68,24 @@ export function InterestBrandCard({ data, className }: InterestBrandCardProps) {
         </button>
       </header>
 
-      <div className="grid grid-cols-4 gap-[10px]">
+      <div className="no-scrollbar flex gap-[8px] max-sm:overflow-x-auto">
         {products.map((product) => (
           <Link
-            className="flex flex-col gap-1"
+            className="flex w-[100px] shrink-0 flex-col gap-[10px]"
             href={`/product/${product.productItemId}`}
             key={product.productItemId}
           >
-            <figure className="aspect-square overflow-hidden rounded-[6px] bg-black/5">
+            <figure className="size-[100px] overflow-hidden bg-black/5">
               <Image
                 alt={product.productName}
                 className="h-full w-full object-cover"
-                height={120}
+                height={100}
                 src={product.imageUrl}
                 unoptimized
-                width={120}
+                width={100}
               />
             </figure>
-            <p className="text-body-5 line-clamp-1 text-black/70">
+            <p className="text-body-5 line-clamp-1 text-black">
               {product.productName}
             </p>
             <span className="text-body-5 font-semibold text-black">
@@ -92,21 +96,18 @@ export function InterestBrandCard({ data, className }: InterestBrandCardProps) {
         {Array.from({ length: emptySlots }).map((_, i) => (
           <div
             aria-hidden
-            className="aspect-square rounded-[6px] bg-black/5"
+            className="size-[100px] shrink-0 bg-black/5"
             key={`empty-${i + 1}`}
           />
         ))}
       </div>
 
-      <Button
-        className="w-full"
-        onClick={() => router.push(brandHref)}
-        size="md"
-        type="button"
-        variant="outline"
+      <Link
+        className="text-body-3 flex w-full items-center justify-center gap-1 rounded-[4px] border border-black/20 bg-white px-[16px] py-[12px] font-semibold text-black max-sm:hidden"
+        href={brandHref}
       >
         브랜드 더보기
-      </Button>
+      </Link>
     </article>
   );
 }
