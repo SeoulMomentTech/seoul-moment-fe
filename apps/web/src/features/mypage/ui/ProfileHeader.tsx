@@ -1,6 +1,6 @@
 "use client";
 
-import { UserIcon } from "lucide-react";
+import { CircleUserRound } from "lucide-react";
 
 import { cn } from "@shared/lib/style";
 
@@ -30,7 +30,7 @@ export function ProfileHeader({ className }: ProfileHeaderProps) {
     <div
       className={cn(
         "flex items-center justify-between gap-4 rounded-[12px] border border-black/10 px-6 py-5",
-        "max-sm:flex-col max-sm:items-stretch max-sm:gap-4",
+        "max-sm:flex-col max-sm:items-stretch max-sm:gap-4 max-sm:border-none max-sm:px-0 max-sm:pb-0",
         className,
       )}
     >
@@ -41,7 +41,10 @@ export function ProfileHeader({ className }: ProfileHeaderProps) {
             src={profile?.profileImageUrl}
           />
           <AvatarFallback>
-            <UserIcon className="size-7 text-black/30" />
+            <CircleUserRound
+              className="size-[60px] text-black/30"
+              strokeWidth={0.75}
+            />
           </AvatarFallback>
         </Avatar>
         <div className="flex min-w-0 flex-col gap-1">
@@ -53,7 +56,7 @@ export function ProfileHeader({ className }: ProfileHeaderProps) {
           ) : (
             <>
               <span className="text-body-1 font-bold text-black">
-                {profile?.nickname ?? ""}
+                {profile?.nickname ?? "nickName"}
               </span>
               <span className="text-body-3 text-black/50">
                 {info?.email ?? ""}

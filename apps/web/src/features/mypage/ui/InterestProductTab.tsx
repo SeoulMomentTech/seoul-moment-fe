@@ -40,11 +40,11 @@ export function InterestProductTab({ className }: InterestProductTabProps) {
         <div className="flex flex-col">
           {Array.from({ length: 4 }).map((_, i) => (
             <div
-              className="flex items-center gap-[20px] border-b border-black/10 py-[16px] last:border-b-0"
+              className="flex items-center gap-[10px] border-b border-black/10 py-[16px]"
               key={`mypage-like-product-skel-${i + 1}`}
             >
-              <Skeleton className="size-[80px] rounded-[6px]" />
-              <div className="flex flex-1 flex-col gap-2">
+              <Skeleton className="size-[80px]" />
+              <div className="flex flex-1 flex-col gap-[16px]">
                 <Skeleton className="h-4 w-16" />
                 <Skeleton className="h-5 w-2/3" />
                 <Skeleton className="h-4 w-20" />
@@ -60,7 +60,7 @@ export function InterestProductTab({ className }: InterestProductTabProps) {
           icon={<HeartIcon className="size-10 text-black/20" />}
         />
       ) : (
-        <ul className="flex flex-col [&>li+li]:border-t [&>li+li]:border-black/10">
+        <ul className="flex flex-col [&>li]:border-b [&>li]:border-black/10">
           {items.map((item) => (
             <li key={item.productItemId}>
               <InterestProductRow

@@ -36,12 +36,12 @@ export function InterestProductRow({
   return (
     <Link
       className={cn(
-        "flex items-center gap-[20px] py-[16px] transition-colors hover:bg-black/[0.02]",
+        "flex items-center gap-[10px] py-[16px] transition-colors hover:bg-black/[0.02]",
         className,
       )}
       href={`/product/${data.productItemId}`}
     >
-      <figure className="size-[80px] shrink-0 overflow-hidden rounded-[6px] bg-black/5">
+      <figure className="size-[80px] shrink-0 overflow-hidden bg-black/5">
         <Image
           alt={data.productName}
           className="h-full w-full object-cover"
@@ -51,13 +51,15 @@ export function InterestProductRow({
           width={80}
         />
       </figure>
-      <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <span className="text-body-4 font-semibold text-black">
-          {data.brandName}
-        </span>
-        <p className="text-body-3 line-clamp-1 text-black/80">
-          {data.productName}
-        </p>
+      <div className="flex min-w-0 flex-1 flex-col gap-[16px]">
+        <div className="flex min-w-0 flex-col gap-[10px]">
+          <span className="text-body-5 font-semibold text-black">
+            {data.brandName}
+          </span>
+          <p className="text-body-3 line-clamp-1 text-black">
+            {data.productName}
+          </p>
+        </div>
         <span className="text-body-3 font-semibold text-black">
           {toNTCurrency(displayPrice)}
         </span>

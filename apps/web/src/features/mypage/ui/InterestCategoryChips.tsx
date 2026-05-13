@@ -15,9 +15,9 @@ interface InterestCategoryChipsProps {
 }
 
 const CHIP_BUTTON_CLASS =
-  "flex shrink-0 cursor-pointer flex-col items-center gap-[8px] px-[8px] py-2 text-sm font-medium";
+  "flex shrink-0 cursor-pointer flex-col items-center gap-[8px] px-[8px] text-body-4 font-normal sm:text-body-3";
 const CHIP_CIRCLE_CLASS =
-  "flex h-[50px] w-[50px] items-center justify-center overflow-hidden rounded-full border border-black/5";
+  "flex h-[50px] w-[50px] items-center justify-center overflow-hidden rounded-full border border-transparent bg-black/5";
 
 export function InterestCategoryChips({
   className,
@@ -38,7 +38,7 @@ export function InterestCategoryChips({
       >
         {Array.from({ length: 8 }).map((_, i) => (
           <div
-            className="flex shrink-0 flex-col items-center gap-[8px] px-[8px] py-2"
+            className="flex shrink-0 flex-col items-center gap-[8px] px-[8px]"
             key={`mypage-cat-skel-${i + 1}`}
           >
             <Skeleton className="h-[50px] w-[50px] rounded-full" />

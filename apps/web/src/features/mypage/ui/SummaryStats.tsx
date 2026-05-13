@@ -56,7 +56,7 @@ export function SummaryStats({ className }: SummaryStatsProps) {
     <div
       className={cn(
         "grid grid-cols-6 items-center gap-2 rounded-[12px] border border-black/10 px-4 py-6",
-        "max-sm:grid-cols-3 max-sm:gap-y-4",
+        "max-sm:grid-cols-3 max-sm:gap-y-4 max-sm:border-none max-sm:px-0 max-sm:pb-0",
         className,
       )}
     >
