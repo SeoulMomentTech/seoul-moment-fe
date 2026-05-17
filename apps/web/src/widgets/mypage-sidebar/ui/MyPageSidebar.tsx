@@ -21,7 +21,7 @@ const MY_INFO_GROUP: ReadonlyArray<SidebarItem> = [
   { label: "로그인 정보", href: "/mypage" },
   { label: "프로필 관리", href: "/mypage" },
   { label: "주소록", href: "/mypage" },
-  { label: "나의 맞춤 정보", href: "/mypage" },
+  { label: "나의 맞춤 정보", href: "/mypage/custom-info" },
 ];
 
 function SidebarGroup({
