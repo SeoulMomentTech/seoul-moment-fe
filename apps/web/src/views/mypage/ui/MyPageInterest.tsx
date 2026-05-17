@@ -5,7 +5,7 @@ import AuthOnly from "@shared/lib/components/AuthOnly";
 import { InterestSection } from "@features/mypage";
 import { MyPageSidebar } from "@widgets/mypage-sidebar";
 
-export function MyPageRecent() {
+export function MyPageInterest() {
   return (
     <AuthOnly>
       <div className="mx-auto mt-[50px] flex w-full max-w-7xl gap-5 pb-[100px] pt-[60px] max-sm:mt-[50px] max-sm:flex-col max-sm:gap-[30px] max-sm:pb-[40px] max-sm:pt-[20px]">

@@ -14,7 +14,7 @@ interface SidebarItem {
 }
 
 const SHOPPING_GROUP: ReadonlyArray<SidebarItem> = [
-  { label: "관심", href: "/mypage/recent" },
+  { label: "관심", href: "/mypage/interest" },
 ];
 
 const MY_INFO_GROUP: ReadonlyArray<SidebarItem> = [

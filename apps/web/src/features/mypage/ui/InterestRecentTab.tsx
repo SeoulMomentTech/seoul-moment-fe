@@ -55,8 +55,12 @@ export function InterestRecentTab({ className }: InterestRecentTabProps) {
             <li key={item.productItemId}>
               <Link className="h-fit" href={`/product/${item.productItemId}`}>
                 <ProductCard
+                  className="h-full flex-1"
                   data={toProductItem(item)}
-                  imageClassName="aspect-square h-auto w-full"
+                  imageClassName={cn(
+                    "aspect-square h-auto w-full",
+                    "max-sm:w-full max-sm:max-h-[150px] max-sm:min-h-[150px]",
+                  )}
                 />
               </Link>
             </li>
