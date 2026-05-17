@@ -1,56 +1,64 @@
 "use client";
 
+import ProductCard from "@entities/product/ui/ProductCard";
 import { cn } from "@shared/lib/style";
+
+import { Link } from "@/i18n/navigation";
 
 import { Skeleton } from "@seoul-moment/ui";
 
 import { EmptyRecent } from "./EmptyRecent";
-import { InterestProductRow } from "./InterestProductRow";
 import { SimilarToRecentSection } from "./SimilarToRecentSection";
 import { useGetUserRecentListQuery } from "../api/useGetUserRecentListQuery";
+import { toProductItem } from "../lib/adapters";
+import {
+  IS_DEV_MYPAGE_MOCK,
+  MOCK_INTEREST_RECENT_ITEMS,
+} from "../mocks/interest";
 
 interface InterestRecentTabProps {
   className?: string;
 }
 
+const GRID_CLASS =
+  "grid grid-cols-4 gap-x-[20px] gap-y-[40px] max-sm:grid-cols-2 max-sm:gap-x-[10px] max-sm:gap-y-[30px]";
+
 export function InterestRecentTab({ className }: InterestRecentTabProps) {
   const { data, isLoading } = useGetUserRecentListQuery({ count: 20 });
-  const items = data?.list ?? [];
+  const items = data?.list?.length
+    ? data.list
+    : IS_DEV_MYPAGE_MOCK
+      ? MOCK_INTEREST_RECENT_ITEMS
+      : [];
 
   return (
     <div className={cn("flex flex-col gap-10 max-sm:gap-8", className)}>
       {isLoading ? (
-        <div className="flex flex-col">
-          {Array.from({ length: 3 }).map((_, i) => (
+        <div className={GRID_CLASS}>
+          {Array.from({ length: 4 }).map((_, i) => (
             <div
-              className="flex items-center gap-[20px] border-b border-black/10 py-[16px] last:border-b-0"
+              className="flex flex-col gap-3"
               key={`mypage-recent-skel-${i + 1}`}
             >
-              <Skeleton className="size-[80px] rounded-[6px]" />
-              <div className="flex flex-1 flex-col gap-2">
-                <Skeleton className="h-4 w-16" />
-                <Skeleton className="h-5 w-2/3" />
-                <Skeleton className="h-4 w-20" />
-              </div>
+              <Skeleton className="aspect-square w-full rounded-[6px]" />
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-5 w-2/3" />
+              <Skeleton className="h-4 w-20" />
             </div>
           ))}
         </div>
       ) : items.length === 0 ? (
         <EmptyRecent />
       ) : (
-        <ul className="flex flex-col [&>li+li]:border-t [&>li+li]:border-black/10">
+        <ul className={GRID_CLASS}>
           {items.map((item) => (
             <li key={item.productItemId}>
-              <InterestProductRow
-                data={{
-                  productItemId: item.productItemId,
-                  brandName: item.brandName,
-                  productName: item.productName,
-                  imageUrl: item.imageUrl,
-                  price: item.price,
-                  discountPrice: item.discountPrice,
-                }}
-              />
+              <Link className="h-fit" href={`/product/${item.productItemId}`}>
+                <ProductCard
+                  data={toProductItem(item)}
+                  imageClassName="aspect-square h-auto w-full"
+                />
+              </Link>
             </li>
           ))}
         </ul>

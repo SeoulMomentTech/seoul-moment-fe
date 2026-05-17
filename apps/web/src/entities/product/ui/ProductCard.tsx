@@ -76,7 +76,7 @@ export default function ProductCard({
           <div
             className={cn(
               "flex min-h-[21px] items-center gap-1",
-              !data.colorCode && "invisible",
+              !data.colorCode && "hidden",
             )}
           >
             <Badge
