@@ -1,5 +1,7 @@
 "use client";
 
+import { Search } from "lucide-react";
+
 import { cn } from "@shared/lib/style";
 
 import { useRouter } from "@/i18n/navigation";
@@ -16,14 +18,15 @@ export function EmptyRecent({ className }: EmptyRecentProps) {
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center gap-4 rounded-[8px] border border-dashed border-black/15 px-6 py-[60px] text-center",
+        "flex flex-col items-center justify-center gap-4 px-6 py-[60px] text-center",
         className,
       )}
     >
+      <Search className="size-6 text-black/40" strokeWidth={1.5} />
       <p className="text-body-3 leading-relaxed text-black/50">
         최근 본 상품이 아직 없어요.
         <br />
-        다양한 상품을 둘러보고 마음에 드는 상품을 만나보세요.
+        요즘 많이 찾는 아이템을 구경해보세요.
       </p>
       <Button
         onClick={() => router.push("/product")}
