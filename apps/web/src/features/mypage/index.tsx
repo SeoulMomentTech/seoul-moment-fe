@@ -3,3 +3,4 @@ export { SummaryStats } from "./ui/SummaryStats";
 export { BnrBanner } from "./ui/BnrBanner";
 export { InterestSection } from "./ui/InterestSection";
 export { CustomInfoSection } from "./ui/CustomInfoSection";
+export { UserSizeInfoModal } from "./ui/UserSizeInfoModal";
