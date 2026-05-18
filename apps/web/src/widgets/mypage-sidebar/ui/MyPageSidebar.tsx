@@ -19,7 +19,7 @@ const SHOPPING_GROUP: ReadonlyArray<SidebarItem> = [
 
 const MY_INFO_GROUP: ReadonlyArray<SidebarItem> = [
   { label: "로그인 정보", href: "/mypage/login-info" },
-  { label: "프로필 관리", href: "/mypage" },
+  { label: "프로필 관리", href: "/mypage/profile" },
   { label: "나의 맞춤 정보", href: "/mypage/custom-info" },
 ];
 

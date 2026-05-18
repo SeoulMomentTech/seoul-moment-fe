@@ -9,13 +9,11 @@ import { cn } from "@shared/lib/style";
 import { Button, Label } from "@seoul-moment/ui";
 
 import { useGetUserInfoQuery } from "../api/useGetUserInfoQuery";
+import { FIELD_LABEL_CLASS, SECTION_TITLE_CLASS } from "../lib/formClasses";
 
 interface LoginInfoSectionProps {
   className?: string;
 }
-
-const SECTION_TITLE_CLASS = "text-body-1 font-semibold text-black";
-const FIELD_LABEL_CLASS = "text-body-3 text-black";
 
 interface NotificationOption {
   key: string;
@@ -143,7 +141,7 @@ export function LoginInfoSection({ className }: LoginInfoSectionProps) {
                 >
                   <span
                     className={cn(
-                      "mt-[1px] flex size-[16px] shrink-0 items-center justify-center rounded-full border transition-colors",
+                      "mt-px flex size-[16px] shrink-0 items-center justify-center rounded-full border transition-colors",
                       active
                         ? "border-black bg-black text-white"
                         : "border-black/30 bg-white",

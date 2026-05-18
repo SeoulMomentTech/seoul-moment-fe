@@ -9,10 +9,15 @@ import { cn } from "@shared/lib/style";
 import { Button, Input, Label } from "@seoul-moment/ui";
 
 import { SizeSelectModal } from "./SizeSelectModal";
+import { type CustomInfoFormValues } from "../lib/adapters";
+import {
+  FIELD_LABEL_CLASS,
+  INPUT_CLASS,
+  SECTION_TITLE_CLASS,
+} from "../lib/formClasses";
 import { SIZE_FIELDS, type SizeType } from "../lib/sizeOptions";
 
-const SECTION_TITLE_CLASS = "text-body-1 font-semibold text-black";
-const FIELD_LABEL_CLASS = "text-body-3 text-black";
+export type { CustomInfoFormValues } from "../lib/adapters";
 
 const MAX_HEIGHT = 250;
 const MAX_WEIGHT = 300;
@@ -56,18 +61,12 @@ function SizeRowButton({
   );
 }
 
-const INITIAL_SIZE_VALUES: Partial<Record<SizeType, string>> = {};
-
-export interface CustomInfoFormValues {
-  height: string;
-  weight: string;
-  sizeValues: Partial<Record<SizeType, string>>;
-}
-
 interface CustomInfoFormProps {
   heightLabel: string;
   weightLabel: string;
   submitLabel: string;
+  defaultValues?: CustomInfoFormValues;
+  submitting?: boolean;
   onSubmit?(values: CustomInfoFormValues): void;
   footer?: ReactNode;
   className?: string;
@@ -77,26 +76,27 @@ export function CustomInfoForm({
   heightLabel,
   weightLabel,
   submitLabel,
+  defaultValues,
+  submitting = false,
   onSubmit,
   footer,
   className,
 }: CustomInfoFormProps) {
   const fieldId = useId();
-  const [height, setHeight] = useState("");
-  const [weight, setWeight] = useState("");
-  const [sizeValues, setSizeValues] =
-    useState<Partial<Record<SizeType, string>>>(INITIAL_SIZE_VALUES);
+  const [height, setHeight] = useState(() => defaultValues?.height ?? "");
+  const [weight, setWeight] = useState(() => defaultValues?.weight ?? "");
+  const [sizeValues, setSizeValues] = useState<
+    Partial<Record<SizeType, string>>
+  >(() => defaultValues?.sizeValues ?? {});
   const [openType, setOpenType] = useState<SizeType | null>(null);
 
   const activeField =
     SIZE_FIELDS.find((field) => field.type === openType) ?? null;
 
-  const isDirty =
-    height.trim() !== "" ||
-    weight.trim() !== "" ||
-    SIZE_FIELDS.some(
-      (field) => sizeValues[field.type] !== INITIAL_SIZE_VALUES[field.type],
-    );
+  const isComplete =
+    height.trim() !== "" &&
+    weight.trim() !== "" &&
+    SIZE_FIELDS.every((field) => Boolean(sizeValues[field.type]));
 
   return (
     <div className={cn("flex flex-col gap-10 max-sm:gap-8", className)}>
@@ -108,6 +108,7 @@ export function CustomInfoForm({
               {heightLabel}
             </Label>
             <Input
+              className={INPUT_CLASS}
               id={`${fieldId}-height`}
               inputMode="numeric"
               onChange={(e) =>
@@ -122,6 +123,7 @@ export function CustomInfoForm({
               {weightLabel}
             </Label>
             <Input
+              className={INPUT_CLASS}
               id={`${fieldId}-weight`}
               inputMode="numeric"
               onChange={(e) =>
@@ -151,7 +153,7 @@ export function CustomInfoForm({
       <div className="flex flex-col gap-4">
         <Button
           className="max-sm:text-body-2 h-[56px] w-full max-sm:h-[48px]"
-          disabled={!isDirty}
+          disabled={!isComplete || submitting}
           onClick={() => onSubmit?.({ height, weight, sizeValues })}
           size="lg"
           type="button"
