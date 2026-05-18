@@ -4,6 +4,8 @@ import { CircleUserRound } from "lucide-react";
 
 import { cn } from "@shared/lib/style";
 
+import { useRouter } from "@/i18n/navigation";
+
 import {
   Avatar,
   AvatarFallback,
@@ -23,6 +25,7 @@ export function ProfileHeader({ className }: ProfileHeaderProps) {
   const { data: profile, isLoading: isProfileLoading } =
     useGetUserProfileQuery();
   const { data: info, isLoading: isInfoLoading } = useGetUserInfoQuery();
+  const router = useRouter();
 
   const isLoading = isProfileLoading || isInfoLoading;
 
@@ -68,19 +71,12 @@ export function ProfileHeader({ className }: ProfileHeaderProps) {
       <div className="flex items-center gap-2 max-sm:w-full">
         <Button
           className="max-sm:flex-1"
+          onClick={() => router.push("/mypage/profile")}
           size="sm"
           type="button"
           variant="outline"
         >
           프로필 관리
-        </Button>
-        <Button
-          className="max-sm:flex-1"
-          size="sm"
-          type="button"
-          variant="outline"
-        >
-          내 스타일
         </Button>
       </div>
     </div>
