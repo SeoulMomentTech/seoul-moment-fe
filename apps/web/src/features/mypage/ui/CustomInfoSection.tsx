@@ -51,6 +51,7 @@ export function CustomInfoSection({ className }: CustomInfoSectionProps) {
           heightLabel="키"
           key={fit ? "edit" : "create"}
           onSubmit={handleSubmit}
+          requireComplete={false}
           submitLabel="저장하기"
           submitting={creating || updating}
           weightLabel="몸무게"

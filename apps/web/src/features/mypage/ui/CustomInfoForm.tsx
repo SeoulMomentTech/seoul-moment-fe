@@ -67,6 +67,11 @@ interface CustomInfoFormProps {
   submitLabel: string;
   defaultValues?: CustomInfoFormValues;
   submitting?: boolean;
+  /**
+   * true(기본): 모든 필드 입력 시에만 제출 가능 (온보딩 등 전체 입력 요구)
+   * false: 1개 이상 입력 시 제출 가능 (부분 업데이트 허용)
+   */
+  requireComplete?: boolean;
   onSubmit?(values: CustomInfoFormValues): void;
   footer?: ReactNode;
   className?: string;
@@ -78,6 +83,7 @@ export function CustomInfoForm({
   submitLabel,
   defaultValues,
   submitting = false,
+  requireComplete = true,
   onSubmit,
   footer,
   className,
@@ -97,6 +103,13 @@ export function CustomInfoForm({
     height.trim() !== "" &&
     weight.trim() !== "" &&
     SIZE_FIELDS.every((field) => Boolean(sizeValues[field.type]));
+
+  const hasAnyValue =
+    height.trim() !== "" ||
+    weight.trim() !== "" ||
+    SIZE_FIELDS.some((field) => Boolean(sizeValues[field.type]));
+
+  const canSubmit = requireComplete ? isComplete : hasAnyValue;
 
   return (
     <div className={cn("flex flex-col gap-10 max-sm:gap-8", className)}>
@@ -153,7 +166,7 @@ export function CustomInfoForm({
       <div className="flex flex-col gap-4">
         <Button
           className="max-sm:text-body-2 h-[56px] w-full max-sm:h-[48px]"
-          disabled={!isComplete || submitting}
+          disabled={!canSubmit || submitting}
           onClick={() => onSubmit?.({ height, weight, sizeValues })}
           size="lg"
           type="button"

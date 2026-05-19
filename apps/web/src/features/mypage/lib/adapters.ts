@@ -1,5 +1,5 @@
 import type { ProductItem } from "@shared/services/product";
-import type { UserFit } from "@shared/services/user";
+import type { GetUserFitRes, UpdateUserFitReq } from "@shared/services/user";
 import type { UserRecentProduct } from "@shared/services/userRecent";
 
 import type { SizeType } from "./sizeOptions";
@@ -10,27 +10,31 @@ export interface CustomInfoFormValues {
   sizeValues: Partial<Record<SizeType, string>>;
 }
 
-export function fitToFormValues(fit: UserFit): CustomInfoFormValues {
+export function fitToFormValues(fit: GetUserFitRes): CustomInfoFormValues {
   return {
-    height: String(fit.height),
-    weight: String(fit.weight),
+    height: fit.height == null ? "" : String(fit.height),
+    weight: fit.weight == null ? "" : String(fit.weight),
     sizeValues: {
-      shoes: String(fit.shoeSize),
-      outer: fit.outerSize,
-      top: fit.topSize,
-      bottom: fit.bottomSize,
+      shoes: fit.shoeSize == null ? "" : String(fit.shoeSize),
+      outer: fit.outerSize ?? "",
+      top: fit.topSize ?? "",
+      bottom: fit.bottomSize ?? "",
     },
   };
 }
 
-export function formValuesToFitPayload(values: CustomInfoFormValues): UserFit {
+export function formValuesToFitPayload(
+  values: CustomInfoFormValues,
+): UpdateUserFitReq {
+  const { bottom, outer, shoes, top } = values.sizeValues;
+
   return {
-    height: Number(values.height),
-    weight: Number(values.weight),
-    shoeSize: Number(values.sizeValues.shoes ?? 0),
-    outerSize: values.sizeValues.outer ?? "",
-    topSize: values.sizeValues.top ?? "",
-    bottomSize: values.sizeValues.bottom ?? "",
+    height: values.height.trim() === "" ? null : Number(values.height),
+    weight: values.weight.trim() === "" ? null : Number(values.weight),
+    shoeSize: shoes ? Number(shoes) : null,
+    outerSize: outer || null,
+    topSize: top || null,
+    bottomSize: bottom || null,
   };
 }
 
