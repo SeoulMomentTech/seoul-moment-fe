@@ -2,7 +2,9 @@ import type { ProductItem } from "@shared/services/product";
 import type {
   GetUserFitRes,
   UpdateUserFitReq,
+  UpdateUserInfoReq,
   UpdateUserProfileReq,
+  UserInfo,
   UserProfile,
 } from "@shared/services/user";
 import type { UserRecentProduct } from "@shared/services/userRecent";
@@ -109,5 +111,28 @@ export function formValuesToProfilePayload(
     city: values.city ?? "",
     district: values.district ?? "",
     detailAddress: values.detailAddress.trim(),
+  };
+}
+
+export type AgreementKey = "newProductAgreed" | "adAgreed" | "recommendAgreed";
+
+export type AgreementValues = Record<AgreementKey, boolean>;
+
+export function userInfoToAgreements(info: UserInfo): AgreementValues {
+  return {
+    newProductAgreed: info.newProductAgreed,
+    adAgreed: info.adAgreed,
+    recommendAgreed: info.recommendAgreed,
+  };
+}
+
+export function agreementsToUserInfoPayload(
+  agreements: AgreementValues,
+  base: Pick<UserInfo, "email" | "phone">,
+): UpdateUserInfoReq {
+  return {
+    email: base.email,
+    phone: base.phone,
+    ...agreements,
   };
 }
