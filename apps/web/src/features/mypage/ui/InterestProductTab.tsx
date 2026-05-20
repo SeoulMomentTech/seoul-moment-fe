@@ -1,8 +1,10 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 
 import { HeartIcon } from "lucide-react";
+
+import { debounce } from "es-toolkit";
 
 import { cn } from "@shared/lib/style";
 import Empty from "@widgets/empty/ui/Empty";
@@ -25,6 +27,13 @@ interface InterestProductTabProps {
   className?: string;
 }
 
+const LIKE_DEBOUNCE_MS = 400;
+
+type LikeFlushFn = ((desired: boolean) => void) & {
+  cancel(): void;
+  flush(): void;
+};
+
 export function InterestProductTab({ className }: InterestProductTabProps) {
   const { productCategoryId, setProductCategoryId } =
     useInterestProductCategory();
@@ -32,44 +41,72 @@ export function InterestProductTab({ className }: InterestProductTabProps) {
     productCategoryId,
     count: 30,
   });
-  const { mutate: deleteLike, isPending: isDeleting } =
-    useDeleteUserProductLikeMutation();
-  const { mutate: createLike, isPending: isCreating } =
-    useCreateUserProductLikeMutation();
+  const { mutate: deleteLike } = useDeleteUserProductLikeMutation();
+  const { mutate: createLike } = useCreateUserProductLikeMutation();
 
   const [unlikedIds, setUnlikedIds] = useState<Set<number>>(new Set());
+  const unlikedIdsRef = useRef(unlikedIds);
+  const syncedLikedMapRef = useRef(new Map<number, boolean>());
+  const flushMapRef = useRef(new Map<number, LikeFlushFn>());
 
   const items = data?.list ?? [];
 
-  const togglePending = isDeleting || isCreating;
+  const updateUnliked = (updater: (prev: Set<number>) => Set<number>) => {
+    const next = updater(unlikedIdsRef.current);
+    unlikedIdsRef.current = next;
+    setUnlikedIds(next);
+  };
+
+  const getFlush = (productItemId: number): LikeFlushFn => {
+    const existing = flushMapRef.current.get(productItemId);
+    if (existing) return existing;
+
+    const fn = debounce((desired: boolean) => {
+      const synced = syncedLikedMapRef.current.get(productItemId) ?? true;
+      if (desired === synced) return;
+
+      syncedLikedMapRef.current.set(productItemId, desired);
+
+      const onError = () => {
+        syncedLikedMapRef.current.set(productItemId, synced);
+        updateUnliked((prev) => {
+          const reverted = new Set(prev);
+          if (synced) reverted.delete(productItemId);
+          else reverted.add(productItemId);
+          return reverted;
+        });
+      };
+
+      if (desired) {
+        createLike(productItemId, { onError });
+      } else {
+        deleteLike(productItemId, { onError });
+      }
+    }, LIKE_DEBOUNCE_MS);
+
+    flushMapRef.current.set(productItemId, fn);
+    return fn;
+  };
+
+  useEffect(() => {
+    const flushMap = flushMapRef.current;
+    return () => {
+      flushMap.forEach((fn) => fn.flush());
+    };
+  }, []);
 
   const handleToggleLike = (productItemId: number) => {
-    const isUnliked = unlikedIds.has(productItemId);
+    const wasUnliked = unlikedIdsRef.current.has(productItemId);
+    const willBeLiked = wasUnliked;
 
-    if (isUnliked) {
-      setUnlikedIds((prev) => {
-        const next = new Set(prev);
-        next.delete(productItemId);
-        return next;
-      });
-      createLike(productItemId, {
-        onError: () => {
-          setUnlikedIds((prev) => new Set(prev).add(productItemId));
-        },
-      });
-      return;
-    }
-
-    setUnlikedIds((prev) => new Set(prev).add(productItemId));
-    deleteLike(productItemId, {
-      onError: () => {
-        setUnlikedIds((prev) => {
-          const next = new Set(prev);
-          next.delete(productItemId);
-          return next;
-        });
-      },
+    updateUnliked((prev) => {
+      const next = new Set(prev);
+      if (wasUnliked) next.delete(productItemId);
+      else next.add(productItemId);
+      return next;
     });
+
+    getFlush(productItemId)(willBeLiked);
   };
 
   return (
@@ -117,10 +154,9 @@ export function InterestProductTab({ className }: InterestProductTabProps) {
                       aria-label={liked ? "좋아요 취소" : "좋아요"}
                       aria-pressed={liked}
                       className={cn(
-                        "cursor-pointer p-2 disabled:opacity-50",
+                        "cursor-pointer p-2",
                         liked ? "text-red-500" : "text-black/30",
                       )}
-                      disabled={togglePending}
                       onClick={() => handleToggleLike(item.productItemId)}
                       type="button"
                     >
