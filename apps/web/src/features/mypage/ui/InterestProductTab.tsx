@@ -1,20 +1,24 @@
 "use client";
 
+import { Suspense, useState } from "react";
+
 import { HeartIcon } from "lucide-react";
 
 import { cn } from "@shared/lib/style";
 import Empty from "@widgets/empty/ui/Empty";
 
+import {
+  useCreateUserProductLikeMutation,
+  useDeleteUserProductLikeMutation,
+} from "@entities/product";
 import { Skeleton } from "@seoul-moment/ui";
 
-import { InterestCategoryChips } from "./InterestCategoryChips";
-import { InterestProductRow } from "./InterestProductRow";
-import { useDeleteUserProductLikeMutation } from "../api/useDeleteUserProductLikeMutation";
-import { useGetUserLikeProductListQuery } from "../api/useGetUserLikeProductListQuery";
 import {
-  IS_DEV_MYPAGE_MOCK,
-  MOCK_INTEREST_PRODUCT_ITEMS,
-} from "../mocks/interest";
+  InterestCategoryChips,
+  InterestCategoryChipsSkeleton,
+} from "./InterestCategoryChips";
+import { InterestProductRow } from "./InterestProductRow";
+import { useGetUserLikeProductListQuery } from "../api/useGetUserLikeProductListQuery";
 import { useInterestProductCategory } from "../model/useInterestProductCategory";
 
 interface InterestProductTabProps {
@@ -30,19 +34,52 @@ export function InterestProductTab({ className }: InterestProductTabProps) {
   });
   const { mutate: deleteLike, isPending: isDeleting } =
     useDeleteUserProductLikeMutation();
+  const { mutate: createLike, isPending: isCreating } =
+    useCreateUserProductLikeMutation();
 
-  const items = data?.list?.length
-    ? data.list
-    : IS_DEV_MYPAGE_MOCK
-      ? MOCK_INTEREST_PRODUCT_ITEMS
-      : [];
+  const [unlikedIds, setUnlikedIds] = useState<Set<number>>(new Set());
+
+  const items = data?.list ?? [];
+
+  const togglePending = isDeleting || isCreating;
+
+  const handleToggleLike = (productItemId: number) => {
+    const isUnliked = unlikedIds.has(productItemId);
+
+    if (isUnliked) {
+      setUnlikedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(productItemId);
+        return next;
+      });
+      createLike(productItemId, {
+        onError: () => {
+          setUnlikedIds((prev) => new Set(prev).add(productItemId));
+        },
+      });
+      return;
+    }
+
+    setUnlikedIds((prev) => new Set(prev).add(productItemId));
+    deleteLike(productItemId, {
+      onError: () => {
+        setUnlikedIds((prev) => {
+          const next = new Set(prev);
+          next.delete(productItemId);
+          return next;
+        });
+      },
+    });
+  };
 
   return (
     <div className={cn("flex flex-col gap-6", className)}>
-      <InterestCategoryChips
-        onChange={setProductCategoryId}
-        value={productCategoryId}
-      />
+      <Suspense fallback={<InterestCategoryChipsSkeleton />}>
+        <InterestCategoryChips
+          onChange={setProductCategoryId}
+          value={productCategoryId}
+        />
+      </Suspense>
 
       {isLoading ? (
         <div className="flex flex-col">
@@ -69,27 +106,37 @@ export function InterestProductTab({ className }: InterestProductTabProps) {
         />
       ) : (
         <ul className="flex flex-col [&>li]:border-b [&>li]:border-black/10">
-          {items.map((item) => (
-            <li key={item.productItemId}>
-              <InterestProductRow
-                data={item}
-                rightSlot={
-                  <button
-                    aria-label="좋아요 취소"
-                    className="cursor-pointer p-2 text-red-500 disabled:opacity-50"
-                    disabled={isDeleting}
-                    onClick={() => deleteLike(item.productItemId)}
-                    type="button"
-                  >
-                    <HeartIcon
-                      className="size-6 fill-red-500"
-                      strokeWidth={1.5}
-                    />
-                  </button>
-                }
-              />
-            </li>
-          ))}
+          {items.map((item) => {
+            const liked = !unlikedIds.has(item.productItemId);
+            return (
+              <li key={item.productItemId}>
+                <InterestProductRow
+                  data={item}
+                  rightSlot={
+                    <button
+                      aria-label={liked ? "좋아요 취소" : "좋아요"}
+                      aria-pressed={liked}
+                      className={cn(
+                        "cursor-pointer p-2 disabled:opacity-50",
+                        liked ? "text-red-500" : "text-black/30",
+                      )}
+                      disabled={togglePending}
+                      onClick={() => handleToggleLike(item.productItemId)}
+                      type="button"
+                    >
+                      <HeartIcon
+                        className={cn(
+                          "size-6",
+                          liked ? "fill-red-500" : "fill-none",
+                        )}
+                        strokeWidth={1.5}
+                      />
+                    </button>
+                  }
+                />
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>

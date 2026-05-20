@@ -2,11 +2,10 @@
 
 import Image from "next/image";
 
+import useProductCategory from "@features/product/model/useProductCategory";
 import { cn } from "@shared/lib/style";
 
 import { Skeleton } from "@seoul-moment/ui";
-
-import { useGetProductCategoryQuery } from "../api/useGetProductCategoryQuery";
 
 interface InterestCategoryChipsProps {
   className?: string;
@@ -14,6 +13,8 @@ interface InterestCategoryChipsProps {
   onChange(next: number | undefined): void;
 }
 
+const CONTAINER_CLASS =
+  "no-scrollbar flex items-center gap-[10px] overflow-x-auto";
 const CHIP_BUTTON_CLASS =
   "flex shrink-0 cursor-pointer flex-col items-center gap-[8px] px-[8px] text-body-4 font-normal sm:text-body-3";
 const CHIP_CIRCLE_CLASS =
@@ -24,38 +25,10 @@ export function InterestCategoryChips({
   value,
   onChange,
 }: InterestCategoryChipsProps) {
-  const { data, isLoading } = useGetProductCategoryQuery();
-  const categories = data?.list ?? [];
-
-  if (isLoading) {
-    return (
-      <div
-        aria-busy="true"
-        className={cn(
-          "no-scrollbar flex items-center gap-[10px] overflow-x-auto",
-          className,
-        )}
-      >
-        {Array.from({ length: 8 }).map((_, i) => (
-          <div
-            className="flex shrink-0 flex-col items-center gap-[8px] px-[8px]"
-            key={`mypage-cat-skel-${i + 1}`}
-          >
-            <Skeleton className="h-[50px] w-[50px] rounded-full" />
-            <Skeleton className="h-4 w-12" />
-          </div>
-        ))}
-      </div>
-    );
-  }
+  const { data: categories } = useProductCategory();
 
   return (
-    <div
-      className={cn(
-        "no-scrollbar flex items-center gap-[10px] overflow-x-auto",
-        className,
-      )}
-    >
+    <div className={cn(CONTAINER_CLASS, className)}>
       <button
         className={cn(CHIP_BUTTON_CLASS, value == null && "font-semibold")}
         onClick={() => onChange(undefined)}
@@ -88,6 +61,26 @@ export function InterestCategoryChips({
           </button>
         );
       })}
+    </div>
+  );
+}
+
+export function InterestCategoryChipsSkeleton({
+  className,
+}: {
+  className?: string;
+}) {
+  return (
+    <div aria-busy="true" className={cn(CONTAINER_CLASS, className)}>
+      {Array.from({ length: 8 }).map((_, i) => (
+        <div
+          className="flex shrink-0 flex-col items-center gap-[8px] px-[8px]"
+          key={`mypage-cat-skel-${i + 1}`}
+        >
+          <Skeleton className="h-[50px] w-[50px] rounded-full" />
+          <Skeleton className="h-4 w-12" />
+        </div>
+      ))}
     </div>
   );
 }
