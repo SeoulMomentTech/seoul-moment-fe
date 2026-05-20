@@ -19,6 +19,11 @@ export interface VerifyEmailCodePayload {
   code: string;
 }
 
+export interface PostNicknameValidatePayload {
+  /** 닉네임 */
+  nickname: string;
+}
+
 export interface UserLoginPayload {
   email: string;
   password: string;
@@ -84,6 +89,14 @@ export const postEmailCode = (email: string) =>
 export const postUserEmailCode = (email: string) =>
   api.post("user/auth/email/code", {
     json: { email },
+  });
+
+/**
+ * @description 닉네임 중복 검사 (응답 없음 / 409: 이미 존재하는 닉네임)
+ */
+export const postNicknameValidate = (data: PostNicknameValidatePayload) =>
+  api.post("user/auth/nickname/validate", {
+    json: data,
   });
 
 /**

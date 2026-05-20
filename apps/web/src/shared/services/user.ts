@@ -20,8 +20,6 @@ export const getUserInfo = () =>
   api.get("user/info").json<CommonRes<GetUserInfoRes>>();
 
 export interface UpdateUserInfoReq {
-  phone?: string;
-  email: string;
   newProductAgreed?: boolean;
   adAgreed?: boolean;
   recommendAgreed?: boolean;

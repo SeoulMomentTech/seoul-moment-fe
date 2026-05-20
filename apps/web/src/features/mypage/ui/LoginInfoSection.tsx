@@ -15,7 +15,6 @@ import { useUpdateUserInfoMutation } from "../api/useUpdateUserInfoMutation";
 import {
   type AgreementKey,
   type AgreementValues,
-  agreementsToUserInfoPayload,
   userInfoToAgreements,
 } from "../lib/adapters";
 import { FIELD_LABEL_CLASS, SECTION_TITLE_CLASS } from "../lib/formClasses";
@@ -58,12 +57,10 @@ function AccountValueField({
   value,
   verified,
   unverifiedMessage,
-  hideAction = false,
 }: {
   value: string;
   verified: boolean;
   unverifiedMessage?: string;
-  hideAction?: boolean;
 }) {
   return (
     <div className="flex flex-col gap-2">
@@ -76,15 +73,13 @@ function AccountValueField({
             <CircleAlert className="text-error size-[18px] shrink-0" />
           )}
         </div>
-        {hideAction ? null : (
-          <Button
-            className="h-[48px] shrink-0 px-[16px]"
-            type="button"
-            variant={verified ? "outline" : "default"}
-          >
-            {verified ? "수정" : "인증"}
-          </Button>
-        )}
+        <Button
+          className="h-[48px] shrink-0 px-[16px]"
+          type="button"
+          variant={verified ? "outline" : "default"}
+        >
+          {verified ? "수정" : "인증"}
+        </Button>
       </div>
       {verified || !unverifiedMessage ? null : (
         <span className="text-body-5 text-error">{unverifiedMessage}</span>
@@ -119,7 +114,10 @@ function NotificationForm({
         <h3 className={SECTION_TITLE_CLASS}>혜택 정보</h3>
         <div className="flex flex-col gap-2">
           <Label className={FIELD_LABEL_CLASS}>이메일주소</Label>
-          <AccountValueField hideAction value={email} verified />
+          <div className="flex h-[48px] items-center justify-between rounded-[4px] border border-black/20 px-[12px]">
+            <span className="text-body-2 text-black">{email}</span>
+            <CheckCircle2 className="text-info size-[18px] shrink-0" />
+          </div>
         </div>
 
         <div className="flex flex-col gap-4">
@@ -191,7 +189,7 @@ export function LoginInfoSection({ className }: LoginInfoSectionProps) {
   const handleSubmit = (agreements: AgreementValues) => {
     if (!userInfo) return;
 
-    updateInfo(agreementsToUserInfoPayload(agreements, userInfo), {
+    updateInfo(agreements, {
       onSuccess: () => toast.success("수정사항이 저장되었습니다."),
     });
   };

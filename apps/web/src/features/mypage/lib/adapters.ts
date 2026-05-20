@@ -2,7 +2,6 @@ import type { ProductItem } from "@shared/services/product";
 import type {
   GetUserFitRes,
   UpdateUserFitReq,
-  UpdateUserInfoReq,
   UpdateUserProfileReq,
   UserInfo,
   UserProfile,
@@ -123,16 +122,5 @@ export function userInfoToAgreements(info: UserInfo): AgreementValues {
     newProductAgreed: info.newProductAgreed,
     adAgreed: info.adAgreed,
     recommendAgreed: info.recommendAgreed,
-  };
-}
-
-export function agreementsToUserInfoPayload(
-  agreements: AgreementValues,
-  base: Pick<UserInfo, "email" | "phone">,
-): UpdateUserInfoReq {
-  return {
-    email: base.email,
-    phone: base.phone,
-    ...agreements,
   };
 }
