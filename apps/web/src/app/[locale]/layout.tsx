@@ -7,6 +7,7 @@ import { getMessages, getTranslations } from "next-intl/server";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Toaster } from "sonner";
 
+import GlobalQueryHandler from "@shared/lib/components/GlobalQueryHandler";
 import { ReactQueryProvider } from "@shared/lib/providers";
 import ScrollRestoration from "@shared/ui/scroll-restoration";
 
@@ -104,6 +105,7 @@ export default async function RootLayout({
               <main className="mx-auto min-h-[calc(100vh-200px)] bg-white">
                 {children}
                 <Toaster />
+                <GlobalQueryHandler />
               </main>
               <Footer />
             </ReactQueryProvider>
