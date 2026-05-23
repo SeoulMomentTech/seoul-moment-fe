@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useState } from "react";
 
 import { StarIcon } from "lucide-react";
 
-import { debounce } from "es-toolkit";
 import { useTranslations } from "next-intl";
 
 import { useAppQuery, useLanguage } from "@shared/lib/hooks";
@@ -15,18 +14,12 @@ import { AvatarBadge } from "@widgets/avatar-badge/ui/AvatarBadge";
 import { LikeCount } from "@widgets/like-count/ui/LikeCount";
 
 import { Link } from "@/i18n/navigation";
-import { useUserAuthStore } from "@/shared/lib/hooks/useUserAuthStore";
 
-import {
-  useCreateUserProductLikeMutation,
-  useDeleteUserProductLikeMutation,
-} from "@entities/product";
+import { useProductLikeToggle } from "@entities/product";
 import { BrandProductList, ProductExternalGroup } from "@features/product";
 import { Button } from "@seoul-moment/ui";
 import { ProductDetailImage } from "@widgets/product-detail-image";
 import { ProductGallery } from "@widgets/product-gallery";
-
-const LIKE_DEBOUNCE_MS = 400;
 
 interface ProductDetailPageProps {
   id: number;
@@ -34,7 +27,6 @@ interface ProductDetailPageProps {
 
 export default function ProductDetailPage({ id }: ProductDetailPageProps) {
   const languageCode = useLanguage();
-  const { isAuthenticated } = useUserAuthStore();
   const { data } = useAppQuery({
     queryKey: ["product-detail", id, languageCode],
     queryFn: () => getProductDetail({ id, languageCode }),
@@ -45,80 +37,16 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
 
   const t = useTranslations();
   const [showMore, setShowMore] = useState(false);
-  const [liked, setLiked] = useState(false);
-  const [syncedLiked, setSyncedLiked] = useState(false);
-  const syncedLikedRef = useRef(false);
-  const initializedIdRef = useRef<number | null>(null);
 
-  const { mutate: createLike } = useCreateUserProductLikeMutation();
-  const { mutate: deleteLike } = useDeleteUserProductLikeMutation();
-
-  const flushLike = useMemo(
-    () =>
-      debounce((desired: boolean) => {
-        const current = syncedLikedRef.current;
-        if (desired === current) return;
-
-        syncedLikedRef.current = desired;
-        setSyncedLiked(desired);
-
-        const onError = () => {
-          syncedLikedRef.current = current;
-          setSyncedLiked(current);
-          setLiked(current);
-        };
-
-        if (desired) {
-          createLike(id, { onError });
-        } else {
-          deleteLike(id, { onError });
-        }
-      }, LIKE_DEBOUNCE_MS),
-    [id, createLike, deleteLike],
-  );
+  const { liked, count, handleToggleLike } = useProductLikeToggle({
+    productId: id,
+    isLiked: data?.isLiked ?? false,
+    likeCount: data?.like ?? 0,
+  });
 
   const handleToggleShowMore = (showMore: boolean) => {
     setShowMore(showMore);
   };
-
-  const handleToggleLike = () => {
-    if (!isAuthenticated) return;
-
-    setLiked((prev) => {
-      const next = !prev;
-      flushLike(next);
-      return next;
-    });
-  };
-
-  useEffect(() => {
-    return () => {
-      flushLike.flush();
-    };
-  }, [flushLike]);
-
-  useEffect(
-    function syncInitialLiked() {
-      if (!data) return;
-      if (initializedIdRef.current === id) return;
-      initializedIdRef.current = id;
-      setLiked(data.isLiked);
-      setSyncedLiked(data.isLiked);
-      syncedLikedRef.current = data.isLiked;
-    },
-    [data, id],
-  );
-
-  useEffect(
-    function resetLiked() {
-      if (!isAuthenticated) {
-        setLiked(false);
-        setSyncedLiked(false);
-        syncedLikedRef.current = false;
-      }
-    },
-    [isAuthenticated],
-  );
 
   if (!data) return null;
 
@@ -155,10 +83,7 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
               </Link>
               <LikeCount
                 active={liked}
-                count={Math.max(
-                  0,
-                  data.like + (liked ? 1 : 0) - (syncedLiked ? 1 : 0),
-                )}
+                count={count}
                 countClassName="max-sm:hidden"
                 iconSize={20}
                 onClick={handleToggleLike}
