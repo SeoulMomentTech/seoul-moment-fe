@@ -1,5 +1,6 @@
 import type { HTTPError } from "ky";
 
+import type { GetBrandPromotionResponse } from "@shared/services/brandPromotion";
 import type { GetProductBrandBannerRes } from "@shared/services/product";
 import { deleteUserBrandLike } from "@shared/services/userLike";
 
@@ -9,9 +10,13 @@ import type { CommonRes } from "@shared/services";
 import { useQueryClient } from "@tanstack/react-query";
 
 type BrandBannerCache = CommonRes<GetProductBrandBannerRes>;
+type BrandPromotionDetailCache = CommonRes<GetBrandPromotionResponse>;
 
 interface OptimisticContext {
-  snapshots: Array<[readonly unknown[], BrandBannerCache | undefined]>;
+  bannerSnapshots: Array<[readonly unknown[], BrandBannerCache | undefined]>;
+  promotionSnapshots: Array<
+    [readonly unknown[], BrandPromotionDetailCache | undefined]
+  >;
 }
 
 export function useDeleteUserBrandLikeMutation() {
@@ -22,13 +27,21 @@ export function useDeleteUserBrandLikeMutation() {
     toastOnError: true,
     onMutate: async (brandId) => {
       const bannerKey = ["productBrandBanner", brandId] as const;
-      await queryClient.cancelQueries({ queryKey: bannerKey });
+      const promotionKey = ["brandPromotionDetail"] as const;
+      await Promise.all([
+        queryClient.cancelQueries({ queryKey: bannerKey }),
+        queryClient.cancelQueries({ queryKey: promotionKey }),
+      ]);
 
-      const snapshots = queryClient.getQueriesData<BrandBannerCache>({
+      const bannerSnapshots = queryClient.getQueriesData<BrandBannerCache>({
         queryKey: bannerKey,
       });
+      const promotionSnapshots =
+        queryClient.getQueriesData<BrandPromotionDetailCache>({
+          queryKey: promotionKey,
+        });
 
-      for (const [key] of snapshots) {
+      for (const [key] of bannerSnapshots) {
         queryClient.setQueryData<BrandBannerCache>(key, (prev) =>
           prev
             ? {
@@ -42,11 +55,33 @@ export function useDeleteUserBrandLikeMutation() {
         );
       }
 
-      return { snapshots };
+      for (const [key, value] of promotionSnapshots) {
+        if (!value?.data?.brand || value.data.brand.id !== brandId) continue;
+        queryClient.setQueryData<BrandPromotionDetailCache>(key, (prev) =>
+          prev
+            ? {
+                ...prev,
+                data: {
+                  ...prev.data,
+                  brand: {
+                    ...prev.data.brand,
+                    isLiked: false,
+                    likeCount: Math.max(0, prev.data.brand.likeCount - 1),
+                  },
+                },
+              }
+            : prev,
+        );
+      }
+
+      return { bannerSnapshots, promotionSnapshots };
     },
     onError: (_err, _brandId, context) => {
       if (!context) return;
-      for (const [key, data] of context.snapshots) {
+      for (const [key, data] of context.bannerSnapshots) {
+        queryClient.setQueryData(key, data);
+      }
+      for (const [key, data] of context.promotionSnapshots) {
         queryClient.setQueryData(key, data);
       }
     },
@@ -55,6 +90,7 @@ export function useDeleteUserBrandLikeMutation() {
       queryClient.invalidateQueries({
         queryKey: ["productBrandBanner", brandId],
       });
+      queryClient.invalidateQueries({ queryKey: ["brandPromotionDetail"] });
     },
   });
 }
