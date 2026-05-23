@@ -12,19 +12,23 @@ import { Link } from "@/i18n/navigation";
 
 import { Avatar, AvatarFallback } from "@seoul-moment/ui";
 
-import { useDeleteUserBrandLikeMutation } from "../api/useDeleteUserBrandLikeMutation";
 import { formatLikeCount } from "../lib/formatLikeCount";
 
 interface InterestBrandCardProps {
   data: UserBrandLike;
+  liked: boolean;
   className?: string;
+  onToggleLike(brandId: number): void;
 }
 
 const SLOT_COUNT = 4;
 
-export function InterestBrandCard({ data, className }: InterestBrandCardProps) {
-  const { mutate: deleteLike, isPending } = useDeleteUserBrandLikeMutation();
-
+export function InterestBrandCard({
+  data,
+  liked,
+  className,
+  onToggleLike,
+}: InterestBrandCardProps) {
   const products = data.recentProductList.slice(0, SLOT_COUNT);
   const emptySlots = Math.max(0, SLOT_COUNT - products.length);
   const brandHref = `/brand/${data.brandId}`;
@@ -58,13 +62,19 @@ export function InterestBrandCard({ data, className }: InterestBrandCardProps) {
           </div>
         </Link>
         <button
-          aria-label="브랜드 좋아요 취소"
-          className="shrink-0 cursor-pointer p-2 text-red-500 disabled:opacity-50"
-          disabled={isPending}
-          onClick={() => deleteLike(data.brandId)}
+          aria-label={liked ? "브랜드 좋아요 취소" : "브랜드 좋아요"}
+          aria-pressed={liked}
+          className={cn(
+            "shrink-0 cursor-pointer p-2",
+            liked ? "text-red-500" : "text-black/30",
+          )}
+          onClick={() => onToggleLike(data.brandId)}
           type="button"
         >
-          <HeartIcon className="size-6 fill-red-500" strokeWidth={1.5} />
+          <HeartIcon
+            className={cn("size-6", liked ? "fill-red-500" : "fill-none")}
+            strokeWidth={1.5}
+          />
         </button>
       </header>
 

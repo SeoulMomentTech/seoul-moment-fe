@@ -1,36 +1,5 @@
-import type {
-  UserBrandLike,
-  UserBrandLikeProduct,
-  UserProductLike,
-} from "@shared/services/userLike";
+import type { UserProductLike } from "@shared/services/userLike";
 import type { UserRecentProduct } from "@shared/services/userRecent";
-
-const buildBrandProducts = (label: string): UserBrandLikeProduct[] => [
-  {
-    productItemId: Number(`${label.charCodeAt(0)}01`),
-    productName: `${label} 맨체스터 유나이티드 23/24 어웨이 저지`,
-    imageUrl: "https://placehold.co/100x100/2a3d5f/fff?text=01",
-    price: 96000,
-  },
-  {
-    productItemId: Number(`${label.charCodeAt(0)}02`),
-    productName: `${label} 맨체스터 유나이티드 23/24 홈 저지`,
-    imageUrl: "https://placehold.co/100x100/3a4d6f/fff?text=02",
-    price: 96000,
-  },
-  {
-    productItemId: Number(`${label.charCodeAt(0)}03`),
-    productName: `${label} 맨체스터 유나이티드 23/24 트레이닝`,
-    imageUrl: "https://placehold.co/100x100/4a5d7f/fff?text=03",
-    price: 96000,
-  },
-  {
-    productItemId: Number(`${label.charCodeAt(0)}04`),
-    productName: `${label} 맨체스터 유나이티드 23/24 폴로`,
-    imageUrl: "https://placehold.co/100x100/5a6d8f/fff?text=04",
-    price: 96000,
-  },
-];
 
 export const MOCK_INTEREST_PRODUCT_ITEMS: UserProductLike[] = [
   {
@@ -60,37 +29,6 @@ export const MOCK_INTEREST_PRODUCT_ITEMS: UserProductLike[] = [
     productName: "옴므 에센스 안티 에이징스킨",
     imageUrl: "https://placehold.co/80x80/e8e8e8/333?text=04",
     price: 43000,
-  },
-];
-
-export const MOCK_INTEREST_BRAND_ITEMS: UserBrandLike[] = [
-  {
-    brandId: 1,
-    englishBrandName: "adidas",
-    brandName: "아디다스",
-    totalLikeCount: 60000,
-    recentProductList: buildBrandProducts("A"),
-  },
-  {
-    brandId: 2,
-    englishBrandName: "Nike",
-    brandName: "나이키",
-    totalLikeCount: 120000,
-    recentProductList: buildBrandProducts("B"),
-  },
-  {
-    brandId: 3,
-    englishBrandName: "NewBalance",
-    brandName: "뉴발란스",
-    totalLikeCount: 35000,
-    recentProductList: buildBrandProducts("C"),
-  },
-  {
-    brandId: 4,
-    englishBrandName: "Puma",
-    brandName: "푸마",
-    totalLikeCount: 28000,
-    recentProductList: buildBrandProducts("D"),
   },
 ];
 

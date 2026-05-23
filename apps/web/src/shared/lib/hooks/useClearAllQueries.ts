@@ -6,6 +6,7 @@ const useClearAllQueries = () => {
   const clearAllQueries = () => {
     queryClient.removeQueries({ queryKey: ["products"] });
     queryClient.removeQueries({ queryKey: ["product-detail"] });
+    queryClient.removeQueries({ queryKey: ["productBrandBanner"] });
   };
 
   return { clearAllQueries };

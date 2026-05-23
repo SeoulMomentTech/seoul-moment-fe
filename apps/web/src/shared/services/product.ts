@@ -165,6 +165,7 @@ export interface GetProductBrandBannerRes {
   englishName: string;
   description: string;
   like: number;
+  isLiked: boolean;
 }
 
 export const getProductBrandBanner = ({
