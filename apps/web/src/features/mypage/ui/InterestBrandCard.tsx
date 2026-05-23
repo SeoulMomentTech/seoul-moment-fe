@@ -10,25 +10,25 @@ import type { UserBrandLike } from "@shared/services/userLike";
 
 import { Link } from "@/i18n/navigation";
 
+import { useBrandLikeToggle } from "@entities/brand";
 import { Avatar, AvatarFallback } from "@seoul-moment/ui";
 
 import { formatLikeCount } from "../lib/formatLikeCount";
 
 interface InterestBrandCardProps {
   data: UserBrandLike;
-  liked: boolean;
   className?: string;
-  onToggleLike(brandId: number): void;
 }
 
 const SLOT_COUNT = 4;
 
-export function InterestBrandCard({
-  data,
-  liked,
-  className,
-  onToggleLike,
-}: InterestBrandCardProps) {
+export function InterestBrandCard({ data, className }: InterestBrandCardProps) {
+  const { liked, handleToggleLike } = useBrandLikeToggle({
+    brandId: data.brandId,
+    isLiked: true,
+    likeCount: data.totalLikeCount,
+  });
+
   const products = data.recentProductList.slice(0, SLOT_COUNT);
   const emptySlots = Math.max(0, SLOT_COUNT - products.length);
   const brandHref = `/brand/${data.brandId}`;
@@ -68,7 +68,7 @@ export function InterestBrandCard({
             "shrink-0 cursor-pointer p-2",
             liked ? "text-red-500" : "text-black/30",
           )}
-          onClick={() => onToggleLike(data.brandId)}
+          onClick={handleToggleLike}
           type="button"
         >
           <HeartIcon

@@ -1,10 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-
 import { Share2Icon } from "lucide-react";
 
-import { debounce } from "es-toolkit";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 
@@ -18,15 +15,10 @@ import type {
 import { Link } from "@/i18n/navigation";
 import { LikeCount } from "@/widgets/like-count/ui/LikeCount";
 
-import {
-  useCreateUserBrandLikeMutation,
-  useDeleteUserBrandLikeMutation,
-} from "@entities/brand";
+import { useBrandLikeToggle } from "@entities/brand";
 import { VStack, HStack, cn, Flex } from "@seoul-moment/ui";
 
 import { useBrandPromotionDetailQuery } from "../model/useBrandPromotionDetailQuery";
-
-const LIKE_DEBOUNCE_MS = 400;
 
 interface BrandIntroductionProps {
   brand: GetBrandPromotionBrandDetailResponse;
@@ -56,75 +48,11 @@ export function BrandIntroduction({
   });
   const brand = data?.brand ?? initialBrand;
 
-  const [liked, setLiked] = useState(brand.isLiked);
-  const [syncedLiked, setSyncedLiked] = useState(brand.isLiked);
-  const syncedLikedRef = useRef(brand.isLiked);
-
-  const { mutate: createLike } = useCreateUserBrandLikeMutation();
-  const { mutate: deleteLike } = useDeleteUserBrandLikeMutation();
-
-  const flushLike = useMemo(
-    () =>
-      debounce((desired: boolean) => {
-        const current = syncedLikedRef.current;
-        if (desired === current) return;
-
-        syncedLikedRef.current = desired;
-        setSyncedLiked(desired);
-
-        const onError = () => {
-          syncedLikedRef.current = current;
-          setSyncedLiked(current);
-          setLiked(current);
-        };
-
-        if (desired) {
-          createLike(brand.id, { onError });
-        } else {
-          deleteLike(brand.id, { onError });
-        }
-      }, LIKE_DEBOUNCE_MS),
-    [brand.id, createLike, deleteLike],
-  );
-
-  const handleToggleLike = () => {
-    if (!isAuthenticated) return;
-
-    setLiked((prev) => {
-      const next = !prev;
-      flushLike(next);
-      return next;
-    });
-  };
-
-  useEffect(() => {
-    return () => {
-      flushLike.flush();
-    };
-  }, [flushLike]);
-
-  useEffect(
-    function syncLikedFromCache() {
-      // 보류 중인 mutation이 있으면 사용자의 의도를 덮어쓰지 않는다.
-      if (liked !== syncedLiked) return;
-      if (syncedLiked === brand.isLiked) return;
-      setLiked(brand.isLiked);
-      setSyncedLiked(brand.isLiked);
-      syncedLikedRef.current = brand.isLiked;
-    },
-    [brand.isLiked, liked, syncedLiked],
-  );
-
-  useEffect(
-    function resetLiked() {
-      if (!isAuthenticated) {
-        setLiked(false);
-        setSyncedLiked(false);
-        syncedLikedRef.current = false;
-      }
-    },
-    [isAuthenticated],
-  );
+  const { liked, count, handleToggleLike } = useBrandLikeToggle({
+    brandId: brand.id,
+    isLiked: brand.isLiked,
+    likeCount: brand.likeCount,
+  });
 
   return (
     <section
@@ -143,10 +71,7 @@ export function BrandIntroduction({
             <HStack align="center" gap={10}>
               <LikeCount
                 active={liked}
-                count={Math.max(
-                  0,
-                  brand.likeCount + (liked ? 1 : 0) - (syncedLiked ? 1 : 0),
-                )}
+                count={count}
                 iconSize={24}
                 onClick={handleToggleLike}
               />

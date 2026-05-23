@@ -1,27 +1,18 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-
 import { Share2Icon } from "lucide-react";
 
-import { debounce } from "es-toolkit";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 
 import { useBrandBanner } from "@entities/brand/model/hooks/useBrandBanner";
 import { useLanguage } from "@shared/lib/hooks";
 import { useModal } from "@shared/lib/hooks";
-import { useUserAuthStore } from "@shared/lib/hooks/useUserAuthStore";
 import { cn } from "@shared/lib/style";
 
 import { Link } from "@/i18n/navigation";
 import { LikeCount } from "@/widgets/like-count/ui/LikeCount";
 
-import {
-  useCreateUserBrandLikeMutation,
-  useDeleteUserBrandLikeMutation,
-} from "@entities/brand";
+import { useBrandLikeToggle } from "@entities/brand";
 import { Button, Flex } from "@seoul-moment/ui";
-
-const LIKE_DEBOUNCE_MS = 400;
 
 interface ProductBrandBannerProps {
   id: number;
@@ -30,7 +21,6 @@ interface ProductBrandBannerProps {
 export default function ProductBrandBanner({ id }: ProductBrandBannerProps) {
   const { openModal } = useModal();
   const languageCode = useLanguage();
-  const { isAuthenticated } = useUserAuthStore();
   const { data } = useBrandBanner({
     params: {
       brandId: id,
@@ -43,76 +33,11 @@ export default function ProductBrandBanner({ id }: ProductBrandBannerProps) {
   });
   const t = useTranslations();
 
-  const [liked, setLiked] = useState(false);
-  const [syncedLiked, setSyncedLiked] = useState(false);
-  const syncedLikedRef = useRef(false);
-  const initializedIdRef = useRef<number | null>(null);
-
-  const { mutate: createLike } = useCreateUserBrandLikeMutation();
-  const { mutate: deleteLike } = useDeleteUserBrandLikeMutation();
-
-  const flushLike = useMemo(
-    () =>
-      debounce((desired: boolean) => {
-        const current = syncedLikedRef.current;
-        if (desired === current) return;
-
-        syncedLikedRef.current = desired;
-        setSyncedLiked(desired);
-
-        const onError = () => {
-          syncedLikedRef.current = current;
-          setSyncedLiked(current);
-          setLiked(current);
-        };
-
-        if (desired) {
-          createLike(id, { onError });
-        } else {
-          deleteLike(id, { onError });
-        }
-      }, LIKE_DEBOUNCE_MS),
-    [id, createLike, deleteLike],
-  );
-
-  const handleToggleLike = () => {
-    if (!isAuthenticated) return;
-
-    setLiked((prev) => {
-      const next = !prev;
-      flushLike(next);
-      return next;
-    });
-  };
-
-  useEffect(() => {
-    return () => {
-      flushLike.flush();
-    };
-  }, [flushLike]);
-
-  useEffect(
-    function syncInitialLiked() {
-      if (!data) return;
-      if (initializedIdRef.current === id) return;
-      initializedIdRef.current = id;
-      setLiked(data.isLiked);
-      setSyncedLiked(data.isLiked);
-      syncedLikedRef.current = data.isLiked;
-    },
-    [data, id],
-  );
-
-  useEffect(
-    function resetLiked() {
-      if (!isAuthenticated) {
-        setLiked(false);
-        setSyncedLiked(false);
-        syncedLikedRef.current = false;
-      }
-    },
-    [isAuthenticated],
-  );
+  const { liked, count, handleToggleLike } = useBrandLikeToggle({
+    brandId: id,
+    isLiked: data?.isLiked ?? false,
+    likeCount: data?.like ?? 0,
+  });
 
   if (!data) return <BannerSkeleton />;
 
@@ -158,10 +83,7 @@ export default function ProductBrandBanner({ id }: ProductBrandBannerProps) {
           <Flex align="center" color="">
             <LikeCount
               active={liked}
-              count={Math.max(
-                0,
-                (data?.like ?? 0) + (liked ? 1 : 0) - (syncedLiked ? 1 : 0),
-              )}
+              count={count}
               iconSize={20}
               onClick={handleToggleLike}
             />
