@@ -57,7 +57,7 @@ export function InterestProductTab({ className }: InterestProductTabProps) {
     useInterestProductCategory();
   const { data, isLoading } = useGetUserLikeProductListQuery({
     productCategoryId,
-    count: 30,
+    count: 100,
   });
 
   const items = data?.list ?? [];

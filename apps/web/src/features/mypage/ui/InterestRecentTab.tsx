@@ -11,10 +11,6 @@ import { EmptyRecent } from "./EmptyRecent";
 import { SimilarToRecentSection } from "./SimilarToRecentSection";
 import { useGetUserRecentListQuery } from "../api/useGetUserRecentListQuery";
 import { toProductItem } from "../lib/adapters";
-import {
-  IS_DEV_MYPAGE_MOCK,
-  MOCK_INTEREST_RECENT_ITEMS,
-} from "../mocks/interest";
 
 interface InterestRecentTabProps {
   className?: string;
@@ -25,11 +21,7 @@ const GRID_CLASS =
 
 export function InterestRecentTab({ className }: InterestRecentTabProps) {
   const { data, isLoading } = useGetUserRecentListQuery({ count: 20 });
-  const items = data?.list?.length
-    ? data.list
-    : IS_DEV_MYPAGE_MOCK
-      ? MOCK_INTEREST_RECENT_ITEMS
-      : [];
+  const items = data?.list?.length ? data.list : [];
 
   return (
     <div className={cn("flex flex-col gap-10 max-sm:gap-8", className)}>

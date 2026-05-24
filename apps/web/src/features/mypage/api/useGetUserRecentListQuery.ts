@@ -1,10 +1,9 @@
 import { useLanguage } from "@shared/lib/hooks";
+import useAppQuery from "@shared/lib/hooks/query/useAppQuery";
 import {
   getUserRecentList,
   type GetUserRecentListRes,
 } from "@shared/services/userRecent";
-
-import useAppQuery from "@/shared/lib/hooks/query/useAppQuery";
 
 interface Args {
   page?: number;

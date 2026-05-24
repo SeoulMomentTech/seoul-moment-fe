@@ -24,7 +24,7 @@ export function InterestBrandTab({ className }: InterestBrandTabProps) {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useGetUserLikeBrandListQuery({ count: 20 });
+    useGetUserLikeBrandListQuery({ count: 50 });
 
   const handleIntersect = useCallback(() => {
     if (!isFetchingNextPage) fetchNextPage();
