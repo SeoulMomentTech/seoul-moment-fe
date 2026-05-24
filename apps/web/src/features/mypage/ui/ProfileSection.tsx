@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { toast } from "sonner";
 
+import { useLanguage } from "@shared/lib/hooks";
 import { cn } from "@shared/lib/style";
 import {
   Select,
@@ -37,6 +38,11 @@ import {
   INPUT_CLASS,
   SECTION_TITLE_CLASS,
 } from "../lib/formClasses";
+import {
+  type RegionOption,
+  getCityOptions,
+  getDistrictOptions,
+} from "../lib/regions";
 
 interface ProfileSectionProps {
   className?: string;
@@ -52,18 +58,19 @@ const GENDER_OPTIONS: ReadonlyArray<{ value: Gender; label: string }> = [
   { value: "OTHER", label: "기타/비공개" },
 ];
 
+const toPairOptions = (values: ReadonlyArray<string>): RegionOption[] =>
+  values.map((v) => ({ value: v, label: v }));
+
 const CURRENT_YEAR = 2026;
-const YEARS = Array.from({ length: 77 }, (_, i) => String(CURRENT_YEAR - i));
-const MONTHS = Array.from({ length: 12 }, (_, i) => String(i + 1));
-const DAYS = Array.from({ length: 31 }, (_, i) => String(i + 1));
-const CITIES: ReadonlyArray<string> = [
-  "台北市",
-  "新北市",
-  "桃園市",
-  "台中市",
-  "台南市",
-  "高雄市",
-];
+const YEAR_OPTIONS = toPairOptions(
+  Array.from({ length: 77 }, (_, i) => String(CURRENT_YEAR - i)),
+);
+const MONTH_OPTIONS = toPairOptions(
+  Array.from({ length: 12 }, (_, i) => String(i + 1)),
+);
+const DAY_OPTIONS = toPairOptions(
+  Array.from({ length: 31 }, (_, i) => String(i + 1)),
+);
 
 function FieldSelect({
   placeholder,
@@ -71,22 +78,24 @@ function FieldSelect({
   value,
   onValueChange,
   className,
+  disabled,
 }: {
   placeholder: string;
-  options: ReadonlyArray<string>;
+  options: ReadonlyArray<RegionOption>;
   value?: string;
   onValueChange(value: string): void;
   className?: string;
+  disabled?: boolean;
 }) {
   return (
-    <Select onValueChange={onValueChange} value={value}>
+    <Select disabled={disabled} onValueChange={onValueChange} value={value}>
       <SelectTrigger className={cn("h-[48px] flex-1", className)}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent className="h-[250px]">
         {options.map((option) => (
-          <SelectItem key={option} value={option}>
-            {option}
+          <SelectItem key={option.value} value={option.value}>
+            {option.label}
           </SelectItem>
         ))}
       </SelectContent>
@@ -197,6 +206,18 @@ function ProfileForm({
     () => defaultValues?.detailAddress ?? "",
   );
 
+  const locale = useLanguage();
+  const cityOptions = useMemo(() => getCityOptions(locale), [locale]);
+  const districtOptions = useMemo(
+    () => getDistrictOptions(city, locale),
+    [city, locale],
+  );
+
+  const handleCityChange = (next: string) => {
+    setCity(next);
+    setDistrict(undefined);
+  };
+
   const isComplete =
     nickname.trim() !== "" &&
     name.trim() !== "" &&
@@ -257,21 +278,21 @@ function ProfileForm({
             <div className="flex items-center gap-2">
               <FieldSelect
                 onValueChange={setBirthYear}
-                options={YEARS}
+                options={YEAR_OPTIONS}
                 placeholder=" "
                 value={birthYear}
               />
               <span className="text-body-3 shrink-0 text-black">년</span>
               <FieldSelect
                 onValueChange={setBirthMonth}
-                options={MONTHS}
+                options={MONTH_OPTIONS}
                 placeholder=" "
                 value={birthMonth}
               />
               <span className="text-body-3 shrink-0 text-black">월</span>
               <FieldSelect
                 onValueChange={setBirthDay}
-                options={DAYS}
+                options={DAY_OPTIONS}
                 placeholder=" "
                 value={birthDay}
               />
@@ -292,14 +313,16 @@ function ProfileForm({
                 value={postalCode}
               />
               <FieldSelect
-                onValueChange={setCity}
-                options={CITIES}
+                onValueChange={handleCityChange}
+                options={cityOptions}
                 placeholder="시/도"
                 value={city}
               />
               <FieldSelect
+                disabled={!city}
+                key={city ?? "no-city"}
                 onValueChange={setDistrict}
-                options={CITIES}
+                options={districtOptions}
                 placeholder="구/군"
                 value={district}
               />
