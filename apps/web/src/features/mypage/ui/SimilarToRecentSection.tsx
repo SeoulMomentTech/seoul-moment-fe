@@ -50,7 +50,7 @@ export function SimilarToRecentSection({
               <Link className="block" href={`/product/${item.productItemId}`}>
                 <ProductCard
                   data={toProductItem(item)}
-                  imageClassName="aspect-square h-auto w-full"
+                  imageClassName="aspect-square h-auto w-full max-sm:size-[150px]"
                 />
               </Link>
             </li>
