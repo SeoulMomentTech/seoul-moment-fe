@@ -9,8 +9,10 @@ import { useModal } from "@shared/lib/hooks";
 import { cn } from "@shared/lib/style";
 
 import { Link } from "@/i18n/navigation";
+import { LikeCount } from "@/widgets/like-count/ui/LikeCount";
 
-import { Button } from "@seoul-moment/ui";
+import { useBrandLikeToggle } from "@entities/brand";
+import { Button, Flex } from "@seoul-moment/ui";
 
 interface ProductBrandBannerProps {
   id: number;
@@ -30,6 +32,12 @@ export default function ProductBrandBanner({ id }: ProductBrandBannerProps) {
     },
   });
   const t = useTranslations();
+
+  const { liked, count, handleToggleLike } = useBrandLikeToggle({
+    brandId: id,
+    isLiked: data?.isLiked ?? false,
+    likeCount: data?.like ?? 0,
+  });
 
   if (!data) return <BannerSkeleton />;
 
@@ -72,14 +80,22 @@ export default function ProductBrandBanner({ id }: ProductBrandBannerProps) {
             </h2>
             <p className="text-black/50">{data?.englishName}</p>
           </div>
-          <Button
-            className="h-auto w-auto rounded-full p-3"
-            onClick={() => openModal("share")}
-            type="button"
-            variant="ghost"
-          >
-            <Share2Icon height={20} width={20} />
-          </Button>
+          <Flex align="center" color="">
+            <LikeCount
+              active={liked}
+              count={count}
+              iconSize={20}
+              onClick={handleToggleLike}
+            />
+            <Button
+              className="h-auto w-auto rounded-full p-3"
+              onClick={() => openModal("share")}
+              type="button"
+              variant="ghost"
+            >
+              <Share2Icon height={20} width={20} />
+            </Button>
+          </Flex>
         </div>
         <div className={cn("flex flex-col gap-10", "max-sm:gap-5")}>
           <p className="text-body-3">{data?.description ?? ""}</p>

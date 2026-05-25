@@ -6,6 +6,7 @@ import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
+import { useNicknameValidate } from "@shared/lib/hooks";
 import { PasswordField } from "@shared/ui/password-field";
 import { TermsConsent } from "@shared/ui/terms-consent";
 
@@ -62,10 +63,14 @@ export function SignupForm() {
   const email = watch("email");
   const verificationCode = watch("verificationCode");
   const isVerified = watch("isVerified");
+  const nickname = watch("nickname");
   const password = watch("password");
   const passwordConfirm = watch("passwordConfirm");
   const termsOfService = watch("termsOfService");
   const privacyPolicy = watch("privacyPolicy");
+
+  const { status: nicknameStatus, message: nicknameMessage } =
+    useNicknameValidate({ nickname });
 
   const postUserEmailCodeMutation = usePostUserEmailCodeMutation({
     onSuccess: () => {
@@ -117,7 +122,8 @@ export function SignupForm() {
     });
   };
 
-  const isSubmitDisabled = !isValid || signUpMutation.isPending;
+  const isSubmitDisabled =
+    !isValid || nicknameStatus !== "available" || signUpMutation.isPending;
   const isResendDisabled =
     !email || postUserEmailCodeMutation.isPending || resendSeconds > 0;
   const sendButtonLabel = isCodeSent
@@ -201,13 +207,25 @@ export function SignupForm() {
             </span>
           )}
         </Flex>
-        <Input
-          className="max-sm:h-12"
-          maxLength={20}
-          placeholder="닉네임을 입력해주세요 (2~20자)"
-          type="text"
-          {...register("nickname")}
-        />
+        <Flex className="w-full" direction="column" gap={6}>
+          <Input
+            className="max-sm:h-12"
+            maxLength={20}
+            placeholder="닉네임을 입력해주세요 (2~20자)"
+            type="text"
+            {...register("nickname")}
+          />
+          {nicknameMessage && (
+            <span
+              className={cn(
+                "text-body-4",
+                nicknameStatus === "available" ? "text-sent" : "text-error",
+              )}
+            >
+              {nicknameMessage}
+            </span>
+          )}
+        </Flex>
         <PasswordField
           placeholder="비밀번호를 입력해주세요"
           showChecklist={password.length > 0}

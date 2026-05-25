@@ -20,8 +20,6 @@ export const getUserInfo = () =>
   api.get("user/info").json<CommonRes<GetUserInfoRes>>();
 
 export interface UpdateUserInfoReq {
-  phone?: string;
-  email: string;
   newProductAgreed?: boolean;
   adAgreed?: boolean;
   recommendAgreed?: boolean;
@@ -90,7 +88,9 @@ export interface UserFit {
   bottomSize: string;
 }
 
-export type CreateUserFitReq = UserFit;
+export type UserFitPayload = { [K in keyof UserFit]: UserFit[K] | null };
+
+export type CreateUserFitReq = UserFitPayload;
 
 /**
  * @description 유저 체형 정보 생성
@@ -102,7 +102,7 @@ export const createUserFit = (data: CreateUserFitReq) =>
     })
     .json<CommonRes<null>>();
 
-export type UpdateUserFitReq = UserFit;
+export type UpdateUserFitReq = UserFitPayload;
 
 /**
  * @description 유저 체형 정보 수정
@@ -114,7 +114,14 @@ export const updateUserFit = (data: UpdateUserFitReq) =>
     })
     .json<CommonRes<null>>();
 
-export type GetUserFitRes = UserFit;
+export interface GetUserFitRes {
+  height: number | null;
+  weight: number | null;
+  shoeSize: number | null;
+  outerSize: string | null;
+  topSize: string | null;
+  bottomSize: string | null;
+}
 
 /**
  * @description 유저 체형 정보 조회

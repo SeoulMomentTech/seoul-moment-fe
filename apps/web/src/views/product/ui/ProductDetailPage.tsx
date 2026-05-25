@@ -15,6 +15,7 @@ import { LikeCount } from "@widgets/like-count/ui/LikeCount";
 
 import { Link } from "@/i18n/navigation";
 
+import { useProductLikeToggle, useTrackRecentProduct } from "@entities/product";
 import { BrandProductList, ProductExternalGroup } from "@features/product";
 import { Button } from "@seoul-moment/ui";
 import { ProductDetailImage } from "@widgets/product-detail-image";
@@ -36,6 +37,14 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
 
   const t = useTranslations();
   const [showMore, setShowMore] = useState(false);
+
+  const { liked, count, handleToggleLike } = useProductLikeToggle({
+    productId: id,
+    isLiked: data?.isLiked ?? false,
+    likeCount: data?.like ?? 0,
+  });
+
+  useTrackRecentProduct({ productId: id });
 
   const handleToggleShowMore = (showMore: boolean) => {
     setShowMore(showMore);
@@ -75,9 +84,11 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
                 />
               </Link>
               <LikeCount
-                count={data.like}
+                active={liked}
+                count={count}
                 countClassName="max-sm:hidden"
                 iconSize={20}
+                onClick={handleToggleLike}
               />
             </div>
             <div

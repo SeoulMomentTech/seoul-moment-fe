@@ -8,6 +8,8 @@ interface LikeCountProps {
   countClassName?: string;
   iconSize?: number;
   count?: number;
+  active?: boolean;
+  disabled?: boolean;
   onClick?(): void;
 }
 
@@ -16,23 +18,50 @@ export function LikeCount({
   iconSize,
   count,
   countClassName,
+  active = false,
+  disabled = false,
   onClick,
 }: LikeCountProps) {
-  return (
-    <div
-      className={cn("flex items-center gap-[4px] text-black/40", className)}
-      onClick={onClick}
-    >
+  const size = iconSize ?? 14;
+  const colorClass = active ? "text-red-500" : "text-black/40";
+  const content = (
+    <>
       <HeartIcon
-        className="text-black/40"
-        height={iconSize ?? 14}
-        width={iconSize ?? 14}
+        className={colorClass}
+        fill={active ? "currentColor" : "none"}
+        height={size}
+        width={size}
       />
-      {count && (
+      {count != null && count > 0 && (
         <span className={cn("text-body-4", countClassName)}>
           {setComma(count)}
         </span>
       )}
+    </>
+  );
+
+  if (onClick) {
+    return (
+      <button
+        aria-label={active ? "좋아요 취소" : "좋아요"}
+        aria-pressed={active}
+        className={cn(
+          "flex cursor-pointer items-center gap-[4px] disabled:opacity-50",
+          colorClass,
+          className,
+        )}
+        disabled={disabled}
+        onClick={onClick}
+        type="button"
+      >
+        {content}
+      </button>
+    );
+  }
+
+  return (
+    <div className={cn("flex items-center gap-[4px]", colorClass, className)}>
+      {content}
     </div>
   );
 }
