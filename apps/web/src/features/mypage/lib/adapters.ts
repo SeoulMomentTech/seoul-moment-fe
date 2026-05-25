@@ -56,6 +56,7 @@ export function toProductItem(p: UserRecentProduct): ProductItem {
     image: p.imageUrl,
     colorName: "",
     colorCode: "",
+    isLiked: false,
   };
 }
 
