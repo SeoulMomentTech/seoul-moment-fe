@@ -2,9 +2,11 @@
 
 import { useMemo, useState } from "react";
 
+import { CircleUserRound } from "lucide-react";
+
 import { toast } from "sonner";
 
-import { useLanguage } from "@shared/lib/hooks";
+import { useLanguage, useNicknameValidate } from "@shared/lib/hooks";
 import { cn } from "@shared/lib/style";
 import {
   Select,
@@ -103,18 +105,24 @@ function FieldSelect({
   );
 }
 
+type HelperTone = "error" | "success";
+
 function EditableTextField({
   id,
   label,
   value,
   placeholder,
   onChange,
+  helperText,
+  helperTone,
 }: {
   id: string;
   label: string;
   value: string;
   placeholder: string;
   onChange(value: string): void;
+  helperText?: string | null;
+  helperTone?: HelperTone;
 }) {
   const [editing, setEditing] = useState(false);
   const [backup, setBackup] = useState("");
@@ -174,6 +182,16 @@ function EditableTextField({
           </Button>
         )}
       </div>
+      {helperText && (
+        <span
+          className={cn(
+            "text-body-4",
+            helperTone === "error" ? "text-error" : "text-sent",
+          )}
+        >
+          {helperText}
+        </span>
+      )}
     </div>
   );
 }
@@ -213,6 +231,22 @@ function ProfileForm({
     [city, locale],
   );
 
+  const initialNickname = defaultValues?.nickname ?? "";
+  const isNicknameUnchanged =
+    nickname === initialNickname && initialNickname !== "";
+  const { status: nicknameStatus, message: nicknameMessage } =
+    useNicknameValidate({
+      nickname,
+      enabled: !isNicknameUnchanged,
+    });
+  const isNicknameValid = isNicknameUnchanged || nicknameStatus === "available";
+  const nicknameHelperTone: HelperTone | undefined =
+    nicknameStatus === "available"
+      ? "success"
+      : nicknameStatus === "duplicated" || nicknameStatus === "error"
+        ? "error"
+        : undefined;
+
   const handleCityChange = (next: string) => {
     setCity(next);
     setDistrict(undefined);
@@ -220,6 +254,7 @@ function ProfileForm({
 
   const isComplete =
     nickname.trim() !== "" &&
+    isNicknameValid &&
     name.trim() !== "" &&
     Boolean(gender) &&
     Boolean(birthYear && birthMonth && birthDay) &&
@@ -234,6 +269,8 @@ function ProfileForm({
         <h3 className={SECTION_TITLE_CLASS}>개인 정보</h3>
         <div className="flex flex-col gap-6 pt-[12px]">
           <EditableTextField
+            helperText={nicknameMessage}
+            helperTone={nicknameHelperTone}
             id="profile-nickname"
             label="닉네임"
             onChange={setNickname}
@@ -392,12 +429,17 @@ export function ProfileSection({ className }: ProfileSectionProps) {
 
       <div className="flex items-center justify-between border-b border-black/10 py-5 max-sm:flex-col max-sm:items-stretch max-sm:gap-4">
         <div className="flex items-center gap-[10px]">
-          <Avatar className="size-[60px]">
+          <Avatar className="size-14">
             <AvatarImage
-              alt="프로필 이미지"
-              src={profile?.profileImageUrl ?? ""}
+              alt={profile?.nickname ?? ""}
+              src={profile?.profileImageUrl}
             />
-            <AvatarFallback className="bg-black/5" />
+            <AvatarFallback>
+              <CircleUserRound
+                className="size-[60px] text-black/30"
+                strokeWidth={0.75}
+              />
+            </AvatarFallback>
           </Avatar>
           <span className="text-body-1 font-medium text-black">
             {profile?.nickname ?? "nickname"}
