@@ -79,6 +79,25 @@ export type GetUserProfileRes = UserProfile;
 export const getUserProfile = () =>
   api.get("user/profile").json<CommonRes<GetUserProfileRes>>();
 
+export interface CreateUserProfileImageReq {
+  imageUrl: string;
+}
+
+/**
+ * @description 유저 프로필 이미지 등록 (기존 이미지가 있으면 교체)
+ */
+export const createUserProfileImage = (data: CreateUserProfileImageReq) =>
+  api
+    .post("user/profile/image", {
+      json: data,
+    })
+    .json<CommonRes<null>>();
+
+/**
+ * @description 유저 프로필 이미지 삭제
+ */
+export const deleteUserProfileImage = () => api.delete("user/profile/image");
+
 export interface UserFit {
   height: number;
   weight: number;

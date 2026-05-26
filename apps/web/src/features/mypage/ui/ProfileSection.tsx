@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState, type ChangeEvent } from "react";
 
 import { CircleUserRound } from "lucide-react";
 
@@ -27,9 +27,12 @@ import {
   RadioGroupItem,
 } from "@seoul-moment/ui";
 
+import { DeleteProfileImageDialog } from "./DeleteProfileImageDialog";
+import { useCreateUserProfileImageMutation } from "../api/useCreateUserProfileImageMutation";
 import { useCreateUserProfileMutation } from "../api/useCreateUserProfileMutation";
 import { useGetUserProfileQuery } from "../api/useGetUserProfileQuery";
 import { useUpdateUserProfileMutation } from "../api/useUpdateUserProfileMutation";
+import { useUploadUserImageFileMutation } from "../api/useUploadUserImageFileMutation";
 import {
   type ProfileFormValues,
   formValuesToProfilePayload,
@@ -40,6 +43,7 @@ import {
   INPUT_CLASS,
   SECTION_TITLE_CLASS,
 } from "../lib/formClasses";
+import { validateProfileImageFile } from "../lib/imageValidation";
 import {
   type RegionOption,
   getCityOptions,
@@ -406,6 +410,16 @@ export function ProfileSection({ className }: ProfileSectionProps) {
     useCreateUserProfileMutation();
   const { mutate: updateProfile, isPending: updating } =
     useUpdateUserProfileMutation();
+  const { mutate: uploadImage, isPending: uploading } =
+    useUploadUserImageFileMutation();
+  const { mutate: registerProfileImage, isPending: registeringImage } =
+    useCreateUserProfileImageMutation();
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+  const isImageUpdating = uploading || registeringImage;
+  const hasProfileImage = Boolean(profile?.profileImageUrl);
 
   const handleSubmit = (values: ProfileFormValues) => {
     const payload = formValuesToProfilePayload(values, profile ?? undefined);
@@ -413,6 +427,35 @@ export function ProfileSection({ className }: ProfileSectionProps) {
 
     run(payload, {
       onSuccess: () => toast.success("프로필이 저장되었습니다."),
+    });
+  };
+
+  const handleChangeImageClick = () => {
+    if (isImageUpdating) return;
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+
+    if (!file) return;
+
+    const errorMessage = validateProfileImageFile(file);
+    if (errorMessage) {
+      toast.error(errorMessage);
+      return;
+    }
+
+    uploadImage(file, {
+      onSuccess: (res) => {
+        registerProfileImage(
+          { imageUrl: res.data.imageUrl },
+          {
+            onSuccess: () => toast.success("프로필 이미지가 변경되었습니다."),
+          },
+        );
+      },
     });
   };
 
@@ -446,15 +489,26 @@ export function ProfileSection({ className }: ProfileSectionProps) {
           </span>
         </div>
         <div className="flex items-center gap-[10px] max-sm:grid max-sm:grid-cols-2">
+          <input
+            accept="image/*"
+            className="hidden"
+            onChange={handleFileChange}
+            ref={fileInputRef}
+            type="file"
+          />
           <Button
             className="h-[44px] px-[16px]"
+            disabled={isImageUpdating}
+            onClick={handleChangeImageClick}
             type="button"
             variant="outline"
           >
-            이미지 변경
+            {isImageUpdating ? "업로드 중..." : "이미지 변경"}
           </Button>
           <Button
             className="h-[44px] px-[16px]"
+            disabled={!hasProfileImage || isImageUpdating}
+            onClick={() => setIsDeleteDialogOpen(true)}
             type="button"
             variant="outline"
           >
@@ -462,6 +516,11 @@ export function ProfileSection({ className }: ProfileSectionProps) {
           </Button>
         </div>
       </div>
+
+      <DeleteProfileImageDialog
+        onOpenChange={setIsDeleteDialogOpen}
+        open={isDeleteDialogOpen}
+      />
 
       {isLoading ? (
         <p className="text-body-3 text-black/40">불러오는 중...</p>
