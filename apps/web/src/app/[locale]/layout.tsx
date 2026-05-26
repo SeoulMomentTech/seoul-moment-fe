@@ -66,6 +66,12 @@ export default async function RootLayout({
   return (
     <html lang={locale ?? "ko"}>
       <head>
+        <Script
+          async
+          defer
+          src="https://accounts.google.com/gsi/client"
+          strategy="afterInteractive"
+        />
         {process.env.NEXT_PUBLIC_ENV === "production" && (
           <>
             <Script
