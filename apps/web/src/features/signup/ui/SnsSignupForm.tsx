@@ -31,7 +31,7 @@ export function SnsSignupForm() {
   useEffect(() => {
     const stored = readSnsSignupContext();
     if (!stored) {
-      toast.error("Google 가입 세션이 만료되었습니다. 다시 시도해주세요.");
+      toast.error("SNS 가입 세션이 만료되었습니다. 다시 시도해주세요.");
       router.replace("/login");
       return;
     }
@@ -90,7 +90,7 @@ export function SnsSignupForm() {
     <form className="w-full" onSubmit={handleSubmit(onSubmit)}>
       <VStack className="w-full pt-[64px]" gap={16}>
         <Flex className="w-full" direction="column" gap={6}>
-          <p className="text-body-3 leading-none text-black/60">Google 계정</p>
+          <p className="text-body-3 leading-none text-black/60">계정</p>
           <Input
             className="bg-black/5 max-sm:h-12"
             disabled
