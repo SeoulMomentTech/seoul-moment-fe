@@ -19,6 +19,13 @@ export interface VerifyEmailCodePayload {
   code: string;
 }
 
+export interface VerifyPhoneCodePayload {
+  /** 전화번호 (국제 코드 포함) */
+  phone: string;
+  /** 코드 (6자리) */
+  code: string;
+}
+
 export interface PostNicknameValidatePayload {
   /** 닉네임 */
   nickname: string;
@@ -148,6 +155,75 @@ export const verifyEmailCode = ({ email, code }: VerifyEmailCodePayload) =>
       json: { email, code },
     })
     .json<{ success: boolean }>();
+
+/**
+ * @description 회원 가입용 휴대폰 인증 코드 발송 (응답 없음 / 409: 이미 가입된 휴대폰)
+ */
+export const postUserPhoneCode = (phone: string) =>
+  api.post("user/auth/phone/code", {
+    json: { phone },
+  });
+
+/**
+ * @description 휴대폰 인증번호 검증
+ */
+export const verifyPhoneCode = ({ phone, code }: VerifyPhoneCodePayload) =>
+  api.post("auth/phone/verify", {
+    json: { phone, code },
+  });
+
+/**
+ * @description 회원 가입용 휴대폰 인증 코드 발송 (응답 없음 / 409: 이미 가입된 휴대폰)
+ */
+export const postSignupPhoneCode = (phone: string) =>
+  api.post("user/auth/signup/phone/code", {
+    json: { phone },
+  });
+
+/**
+ * @description 회원 가입용 휴대폰 인증 코드 검증 (응답 없음 / 401: 인증 코드 만료 또는 불일치)
+ */
+export const postSignupPhoneVerify = ({
+  phone,
+  code,
+}: VerifyPhoneCodePayload) =>
+  api.post("user/auth/signup/phone/verify", {
+    json: { phone, code },
+  });
+
+/**
+ * @description 회원 정보 수정용 휴대폰 인증 코드 발송 (access_token 필요 / 409: 이미 가입된 휴대폰)
+ */
+export const postInfoPhoneCode = (phone: string) =>
+  api.post("user/auth/info/phone/code", {
+    json: { phone },
+  });
+
+/**
+ * @description 회원 정보 수정용 휴대폰 인증 코드 검증 (access_token 필요 / 401: 인증 코드 만료 또는 불일치)
+ */
+export const postInfoPhoneVerify = ({ phone, code }: VerifyPhoneCodePayload) =>
+  api.post("user/auth/info/phone/verify", {
+    json: { phone, code },
+  });
+
+/**
+ * @description 비밀번호 찾기용 휴대폰 인증 코드 발송 (응답 없음 / 404: 존재하지 않는 휴대폰)
+ */
+export const postPasswordPhoneCode = (phone: string) =>
+  api.post("user/auth/password/phone/code", {
+    json: { phone },
+  });
+
+/**
+ * @description 비밀번호 찾기용 휴대폰 인증 코드 검증 (one time token 반환 / 401: 인증 코드 만료 또는 불일치)
+ */
+export const postPasswordPhoneVerify = (data: VerifyPhoneCodePayload) =>
+  api
+    .post("user/auth/password/phone/verify", {
+      json: data,
+    })
+    .json<CommonRes<PasswordEmailVerifyResponse>>();
 
 /**
  * @description 비밀번호 찾기 이메일 인증 코드 발송

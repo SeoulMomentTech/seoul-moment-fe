@@ -10,6 +10,7 @@ import { cn } from "@shared/lib/style";
 
 import { Button, Label } from "@seoul-moment/ui";
 
+import { PhoneVerificationFlow } from "./PhoneVerificationFlow";
 import { useGetUserInfoQuery } from "../api/useGetUserInfoQuery";
 import { useUpdateUserInfoMutation } from "../api/useUpdateUserInfoMutation";
 import {
@@ -55,18 +56,31 @@ const EMPTY_AGREEMENTS: AgreementValues = {
 
 function AccountValueField({
   value,
+  placeholder,
   verified,
   unverifiedMessage,
+  onClick,
 }: {
   value: string;
+  placeholder?: string;
   verified: boolean;
   unverifiedMessage?: string;
+  onClick?(): void;
 }) {
+  const hasValue = value.length > 0;
+
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-[10px]">
         <div className="flex h-[48px] flex-1 items-center justify-between rounded-[4px] border border-black/20 px-[12px]">
-          <span className="text-body-2 text-black">{value}</span>
+          <span
+            className={cn(
+              "text-body-2",
+              hasValue ? "text-black" : "text-black/40",
+            )}
+          >
+            {hasValue ? value : (placeholder ?? "")}
+          </span>
           {verified ? (
             <CheckCircle2 className="text-info size-[18px] shrink-0" />
           ) : (
@@ -75,6 +89,7 @@ function AccountValueField({
         </div>
         <Button
           className="h-[48px] shrink-0 px-[16px]"
+          onClick={onClick}
           type="button"
           variant={verified ? "outline" : "default"}
         >
@@ -182,6 +197,8 @@ export function LoginInfoSection({ className }: LoginInfoSectionProps) {
   const { data: userInfo, isLoading } = useGetUserInfoQuery();
   const { mutate: updateInfo, isPending } = useUpdateUserInfoMutation();
 
+  const [isPhoneFlowOpen, setIsPhoneFlowOpen] = useState(false);
+
   const email = userInfo?.email ?? "";
   const phone = userInfo?.phone ?? "";
   const phoneVerified = Boolean(userInfo?.phone);
@@ -210,6 +227,8 @@ export function LoginInfoSection({ className }: LoginInfoSectionProps) {
         <div className="flex flex-col gap-2">
           <Label className={FIELD_LABEL_CLASS}>휴대폰번호</Label>
           <AccountValueField
+            onClick={() => setIsPhoneFlowOpen(true)}
+            placeholder="휴대폰 번호 미등록"
             unverifiedMessage="휴대폰 번호를 인증해주세요."
             value={phone}
             verified={phoneVerified}
@@ -228,6 +247,11 @@ export function LoginInfoSection({ className }: LoginInfoSectionProps) {
           submitting={isPending}
         />
       )}
+
+      <PhoneVerificationFlow
+        onOpenChange={setIsPhoneFlowOpen}
+        open={isPhoneFlowOpen}
+      />
     </section>
   );
 }
