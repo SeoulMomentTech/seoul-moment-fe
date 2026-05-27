@@ -5,6 +5,8 @@ import {
   type UserBrandLike,
 } from "@shared/services/userLike";
 
+import { useUserAuthStore } from "@/shared/lib/hooks/useUserAuthStore";
+
 import type { CommonRes } from "@shared/services";
 
 interface Args {
@@ -19,9 +21,10 @@ export function useGetUserLikeBrandListQuery({
   enabled,
 }: Args = {}) {
   const languageCode = useLanguage();
+  const { id } = useUserAuthStore();
 
   return useAppInfiniteQuery<PageRes, Error, UserBrandLike[]>({
-    queryKey: ["user", "like", "brand", { count, languageCode }],
+    queryKey: ["user", "like", "brand", { count, languageCode }, id],
     queryFn: ({ pageParam = 1 }) =>
       getUserBrandLikeList({
         page: pageParam as number,
@@ -38,6 +41,6 @@ export function useGetUserLikeBrandListQuery({
       return fetched < total ? allPages.length + 1 : undefined;
     },
     select: (res) => res.pages.flatMap((page) => page.data.list),
-    enabled,
+    enabled: enabled !== false && !!id,
   });
 }

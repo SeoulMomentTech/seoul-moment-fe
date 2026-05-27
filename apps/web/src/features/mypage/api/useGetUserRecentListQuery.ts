@@ -5,6 +5,8 @@ import {
   type GetUserRecentListRes,
 } from "@shared/services/userRecent";
 
+import { useUserAuthStore } from "@/shared/lib/hooks/useUserAuthStore";
+
 interface Args {
   page?: number;
   count?: number;
@@ -17,15 +19,16 @@ export function useGetUserRecentListQuery({
   enabled,
 }: Args = {}) {
   const languageCode = useLanguage();
+  const { id } = useUserAuthStore();
 
   return useAppQuery<
     Awaited<ReturnType<typeof getUserRecentList>>,
     Error,
     GetUserRecentListRes
   >({
-    queryKey: ["user", "recent", { page, count, languageCode }],
+    queryKey: ["user", "recent", { page, count, languageCode }, id],
     queryFn: () => getUserRecentList({ page, count, languageCode }),
     select: (res) => res.data,
-    enabled,
+    enabled: enabled !== false && !!id,
   });
 }
