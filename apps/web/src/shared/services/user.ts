@@ -47,19 +47,10 @@ export interface UserProfile {
   detailAddress: string;
 }
 
-export type CreateUserProfileReq = UserProfile;
-
-/**
- * @description 유저 프로필 생성
- */
-export const createUserProfile = (data: CreateUserProfileReq) =>
-  api
-    .post("user/profile", {
-      json: data,
-    })
-    .json<CommonRes<null>>();
-
-export type UpdateUserProfileReq = UserProfile;
+export type UpdateUserProfileReq = Omit<
+  UserProfile,
+  "nickname" | "name" | "profileImageUrl"
+>;
 
 /**
  * @description 유저 프로필 수정
@@ -78,6 +69,34 @@ export type GetUserProfileRes = UserProfile;
  */
 export const getUserProfile = () =>
   api.get("user/profile").json<CommonRes<GetUserProfileRes>>();
+
+export interface UpdateUserProfileNicknameReq {
+  nickname: string;
+}
+
+/**
+ * @description 유저 닉네임 수정
+ */
+export const updateUserProfileNickname = (data: UpdateUserProfileNicknameReq) =>
+  api
+    .patch("user/profile/nickname", {
+      json: data,
+    })
+    .json<CommonRes<null>>();
+
+export interface UpdateUserProfileNameReq {
+  name: string;
+}
+
+/**
+ * @description 유저 이름 수정
+ */
+export const updateUserProfileName = (data: UpdateUserProfileNameReq) =>
+  api
+    .patch("user/profile/name", {
+      json: data,
+    })
+    .json<CommonRes<null>>();
 
 export interface CreateUserProfileImageReq {
   imageUrl: string;

@@ -94,7 +94,6 @@ const pad2 = (value: string) => value.padStart(2, "0");
 
 export function formValuesToProfilePayload(
   values: ProfileFormValues,
-  base?: Pick<UserProfile, "nickname" | "profileImageUrl">,
 ): UpdateUserProfileReq {
   const birthDate =
     values.birthYear && values.birthMonth && values.birthDay
@@ -102,9 +101,6 @@ export function formValuesToProfilePayload(
       : "";
 
   return {
-    profileImageUrl: base?.profileImageUrl,
-    nickname: values.nickname.trim(),
-    name: values.name.trim(),
     gender: values.gender ?? "OTHER",
     birthDate,
     postalCode: values.postalCode.trim(),
