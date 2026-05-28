@@ -10,6 +10,8 @@ import { AccountField } from "./AccountField";
 import { VerifyCodeField } from "./VerifyCodeField";
 import { usePostPasswordEmailCodeMutation } from "../api/usePostPasswordEmailCodeMutation";
 import { usePostPasswordEmailVerifyMutation } from "../api/usePostPasswordEmailVerifyMutation";
+import { usePostPasswordPhoneCodeMutation } from "../api/usePostPasswordPhoneCodeMutation";
+import { usePostPasswordPhoneVerifyMutation } from "../api/usePostPasswordPhoneVerifyMutation";
 import { maskAccount } from "../model/maskAccount";
 import {
   getVerificationMessage,
@@ -27,9 +29,6 @@ interface VerificationFormProps {
   method: FindPasswordMethod;
   onVerified(payload: { maskedAccount: string; token: string }): void;
 }
-
-const MOCK_PHONE_VERIFY_CODE = "123456";
-const MOCK_PHONE_TOKEN = "mock-phone-token";
 
 export function VerificationForm({
   method,
@@ -72,14 +71,29 @@ export function VerificationForm({
     },
   });
 
+  const postPhoneCodeMutation = usePostPasswordPhoneCodeMutation({
+    onSuccess: () => {
+      setStatus("sent");
+      startCountdown();
+    },
+  });
+
+  const verifyPhoneCodeMutation = usePostPasswordPhoneVerifyMutation({
+    onSuccess: (token) => {
+      setResetToken(token);
+      setStatus("verified");
+    },
+    onError: () => {
+      setStatus("failed");
+    },
+  });
+
   const handleRequestCode = () => {
     if (method === "email") {
       postEmailCodeMutation.mutate(account.trim());
       return;
     }
-    // TODO: 폰 인증 API 연동 (현재 mock)
-    setStatus("sent");
-    startCountdown();
+    postPhoneCodeMutation.mutate(account.trim());
   };
 
   const handleVerify = () => {
@@ -90,13 +104,10 @@ export function VerificationForm({
       });
       return;
     }
-    // TODO: 폰 인증 API 연동 (현재 mock)
-    if (verifyCode === MOCK_PHONE_VERIFY_CODE) {
-      setResetToken(MOCK_PHONE_TOKEN);
-      setStatus("verified");
-    } else {
-      setStatus("failed");
-    }
+    verifyPhoneCodeMutation.mutate({
+      phone: account.trim(),
+      code: verifyCode,
+    });
   };
 
   const handleProceed = () => {
@@ -111,9 +122,13 @@ export function VerificationForm({
   const isCodeSent = status !== "idle";
   const isVerified = status === "verified";
   const isRequestingCode =
-    method === "email" && postEmailCodeMutation.isPending;
+    method === "email"
+      ? postEmailCodeMutation.isPending
+      : postPhoneCodeMutation.isPending;
   const isVerifyingCode =
-    method === "email" && verifyEmailCodeMutation.isPending;
+    method === "email"
+      ? verifyEmailCodeMutation.isPending
+      : verifyPhoneCodeMutation.isPending;
   const canVerify =
     isCodeSent && !!verifyCode && !isVerified && !isVerifyingCode;
   const requestButtonLabel = isCodeSent ? "재전송" : "인증";

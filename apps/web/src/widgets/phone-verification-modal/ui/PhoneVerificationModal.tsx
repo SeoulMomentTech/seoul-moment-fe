@@ -23,7 +23,6 @@ interface PhoneVerificationModalProps {
   onOpenChange(open: boolean): void;
   onSendCode(phone: string): void;
   onVerifyCode(phone: string, code: string): void;
-  onConfirm(): void;
   isCodeSent?: boolean;
   isVerified?: boolean;
   isSendingCode?: boolean;
@@ -45,7 +44,6 @@ export function PhoneVerificationModal({
   onOpenChange,
   onSendCode,
   onVerifyCode,
-  onConfirm,
   isCodeSent = false,
   isVerified = false,
   isSendingCode = false,
@@ -84,7 +82,6 @@ export function PhoneVerificationModal({
   const isSendDisabled = isPhoneEmpty || isSendingCode || isVerified;
   const isVerifyDisabled =
     isCodeEmpty || !isCodeSent || isVerifying || isVerified || secondsLeft <= 0;
-  const isConfirmDisabled = !isVerified;
   const showSentMessage = isCodeSent && !isVerified;
 
   return (
@@ -162,7 +159,7 @@ export function PhoneVerificationModal({
               <p className="text-body-3 w-full text-center leading-none text-black/40 max-sm:hidden">
                 원활한 서비스 이용을 위해 인증을 완료해주세요.
               </p>
-              <p className="text-title-4 text-foreground hidden w-full whitespace-pre-line text-center font-semibold leading-[1.5] max-sm:block">
+              <p className="text-title-4 text-foreground hidden w-full whitespace-pre-line text-center font-semibold leading-normal max-sm:block">
                 {`원활한 서비스 이용을 위해\n인증을 완료해주세요.`}
               </p>
             </div>
@@ -172,7 +169,7 @@ export function PhoneVerificationModal({
                 <HStack align="center" className="w-full" gap={8}>
                   <Input
                     autoComplete="tel"
-                    className="flex-1"
+                    className="h-[58.5px] flex-1"
                     disabled={isVerified}
                     inputMode="numeric"
                     onChange={(event) => setPhone(event.target.value)}
@@ -201,7 +198,7 @@ export function PhoneVerificationModal({
                   <HStack
                     align="center"
                     className={cn(
-                      "flex-1 rounded-[4px] border border-black/20 bg-white",
+                      "h-[58.5px] flex-1 rounded-[4px] border border-black/20 bg-white",
                       "px-[12px] py-[16px]",
                       "focus-within:border-foreground",
                     )}
@@ -247,15 +244,6 @@ export function PhoneVerificationModal({
                 )}
               </VStack>
             </VStack>
-
-            <Button
-              className="w-full rounded-[4px] py-[16px] font-semibold"
-              disabled={isConfirmDisabled}
-              onClick={onConfirm}
-              type="button"
-            >
-              확인
-            </Button>
           </div>
         </div>
       </DialogContent>
