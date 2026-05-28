@@ -7,6 +7,7 @@ import { CircleUserRound } from "lucide-react";
 import { toast } from "sonner";
 
 import { useLanguage, useNicknameValidate } from "@shared/lib/hooks";
+import { NICKNAME_MAX_LENGTH, sanitizeNickname } from "@shared/lib/nickname";
 import { cn } from "@shared/lib/style";
 import {
   Select,
@@ -121,6 +122,7 @@ function EditableTextField({
   onConfirm,
   confirmDisabled = false,
   pending = false,
+  maxLength,
   helperText,
   helperTone,
 }: {
@@ -132,6 +134,7 @@ function EditableTextField({
   onConfirm?(value: string): Promise<void>;
   confirmDisabled?: boolean;
   pending?: boolean;
+  maxLength?: number;
   helperText?: string | null;
   helperTone?: HelperTone;
 }) {
@@ -161,6 +164,7 @@ function EditableTextField({
             "flex-1 read-only:bg-black/5 read-only:text-black/60",
           )}
           id={id}
+          maxLength={maxLength}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           readOnly={!editing}
@@ -306,10 +310,11 @@ function ProfileForm({
             helperTone={nicknameHelperTone}
             id="profile-nickname"
             label="닉네임"
-            onChange={setNickname}
+            maxLength={NICKNAME_MAX_LENGTH}
+            onChange={(value) => setNickname(sanitizeNickname(value))}
             onConfirm={onUpdateNickname}
             pending={nicknamePending}
-            placeholder="닉네임을 입력하세요"
+            placeholder="영문, 숫자만 입력 가능"
             value={nickname}
           />
 
