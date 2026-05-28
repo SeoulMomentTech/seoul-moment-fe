@@ -5,6 +5,7 @@ import {
 } from "@shared/services/userLike";
 
 import useAppQuery from "@/shared/lib/hooks/query/useAppQuery";
+import { useUserAuthStore } from "@/shared/lib/hooks/useUserAuthStore";
 
 interface Args {
   page?: number;
@@ -20,6 +21,7 @@ export function useGetUserLikeProductListQuery({
   enabled,
 }: Args = {}) {
   const languageCode = useLanguage();
+  const { id } = useUserAuthStore();
 
   return useAppQuery<
     Awaited<ReturnType<typeof getUserProductLikeList>>,
@@ -31,6 +33,7 @@ export function useGetUserLikeProductListQuery({
       "like",
       "product",
       { page, count, productCategoryId, languageCode },
+      id,
     ],
     queryFn: () =>
       getUserProductLikeList({
@@ -40,6 +43,6 @@ export function useGetUserLikeProductListQuery({
         languageCode,
       }),
     select: (res) => res.data,
-    enabled,
+    enabled: enabled !== false && !!id,
   });
 }

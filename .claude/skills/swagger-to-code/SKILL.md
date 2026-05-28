@@ -28,10 +28,10 @@ You understand how to read and interpret Swagger (OpenAPI) specifications and co
 
   ```bash
   # Filter by URL path keyword
-  node .claude/skills/swagger-to-code/scripts/extract-swagger.js "https://api.seoulmoment.com.tw/docs-json" "/admin/product" > .claude/tmp/filtered-swagger.json
+  node .claude/skills/swagger-to-code/scripts/extract-swagger.js "https://api-dev.seoulmoment.com.tw/docs-json" "/admin/product" > .claude/tmp/filtered-swagger.json
 
   # Filter by Swagger Tag
-  node .claude/skills/swagger-to-code/scripts/extract-swagger.js "https://api.seoulmoment.com.tw/docs-json" "Product" > .claude/tmp/filtered-swagger.json
+  node .claude/skills/swagger-to-code/scripts/extract-swagger.js "https://api-dev.seoulmoment.com.tw/docs-json" "Product" > .claude/tmp/filtered-swagger.json
   ```
 
 - If the script fails, create a small temporary Node.js script to download and filter the JSON paths and referenced `components.schemas` recursively, then run it.
@@ -45,10 +45,10 @@ You understand how to read and interpret Swagger (OpenAPI) specifications and co
 
 Determine which app the endpoints belong to:
 
-| Endpoint path pattern | Target app | Service directory |
-|-|-|-|
-| `/admin/...` | **admin** (Vite + Axios) | `apps/admin/src/shared/services/` |
-| No `/admin/` prefix | **web** (Next.js + ky) | `apps/web/src/shared/services/` |
+| Endpoint path pattern | Target app               | Service directory                 |
+| --------------------- | ------------------------ | --------------------------------- |
+| `/admin/...`          | **admin** (Vite + Axios) | `apps/admin/src/shared/services/` |
+| No `/admin/` prefix   | **web** (Next.js + ky)   | `apps/web/src/shared/services/`   |
 
 **Before generating code**, read the existing service file for the domain (if it exists) to match established patterns and avoid style drift.
 
@@ -76,26 +76,28 @@ Determine which app the endpoints belong to:
 
 ## Function Naming Convention
 
-| HTTP Method | Pattern | Web example | Admin example |
-|-|-|-|-|
-| GET (list) | `get[Domain]List` | `getProductList` | `getAdminProductList` |
+| HTTP Method  | Pattern             | Web example        | Admin example           |
+| ------------ | ------------------- | ------------------ | ----------------------- |
+| GET (list)   | `get[Domain]List`   | `getProductList`   | `getAdminProductList`   |
 | GET (detail) | `get[Domain]Detail` | `getProductDetail` | `getAdminProductDetail` |
-| GET (other) | `get[Domain][Noun]` | `getHome` | `getAdminHomeBanner` |
-| POST | `create[Domain]` | `createInquiry` | `createAdminProduct` |
-| PATCH/PUT | `update[Domain]` | — | `updateAdminProduct` |
-| DELETE | `delete[Domain]` | — | `deleteAdminProduct` |
+| GET (other)  | `get[Domain][Noun]` | `getHome`          | `getAdminHomeBanner`    |
+| POST         | `create[Domain]`    | `createInquiry`    | `createAdminProduct`    |
+| PATCH/PUT    | `update[Domain]`    | —                  | `updateAdminProduct`    |
+| DELETE       | `delete[Domain]`    | —                  | `deleteAdminProduct`    |
 
 ---
 
 ## Web App Conventions (ky)
 
 **Imports:**
+
 ```ts
 import type { CommonRes, PublicLanguageCode } from "./";
 import { api } from "./";
 ```
 
 **Key rules:**
+
 - Response wrapper: `CommonRes<T>` (`{ result: boolean; data: T }`)
 - i18n endpoints extend `PublicLanguageCode` — the `languageCode` param is auto-converted to `Accept-language` header by a ky `beforeRequest` hook
 - HTTP calls use ky chained API: `api.get("path", { searchParams }).json<CommonRes<T>>()`
@@ -103,6 +105,7 @@ import { api } from "./";
 - Request/response interfaces are defined in the same service file
 
 **Example:**
+
 ```ts
 // apps/web/src/shared/services/home.ts
 
@@ -139,12 +142,14 @@ export const getHome = ({ languageCode }: PublicLanguageCode) =>
 ## Admin App Conventions (Axios)
 
 **Imports:**
+
 ```ts
 import { fetcher } from ".";
 import type { ApiResponse } from "./types";
 ```
 
 **Key rules:**
+
 - Response wrapper: `ApiResponse<T>` (`{ result: boolean; data: T }`) — imported from `./types`
 - Use `Branded<number, "Tag">` for type-safe entity IDs (e.g., `AdminProductId`)
 - HTTP calls: `fetcher.get<ApiResponse<T>>("/admin/path", { params })`
@@ -153,6 +158,7 @@ import type { ApiResponse } from "./types";
 - Optional list params: `page?`, `count?`, `search?`, `sort?: SortDirection`
 
 **Example:**
+
 ```ts
 // apps/admin/src/shared/services/products.ts
 

@@ -49,6 +49,46 @@ export interface PatchPasswordPayload {
   token: string;
 }
 
+export interface PostGoogleLoginPayload {
+  /** Google Sign-In에서 발급받은 idToken */
+  idToken: string;
+}
+
+export interface PostGoogleLoginResponse {
+  /** Google 계정 연결 확인이 필요한지 여부. true면 email/linkToken이 내려가고, 연결 확인 모달 후 /user/auth/google/link 호출 필요 */
+  needsLinkConfirm: boolean;
+  /** 연결 확인 또는 신규 가입이 필요한 경우 표시용 Google 계정 이메일 */
+  email?: string;
+  /** 연결 확인이 필요한 경우 /user/auth/google/link에 전달할 단기 JWT (5분 만료) */
+  linkToken?: string;
+  /** 가입된 이메일이 없어 SNS 회원가입이 필요한지 여부 */
+  needsSignup?: boolean;
+  /** SNS 회원가입이 필요한 경우 /user/auth/google/signup에 전달할 단기 JWT (10분 만료) */
+  signupToken?: string;
+  /** 이미 연결된 계정인 경우 발급되는 access token */
+  token?: string;
+  /** 이미 연결된 계정인 경우 발급되는 refresh token */
+  refreshToken?: string;
+}
+
+export interface PostGoogleLinkPayload {
+  /** /user/auth/google/login 응답으로 받은 단기 linkToken */
+  linkToken: string;
+}
+
+export interface PostGoogleSignupPayload {
+  /** /user/auth/google/login 응답으로 받은 단기 signupToken */
+  signupToken: string;
+  /** 닉네임 */
+  nickname: string;
+  /** 신상품 및 기획전 출시 알림 */
+  newProductAgreed?: boolean;
+  /** 광고 및 이벤트 할인 이메일 */
+  adAgreed?: boolean;
+  /** 개인 맞춤 상품 추천 알림 */
+  recommendAgreed?: boolean;
+}
+
 /**
  * @description 유저 회원가입 (응답: 204 No Content)
  */
@@ -137,3 +177,33 @@ export const patchPassword = ({ password, token }: PatchPasswordPayload) =>
       Authorization: `Bearer ${token}`,
     },
   });
+
+/**
+ * @description Google 로그인 / 연결확인 / 신규가입 분기 (1단계). idToken 검증 후 토큰 또는 linkToken/signupToken 발급
+ */
+export const postGoogleLogin = (data: PostGoogleLoginPayload) =>
+  api
+    .post("user/auth/google/login", {
+      json: data,
+    })
+    .json<CommonRes<PostGoogleLoginResponse>>();
+
+/**
+ * @description Google 계정 연결 (2-A단계). 기존 계정에 Google 계정을 연결하고 access/refresh 토큰 발급
+ */
+export const postGoogleLink = (data: PostGoogleLinkPayload) =>
+  api
+    .post("user/auth/google/link", {
+      json: data,
+    })
+    .json<CommonRes<UserLoginResponse>>();
+
+/**
+ * @description Google SNS 회원가입 (2-B단계). signupToken + 닉네임/약관동의로 신규 가입 후 access/refresh 토큰 발급
+ */
+export const postGoogleSignup = (data: PostGoogleSignupPayload) =>
+  api
+    .post("user/auth/google/signup", {
+      json: data,
+    })
+    .json<CommonRes<UserLoginResponse>>();

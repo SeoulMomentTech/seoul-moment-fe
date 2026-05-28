@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
+import { decodeJWT } from "../utils";
+
 export interface UserAuthUser {
   id: number;
   email: string;
@@ -13,6 +15,8 @@ interface UserAuthState {
   user: UserAuthUser | null;
   isAuthenticated: boolean;
   hasHydrated: boolean;
+  id: number;
+  exp: number;
   login(params: {
     accessToken: string;
     refreshToken?: string | null;
@@ -25,12 +29,20 @@ interface UserAuthState {
 
 const initialState: Pick<
   UserAuthState,
-  "accessToken" | "refreshToken" | "user" | "isAuthenticated"
+  "accessToken" | "refreshToken" | "user" | "isAuthenticated" | "id" | "exp"
 > = {
   accessToken: null,
   refreshToken: null,
   user: null,
   isAuthenticated: false,
+  id: 0,
+  exp: 0,
+};
+
+const readClaims = (token: string | null) => {
+  if (!token) return { id: 0, exp: 0 };
+  const payload = decodeJWT(token);
+  return { id: payload?.id ?? 0, exp: payload?.exp ?? 0 };
 };
 
 // localStorage 는 브라우저에서만 접근 가능. SSR 단계(typeof window === "undefined")
@@ -51,12 +63,14 @@ export const useUserAuthStore = create<UserAuthState>()(
           refreshToken: refreshToken ?? state.refreshToken,
           user: user ?? state.user,
           isAuthenticated: true,
+          ...readClaims(accessToken),
         })),
       logout: () => set(() => ({ ...initialState })),
       updateAccessToken: (token) =>
         set(() => ({
           accessToken: token,
           isAuthenticated: Boolean(token),
+          ...readClaims(token),
         })),
       setUser: (user) => set(() => ({ user })),
     }),
@@ -68,6 +82,8 @@ export const useUserAuthStore = create<UserAuthState>()(
         refreshToken: state.refreshToken,
         user: state.user,
         isAuthenticated: state.isAuthenticated,
+        id: state.id,
+        exp: state.exp,
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {
