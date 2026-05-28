@@ -7,6 +7,7 @@ import { CircleUserRound } from "lucide-react";
 import { toast } from "sonner";
 
 import { useLanguage, useNicknameValidate } from "@shared/lib/hooks";
+import { NICKNAME_MAX_LENGTH, sanitizeNickname } from "@shared/lib/nickname";
 import { cn } from "@shared/lib/style";
 import {
   Select,
@@ -29,9 +30,10 @@ import {
 
 import { DeleteProfileImageDialog } from "./DeleteProfileImageDialog";
 import { useCreateUserProfileImageMutation } from "../api/useCreateUserProfileImageMutation";
-import { useCreateUserProfileMutation } from "../api/useCreateUserProfileMutation";
 import { useGetUserProfileQuery } from "../api/useGetUserProfileQuery";
 import { useUpdateUserProfileMutation } from "../api/useUpdateUserProfileMutation";
+import { useUpdateUserProfileNameMutation } from "../api/useUpdateUserProfileNameMutation";
+import { useUpdateUserProfileNicknameMutation } from "../api/useUpdateUserProfileNicknameMutation";
 import { useUploadUserImageFileMutation } from "../api/useUploadUserImageFileMutation";
 import {
   type ProfileFormValues,
@@ -117,6 +119,10 @@ function EditableTextField({
   value,
   placeholder,
   onChange,
+  onConfirm,
+  confirmDisabled = false,
+  pending = false,
+  maxLength,
   helperText,
   helperTone,
 }: {
@@ -125,11 +131,26 @@ function EditableTextField({
   value: string;
   placeholder: string;
   onChange(value: string): void;
+  onConfirm?(value: string): Promise<void>;
+  confirmDisabled?: boolean;
+  pending?: boolean;
+  maxLength?: number;
   helperText?: string | null;
   helperTone?: HelperTone;
 }) {
   const [editing, setEditing] = useState(false);
   const [backup, setBackup] = useState("");
+
+  const handleConfirm = async () => {
+    if (onConfirm && value !== backup) {
+      try {
+        await onConfirm(value);
+      } catch {
+        return;
+      }
+    }
+    setEditing(false);
+  };
 
   return (
     <div className="flex flex-col gap-2">
@@ -143,6 +164,7 @@ function EditableTextField({
             "flex-1 read-only:bg-black/5 read-only:text-black/60",
           )}
           id={id}
+          maxLength={maxLength}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           readOnly={!editing}
@@ -152,7 +174,8 @@ function EditableTextField({
           <>
             <Button
               className="h-[48px] shrink-0 px-[16px]"
-              onClick={() => setEditing(false)}
+              disabled={confirmDisabled || pending}
+              onClick={handleConfirm}
               size="sm"
               type="button"
             >
@@ -160,6 +183,7 @@ function EditableTextField({
             </Button>
             <Button
               className="h-[48px] shrink-0 px-[16px]"
+              disabled={pending}
               onClick={() => {
                 onChange(backup);
                 setEditing(false);
@@ -204,12 +228,20 @@ interface ProfileFormProps {
   defaultValues?: ProfileFormValues;
   submitting?: boolean;
   onSubmit(values: ProfileFormValues): void;
+  onUpdateNickname(nickname: string): Promise<void>;
+  onUpdateName(name: string): Promise<void>;
+  nicknamePending?: boolean;
+  namePending?: boolean;
 }
 
 function ProfileForm({
   defaultValues,
   submitting = false,
   onSubmit,
+  onUpdateNickname,
+  onUpdateName,
+  nicknamePending = false,
+  namePending = false,
 }: ProfileFormProps) {
   const [nickname, setNickname] = useState(() => defaultValues?.nickname ?? "");
   const [name, setName] = useState(() => defaultValues?.name ?? "");
@@ -273,19 +305,26 @@ function ProfileForm({
         <h3 className={SECTION_TITLE_CLASS}>개인 정보</h3>
         <div className="flex flex-col gap-6 pt-[12px]">
           <EditableTextField
+            confirmDisabled={!isNicknameValid || nicknameStatus === "checking"}
             helperText={nicknameMessage}
             helperTone={nicknameHelperTone}
             id="profile-nickname"
             label="닉네임"
-            onChange={setNickname}
-            placeholder="닉네임을 입력하세요"
+            maxLength={NICKNAME_MAX_LENGTH}
+            onChange={(value) => setNickname(sanitizeNickname(value))}
+            onConfirm={onUpdateNickname}
+            pending={nicknamePending}
+            placeholder="영문, 숫자만 입력 가능"
             value={nickname}
           />
 
           <EditableTextField
+            confirmDisabled={name.trim() === ""}
             id="profile-name"
             label="이름"
             onChange={setName}
+            onConfirm={onUpdateName}
+            pending={namePending}
             placeholder="이름을 입력하세요"
             value={name}
           />
@@ -406,10 +445,12 @@ function ProfileForm({
 
 export function ProfileSection({ className }: ProfileSectionProps) {
   const { data: profile, isLoading } = useGetUserProfileQuery();
-  const { mutate: createProfile, isPending: creating } =
-    useCreateUserProfileMutation();
   const { mutate: updateProfile, isPending: updating } =
     useUpdateUserProfileMutation();
+  const { mutateAsync: updateNicknameAsync, isPending: updatingNickname } =
+    useUpdateUserProfileNicknameMutation();
+  const { mutateAsync: updateNameAsync, isPending: updatingName } =
+    useUpdateUserProfileNameMutation();
   const { mutate: uploadImage, isPending: uploading } =
     useUploadUserImageFileMutation();
   const { mutate: registerProfileImage, isPending: registeringImage } =
@@ -422,12 +463,21 @@ export function ProfileSection({ className }: ProfileSectionProps) {
   const hasProfileImage = Boolean(profile?.profileImageUrl);
 
   const handleSubmit = (values: ProfileFormValues) => {
-    const payload = formValuesToProfilePayload(values, profile ?? undefined);
-    const run = profile ? updateProfile : createProfile;
+    const payload = formValuesToProfilePayload(values);
 
-    run(payload, {
+    updateProfile(payload, {
       onSuccess: () => toast.success("프로필이 저장되었습니다."),
     });
+  };
+
+  const handleUpdateNickname = async (nickname: string) => {
+    await updateNicknameAsync({ nickname });
+    toast.success("닉네임이 변경되었습니다.");
+  };
+
+  const handleUpdateName = async (name: string) => {
+    await updateNameAsync({ name });
+    toast.success("이름이 변경되었습니다.");
   };
 
   const handleChangeImageClick = () => {
@@ -528,8 +578,12 @@ export function ProfileSection({ className }: ProfileSectionProps) {
         <ProfileForm
           defaultValues={profile ? profileToFormValues(profile) : undefined}
           key={profile ? "edit" : "create"}
+          namePending={updatingName}
+          nicknamePending={updatingNickname}
           onSubmit={handleSubmit}
-          submitting={creating || updating}
+          onUpdateName={handleUpdateName}
+          onUpdateNickname={handleUpdateNickname}
+          submitting={updating}
         />
       )}
     </section>

@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { useNicknameValidate } from "@shared/lib/hooks";
+import { NICKNAME_MAX_LENGTH, sanitizeNickname } from "@shared/lib/nickname";
 import { PasswordField } from "@shared/ui/password-field";
 import { TermsConsent } from "@shared/ui/terms-consent";
 
@@ -210,10 +211,15 @@ export function SignupForm() {
         <Flex className="w-full" direction="column" gap={6}>
           <Input
             className="max-sm:h-12"
-            maxLength={20}
-            placeholder="닉네임을 입력해주세요 (2~20자)"
+            maxLength={NICKNAME_MAX_LENGTH}
+            placeholder="영문, 숫자만 입력 가능 (2~20자)"
             type="text"
-            {...register("nickname")}
+            {...register("nickname", {
+              onChange: (e) =>
+                setValue("nickname", sanitizeNickname(e.target.value), {
+                  shouldValidate: true,
+                }),
+            })}
           />
           {nicknameMessage && (
             <span

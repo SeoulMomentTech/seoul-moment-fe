@@ -5,11 +5,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { debounce } from "es-toolkit";
 import type { HTTPError } from "ky";
 
+import { NICKNAME_MAX_LENGTH, NICKNAME_MIN_LENGTH } from "@shared/lib/nickname";
 import { postNicknameValidate } from "@shared/services/auth";
 
 const DEFAULT_DEBOUNCE_MS = 400;
-const MIN_NICKNAME_LENGTH = 2;
-const MAX_NICKNAME_LENGTH = 20;
 
 export type NicknameValidateStatus =
   | "idle"
@@ -39,7 +38,7 @@ const MESSAGES: Record<NicknameValidateStatus, string | null> = {
 };
 
 const isValidLength = (value: string) =>
-  value.length >= MIN_NICKNAME_LENGTH && value.length <= MAX_NICKNAME_LENGTH;
+  value.length >= NICKNAME_MIN_LENGTH && value.length <= NICKNAME_MAX_LENGTH;
 
 export function useNicknameValidate({
   nickname,

@@ -71,6 +71,7 @@ describe("NowOnSaleContents", () => {
         image: "img1",
         colorName: "Red",
         colorCode: "#FF0000",
+        isLiked: false,
       },
     ];
 
