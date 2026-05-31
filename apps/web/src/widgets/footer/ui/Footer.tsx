@@ -44,6 +44,7 @@ export function Footer() {
               <Link href="/about">{t("about")}</Link>
               <Link href="/contact">{t("contact")}</Link>
               <Link href="/policy">{t("policy")}</Link>
+              <Link href="/terms">{t("terms")}</Link>
             </div>
             <div
               className={cn(
