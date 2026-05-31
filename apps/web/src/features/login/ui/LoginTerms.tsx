@@ -1,5 +1,7 @@
 "use client";
 
+import { Link } from "@/i18n/navigation";
+
 import { cn, VStack } from "@seoul-moment/ui";
 
 export function LoginTerms() {
@@ -13,15 +15,15 @@ export function LoginTerms() {
       >
         登入帳號，即表示您已閱讀並同意 SEOUL MOMONET
       </p>
-      <button
+      <Link
         className={cn(
           "text-body-3 w-full cursor-pointer text-center leading-none text-black/60 underline",
           "max-sm:text-body-4",
         )}
-        type="button"
+        href="/terms"
       >
         會員條款 與 客戶隱私權條款
-      </button>
+      </Link>
     </VStack>
   );
 }

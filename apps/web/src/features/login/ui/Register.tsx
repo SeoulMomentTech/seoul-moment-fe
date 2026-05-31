@@ -10,7 +10,7 @@ export function Register() {
         "max-md:mt-0 max-md:border-t-0 max-md:pt-[50px]",
       )}
     >
-      <span>沒有 PChome 24h購物帳號？</span>
+      <span>沒有 SEOUL MOMONET購物帳號?</span>
       <Link className="text-black/60" href="/signup">
         立即註冊
       </Link>
