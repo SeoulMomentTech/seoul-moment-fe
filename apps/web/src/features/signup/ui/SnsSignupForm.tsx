@@ -68,6 +68,7 @@ export function SnsSignupForm() {
     onSuccess: () => {
       clearSnsSignupContext();
       toast.success("가입이 완료되었습니다.", { position: "top-center" });
+      router.replace("/login");
     },
   });
 
