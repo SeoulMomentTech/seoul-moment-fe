@@ -1,74 +1,16 @@
-import type { PropsWithChildren, ReactNode } from "react";
+import type { ReactNode } from "react";
 
-import { cn, VStack } from "@seoul-moment/ui";
-
-function Section({ title, children }: PropsWithChildren<{ title: string }>) {
-  return (
-    <VStack className="w-full" gap={12}>
-      <h2 className="text-body-1 text-foreground w-full font-semibold leading-snug">
-        {title}
-      </h2>
-      <VStack className="w-full" gap={16}>
-        {children}
-      </VStack>
-    </VStack>
-  );
-}
-
-function SubSection({
-  title,
-  children,
-}: PropsWithChildren<{ title?: string }>) {
-  return (
-    <VStack className="w-full" gap={6}>
-      {title ? (
-        <h3 className="text-body-2 text-foreground w-full font-medium leading-snug">
-          {title}
-        </h3>
-      ) : null}
-      {children}
-    </VStack>
-  );
-}
-
-function Paragraph({ children }: PropsWithChildren) {
-  return (
-    <p className="text-body-3 w-full leading-relaxed text-black/60">
-      {children}
-    </p>
-  );
-}
-
-function Bullets({
-  items,
-  className,
-}: {
-  items: string[];
-  className?: string;
-}) {
-  return (
-    <ul
-      className={cn(
-        "text-body-3 w-full list-disc space-y-1 pl-5 leading-relaxed text-black/60",
-        className,
-      )}
-    >
-      {items.map((item) => (
-        <li key={item}>{item}</li>
-      ))}
-    </ul>
-  );
-}
+import {
+  Bullets,
+  LegalDocument,
+  Paragraph,
+  Section,
+  SubSection,
+} from "@shared/ui/legal-document";
 
 export function TermsOfServiceContent(): ReactNode {
   return (
-    <VStack className="w-full pt-[40px]" gap={32}>
-      <VStack className="w-full" gap={4}>
-        <h1 className="text-title-4 text-foreground w-full font-semibold leading-snug">
-          首爾映像有限公司 平台服務條款
-        </h1>
-      </VStack>
-
+    <LegalDocument title="首爾映像有限公司 平台服務條款">
       <Section title="服務說明">
         <SubSection title="服務範圍">
           <Paragraph>本平台主要提供以下服務：</Paragraph>
@@ -496,6 +438,6 @@ export function TermsOfServiceContent(): ReactNode {
       </Section>
 
       <Paragraph>最後更新日期：2024年11月26日</Paragraph>
-    </VStack>
+    </LegalDocument>
   );
 }
