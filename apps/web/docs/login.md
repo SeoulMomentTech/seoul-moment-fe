@@ -26,23 +26,21 @@ apps/web/src/
 
 ## 컴포넌트 책임
 
-| 컴포넌트 | 책임 | 주요 의존성 |
-| --- | --- | --- |
-| `LoginPage` | 외곽 레이아웃 + 5개 섹션 수직 합성 | `VStack` |
-| `LoginHeader` | `next/image`로 `/logo.png` 노출 + 환영 문구 (한국어 하드코딩) | `next/image`, `VStack` |
-| `LoginForm` | 단일 input(휴대폰/이메일), 帳號 체크박스, 忘記密碼 `Link`, 로그인 button. **현재 placeholder 상태(상태/검증 미연동)** | `Input`, `HStack`, `Link` from `@/i18n/navigation` |
-| `LoginTerms` | 약관 안내 문구 + 회원약관 버튼. `useTranslations()` 호출하지만 i18n 키 누락 | `next-intl`, `VStack` |
-| `SocialLoginButtons` | Google · LINE 로그인 버튼. 아이콘은 `/public/login/{google.svg, line.png}` | `next/image`, `Button` from `@seoul-moment/ui`, `next-intl` |
-| `Register` | "沒有 PChome 24h購物帳號？" + `Link href="/signup"` | `Link` from `@/i18n/navigation` |
+| 컴포넌트             | 책임                                                                                                                  | 주요 의존성                                                 |
+| -------------------- | --------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| `LoginPage`          | 외곽 레이아웃 + 5개 섹션 수직 합성                                                                                    | `VStack`                                                    |
+| `LoginHeader`        | `next/image`로 `/logo.png` 노출 + 환영 문구 (한국어 하드코딩)                                                         | `next/image`, `VStack`                                      |
+| `LoginForm`          | 단일 input(휴대폰/이메일), 帳號 체크박스, 忘記密碼 `Link`, 로그인 button. **현재 placeholder 상태(상태/검증 미연동)** | `Input`, `HStack`, `Link` from `@/i18n/navigation`          |
+| `LoginTerms`         | 약관 안내 문구 + 회원약관 버튼. `useTranslations()` 호출하지만 i18n 키 누락                                           | `next-intl`, `VStack`                                       |
+| `SocialLoginButtons` | Google · LINE 로그인 버튼. 아이콘은 `/public/login/{google.svg, line.png}`                                            | `next/image`, `Button` from `@seoul-moment/ui`, `next-intl` |
+| `Register`           | "沒有 SEOUL MOMONET購物帳號？" + `Link href="/signup"`                                                                | `Link` from `@/i18n/navigation`                             |
 
 ## 레이아웃 패턴 (signup·find-password 공유)
 
 ```tsx
 // LoginPage.tsx
 <VStack className="w-full px-4 pb-[122px] pt-[136px] max-md:pb-[50px] max-md:pt-[106px]">
-  <VStack className="w-full max-w-[414px]">
-    {/* 섹션들 */}
-  </VStack>
+  <VStack className="w-full max-w-[414px]">{/* 섹션들 */}</VStack>
 </VStack>
 ```
 
@@ -52,12 +50,12 @@ apps/web/src/
 
 ## 인증 라우트 간 연결
 
-| 출발 | 컴포넌트·요소 | 목적지 | 처리 |
-| --- | --- | --- | --- |
-| `/login` | `LoginForm`의 "忘記密碼" `Link` | `/find-password` | 비밀번호 찾기 진입 |
-| `/login` | `Register`의 "立即註冊" `Link` | `/signup` | 회원가입 진입 |
-| `/find-password` | (현재 미구현) | `/login` | 비밀번호 재설정 후 복귀 (TODO) |
-| `/signup` | `LoginPrompt`의 "立即登入" `Link` | `/login` | 회원가입 후 로그인 진입 |
+| 출발             | 컴포넌트·요소                     | 목적지           | 처리                           |
+| ---------------- | --------------------------------- | ---------------- | ------------------------------ |
+| `/login`         | `LoginForm`의 "忘記密碼" `Link`   | `/find-password` | 비밀번호 찾기 진입             |
+| `/login`         | `Register`의 "立即註冊" `Link`    | `/signup`        | 회원가입 진입                  |
+| `/find-password` | (현재 미구현)                     | `/login`         | 비밀번호 재설정 후 복귀 (TODO) |
+| `/signup`        | `LoginPrompt`의 "立即登入" `Link` | `/login`         | 회원가입 후 로그인 진입        |
 
 > 모든 링크는 `@/i18n/navigation`의 `Link`를 사용해 locale prefix(`/ko/...`)가 자동 적용된다.
 
@@ -119,13 +117,13 @@ import { LoginHeader } from "@features/login";
 
 ## 설계 결정 (ADR)
 
-| 결정 | 대안 | 채택 이유 | 영향 / 향후 |
-| --- | --- | --- | --- |
-| **외곽 레이아웃을 view에 인라인** (`pt-[136px] max-md:pt-[106px]`, `max-w-[414px]`) | 공유 `<AuthLayout>` 위젯으로 추출 | signup·find-password와 동일 값 3중 복제이지만, 현재로선 위젯화 비용 > 중복 비용. 디자인이 안정되어 있고 페이지가 3개라 한 번에 맞춰가는 편이 낫다 | 인증 페이지가 4번째 추가되거나 외곽 패턴이 변경되면 `widgets/auth-layout`로 추출 |
-| **5개 컴포넌트로 섹션 분할** (Header/Form/Terms/Social/Register) | 단일 LoginPage 파일 | 각 섹션의 책임이 분리되어 있고, i18n / API 연동을 점진적으로 도입할 때 변경 영역이 좁아진다. 디자인 시스템 검토(figma-to-code)도 섹션 단위로 받기 좋음 | 단점: `features/login/index.tsx`에 5개 export. 가독성에 큰 부담 없음 |
-| **`react-hook-form` 미도입** (현재 placeholder) | `signupForm`처럼 `useForm` + zod 도입 | login은 OAuth 위주이고 form 필드가 1개라 도입 비용이 가치 대비 낮다. UI 골격만 먼저 받고 API 연동 시점에 일괄 도입 | API 연동 PR에서 함께 검토. 그때까지는 수동 onChange/state로 대응 가능 |
-| **forgot 링크를 `<Link>`로 처리** | `useRouter().push("/find-password")` | SSR 친화적이고 prefetch 자동 적용. `@/i18n/navigation` 래퍼가 locale prefix를 자동으로 붙여 `/ko/find-password`로 이동 | 일반 클릭 외 핸들러 필요(예: 폼 dirty 시 confirm)가 생기면 `useRouter` 전환 |
-| **i18n 키를 인라인 한국어로 사용** (`t("구글로 로그인")`) | 네임스페이스 키(`t("auth.login.google")`) | 키와 한국어 디폴트가 1:1로 매핑되어 번역가가 컨텍스트를 잃지 않음. 단점: 키 변경 비용 큼 | 일괄 i18n 정비 시 네임스페이스 도입 검토 |
+| 결정                                                                                | 대안                                      | 채택 이유                                                                                                                                              | 영향 / 향후                                                                      |
+| ----------------------------------------------------------------------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------- |
+| **외곽 레이아웃을 view에 인라인** (`pt-[136px] max-md:pt-[106px]`, `max-w-[414px]`) | 공유 `<AuthLayout>` 위젯으로 추출         | signup·find-password와 동일 값 3중 복제이지만, 현재로선 위젯화 비용 > 중복 비용. 디자인이 안정되어 있고 페이지가 3개라 한 번에 맞춰가는 편이 낫다      | 인증 페이지가 4번째 추가되거나 외곽 패턴이 변경되면 `widgets/auth-layout`로 추출 |
+| **5개 컴포넌트로 섹션 분할** (Header/Form/Terms/Social/Register)                    | 단일 LoginPage 파일                       | 각 섹션의 책임이 분리되어 있고, i18n / API 연동을 점진적으로 도입할 때 변경 영역이 좁아진다. 디자인 시스템 검토(figma-to-code)도 섹션 단위로 받기 좋음 | 단점: `features/login/index.tsx`에 5개 export. 가독성에 큰 부담 없음             |
+| **`react-hook-form` 미도입** (현재 placeholder)                                     | `signupForm`처럼 `useForm` + zod 도입     | login은 OAuth 위주이고 form 필드가 1개라 도입 비용이 가치 대비 낮다. UI 골격만 먼저 받고 API 연동 시점에 일괄 도입                                     | API 연동 PR에서 함께 검토. 그때까지는 수동 onChange/state로 대응 가능            |
+| **forgot 링크를 `<Link>`로 처리**                                                   | `useRouter().push("/find-password")`      | SSR 친화적이고 prefetch 자동 적용. `@/i18n/navigation` 래퍼가 locale prefix를 자동으로 붙여 `/ko/find-password`로 이동                                 | 일반 클릭 외 핸들러 필요(예: 폼 dirty 시 confirm)가 생기면 `useRouter` 전환      |
+| **i18n 키를 인라인 한국어로 사용** (`t("구글로 로그인")`)                           | 네임스페이스 키(`t("auth.login.google")`) | 키와 한국어 디폴트가 1:1로 매핑되어 번역가가 컨텍스트를 잃지 않음. 단점: 키 변경 비용 큼                                                               | 일괄 i18n 정비 시 네임스페이스 도입 검토                                         |
 
 ## 참고
 
