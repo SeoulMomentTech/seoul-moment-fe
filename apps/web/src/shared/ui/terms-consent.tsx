@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Check, ChevronRight } from "lucide-react";
 
 import { TermsModal } from "@shared/ui/terms-modal";
+import { TermsOfServiceContent } from "@shared/ui/terms-of-service-content";
 
 import { cn, HStack, VStack } from "@seoul-moment/ui";
 
@@ -83,9 +84,13 @@ export function TermsConsent({
           open={openKey === key}
           title={label}
         >
-          <p className="text-body-3 leading-normal text-black/60">
-            약관 내용입니다.
-          </p>
+          {key === "termsOfService" ? (
+            <TermsOfServiceContent />
+          ) : (
+            <p className="text-body-3 leading-normal text-black/60">
+              약관 내용입니다.
+            </p>
+          )}
         </TermsModal>
       ))}
     </>
