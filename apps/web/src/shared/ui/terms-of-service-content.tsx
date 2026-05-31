@@ -62,7 +62,7 @@ function Bullets({
 
 export function TermsOfServiceContent(): ReactNode {
   return (
-    <VStack className="w-full" gap={32}>
+    <VStack className="w-full pt-[40px]" gap={32}>
       <VStack className="w-full" gap={4}>
         <h1 className="text-title-4 text-foreground w-full font-semibold leading-snug">
           首爾映像有限公司 平台服務條款
