@@ -50,7 +50,7 @@ export function InterestRecentTab({ className }: InterestRecentTabProps) {
                   className="h-full flex-1"
                   data={toProductItem(item)}
                   imageClassName={cn(
-                    "aspect-square h-auto w-full",
+                    "aspect-square h-[260px] w-full",
                     "max-sm:w-full max-sm:max-h-[150px] max-sm:min-h-[150px]",
                   )}
                 />
