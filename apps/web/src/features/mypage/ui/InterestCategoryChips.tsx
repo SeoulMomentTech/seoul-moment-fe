@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 import useProductCategory from "@features/product/model/useProductCategory";
 import { cn } from "@shared/lib/style";
@@ -26,6 +27,7 @@ export function InterestCategoryChips({
   onChange,
 }: InterestCategoryChipsProps) {
   const { data: categories } = useProductCategory();
+  const t = useTranslations();
 
   return (
     <div className={cn(CONTAINER_CLASS, className)}>
@@ -37,7 +39,7 @@ export function InterestCategoryChips({
         <div className={cn(CHIP_CIRCLE_CLASS, value == null && "border-black")}>
           ALL
         </div>
-        <span>전체</span>
+        <span>{t("subcategory_all")}</span>
       </button>
       {categories.map((category) => {
         const selected = category.id === value;

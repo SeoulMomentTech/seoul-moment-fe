@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { debounce } from "es-toolkit";
+import { toast } from "sonner";
 
 import { useUserAuthStore } from "@shared/lib/hooks/useUserAuthStore";
 
@@ -63,7 +64,10 @@ export function useBrandLikeToggle({
   );
 
   const handleToggleLike = () => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated) {
+      toast.error("로그인이 필요합니다.");
+      return;
+    }
 
     setLiked((prev) => {
       const next = !prev;
