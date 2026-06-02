@@ -228,7 +228,7 @@ export function TermsOfServiceContent(): ReactNode {
           <Bullets
             items={[
               "直接於第三方電商平台申請（登入蝦皮購物、酷澎或其他平台帳號，於訂單管理系統中申請退貨，依該平台流程完成）",
-              "聯繫本公司客服協助（客服電話、客服信箱、線上客服系統）",
+              "聯繫本公司客服協助：客服電話 0917-986-827、客服信箱 seoulmomenttw@gmail.com、線上客服系統 Line: seoulmoment",
               "本公司將協助您於各該第三方電商平台完成退貨程序",
             ]}
           />
@@ -372,6 +372,18 @@ export function TermsOfServiceContent(): ReactNode {
       </Section>
 
       <Section title="爭議處理與準據法">
+        <SubSection title="客戶服務">
+          <Paragraph>
+            若您對服務有任何疑問或爭議，可透過以下方式聯繫本公司：
+          </Paragraph>
+          <Bullets
+            items={[
+              "關於導購服務、商品資訊、會員服務：客服電話 0917-986-827（週一至週五 09:00－21:00｜週末（週六）12:00－16:00）、客服信箱 seoulmomenttw@gmail.com、線上客服系統 Line: seoulmoment 或登入會員中心後使用(Email)",
+              "關於訂單、付款、配送、退換貨：可聯繫本公司客服（如上），或直接聯繫您下單之第三方電商平台客服（蝦皮購物、酷澎等）",
+              "本公司服務地址：台北市大安區忠孝東路四段231號10樓之2",
+            ]}
+          />
+        </SubSection>
         <SubSection title="爭議處理機制">
           <Bullets
             items={[
@@ -406,11 +418,15 @@ export function TermsOfServiceContent(): ReactNode {
               "公司名稱：首爾映像有限公司",
               "代表人：朴佑濬",
               "公司地址：台北市大安區忠孝東路四段231號10樓之2",
-              "客服信箱：service@seoulimage.com.tw",
-              "營業時間：週一至週日 09:00-21:00",
+              "客服電話：0917-986-827",
+              "客服信箱：seoulmomenttw@gmail.com",
+              "營業時間：週一至週五 09:00－21:00｜週末（週六）12:00－16:00",
               "統一編號：00148871",
             ]}
           />
+        </SubSection>
+        <SubSection title="第三方電商平台賣場資訊">
+          <Bullets items={["蝦皮購物官方賣場", "酷澎官方賣場"]} />
         </SubSection>
       </Section>
 
