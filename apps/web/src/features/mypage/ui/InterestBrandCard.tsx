@@ -3,6 +3,7 @@
 import { ChevronRight, HeartIcon } from "lucide-react";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@shared/lib/style";
 import { toNTCurrency } from "@shared/lib/utils";
@@ -23,6 +24,7 @@ interface InterestBrandCardProps {
 const SLOT_COUNT = 4;
 
 export function InterestBrandCard({ data, className }: InterestBrandCardProps) {
+  const t = useTranslations();
   const { liked, handleToggleLike } = useBrandLikeToggle({
     brandId: data.brandId,
     isLiked: true,
@@ -62,7 +64,7 @@ export function InterestBrandCard({ data, className }: InterestBrandCardProps) {
           </div>
         </Link>
         <button
-          aria-label={liked ? "브랜드 좋아요 취소" : "브랜드 좋아요"}
+          aria-label={liked ? t("brand_unlike") : t("brand_like")}
           aria-pressed={liked}
           className={cn(
             "shrink-0 cursor-pointer p-2",
@@ -116,7 +118,7 @@ export function InterestBrandCard({ data, className }: InterestBrandCardProps) {
         className="text-body-3 flex w-full items-center justify-center gap-1 rounded-[4px] border border-black/20 bg-white px-[16px] py-[12px] font-semibold text-black max-sm:hidden"
         href={brandHref}
       >
-        브랜드 더보기
+        {t("brand_more")}
       </Link>
     </article>
   );

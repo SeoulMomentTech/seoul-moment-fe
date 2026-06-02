@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { Check, CheckCircle2, CircleAlert } from "lucide-react";
 
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 import { cn } from "@shared/lib/style";
@@ -26,25 +27,25 @@ interface LoginInfoSectionProps {
 
 interface NotificationOption {
   key: AgreementKey;
-  title: string;
-  description: string;
+  titleKey: string;
+  descriptionKey: string;
 }
 
 const NOTIFICATION_OPTIONS: ReadonlyArray<NotificationOption> = [
   {
     key: "newProductAgreed",
-    title: "신상품 및 기획전 출시 알림",
-    description: "개인 전용 혜택 및 관심 상품 가격 인하 알림",
+    titleKey: "new_arrivals_alerts",
+    descriptionKey: "personal_offers_alerts",
   },
   {
     key: "adAgreed",
-    title: "광고 및 이벤트 할인 이메일",
-    description: "현재 진행 중인 프로모션 알림",
+    titleKey: "marketing_promotion_emails",
+    descriptionKey: "ongoing_promotion_notification",
   },
   {
     key: "recommendAgreed",
-    title: "개인 맞춤 상품 추천 알림",
-    description: "개인 전용 혜택 및 관심 상품 가격 인하 알림",
+    titleKey: "personalized_product_suggestions",
+    descriptionKey: "personal_offers_alerts",
   },
 ];
 
@@ -67,6 +68,7 @@ function AccountValueField({
   unverifiedMessage?: string;
   onClick?(): void;
 }) {
+  const t = useTranslations();
   const hasValue = value.length > 0;
 
   return (
@@ -93,7 +95,7 @@ function AccountValueField({
           type="button"
           variant={verified ? "outline" : "default"}
         >
-          {verified ? "수정" : "인증"}
+          {verified ? t("modify") : t("verification")}
         </Button>
       </div>
       {verified || !unverifiedMessage ? null : (
@@ -116,6 +118,7 @@ function NotificationForm({
   submitting = false,
   onSubmit,
 }: NotificationFormProps) {
+  const t = useTranslations();
   const base = defaultValues ?? EMPTY_AGREEMENTS;
   const [agreements, setAgreements] = useState<AgreementValues>(() => base);
 
@@ -126,9 +129,9 @@ function NotificationForm({
   return (
     <>
       <div className="flex flex-col gap-5">
-        <h3 className={SECTION_TITLE_CLASS}>혜택 정보</h3>
+        <h3 className={SECTION_TITLE_CLASS}>{t("promotion_benefits")}</h3>
         <div className="flex flex-col gap-2">
-          <Label className={FIELD_LABEL_CLASS}>이메일주소</Label>
+          <Label className={FIELD_LABEL_CLASS}>{t("email_address")}</Label>
           <div className="flex h-[48px] items-center justify-between rounded-[4px] border border-black/20 px-[12px]">
             <span className="text-body-2 text-black">{email}</span>
             <CheckCircle2 className="text-info size-[18px] shrink-0" />
@@ -136,9 +139,7 @@ function NotificationForm({
         </div>
 
         <div className="flex flex-col gap-4">
-          <span className="text-body-3 text-black/50">
-            이메일 &amp; 유선 수신 설정
-          </span>
+          <span className="text-body-3 text-black/50">{t("email_phone")}</span>
           <div className="flex flex-col gap-5">
             {NOTIFICATION_OPTIONS.map((option) => {
               const active = agreements[option.key];
@@ -167,10 +168,10 @@ function NotificationForm({
                   </span>
                   <span className="flex flex-col gap-1">
                     <span className="text-body-3 text-black">
-                      {option.title}
+                      {t(option.titleKey)}
                     </span>
                     <span className="text-body-5 text-black/40">
-                      {option.description}
+                      {t(option.descriptionKey)}
                     </span>
                   </span>
                 </button>
@@ -187,13 +188,14 @@ function NotificationForm({
         size="lg"
         type="button"
       >
-        수정사항 저장
+        {t("save_changes")}
       </Button>
     </>
   );
 }
 
 export function LoginInfoSection({ className }: LoginInfoSectionProps) {
+  const t = useTranslations();
   const { data: userInfo, isLoading } = useGetUserInfoQuery();
   const { mutate: updateInfo, isPending } = useUpdateUserInfoMutation();
 
@@ -207,7 +209,7 @@ export function LoginInfoSection({ className }: LoginInfoSectionProps) {
     if (!userInfo) return;
 
     updateInfo(agreements, {
-      onSuccess: () => toast.success("수정사항이 저장되었습니다."),
+      onSuccess: () => toast.success(t("changes_saved")),
     });
   };
 
@@ -219,17 +221,17 @@ export function LoginInfoSection({ className }: LoginInfoSectionProps) {
       )}
     >
       <h2 className="text-title-4 sm:text-title-3 font-bold text-black">
-        로그인 정보
+        {t("login_info")}
       </h2>
 
       <div className="flex flex-col gap-5">
-        <h3 className={SECTION_TITLE_CLASS}>내 계정</h3>
+        <h3 className={SECTION_TITLE_CLASS}>{t("my_account_2")}</h3>
         <div className="flex flex-col gap-2">
-          <Label className={FIELD_LABEL_CLASS}>휴대폰번호</Label>
+          <Label className={FIELD_LABEL_CLASS}>{t("mobile_number")}</Label>
           <AccountValueField
             onClick={() => setIsPhoneFlowOpen(true)}
-            placeholder="휴대폰 번호 미등록"
-            unverifiedMessage="휴대폰 번호를 인증해주세요."
+            placeholder={t("number_not_registered")}
+            unverifiedMessage={t("verify_your_number")}
             value={phone}
             verified={phoneVerified}
           />
@@ -237,7 +239,7 @@ export function LoginInfoSection({ className }: LoginInfoSectionProps) {
       </div>
 
       {isLoading ? (
-        <p className="text-body-3 text-black/40">불러오는 중...</p>
+        <p className="text-body-3 text-black/40">{t("loading")}</p>
       ) : (
         <NotificationForm
           defaultValues={userInfo ? userInfoToAgreements(userInfo) : undefined}

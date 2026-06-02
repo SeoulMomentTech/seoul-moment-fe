@@ -4,6 +4,8 @@ import { type ReactNode, useId, useState } from "react";
 
 import { ChevronRight } from "lucide-react";
 
+import { useTranslations } from "next-intl";
+
 import { cn } from "@shared/lib/style";
 
 import { Button, Input, Label } from "@seoul-moment/ui";
@@ -37,6 +39,7 @@ function SizeRowButton({
   value?: string;
   onClick(): void;
 }) {
+  const t = useTranslations();
   const hasValue = Boolean(value);
 
   return (
@@ -53,7 +56,7 @@ function SizeRowButton({
             hasValue ? "text-black" : "text-black/40",
           )}
         >
-          {hasValue ? value : "선택하기"}
+          {hasValue ? value : t("select_2")}
         </span>
         <ChevronRight className="size-[14px] text-black/40" />
       </span>
@@ -88,6 +91,7 @@ export function CustomInfoForm({
   footer,
   className,
 }: CustomInfoFormProps) {
+  const t = useTranslations();
   const fieldId = useId();
   const [height, setHeight] = useState(() => defaultValues?.height ?? "");
   const [weight, setWeight] = useState(() => defaultValues?.weight ?? "");
@@ -114,7 +118,7 @@ export function CustomInfoForm({
   return (
     <div className={cn("flex flex-col gap-10 max-sm:gap-8", className)}>
       <div className="flex flex-col gap-5">
-        <h3 className={SECTION_TITLE_CLASS}>체형 정보</h3>
+        <h3 className={SECTION_TITLE_CLASS}>{t("body_info")}</h3>
         <div className="flex flex-col gap-5">
           <div className="flex flex-col gap-2">
             <Label className={FIELD_LABEL_CLASS} htmlFor={`${fieldId}-height`}>
@@ -127,7 +131,7 @@ export function CustomInfoForm({
               onChange={(e) =>
                 setHeight(clampNumeric(e.target.value, MAX_HEIGHT))
               }
-              placeholder="키를 입력하세요"
+              placeholder={t("enter_height")}
               value={height}
             />
           </div>
@@ -142,7 +146,7 @@ export function CustomInfoForm({
               onChange={(e) =>
                 setWeight(clampNumeric(e.target.value, MAX_WEIGHT))
               }
-              placeholder="몸무게를 입력하세요"
+              placeholder={t("enter_weight")}
               value={weight}
             />
           </div>
@@ -150,12 +154,12 @@ export function CustomInfoForm({
       </div>
 
       <div className="flex flex-col gap-5">
-        <h3 className={SECTION_TITLE_CLASS}>사이즈 정보</h3>
+        <h3 className={SECTION_TITLE_CLASS}>{t("size_info")}</h3>
         <div className="flex flex-col">
           {SIZE_FIELDS.map((field) => (
             <SizeRowButton
               key={field.type}
-              label={field.label}
+              label={t(field.labelKey)}
               onClick={() => setOpenType(field.type)}
               value={sizeValues[field.type]}
             />
@@ -186,7 +190,7 @@ export function CustomInfoForm({
           }}
           open={openType !== null}
           options={activeField.options}
-          title={activeField.modalTitle}
+          title={t(activeField.modalTitleKey)}
           value={sizeValues[activeField.type]}
         />
       ) : null}

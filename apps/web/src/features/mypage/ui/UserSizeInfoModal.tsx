@@ -2,6 +2,8 @@
 
 import { ChevronLeft } from "lucide-react";
 
+import { useTranslations } from "next-intl";
+
 import useMediaQuery from "@shared/lib/hooks/useMediaQuery";
 
 import {
@@ -28,6 +30,7 @@ export function UserSizeInfoModal({
   onOpenChange,
   onSubmit,
 }: UserSizeInfoModalProps) {
+  const t = useTranslations();
   const isMobile = useMediaQuery("(max-width: 639px)");
 
   const laterButton = (
@@ -36,7 +39,7 @@ export function UserSizeInfoModal({
       onClick={() => onOpenChange(false)}
       type="button"
     >
-      나중에 하기
+      {t("do_later")}
     </button>
   );
 
@@ -48,10 +51,10 @@ export function UserSizeInfoModal({
   const form = (
     <CustomInfoForm
       footer={laterButton}
-      heightLabel="신장 (Height)"
+      heightLabel={t("height_label")}
       onSubmit={handleSubmit}
-      submitLabel={isMobile ? "확인" : "저장하기"}
-      weightLabel="몸무게 (Weight)"
+      submitLabel={isMobile ? t("confirm") : t("save")}
+      weightLabel={t("weight_label")}
     />
   );
 
@@ -62,7 +65,7 @@ export function UserSizeInfoModal({
           <div className="flex h-full flex-col gap-[28px] overflow-y-auto px-[20px] pb-[24px] pt-[12px]">
             <div className="flex items-center">
               <button
-                aria-label="뒤로"
+                aria-label={t("back")}
                 className="text-black"
                 onClick={() => onOpenChange(false)}
                 type="button"
@@ -70,17 +73,17 @@ export function UserSizeInfoModal({
                 <ChevronLeft className="size-6" />
               </button>
               <span className="text-body-2 flex-1 font-semibold text-black">
-                추가 정보 입력하기
+                {t("enter_additional_info")}
               </span>
               <span className="size-6" />
             </div>
 
             <div className="flex flex-col gap-2 text-center">
               <DrawerTitle className="text-title-4 font-bold text-black">
-                환영합니다.
+                {t("welcome")}
               </DrawerTitle>
               <DrawerDescription className="text-body-2 text-black/50">
-                더 편리한 이용을 위해 몇 가지 설정이 필요해요.
+                {t("setup_needed_description")}
               </DrawerDescription>
             </div>
 
@@ -99,14 +102,16 @@ export function UserSizeInfoModal({
       >
         <div className="flex flex-col gap-2 text-center">
           <DialogTitle className="text-title-4 font-bold text-black">
-            환영합니다.
+            {t("welcome")}
           </DialogTitle>
           <DialogDescription className="text-body-2 text-black/50">
-            더 편리한 이용을 위해 몇 가지 설정이 필요해요.
+            {t("setup_needed_description")}
           </DialogDescription>
         </div>
 
-        <h2 className="text-title-3 font-bold text-black">나의 맞춤 정보</h2>
+        <h2 className="text-title-3 font-bold text-black">
+          {t("personalized_info")}
+        </h2>
 
         {form}
       </DialogContent>

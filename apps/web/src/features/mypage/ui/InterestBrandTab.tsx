@@ -4,6 +4,8 @@ import { useCallback, useRef } from "react";
 
 import { HeartIcon } from "lucide-react";
 
+import { useTranslations } from "next-intl";
+
 import { useIntersectionObserver } from "@shared/lib/hooks";
 import { cn } from "@shared/lib/style";
 import Empty from "@widgets/empty/ui/Empty";
@@ -21,6 +23,7 @@ const GRID_CLASS =
   "grid grid-cols-2 gap-[17px] max-sm:grid-cols-1 max-sm:gap-0";
 
 export function InterestBrandTab({ className }: InterestBrandTabProps) {
+  const t = useTranslations();
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
@@ -56,7 +59,7 @@ export function InterestBrandTab({ className }: InterestBrandTabProps) {
     return (
       <Empty
         className="py-[60px]"
-        description="관심 브랜드가 없습니다"
+        description={t("no_favorite_brands")}
         icon={<HeartIcon className="size-10 text-black/20" />}
       />
     );

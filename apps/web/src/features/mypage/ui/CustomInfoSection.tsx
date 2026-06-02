@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 import { cn } from "@shared/lib/style";
@@ -19,6 +20,7 @@ interface CustomInfoSectionProps {
 }
 
 export function CustomInfoSection({ className }: CustomInfoSectionProps) {
+  const t = useTranslations();
   const { data: fit, isLoading } = useGetUserFitQuery();
   const { mutate: createFit, isPending: creating } = useCreateUserFitMutation();
   const { mutate: updateFit, isPending: updating } = useUpdateUserFitMutation();
@@ -28,7 +30,7 @@ export function CustomInfoSection({ className }: CustomInfoSectionProps) {
     const run = fit ? updateFit : createFit;
 
     run(payload, {
-      onSuccess: () => toast.success("맞춤 정보가 저장되었습니다."),
+      onSuccess: () => toast.success(t("personalized_info_saved")),
     });
   };
 
@@ -40,21 +42,21 @@ export function CustomInfoSection({ className }: CustomInfoSectionProps) {
       )}
     >
       <h2 className="text-title-4 sm:text-title-3 font-bold text-black">
-        나의 맞춤 정보
+        {t("personalized_info")}
       </h2>
 
       {isLoading ? (
-        <p className="text-body-3 text-black/40">불러오는 중...</p>
+        <p className="text-body-3 text-black/40">{t("loading")}</p>
       ) : (
         <CustomInfoForm
           defaultValues={fit ? fitToFormValues(fit) : undefined}
-          heightLabel="키"
+          heightLabel={t("height")}
           key={fit ? "edit" : "create"}
           onSubmit={handleSubmit}
           requireComplete={false}
-          submitLabel="저장하기"
+          submitLabel={t("save")}
           submitting={creating || updating}
-          weightLabel="몸무게"
+          weightLabel={t("weight")}
         />
       )}
     </section>

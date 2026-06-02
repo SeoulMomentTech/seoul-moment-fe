@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { cn } from "@shared/lib/style";
 
 import { Link, usePathname } from "@/i18n/navigation";
@@ -19,6 +21,8 @@ function SidebarGroup({
   items: ReadonlyArray<SidebarItem>;
   pathname: string;
 }) {
+  const t = useTranslations();
+
   return (
     <div className="flex flex-col gap-4">
       <h3 className="text-body-1 font-semibold text-black">{title}</h3>
@@ -37,7 +41,7 @@ function SidebarGroup({
                 )}
                 href={item.href}
               >
-                {item.label}
+                {t(item.labelKey)}
               </Link>
             </li>
           );
@@ -49,18 +53,19 @@ function SidebarGroup({
 
 export default function MyPageSidebar({ className }: MyPageSidebarProps) {
   const pathname = usePathname();
+  const t = useTranslations();
 
   return (
     <aside className={cn("flex flex-col gap-10", className)}>
       <Link href="/mypage">
-        <h1 className="text-title-3 font-bold text-black">마이페이지</h1>
+        <h1 className="text-title-3 font-bold text-black">{t("my_account")}</h1>
       </Link>
       {SIDEBAR_GROUPS.map((group) => (
         <SidebarGroup
           items={group.items}
-          key={group.title}
+          key={group.titleKey}
           pathname={pathname}
-          title={group.title}
+          title={t(group.titleKey)}
         />
       ))}
     </aside>

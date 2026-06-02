@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 import {
@@ -30,13 +31,14 @@ export function GoogleLinkConfirmDialog({
   onOpenChange,
   onLinked,
 }: GoogleLinkConfirmDialogProps) {
+  const t = useTranslations();
   const linkMutation = useGoogleLinkMutation({
     onSuccess: () => {
       onOpenChange(false);
       onLinked?.();
     },
     onError: () => {
-      toast.error("Google 계정 연결에 실패했습니다. 다시 시도해주세요.");
+      toast.error(t("connect_google_failed"));
       onOpenChange(false);
     },
   });
@@ -68,12 +70,13 @@ export function GoogleLinkConfirmDialog({
       >
         <VStack className="w-full" gap={12}>
           <DialogTitle className="text-title-4 text-foreground text-left font-semibold leading-tight">
-            기존 계정에 Google 연결
+            {t("connect_google_to_existing_account")}
           </DialogTitle>
           <DialogDescription className="text-body-3 text-left leading-normal text-black/60">
             <strong className="font-semibold text-black/80">{email}</strong>{" "}
-            계정이 이미 존재합니다.
-            <br />이 계정에 Google 로그인을 연결하시겠습니까?
+            {t("account_exists")}
+            <br />
+            {t("connect_account_to_google")}
           </DialogDescription>
         </VStack>
 
@@ -85,7 +88,7 @@ export function GoogleLinkConfirmDialog({
             type="button"
             variant="outline"
           >
-            취소
+            {t("cancel")}
           </Button>
           <Button
             className="flex-1 rounded-[4px] bg-black py-[12px] font-semibold text-white"
@@ -93,7 +96,7 @@ export function GoogleLinkConfirmDialog({
             onClick={handleConfirm}
             type="button"
           >
-            {linkMutation.isPending ? "연결 중..." : "연결하기"}
+            {linkMutation.isPending ? t("connecting") : t("connect")}
           </Button>
         </DialogFooter>
       </DialogContent>

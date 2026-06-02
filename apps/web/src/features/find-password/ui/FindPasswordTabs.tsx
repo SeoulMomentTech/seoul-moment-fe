@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { cn, Tabs, TabsList, TabsTrigger } from "@seoul-moment/ui";
 
 import type { FindPasswordMethod } from "../model/schema";
@@ -17,6 +19,8 @@ export function FindPasswordTabs({
   onValueChange,
   className,
 }: FindPasswordTabsProps) {
+  const t = useTranslations();
+
   return (
     <Tabs
       className={cn("w-full gap-0 border-b border-b-black/10", className)}
@@ -28,13 +32,13 @@ export function FindPasswordTabs({
           className="text-body-2 flex-1 rounded-none px-0 pb-[20px] pt-[12px]"
           value="email"
         >
-          이메일
+          {t("email")}
         </TabsTrigger>
         <TabsTrigger
           className="text-body-2 flex-1 rounded-none px-0 pb-[20px] pt-[12px]"
           value="phone"
         >
-          휴대폰번호
+          {t("mobile_number")}
         </TabsTrigger>
       </TabsList>
     </Tabs>

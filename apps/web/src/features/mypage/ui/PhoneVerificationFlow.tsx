@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 import { useQueryClient } from "@tanstack/react-query";
@@ -24,6 +25,7 @@ export function PhoneVerificationFlow({
   open,
   onOpenChange,
 }: PhoneVerificationFlowProps) {
+  const t = useTranslations();
   const queryClient = useQueryClient();
 
   const [isCodeSent, setIsCodeSent] = useState(false);
@@ -69,7 +71,7 @@ export function PhoneVerificationFlow({
 
   const handleSuccessContinue = () => {
     queryClient.invalidateQueries({ queryKey: ["user", "info"] });
-    toast.success("휴대폰 번호가 인증되었습니다.");
+    toast.success(t("phone_verified"));
     setResultState(null);
     resetFlow();
   };

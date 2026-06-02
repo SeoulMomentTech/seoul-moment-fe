@@ -4,6 +4,8 @@ import { Suspense } from "react";
 
 import { HeartIcon } from "lucide-react";
 
+import { useTranslations } from "next-intl";
+
 import { cn } from "@shared/lib/style";
 import Empty from "@widgets/empty/ui/Empty";
 
@@ -27,6 +29,7 @@ function InterestProductLikeButton({
 }: {
   productItemId: number;
 }) {
+  const t = useTranslations();
   const { liked, handleToggleLike } = useProductLikeToggle({
     productId: productItemId,
     isLiked: true,
@@ -35,7 +38,7 @@ function InterestProductLikeButton({
 
   return (
     <button
-      aria-label={liked ? "좋아요 취소" : "좋아요"}
+      aria-label={liked ? t("unlike") : t("like")}
       aria-pressed={liked}
       className={cn(
         "cursor-pointer p-2",
@@ -53,6 +56,7 @@ function InterestProductLikeButton({
 }
 
 export function InterestProductTab({ className }: InterestProductTabProps) {
+  const t = useTranslations();
   const { productCategoryId, setProductCategoryId } =
     useInterestProductCategory();
   const { data, isLoading } = useGetUserLikeProductListQuery({
@@ -91,7 +95,7 @@ export function InterestProductTab({ className }: InterestProductTabProps) {
       ) : items.length === 0 ? (
         <Empty
           className="py-[60px]"
-          description="관심 상품이 없습니다"
+          description={t("no_favorite_products")}
           icon={<HeartIcon className="size-10 text-black/20" />}
         />
       ) : (

@@ -2,8 +2,8 @@ export type SizeType = "shoes" | "outer" | "top" | "bottom";
 
 export interface SizeFieldConfig {
   type: SizeType;
-  label: string;
-  modalTitle: string;
+  labelKey: string;
+  modalTitleKey: string;
   options: ReadonlyArray<string>;
 }
 
@@ -29,26 +29,26 @@ const APPAREL_SIZES = [
 export const SIZE_FIELDS: ReadonlyArray<SizeFieldConfig> = [
   {
     type: "shoes",
-    label: "신발",
-    modalTitle: "내 신발 사이즈",
+    labelKey: "shoes",
+    modalTitleKey: "my_shoes_size",
     options: range(220, 290, 5),
   },
   {
     type: "outer",
-    label: "아우터",
-    modalTitle: "내 아우터 사이즈",
+    labelKey: "outer_wear",
+    modalTitleKey: "my_outerwear_size",
     options: APPAREL_SIZES,
   },
   {
     type: "top",
-    label: "상의",
-    modalTitle: "내 상의 사이즈",
+    labelKey: "tops",
+    modalTitleKey: "my_top_size",
     options: APPAREL_SIZES,
   },
   {
     type: "bottom",
-    label: "하의",
-    modalTitle: "내 하의 사이즈",
+    labelKey: "bottoms",
+    modalTitleKey: "my_bottom_size",
     options: range(23, 37, 1),
   },
 ];

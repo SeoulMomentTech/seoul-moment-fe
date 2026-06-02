@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { useTranslations } from "next-intl";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -26,18 +27,19 @@ import {
 } from "../model/snsSchema";
 
 export function SnsSignupForm() {
+  const t = useTranslations();
   const router = useRouter();
   const [context, setContext] = useState<SnsSignupContext | null>(null);
 
   useEffect(() => {
     const stored = readSnsSignupContext();
     if (!stored) {
-      toast.error("SNS 가입 세션이 만료되었습니다. 다시 시도해주세요.");
+      toast.error(t("session_has_expired"));
       router.replace("/login");
       return;
     }
     setContext(stored);
-  }, [router]);
+  }, [router, t]);
 
   const {
     register,
@@ -67,7 +69,7 @@ export function SnsSignupForm() {
   const signupMutation = useGoogleSignupMutation({
     onSuccess: () => {
       clearSnsSignupContext();
-      toast.success("가입이 완료되었습니다.", { position: "top-center" });
+      toast.success(t("registration_completed"), { position: "top-center" });
       router.replace("/login");
     },
   });
@@ -92,7 +94,9 @@ export function SnsSignupForm() {
     <form className="w-full" onSubmit={handleSubmit(onSubmit)}>
       <VStack className="w-full pt-[64px]" gap={16}>
         <Flex className="w-full" direction="column" gap={6}>
-          <p className="text-body-3 leading-none text-black/60">계정</p>
+          <p className="text-body-3 leading-none text-black/60">
+            {t("account")}
+          </p>
           <Input
             className="bg-black/5 max-sm:h-12"
             disabled
@@ -105,7 +109,7 @@ export function SnsSignupForm() {
           <Input
             className="max-sm:h-12"
             maxLength={NICKNAME_MAX_LENGTH}
-            placeholder="영문, 숫자만 입력 가능 (2~20자)"
+            placeholder={t("allowed_input")}
             type="text"
             {...register("nickname", {
               onChange: (e) =>
@@ -145,7 +149,7 @@ export function SnsSignupForm() {
           disabled={isSubmitDisabled}
           type="submit"
         >
-          가입 완료
+          {t("signup_complete")}
         </button>
       </div>
     </form>

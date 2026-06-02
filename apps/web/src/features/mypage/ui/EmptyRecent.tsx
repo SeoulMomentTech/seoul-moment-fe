@@ -2,6 +2,8 @@
 
 import { Search } from "lucide-react";
 
+import { useTranslations } from "next-intl";
+
 import { cn } from "@shared/lib/style";
 
 import { useRouter } from "@/i18n/navigation";
@@ -13,6 +15,7 @@ interface EmptyRecentProps {
 }
 
 export function EmptyRecent({ className }: EmptyRecentProps) {
+  const t = useTranslations();
   const router = useRouter();
 
   return (
@@ -24,9 +27,9 @@ export function EmptyRecent({ className }: EmptyRecentProps) {
     >
       <Search className="size-6 text-black/40" strokeWidth={1.5} />
       <p className="text-body-3 leading-relaxed text-black/50">
-        최근 본 상품이 아직 없어요.
+        {t("no_viewed_products")}
         <br />
-        요즘 많이 찾는 아이템을 구경해보세요.
+        {t("discover_products")}
       </p>
       <Button
         onClick={() => router.push("/product")}
@@ -34,7 +37,7 @@ export function EmptyRecent({ className }: EmptyRecentProps) {
         type="button"
         variant="outline"
       >
-        인기 상품 보기
+        {t("view_popular_products")}
       </Button>
     </div>
   );

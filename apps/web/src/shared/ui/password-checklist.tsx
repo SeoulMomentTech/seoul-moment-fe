@@ -2,6 +2,8 @@
 
 import { Check } from "lucide-react";
 
+import { useTranslations } from "next-intl";
+
 import { cn, HStack, VStack } from "@seoul-moment/ui";
 
 import {
@@ -13,20 +15,21 @@ interface Props {
   value: string;
 }
 
-const RULE_ORDER: { key: PasswordRuleKey; label: string }[] = [
-  { key: "minLength", label: "최소 8자" },
-  { key: "hasUpper", label: "적어도 하나의 대문자 영어 단어" },
-  { key: "hasLower", label: "적어도 하나의 소문자 영어 단어" },
-  { key: "hasNumber", label: "적어도 하나의 숫자" },
-  { key: "hasSpecial", label: "특수 문자 하나 이상 포함 : ~#@$%&!*_?-<>등" },
+const RULE_ORDER: { key: PasswordRuleKey; labelKey: string }[] = [
+  { key: "minLength", labelKey: "minimum_characters" },
+  { key: "hasUpper", labelKey: "least_one_uppercase" },
+  { key: "hasLower", labelKey: "least_one_lowercase" },
+  { key: "hasNumber", labelKey: "least_one_number" },
+  { key: "hasSpecial", labelKey: "least_one_special" },
 ];
 
 export function PasswordChecklist({ value }: Props) {
+  const t = useTranslations();
   const status = usePasswordRules(value);
 
   return (
     <VStack className="w-full pb-[8px]" gap={10}>
-      {RULE_ORDER.map(({ key, label }) => {
+      {RULE_ORDER.map(({ key, labelKey }) => {
         const passed = status[key];
         return (
           <HStack className="w-full" gap={4} key={key}>
@@ -44,7 +47,7 @@ export function PasswordChecklist({ value }: Props) {
                 passed ? "text-foreground" : "text-black/40",
               )}
             >
-              {label}
+              {t(labelKey)}
             </span>
           </HStack>
         );

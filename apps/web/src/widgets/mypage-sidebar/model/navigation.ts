@@ -1,24 +1,24 @@
 export interface SidebarItem {
-  label: string;
+  labelKey: string;
   href: string;
 }
 
 export interface SidebarGroup {
-  title: string;
+  titleKey: string;
   items: ReadonlyArray<SidebarItem>;
 }
 
 export const SIDEBAR_GROUPS: ReadonlyArray<SidebarGroup> = [
   {
-    title: "쇼핑 정보",
-    items: [{ label: "관심", href: "/mypage/interest" }],
+    titleKey: "shopping_info",
+    items: [{ labelKey: "favorites", href: "/mypage/interest" }],
   },
   {
-    title: "내 정보",
+    titleKey: "my_profile",
     items: [
-      { label: "로그인 정보", href: "/mypage/login-info" },
-      { label: "프로필 관리", href: "/mypage/profile" },
-      { label: "나의 맞춤 정보", href: "/mypage/custom-info" },
+      { labelKey: "login_info", href: "/mypage/login-info" },
+      { labelKey: "profile_settings", href: "/mypage/profile" },
+      { labelKey: "personalized_info", href: "/mypage/custom-info" },
     ],
   },
 ];

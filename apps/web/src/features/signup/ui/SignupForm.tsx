@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { useTranslations } from "next-intl";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -25,6 +26,7 @@ import {
 } from "../model/schema";
 
 export function SignupForm() {
+  const t = useTranslations();
   const router = useRouter();
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [verifyError, setVerifyError] = useState<string | null>(null);
@@ -87,13 +89,13 @@ export function SignupForm() {
     },
     onError: () => {
       setValue("isVerified", false, { shouldValidate: true });
-      setVerifyError("인증코드가 일치하지 않습니다. 다시 확인해주세요.");
+      setVerifyError(t("code_not_match"));
     },
   });
 
   const signUpMutation = useUserSignUpMutation({
     onSuccess: () => {
-      toast.success("가입이 완료되었습니다. 로그인해주세요.", {
+      toast.success(t("registration_complete"), {
         position: "top-center",
       });
       router.replace("/login");
@@ -129,16 +131,16 @@ export function SignupForm() {
     !email || postUserEmailCodeMutation.isPending || resendSeconds > 0;
   const sendButtonLabel = isCodeSent
     ? resendSeconds > 0
-      ? `재발송 (${resendSeconds}s)`
-      : "재발송"
-    : "인증코드 발송";
+      ? `${t("resend")} (${resendSeconds}s)`
+      : t("resend")
+    : t("send_verification_code");
 
   return (
     <form className="w-full" onSubmit={handleSubmit(onSubmit)}>
       <VStack className="w-full pt-[64px]" gap={16}>
         <Input
           className="max-sm:h-12"
-          placeholder="이메일을 입력해주세요"
+          placeholder={t("enter_email")}
           type="email"
           {...register("email", {
             onChange: () => {
@@ -154,7 +156,7 @@ export function SignupForm() {
             <Input
               className="flex-1 max-sm:h-12"
               inputMode="numeric"
-              placeholder="인증코드를 입력해주세요"
+              placeholder={t("enter_code")}
               type="text"
               {...register("verificationCode", {
                 onChange: () => {
@@ -190,13 +192,13 @@ export function SignupForm() {
                 onClick={handleVerifyCode}
                 type="button"
               >
-                {isVerified ? "인증 완료" : "확인"}
+                {isVerified ? t("verification_success_full") : t("confirm")}
               </Button>
             )}
           </HStack>
           {isCodeSent && !isVerified && !verifyError && (
             <span className="text-body-4 text-black/60">
-              인증코드가 이메일로 발송되었습니다.
+              {t("code_sent_email")}
             </span>
           )}
           {verifyError && (
@@ -204,7 +206,7 @@ export function SignupForm() {
           )}
           {isVerified && (
             <span className="text-body-4 text-sent">
-              이메일 인증이 완료되었습니다.
+              {t("email_verification_completed")}
             </span>
           )}
         </Flex>
@@ -212,7 +214,7 @@ export function SignupForm() {
           <Input
             className="max-sm:h-12"
             maxLength={NICKNAME_MAX_LENGTH}
-            placeholder="영문, 숫자만 입력 가능 (2~20자)"
+            placeholder={t("allowed_input")}
             type="text"
             {...register("nickname", {
               onChange: (e) =>
@@ -233,13 +235,13 @@ export function SignupForm() {
           )}
         </Flex>
         <PasswordField
-          placeholder="비밀번호를 입력해주세요"
+          placeholder={t("enter_password")}
           showChecklist={password.length > 0}
           value={password}
           {...register("password")}
         />
         <PasswordField
-          placeholder="비밀번호 확인"
+          placeholder={t("confirm_password")}
           value={passwordConfirm}
           {...register("passwordConfirm")}
         />
@@ -262,7 +264,7 @@ export function SignupForm() {
           disabled={isSubmitDisabled}
           type="submit"
         >
-          회원가입
+          {t("sign_up")}
         </button>
       </div>
     </form>

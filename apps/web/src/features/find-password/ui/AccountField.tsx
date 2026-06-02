@@ -1,15 +1,11 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import type { UseFormRegisterReturn } from "react-hook-form";
 
 import { Button, HStack, Input } from "@seoul-moment/ui";
 
 import { DEFAULT_COUNTRY_CODE, type FindPasswordMethod } from "../model/schema";
-
-const PLACEHOLDER_BY_METHOD: Record<FindPasswordMethod, string> = {
-  email: "請輸入Email",
-  phone: DEFAULT_COUNTRY_CODE,
-};
 
 const INPUT_TYPE_BY_METHOD: Record<FindPasswordMethod, string> = {
   email: "text",
@@ -31,11 +27,15 @@ export function AccountField({
   buttonDisabled,
   onRequest,
 }: AccountFieldProps) {
+  const t = useTranslations();
+  const placeholder =
+    method === "email" ? t("enter_your_email") : DEFAULT_COUNTRY_CODE;
+
   return (
     <HStack align="start" className="w-full" gap={8}>
       <Input
         className="text-body-2 flex-1 placeholder:text-black/20"
-        placeholder={PLACEHOLDER_BY_METHOD[method]}
+        placeholder={placeholder}
         type={INPUT_TYPE_BY_METHOD[method]}
         {...registerProps}
       />

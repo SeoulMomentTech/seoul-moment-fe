@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -11,9 +12,8 @@ import { cn, HStack, Input, VStack } from "@seoul-moment/ui";
 import { useUserLoginMutation } from "../api/useUserLoginMutation";
 import { loginFormResolver, type LoginFormValues } from "../model/schema";
 
-const ERROR_MESSAGE = "Please check your email or password";
-
 export function LoginForm() {
+  const t = useTranslations();
   const {
     register,
     handleSubmit,
@@ -26,7 +26,7 @@ export function LoginForm() {
 
   const loginMutation = useUserLoginMutation({
     onError: () => {
-      toast.error(ERROR_MESSAGE);
+      toast.error(t("login_failed"));
     },
   });
 
@@ -38,13 +38,13 @@ export function LoginForm() {
       <VStack className="w-full pt-[34px]" gap={14}>
         <Input
           className="max-sm:h-12"
-          placeholder="請輸入電子信箱"
+          placeholder={t("enter_email")}
           type="text"
           {...register("account")}
         />
         <Input
           className="max-sm:h-12"
-          placeholder="請輸入密碼"
+          placeholder={t("enter_password")}
           type="password"
           {...register("password")}
         />
@@ -53,7 +53,7 @@ export function LoginForm() {
             className="text-body-3 cursor-pointer leading-none text-black/60 underline"
             href="/find-password"
           >
-            忘記密碼
+            {t("forgot_password_1")}
           </Link>
         </HStack>
       </VStack>
@@ -69,7 +69,7 @@ export function LoginForm() {
           disabled={!isValid || loginMutation.isPending}
           type="submit"
         >
-          로그인
+          {t("login")}
         </button>
       </div>
     </form>
