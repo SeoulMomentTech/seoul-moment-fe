@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 import { useUserAuthStore } from "@shared/lib/hooks/useUserAuthStore";
@@ -25,6 +26,7 @@ interface LinkPromptState {
 }
 
 export function SocialLoginButtons() {
+  const t = useTranslations();
   const router = useRouter();
   const login = useUserAuthStore((s) => s.login);
   const [isStartingGoogle, setIsStartingGoogle] = useState(false);
@@ -48,10 +50,10 @@ export function SocialLoginButtons() {
         router.push("/signup/sns");
         return;
       }
-      toast.error("Google 로그인 응답을 처리할 수 없습니다.");
+      toast.error(t("google_login_response_error"));
     },
     onError: () => {
-      toast.error("Google 로그인에 실패했습니다. 다시 시도해주세요.");
+      toast.error(t("google_login_failed"));
     },
   });
 
@@ -69,7 +71,7 @@ export function SocialLoginButtons() {
         toast.error(
           error instanceof Error
             ? error.message
-            : "Google 로그인을 시작할 수 없습니다.",
+            : t("google_login_start_error"),
         );
       }
     } finally {
@@ -101,7 +103,7 @@ export function SocialLoginButtons() {
             width={24}
           />
           <span className="flex-1 text-center font-semibold text-black">
-            {isGoogleBusy ? "로그인 중..." : "구글로 로그인"}
+            {isGoogleBusy ? `${t("logging_in")}...` : t("login_in_with_google")}
           </span>
         </Button>
       </VStack>

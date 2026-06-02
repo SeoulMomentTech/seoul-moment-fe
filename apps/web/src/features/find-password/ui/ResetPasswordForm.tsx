@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
 
@@ -23,6 +24,7 @@ export function ResetPasswordForm({
   token,
   onSuccess,
 }: ResetPasswordFormProps) {
+  const t = useTranslations();
   const {
     register,
     handleSubmit,
@@ -54,12 +56,12 @@ export function ResetPasswordForm({
       <VStack className="w-full" gap={40}>
         <VStack className="w-full" gap={16}>
           <PasswordField
-            placeholder="비밀번호 입력"
+            placeholder={t("enter_password_input")}
             value={password}
             {...register("password")}
           />
           <PasswordField
-            placeholder="비밀번호 재입력"
+            placeholder={t("re_enter_password_input")}
             value={passwordConfirm}
             {...register("passwordConfirm")}
           />
@@ -70,7 +72,7 @@ export function ResetPasswordForm({
           disabled={isSubmitDisabled}
           type="submit"
         >
-          변경하기
+          {t("edit_2")}
         </Button>
       </VStack>
     </form>

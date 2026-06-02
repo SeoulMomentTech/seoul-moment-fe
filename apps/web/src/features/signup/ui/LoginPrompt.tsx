@@ -1,8 +1,12 @@
+import { useTranslations } from "next-intl";
+
 import { Link } from "@/i18n/navigation";
 
 import { cn } from "@seoul-moment/ui";
 
 export function LoginPrompt() {
+  const t = useTranslations();
+
   return (
     <div
       className={cn(
@@ -10,9 +14,9 @@ export function LoginPrompt() {
         "max-md:mt-0 max-md:border-t-0 max-md:pt-[50px]",
       )}
     >
-      <span>이미 계정이 있으신가요?</span>
+      <span>{t("already_have_account")}</span>
       <Link className="text-black/60 underline" href="/login">
-        로그인
+        {t("login")}
       </Link>
     </div>
   );

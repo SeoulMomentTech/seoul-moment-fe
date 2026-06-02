@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 
 import { ChevronLeftIcon, XIcon } from "lucide-react";
 
+import { useTranslations } from "next-intl";
+
 import {
   Button,
   cn,
@@ -54,6 +56,8 @@ export function PhoneVerificationModal({
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
   const [secondsLeft, setSecondsLeft] = useState(0);
+
+  const t = useTranslations();
 
   useEffect(() => {
     if (!open) {
@@ -112,7 +116,7 @@ export function PhoneVerificationModal({
             )}
           >
             <DialogClose
-              aria-label="뒤로 가기"
+              aria-label={t("back")}
               className={cn(
                 "absolute left-[20px] top-1/2 -translate-y-1/2 cursor-pointer outline-none",
                 "sm:hidden",
@@ -123,12 +127,12 @@ export function PhoneVerificationModal({
 
             <div className="flex h-full w-full items-center sm:hidden">
               <p className="text-body-2 text-foreground pl-[28px] font-semibold leading-none">
-                휴대폰 번호 인증
+                {t("phone_verification")}
               </p>
             </div>
 
             <DialogClose
-              aria-label="닫기"
+              aria-label={t("close")}
               className={cn(
                 "ml-auto block cursor-pointer outline-none",
                 "max-sm:hidden",
@@ -153,14 +157,14 @@ export function PhoneVerificationModal({
                   "max-sm:sr-only",
                 )}
               >
-                휴대폰 번호 인증
+                {t("phone_verification")}
               </DialogTitle>
 
               <p className="text-body-3 w-full text-center leading-none text-black/40 max-sm:hidden">
-                원활한 서비스 이용을 위해 인증을 완료해주세요.
+                {t("verification_description_1")}
               </p>
               <p className="text-title-4 text-foreground hidden w-full whitespace-pre-line text-center font-semibold leading-normal max-sm:block">
-                {`원활한 서비스 이용을 위해\n인증을 완료해주세요.`}
+                {t("verification_description_2")}
               </p>
             </div>
 
@@ -173,7 +177,7 @@ export function PhoneVerificationModal({
                     disabled={isVerified}
                     inputMode="numeric"
                     onChange={(event) => setPhone(event.target.value)}
-                    placeholder="휴대폰 번호를 입력해주세요"
+                    placeholder={t("input_phone")}
                     type="tel"
                     value={phone}
                   />
@@ -183,12 +187,12 @@ export function PhoneVerificationModal({
                     onClick={() => onSendCode(phone)}
                     type="button"
                   >
-                    인증
+                    {t("verification")}
                   </Button>
                 </HStack>
                 {showSentMessage && (
                   <p className="text-body-3 text-info w-full leading-none">
-                    인증코드가 SMS로 발송되었습니다.
+                    {t("code_sent_to_sms")}
                   </p>
                 )}
               </VStack>
@@ -213,7 +217,7 @@ export function PhoneVerificationModal({
                       disabled={!isCodeSent || isVerified}
                       inputMode="numeric"
                       onChange={(event) => setCode(event.target.value)}
-                      placeholder="인증코드를 입력해주세요"
+                      placeholder={t("enter_code")}
                       type="text"
                       value={code}
                     />
@@ -229,7 +233,7 @@ export function PhoneVerificationModal({
                     onClick={() => onVerifyCode(phone, code)}
                     type="button"
                   >
-                    {isVerified ? "인증 완료" : "확인"}
+                    {isVerified ? t("verification_success_full") : t("confirm")}
                   </Button>
                 </HStack>
                 {errorMessage && (
@@ -239,7 +243,7 @@ export function PhoneVerificationModal({
                 )}
                 {isVerified && (
                   <p className="text-body-3 text-info w-full leading-none">
-                    휴대폰 인증이 완료되었습니다.
+                    {t("phone_verify_completed")}
                   </p>
                 )}
               </VStack>

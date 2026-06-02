@@ -2,6 +2,8 @@
 
 import { Check } from "lucide-react";
 
+import { useTranslations } from "next-intl";
+
 import { cn, HStack, VStack } from "@seoul-moment/ui";
 
 export type MarketingConsentKey =
@@ -9,10 +11,10 @@ export type MarketingConsentKey =
   | "adAgreed"
   | "recommendAgreed";
 
-const CONSENT_ITEMS: { key: MarketingConsentKey; label: string }[] = [
-  { key: "newProductAgreed", label: "신상품 및 기획전 출시 알림" },
-  { key: "adAgreed", label: "광고 및 이벤트 할인 이메일" },
-  { key: "recommendAgreed", label: "개인 맞춤 상품 추천 알림" },
+const CONSENT_ITEMS: { key: MarketingConsentKey; labelKey: string }[] = [
+  { key: "newProductAgreed", labelKey: "new_arrivals_alerts" },
+  { key: "adAgreed", labelKey: "marketing_promotion_emails" },
+  { key: "recommendAgreed", labelKey: "personalized_product_suggestions" },
 ];
 
 interface MarketingConsentProps {
@@ -28,6 +30,7 @@ export function MarketingConsent({
   recommendAgreed,
   onChange,
 }: MarketingConsentProps) {
+  const t = useTranslations();
   const values: Record<MarketingConsentKey, boolean> = {
     newProductAgreed,
     adAgreed,
@@ -43,24 +46,24 @@ export function MarketingConsent({
   return (
     <VStack className="w-full pt-[20px]" gap={8}>
       <p className="text-body-3 w-full leading-none text-black/60">
-        마케팅 수신 동의 (선택)
+        {t("marketing_opts")}
       </p>
 
       <VStack className="w-full" gap={0}>
         <HStack className="w-full border-b border-black/5 pb-[16px] pt-[10px]">
           <CheckboxButton
             active={isAllAgreed}
-            label="전체 동의"
+            label={t("agree_all")}
             onToggle={handleToggleAll}
           />
         </HStack>
 
         <VStack className="w-full pt-[16px]" gap={20}>
-          {CONSENT_ITEMS.map(({ key, label }) => (
+          {CONSENT_ITEMS.map(({ key, labelKey }) => (
             <HStack align="between" className="w-full" key={key}>
               <CheckboxButton
                 active={values[key]}
-                label={label}
+                label={t(labelKey)}
                 onToggle={() => onChange(key, !values[key])}
               />
             </HStack>

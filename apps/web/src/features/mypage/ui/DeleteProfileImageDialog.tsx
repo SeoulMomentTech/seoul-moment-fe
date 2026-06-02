@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 import {
@@ -24,13 +25,14 @@ export function DeleteProfileImageDialog({
   open,
   onOpenChange,
 }: DeleteProfileImageDialogProps) {
+  const t = useTranslations();
   const deleteMutation = useDeleteUserProfileImageMutation();
 
   const handleConfirm = () => {
     if (deleteMutation.isPending) return;
     deleteMutation.mutate(undefined, {
       onSuccess: () => {
-        toast.success("프로필 이미지가 삭제되었습니다.");
+        toast.success(t("profile_image_deleted"));
         onOpenChange(false);
       },
     });
@@ -58,10 +60,10 @@ export function DeleteProfileImageDialog({
       >
         <VStack className="w-full" gap={12}>
           <DialogTitle className="text-title-4 text-foreground text-left font-semibold leading-tight">
-            프로필 이미지 삭제
+            {t("delete_profile_image")}
           </DialogTitle>
           <DialogDescription className="text-body-3 text-left leading-normal text-black/60">
-            프로필 이미지를 삭제하시겠습니까?
+            {t("delete_profile_image2")}
           </DialogDescription>
         </VStack>
 
@@ -73,7 +75,7 @@ export function DeleteProfileImageDialog({
             type="button"
             variant="outline"
           >
-            취소
+            {t("cancel")}
           </Button>
           <Button
             className="flex-1 rounded-[4px] bg-black py-[12px] font-semibold text-white"
@@ -81,7 +83,7 @@ export function DeleteProfileImageDialog({
             onClick={handleConfirm}
             type="button"
           >
-            {deleteMutation.isPending ? "삭제 중..." : "삭제"}
+            {deleteMutation.isPending ? t("deleting") : t("remove")}
           </Button>
         </DialogFooter>
       </DialogContent>

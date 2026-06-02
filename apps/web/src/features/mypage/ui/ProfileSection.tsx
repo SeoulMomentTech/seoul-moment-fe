@@ -4,6 +4,7 @@ import { useMemo, useRef, useState, type ChangeEvent } from "react";
 
 import { CircleUserRound } from "lucide-react";
 
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 import { useLanguage, useNicknameValidate } from "@shared/lib/hooks";
@@ -60,10 +61,10 @@ const FIELD_LABEL_CLASS = cn(FIELD_LABEL_BASE_CLASS, "text-black/60");
 
 type Gender = "MALE" | "FEMALE" | "OTHER";
 
-const GENDER_OPTIONS: ReadonlyArray<{ value: Gender; label: string }> = [
-  { value: "MALE", label: "남성" },
-  { value: "FEMALE", label: "여성" },
-  { value: "OTHER", label: "기타/비공개" },
+const GENDER_OPTIONS: ReadonlyArray<{ value: Gender; labelKey: string }> = [
+  { value: "MALE", labelKey: "male" },
+  { value: "FEMALE", labelKey: "female" },
+  { value: "OTHER", labelKey: "other" },
 ];
 
 const toPairOptions = (values: ReadonlyArray<string>): RegionOption[] =>
@@ -138,6 +139,7 @@ function EditableTextField({
   helperText?: string | null;
   helperTone?: HelperTone;
 }) {
+  const t = useTranslations();
   const [editing, setEditing] = useState(false);
   const [backup, setBackup] = useState("");
 
@@ -179,7 +181,7 @@ function EditableTextField({
               size="sm"
               type="button"
             >
-              확인
+              {t("confirm")}
             </Button>
             <Button
               className="h-[48px] shrink-0 px-[16px]"
@@ -192,7 +194,7 @@ function EditableTextField({
               type="button"
               variant="outline"
             >
-              취소
+              {t("cancel")}
             </Button>
           </>
         ) : (
@@ -206,7 +208,7 @@ function EditableTextField({
             type="button"
             variant="outline"
           >
-            수정
+            {t("modify")}
           </Button>
         )}
       </div>
@@ -243,6 +245,7 @@ function ProfileForm({
   nicknamePending = false,
   namePending = false,
 }: ProfileFormProps) {
+  const t = useTranslations();
   const [nickname, setNickname] = useState(() => defaultValues?.nickname ?? "");
   const [name, setName] = useState(() => defaultValues?.name ?? "");
   const [gender, setGender] = useState<Gender | undefined>(
@@ -302,35 +305,35 @@ function ProfileForm({
   return (
     <>
       <div className="flex flex-col gap-5">
-        <h3 className={SECTION_TITLE_CLASS}>개인 정보</h3>
+        <h3 className={SECTION_TITLE_CLASS}>{t("personal_info")}</h3>
         <div className="flex flex-col gap-6 pt-[12px]">
           <EditableTextField
             confirmDisabled={!isNicknameValid || nicknameStatus === "checking"}
             helperText={nicknameMessage}
             helperTone={nicknameHelperTone}
             id="profile-nickname"
-            label="닉네임"
+            label={t("nickname")}
             maxLength={NICKNAME_MAX_LENGTH}
             onChange={(value) => setNickname(sanitizeNickname(value))}
             onConfirm={onUpdateNickname}
             pending={nicknamePending}
-            placeholder="영문, 숫자만 입력 가능"
+            placeholder={t("allowed_input")}
             value={nickname}
           />
 
           <EditableTextField
             confirmDisabled={name.trim() === ""}
             id="profile-name"
-            label="이름"
+            label={t("name")}
             onChange={setName}
             onConfirm={onUpdateName}
             pending={namePending}
-            placeholder="이름을 입력하세요"
+            placeholder={t("input_name")}
             value={name}
           />
 
           <div className="flex flex-col gap-2">
-            <Label className={FIELD_LABEL_CLASS}>성별</Label>
+            <Label className={FIELD_LABEL_CLASS}>{t("gender")}</Label>
             <RadioGroup
               className="flex gap-5 py-[10px] max-sm:flex-col max-sm:gap-3"
               onValueChange={(value) => setGender(value as Gender)}
@@ -346,7 +349,7 @@ function ProfileForm({
                     className="text-body-2 text-black"
                     htmlFor={`gender-${option.value}`}
                   >
-                    {option.label}
+                    {t(option.labelKey)}
                   </Label>
                 </div>
               ))}
@@ -354,7 +357,7 @@ function ProfileForm({
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label className={FIELD_LABEL_CLASS}>생일</Label>
+            <Label className={FIELD_LABEL_CLASS}>{t("date_of_birth")}</Label>
             <div className="flex items-center gap-2">
               <FieldSelect
                 onValueChange={setBirthYear}
@@ -362,40 +365,46 @@ function ProfileForm({
                 placeholder=" "
                 value={birthYear}
               />
-              <span className="text-body-3 shrink-0 text-black">년</span>
+              <span className="text-body-3 shrink-0 text-black">
+                {t("year")}
+              </span>
               <FieldSelect
                 onValueChange={setBirthMonth}
                 options={MONTH_OPTIONS}
                 placeholder=" "
                 value={birthMonth}
               />
-              <span className="text-body-3 shrink-0 text-black">월</span>
+              <span className="text-body-3 shrink-0 text-black">
+                {t("month")}
+              </span>
               <FieldSelect
                 onValueChange={setBirthDay}
                 options={DAY_OPTIONS}
                 placeholder=" "
                 value={birthDay}
               />
-              <span className="text-body-3 shrink-0 text-black">일</span>
+              <span className="text-body-3 shrink-0 text-black">
+                {t("day")}
+              </span>
             </div>
           </div>
 
           <div className="flex flex-col gap-2">
             <Label className={FIELD_LABEL_CLASS} htmlFor="profile-postal">
-              지역
+              {t("region")}
             </Label>
             <div className="flex items-center gap-2">
               <Input
                 className={cn(INPUT_CLASS, "flex-1")}
                 id="profile-postal"
                 onChange={(e) => setPostalCode(e.target.value)}
-                placeholder="우편번호"
+                placeholder={t("postal_code")}
                 value={postalCode}
               />
               <FieldSelect
                 onValueChange={handleCityChange}
                 options={cityOptions}
-                placeholder="시/도"
+                placeholder={t("city")}
                 value={city}
               />
               <FieldSelect
@@ -403,14 +412,14 @@ function ProfileForm({
                 key={city ?? "no-city"}
                 onValueChange={setDistrict}
                 options={districtOptions}
-                placeholder="구/군"
+                placeholder={t("district")}
                 value={district}
               />
             </div>
             <Input
               className={INPUT_CLASS}
               onChange={(e) => setDetailAddress(e.target.value)}
-              placeholder="상세 주소"
+              placeholder={t("detail_address")}
               value={detailAddress}
             />
           </div>
@@ -437,13 +446,14 @@ function ProfileForm({
         size="lg"
         type="button"
       >
-        수정하기
+        {t("edit")}
       </Button>
     </>
   );
 }
 
 export function ProfileSection({ className }: ProfileSectionProps) {
+  const t = useTranslations();
   const { data: profile, isLoading } = useGetUserProfileQuery();
   const { mutate: updateProfile, isPending: updating } =
     useUpdateUserProfileMutation();
@@ -466,18 +476,18 @@ export function ProfileSection({ className }: ProfileSectionProps) {
     const payload = formValuesToProfilePayload(values);
 
     updateProfile(payload, {
-      onSuccess: () => toast.success("프로필이 저장되었습니다."),
+      onSuccess: () => toast.success(t("profile_saved")),
     });
   };
 
   const handleUpdateNickname = async (nickname: string) => {
     await updateNicknameAsync({ nickname });
-    toast.success("닉네임이 변경되었습니다.");
+    toast.success(t("nickname_updated"));
   };
 
   const handleUpdateName = async (name: string) => {
     await updateNameAsync({ name });
-    toast.success("이름이 변경되었습니다.");
+    toast.success(t("name_updated"));
   };
 
   const handleChangeImageClick = () => {
@@ -491,9 +501,9 @@ export function ProfileSection({ className }: ProfileSectionProps) {
 
     if (!file) return;
 
-    const errorMessage = validateProfileImageFile(file);
-    if (errorMessage) {
-      toast.error(errorMessage);
+    const errorKey = validateProfileImageFile(file);
+    if (errorKey) {
+      toast.error(t(errorKey));
       return;
     }
 
@@ -502,7 +512,7 @@ export function ProfileSection({ className }: ProfileSectionProps) {
         registerProfileImage(
           { imageUrl: res.data.imageUrl },
           {
-            onSuccess: () => toast.success("프로필 이미지가 변경되었습니다."),
+            onSuccess: () => toast.success(t("profile_image_updated")),
           },
         );
       },
@@ -517,7 +527,7 @@ export function ProfileSection({ className }: ProfileSectionProps) {
       )}
     >
       <h2 className="text-title-4 sm:text-title-3 font-bold text-black">
-        프로필 관리
+        {t("profile_settings")}
       </h2>
 
       <div className="flex items-center justify-between border-b border-black/10 py-5 max-sm:flex-col max-sm:items-stretch max-sm:gap-4">
@@ -553,7 +563,7 @@ export function ProfileSection({ className }: ProfileSectionProps) {
             type="button"
             variant="outline"
           >
-            {isImageUpdating ? "업로드 중..." : "이미지 변경"}
+            {isImageUpdating ? t("uploading") : t("change_image")}
           </Button>
           <Button
             className="h-[44px] px-[16px]"
@@ -562,7 +572,7 @@ export function ProfileSection({ className }: ProfileSectionProps) {
             type="button"
             variant="outline"
           >
-            삭제
+            {t("delete")}
           </Button>
         </div>
       </div>
@@ -573,7 +583,7 @@ export function ProfileSection({ className }: ProfileSectionProps) {
       />
 
       {isLoading ? (
-        <p className="text-body-3 text-black/40">불러오는 중...</p>
+        <p className="text-body-3 text-black/40">{t("loading")}</p>
       ) : (
         <ProfileForm
           defaultValues={profile ? profileToFormValues(profile) : undefined}

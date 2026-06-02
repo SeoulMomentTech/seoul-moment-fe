@@ -2,6 +2,8 @@
 
 import { CheckIcon, ChevronLeftIcon } from "lucide-react";
 
+import { useTranslations } from "next-intl";
+
 import {
   Button,
   cn,
@@ -35,6 +37,7 @@ export function PhoneVerificationResultModal(
 ) {
   const { open, onOpenChange, status } = props;
   const isSuccess = status === "success";
+  const t = useTranslations();
 
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
@@ -56,20 +59,20 @@ export function PhoneVerificationResultModal(
         showCloseButton={false}
       >
         <DialogTitle className="sr-only">
-          {isSuccess ? "휴대폰 번호 인증 완료" : "휴대폰 번호 인증 실패"}
+          {isSuccess ? t("phone_verify_complete") : t("phone_verify_failed")}
         </DialogTitle>
 
         <div className="flex h-full w-full flex-col">
           <header className="relative h-14 w-full border-b border-black/10 px-[20px] sm:hidden">
             <DialogClose
-              aria-label="뒤로 가기"
+              aria-label={t("back")}
               className="absolute left-[20px] top-1/2 -translate-y-1/2 cursor-pointer outline-none"
             >
               <ChevronLeftIcon size={24} />
             </DialogClose>
             <div className="flex h-full w-full items-center">
               <p className="text-body-2 text-foreground pl-[28px] font-semibold leading-none">
-                휴대폰 번호 인증
+                {t("phone_verification")}
               </p>
             </div>
           </header>
@@ -106,11 +109,11 @@ export function PhoneVerificationResultModal(
 
               {isSuccess ? (
                 <p className="text-body-2 text-foreground w-full text-center leading-none">
-                  인증이 완료되었습니다.
+                  {t("verify_completed")}
                 </p>
               ) : (
                 <p className="text-body-2 text-foreground w-full whitespace-pre-line text-center leading-[1.5]">
-                  {`인증에 실패하였습니다.\n다시 시도해주세요.`}
+                  {`${t("verify_failed")}\n${t("please_try_again")}`}
                 </p>
               )}
             </div>
@@ -121,8 +124,8 @@ export function PhoneVerificationResultModal(
                 onClick={props.onContinue}
                 type="button"
               >
-                <span className="max-sm:hidden">확인</span>
-                <span className="hidden max-sm:inline">계속하기</span>
+                <span className="max-sm:hidden">{t("confirm")}</span>
+                <span className="hidden max-sm:inline">{t("continue")}</span>
               </Button>
             ) : (
               <HStack align="center" className="w-full" gap={8}>
@@ -132,14 +135,14 @@ export function PhoneVerificationResultModal(
                   type="button"
                   variant="outline"
                 >
-                  취소
+                  {t("cancel")}
                 </Button>
                 <Button
                   className="flex-1 rounded-[4px] py-[16px] font-semibold"
                   onClick={props.onRetry}
                   type="button"
                 >
-                  다시 시도하기
+                  {t("try_again")}
                 </Button>
               </HStack>
             )}

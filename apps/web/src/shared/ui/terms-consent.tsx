@@ -4,6 +4,8 @@ import { useState } from "react";
 
 import { Check, ChevronRight } from "lucide-react";
 
+import { useTranslations } from "next-intl";
+
 import { PrivacyPolicyContent } from "@shared/ui/privacy-policy-content";
 import { TermsModal } from "@shared/ui/terms-modal";
 import { TermsOfServiceContent } from "@shared/ui/terms-of-service-content";
@@ -28,6 +30,7 @@ export function TermsConsent({
   privacyPolicy,
   onChange,
 }: TermsConsentProps) {
+  const t = useTranslations();
   const [openKey, setOpenKey] = useState<TermKey | null>(null);
 
   const values: Record<TermKey, boolean> = { termsOfService, privacyPolicy };
@@ -42,14 +45,14 @@ export function TermsConsent({
     <>
       <VStack className="w-full pt-[20px]" gap={8}>
         <p className="text-body-3 w-full leading-none text-black/60">
-          서비스 약관 및 정책
+          {t("tos_policies")}
         </p>
 
         <VStack className="w-full" gap={0}>
           <HStack className="w-full border-b border-black/5 pb-[16px] pt-[10px]">
             <CheckboxButton
               active={isAllAgreed}
-              label="전체 동의"
+              label={t("agree_all")}
               onToggle={handleToggleAll}
             />
           </HStack>
@@ -67,7 +70,9 @@ export function TermsConsent({
                   onClick={() => setOpenKey(key)}
                   type="button"
                 >
-                  <span className="text-body-3 leading-none">자세히</span>
+                  <span className="text-body-3 leading-none">
+                    {t("details")}
+                  </span>
                   <ChevronRight className="size-[14px]" />
                 </button>
               </HStack>

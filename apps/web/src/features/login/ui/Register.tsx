@@ -1,8 +1,14 @@
+"use client";
+
+import { useTranslations } from "next-intl";
+
 import { Link } from "@/i18n/navigation";
 
 import { cn } from "@seoul-moment/ui";
 
 export function Register() {
+  const t = useTranslations();
+
   return (
     <div
       className={cn(
@@ -10,9 +16,9 @@ export function Register() {
         "max-md:mt-0 max-md:border-t-0 max-md:pt-[50px]",
       )}
     >
-      <span>沒有 SEOUL MOMONET購物帳號?</span>
+      <span>{t("no_account_yet")}</span>
       <Link className="text-black/60" href="/signup">
-        立即註冊
+        {t("signup_now")}
       </Link>
     </div>
   );

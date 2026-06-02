@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import type { UseFormRegisterReturn } from "react-hook-form";
 
 import { Button, HStack } from "@seoul-moment/ui";
@@ -21,13 +22,15 @@ export function VerifyCodeField({
   buttonDisabled,
   onVerify,
 }: VerifyCodeFieldProps) {
+  const t = useTranslations();
+
   return (
     <HStack align="start" className="w-full" gap={8}>
       <div className="flex flex-1 items-center gap-2 rounded-[4px] border border-black/20 bg-white px-[12px] py-[16px]">
         <input
           className="text-body-2 min-w-0 flex-1 outline-none placeholder:text-black/20"
           inputMode="numeric"
-          placeholder="인증번호"
+          placeholder={t("verification_code")}
           type="text"
           {...registerProps}
         />
@@ -43,7 +46,7 @@ export function VerifyCodeField({
         onClick={onVerify}
         type="button"
       >
-        확인
+        {t("confirm")}
       </Button>
     </HStack>
   );

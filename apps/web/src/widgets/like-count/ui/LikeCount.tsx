@@ -1,4 +1,8 @@
+"use client";
+
 import { HeartIcon } from "lucide-react";
+
+import { useTranslations } from "next-intl";
 
 import { cn } from "@shared/lib/style";
 import { setComma } from "@shared/lib/utils";
@@ -22,6 +26,7 @@ export function LikeCount({
   disabled = false,
   onClick,
 }: LikeCountProps) {
+  const t = useTranslations();
   const size = iconSize ?? 14;
   const colorClass = active ? "text-red-500" : "text-black/40";
   const content = (
@@ -43,7 +48,7 @@ export function LikeCount({
   if (onClick) {
     return (
       <button
-        aria-label={active ? "좋아요 취소" : "좋아요"}
+        aria-label={active ? t("unlike") : t("like")}
         aria-pressed={active}
         className={cn(
           "flex cursor-pointer items-center gap-[4px] disabled:opacity-50",

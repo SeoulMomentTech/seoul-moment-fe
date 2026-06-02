@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { useTranslations } from "next-intl";
+
 import GuestOnly from "@shared/lib/components/GuestOnly";
 
 import { useRouter } from "@/i18n/navigation";
@@ -16,12 +18,13 @@ import {
 
 type Step = "verify" | "reset";
 
-const REQUEST_DESCRIPTION_BY_METHOD: Record<FindPasswordMethod, string> = {
-  email: "가입했던 이메일을 기입해주세요.",
-  phone: "가입했던 휴대전화 번호를 기입해주세요.",
+const REQUEST_DESCRIPTION_KEY_BY_METHOD: Record<FindPasswordMethod, string> = {
+  email: "enter_used_email",
+  phone: "enter_used_phone",
 };
 
 export function FindPasswordPage() {
+  const t = useTranslations();
   const router = useRouter();
   const [method, setMethod] = useState<FindPasswordMethod>("email");
   const [step, setStep] = useState<Step>("verify");
@@ -54,7 +57,7 @@ export function FindPasswordPage() {
                 value={method}
               />
               <p className="text-body-3 order-3 mt-[38px] text-center font-medium leading-none text-black/80 max-sm:hidden">
-                {REQUEST_DESCRIPTION_BY_METHOD[method]}
+                {t(REQUEST_DESCRIPTION_KEY_BY_METHOD[method])}
               </p>
               <div className="order-4 mt-[30px] max-sm:mt-[38px] max-sm:px-4">
                 <VerificationForm

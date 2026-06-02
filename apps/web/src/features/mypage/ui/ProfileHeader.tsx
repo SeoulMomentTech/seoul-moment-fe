@@ -2,6 +2,8 @@
 
 import { CircleUserRound } from "lucide-react";
 
+import { useTranslations } from "next-intl";
+
 import { cn } from "@shared/lib/style";
 
 import { useRouter } from "@/i18n/navigation";
@@ -26,6 +28,7 @@ export function ProfileHeader({ className }: ProfileHeaderProps) {
     useGetUserProfileQuery();
   const { data: info, isLoading: isInfoLoading } = useGetUserInfoQuery();
   const router = useRouter();
+  const t = useTranslations();
 
   const isLoading = isProfileLoading || isInfoLoading;
 
@@ -76,7 +79,7 @@ export function ProfileHeader({ className }: ProfileHeaderProps) {
           type="button"
           variant="outline"
         >
-          프로필 관리
+          {t("profile_settings")}
         </Button>
       </div>
     </div>

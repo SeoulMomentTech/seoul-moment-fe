@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 
 import { Button, cn, VStack } from "@seoul-moment/ui";
@@ -34,6 +35,7 @@ export function VerificationForm({
   method,
   onVerified,
 }: VerificationFormProps) {
+  const t = useTranslations();
   const { register, watch } = useForm<VerificationFormValues>({
     resolver: verificationFormResolver,
     mode: "onChange",
@@ -131,7 +133,7 @@ export function VerificationForm({
       : verifyPhoneCodeMutation.isPending;
   const canVerify =
     isCodeSent && !!verifyCode && !isVerified && !isVerifyingCode;
-  const requestButtonLabel = isCodeSent ? "재전송" : "인증";
+  const requestButtonLabel = isCodeSent ? t("resend_2") : t("verification");
   const requestButtonDisabled =
     isVerified ||
     isRequestingCode ||
@@ -166,7 +168,7 @@ export function VerificationForm({
                   message.tone === "error" && "text-error",
                 )}
               >
-                {message.text}
+                {message.textKey ? t(message.textKey) : message.text}
               </p>
             ) : null}
           </VStack>
@@ -178,7 +180,7 @@ export function VerificationForm({
           onClick={handleProceed}
           type="button"
         >
-          확인
+          {t("confirm")}
         </Button>
       </VStack>
     </form>

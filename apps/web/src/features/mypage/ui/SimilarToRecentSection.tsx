@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import ProductCard from "@entities/product/ui/ProductCard";
 import { cn } from "@shared/lib/style";
 
@@ -17,6 +19,7 @@ interface SimilarToRecentSectionProps {
 export function SimilarToRecentSection({
   className,
 }: SimilarToRecentSectionProps) {
+  const t = useTranslations();
   const { data, isLoading } = useGetUserRecentRecommendListQuery();
   const items = data?.list ?? [];
 
@@ -27,7 +30,7 @@ export function SimilarToRecentSection({
   return (
     <section className={cn("flex flex-col gap-5", className)}>
       <h3 className="text-body-1 font-semibold text-black">
-        최근 본 상품과 비슷한 상품
+        {t("similar_recent_products")}
       </h3>
       {isLoading ? (
         <div className="grid grid-cols-4 gap-x-[20px] gap-y-[40px] max-sm:grid-cols-2 max-sm:gap-x-[10px] max-sm:gap-y-[30px]">

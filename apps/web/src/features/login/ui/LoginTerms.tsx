@@ -1,10 +1,14 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { Link } from "@/i18n/navigation";
 
 import { cn, VStack } from "@seoul-moment/ui";
 
 export function LoginTerms() {
+  const t = useTranslations();
+
   return (
     <VStack className="w-full pt-[20px]" gap={10}>
       <p
@@ -13,7 +17,7 @@ export function LoginTerms() {
           "max-md:text-body-4",
         )}
       >
-        登入帳號，即表示您已閱讀並同意 SEOUL MOMONET
+        {t("login_consent_text")}
       </p>
       <Link
         className={cn(
@@ -22,7 +26,7 @@ export function LoginTerms() {
         )}
         href="/terms"
       >
-        會員條款 與 客戶隱私權條款
+        {t("terms_and_privacy")}
       </Link>
     </VStack>
   );

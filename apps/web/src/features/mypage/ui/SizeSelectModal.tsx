@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 
 import { X } from "lucide-react";
 
+import { useTranslations } from "next-intl";
+
 import useMediaQuery from "@shared/lib/hooks/useMediaQuery";
 import { cn } from "@shared/lib/style";
 
@@ -36,6 +38,7 @@ export function SizeSelectModal({
 }: SizeSelectModalProps) {
   const isMobile = useMediaQuery("(max-width: 639px)");
   const [selected, setSelected] = useState<string | undefined>(value);
+  const t = useTranslations();
 
   useEffect(() => {
     if (open) setSelected(value);
@@ -80,7 +83,7 @@ export function SizeSelectModal({
                 {title}
               </DrawerTitle>
               <button
-                aria-label="닫기"
+                aria-label={t("close")}
                 className="absolute right-0 text-black"
                 onClick={() => onOpenChange(false)}
                 type="button"
@@ -94,7 +97,7 @@ export function SizeSelectModal({
               onClick={handleConfirm}
               type="button"
             >
-              확인
+              {t("confirm")}
             </Button>
           </div>
         </DrawerContent>
@@ -113,7 +116,7 @@ export function SizeSelectModal({
             {title}
           </DialogTitle>
           <button
-            aria-label="닫기"
+            aria-label={t("close")}
             className="absolute right-0 text-black"
             onClick={() => onOpenChange(false)}
             type="button"
@@ -127,7 +130,7 @@ export function SizeSelectModal({
           onClick={handleConfirm}
           type="button"
         >
-          확인
+          {t("confirm")}
         </Button>
       </DialogContent>
     </Dialog>
