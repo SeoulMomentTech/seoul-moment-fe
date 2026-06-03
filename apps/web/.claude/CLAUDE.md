@@ -37,8 +37,8 @@ app/ → views/ → widgets/ → features/ → entities/ → shared/
 - **app/** — Next.js App Router routes (`[locale]/` prefix for i18n), providers, global config
 - **views/** — Page-level compositions (one per route)
 - **widgets/** — Reusable blocks (Header, Footer)
-- **features/** — User interaction modules (About, Article, Home, Inquiry, News, Product, Promotion, Search)
-- **entities/** — Domain models (Article, Brand, Lookbook, Magazine, News, Partner, Product)
+- **features/** — User interaction modules (About, Article, FindPassword, Home, Inquiry, Login, Mypage, News, Product, Promotion, Search, Signup)
+- **entities/** — Domain models (Article, Brand, Lookbook, Magazine, News, Partner, Product). Note: `magazine` and `megazine` dirs coexist — `megazine` is a legacy/typo slice, prefer `magazine`.
 - **shared/** — Services, hooks, constants, UI re-exports
 
 ### Path Aliases
@@ -135,3 +135,7 @@ password flows.
   `user/auth/email/verify` swagger entry is published. The legacy
   `postEmailCode` (`auth/email/code`) function is kept as a fallback but
   no longer wired to signup.
+- **SNS auth (Google only).** Login/signup via `/user/auth/google/{login,link,signup}`
+  3-step flow. Shared signup UI (`/signup/sns`, `snsAuthStorage`, `SnsSignupForm`)
+  wraps a Google-only comms layer (`google*` hooks). Apple/Kakao/Naver not implemented.
+  See `.claude/references/sns-auth-flow.md`.

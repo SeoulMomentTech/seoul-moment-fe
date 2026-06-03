@@ -29,7 +29,7 @@ Traditional page-based SPA structure (not FSD).
 
 ```
 src/
-  pages/          # 18 page modules (User, Product, Article, News, Brand, etc.)
+  pages/          # 16 page modules (User, Product, Article, News, Brand, Promotion, etc.)
   shared/
     services/     # API layer (Axios)
     hooks/        # useAppQuery, useAppMutation, useAuth

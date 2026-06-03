@@ -46,3 +46,4 @@ For deeper conventions with code examples, see `.claude/references/`:
 - **[general.md](references/general.md)** — TypeScript rules, ESLint conventions, import ordering, restricted imports, FSD layer rules, React rules, Toss frontend principles
 - **[style.md](references/style.md)** — Tailwind v4 design tokens, CSS import order, @seoul-moment/ui component catalog and patterns, custom animations
 - **[api.md](references/api.md)** — Web (ky) / Admin (axios) API layers, service file patterns, query hook wrappers, token refresh flow
+- **[sns-auth-flow.md](references/sns-auth-flow.md)** — Web SNS(Google) 로그인·가입 3-step 플로우 (login/link/signup), 공통 가입 화면 + Google 전용 통신 계층
