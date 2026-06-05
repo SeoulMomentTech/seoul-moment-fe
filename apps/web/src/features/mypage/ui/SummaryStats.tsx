@@ -5,6 +5,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+import { capitalize } from "es-toolkit";
 import { useTranslations } from "next-intl";
 
 import { cn } from "@shared/lib/style";
@@ -17,7 +18,7 @@ interface StatItem {
 }
 
 const STATS: ReadonlyArray<StatItem> = [
-  { key: "likes", label: "좋아요", icon: HeartIcon },
+  { key: "like", label: "좋아요", icon: HeartIcon },
   { key: "review", label: "리뷰", icon: MessageSquareTextIcon },
   { key: "notice", label: "공지사항", icon: FileTextIcon },
 ];
@@ -52,7 +53,9 @@ export function SummaryStats({ className }: SummaryStatsProps) {
           key={stat.key}
         >
           <StatIcon icon={stat.icon} />
-          <span className="text-body-4 text-black/70">{t(stat.key)}</span>
+          <span className="text-body-4 text-black/70">
+            {capitalize(t(stat.key))}
+          </span>
         </div>
       ))}
     </div>
