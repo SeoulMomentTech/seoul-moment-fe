@@ -41,6 +41,8 @@ Direct use of TanStack React Query hooks is **banned** via ESLint. Always use th
 - Web: `@shared/lib/hooks/query/useAppQuery`, `useAppMutation`, `useAppInfiniteQuery`
 - Admin: `@shared/hooks/useAppQuery`, `@shared/hooks/useAppMutation`
 
+**This list is exhaustive.** Only the TanStack Query hooks above are restricted. All other third-party libraries — `next-intl` (`useTranslations`, etc.), `es-toolkit` (`capitalize`, `chunk`, `debounce`, etc.), `lucide-react`, `react-hook-form`, and so on — may be imported **directly in any FSD layer** (including `features/` and `entities/`). There is no requirement to wrap external utilities or framework/i18n hooks in `shared/`; doing so for a stateless helper is premature abstraction. Do **not** flag a direct external-library import as an FSD violation.
+
 ## React Rules (ESLint enforced)
 
 - `jsx-sort-props` — JSX props must be alphabetically sorted
@@ -84,6 +86,8 @@ app/ → views/ → widgets/ → features/ → entities/ → shared/
 - **shared/** — Services, hooks, constants, UI re-exports
 
 A feature can import from entities and shared, but **never** from widgets, views, or app.
+
+This downward-only rule governs **internal cross-layer imports only** (the `@shared/`, `@entities/`, `@features/`, etc. aliases). It does **not** apply to third-party/`node_modules` imports — any layer may import external libraries (`next-intl`, `es-toolkit`, `lucide-react`, etc.) directly. See [Restricted Imports](#restricted-imports) for the only enforced exception (TanStack Query hooks).
 
 ## Forms
 
