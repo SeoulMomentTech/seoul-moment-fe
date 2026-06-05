@@ -1,44 +1,29 @@
 import {
   FileTextIcon,
   MessageSquareTextIcon,
-  TicketIcon,
-  UsersIcon,
+  HeartIcon,
   type LucideIcon,
 } from "lucide-react";
+
+import { capitalize } from "es-toolkit";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@shared/lib/style";
 
 interface StatItem {
   key: string;
   label: string;
-  icon: "seller" | "op" | LucideIcon;
+  icon: LucideIcon;
   value?: string;
 }
 
 const STATS: ReadonlyArray<StatItem> = [
-  { key: "seller_grade", label: "판매자등급", icon: "seller", value: "S" },
-  { key: "op", label: "0P", icon: "op" },
-  { key: "coupon", label: "쿠폰 25", icon: TicketIcon },
+  { key: "like", label: "좋아요", icon: HeartIcon },
   { key: "review", label: "리뷰", icon: MessageSquareTextIcon },
-  { key: "invite", label: "친구초대", icon: UsersIcon },
   { key: "notice", label: "공지사항", icon: FileTextIcon },
 ];
 
-function StatIcon({ icon, value }: Pick<StatItem, "icon" | "value">) {
-  if (icon === "seller") {
-    return (
-      <div className="flex size-9 items-center justify-center rounded-full bg-black text-[14px] font-bold text-white">
-        {value ?? "S"}
-      </div>
-    );
-  }
-  if (icon === "op") {
-    return (
-      <div className="flex size-9 items-center justify-center rounded-full border border-black/15 text-[12px] font-semibold text-black/60">
-        P
-      </div>
-    );
-  }
+function StatIcon({ icon }: Pick<StatItem, "icon">) {
   const Icon = icon;
   return (
     <div className="flex size-9 items-center justify-center">
@@ -52,6 +37,8 @@ interface SummaryStatsProps {
 }
 
 export function SummaryStats({ className }: SummaryStatsProps) {
+  const t = useTranslations();
+
   return (
     <div
       className={cn(
@@ -65,8 +52,10 @@ export function SummaryStats({ className }: SummaryStatsProps) {
           className="flex flex-col items-center justify-center gap-2 text-center"
           key={stat.key}
         >
-          <StatIcon icon={stat.icon} value={stat.value} />
-          <span className="text-body-4 text-black/70">{stat.label}</span>
+          <StatIcon icon={stat.icon} />
+          <span className="text-body-4 text-black/70">
+            {capitalize(t(stat.key))}
+          </span>
         </div>
       ))}
     </div>
