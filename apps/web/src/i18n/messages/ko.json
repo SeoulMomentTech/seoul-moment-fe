@@ -278,5 +278,6 @@
   "brand_like": "브랜드 좋아요",
   "brand_unlike": "브랜드 좋아요 취소",
   "back": "뒤로",
-  "notice": "공지사항"
+  "notice": "공지사항",
+  "logout_success": "로그아웃 되었어요."
 }
