@@ -2,6 +2,7 @@
 
 import type { PropsWithChildren } from "react";
 
+import { isKyError } from "ky";
 import { toast } from "sonner";
 
 import * as Sentry from "@sentry/nextjs";
@@ -53,7 +54,21 @@ const queryClient = new QueryClient({
       }
 
       if (mutation.meta?.showToast) {
-        toast.error(err.message);
+        if (isKyError(err)) {
+          const kyError = err as ExtendedHTTPError;
+          kyError.response
+            .clone()
+            .json()
+            .then((data) => {
+              const message = (data as { message?: string } | null)?.message;
+              toast.error(message ?? err.message);
+            })
+            .catch(() => {
+              toast.error(err.message);
+            });
+        } else {
+          toast.error(err.message);
+        }
       }
     },
   }),

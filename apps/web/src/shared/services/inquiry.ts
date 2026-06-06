@@ -14,25 +14,6 @@ export const postEmail = (data: PostEmailRequest) =>
     })
     .json<{ success: boolean }>(); // 바로 json 파싱
 
-export const postEmailCode = (email: string) =>
-  api
-    .post("auth/email/code", {
-      json: { email },
-    })
-    .json<{ success: boolean }>();
-
-interface VerifyEmailCodeRequest {
-  email: string;
-  code: string;
-}
-
-export const verifyEmailCode = ({ email, code }: VerifyEmailCodeRequest) =>
-  api
-    .post("auth/email/verify", {
-      json: { email, code },
-    })
-    .json<{ success: boolean }>();
-
 export const verifyRecaptcha = (token: string) =>
   api
     .post("auth/recaptcha", {

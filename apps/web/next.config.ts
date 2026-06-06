@@ -5,6 +5,20 @@ import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
   transpilePackages: ["@seoul-moment/ui"],
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  async redirects() {
+    return [
+      // /magazine 및 하위 경로(상세 포함) 접근 시 메인으로 임시 리다이렉트.
+      // localePrefix가 "always"라 미들웨어가 locale을 먼저 보정하므로 source에 locale 세그먼트 포함.
+      {
+        source: "/:locale(ko|en|zh-TW)/magazine/:path*",
+        destination: "/:locale",
+        permanent: false,
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       {

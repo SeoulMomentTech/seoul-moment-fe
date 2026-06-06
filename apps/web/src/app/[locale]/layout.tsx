@@ -1,6 +1,5 @@
 import type { PropsWithChildren } from "react";
 
-import { Geist, Geist_Mono } from "next/font/google";
 import { notFound } from "next/navigation";
 import Script from "next/script";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
@@ -8,6 +7,7 @@ import { getMessages, getTranslations } from "next-intl/server";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Toaster } from "sonner";
 
+import GlobalQueryHandler from "@shared/lib/components/GlobalQueryHandler";
 import { ReactQueryProvider } from "@shared/lib/providers";
 import ScrollRestoration from "@shared/ui/scroll-restoration";
 
@@ -23,16 +23,6 @@ interface Props {
     locale?: string;
   }>;
 }
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export async function generateMetadata() {
   try {
@@ -76,6 +66,12 @@ export default async function RootLayout({
   return (
     <html lang={locale ?? "ko"}>
       <head>
+        <Script
+          async
+          defer
+          src="https://accounts.google.com/gsi/client"
+          strategy="afterInteractive"
+        />
         {process.env.NEXT_PUBLIC_ENV === "production" && (
           <>
             <Script
@@ -106,9 +102,7 @@ export default async function RootLayout({
           </>
         )}
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className="antialiased">
         <ScrollRestoration />
         <NuqsAdapter>
           <NextIntlClientProvider messages={messages}>
@@ -117,6 +111,7 @@ export default async function RootLayout({
               <main className="mx-auto min-h-[calc(100vh-200px)] bg-white">
                 {children}
                 <Toaster />
+                <GlobalQueryHandler />
               </main>
               <Footer />
             </ReactQueryProvider>

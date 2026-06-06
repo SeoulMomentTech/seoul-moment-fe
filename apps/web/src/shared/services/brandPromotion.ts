@@ -46,6 +46,8 @@ export interface GetBrandPromotionBrandDetailResponse {
   likeCount: number;
   /** 브랜드 색상 */
   colorCode: string;
+  /** 좋아요 여부 (로그인 사용자만 확인 가능) */
+  isLiked: boolean;
 }
 
 export type BrandSectionType =

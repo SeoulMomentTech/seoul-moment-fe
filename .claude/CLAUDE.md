@@ -21,8 +21,23 @@ App-specific guides (commands, architecture, API layer, conventions):
 ## Monorepo Tooling
 
 - **pnpm workspaces** (v10) with **Turborepo** for task orchestration and caching
-- **Husky** pre-commit hooks run lint-staged (ESLint + Prettier on staged files)
+- **Husky** pre-commit hooks run lint-staged (ESLint + Prettier on staged files); the formatter may reorder/remove imports during commit, so re-read modified files before chained edits
 - Package references use `workspace:*` protocol
+
+## Root Commands
+
+Common monorepo-wide tasks (filtered variants live in sub-CLAUDE.md files):
+
+```bash
+pnpm dev                  # Run dev for every workspace (turbo run dev)
+pnpm build                # Build every workspace
+pnpm lint                 # Lint every workspace
+pnpm lint:fix:all         # Auto-fix web + admin
+pnpm test:e2e             # Run all Playwright e2e suites
+pnpm i18n:sync            # Sync web translations from Google Sheets
+```
+
+App-scoped shortcuts (`dev:web`, `dev:admin`, `build:ui`, `test:web-e2e`, etc.) are also exposed at root via Turborepo `--filter`.
 
 ## Detailed References
 
@@ -31,3 +46,4 @@ For deeper conventions with code examples, see `.claude/references/`:
 - **[general.md](references/general.md)** — TypeScript rules, ESLint conventions, import ordering, restricted imports, FSD layer rules, React rules, Toss frontend principles
 - **[style.md](references/style.md)** — Tailwind v4 design tokens, CSS import order, @seoul-moment/ui component catalog and patterns, custom animations
 - **[api.md](references/api.md)** — Web (ky) / Admin (axios) API layers, service file patterns, query hook wrappers, token refresh flow
+- **[sns-auth-flow.md](references/sns-auth-flow.md)** — Web SNS(Google) 로그인·가입 3-step 플로우 (login/link/signup), 공통 가입 화면 + Google 전용 통신 계층

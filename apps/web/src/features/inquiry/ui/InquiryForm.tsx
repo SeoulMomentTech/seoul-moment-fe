@@ -9,12 +9,8 @@ import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import {
-  postEmail,
-  postEmailCode,
-  verifyEmailCode,
-  verifyRecaptcha,
-} from "@shared/services/inquiry";
+import { postEmailCode, verifyEmailCode } from "@shared/services/auth";
+import { postEmail, verifyRecaptcha } from "@shared/services/inquiry";
 import {
   Select,
   SelectContent,

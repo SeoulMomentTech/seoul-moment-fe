@@ -10,4 +10,13 @@ scripts/account.json
 
 # Sentry Config File
 .env.sentry-build-plugin
-\n# Playwright\ntest-results/\nplaywright-report/\nblob-report/\nplaywright/.cache/
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Local sandbox routes for visual verification
+src/app/\[locale\]/sandbox/
+.playwright-mcp/

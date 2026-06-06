@@ -7,10 +7,11 @@ import { getTranslations } from "next-intl/server";
 import { isValidId, stripHtml } from "@shared/lib/utils";
 import { reportMetadataError } from "@shared/lib/utils/log/report-metadata-error";
 import { getBrandPromotionDetailV1 } from "@shared/services/brandPromotion";
-import PromotionPage from "@views/promotion/ui/PromotionPage";
 
 import type { LanguageType } from "@/i18n/const";
 import type { PageParams } from "@/types";
+
+import { PromotionPage } from "@views/promotion";
 
 const fetchBrandPromotion = cache((id: number, languageCode: LanguageType) => {
   return getBrandPromotionDetailV1(id, languageCode);

@@ -34,7 +34,10 @@ export default function PromotionPage({
     <>
       <MainBanner bannerList={data.bannerList} />
       <BrandTab promotionId={promotionId} selectedId={brandPromotionId} />
-      <BrandIntroduction brand={data.brand} />
+      <BrandIntroduction
+        brand={data.brand}
+        brandPromotionId={brandPromotionId}
+      />
       <BrandLookbook sectionList={data.sectionList} />
       <BrandSpecialEvent brandId={data.brand.id} products={data.productList} />
       <BrandOfflinePopup popupList={data.popupList} />

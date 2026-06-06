@@ -67,6 +67,7 @@ export interface ProductItem {
   image: string;
   colorName: string;
   colorCode: string;
+  isLiked: boolean;
 }
 
 export interface External {
@@ -141,6 +142,7 @@ export interface GetProductDetailRes {
   subImage: string[];
   relate: ProductItem[];
   external: External[];
+  isLiked: boolean;
 }
 
 export const getProductDetail = ({ id, languageCode }: GetProductDetailReq) =>
@@ -163,6 +165,7 @@ export interface GetProductBrandBannerRes {
   englishName: string;
   description: string;
   like: number;
+  isLiked: boolean;
 }
 
 export const getProductBrandBanner = ({

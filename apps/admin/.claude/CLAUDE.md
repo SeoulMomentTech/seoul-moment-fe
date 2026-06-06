@@ -29,7 +29,7 @@ Traditional page-based SPA structure (not FSD).
 
 ```
 src/
-  pages/          # 18 page modules (User, Product, Article, News, Brand, etc.)
+  pages/          # 16 page modules (User, Product, Article, News, Brand, Promotion, etc.)
   shared/
     services/     # API layer (Axios)
     hooks/        # useAppQuery, useAppMutation, useAuth
@@ -83,7 +83,9 @@ Direct use of `@tanstack/react-query` hooks is **banned by ESLint**. Use wrapper
 
 ## Key Dependencies
 
-- `react-hook-form` + `zod` — form validation (also has legacy `formik` usage)
+- `react-hook-form` + `zod` — preferred for new forms
+- `formik` — legacy; only kept where it already exists. Do not introduce
+  in new pages
 - `sonner` — toast notifications
 - `zustand` — client state (auth store with localStorage)
 - `@tanstack/react-query` — server state (via `useAppQuery`/`useAppMutation` wrappers)
