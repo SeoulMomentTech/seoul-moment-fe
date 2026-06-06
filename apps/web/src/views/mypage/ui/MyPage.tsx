@@ -2,7 +2,7 @@
 
 import AuthOnly from "@shared/lib/components/AuthOnly";
 
-import { InterestSection, ProfileHeader, SummaryStats } from "@features/mypage";
+import { InterestSection, ProfileHeader } from "@features/mypage";
 import { MyPageInfoList } from "@widgets/mypage-info-list";
 import { MyPageSidebar } from "@widgets/mypage-sidebar";
 
@@ -13,7 +13,7 @@ export function MyPage() {
         <MyPageSidebar className="w-[305px] shrink-0 max-sm:hidden" />
         <div className="flex min-w-[955px] flex-1 flex-col gap-10 max-sm:min-w-full max-sm:gap-[30px] max-sm:px-[20px]">
           <ProfileHeader />
-          <SummaryStats />
+          {/* <SummaryStats /> */}
           {/* <BnrBanner /> */}
           <InterestSection />
           <MyPageInfoList className="sm:hidden" />
