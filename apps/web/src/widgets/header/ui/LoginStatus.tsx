@@ -1,5 +1,8 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+import { toast } from "sonner";
+
 import { Link, usePathname } from "@/i18n/navigation";
 import { useUserAuthStore } from "@/shared/lib/hooks/useUserAuthStore";
 
@@ -9,11 +12,17 @@ const style = "text-body-3 pt-[20px] pb-[20px]";
 
 function LoginStatus() {
   const pathname = usePathname();
+  const t = useTranslations();
   const { isAuthenticated, logout } = useUserAuthStore();
+
+  const handleLogout = () => {
+    logout();
+    toast.success(t("logout_success"));
+  };
 
   if (isAuthenticated) {
     return (
-      <button className={style} onClick={logout} type="button">
+      <button className={style} onClick={handleLogout} type="button">
         Logout
       </button>
     );
