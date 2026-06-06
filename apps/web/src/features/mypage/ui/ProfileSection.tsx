@@ -292,9 +292,6 @@ function ProfileForm({
   };
 
   const isComplete =
-    nickname.trim() !== "" &&
-    isNicknameValid &&
-    name.trim() !== "" &&
     Boolean(gender) &&
     Boolean(birthYear && birthMonth && birthDay) &&
     postalCode.trim() !== "" &&
@@ -397,7 +394,11 @@ function ProfileForm({
               <Input
                 className={cn(INPUT_CLASS, "flex-1")}
                 id="profile-postal"
-                onChange={(e) => setPostalCode(e.target.value)}
+                inputMode="numeric"
+                maxLength={6}
+                onChange={(e) =>
+                  setPostalCode(e.target.value.replace(/[^0-9]/g, ""))
+                }
                 placeholder={t("postal_code")}
                 value={postalCode}
               />
