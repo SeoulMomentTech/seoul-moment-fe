@@ -278,5 +278,6 @@
   "brand_like": "Like brand",
   "brand_unlike": "Unlike brand",
   "back": "Back",
-  "notice": "Notice"
+  "notice": "Notice",
+  "logout_success": "You have been logged out."
 }
