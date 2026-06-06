@@ -6,6 +6,7 @@ import { MenuIcon, ChevronRightIcon, LogIn, LogOut } from "lucide-react";
 
 import Image from "next/image";
 import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 import { useModal } from "@shared/lib/hooks";
 import {
@@ -149,6 +150,11 @@ function Mobile() {
   const hasHydrated = useUserAuthHydrated();
   const showMypage = hasHydrated && isAuthenticated;
 
+  const handleLogout = () => {
+    logout();
+    toast.success(t("logout_success"));
+  };
+
   return (
     <div
       className={cn(
@@ -269,7 +275,7 @@ function Mobile() {
           <button
             aria-label="Logout"
             className="flex cursor-pointer items-center"
-            onClick={logout}
+            onClick={handleLogout}
             type="button"
           >
             <LogOut className="size-5" />
