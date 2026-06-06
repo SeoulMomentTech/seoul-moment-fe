@@ -23,7 +23,7 @@ export function ProductImageSection({
       <div className="border-b border-gray-200 px-6 py-4">
         <h3 className="text-base font-semibold">상품 이미지</h3>
         <p className="mt-1 text-sm text-gray-600">
-          대표 이미지와 상세 이미지를 업로드하세요.
+          대표 이미지와 서브 이미지를 업로드하세요.
         </p>
       </div>
       <div className="space-y-6 px-6 py-5">
@@ -39,7 +39,7 @@ export function ProductImageSection({
 
         <MultipleImageUpload
           folder="product"
-          label="상세 이미지"
+          label="서브 이미지"
           maxImages={10}
           onChange={onImageUrlListChange}
           value={imageUrlList}

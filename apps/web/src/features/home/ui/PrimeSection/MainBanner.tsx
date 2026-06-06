@@ -22,6 +22,7 @@ export function MainBanner({ promise }: MainBannerProps) {
         "flex justify-center",
         "min-w-7xl mx-auto h-[600px] max-w-7xl pt-14",
         "max-sm:h-[350px] max-sm:min-w-full",
+        "relative",
       )}
     >
       <picture>
@@ -44,6 +45,14 @@ export function MainBanner({ promise }: MainBannerProps) {
           width={1280}
         />
       </picture>
+      <p
+        className={cn(
+          "absolute bottom-[50%] left-[50%] translate-x-[-50%] translate-y-[50%] text-[80px] font-bold text-white",
+          "max-sm:text-white! max-sm:whitespace-pre max-sm:text-[40px]",
+        )}
+      >
+        Seoul Moment
+      </p>
     </section>
   );
 }
