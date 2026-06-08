@@ -291,14 +291,6 @@ function ProfileForm({
     setDistrict(undefined);
   };
 
-  const isComplete =
-    Boolean(gender) &&
-    Boolean(birthYear && birthMonth && birthDay) &&
-    postalCode.trim() !== "" &&
-    Boolean(city) &&
-    Boolean(district) &&
-    detailAddress.trim() !== "";
-
   return (
     <>
       <div className="flex flex-col gap-5">
@@ -429,7 +421,7 @@ function ProfileForm({
 
       <Button
         className="h-[56px] w-full"
-        disabled={!isComplete || submitting}
+        disabled={submitting}
         onClick={() =>
           onSubmit({
             nickname,
