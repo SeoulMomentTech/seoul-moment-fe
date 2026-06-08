@@ -109,8 +109,7 @@ export function BannerModal({
     isSaving ||
     isUploading ||
     !hasAllImages ||
-    !pcImageFile ||
-    !mobileImageFile;
+    (!pcImageFile && !mobileImageFile);
 
   return (
     <HStack align="center" className="fixed inset-0 z-50">

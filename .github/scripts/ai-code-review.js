@@ -3,7 +3,9 @@ const path = require("node:path");
 
 const MARKER_FULL = "<!-- ai-code-review:full -->";
 const MARKER_SUMMARY = "<!-- ai-code-review:summary -->";
+const MARKER_REPLY = "<!-- ai-code-review:reply -->";
 const ALL_MARKERS = [MARKER_FULL, MARKER_SUMMARY];
+const REPLY_COMMAND = "/ask";
 const MAX_DIFF_LENGTH = 100000;
 const MODEL = "gpt-4.1";
 const SUMMARY_MODEL = "gpt-4.1-mini";
@@ -423,12 +425,186 @@ async function reactToTriggerComment({ owner, repo, commentId, token }) {
   );
 }
 
+function stripMarkers(body) {
+  if (!body) return "";
+  let out = body;
+  for (const marker of [MARKER_FULL, MARKER_SUMMARY, MARKER_REPLY]) {
+    out = out.split(marker).join("");
+  }
+  return out;
+}
+
+function stripReplyCommand(body) {
+  return (body ?? "").split(REPLY_COMMAND).join("").trim();
+}
+
+async function fetchReviewComment({ owner, repo, commentId, token }) {
+  const res = await fetch(
+    `https://api.github.com/repos/${owner}/${repo}/pulls/comments/${commentId}`,
+    { headers: ghHeaders(token) }
+  );
+  if (!res.ok) {
+    throw new Error(`Failed to fetch review comment: ${res.status} ${await res.text()}`);
+  }
+  return res.json();
+}
+
+async function fetchAllReviewComments({ owner, repo, pullNumber, token }) {
+  const all = [];
+  let page = 1;
+  while (true) {
+    const res = await fetch(
+      `https://api.github.com/repos/${owner}/${repo}/pulls/${pullNumber}/comments?per_page=100&page=${page}`,
+      { headers: ghHeaders(token) }
+    );
+    if (!res.ok) throw new Error(`Failed to list review comments: ${res.status}`);
+    const batch = await res.json();
+    all.push(...batch);
+    if (batch.length < 100) break;
+    page += 1;
+  }
+  return all;
+}
+
+async function reactToReviewComment({ owner, repo, commentId, token }) {
+  if (!commentId) return;
+  await fetch(
+    `https://api.github.com/repos/${owner}/${repo}/pulls/comments/${commentId}/reactions`,
+    {
+      method: "POST",
+      headers: { ...ghHeaders(token), "Content-Type": "application/json" },
+      body: JSON.stringify({ content: "eyes" }),
+    }
+  );
+}
+
+async function postReviewCommentReply({ owner, repo, pullNumber, rootId, token, body }) {
+  const res = await fetch(
+    `https://api.github.com/repos/${owner}/${repo}/pulls/${pullNumber}/comments/${rootId}/replies`,
+    {
+      method: "POST",
+      headers: { ...ghHeaders(token), "Content-Type": "application/json" },
+      body: JSON.stringify({ body }),
+    }
+  );
+  if (!res.ok) {
+    throw new Error(`Failed to post review comment reply: ${res.status} ${await res.text()}`);
+  }
+}
+
+function buildReplySystemPrompt(conventions) {
+  return `You are a **senior software engineer** responding to a follow-up in a Pull Request inline review thread.
+The first message in the thread is your earlier automated review comment. A human teammate has replied — usually a question, a request for clarification, or pushback.
+
+# How to respond
+- Answer the latest message directly and concisely in **English**, using GitHub-flavored markdown.
+- If the author demonstrates that your original concern does not apply (e.g. the behavior is intentional, or they provide context you lacked), say so plainly and withdraw the concern. Do NOT insist to save face.
+- If your concern still stands, explain why with specific technical reasoning grounded in the code context and the project conventions below.
+- Reference the project conventions when relevant; never contradict them.
+- No greetings, no filler, no restating the question. Just the substantive answer.
+
+---
+
+# Project Conventions (binding)
+
+${conventions || "(no conventions document found)"}
+`;
+}
+
+async function runReply({ owner, repo, pullNumber, token, openaiApiKey, triggerCommentId }) {
+  const trigger = await fetchReviewComment({ owner, repo, commentId: triggerCommentId, token });
+  const rootId = trigger.in_reply_to_id || trigger.id;
+
+  await reactToReviewComment({ owner, repo, commentId: triggerCommentId, token });
+
+  const allComments = await fetchAllReviewComments({ owner, repo, pullNumber, token });
+  const thread = allComments
+    .filter((c) => c.id === rootId || c.in_reply_to_id === rootId)
+    .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
+  const root = thread.find((c) => c.id === rootId) ?? trigger;
+  const filePath = root.path ?? trigger.path;
+  const diffHunk = root.diff_hunk ?? trigger.diff_hunk ?? "";
+
+  const conversation = (thread.length > 0 ? thread : [trigger])
+    .map((c) => {
+      const who = c.user?.type === "Bot" ? "Reviewer (you, earlier)" : `@${c.user?.login}`;
+      return `${who}:\n${stripMarkers(c.body).trim()}`;
+    })
+    .join("\n\n");
+
+  const question = stripReplyCommand(trigger.body);
+  const conventions = loadConventions(filePath ? [filePath] : []);
+  const systemPrompt = buildReplySystemPrompt(conventions);
+  const userPrompt = `File: \`${filePath ?? "(unknown)"}\`
+
+Code context (diff hunk):
+\`\`\`${fenceLang(filePath ?? "")}
+${diffHunk}
+\`\`\`
+
+Review thread so far (oldest first):
+${conversation}
+
+The latest message to answer:
+${question}
+
+Write your reply now.`;
+
+  console.log(`Reply mode — thread root #${rootId}, file ${filePath}, ${thread.length} thread comment(s).`);
+
+  const openaiRes = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${openaiApiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      temperature: TEMPERATURE,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ],
+    }),
+  });
+
+  if (!openaiRes.ok) {
+    const errorText = await openaiRes.text();
+    console.error("OpenAI API Error:", errorText);
+    throw new Error(`OpenAI API failed (${openaiRes.status})`);
+  }
+
+  const result = await openaiRes.json();
+  if (result.usage) {
+    console.log(
+      `Tokens (reply) — prompt: ${result.usage.prompt_tokens}, completion: ${result.usage.completion_tokens}, total: ${result.usage.total_tokens}`
+    );
+  }
+
+  const answer = result.choices[0].message.content.trim();
+  await postReviewCommentReply({
+    owner,
+    repo,
+    pullNumber,
+    rootId,
+    token,
+    body: `${MARKER_REPLY}\n${answer}`,
+  });
+  console.log(`Posted reply to thread root #${rootId}.`);
+}
+
 async function run() {
   const token = process.env.GITHUB_TOKEN;
   const openaiApiKey = process.env.OPENAI_API_KEY;
   const githubRepository = process.env.GITHUB_REPOSITORY;
   const pullNumber = process.env.PR_NUMBER;
-  const reviewMode = process.env.REVIEW_MODE === "summary" ? "summary" : "full";
+  const reviewMode =
+    process.env.REVIEW_MODE === "summary"
+      ? "summary"
+      : process.env.REVIEW_MODE === "reply"
+        ? "reply"
+        : "full";
   const triggerCommentId = process.env.TRIGGER_COMMENT_ID;
 
   if (!token) throw new Error("Missing GITHUB_TOKEN");
@@ -439,6 +615,11 @@ async function run() {
   const [owner, repo] = githubRepository.split("/");
 
   console.log(`Mode: ${reviewMode}, PR: #${pullNumber}, Trigger comment: ${triggerCommentId ?? "(none)"}`);
+
+  if (reviewMode === "reply") {
+    if (!triggerCommentId) throw new Error("Missing TRIGGER_COMMENT_ID for reply mode");
+    return runReply({ owner, repo, pullNumber, token, openaiApiKey, triggerCommentId });
+  }
 
   if (triggerCommentId) {
     await reactToTriggerComment({ owner, repo, commentId: triggerCommentId, token });
