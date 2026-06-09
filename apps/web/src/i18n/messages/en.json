@@ -279,5 +279,8 @@
   "brand_unlike": "Unlike brand",
   "back": "Back",
   "notice": "Notice",
-  "logout_success": "You have been logged out."
+  "logout_success": "You have been logged out.",
+  "crop_profile_image": "Edit Profile Image",
+  "zoom": "Zoom",
+  "image_crop_failed": "Failed to edit the image."
 }
