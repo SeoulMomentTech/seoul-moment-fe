@@ -30,6 +30,7 @@ import {
 } from "@seoul-moment/ui";
 
 import { DeleteProfileImageDialog } from "./DeleteProfileImageDialog";
+import { ProfileImageCropDialog } from "./ProfileImageCropDialog";
 import { useCreateUserProfileImageMutation } from "../api/useCreateUserProfileImageMutation";
 import { useGetUserProfileQuery } from "../api/useGetUserProfileQuery";
 import { useUpdateUserProfileMutation } from "../api/useUpdateUserProfileMutation";
@@ -461,6 +462,9 @@ export function ProfileSection({ className }: ProfileSectionProps) {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isCropDialogOpen, setIsCropDialogOpen] = useState(false);
+  const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
+  const [cropFileName, setCropFileName] = useState("profile.jpg");
 
   const isImageUpdating = uploading || registeringImage;
   const hasProfileImage = Boolean(profile?.profileImageUrl);
@@ -500,12 +504,29 @@ export function ProfileSection({ className }: ProfileSectionProps) {
       return;
     }
 
-    uploadImage(file, {
+    setCropImageSrc(URL.createObjectURL(file));
+    setCropFileName(file.name);
+    setIsCropDialogOpen(true);
+  };
+
+  const closeCropDialog = () => {
+    setIsCropDialogOpen(false);
+    setCropImageSrc((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
+  };
+
+  const handleCropConfirm = (croppedFile: File) => {
+    uploadImage(croppedFile, {
       onSuccess: (res) => {
         registerProfileImage(
           { imageUrl: res.data.imageUrl },
           {
-            onSuccess: () => toast.success(t("profile_image_updated")),
+            onSuccess: () => {
+              toast.success(t("profile_image_updated"));
+              closeCropDialog();
+            },
           },
         );
       },
@@ -573,6 +594,21 @@ export function ProfileSection({ className }: ProfileSectionProps) {
       <DeleteProfileImageDialog
         onOpenChange={setIsDeleteDialogOpen}
         open={isDeleteDialogOpen}
+      />
+
+      <ProfileImageCropDialog
+        fileName={cropFileName}
+        imageSrc={cropImageSrc}
+        isProcessing={isImageUpdating}
+        onCropConfirm={handleCropConfirm}
+        onOpenChange={(next) => {
+          if (next) {
+            setIsCropDialogOpen(true);
+          } else {
+            closeCropDialog();
+          }
+        }}
+        open={isCropDialogOpen}
       />
 
       {isLoading ? (
