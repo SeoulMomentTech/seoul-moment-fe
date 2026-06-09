@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState, type ChangeEvent } from "react";
+import { useMemo, useState } from "react";
 
 import { CircleUserRound } from "lucide-react";
 
@@ -31,12 +31,10 @@ import {
 
 import { DeleteProfileImageDialog } from "./DeleteProfileImageDialog";
 import { ProfileImageCropDialog } from "./ProfileImageCropDialog";
-import { useCreateUserProfileImageMutation } from "../api/useCreateUserProfileImageMutation";
 import { useGetUserProfileQuery } from "../api/useGetUserProfileQuery";
 import { useUpdateUserProfileMutation } from "../api/useUpdateUserProfileMutation";
 import { useUpdateUserProfileNameMutation } from "../api/useUpdateUserProfileNameMutation";
 import { useUpdateUserProfileNicknameMutation } from "../api/useUpdateUserProfileNicknameMutation";
-import { useUploadUserImageFileMutation } from "../api/useUploadUserImageFileMutation";
 import {
   type ProfileFormValues,
   formValuesToProfilePayload,
@@ -47,12 +45,12 @@ import {
   INPUT_CLASS,
   SECTION_TITLE_CLASS,
 } from "../lib/formClasses";
-import { validateProfileImageFile } from "../lib/imageValidation";
 import {
   type RegionOption,
   getCityOptions,
   getDistrictOptions,
 } from "../lib/regions";
+import { useProfileImageUpload } from "../model/useProfileImageUpload";
 
 interface ProfileSectionProps {
   className?: string;
@@ -455,18 +453,20 @@ export function ProfileSection({ className }: ProfileSectionProps) {
     useUpdateUserProfileNicknameMutation();
   const { mutateAsync: updateNameAsync, isPending: updatingName } =
     useUpdateUserProfileNameMutation();
-  const { mutate: uploadImage, isPending: uploading } =
-    useUploadUserImageFileMutation();
-  const { mutate: registerProfileImage, isPending: registeringImage } =
-    useCreateUserProfileImageMutation();
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isCropDialogOpen, setIsCropDialogOpen] = useState(false);
-  const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
-  const [cropFileName, setCropFileName] = useState("profile.jpg");
+  const {
+    fileInputRef,
+    isCropDialogOpen,
+    cropImageSrc,
+    cropFileName,
+    isImageUpdating,
+    openFilePicker,
+    handleFileChange,
+    closeCropDialog,
+    handleCropConfirm,
+  } = useProfileImageUpload();
 
-  const isImageUpdating = uploading || registeringImage;
   const hasProfileImage = Boolean(profile?.profileImageUrl);
 
   const handleSubmit = (values: ProfileFormValues) => {
@@ -485,52 +485,6 @@ export function ProfileSection({ className }: ProfileSectionProps) {
   const handleUpdateName = async (name: string) => {
     await updateNameAsync({ name });
     toast.success(t("name_updated"));
-  };
-
-  const handleChangeImageClick = () => {
-    if (isImageUpdating) return;
-    fileInputRef.current?.click();
-  };
-
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    event.target.value = "";
-
-    if (!file) return;
-
-    const errorKey = validateProfileImageFile(file);
-    if (errorKey) {
-      toast.error(t(errorKey));
-      return;
-    }
-
-    setCropImageSrc(URL.createObjectURL(file));
-    setCropFileName(file.name);
-    setIsCropDialogOpen(true);
-  };
-
-  const closeCropDialog = () => {
-    setIsCropDialogOpen(false);
-    setCropImageSrc((prev) => {
-      if (prev) URL.revokeObjectURL(prev);
-      return null;
-    });
-  };
-
-  const handleCropConfirm = (croppedFile: File) => {
-    uploadImage(croppedFile, {
-      onSuccess: (res) => {
-        registerProfileImage(
-          { imageUrl: res.data.imageUrl },
-          {
-            onSuccess: () => {
-              toast.success(t("profile_image_updated"));
-              closeCropDialog();
-            },
-          },
-        );
-      },
-    });
   };
 
   return (
@@ -573,7 +527,7 @@ export function ProfileSection({ className }: ProfileSectionProps) {
           <Button
             className="h-[44px] px-[16px]"
             disabled={isImageUpdating}
-            onClick={handleChangeImageClick}
+            onClick={openFilePicker}
             type="button"
             variant="outline"
           >
@@ -602,11 +556,7 @@ export function ProfileSection({ className }: ProfileSectionProps) {
         isProcessing={isImageUpdating}
         onCropConfirm={handleCropConfirm}
         onOpenChange={(next) => {
-          if (next) {
-            setIsCropDialogOpen(true);
-          } else {
-            closeCropDialog();
-          }
+          if (!next) closeCropDialog();
         }}
         open={isCropDialogOpen}
       />
