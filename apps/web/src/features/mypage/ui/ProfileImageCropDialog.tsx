@@ -29,6 +29,7 @@ interface ProfileImageCropDialogProps {
 
 const MIN_ZOOM = 1;
 const MAX_ZOOM = 3;
+const DEFAULT_ZOOM = 2;
 const ZOOM_STEP = 0.1;
 
 export function ProfileImageCropDialog({
@@ -42,12 +43,12 @@ export function ProfileImageCropDialog({
   const t = useTranslations();
 
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(MIN_ZOOM);
+  const [zoom, setZoom] = useState(DEFAULT_ZOOM);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
 
   const resetState = () => {
     setCrop({ x: 0, y: 0 });
-    setZoom(MIN_ZOOM);
+    setZoom(DEFAULT_ZOOM);
     setCroppedAreaPixels(null);
   };
 
