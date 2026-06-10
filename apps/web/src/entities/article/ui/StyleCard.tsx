@@ -43,13 +43,17 @@ export default function StyleCard({
             "h-[200px] w-full bg-slate-300 max-sm:h-[221px]",
             imageClassName,
           )}
-          style={{ backgroundImage: `url(${imageUrl})` }}
+          style={{
+            backgroundImage: `url(${imageUrl})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
         />
       }
       subTitle={
         <p
           className={cn(
-            "max-sm:text-body-4",
+            "max-sm:text-body-4 line-clamp-2",
             textColor === "white" && "text-white",
           )}
         >
@@ -59,7 +63,7 @@ export default function StyleCard({
       title={
         <div
           className={cn(
-            "flex flex-col gap-2.5",
+            "line-clamp-2 flex min-h-[54px] flex-col gap-2.5",
             textColor === "white" && "text-white",
           )}
         >

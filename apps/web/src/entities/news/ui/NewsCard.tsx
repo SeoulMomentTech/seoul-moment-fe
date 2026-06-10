@@ -16,7 +16,7 @@ export function NewsCard({ category, title, imageUrl }: NewsCardProps) {
     >
       <div
         className="min-h-[90px] min-w-[90px] bg-slate-300"
-        style={{ backgroundImage: `url(${imageUrl})` }}
+        style={{ backgroundImage: `url(${imageUrl})`, backgroundSize: "cover" }}
       />
       <div className="flex flex-col justify-center gap-2.5">
         <span className="text-body-4">{category}</span>

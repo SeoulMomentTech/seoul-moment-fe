@@ -1,31 +1,15 @@
 import { cn } from "@shared/lib/style";
+import type { News } from "@shared/services/news";
+
+import { Link } from "@/i18n/navigation";
 
 import { NewsCard } from "@entities/news";
 
-const MOCK_NEWS = [
-  {
-    category: "SNEAKERS",
-    title: "사계절 신어도 좋은 여름 신발 추천, 베드락 샌들의 마운틴 글루",
-    imageUrl: "",
-  },
-  {
-    category: "SNEAKERS",
-    title: "사계절 신어도 좋은 여름 신발 추천, 베드락 샌들의 마운틴 글루",
-    imageUrl: "",
-  },
-  {
-    category: "SNEAKERS",
-    title: "사계절 신어도 좋은 여름 신발 추천, 베드락 샌들의 마운틴 글루",
-    imageUrl: "",
-  },
-  {
-    category: "SNEAKERS",
-    title: "사계절 신어도 좋은 여름 신발 추천, 베드락 샌들의 마운틴 글루",
-    imageUrl: "",
-  },
-];
+interface NewsUpdateProps {
+  news: News[];
+}
 
-export function NewsUpdate() {
+export function NewsUpdate({ news }: NewsUpdateProps) {
   return (
     <div className={cn("flex flex-1 flex-col gap-[30px]", "max-sm:px-[20px]")}>
       <h2 className="text-title-2 max-sm:text-title-4 font-bold">
@@ -37,8 +21,14 @@ export function NewsUpdate() {
           "scrollbar-thin scrollbar-color-transparent",
         )}
       >
-        {MOCK_NEWS.map((news, index) => (
-          <NewsCard key={`${news.title}-${index + 1}`} {...news} />
+        {news.map((item) => (
+          <Link href={`/news/${item.id}`} key={item.id}>
+            <NewsCard
+              category={item.writer}
+              imageUrl={item.homeImage}
+              title={item.title}
+            />
+          </Link>
         ))}
       </div>
     </div>
