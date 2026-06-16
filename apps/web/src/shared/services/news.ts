@@ -69,3 +69,60 @@ export const getNewsDetail = ({ id, languageCode }: GetNewsDetailReq) =>
       },
     })
     .json<CommonRes<GetNewsDetailRes>>();
+
+export interface GetNewsByCategoryReq extends PublicLanguageCode {
+  page?: number;
+  count?: number;
+  search?: string;
+  sort?: "ASC" | "DESC";
+  categoryId?: number;
+}
+
+/**
+ * @description 뉴스 카테고리 ID 기준 뉴스 리스트 조회 (다국어)
+ */
+export const getNewsByCategory = (params: GetNewsByCategoryReq) => {
+  const searchParams = Object.entries(params).reduce<
+    Array<Array<string | number>>
+  >(
+    (acc, [key, value]) =>
+      value === undefined || value === null ? acc : [...acc, [key, value]],
+    [],
+  );
+
+  return api
+    .get("news/category", {
+      searchParams,
+    })
+    .json<CommonRes<GetNewsListRes>>();
+};
+
+export interface NewsCategory {
+  categoryId: number;
+  name: string;
+}
+
+export interface NewsDashboardHashtag {
+  name: string;
+  list: News[];
+}
+
+export interface GetNewsDashboardRes {
+  recentList: News[];
+  editorPickList: News[];
+  hashtag: NewsDashboardHashtag;
+  newsCategoryCardList: News[];
+  newsCategoryList: NewsCategory[];
+}
+
+/**
+ * @description 뉴스 대시보드 조회 (최근/편집자추천/해시태그/카테고리, 다국어)
+ */
+export const getNewsDashboard = ({ languageCode }: PublicLanguageCode) =>
+  api
+    .get("news/dashboard", {
+      searchParams: {
+        languageCode,
+      },
+    })
+    .json<CommonRes<GetNewsDashboardRes>>();
