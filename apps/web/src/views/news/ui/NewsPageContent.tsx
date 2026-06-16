@@ -21,7 +21,6 @@ interface NewsPageContentProps {
 export function NewsPageContent({ promise }: NewsPageContentProps) {
   const { data } = use(promise);
   const { recentList, editorPickList, hashtag } = data;
-
   const [featured, ...newsList] = recentList;
 
   return (
@@ -50,53 +49,57 @@ export function NewsPageContent({ promise }: NewsPageContentProps) {
         )}
         <NewsUpdate news={newsList} />
       </section>
-      <SectionWithLabel
-        className={cn(
-          "mx-auto mb-[103px] w-[1280px]",
-          "max-sm:mb-[90px] max-sm:w-full max-sm:px-[20px]",
-        )}
-        label={
-          <h2 className="text-title-2 max-sm:text-title-4 mb-[30px] font-bold max-sm:mb-[20px]">
-            Editor’s Pick
-          </h2>
-        }
-      >
-        <EditorPickSlide items={editorPickList} />
-      </SectionWithLabel>
-      <section
-        className={cn(
-          "mx-auto mb-[100px] h-[618px] w-full min-w-[1280px] bg-black py-[100px]",
-          "max-sm:mb-[50px] max-sm:h-[511px] max-sm:min-w-full max-sm:max-w-none max-sm:flex-col",
-          "max-sm:px-[20px] max-sm:py-[50px]",
-        )}
-      >
-        <div
+      {editorPickList.length > 0 && (
+        <SectionWithLabel
           className={cn(
-            "mx-auto flex w-[1280px] gap-[130px]",
-            "max-sm:w-full max-sm:flex-col max-sm:gap-[40px]",
+            "mx-auto mb-[103px] w-[1280px]",
+            "max-sm:mb-[90px] max-sm:w-full max-sm:px-[20px]",
+          )}
+          label={
+            <h2 className="text-title-2 max-sm:text-title-4 mb-[30px] font-bold max-sm:mb-[20px]">
+              Editor’s Pick
+            </h2>
+          }
+        >
+          <EditorPickSlide items={editorPickList} />
+        </SectionWithLabel>
+      )}
+      {hashtag.list.length > 0 && (
+        <section
+          className={cn(
+            "mx-auto mb-[100px] h-[618px] w-full min-w-[1280px] bg-black py-[100px]",
+            "max-sm:mb-[50px] max-sm:h-[511px] max-sm:min-w-full max-sm:max-w-none max-sm:flex-col",
+            "max-sm:px-[20px] max-sm:py-[50px]",
           )}
         >
           <div
             className={cn(
-              "flex flex-col gap-[30px] text-white",
-              "max-sm:gap-[10px]",
+              "mx-auto flex w-[1280px] gap-[130px]",
+              "max-sm:w-full max-sm:flex-col max-sm:gap-[40px]",
             )}
           >
-            <span className="max-sm:text-body-3">Hot Keyword</span>
-            <h3 className="text-title-1 max-sm:text-title-3 font-bold">
-              #{hashtag.name}
-            </h3>
+            <div
+              className={cn(
+                "flex flex-col gap-[30px] text-white",
+                "max-sm:gap-[10px]",
+              )}
+            >
+              <span className="max-sm:text-body-3">Hot Keyword</span>
+              <h3 className="text-title-1 max-sm:text-title-3 font-bold">
+                #{hashtag.name}
+              </h3>
+            </div>
+            <div
+              className={cn(
+                "h-[418px] w-[951px]",
+                "max-sm:h-auto max-sm:w-full max-sm:overflow-x-auto",
+              )}
+            >
+              <HotKeywordList items={hashtag.list} />
+            </div>
           </div>
-          <div
-            className={cn(
-              "h-[418px] w-[951px]",
-              "max-sm:h-auto max-sm:w-full max-sm:overflow-x-auto",
-            )}
-          >
-            <HotKeywordList items={hashtag.list} />
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
       <SectionWithLabel
         className={cn(
           "mx-auto mb-[100px] w-[1280px]",

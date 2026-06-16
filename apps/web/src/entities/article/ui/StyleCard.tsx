@@ -68,7 +68,12 @@ export default function StyleCard({
           )}
         >
           <span className="text-body-4 max-sm:text-body-5">{category}</span>
-          <h4 className={cn("text-body-1 font-semibold", "max-sm:text-body-2")}>
+          <h4
+            className={cn(
+              "text-body-1 line-clamp-2 font-semibold",
+              "max-sm:text-body-2",
+            )}
+          >
             {title}
           </h4>
         </div>
