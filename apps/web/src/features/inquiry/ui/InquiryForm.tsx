@@ -169,7 +169,7 @@ export default function InquiryForm() {
                 disabled={isCodeSent}
               />
               <Button
-                className="h-[48px] w-[68px] font-semibold"
+                className="h-[48px] w-[68px] whitespace-pre font-semibold"
                 disabled={isCodeSent}
                 onClick={handleClickVerify}
                 type="button"
@@ -218,21 +218,21 @@ export default function InquiryForm() {
             <div className="flex h-[48px] gap-[8px]">
               <Select onValueChange={handleSelectSubject} value={emailSubject}>
                 <SelectTrigger className="h-full max-w-[150px]">
-                  {emailSubject.length === 0 ? t("select") : emailSubject}
+                  {emailSubject.length === 0 ? t("select") : t(emailSubject)}
                 </SelectTrigger>
                 <SelectContent className="w-[150px]">
-                  <SelectItem value="제휴문의">
+                  <SelectItem value="partnership_inquiry">
                     {t("partnership_inquiry")}
                   </SelectItem>
-                  <SelectItem value="입점문의">
+                  <SelectItem value="listing_inquiry">
                     {t("listing_inquiry")}
                   </SelectItem>
-                  <SelectItem value="기타">{t("etc")}</SelectItem>
+                  <SelectItem value="etc">{t("etc")}</SelectItem>
                 </SelectContent>
               </Select>
               <Input
                 {...register("subject")}
-                disabled={emailSubject !== "기타"}
+                disabled={emailSubject !== "etc"}
               />
             </div>
             {errors.subject && (
