@@ -248,7 +248,7 @@
   "verification_description_2": "원활한 서비스 이용을 위해 \n인증을 완료해주세요.",
   "code_sent_to_sms": "인증코드가 SMS로 발송되었습니다.",
   "phone_verify_completed": "휴대폰 인증이 완료되었습니다.",
-  "input_phone": "휴대폰 번호를 입력해주세요",
+  "input_phone": "휴대폰 번호를 입력해주세요.",
   "login_failed": "이메일 또는 비밀번호를 확인해주세요.",
   "login_consent_text": "로그인하면 서울모먼트의 아래 약관에 동의하는 것으로 간주됩니다.",
   "terms_and_privacy": "이용약관 및 개인정보처리방침",
