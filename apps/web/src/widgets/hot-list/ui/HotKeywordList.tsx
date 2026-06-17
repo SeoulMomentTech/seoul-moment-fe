@@ -18,11 +18,11 @@ export default function HotKeywordList({
         className,
       )}
     >
-      {items.map((item) => (
+      {items.slice(0, 3).map((item) => (
         <StyleCard
           author={item.writer}
           category={item.newsCategoryName}
-          className="h-[418px] max-sm:h-[323px] max-sm:min-w-[208px]"
+          className="h-[418px] max-sm:h-[323px] max-sm:min-w-[208px] max-sm:first:pl-[20px] max-sm:last:pr-[20px]"
           date={item.createDate}
           imageClassName="h-[297px] max-sm:h-[208px]"
           imageUrl={item.homeImage}

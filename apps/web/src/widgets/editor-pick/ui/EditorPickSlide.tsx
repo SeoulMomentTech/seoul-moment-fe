@@ -34,7 +34,7 @@ const SlideButton = ({ type }: SlideButtonProps) => {
   return (
     <Button
       className={cn(
-        "absolute z-[2] max-sm:hidden",
+        "z-2 absolute max-sm:hidden",
         "h-[32px] w-[32px] rounded-full border border-white/20 bg-white p-0 shadow-sm",
         "hover:bg-white",
         type === "prev" && "left-[14px] top-[40%]",
@@ -69,20 +69,22 @@ export default function EditorPickSlide({ items }: EditorPickSlideProps) {
           },
         }}
         className="w-full max-sm:w-full"
-        loop
         modules={[FreeMode]}
         slidesPerView="auto"
         spaceBetween={16}
       >
         <SlideButton type="prev" />
         {items.map((item) => (
-          <SwiperSlide key={`pick-${item.id}`}>
+          <SwiperSlide
+            className="max-sm:first:pl-[20px] max-sm:last:pr-[20px]"
+            key={`pick-${item.id}`}
+          >
             <StyleCard
               author={item.writer}
               category={item.newsCategoryName}
-              className="h-[321px] max-sm:h-[257px]"
+              className="min-h-[321px] max-sm:h-[257px]"
               date={item.createDate}
-              imageClassName="max-sm:h-[142px]"
+              imageClassName="min-h-[200px] max-sm:min-h-[142px] max-sm:h-[142px]"
               imageUrl={item.homeImage}
               subTitle={item.content}
               title={item.title}

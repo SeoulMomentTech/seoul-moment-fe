@@ -54,10 +54,10 @@ export function NewsPageContent({ promise }: NewsPageContentProps) {
         <SectionWithLabel
           className={cn(
             "mx-auto mb-[103px] w-[1280px]",
-            "max-sm:mb-[90px] max-sm:w-full max-sm:px-[20px]",
+            "max-sm:mb-[90px] max-sm:w-full",
           )}
           label={
-            <h2 className="text-title-2 max-sm:text-title-4 mb-[30px] font-bold max-sm:mb-[20px]">
+            <h2 className="text-title-2 max-sm:text-title-4 mb-[30px] font-bold max-sm:mb-[20px] max-sm:px-[20px]">
               Editor’s Pick
             </h2>
           }
@@ -70,7 +70,7 @@ export function NewsPageContent({ promise }: NewsPageContentProps) {
           className={cn(
             "mx-auto mb-[100px] h-[618px] w-full min-w-[1280px] bg-black py-[100px]",
             "max-sm:mb-[50px] max-sm:h-[511px] max-sm:min-w-full max-sm:max-w-none max-sm:flex-col",
-            "max-sm:px-[20px] max-sm:py-[50px]",
+            "max-sm:py-[50px]",
           )}
         >
           <div
@@ -82,7 +82,7 @@ export function NewsPageContent({ promise }: NewsPageContentProps) {
             <div
               className={cn(
                 "flex flex-col gap-[30px] text-white",
-                "max-sm:gap-[10px]",
+                "max-sm:gap-[10px] max-sm:px-[20px]",
               )}
             >
               <span className="max-sm:text-body-3">Hot Keyword</span>
