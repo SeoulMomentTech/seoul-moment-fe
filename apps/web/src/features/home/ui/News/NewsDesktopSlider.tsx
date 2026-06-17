@@ -58,6 +58,7 @@ export function NewsDesktopSlider({ data }: NewsDesktopSliderProps) {
                   <Link href={`/news/${main.id}`}>
                     <FeaturedMainNewsCard
                       author={main.writer}
+                      category=""
                       date={main.createDate}
                       imageUrl={main.homeImage}
                       subTitle={main.content}

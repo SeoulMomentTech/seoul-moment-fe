@@ -5,6 +5,8 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 
+import { toTaiwanPhoneNumber } from "@shared/lib/utils";
+
 import { Button, cn, VStack } from "@seoul-moment/ui";
 
 import { AccountField } from "./AccountField";
@@ -95,7 +97,7 @@ export function VerificationForm({
       postEmailCodeMutation.mutate(account.trim());
       return;
     }
-    postPhoneCodeMutation.mutate(account.trim());
+    postPhoneCodeMutation.mutate(toTaiwanPhoneNumber(account.trim()));
   };
 
   const handleVerify = () => {
@@ -107,7 +109,7 @@ export function VerificationForm({
       return;
     }
     verifyPhoneCodeMutation.mutate({
-      phone: account.trim(),
+      phone: toTaiwanPhoneNumber(account.trim()),
       code: verifyCode,
     });
   };

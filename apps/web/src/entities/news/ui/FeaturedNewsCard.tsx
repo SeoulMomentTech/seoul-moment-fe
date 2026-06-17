@@ -11,6 +11,7 @@ interface FeaturedMainNewsCardProps {
   subTitle: string;
   imageUrl: string;
   className?: string;
+  category: string;
 }
 
 export function FeaturedMainNewsCard({
@@ -18,6 +19,7 @@ export function FeaturedMainNewsCard({
   date,
   title,
   subTitle,
+  category,
   imageUrl,
   className,
 }: FeaturedMainNewsCardProps) {
@@ -42,14 +44,17 @@ export function FeaturedMainNewsCard({
         }
         subTitle={<p className="line-clamp-3">{subTitle}</p>}
         title={
-          <h4
-            className={cn(
-              "text-title-3 break-keep font-semibold",
-              "max-sm:text-body-2",
-            )}
-          >
-            {title}
-          </h4>
+          <div>
+            <span className="text-body-3 max-sm:text-body-5">{category}</span>
+            <h4
+              className={cn(
+                "text-title-3 break-keep font-semibold",
+                "max-sm:text-body-2",
+              )}
+            >
+              {title}
+            </h4>
+          </div>
         }
       />
     </div>

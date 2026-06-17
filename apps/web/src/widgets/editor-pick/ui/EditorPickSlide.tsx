@@ -7,62 +7,12 @@ import { Swiper, SwiperSlide, useSwiper } from "swiper/react"; // 예시: Swiper
 
 import StyleCard from "@entities/article/ui/StyleCard";
 import { cn } from "@shared/lib/style";
+import type { News } from "@shared/services/news";
 
 import { Button } from "@seoul-moment/ui";
 
 import "swiper/css";
 import "./editor-pick-slide.css";
-
-const MOCK_DATA = [
-  {
-    author: "오끼드",
-    date: "2025.05.30",
-    category: "ITEM",
-    title: "디자인 갤러리",
-    subTitle: "마음이 모이는곳",
-    imageUrl: "",
-  },
-  {
-    author: "오끼드",
-    date: "2025.05.30",
-    category: "ITEM",
-    title: "디자인 갤러리",
-    subTitle: "마음이 모이는곳",
-    imageUrl: "",
-  },
-  {
-    author: "오끼드",
-    date: "2025.05.30",
-    category: "ITEM",
-    title: "디자인 갤러리",
-    subTitle: "마음이 모이는곳",
-    imageUrl: "",
-  },
-  {
-    author: "오끼드",
-    date: "2025.05.30",
-    category: "ITEM",
-    title: "디자인 갤러리",
-    subTitle: "마음이 모이는곳",
-    imageUrl: "",
-  },
-  {
-    author: "오끼드",
-    date: "2025.05.30",
-    category: "ITEM",
-    title: "디자인 갤러리",
-    subTitle: "마음이 모이는곳",
-    imageUrl: "",
-  },
-  {
-    author: "오끼드",
-    date: "2025.05.30",
-    category: "ITEM",
-    title: "디자인 갤러리",
-    subTitle: "마음이 모이는곳",
-    imageUrl: "",
-  },
-];
 
 interface SlideButtonProps {
   type: "next" | "prev";
@@ -102,7 +52,11 @@ const SlideButton = ({ type }: SlideButtonProps) => {
   );
 };
 
-export default function EditorPickSlide() {
+interface EditorPickSlideProps {
+  items: News[];
+}
+
+export default function EditorPickSlide({ items }: EditorPickSlideProps) {
   return (
     <div className="relative">
       <Swiper
@@ -121,12 +75,17 @@ export default function EditorPickSlide() {
         spaceBetween={16}
       >
         <SlideButton type="prev" />
-        {MOCK_DATA.map((item, index) => (
-          <SwiperSlide key={`pick-${item.title}-${index + 1}`}>
+        {items.map((item) => (
+          <SwiperSlide key={`pick-${item.id}`}>
             <StyleCard
+              author={item.writer}
+              category={item.newsCategoryName}
               className="h-[321px] max-sm:h-[257px]"
+              date={item.createDate}
               imageClassName="max-sm:h-[142px]"
-              {...item}
+              imageUrl={item.homeImage}
+              subTitle={item.content}
+              title={item.title}
             />
           </SwiperSlide>
         ))}

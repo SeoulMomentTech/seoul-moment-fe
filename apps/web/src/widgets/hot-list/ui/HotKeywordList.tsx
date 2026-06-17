@@ -1,38 +1,16 @@
 import StyleCard from "@entities/article/ui/StyleCard";
 import { cn } from "@shared/lib/style";
-
-const MOCK_HOT_KEYWORD = [
-  {
-    author: "오끼드",
-    date: "2025.05.30",
-    category: "ITEM",
-    title: "디자인 갤러리",
-    subTitle: "마음이 모이는곳",
-    imageUrl: "",
-  },
-  {
-    author: "오끼드",
-    date: "2025.05.30",
-    category: "ITEM",
-    title: "디자인 갤러리",
-    subTitle: "마음이 모이는곳",
-    imageUrl: "",
-  },
-  {
-    author: "오끼드",
-    date: "2025.05.30",
-    category: "ITEM",
-    title: "디자인 갤러리",
-    subTitle: "마음이 모이는곳",
-    imageUrl: "",
-  },
-];
+import type { News } from "@shared/services/news";
 
 interface HotKeywordListProps {
   className?: string;
+  items: News[];
 }
 
-export default function HotKeywordList({ className }: HotKeywordListProps) {
+export default function HotKeywordList({
+  className,
+  items,
+}: HotKeywordListProps) {
   return (
     <div
       className={cn(
@@ -40,13 +18,18 @@ export default function HotKeywordList({ className }: HotKeywordListProps) {
         className,
       )}
     >
-      {MOCK_HOT_KEYWORD.map((item, index) => (
+      {items.map((item) => (
         <StyleCard
+          author={item.writer}
+          category={item.newsCategoryName}
           className="h-[418px] max-sm:h-[323px] max-sm:min-w-[208px]"
+          date={item.createDate}
           imageClassName="h-[297px] max-sm:h-[208px]"
-          key={`hot-${item.title}-${index + 1}`}
+          imageUrl={item.homeImage}
+          key={`hot-${item.id}`}
+          subTitle={item.content}
           textColor="white"
-          {...item}
+          title={item.title}
         />
       ))}
     </div>
