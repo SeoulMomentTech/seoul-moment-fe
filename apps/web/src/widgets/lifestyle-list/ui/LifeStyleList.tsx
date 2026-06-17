@@ -46,7 +46,7 @@ export default function LifeStyleList({ className }: LifeStyleListProps) {
         {items.map((item) => (
           <LifeStyleCard
             author={item.writer}
-            category=""
+            category={item.newsCategoryName}
             date={item.createDate}
             imageUrl={item.homeImage}
             key={`lifestyle-${item.id}`}
