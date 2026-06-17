@@ -33,6 +33,21 @@ export const stripHtml = (value: string) =>
     .replace(/\s+/g, " ") // 다중 공백 및 줄바꿈을 단일 공백으로 축소
     .trim();
 
+export const TAIWAN_DIAL_CODE = "+886";
+
+/**
+ * 사용자가 입력한 대만 로컬 번호를 +886 국제 표기로 정규화한다.
+ * 비숫자 문자를 제거하고 선행 886/0을 떼어낸 뒤 +886을 결합한다.
+ * 예) "0912345678" -> "+886912345678"
+ */
+export const toTaiwanPhoneNumber = (input: string): string => {
+  const digits = input
+    .replace(/\D/g, "")
+    .replace(/^886/, "")
+    .replace(/^0+/, "");
+  return `${TAIWAN_DIAL_CODE}${digits}`;
+};
+
 const throttleFetchMutex = new Mutex();
 
 export async function throttledFetch(url: string, options?: Options) {

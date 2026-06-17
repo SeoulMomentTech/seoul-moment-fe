@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
+import { toTaiwanPhoneNumber } from "@shared/lib/utils";
+
 import { useQueryClient } from "@tanstack/react-query";
 import {
   PhoneVerificationModal,
@@ -61,12 +63,12 @@ export function PhoneVerificationFlow({
   const handleSendCode = (phone: string) => {
     if (sendCodeMutation.isPending) return;
     setIsCodeSent(false);
-    sendCodeMutation.mutate(phone);
+    sendCodeMutation.mutate(toTaiwanPhoneNumber(phone));
   };
 
   const handleVerifyCode = (phone: string, code: string) => {
     if (verifyCodeMutation.isPending) return;
-    verifyCodeMutation.mutate({ phone, code });
+    verifyCodeMutation.mutate({ phone: toTaiwanPhoneNumber(phone), code });
   };
 
   const handleSuccessContinue = () => {
