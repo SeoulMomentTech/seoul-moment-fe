@@ -36,6 +36,7 @@ export function NewsPageContent({ promise }: NewsPageContentProps) {
           <Link href={`/news/${featured.id}`}>
             <FeaturedMainNewsCard
               author={featured.writer}
+              category={featured.newsCategoryName}
               className={cn(
                 "h-[480px] w-[738px]",
                 "max-sm:h-[600px] max-sm:w-full",

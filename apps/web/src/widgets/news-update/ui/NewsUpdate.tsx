@@ -24,7 +24,7 @@ export function NewsUpdate({ news }: NewsUpdateProps) {
         {news.map((item) => (
           <Link href={`/news/${item.id}`} key={item.id}>
             <NewsCard
-              category={item.writer}
+              category={item.newsCategoryName}
               imageUrl={item.homeImage}
               title={item.title}
             />

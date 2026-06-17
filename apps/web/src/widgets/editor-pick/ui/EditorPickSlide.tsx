@@ -79,7 +79,7 @@ export default function EditorPickSlide({ items }: EditorPickSlideProps) {
           <SwiperSlide key={`pick-${item.id}`}>
             <StyleCard
               author={item.writer}
-              category=""
+              category={item.newsCategoryName}
               className="h-[321px] max-sm:h-[257px]"
               date={item.createDate}
               imageClassName="max-sm:h-[142px]"
