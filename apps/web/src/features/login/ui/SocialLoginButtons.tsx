@@ -62,9 +62,6 @@ export function SocialLoginButtons() {
     setIsStartingGoogle(true);
     try {
       const idToken = await requestGoogleIdToken();
-
-      console.log(idToken);
-
       googleLoginMutation.mutate({ idToken });
     } catch (error) {
       if (!(error instanceof GoogleSignInCancelledError)) {
