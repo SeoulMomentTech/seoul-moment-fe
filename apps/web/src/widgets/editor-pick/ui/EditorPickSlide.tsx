@@ -75,14 +75,11 @@ export default function EditorPickSlide({ items }: EditorPickSlideProps) {
       >
         <SlideButton type="prev" />
         {items.map((item) => (
-          <SwiperSlide
-            className="max-sm:first:pl-[20px] max-sm:last:pr-[20px]"
-            key={`pick-${item.id}`}
-          >
+          <SwiperSlide className="max-sm:px-[20px]" key={`pick-${item.id}`}>
             <StyleCard
               author={item.writer}
               category={item.newsCategoryName}
-              className="min-h-[321px] max-sm:h-[257px]"
+              className="h-auto min-h-[321px] max-sm:h-[257px]"
               date={item.createDate}
               imageClassName="min-h-[200px] max-sm:min-h-[142px] max-sm:h-[142px]"
               imageUrl={item.homeImage}
