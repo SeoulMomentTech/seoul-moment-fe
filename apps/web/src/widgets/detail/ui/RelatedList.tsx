@@ -37,7 +37,7 @@ export function RelatedList({ lastNews, type }: RelatedListProps) {
             {!isEmpty && (
               <Link
                 className="text-body-3 max-sm:text-body-4 hover:underline"
-                href="/"
+                href="/news"
               >
                 More
               </Link>
