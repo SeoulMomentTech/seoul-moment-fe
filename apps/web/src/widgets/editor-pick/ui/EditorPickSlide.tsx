@@ -1,8 +1,11 @@
 "use client";
 
+import { useState } from "react";
+
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { FreeMode } from "swiper/modules";
+import type { SwiperClass } from "swiper/react";
 import { Swiper, SwiperSlide, useSwiper } from "swiper/react"; // 예시: Swiper 라이브러리 사용
 
 import StyleCard from "@entities/article/ui/StyleCard";
@@ -16,9 +19,10 @@ import "./editor-pick-slide.css";
 
 interface SlideButtonProps {
   type: "next" | "prev";
+  disabled?: boolean;
 }
 
-const SlideButton = ({ type }: SlideButtonProps) => {
+const SlideButton = ({ type, disabled }: SlideButtonProps) => {
   const swiper = useSwiper();
 
   const handleClick = () => {
@@ -37,9 +41,11 @@ const SlideButton = ({ type }: SlideButtonProps) => {
         "z-2 absolute max-sm:hidden",
         "h-[32px] w-[32px] rounded-full border border-white/20 bg-white p-0 shadow-sm",
         "hover:bg-white",
+        "disabled:cursor-not-allowed disabled:bg-white disabled:opacity-40",
         type === "prev" && "left-[14px] top-[40%]",
         type === "next" && "right-[14px] top-[40%]",
       )}
+      disabled={disabled}
       onClick={handleClick}
     >
       {type === "prev" && (
@@ -57,6 +63,14 @@ interface EditorPickSlideProps {
 }
 
 export default function EditorPickSlide({ items }: EditorPickSlideProps) {
+  const [isBeginning, setIsBeginning] = useState(true);
+  const [isEnd, setIsEnd] = useState(false);
+
+  const updateEdges = (swiper: SwiperClass) => {
+    setIsBeginning(swiper.isBeginning);
+    setIsEnd(swiper.isEnd);
+  };
+
   return (
     <div className="relative">
       <Swiper
@@ -68,14 +82,22 @@ export default function EditorPickSlide({ items }: EditorPickSlideProps) {
             spaceBetween: 40,
           },
         }}
-        className="w-full max-sm:w-full"
+        className="editor-pick-swiper w-full max-sm:w-full"
         modules={[FreeMode]}
+        onProgress={updateEdges}
+        onResize={updateEdges}
+        onSlideChange={updateEdges}
+        onSwiper={updateEdges}
         slidesPerView="auto"
         spaceBetween={16}
+        watchOverflow
       >
-        <SlideButton type="prev" />
+        <SlideButton disabled={isBeginning} type="prev" />
         {items.map((item) => (
-          <SwiperSlide className="max-sm:px-[20px]" key={`pick-${item.id}`}>
+          <SwiperSlide
+            className="max-sm:first:pl-[20px]"
+            key={`pick-${item.id}`}
+          >
             <StyleCard
               author={item.writer}
               category={item.newsCategoryName}
@@ -88,7 +110,7 @@ export default function EditorPickSlide({ items }: EditorPickSlideProps) {
             />
           </SwiperSlide>
         ))}
-        <SlideButton type="next" />
+        <SlideButton disabled={isEnd} type="next" />
       </Swiper>
     </div>
   );
