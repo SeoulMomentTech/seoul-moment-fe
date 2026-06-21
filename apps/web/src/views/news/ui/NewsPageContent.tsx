@@ -93,7 +93,7 @@ export function NewsPageContent({ promise }: NewsPageContentProps) {
             <div
               className={cn(
                 "h-[418px] w-[951px]",
-                "max-sm:h-auto max-sm:w-full max-sm:overflow-x-auto",
+                "max-sm:h-auto max-sm:w-full",
               )}
             >
               <HotKeywordList items={hashtag.list} />

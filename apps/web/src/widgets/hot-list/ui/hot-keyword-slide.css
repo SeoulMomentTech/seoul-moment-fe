@@ -1,0 +1,11 @@
+.hot-keyword-swiper .swiper-slide {
+  width: calc((100% - 60px) / 3);
+  margin-right: 30px;
+}
+
+@media (max-width: 640px) {
+  .hot-keyword-swiper .swiper-slide {
+    width: 208px;
+    margin-right: 16px;
+  }
+}
