@@ -1,5 +1,9 @@
+import type { ReactNode } from "react";
+
+import { NextIntlClientProvider } from "next-intl";
 import { describe, expect, it, vi } from "vitest";
 
+import messages from "@/i18n/messages/ko.json";
 import type { Article } from "@/shared/services/article";
 
 import { render, screen } from "@testing-library/react";
@@ -30,17 +34,25 @@ vi.mock("@widgets/empty", () => ({
   ),
 }));
 
+// Provide real ko messages so useTranslations resolves actual strings
+const renderWithIntl = (ui: ReactNode) =>
+  render(
+    <NextIntlClientProvider locale="ko" messages={messages}>
+      {ui}
+    </NextIntlClientProvider>,
+  );
+
 describe("ArticleContents", () => {
   it("renders empty state with correct icon and message when data is empty", () => {
     // given
     const data: Article[] = [];
 
     // when
-    render(<ArticleContents data={data} />);
+    renderWithIntl(<ArticleContents data={data} />);
 
     // then
     expect(screen.getByTestId("empty-state")).toBeInTheDocument();
-    expect(screen.getByText("등록된 아티클이 없습니다.")).toBeInTheDocument();
+    expect(screen.getByText("등록된 글이 없습니다.")).toBeInTheDocument();
     expect(screen.getByRole("img")).toBeInTheDocument();
     expect(screen.queryByTestId("article-list")).not.toBeInTheDocument();
     expect(screen.queryByTestId("article-slide")).not.toBeInTheDocument();
@@ -61,7 +73,7 @@ describe("ArticleContents", () => {
     ];
 
     // when
-    render(<ArticleContents data={data} />);
+    renderWithIntl(<ArticleContents data={data} />);
 
     // then
     expect(screen.queryByTestId("empty-state")).not.toBeInTheDocument();

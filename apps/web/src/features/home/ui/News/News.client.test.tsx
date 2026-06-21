@@ -1,6 +1,11 @@
+import type { ReactNode } from "react";
+
+import { NextIntlClientProvider } from "next-intl";
 import { describe, expect, it, vi } from "vitest";
 
 import type { News } from "@shared/services/news";
+
+import messages from "@/i18n/messages/ko.json";
 
 import { render, screen } from "@testing-library/react";
 
@@ -34,13 +39,21 @@ vi.mock("@/i18n/navigation", () => ({
   ),
 }));
 
+// Provide real ko messages so useTranslations resolves actual strings
+const renderWithIntl = (ui: ReactNode) =>
+  render(
+    <NextIntlClientProvider locale="ko" messages={messages}>
+      {ui}
+    </NextIntlClientProvider>,
+  );
+
 describe("NewsContents", () => {
   it("renders empty state with correct icon and message when data is empty", () => {
     // given
     const data: News[] = [];
 
     // when
-    render(<NewsContents data={data} />);
+    renderWithIntl(<NewsContents data={data} />);
 
     // then
     expect(screen.getByTestId("empty-state")).toBeInTheDocument();
@@ -59,6 +72,7 @@ describe("NewsContents", () => {
         homeImage: "img1",
         image: "",
         content: "Sub 1",
+        newsCategoryName: "Category 1",
       },
       {
         id: 2,
@@ -68,15 +82,17 @@ describe("NewsContents", () => {
         homeImage: "img2",
         image: "",
         content: "Sub 2",
+        newsCategoryName: "Category 2",
       },
     ];
 
     // when
-    render(<NewsContents data={data} />);
+    renderWithIntl(<NewsContents data={data} />);
 
     // then
+    // NewsContents renders both desktop and mobile sliders, so cards appear more than once
     expect(screen.queryByTestId("empty-state")).not.toBeInTheDocument();
-    expect(screen.getByTestId("main-news-card")).toBeInTheDocument();
-    expect(screen.getByTestId("sub-news-card")).toBeInTheDocument();
+    expect(screen.getAllByTestId("main-news-card").length).toBeGreaterThan(0);
+    expect(screen.getAllByTestId("sub-news-card").length).toBeGreaterThan(0);
   });
 });
