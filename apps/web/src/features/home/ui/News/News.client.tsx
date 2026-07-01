@@ -9,6 +9,8 @@ import { useTranslations } from "next-intl";
 import { cn } from "@shared/lib/style";
 import type { getNewsList, News } from "@shared/services/news";
 
+import { Link } from "@/i18n/navigation";
+
 import { Empty } from "@widgets/empty";
 import { SectionWithLabel } from "@widgets/section-with-label";
 
@@ -21,6 +23,7 @@ interface NewsProps {
 
 export function News({ promise }: NewsProps) {
   const res = use(promise);
+  const t = useTranslations();
 
   return (
     <SectionWithLabel
@@ -35,6 +38,13 @@ export function News({ promise }: NewsProps) {
           <h3 className="text-title-2 max-sm:text-title-4">
             <b>NEWS</b>
           </h3>
+
+          <Link
+            className="text-body-3 max-sm:text-body-4 hover:underline"
+            href="/news"
+          >
+            {t("more")}
+          </Link>
         </div>
       }
     >

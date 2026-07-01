@@ -6,6 +6,8 @@ import { ChevronLeftIcon, XIcon } from "lucide-react";
 
 import { useTranslations } from "next-intl";
 
+import { TAIWAN_DIAL_CODE } from "@shared/lib/utils";
+
 import {
   Button,
   cn,
@@ -14,7 +16,6 @@ import {
   DialogContent,
   DialogTitle,
   HStack,
-  Input,
   VStack,
 } from "@seoul-moment/ui";
 
@@ -171,16 +172,34 @@ export function PhoneVerificationModal({
             <VStack align="top" className="w-full" gap={20}>
               <VStack align="top" className="w-full" gap={8}>
                 <HStack align="center" className="w-full" gap={8}>
-                  <Input
-                    autoComplete="tel"
-                    className="h-[58.5px] flex-1"
-                    disabled={isVerified}
-                    inputMode="numeric"
-                    onChange={(event) => setPhone(event.target.value)}
-                    placeholder={t("input_phone")}
-                    type="tel"
-                    value={phone}
-                  />
+                  <HStack
+                    align="center"
+                    className={cn(
+                      "h-[58.5px] flex-1 rounded-[4px] border border-black/20 bg-white",
+                      "px-[12px] py-[16px]",
+                      "focus-within:border-foreground",
+                      isVerified && "bg-black/5",
+                    )}
+                    gap={8}
+                  >
+                    <span className="text-body-2 text-foreground shrink-0 leading-none">
+                      {TAIWAN_DIAL_CODE}
+                    </span>
+                    <input
+                      autoComplete="tel"
+                      className={cn(
+                        "text-body-2 text-foreground placeholder:text-black/40",
+                        "min-w-0 flex-1 bg-transparent leading-none outline-none",
+                        "disabled:cursor-not-allowed",
+                      )}
+                      disabled={isVerified}
+                      inputMode="numeric"
+                      onChange={(event) => setPhone(event.target.value)}
+                      placeholder={t("input_phone")}
+                      type="tel"
+                      value={phone}
+                    />
+                  </HStack>
                   <Button
                     className="h-[58.5px] shrink-0 rounded-[4px] py-[16px] font-semibold"
                     disabled={isSendDisabled}

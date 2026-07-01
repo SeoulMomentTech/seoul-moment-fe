@@ -1,5 +1,11 @@
+.editor-pick-swiper .swiper-slide {
+  width: calc((100% - 120px) / 4);
+  margin-right: 40px;
+}
+
 @media (max-width: 640px) {
-  .swiper-slide {
+  .editor-pick-swiper .swiper-slide {
     width: 208px;
+    margin-right: 16px;
   }
 }

@@ -1,5 +1,9 @@
+import type { ReactNode } from "react";
+
+import { NextIntlClientProvider } from "next-intl";
 import { describe, expect, it, vi } from "vitest";
 
+import messages from "@/i18n/messages/ko.json";
 import type { ProductItem } from "@/shared/services/product";
 
 import { render, screen } from "@testing-library/react";
@@ -7,10 +11,6 @@ import { render, screen } from "@testing-library/react";
 import { NowOnSaleContents } from "./NowOnSale.client";
 
 // Mocks
-vi.mock("next-intl", () => ({
-  useTranslations: () => (key: string) => key,
-}));
-
 vi.mock("@/i18n/navigation", () => ({
   Link: ({ children, href }: { children: React.ReactNode; href: string }) => (
     <a href={href}>{children}</a>
@@ -44,13 +44,21 @@ vi.mock("@seoul-moment/ui", () => ({
   ),
 }));
 
+// Provide real ko messages so useTranslations resolves actual strings
+const renderWithIntl = (ui: ReactNode) =>
+  render(
+    <NextIntlClientProvider locale="ko" messages={messages}>
+      {ui}
+    </NextIntlClientProvider>,
+  );
+
 describe("NowOnSaleContents", () => {
   it("renders empty state when data is empty", () => {
     // given
     const data: ProductItem[] = [];
 
     // when
-    render(<NowOnSaleContents data={data} />);
+    renderWithIntl(<NowOnSaleContents data={data} />);
 
     // then
     expect(screen.getByTestId("empty-state")).toBeInTheDocument();
@@ -76,7 +84,7 @@ describe("NowOnSaleContents", () => {
     ];
 
     // when
-    render(<NowOnSaleContents data={data} />);
+    renderWithIntl(<NowOnSaleContents data={data} />);
 
     // then
     expect(screen.queryByTestId("empty-state")).not.toBeInTheDocument();

@@ -41,6 +41,7 @@ export function NewsMobileSlider({ data }: NewsMobileSliderProps) {
             <Link href={`/news/${news.id}`}>
               <FeaturedMainNewsCard
                 author={news.writer}
+                category=""
                 date={news.createDate}
                 imageUrl={news.homeImage}
                 subTitle={news.content}
