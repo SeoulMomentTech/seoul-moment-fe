@@ -35,43 +35,55 @@ let devSitemapCache: {
   data: MetadataRoute.Sitemap;
 } | null = null;
 
+const localeUrl = (baseUrl: string, locale: string, path: string) =>
+  `${baseUrl}/${locale}${path}`;
+
+const buildLanguages = (baseUrl: string, path: string) => ({
+  ...Object.fromEntries(
+    routing.locales.map((locale) => [locale, localeUrl(baseUrl, locale, path)]),
+  ),
+  "x-default": localeUrl(baseUrl, routing.defaultLocale, path),
+});
+
 const buildLocalizedRoutes = (
   baseUrl: string,
   routes: RouteConfig[],
   lastModified: Date,
 ): MetadataRoute.Sitemap =>
-  routing.locales.flatMap((locale) =>
-    routes.map((route) => ({
-      url: `${baseUrl}/${locale}${route.path}`,
-      lastModified,
-      changeFrequency: route.changeFrequency,
-      priority: route.priority,
-    })),
-  );
+  routes.map((route) => ({
+    url: localeUrl(baseUrl, routing.defaultLocale, route.path),
+    lastModified,
+    changeFrequency: route.changeFrequency,
+    priority: route.priority,
+    alternates: { languages: buildLanguages(baseUrl, route.path) },
+  }));
 
 const buildLocalizedDynamicRoutes = (
   baseUrl: string,
   routes: DynamicRouteConfig[],
   lastModified: Date,
 ): MetadataRoute.Sitemap =>
-  routing.locales.flatMap((locale) =>
-    routes.flatMap((route) =>
-      route.ids.map((id) => ({
-        url: `${baseUrl}/${locale}${route.basePath}/${id}`,
+  routes.flatMap((route) =>
+    route.ids.map((id) => {
+      const path = `${route.basePath}/${id}`;
+
+      return {
+        url: localeUrl(baseUrl, routing.defaultLocale, path),
         lastModified,
         changeFrequency: route.changeFrequency,
         priority: route.priority,
-      })),
-    ),
+        alternates: { languages: buildLanguages(baseUrl, path) },
+      };
+    }),
   );
 
 const getProductIds = async () => {
   const languageCode = routing.defaultLocale;
   const ids: number[] = [];
   let page = 1;
-  let total = 0;
+  let total = Infinity;
 
-  do {
+  while (ids.length < total && ids.length < MAX_LIST_COUNT) {
     const response = await getProductList({
       languageCode,
       page,
@@ -80,9 +92,12 @@ const getProductIds = async () => {
 
     const list = response.data.list ?? [];
     total = response.data.total ?? 0;
+
+    if (list.length === 0) break; // 진행 없음 → 무한 루프 방지
+
     ids.push(...list.map((product) => product.id));
     page += 1;
-  } while (ids.length < total);
+  }
 
   return [...new Set(ids)];
 };
