@@ -105,6 +105,11 @@ const menuItems: MenuItemConfig[] = [
     subItems: [
       { id: "news", label: "뉴스 목록", path: PATH.NEWS },
       {
+        id: "news-category",
+        label: "카테고리 관리",
+        path: PATH.NEWS_CATEGORY,
+      },
+      {
         id: "news-hashtag",
         label: "해시태그 관리",
         path: PATH.NEWS_HASHTAG,

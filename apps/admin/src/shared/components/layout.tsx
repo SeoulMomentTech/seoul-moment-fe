@@ -30,6 +30,7 @@ export type MenuItem =
   | "news"
   | "news-add"
   | "news-edit"
+  | "news-category"
   | "news-hashtag"
   | "promotion"
   | "promotion-add"

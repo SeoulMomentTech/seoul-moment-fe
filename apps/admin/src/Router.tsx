@@ -14,6 +14,7 @@ import { BrandListPage } from "@pages/BrandPage/ListPage";
 import { BrandPromotionAddPage } from "@pages/BrandPromotionPage/AddPage";
 import { BrandPromotionEditPage } from "@pages/BrandPromotionPage/EditPage";
 import NewsAddPage from "@pages/NewsPage/AddPage";
+import NewsCategoryPage from "@pages/NewsPage/CategoryPage";
 import NewsEditPage from "@pages/NewsPage/EditPage";
 import NewsHashtagPage from "@pages/NewsPage/HashtagPage";
 import ProductOptionAddPage from "@pages/ProductOptionsPage/AddPage";
@@ -174,6 +175,10 @@ const privateRoutes: RouteObject[] = [
       {
         path: PATH.NEWS_EDIT,
         element: <NewsEditPage />,
+      },
+      {
+        path: PATH.NEWS_CATEGORY,
+        element: <NewsCategoryPage />,
       },
       {
         path: PATH.NEWS_HASHTAG,
