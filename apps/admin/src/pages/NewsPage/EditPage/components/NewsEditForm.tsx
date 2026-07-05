@@ -7,10 +7,9 @@ import { useAdminCategoryListQuery } from "@pages/ProductCategoriesPage/hooks";
 import { LANGUAGE_LIST } from "@shared/constants/locale";
 import { PATH } from "@shared/constants/route";
 import type {
-  AdminNewsDetail,
+  AdminNewsDetailV1,
   AdminNewsId,
-  CreateAdminNewsRequest,
-  UpdateAdminNewsRequestV2,
+  UpdateAdminNewsRequestV1,
 } from "@shared/services/news";
 import { uploadImageFile } from "@shared/utils/image";
 import { useFormik } from "formik";
@@ -22,17 +21,20 @@ import {
   NewsInfoCard,
   NewsMetaFields,
 } from "../../components";
-import { useAdminNewsQuery, useUpdateAdminNewsV2Mutation } from "../../hooks";
-import type { NewsFormErrors } from "../../types";
+import {
+  useAdminNewsCategoryListQuery,
+  useAdminNewsHashtagListQuery,
+  useAdminNewsV1Query,
+  useUpdateAdminNewsV1Mutation,
+} from "../../hooks";
+import type { NewsFormErrors, NewsFormValues } from "../../types";
 import { validateNewsForm } from "../../utils";
 
 interface NewsEditFormProps {
   newsId: AdminNewsId;
 }
 
-const buildInitialValues = (
-  detail: AdminNewsDetail,
-): CreateAdminNewsRequest => {
+const buildInitialValues = (detail: AdminNewsDetailV1): NewsFormValues => {
   const sectionCount = Math.max(
     0,
     ...detail.multilingualTextList.map((item) => item.section?.length ?? 0),
@@ -63,7 +65,10 @@ const buildInitialValues = (
 
   return {
     categoryId: detail.categoryId,
+    newsCategoryId: detail.newsCategoryId,
     brandId: detail.brandId,
+    hashtagId: detail.hashtagId,
+    editorPick: detail.editorPick ?? false,
     writer: detail.writer ?? "",
     banner: detail.banner ?? "",
     profile: detail.profile ?? "",
@@ -107,19 +112,31 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
       sort: "DESC",
     });
 
-  const { data: newsResponse, isLoading, isError } = useAdminNewsQuery(newsId, {
-    toastOnError: '존재하지 않는 뉴스입니다.'
+  const { data: newsCategoryResponse, isLoading: isNewsCategoryLoading } =
+    useAdminNewsCategoryListQuery();
+  const { data: hashtagResponse, isLoading: isHashtagLoading } =
+    useAdminNewsHashtagListQuery();
+
+  const {
+    data: newsResponse,
+    isLoading,
+    isError,
+  } = useAdminNewsV1Query(newsId, {
+    toastOnError: "존재하지 않는 뉴스입니다.",
   });
   const detail = newsResponse?.data;
 
-  const { mutateAsync: updateNews, isPending } = useUpdateAdminNewsV2Mutation({
+  const { mutateAsync: updateNews, isPending } = useUpdateAdminNewsV1Mutation({
     onSuccess: () => navigate(PATH.NEWS),
   });
 
-  const formik = useFormik<CreateAdminNewsRequest>({
+  const formik = useFormik<NewsFormValues>({
     initialValues: {
       categoryId: 1,
+      newsCategoryId: 0,
       brandId: undefined,
+      hashtagId: undefined,
+      editorPick: false,
       writer: "",
       banner: "",
       profile: "",
@@ -148,9 +165,12 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
           ? (await uploadImageFile(homeImageFile, "news")).imageUrl
           : values.homeImage;
 
-      const payload: UpdateAdminNewsRequestV2 = {
+      const payload: UpdateAdminNewsRequestV1 = {
         categoryId: values.categoryId,
+        newsCategoryId: values.newsCategoryId,
         brandId: values.brandId,
+        hashtagId: values.hashtagId,
+        editorPick: values.editorPick,
         writer: values.writer,
         banner,
         profile,
@@ -183,11 +203,14 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
 
 
   const handleChangeMetaField = useCallback(
-    (field: "categoryId" | "brandId" | "writer", value: string) => {
+    (
+      field: "categoryId" | "brandId" | "writer" | "newsCategoryId",
+      value: string,
+    ) => {
       if (isCategoryLoading || isBrandLoading || !value) return;
 
-      if (field === "categoryId") {
-        setFieldValue("categoryId", Number(value));
+      if (field === "categoryId" || field === "newsCategoryId") {
+        setFieldValue(field, Number(value));
         return;
       }
 
@@ -274,6 +297,20 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
         ...baseBrandOptions,
       ]
       : baseBrandOptions;
+  const newsCategoryOptions =
+    newsCategoryResponse?.data.list.map((category) => ({
+      value: category.id,
+      label:
+        category.nameList.find((item) => item.languageCode === "ko")?.name ??
+        `ID ${category.id}`,
+    })) ?? [];
+  const hashtagOptions =
+    hashtagResponse?.data.list.map((hashtag) => ({
+      value: hashtag.id,
+      label:
+        hashtag.nameList.find((item) => item.languageCode === "ko")?.name ??
+        `ID ${hashtag.id}`,
+    })) ?? [];
 
   if (isError) {
     return <Navigate replace to={PATH.NEWS} />;
@@ -312,9 +349,26 @@ export function NewsEditForm({ newsId }: NewsEditFormProps) {
           brandOptions={brandOptions}
           categoryOptions={categoryOptions}
           errors={errors}
+          hashtagOptions={hashtagOptions}
           isBrandLoading={isBrandLoading}
           isCategoryLoading={isCategoryLoading}
+          isHashtagLoading={isHashtagLoading}
+          isNewsCategoryLoading={isNewsCategoryLoading}
+          newsCategoryOptions={newsCategoryOptions}
           onChange={handleChangeMetaField}
+          onEditorPickChange={(checked) =>
+            formik.setFieldValue("editorPick", checked)
+          }
+          onHashtagChange={(value) => {
+            // Radix Select가 옵션 로딩 중 빈 값으로 onValueChange를 호출해도
+            // 초기값(hashtagId)을 덮어쓰지 않도록 가드
+            if (!value) return;
+            formik.setFieldValue(
+              "hashtagId",
+              value === "none" ? undefined : Number(value),
+            );
+          }}
+          showEditorPick
           values={formik.values}
         />
 
