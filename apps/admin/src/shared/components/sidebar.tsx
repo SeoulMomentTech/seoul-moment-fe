@@ -205,8 +205,9 @@ export default function Sidebar({
                     <AccordionTrigger
                       className={cn(
                         "items-center rounded-lg px-4 py-3 text-sm transition-colors",
-                        "text-gray-700 hover:bg-gray-100",
-                        isSelected && "bg-gray-900 text-white",
+                        isSelected
+                          ? "bg-gray-900 text-white"
+                          : "text-gray-700 hover:bg-gray-100",
                       )}
                     >
                       <HStack className="flex-1 text-left" gap={12}>
@@ -219,9 +220,9 @@ export default function Sidebar({
                         <Link
                           className={cn(
                             "flex w-full items-center gap-3 rounded-lg px-4 py-2 text-sm transition-colors",
-                            "text-gray-600 hover:bg-gray-50",
-                            isPathActive(subItem.path) &&
-                            "bg-gray-100 text-gray-900",
+                            isPathActive(subItem.path)
+                              ? "bg-gray-100 text-gray-900"
+                              : "text-gray-600 hover:bg-gray-50",
                           )}
                           key={subItem.id}
                           to={subItem.path}
