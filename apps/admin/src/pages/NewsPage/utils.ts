@@ -1,6 +1,4 @@
-import type { CreateAdminNewsRequest } from "@shared/services/news";
-
-import type { NewsFormErrors } from "./types";
+import type { NewsFormErrors, NewsFormValues } from "./types";
 
 interface LanguageInfo {
   id: number;
@@ -8,9 +6,12 @@ interface LanguageInfo {
 
 export const createInitialValues = (
   languages: LanguageInfo[],
-): CreateAdminNewsRequest => ({
+): NewsFormValues => ({
   categoryId: 1,
+  newsCategoryId: 0,
   brandId: undefined,
+  hashtagId: undefined,
+  editorPick: false,
   writer: "",
   banner: "",
   profile: "",
@@ -23,13 +24,15 @@ export const createInitialValues = (
   sectionList: [],
 });
 
-export const validateNewsForm = (
-  values: CreateAdminNewsRequest,
-): NewsFormErrors => {
+export const validateNewsForm = (values: NewsFormValues): NewsFormErrors => {
   const errors: NewsFormErrors = {};
 
   if (!values.categoryId || Number.isNaN(values.categoryId)) {
     errors.categoryId = "카테고리 ID를 입력해주세요.";
+  }
+
+  if (!values.newsCategoryId || Number.isNaN(values.newsCategoryId)) {
+    errors.newsCategoryId = "뉴스 카테고리를 선택해주세요.";
   }
 
   if (!values.writer.trim()) {

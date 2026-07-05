@@ -1,6 +1,6 @@
 import { type ReactNode } from "react";
 
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 
 import {
   LayoutDashboard,
@@ -100,8 +100,21 @@ const menuItems: MenuItemConfig[] = [
   {
     id: "news",
     label: "뉴스 관리",
-    path: PATH.NEWS,
+    path: "",
     icon: <Newspaper className="h-5 w-5" />,
+    subItems: [
+      { id: "news", label: "뉴스 목록", path: PATH.NEWS },
+      {
+        id: "news-category",
+        label: "카테고리 관리",
+        path: PATH.NEWS_CATEGORY,
+      },
+      {
+        id: "news-hashtag",
+        label: "해시태그 관리",
+        path: PATH.NEWS_HASHTAG,
+      },
+    ],
   },
   {
     id: "article",
@@ -127,17 +140,34 @@ const menuItems: MenuItemConfig[] = [
   },
 ];
 
-const defaultExpandedMenus: MenuItem[] = ["users", "products", "brand"];
+const defaultExpandedMenus: MenuItem[] = ["users", "products", "brand", "news"];
 
 export default function Sidebar({
   isMobileMenuOpen,
-  selectedMenu,
   onMobileMenuClose,
 }: SidebarProps) {
-  const isSubItemSelected = (item: MenuItemConfig) => {
-    if (!item.subItems) return false;
-    return item.subItems.some((subItem) => subItem.id === selectedMenu);
-  };
+  const { pathname } = useLocation();
+
+  // 현재 경로를 접두어로 갖는 메뉴 경로 중 가장 구체적인(긴) 경로를 활성 처리한다.
+  const allPaths = menuItems
+    .flatMap((item) =>
+      item.subItems
+        ? item.subItems.map((subItem) => subItem.path)
+        : item.path
+          ? [item.path]
+          : [],
+    )
+    .filter(Boolean);
+
+  const activePath = allPaths
+    .filter((path) => pathname === path || pathname.startsWith(`${path}/`))
+    .sort((a, b) => b.length - a.length)[0];
+
+  const isPathActive = (path?: string) =>
+    Boolean(path) && path === activePath;
+
+  const isSubItemSelected = (item: MenuItemConfig) =>
+    item.subItems?.some((subItem) => isPathActive(subItem.path)) ?? false;
 
   return (
     <>
@@ -162,7 +192,7 @@ export default function Sidebar({
           >
             {menuItems.map((item) => {
               const isSelected =
-                (selectedMenu === item.id && !item.subItems) ||
+                (!item.subItems && isPathActive(item.path)) ||
                 isSubItemSelected(item);
 
               if (item.subItems) {
@@ -190,7 +220,7 @@ export default function Sidebar({
                           className={cn(
                             "flex w-full items-center gap-3 rounded-lg px-4 py-2 text-sm transition-colors",
                             "text-gray-600 hover:bg-gray-50",
-                            selectedMenu === subItem.id &&
+                            isPathActive(subItem.path) &&
                             "bg-gray-100 text-gray-900",
                           )}
                           key={subItem.id}
