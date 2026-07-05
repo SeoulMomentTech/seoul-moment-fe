@@ -86,6 +86,18 @@ function Desktop() {
               {t("product")}
             </Link>
           </li>
+          <li>
+            <Link
+              className={cn(
+                styleMap.deskTop.menu,
+                pathname === "/news" && "font-semibold",
+              )}
+              href="/news"
+              prefetch={ENABLE_HEADER_PREFETCH}
+            >
+              {t("news")}
+            </Link>
+          </li>
         </ul>
       </div>
       <div className="items-center-safe flex gap-[40px]">
@@ -191,6 +203,19 @@ function Mobile() {
                     prefetch={ENABLE_HEADER_PREFETCH}
                   >
                     {t("product")}
+                    <ChevronRightIcon height={16} width={16} />
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    className={styleMap.mobile.menu}
+                    href="/news"
+                    onClick={() => {
+                      setIsOpen(false);
+                    }}
+                    prefetch={ENABLE_HEADER_PREFETCH}
+                  >
+                    {t("news")}
                     <ChevronRightIcon height={16} width={16} />
                   </Link>
                 </li>
