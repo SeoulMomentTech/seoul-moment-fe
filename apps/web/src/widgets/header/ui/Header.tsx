@@ -209,7 +209,7 @@ function Mobile() {
                 <li>
                   <Link
                     className={styleMap.mobile.menu}
-                    href="/product"
+                    href="/news"
                     onClick={() => {
                       setIsOpen(false);
                     }}
