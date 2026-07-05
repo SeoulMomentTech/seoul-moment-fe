@@ -66,6 +66,10 @@ export default async function RootLayout({
   return (
     <html lang={locale ?? "ko"}>
       <head>
+        <meta
+          content="tkdfXJ6-ynp9D_0x2zpVyESgoJIA3YtbN5LxrpjEGxQ"
+          name="google-site-verification"
+        />
         <Script
           async
           defer
