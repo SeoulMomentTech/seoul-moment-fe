@@ -113,16 +113,6 @@ export interface AdminNewsDetail {
   multilingualTextList: AdminNewsMultilingualText[];
 }
 
-export interface UpdateAdminNewsRequest {
-  categoryId?: number;
-  brandId?: number;
-  writer?: string;
-  banner?: string;
-  profile?: string;
-  homeImage?: string;
-  multilingualTextList?: UpdateAdminNewsInfoTextPayloadV2[];
-}
-
 /**
  * V1 뉴스 상세 (V1AdminNews) — newsCategoryId, hashtagId, editorPick 필드 추가
  */
@@ -194,34 +184,6 @@ export interface UpdateAdminNewsHashtagRequest {
  */
 export const getAdminNewsList = (params?: AdminNewsListParams) =>
   fetcher.get<ApiResponse<AdminNewsListData>>("/admin/news", { params });
-
-/**
- * @description 뉴스 다국어 조회
- */
-export const getAdminNewsInfo = (newsId: AdminNewsId) =>
-  fetcher.get<ApiResponse<AdminNewsDetail>>(`/admin/news/${newsId}`);
-
-/**
- * @description 뉴스 데이터 입력
- */
-export const createAdminNews = (payload: CreateAdminNewsRequest) =>
-  fetcher.post("/admin/news", payload);
-
-/**
- * @description 뉴스 수정
- */
-export const updateAdminNews = (
-  newsId: AdminNewsId,
-  payload: UpdateAdminNewsRequest,
-) => fetcher.patch(`/admin/news/${newsId}`, payload);
-
-/**
- * @description 뉴스 수정 (V2)
- */
-export const updateAdminNewsV2 = (
-  newsId: AdminNewsId,
-  payload: UpdateAdminNewsRequestV2,
-) => fetcher.patch(`/admin/news/v2/${newsId}`, payload);
 
 /**
  * @description 뉴스 삭제
