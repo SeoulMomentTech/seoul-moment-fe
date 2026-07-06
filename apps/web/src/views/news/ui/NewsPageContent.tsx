@@ -86,7 +86,7 @@ export function NewsPageContent({ promise }: NewsPageContentProps) {
               )}
             >
               <span className="max-sm:text-body-3">Hot Keyword</span>
-              <h3 className="text-title-1 max-sm:text-title-3 font-bold">
+              <h3 className="text-title-2 max-sm:text-title-3 font-bold">
                 #{hashtag.name}
               </h3>
             </div>
