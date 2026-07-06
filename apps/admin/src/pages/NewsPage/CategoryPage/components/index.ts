@@ -1,2 +1,2 @@
 export * from "./NewsCategoryTable";
-export * from "./NewsCategoryEditModal";
+export * from "./NewsCategoryFormModal";

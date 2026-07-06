@@ -157,6 +157,14 @@ interface AdminNewsCategoryListData {
   list: AdminNewsCategory[];
 }
 
+export interface CreateAdminNewsCategoryRequest {
+  nameList: AdminNewsNamePayload[];
+}
+
+export interface CreateAdminNewsCategoryResponse {
+  id: number;
+}
+
 export interface UpdateAdminNewsCategoryRequest {
   nameList: AdminNewsNamePayload[];
 }
@@ -218,6 +226,17 @@ export const updateAdminNewsV1 = (
  */
 export const getAdminNewsCategoryList = () =>
   fetcher.get<ApiResponse<AdminNewsCategoryListData>>("/admin/news/category");
+
+/**
+ * @description 뉴스 카테고리 생성
+ */
+export const createAdminNewsCategory = (
+  payload: CreateAdminNewsCategoryRequest,
+) =>
+  fetcher.post<ApiResponse<CreateAdminNewsCategoryResponse>>(
+    "/admin/news/category",
+    payload,
+  );
 
 /**
  * @description 뉴스 카테고리 다국어 조회

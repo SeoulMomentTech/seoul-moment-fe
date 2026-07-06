@@ -6,6 +6,7 @@ export * from "./useUpdateAdminNewsV1Mutation";
 export * from "./useDeleteAdminNewsMutation";
 export * from "./useAdminNewsCategoryListQuery";
 export * from "./useAdminNewsCategoryQuery";
+export * from "./useCreateAdminNewsCategoryMutation";
 export * from "./useUpdateAdminNewsCategoryMutation";
 export * from "./useDeleteAdminNewsCategoryMutation";
 export * from "./useAdminNewsHashtagListQuery";
