@@ -5,6 +5,7 @@ import type { News } from "@shared/services/news";
 import CardSlider from "@shared/ui/card-slider";
 
 import "./hot-keyword-slide.css";
+import { cn } from "@seoul-moment/ui";
 
 interface HotKeywordListProps {
   className?: string;
@@ -23,6 +24,7 @@ export default function HotKeywordList({
           spaceBetween: 30,
         },
       }}
+      buttonClassName={cn(items.length < 4 && "hidden")}
       className={className}
       getKey={(item) => `hot-${item.id}`}
       items={items}
