@@ -34,9 +34,10 @@ const SLIDE_BUTTON: Record<SlideButtonType, SlideButtonConfig> = {
 interface SlideButtonProps {
   type: SlideButtonType;
   disabled?: boolean;
+  className?: string;
 }
 
-const SlideButton = ({ type, disabled }: SlideButtonProps) => {
+const SlideButton = ({ type, disabled, className }: SlideButtonProps) => {
   const swiper = useSwiper();
   const { position, Icon, move } = SLIDE_BUTTON[type];
 
@@ -48,6 +49,7 @@ const SlideButton = ({ type, disabled }: SlideButtonProps) => {
         "hover:bg-white",
         "disabled:cursor-not-allowed disabled:bg-white disabled:opacity-40",
         position,
+        className,
       )}
       disabled={disabled}
       onClick={() => move(swiper)}

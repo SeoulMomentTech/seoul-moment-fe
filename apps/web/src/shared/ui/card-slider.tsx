@@ -22,6 +22,7 @@ interface CardSliderProps<T> {
   /** 슬라이드 너비/간격을 정의하는 스코프 클래스 (예: editor-pick-swiper) */
   swiperClassName?: string;
   slideClassName?: string;
+  buttonClassName?: string;
 }
 
 /**
@@ -36,6 +37,7 @@ export default function CardSlider<T>({
   className,
   swiperClassName,
   slideClassName,
+  buttonClassName,
 }: CardSliderProps<T>) {
   const { isBeginning, isEnd, onEdge } = useSwiperEdges();
 
@@ -53,13 +55,17 @@ export default function CardSlider<T>({
         spaceBetween={16}
         watchOverflow
       >
-        <SlideButton disabled={isBeginning} type="prev" />
+        <SlideButton
+          className={buttonClassName}
+          disabled={isBeginning}
+          type="prev"
+        />
         {items.map((item) => (
           <SwiperSlide className={slideClassName} key={getKey(item)}>
             {renderItem(item)}
           </SwiperSlide>
         ))}
-        <SlideButton disabled={isEnd} type="next" />
+        <SlideButton className={buttonClassName} disabled={isEnd} type="next" />
       </Swiper>
     </div>
   );
