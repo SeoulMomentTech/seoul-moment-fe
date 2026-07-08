@@ -1,8 +1,8 @@
 import { useAppMutation } from "@shared/hooks/useAppMutation";
 import {
-  updateAdminNewsV2,
+  updateAdminNewsV1,
   type AdminNewsId,
-  type UpdateAdminNewsRequestV2,
+  type UpdateAdminNewsRequestV1,
 } from "@shared/services/news";
 
 import {
@@ -12,34 +12,36 @@ import {
 
 import { NEWS_QUERY_KEY, newsQueryKeys } from "./queryKeys";
 
-type UpdateAdminNewsV2Response = Awaited<ReturnType<typeof updateAdminNewsV2>>;
+type UpdateAdminNewsV1Response = Awaited<
+  ReturnType<typeof updateAdminNewsV1>
+>;
 
-interface UpdateAdminNewsV2Variables {
+interface UpdateAdminNewsV1Variables {
   newsId: AdminNewsId;
-  payload: UpdateAdminNewsRequestV2;
+  payload: UpdateAdminNewsRequestV1;
 }
 
-type UpdateAdminNewsV2Options = Omit<
+type UpdateAdminNewsV1Options = Omit<
   UseMutationOptions<
-    UpdateAdminNewsV2Response,
+    UpdateAdminNewsV1Response,
     unknown,
-    UpdateAdminNewsV2Variables
+    UpdateAdminNewsV1Variables
   >,
   "mutationFn"
 >;
 
-export const useUpdateAdminNewsV2Mutation = (
-  options?: UpdateAdminNewsV2Options,
+export const useUpdateAdminNewsV1Mutation = (
+  options?: UpdateAdminNewsV1Options,
 ) => {
   const queryClient = useQueryClient();
 
   return useAppMutation({
-    mutationFn: ({ newsId, payload }) => updateAdminNewsV2(newsId, payload),
+    mutationFn: ({ newsId, payload }) => updateAdminNewsV1(newsId, payload),
     ...options,
     onSuccess: async (data, variables, context, mutation) => {
       await queryClient.invalidateQueries({ queryKey: NEWS_QUERY_KEY });
       await queryClient.invalidateQueries({
-        queryKey: newsQueryKeys.detail(variables.newsId),
+        queryKey: newsQueryKeys.detailV1(variables.newsId),
       });
       await options?.onSuccess?.(data, variables, context, mutation);
     },

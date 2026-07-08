@@ -26,6 +26,8 @@ export const PATH = {
   NEWS: "/news",
   NEWS_ADD: "/news/add",
   NEWS_EDIT: "/news/edit/:id",
+  NEWS_CATEGORY: "/news/category",
+  NEWS_HASHTAG: "/news/hashtag",
 
   // Article
   ARTICLE: "/article",

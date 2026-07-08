@@ -6,7 +6,7 @@ import { useAdminBrandListQuery } from "@pages/BrandPage/ListPage/hooks";
 import { useAdminCategoryListQuery } from "@pages/ProductCategoriesPage/hooks";
 import { LANGUAGE_LIST } from "@shared/constants/locale";
 import { PATH } from "@shared/constants/route";
-import { type CreateAdminNewsRequest } from "@shared/services/news";
+import { type CreateAdminNewsRequestV1 } from "@shared/services/news";
 import { stripImageDomain, uploadImageFile } from "@shared/utils/image";
 import { useFormik } from "formik";
 
@@ -17,12 +17,14 @@ import {
   NewsInfoCard,
   NewsMetaFields,
 } from "../../components";
-import { useCreateAdminNewsMutation } from "../../hooks";
-import type { NewsFormErrors } from "../../types";
+import {
+  useAdminNewsCategoryListQuery,
+  useCreateAdminNewsV1Mutation,
+} from "../../hooks";
+import type { NewsFormErrors, NewsFormValues } from "../../types";
 import { createInitialValues, validateNewsForm } from "../../utils";
 
-const INITIAL_FORM_VALUES: CreateAdminNewsRequest =
-  createInitialValues(LANGUAGE_LIST);
+const INITIAL_FORM_VALUES: NewsFormValues = createInitialValues(LANGUAGE_LIST);
 
 export function NewsForm() {
   const navigate = useNavigate();
@@ -47,12 +49,14 @@ export function NewsForm() {
       searchColumn: "name",
       sort: "DESC",
     });
+  const { data: newsCategoryResponse, isLoading: isNewsCategoryLoading } =
+    useAdminNewsCategoryListQuery();
 
-  const { mutateAsync: createNews, isPending } = useCreateAdminNewsMutation({
+  const { mutateAsync: createNews, isPending } = useCreateAdminNewsV1Mutation({
     onSuccess: () => navigate(PATH.NEWS),
   });
 
-  const formik = useFormik<CreateAdminNewsRequest>({
+  const formik = useFormik<NewsFormValues>({
     initialValues: INITIAL_FORM_VALUES,
     validateOnBlur: false,
     validateOnChange: false,
@@ -76,13 +80,19 @@ export function NewsForm() {
         imageUrlList: section.imageUrlList.map((url) => stripImageDomain(url)),
       }));
 
-      await createNews({
-        ...values,
+      const payload: CreateAdminNewsRequestV1 = {
+        categoryId: values.categoryId,
+        newsCategoryId: values.newsCategoryId,
+        brandId: values.brandId,
+        writer: values.writer,
         banner,
         profile,
         homeImage,
+        list: values.list,
         sectionList,
-      });
+      };
+
+      await createNews(payload);
     },
   });
 
@@ -93,6 +103,13 @@ export function NewsForm() {
       label:
         category.languageList.find((item) => item.languageCode === "ko")
           ?.name ?? `ID ${category.id}`,
+    })) ?? [];
+  const newsCategoryOptions =
+    newsCategoryResponse?.data.list.map((category) => ({
+      value: category.id,
+      label:
+        category.nameList.find((item) => item.languageCode === "ko")?.name ??
+        `ID ${category.id}`,
     })) ?? [];
   const brandOptions =
     brandResponse?.data.list.map((brand) => ({
@@ -115,9 +132,11 @@ export function NewsForm() {
             errors={errors}
             isBrandLoading={isBrandLoading}
             isCategoryLoading={isCategoryLoading}
+            isNewsCategoryLoading={isNewsCategoryLoading}
+            newsCategoryOptions={newsCategoryOptions}
             onChange={(field, value) => {
-              if (field === "categoryId") {
-                formik.setFieldValue("categoryId", Number(value));
+              if (field === "categoryId" || field === "newsCategoryId") {
+                formik.setFieldValue(field, Number(value));
                 return;
               }
 

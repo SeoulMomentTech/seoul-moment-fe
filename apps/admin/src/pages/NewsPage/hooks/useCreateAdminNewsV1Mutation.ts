@@ -1,7 +1,7 @@
 import { useAppMutation } from "@shared/hooks/useAppMutation";
 import {
-  createAdminNews,
-  type CreateAdminNewsRequest,
+  createAdminNewsV1,
+  type CreateAdminNewsRequestV1,
 } from "@shared/services/news";
 
 import {
@@ -11,20 +11,26 @@ import {
 
 import { NEWS_QUERY_KEY } from "./queryKeys";
 
-type CreateAdminNewsResponse = Awaited<ReturnType<typeof createAdminNews>>;
+type CreateAdminNewsV1Response = Awaited<
+  ReturnType<typeof createAdminNewsV1>
+>;
 
-type CreateAdminNewsOptions = Omit<
-  UseMutationOptions<CreateAdminNewsResponse, unknown, CreateAdminNewsRequest>,
+type CreateAdminNewsV1Options = Omit<
+  UseMutationOptions<
+    CreateAdminNewsV1Response,
+    unknown,
+    CreateAdminNewsRequestV1
+  >,
   "mutationFn"
 >;
 
-export const useCreateAdminNewsMutation = (
-  options?: CreateAdminNewsOptions,
+export const useCreateAdminNewsV1Mutation = (
+  options?: CreateAdminNewsV1Options,
 ) => {
   const queryClient = useQueryClient();
 
   return useAppMutation({
-    mutationFn: createAdminNews,
+    mutationFn: createAdminNewsV1,
     ...options,
     onSuccess: async (data, variables, context, mutation) => {
       await queryClient.invalidateQueries({ queryKey: NEWS_QUERY_KEY });
