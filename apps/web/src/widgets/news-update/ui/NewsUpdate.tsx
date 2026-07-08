@@ -17,7 +17,7 @@ export function NewsUpdate({ news }: NewsUpdateProps) {
       </h2>
       <div
         className={cn(
-          "h-ful flex h-[428px] w-full flex-1 flex-col gap-[20px] overflow-auto",
+          "h-ful flex h-[428px] w-full flex-1 flex-col gap-[20px] overflow-auto overscroll-contain",
           "scrollbar-thin scrollbar-color-transparent",
         )}
       >
