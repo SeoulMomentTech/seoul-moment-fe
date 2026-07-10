@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Seoul Moment frontend monorepo: a multilingual e-commerce/content platform with two apps and shared packages.
 
-- **apps/web** - Next.js 15 (App Router, Turbopack) main service with i18n (ko, en, zh-TW)
+- **apps/web** - Next.js 16 (App Router, Turbopack) main service with i18n (ko, en, zh-TW)
 - **apps/admin** - Vite 7 + React Router v7 SPA admin backoffice
 - **packages/ui** - Shared Radix UI component library (@seoul-moment/ui)
 - **packages/tailwind-config** - Shared Tailwind CSS v4 config

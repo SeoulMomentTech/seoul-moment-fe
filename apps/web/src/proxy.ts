@@ -5,7 +5,7 @@ import { routing } from "./i18n/routing";
 
 const intl = createMiddleware(routing);
 
-export default function middleware(req: NextRequest) {
+export default function proxy(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
 
   // 이미 /{locale}로 시작하면 next-intl만 통과

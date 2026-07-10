@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## App Overview
 
-`@seoul-moment/web` — Next.js 15 (App Router, Turbopack) multilingual e-commerce/content platform with i18n support (ko, en, zh-TW).
+`@seoul-moment/web` — Next.js 16 (App Router, Turbopack) multilingual e-commerce/content platform with i18n support (ko, en, zh-TW).
 
 ## Commands
 
@@ -80,7 +80,7 @@ available, falling back to `err.message` otherwise.
 
 ## i18n — next-intl v4
 
-- Middleware-based locale detection (`src/middleware.ts`)
+- Proxy-based locale detection (`src/proxy.ts` — Next 16 renamed the Middleware convention to Proxy; uses next-intl `createMiddleware`)
 - Messages in `messages/{locale}.json`
 - Translations sync from Google Sheets via `scripts/syncLocaleFromSheet.js`
 - Request interfaces extend `PublicLanguageCode` when locale-aware

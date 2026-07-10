@@ -18,9 +18,9 @@
     "lint:fix:web": "turbo run lint:fix --filter=@seoul-moment/web",
     "prepare": "husky",
     "start": "turbo run start --filter=@seoul-moment/web",
-    "test:e2e": "turbo run test:e2e",
     "test:admin-e2e": "turbo run test:e2e --filter=@seoul-moment/admin",
     "test:admin-e2e:ui": "turbo run test:e2e:ui --filter=@seoul-moment/admin",
+    "test:e2e": "turbo run test:e2e",
     "test:web-e2e": "turbo run test:e2e --filter=@seoul-moment/web",
     "test:web-e2e:ui": "turbo run test:e2e:ui --filter=@seoul-moment/web"
   },
@@ -35,5 +35,13 @@
     "prettier-plugin-tailwindcss": "^0.6.14",
     "turbo": "^2.1.2"
   },
-  "packageManager": "pnpm@10.18.3"
+  "packageManager": "pnpm@10.18.3",
+  "pnpm": {
+    "overrides": {
+      "@types/react": "19.2.17",
+      "@types/react-dom": "19.2.3",
+      "react": "19.2.7",
+      "react-dom": "19.2.7"
+    }
+  }
 }
