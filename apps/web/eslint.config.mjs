@@ -2,6 +2,15 @@ import nextJsConfig from "@seoul-moment/eslint-config/next-js";
 
 const config = [
   {
+    // next lint 제거(Next 16)로 eslint를 직접 실행하므로 빌드 산출물을 명시적으로 무시한다.
+    ignores: [
+      ".next/**",
+      "next-env.d.ts",
+      "coverage/**",
+      "playwright-report/**",
+    ],
+  },
+  {
     rules: {
       "no-restricted-imports": [
         "error",
