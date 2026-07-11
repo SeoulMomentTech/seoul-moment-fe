@@ -67,7 +67,7 @@ export default function StyleCard({
             textColor === "white" && "text-white",
           )}
         >
-          <span className="text-body-4 max-sm:text-body-5 block min-h-[1lh]">
+          <span className="text-body-4 max-sm:text-body-5 block min-h-5">
             {category}
           </span>
           <h4
