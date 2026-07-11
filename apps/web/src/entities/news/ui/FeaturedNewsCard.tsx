@@ -34,7 +34,6 @@ export function FeaturedMainNewsCard({
       style={{
         backgroundImage: `url(${imageUrl})`,
         backgroundBlendMode: "darken",
-        backgroundSize: "100% 100%",
       }}
     >
       <Card
