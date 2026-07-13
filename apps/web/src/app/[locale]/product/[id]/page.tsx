@@ -8,6 +8,7 @@ import { reportMetadataError } from "@shared/lib/utils/log/report-metadata-error
 import { getProductDetail } from "@shared/services/product";
 
 import type { LanguageType } from "@/i18n/const";
+import { buildLocalizedAlternates } from "@/i18n/metadata";
 import type { PageParams } from "@/types";
 
 import { ProductDetailPage } from "@views/product";
@@ -33,6 +34,7 @@ export async function generateMetadata({
     return {
       title: `${product.name} | ${t("title")}`,
       description: `${product.brand.name} - ${product.name}`,
+      alternates: buildLocalizedAlternates(locale, `/product/${productId}`),
       openGraph: {
         title: `${product.name} | ${t("title")}`,
         description: `${product.brand.name} - ${product.name}`,

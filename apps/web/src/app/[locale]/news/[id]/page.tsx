@@ -11,6 +11,7 @@ import { getNewsDetail, getNewsList } from "@shared/services/news";
 import { StructuredDataScript } from "@shared/ui/structured-data-script";
 
 import type { LanguageType } from "@/i18n/const";
+import { buildLocalizedAlternates } from "@/i18n/metadata";
 import { routing } from "@/i18n/routing";
 import type { PageParams } from "@/types";
 
@@ -61,6 +62,7 @@ export async function generateMetadata({
     return {
       title: `${news.title} | ${t("title")}`,
       description,
+      alternates: buildLocalizedAlternates(locale, `/news/${newsId}`),
       openGraph: {
         title: `${news.title} | ${t("title")}`,
         description,
