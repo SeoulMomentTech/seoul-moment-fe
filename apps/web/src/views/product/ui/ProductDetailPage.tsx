@@ -116,20 +116,20 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
               </div>
               {/** 가격 영역*/}
               <div className="flex flex-col gap-[20px]">
-                {data.price && (
+                {data.price > 0 && (
                   <div className={cn("text-body-3 flex", "text-body-4")}>
                     <span className="min-w-[120px]">{t("price")}</span>
                     <span
                       className={cn(
                         "text-black",
-                        data.discountPrice && "text-black/40 line-through",
+                        data.discountPrice > 0 && "text-black/40 line-through",
                       )}
                     >
                       {toNTCurrency(data.price)}
                     </span>
                   </div>
                 )}
-                {data.discountPrice && (
+                {data.discountPrice > 0 && (
                   <div className="flex items-center">
                     <span
                       className={cn(
@@ -164,7 +164,7 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
                   <span>{data.origin}</span>
                 </div>
               )}
-              {data.shippingInfo && (
+              {data.shippingInfo > 0 && (
                 <div className={cn("text-body-3 flex", "text-body-4")}>
                   <span className="min-w-[130px]">
                     {t("shipping_information")}
@@ -172,7 +172,7 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
                   <span>{t("within_days", { n: data.shippingInfo })}</span>
                 </div>
               )}
-              {data.shippingCost && (
+              {data.shippingCost > 0 && (
                 <div className={cn("text-body-3 flex", "text-body-4")}>
                   <span className="min-w-[130px]">{t("shipping_fee")}</span>
                   <span>{toNTCurrency(data.shippingCost)}</span>
