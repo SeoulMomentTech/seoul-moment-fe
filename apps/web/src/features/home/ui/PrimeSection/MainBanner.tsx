@@ -46,14 +46,14 @@ export function MainBanner({ promise }: MainBannerProps) {
         />
       </picture>
       <div className="absolute left-0 top-0 flex size-full items-center justify-center pt-14">
-        <p
+        <h1
           className={cn(
             "text-[80px] font-bold text-white",
             "max-sm:whitespace-pre max-sm:text-[40px]",
           )}
         >
           Seoul Moment
-        </p>
+        </h1>
       </div>
     </section>
   );

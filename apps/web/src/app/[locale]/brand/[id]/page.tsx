@@ -8,6 +8,7 @@ import { reportMetadataError } from "@shared/lib/utils/log/report-metadata-error
 import { getBrandDetail } from "@shared/services/brand";
 
 import type { LanguageType } from "@/i18n/const";
+import { buildLocalizedAlternates } from "@/i18n/metadata";
 import type { PageParams } from "@/types";
 
 import { BrandDetailPage } from "@views/brand";
@@ -32,13 +33,22 @@ export async function generateMetadata({
 
     const description = brand.description.replace(/<[^>]*>/g, "").slice(0, 160);
 
+    const images = brand.bannerList?.[0] ? [brand.bannerList[0]] : [];
+
     return {
       title: `${brand.name} | ${t("title")}`,
       description,
+      alternates: buildLocalizedAlternates(locale, `/brand/${brandId}`),
       openGraph: {
         title: `${brand.name} | ${t("title")}`,
         description,
-        images: brand.bannerList?.[0] ? [{ url: brand.bannerList[0] }] : [],
+        images: images.map((url) => ({ url })),
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: `${brand.name} | ${t("title")}`,
+        description,
+        images,
       },
     };
   } catch (error) {

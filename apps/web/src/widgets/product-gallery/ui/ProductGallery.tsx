@@ -16,9 +16,13 @@ import "swiper/css/thumbs";
 
 interface ProductGalleryProps {
   images: string[];
+  productName: string;
 }
 
-export default function ProductGallery({ images }: ProductGalleryProps) {
+export default function ProductGallery({
+  images,
+  productName,
+}: ProductGalleryProps) {
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperClass | null>(null);
 
   return (
@@ -47,11 +51,12 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
         {images.map((src, idx) => (
           <SwiperSlide key={`${src}-${idx + 1}`}>
             <Image
-              alt=""
+              alt={`${productName} - ${idx + 1}`}
               className="h-full"
               height={800}
+              priority={idx === 0}
+              sizes="(max-width: 640px) 100vw, 560px"
               src={src}
-              unoptimized
               width={800}
             />
           </SwiperSlide>
@@ -70,11 +75,11 @@ export default function ProductGallery({ images }: ProductGalleryProps) {
           {images.map((src, idx) => (
             <SwiperSlide key={`sub-${src}-${idx + 1}`}>
               <Image
-                alt=""
+                alt={`${productName} - thumbnail ${idx + 1}`}
                 className="object-contain"
                 height={800}
+                sizes="80px"
                 src={src}
-                unoptimized
                 width={800}
               />
             </SwiperSlide>

@@ -39,7 +39,7 @@ export function DetailMain({
   return (
     <section className={cn(styleMap.desktop.section, styleMap.mobile.section)}>
       <BaseImage
-        alt=""
+        alt={title}
         className={cn(styleMap.desktop.image, styleMap.mobile.image)}
         height={1200}
         priority
@@ -72,7 +72,7 @@ export function DetailMain({
           <div className="flex items-center gap-[10px] max-sm:gap-[4px]">
             <figure className="h-[40px] w-[40px] overflow-hidden rounded-full bg-slate-300 max-sm:h-[24px] max-sm:w-[24px]">
               <BaseImage
-                alt=""
+                alt={author}
                 className="h-full w-full"
                 height={50}
                 src={avatarUrl}

@@ -99,7 +99,7 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
                   key={`${image}-${idx + 1}`}
                 >
                   <Image
-                    alt=""
+                    alt={`${data.name} - ${idx + 1}`}
                     className={cn(
                       "h-[500px] w-[305px] bg-transparent",
                       "max-sm:h-[320px] max-sm:w-[208px]",
@@ -128,7 +128,7 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
               )}
             >
               <Image
-                alt=""
+                alt={data.name}
                 className="h-full object-cover"
                 height={600}
                 src={second.imageList[0]}
@@ -189,7 +189,7 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
               )}
             >
               <Image
-                alt=""
+                alt={data.name}
                 className="h-full object-cover"
                 height={600}
                 src={third.imageList[0]}
@@ -229,7 +229,7 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
                 )}
               >
                 <Image
-                  alt=""
+                  alt={data.name}
                   className="h-full object-cover"
                   height={600}
                   src={fourth.imageList[0]}
@@ -261,7 +261,7 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
                 )}
               >
                 <Image
-                  alt=""
+                  alt={data.name}
                   className="h-full object-cover"
                   height={600}
                   src={fifth.imageList[0]}

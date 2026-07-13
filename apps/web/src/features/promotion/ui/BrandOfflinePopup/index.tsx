@@ -20,7 +20,7 @@ interface BrandOnlineEventProps {
 }
 
 export function BrandOfflinePopup({ popupList }: BrandOnlineEventProps) {
-  const [selectedId, setSelectedId] = useState(popupList[0].id);
+  const [selectedId, setSelectedId] = useState(popupList[0]?.id);
   const isMobile = useMediaQuery("(max-width: 40rem)", false);
   const { copy } = useCopyToClipboard();
   const t = useTranslations();
@@ -32,6 +32,8 @@ export function BrandOfflinePopup({ popupList }: BrandOnlineEventProps) {
     await copy(activeEvent.address);
     toast.success("Address Copied");
   };
+
+  if (popupList.length === 0) return null;
 
   return (
     <section

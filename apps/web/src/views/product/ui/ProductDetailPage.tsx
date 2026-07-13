@@ -66,7 +66,7 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
             "max-sm:flex-col max-sm:gap-[30px] max-sm:border-b-transparent max-sm:pb-0",
           )}
         >
-          <ProductGallery images={data.subImage} />
+          <ProductGallery images={data.subImage} productName={data.name} />
           <div className="w-full max-sm:px-[20px]">
             <h2
               className={cn(

@@ -73,34 +73,36 @@ function Desktop() {
             width={200}
           />
         </Link>
-        <ul className="flex gap-[40px]">
-          <li>
-            <Link
-              className={cn(
-                styleMap.deskTop.menu,
-                pathname === "/product" && "font-semibold",
-              )}
-              href="/product"
-              prefetch={ENABLE_HEADER_PREFETCH}
-            >
-              {t("product")}
-            </Link>
-          </li>
-          <li>
-            <Link
-              className={cn(
-                styleMap.deskTop.menu,
-                pathname === "/news" && "font-semibold",
-              )}
-              href="/news"
-              prefetch={ENABLE_HEADER_PREFETCH}
-            >
-              {t("news")}
-            </Link>
-          </li>
-        </ul>
+        <nav aria-label="Primary">
+          <ul className="flex gap-[40px]">
+            <li>
+              <Link
+                className={cn(
+                  styleMap.deskTop.menu,
+                  pathname === "/product" && "font-semibold",
+                )}
+                href="/product"
+                prefetch={ENABLE_HEADER_PREFETCH}
+              >
+                {t("product")}
+              </Link>
+            </li>
+            <li>
+              <Link
+                className={cn(
+                  styleMap.deskTop.menu,
+                  pathname === "/news" && "font-semibold",
+                )}
+                href="/news"
+                prefetch={ENABLE_HEADER_PREFETCH}
+              >
+                {t("news")}
+              </Link>
+            </li>
+          </ul>
+        </nav>
       </div>
-      <div className="items-center-safe flex gap-[40px]">
+      <nav aria-label="Secondary" className="items-center-safe flex gap-[40px]">
         <ul className="flex items-center gap-[40px]">
           <li>
             <Link
@@ -147,7 +149,7 @@ function Desktop() {
             <LoginStatus />
           </li>
         </ul>
-      </div>
+      </nav>
     </div>
   );
 }
@@ -192,88 +194,90 @@ function Mobile() {
               <SheetDescription className="sr-only" />
             </SheetHeader>
             <div className="flex h-full flex-col justify-between">
-              <ul className="flex flex-col">
-                <li>
-                  <Link
-                    className={styleMap.mobile.menu}
-                    href="/product"
-                    onClick={() => {
-                      setIsOpen(false);
-                    }}
-                    prefetch={ENABLE_HEADER_PREFETCH}
-                  >
-                    {t("product")}
-                    <ChevronRightIcon height={16} width={16} />
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    className={styleMap.mobile.menu}
-                    href="/news"
-                    onClick={() => {
-                      setIsOpen(false);
-                    }}
-                    prefetch={ENABLE_HEADER_PREFETCH}
-                  >
-                    {t("news")}
-                    <ChevronRightIcon height={16} width={16} />
-                  </Link>
-                </li>
-                <li>
-                  <button
-                    className={cn(styleMap.mobile.menu, "w-full")}
-                    onClick={() => {
-                      setIsOpen(false);
-                      setIsBrandModalOpen(true);
-                    }}
-                    type="button"
-                  >
-                    {t("brand")}
-                    <ChevronRightIcon height={16} width={16} />
-                  </button>
-                </li>
-                <li>
-                  <Link
-                    className={styleMap.mobile.menu}
-                    href="/about"
-                    onClick={() => {
-                      setIsOpen(false);
-                    }}
-                    prefetch={ENABLE_HEADER_PREFETCH}
-                  >
-                    {t("about")}
-                    <ChevronRightIcon height={16} width={16} />
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    className={styleMap.mobile.menu}
-                    href="/contact"
-                    onClick={() => {
-                      setIsOpen(false);
-                    }}
-                    prefetch={ENABLE_HEADER_PREFETCH}
-                  >
-                    {t("contact")}
-                    <ChevronRightIcon height={16} width={16} />
-                  </Link>
-                </li>
-                {showMypage && (
+              <nav aria-label="Primary">
+                <ul className="flex flex-col">
                   <li>
                     <Link
                       className={styleMap.mobile.menu}
-                      href="/mypage"
+                      href="/product"
                       onClick={() => {
                         setIsOpen(false);
                       }}
                       prefetch={ENABLE_HEADER_PREFETCH}
                     >
-                      MyPage
+                      {t("product")}
                       <ChevronRightIcon height={16} width={16} />
                     </Link>
                   </li>
-                )}
-              </ul>
+                  <li>
+                    <Link
+                      className={styleMap.mobile.menu}
+                      href="/news"
+                      onClick={() => {
+                        setIsOpen(false);
+                      }}
+                      prefetch={ENABLE_HEADER_PREFETCH}
+                    >
+                      {t("news")}
+                      <ChevronRightIcon height={16} width={16} />
+                    </Link>
+                  </li>
+                  <li>
+                    <button
+                      className={cn(styleMap.mobile.menu, "w-full")}
+                      onClick={() => {
+                        setIsOpen(false);
+                        setIsBrandModalOpen(true);
+                      }}
+                      type="button"
+                    >
+                      {t("brand")}
+                      <ChevronRightIcon height={16} width={16} />
+                    </button>
+                  </li>
+                  <li>
+                    <Link
+                      className={styleMap.mobile.menu}
+                      href="/about"
+                      onClick={() => {
+                        setIsOpen(false);
+                      }}
+                      prefetch={ENABLE_HEADER_PREFETCH}
+                    >
+                      {t("about")}
+                      <ChevronRightIcon height={16} width={16} />
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      className={styleMap.mobile.menu}
+                      href="/contact"
+                      onClick={() => {
+                        setIsOpen(false);
+                      }}
+                      prefetch={ENABLE_HEADER_PREFETCH}
+                    >
+                      {t("contact")}
+                      <ChevronRightIcon height={16} width={16} />
+                    </Link>
+                  </li>
+                  {showMypage && (
+                    <li>
+                      <Link
+                        className={styleMap.mobile.menu}
+                        href="/mypage"
+                        onClick={() => {
+                          setIsOpen(false);
+                        }}
+                        prefetch={ENABLE_HEADER_PREFETCH}
+                      >
+                        MyPage
+                        <ChevronRightIcon height={16} width={16} />
+                      </Link>
+                    </li>
+                  )}
+                </ul>
+              </nav>
               <div className="flex items-center pb-[33px]">
                 {Object.entries(localeLabels).map(
                   ([code, label], index, array) => (

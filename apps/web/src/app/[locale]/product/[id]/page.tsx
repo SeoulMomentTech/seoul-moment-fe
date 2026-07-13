@@ -31,14 +31,24 @@ export async function generateMetadata({
   try {
     const { data: product } = await fetchProductDetail(productId, locale);
 
+    const title = `${product.name} | ${t("title")}`;
+    const description = `${product.brand.name} - ${product.name}`;
+    const images = product.subImage?.[0] ? [product.subImage[0]] : [];
+
     return {
-      title: `${product.name} | ${t("title")}`,
-      description: `${product.brand.name} - ${product.name}`,
+      title,
+      description,
       alternates: buildLocalizedAlternates(locale, `/product/${productId}`),
       openGraph: {
-        title: `${product.name} | ${t("title")}`,
-        description: `${product.brand.name} - ${product.name}`,
-        images: product.subImage?.[0] ? [{ url: product.subImage[0] }] : [],
+        title,
+        description,
+        images: images.map((url) => ({ url })),
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+        images,
       },
     };
   } catch (error) {

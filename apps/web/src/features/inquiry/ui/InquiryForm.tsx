@@ -59,7 +59,7 @@ export default function InquiryForm() {
   const formValues = watch();
 
   const isEmpty = Object.entries(formValues).some(([key, value]) => {
-    if (key === "subject" && emailSubject !== "기타") {
+    if (key === "subject" && emailSubject !== "etc") {
       return false;
     }
 
@@ -129,7 +129,7 @@ export default function InquiryForm() {
         to: "seoulmomenttw@gmail.com",
         html: message,
         name,
-        subject: emailSubject === "기타" ? subject : emailSubject,
+        subject: emailSubject === "etc" ? subject : emailSubject,
       });
       setModalOpen({
         type: "success",
