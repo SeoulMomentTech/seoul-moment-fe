@@ -27,6 +27,9 @@ import { inquiryFormRezolver, type InquiryFormValues } from "../model/schema";
 
 const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ?? "";
 
+// "기타(직접 입력)" 문의 유형의 select 값. 이 값일 때만 subject 입력이 활성화·검증된다.
+const ETC_SUBJECT = "etc";
+
 export default function InquiryForm() {
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [modalOpen, setModalOpen] = useState<ModalStatus | null>(null);
@@ -59,7 +62,7 @@ export default function InquiryForm() {
   const formValues = watch();
 
   const isEmpty = Object.entries(formValues).some(([key, value]) => {
-    if (key === "subject" && emailSubject !== "etc") {
+    if (key === "subject" && emailSubject !== ETC_SUBJECT) {
       return false;
     }
 
@@ -129,7 +132,7 @@ export default function InquiryForm() {
         to: "seoulmomenttw@gmail.com",
         html: message,
         name,
-        subject: emailSubject === "etc" ? subject : emailSubject,
+        subject: emailSubject === ETC_SUBJECT ? subject : emailSubject,
       });
       setModalOpen({
         type: "success",
@@ -227,12 +230,12 @@ export default function InquiryForm() {
                   <SelectItem value="listing_inquiry">
                     {t("listing_inquiry")}
                   </SelectItem>
-                  <SelectItem value="etc">{t("etc")}</SelectItem>
+                  <SelectItem value={ETC_SUBJECT}>{t("etc")}</SelectItem>
                 </SelectContent>
               </Select>
               <Input
                 {...register("subject")}
-                disabled={emailSubject !== "etc"}
+                disabled={emailSubject !== ETC_SUBJECT}
               />
             </div>
             {errors.subject && (
