@@ -1,5 +1,6 @@
 import type { PropsWithChildren } from "react";
 
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Script from "next/script";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
@@ -7,6 +8,7 @@ import { getMessages, getTranslations } from "next-intl/server";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Toaster } from "sonner";
 
+import { BASE_URL } from "@shared/constants/env";
 import GlobalQueryHandler from "@shared/lib/components/GlobalQueryHandler";
 import { ReactQueryProvider } from "@shared/lib/providers";
 import ScrollRestoration from "@shared/ui/scroll-restoration";
@@ -24,27 +26,31 @@ interface Props {
   }>;
 }
 
-export async function generateMetadata() {
+export async function generateMetadata(): Promise<Metadata> {
   try {
     const t = await getTranslations();
 
     return {
+      metadataBase: new URL(BASE_URL),
       title: t("seo_main_title"),
       description: t("seo_main_description"),
-      alternates: {
-        canonical: "https://seoulmoment.com.tw",
-      },
       openGraph: {
         title: t("seo_main_title"),
         description: t("seo_main_description"),
         images: [
           {
-            url: "https://seoulmoment.com.tw/og-image.png",
+            url: "/og-image.png",
             width: 1200,
             height: 630,
             alt: "Seoul Moment OG Image",
           },
         ],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: t("seo_main_title"),
+        description: t("seo_main_description"),
+        images: ["/og-image.png"],
       },
     };
   } catch {
@@ -64,7 +70,7 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang={locale ?? "ko"}>
+    <html lang={locale ?? routing.defaultLocale}>
       <head>
         <meta
           content="tkdfXJ6-ynp9D_0x2zpVyESgoJIA3YtbN5LxrpjEGxQ"

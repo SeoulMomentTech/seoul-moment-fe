@@ -5,6 +5,7 @@ import { ChevronRight, HeartIcon } from "lucide-react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 
+import { useLanguage } from "@shared/lib/hooks";
 import { cn } from "@shared/lib/style";
 import { toNTCurrency } from "@shared/lib/utils";
 import type { UserBrandLike } from "@shared/services/userLike";
@@ -25,6 +26,7 @@ const SLOT_COUNT = 4;
 
 export function InterestBrandCard({ data, className }: InterestBrandCardProps) {
   const t = useTranslations();
+  const locale = useLanguage();
   const { liked, handleToggleLike } = useBrandLikeToggle({
     brandId: data.brandId,
     isLiked: true,
@@ -59,7 +61,8 @@ export function InterestBrandCard({ data, className }: InterestBrandCardProps) {
               />
             </span>
             <span className="text-body-5 truncate text-black/40">
-              {data.brandName} | 관심 {formatLikeCount(data.totalLikeCount)}
+              {data.brandName} | 관심{" "}
+              {formatLikeCount(data.totalLikeCount, locale)}
             </span>
           </div>
         </Link>
