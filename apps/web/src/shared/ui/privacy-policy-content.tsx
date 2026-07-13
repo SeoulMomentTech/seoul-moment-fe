@@ -143,7 +143,7 @@ export function PrivacyPolicyContent(): ReactNode {
             items={[
               "第三方電商平台：本平台為導購平台，點擊購買連結後將導向第三方電商平台（包括但不限於蝦皮購物、酷澎等）完成交易；可能透過網址參數或其他技術傳遞必要資訊；本公司作為賣家將依平台規則取得必要訂單資訊（如姓名、電話、地址等）以履行交易；第三方平台對個資之處理依各該平台隱私權政策辦理",
               "服務提供商：網站託管、客戶服務、電子郵件、數據分析、雲端服務、行銷服務等供應商；本公司僅在必要範圍內提供，並要求其遵守保密義務及相關法令規定",
-              "廣告及分析合作夥伴：與廣告平台（如Google Ads、Facebook Ads、LINE Ads）、網站分析工具（如Google Analytics）、社群媒體平台分享去識別化或匿名化之資料",
+              "廣告及分析合作夥伴：與廣告平台（如Google AdSense、Google Ads、Facebook Ads、LINE Ads）、網站分析工具（如Google Analytics）、社群媒體平台分享去識別化或匿名化之資料。第三方廣告供應商（包括Google）會使用Cookie，根據您先前造訪本平台及其他網站的紀錄放送個人化廣告",
               "法律要求或保護權益：依法令規定或司法、檢調機關之要求；為保護本公司、其他使用者或公眾之權利、財產或安全；為防止詐欺、安全威脅或違法行為；執行本服務條款或本隱私權政策",
               "企業交易：如本公司進行合併、收購、出售資產或其他企業交易，您的個人資料可能作為交易之一部分移轉予承接方；本公司將事前通知您，並確保承接方遵守本隱私權政策或提供同等保護",
             ]}
@@ -244,7 +244,7 @@ export function PrivacyPolicyContent(): ReactNode {
               "必要性Cookie（無法關閉）：維持網站基本功能運作、辨識會員登入狀態、記住您的偏好設定、保護網站及使用者安全",
               "功能性Cookie：記住您的語言偏好、記住您的瀏覽偏好、提供個人化內容",
               "效能分析Cookie：分析網站流量及使用情況、瞭解使用者如何使用網站、改善網站功能及使用者體驗（本平台使用Google Analytics進行網站分析）",
-              "行銷Cookie：追蹤您的瀏覽行為、提供個人化廣告內容、評估廣告效益（本平台可能使用Google Ads、Facebook Pixel等追蹤工具）",
+              "行銷Cookie：追蹤您的瀏覽行為、提供個人化廣告內容、評估廣告效益（本平台可能使用Google AdSense、Google Ads、Facebook Pixel等追蹤工具；Google會使用廣告Cookie放送並管理廣告）",
             ]}
           />
         </SubSection>
@@ -253,6 +253,7 @@ export function PrivacyPolicyContent(): ReactNode {
           <Bullets
             items={[
               "Google Analytics — 用途：網站流量分析；隱私權政策：https://policies.google.com/privacy",
+              "Google AdSense — 用途：第三方廣告放送及個人化廣告（Google使用廣告Cookie）；您可於 https://policies.google.com/technologies/ads 進一步瞭解並管理廣告設定；隱私權政策：https://policies.google.com/privacy",
               "Google Ads / Google Tag Manager — 用途：廣告投放及轉換追蹤；隱私權政策：https://policies.google.com/privacy",
               "Facebook Pixel — 用途：廣告投放及成效追蹤；隱私權政策：https://www.facebook.com/privacy/",
               "LINE Tag — 用途：廣告投放及成效追蹤；隱私權政策：https://terms.line.me/line_rules/",
@@ -386,7 +387,7 @@ export function PrivacyPolicyContent(): ReactNode {
         </SubSection>
       </Section>
 
-      <Paragraph>最後更新日期：2024年11月26日</Paragraph>
+      <Paragraph>最後更新日期：2026年7月13日</Paragraph>
     </LegalDocument>
   );
 }

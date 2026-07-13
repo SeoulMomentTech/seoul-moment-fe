@@ -61,24 +61,38 @@ export function Footer() {
             </div>
           </div>
           <div className="flex h-fit flex-1 justify-end gap-[10px]">
-            <Link
+            <a
               className={cn(
                 "flex items-center",
                 "max-sm:h-[36px] max-sm:w-[36px]",
               )}
-              href="/"
+              href="https://www.threads.com/@seoul_moment_tw"
+              rel="noopener noreferrer"
+              target="_blank"
             >
-              <Image alt="" height={50} src="/sns/thread.svg" width={50} />
-            </Link>
-            <Link
+              <Image
+                alt="Seoul Moment Threads"
+                height={50}
+                src="/sns/thread.svg"
+                width={50}
+              />
+            </a>
+            <a
               className={cn(
                 "flex items-center",
                 "max-sm:h-[36px] max-sm:w-[36px]",
               )}
-              href="/"
+              href="https://www.instagram.com/seoul_moment_tw"
+              rel="noopener noreferrer"
+              target="_blank"
             >
-              <Image alt="" height={50} src="/sns/insta.svg" width={50} />
-            </Link>
+              <Image
+                alt="Seoul Moment Instagram"
+                height={50}
+                src="/sns/insta.svg"
+                width={50}
+              />
+            </a>
           </div>
         </div>
         <div className={cn("flex flex-col py-[40px] text-white/80")}>
