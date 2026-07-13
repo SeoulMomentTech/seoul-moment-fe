@@ -162,6 +162,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     //{ path: "/magazine", changeFrequency: "weekly", priority: 0.8 },
     { path: "/news", changeFrequency: "daily", priority: 0.8 },
     { path: "/contact", changeFrequency: "monthly", priority: 0.6 },
+    { path: "/policy", changeFrequency: "yearly", priority: 0.3 },
+    { path: "/terms", changeFrequency: "yearly", priority: 0.3 },
   ] as const;
 
   const [productIds, brandIds, newsIds, articleIds] = await Promise.all([
