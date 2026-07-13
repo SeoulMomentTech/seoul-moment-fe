@@ -59,15 +59,24 @@ export async function generateMetadata({
 
     const description = stripHtml(news.content).slice(0, 160);
 
+    const title = `${news.title} | ${t("title")}`;
+    const images = news.banner ? [news.banner] : [];
+
     return {
-      title: `${news.title} | ${t("title")}`,
+      title,
       description,
       alternates: buildLocalizedAlternates(locale, `/news/${newsId}`),
       openGraph: {
-        title: `${news.title} | ${t("title")}`,
+        title,
         description,
-        images: news.banner ? [{ url: news.banner }] : [],
+        images: images.map((url) => ({ url })),
         type: "article",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+        images,
       },
     };
   } catch (error) {

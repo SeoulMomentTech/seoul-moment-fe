@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { debounce } from "es-toolkit";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 import { useUserAuthStore } from "@shared/lib/hooks/useUserAuthStore";
@@ -30,6 +31,7 @@ export function useProductLikeToggle({
   likeCount,
 }: UseProductLikeToggleProps): UseProductLikeToggleReturn {
   const { isAuthenticated } = useUserAuthStore();
+  const t = useTranslations();
 
   const [liked, setLiked] = useState(isLiked);
   const [syncedLiked, setSyncedLiked] = useState(isLiked);
@@ -65,7 +67,7 @@ export function useProductLikeToggle({
 
   const handleToggleLike = () => {
     if (!isAuthenticated) {
-      toast.error("로그인이 필요합니다.");
+      toast.error(t("login_required"));
       return;
     }
 

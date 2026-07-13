@@ -12,15 +12,14 @@ import { cn } from "@shared/lib/style";
 
 interface StatItem {
   key: string;
-  label: string;
   icon: LucideIcon;
   value?: string;
 }
 
 const STATS: ReadonlyArray<StatItem> = [
-  { key: "like", label: "좋아요", icon: HeartIcon },
-  { key: "review", label: "리뷰", icon: MessageSquareTextIcon },
-  { key: "notice", label: "공지사항", icon: FileTextIcon },
+  { key: "like", icon: HeartIcon },
+  { key: "review", icon: MessageSquareTextIcon },
+  { key: "notice", icon: FileTextIcon },
 ];
 
 function StatIcon({ icon }: Pick<StatItem, "icon">) {
