@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
+import { getQueryClient, HydrateClient } from "@shared/lib/query";
 import { reportMetadataError } from "@shared/lib/utils/log/report-metadata-error";
 import { getProductDetail } from "@shared/services/product";
 
@@ -60,12 +61,24 @@ export async function generateMetadata({
 export default async function ProductDetail({
   params,
 }: PageParams<{ id: string }>) {
-  const { id } = await params;
+  const { id, locale } = await params;
   const productId = Number(id);
 
   if (!Number.isInteger(productId) || !productId) {
     notFound();
   }
 
-  return <ProductDetailPage id={productId} />;
+  // 클라이언트(ProductDetailPage)와 동일한 queryKey로 서버에서 미리 채운다.
+  // fetchProductDetail은 cache()로 감싸져 있어 generateMetadata와 네트워크 요청을 공유한다(이동당 1회).
+  const queryClient = getQueryClient();
+  await queryClient.prefetchQuery({
+    queryKey: ["product-detail", productId, locale],
+    queryFn: () => fetchProductDetail(productId, locale),
+  });
+
+  return (
+    <HydrateClient>
+      <ProductDetailPage id={productId} />
+    </HydrateClient>
+  );
 }

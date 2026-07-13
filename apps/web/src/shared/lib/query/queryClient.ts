@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import { isKyError } from "ky";
 import { toast } from "sonner";
 
@@ -30,6 +32,8 @@ function makeQueryClient() {
         shouldDehydrateQuery: (query) =>
           defaultShouldDehydrateQuery(query) ||
           query.state.status === "pending",
+        // Next.js가 동적 페이지를 감지하는 서버 에러를 삼키지 않도록 redact를 끈다.
+        shouldRedactErrors: () => false,
       },
     },
     queryCache: new QueryCache({
@@ -85,12 +89,17 @@ function makeQueryClient() {
   });
 }
 
+// 서버에서는 React cache()로 요청 스코프 싱글톤을 만든다. 같은 요청 안에서
+// prefetch(page)와 dehydrate(HydrateClient)가 동일 인스턴스를 공유하고,
+// cache()가 요청 단위로 격리되므로 요청 간 캐시 오염도 없다.
+const getServerQueryClient = cache(makeQueryClient);
+
 let browserQueryClient: QueryClient | undefined = undefined;
 
 /**
  * 실행 환경에 맞는 QueryClient를 반환한다.
  *
- * - 서버: 요청마다 새 인스턴스를 만들어 요청 간 캐시 오염을 막는다.
+ * - 서버: 요청 스코프로 동일 인스턴스를 재사용한다(React cache).
  * - 브라우저: 최초 1회만 만들고 이후 동일 인스턴스를 재사용한다(싱글톤).
  *
  * suspense 경계 이전에서 useState로 초기화하면 초기 렌더 suspend 시
@@ -98,7 +107,7 @@ let browserQueryClient: QueryClient | undefined = undefined;
  */
 export function getQueryClient() {
   if (isServer) {
-    return makeQueryClient();
+    return getServerQueryClient();
   }
 
   if (!browserQueryClient) {
