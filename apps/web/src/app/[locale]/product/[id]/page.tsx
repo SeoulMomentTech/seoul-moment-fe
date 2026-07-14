@@ -60,12 +60,19 @@ export async function generateMetadata({
 export default async function ProductDetail({
   params,
 }: PageParams<{ id: string }>) {
-  const { id } = await params;
+  const { id, locale } = await params;
   const productId = Number(id);
 
   if (!Number.isInteger(productId) || !productId) {
     notFound();
   }
 
-  return <ProductDetailPage id={productId} />;
+  // fetchProductDetail은 cache()로 감싸져 generateMetadata와 네트워크 요청을 공유한다(이동당 1회).
+  // 받은 응답을 initialData로 넘겨 클라이언트 useAppQuery의 초기값으로 쓴다.
+  // (마운트 재요청 없음 + 캐시 엔트리 유지로 인증 사용자 isLiked 재조회 가능.)
+  const initialData = await fetchProductDetail(productId, locale).catch(() =>
+    notFound(),
+  );
+
+  return <ProductDetailPage id={productId} initialData={initialData} />;
 }

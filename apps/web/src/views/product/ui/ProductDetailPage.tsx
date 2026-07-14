@@ -7,9 +7,13 @@ import { StarIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { useAppQuery, useLanguage } from "@shared/lib/hooks";
+import { useUserAuthStore } from "@shared/lib/hooks/useUserAuthStore";
 import { cn } from "@shared/lib/style";
 import { setComma, toNTCurrency } from "@shared/lib/utils";
-import { getProductDetail } from "@shared/services/product";
+import {
+  getProductDetail,
+  type GetProductDetailRes,
+} from "@shared/services/product";
 import { AvatarBadge } from "@widgets/avatar-badge/ui/AvatarBadge";
 import { LikeCount } from "@widgets/like-count/ui/LikeCount";
 
@@ -18,20 +22,30 @@ import { Link } from "@/i18n/navigation";
 import { useProductLikeToggle, useTrackRecentProduct } from "@entities/product";
 import { BrandProductList, ProductExternalGroup } from "@features/product";
 import { Button } from "@seoul-moment/ui";
+import type { CommonRes } from "@shared/services";
 import { ProductDetailImage } from "@widgets/product-detail-image";
 import { ProductGallery } from "@widgets/product-gallery";
 
 interface ProductDetailPageProps {
   id: number;
+  initialData: CommonRes<GetProductDetailRes>;
 }
 
-export default function ProductDetailPage({ id }: ProductDetailPageProps) {
+export default function ProductDetailPage({
+  id,
+  initialData,
+}: ProductDetailPageProps) {
   const languageCode = useLanguage();
+  const { isAuthenticated } = useUserAuthStore();
   const { data } = useAppQuery({
     queryKey: ["product-detail", id, languageCode],
     queryFn: () => getProductDetail({ id, languageCode }),
     select: (res) => res.data,
-    enabled: !!id,
+    initialData,
+    // SSR fetch는 accessToken 없이 호출되어 isLiked가 false다.
+    // stale 마킹 + 인증된 경우에만 재조회해 개인화 값(isLiked)을 정확히 채운다.
+    initialDataUpdatedAt: 0,
+    enabled: !!id && isAuthenticated,
     throwOnError: true,
   });
 
@@ -55,28 +69,28 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
   return (
     <div
       className={cn(
-        "px-[20px] pb-[100px] pt-[106px]",
-        "max-sm:px-0 max-sm:pb-0 max-sm:pt-[56px]",
+        "pb-25 pt-26.5 px-5",
+        "max-sm:px-0 max-sm:pb-0 max-sm:pt-14",
       )}
     >
       <section className={cn("mx-auto w-[1200px]", "max-sm:w-full")}>
         <div
           className={cn(
-            "flex gap-[80px] border-b border-b-black/10 pb-[50px]",
-            "max-sm:flex-col max-sm:gap-[30px] max-sm:border-b-transparent max-sm:pb-0",
+            "pb-12.5 flex gap-20 border-b border-b-black/10",
+            "max-sm:gap-7.5 max-sm:flex-col max-sm:border-b-transparent max-sm:pb-0",
           )}
         >
           <ProductGallery images={data.subImage} productName={data.name} />
-          <div className="w-full max-sm:px-[20px]">
+          <div className="w-full max-sm:px-5">
             <h2
               className={cn(
-                "text-title-4 mb-[20px] font-bold",
+                "text-title-4 mb-5 font-bold",
                 "max-sm:text-body-2",
               )}
             >
               {data.name}
             </h2>
-            <div className="flex items-center justify-between py-[10px]">
+            <div className="flex items-center justify-between py-2.5">
               <Link href={`/product?brandId=${data.brand.id}`}>
                 <AvatarBadge
                   avatarUrl={data.brand.profileImg}
@@ -93,11 +107,11 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
             </div>
             <div
               className={cn(
-                "flex flex-col gap-[30px] border-b border-b-black/10 pb-[20px] pt-[10px]",
-                "max-sm:gap-[20px]",
+                "gap-7.5 flex flex-col border-b border-b-black/10 pb-5 pt-2.5",
+                "max-sm:gap-5",
               )}
             >
-              <div className="flex gap-[4px]">
+              <div className="flex gap-1">
                 <div className="flex items-center">
                   <StarIcon
                     className="text-transparent"
@@ -115,10 +129,10 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
                 </span>
               </div>
               {/** 가격 영역*/}
-              <div className="flex flex-col gap-[20px]">
+              <div className="flex flex-col gap-5">
                 {data.price > 0 && (
                   <div className={cn("text-body-3 flex", "text-body-4")}>
-                    <span className="min-w-[120px]">{t("price")}</span>
+                    <span className="min-w-30">{t("price")}</span>
                     <span
                       className={cn(
                         "text-black",
@@ -133,7 +147,7 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
                   <div className="flex items-center">
                     <span
                       className={cn(
-                        "text-body-3 min-w-[120px]",
+                        "text-body-3 min-w-30",
                         "max-sm:text-body-4",
                       )}
                     >
@@ -154,19 +168,19 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
             {/** 원산지, 배송 정보 */}
             <div
               className={cn(
-                "flex flex-col gap-[20px] pb-[50px] pt-[20px]",
-                "max-sm:gap-[16px] max-sm:pb-[16px]",
+                "pb-12.5 flex flex-col gap-5 pt-5",
+                "max-sm:gap-4 max-sm:pb-4",
               )}
             >
               {data.origin && (
                 <div className={cn("text-body-3 flex", "text-body-4")}>
-                  <span className="min-w-[130px]">{t("place_of_origin")}</span>
+                  <span className="min-w-32.5">{t("place_of_origin")}</span>
                   <span>{data.origin}</span>
                 </div>
               )}
               {data.shippingInfo > 0 && (
                 <div className={cn("text-body-3 flex", "text-body-4")}>
-                  <span className="min-w-[130px]">
+                  <span className="min-w-32.5">
                     {t("shipping_information")}
                   </span>
                   <span>{t("within_days", { n: data.shippingInfo })}</span>
@@ -174,21 +188,21 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
               )}
               {data.shippingCost > 0 && (
                 <div className={cn("text-body-3 flex", "text-body-4")}>
-                  <span className="min-w-[130px]">{t("shipping_fee")}</span>
+                  <span className="min-w-32.5">{t("shipping_fee")}</span>
                   <span>{toNTCurrency(data.shippingCost)}</span>
                 </div>
               )}
               {/* 색상 정보 */}
               {data.option?.COLOR?.length > 0 && (
                 <div className={cn("text-body-3 flex", "text-body-4")}>
-                  <span className="min-w-[130px]">{t("color")}</span>
+                  <span className="min-w-32.5">{t("color")}</span>
                   <span>{data.option.COLOR[0].value}</span>
                 </div>
               )}
               {/* 사이즈 */}
               {data.option?.SIZE?.length > 0 && (
                 <div className={cn("text-body-3 flex", "text-body-4")}>
-                  <span className="min-w-[130px]">{t("size")}</span>
+                  <span className="min-w-32.5">{t("size")}</span>
                   <span>
                     {data.option.SIZE.map((item) => item.value).join("/")}
                   </span>
@@ -203,7 +217,7 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
           <div
             className={cn(
               "flex items-center justify-center",
-              "absolute bottom-0 left-0 w-full py-[20px]",
+              "absolute bottom-0 left-0 w-full py-5",
             )}
             style={{
               background:
@@ -213,7 +227,7 @@ export default function ProductDetailPage({ id }: ProductDetailPageProps) {
             <Button
               className={cn(
                 "border-black/20 bg-transparent",
-                "text-body-2 max-sm:mx-[20px] max-sm:w-full",
+                "text-body-2 max-sm:mx-5 max-sm:w-full",
                 showMore && "hidden",
               )}
               onClick={() => handleToggleShowMore(!showMore)}

@@ -112,7 +112,10 @@ export default async function RootLayout({
           </>
         )}
       </head>
-      <body className="antialiased">
+      {/* 브라우저 확장(비밀번호 관리자·번역기 등)이 <body>에 속성을 주입해
+          하이드레이션 경고가 발생하는 것을 막는다. 이 요소의 속성 diff만
+          건너뛰며, 자식 콘텐츠의 불일치는 그대로 검출된다. */}
+      <body className="antialiased" suppressHydrationWarning>
         <ScrollRestoration />
         <NuqsAdapter>
           <NextIntlClientProvider messages={messages}>
