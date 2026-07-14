@@ -4,7 +4,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
-import { getQueryClient, HydrateClient } from "@shared/lib/query";
 import { reportMetadataError } from "@shared/lib/utils/log/report-metadata-error";
 import { getProductDetail } from "@shared/services/product";
 
@@ -68,17 +67,12 @@ export default async function ProductDetail({
     notFound();
   }
 
-  // 클라이언트(ProductDetailPage)와 동일한 queryKey로 서버에서 미리 채운다.
-  // fetchProductDetail은 cache()로 감싸져 있어 generateMetadata와 네트워크 요청을 공유한다(이동당 1회).
-  const queryClient = getQueryClient();
-  await queryClient.prefetchQuery({
-    queryKey: ["product-detail", productId, locale],
-    queryFn: () => fetchProductDetail(productId, locale),
-  });
-
-  return (
-    <HydrateClient>
-      <ProductDetailPage id={productId} />
-    </HydrateClient>
+  // fetchProductDetail은 cache()로 감싸져 generateMetadata와 네트워크 요청을 공유한다(이동당 1회).
+  // 받은 응답을 initialData로 넘겨 클라이언트 useAppQuery의 초기값으로 쓴다.
+  // (마운트 재요청 없음 + 캐시 엔트리 유지로 인증 사용자 isLiked 재조회 가능.)
+  const initialData = await fetchProductDetail(productId, locale).catch(() =>
+    notFound(),
   );
+
+  return <ProductDetailPage id={productId} initialData={initialData} />;
 }

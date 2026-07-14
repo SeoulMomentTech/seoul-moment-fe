@@ -7,9 +7,13 @@ import { StarIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { useAppQuery, useLanguage } from "@shared/lib/hooks";
+import { useUserAuthStore } from "@shared/lib/hooks/useUserAuthStore";
 import { cn } from "@shared/lib/style";
 import { setComma, toNTCurrency } from "@shared/lib/utils";
-import { getProductDetail } from "@shared/services/product";
+import {
+  getProductDetail,
+  type GetProductDetailRes,
+} from "@shared/services/product";
 import { AvatarBadge } from "@widgets/avatar-badge/ui/AvatarBadge";
 import { LikeCount } from "@widgets/like-count/ui/LikeCount";
 
@@ -18,20 +22,30 @@ import { Link } from "@/i18n/navigation";
 import { useProductLikeToggle, useTrackRecentProduct } from "@entities/product";
 import { BrandProductList, ProductExternalGroup } from "@features/product";
 import { Button } from "@seoul-moment/ui";
+import type { CommonRes } from "@shared/services";
 import { ProductDetailImage } from "@widgets/product-detail-image";
 import { ProductGallery } from "@widgets/product-gallery";
 
 interface ProductDetailPageProps {
   id: number;
+  initialData: CommonRes<GetProductDetailRes>;
 }
 
-export default function ProductDetailPage({ id }: ProductDetailPageProps) {
+export default function ProductDetailPage({
+  id,
+  initialData,
+}: ProductDetailPageProps) {
   const languageCode = useLanguage();
+  const { isAuthenticated } = useUserAuthStore();
   const { data } = useAppQuery({
     queryKey: ["product-detail", id, languageCode],
     queryFn: () => getProductDetail({ id, languageCode }),
     select: (res) => res.data,
-    enabled: !!id,
+    initialData,
+    // SSR fetch는 accessToken 없이 호출되어 isLiked가 false다.
+    // stale 마킹 + 인증된 경우에만 재조회해 개인화 값(isLiked)을 정확히 채운다.
+    initialDataUpdatedAt: 0,
+    enabled: !!id && isAuthenticated,
     throwOnError: true,
   });
 
