@@ -2,79 +2,14 @@
 
 import type { PropsWithChildren } from "react";
 
-import { isKyError } from "ky";
-import { toast } from "sonner";
+import { QueryClientProvider } from "@tanstack/react-query";
 
-import * as Sentry from "@sentry/nextjs";
-import type { ExtendedHTTPError } from "@shared/services";
-import {
-  MutationCache,
-  QueryCache,
-  QueryClient,
-  QueryClientProvider,
-} from "@tanstack/react-query";
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      retry: false,
-      staleTime: 5 * 60 * 1000, // 5분
-    },
-  },
-  queryCache: new QueryCache({
-    onError: (err, query) => {
-      if (query.meta?.logError && !(err as ExtendedHTTPError).isReported) {
-        Sentry.withScope((scope) => {
-          scope.setTag("type", "query");
-          scope.setContext("Query Info", {
-            queryKey: query.queryKey,
-          });
-          Sentry.captureException(err);
-        });
-      }
-    },
-  }),
-  mutationCache: new MutationCache({
-    onError: (err, _var, _ctx, mutation) => {
-      if (mutation.meta?.logError) {
-        // track error
-        console.error(err.message);
-
-        // 이미 ky의 beforeErrorHandler 등에서 처리된 에러가 아닌 경우 Sentry 전송
-        if (!(err as ExtendedHTTPError).isReported) {
-          Sentry.withScope((scope) => {
-            scope.setTag("type", "mutation");
-            scope.setContext("Mutation Info", {
-              mutationKey: mutation.options.mutationKey,
-            });
-            Sentry.captureException(err);
-          });
-        }
-      }
-
-      if (mutation.meta?.showToast) {
-        if (isKyError(err)) {
-          const kyError = err as ExtendedHTTPError;
-          kyError.response
-            .clone()
-            .json()
-            .then((data) => {
-              const message = (data as { message?: string } | null)?.message;
-              toast.error(message ?? err.message);
-            })
-            .catch(() => {
-              toast.error(err.message);
-            });
-        } else {
-          toast.error(err.message);
-        }
-      }
-    },
-  }),
-});
+import { getQueryClient } from "./query/queryClient";
 
 export function ReactQueryProvider({ children }: PropsWithChildren) {
+  // 브라우저에서는 getQueryClient()가 싱글톤을 반환하므로 리렌더 간 인스턴스가 안정적이다.
+  const queryClient = getQueryClient();
+
   return (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
