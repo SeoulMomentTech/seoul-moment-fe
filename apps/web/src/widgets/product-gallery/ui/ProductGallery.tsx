@@ -59,16 +59,21 @@ export default function ProductGallery({
       >
         {images.map((src, idx) => (
           <SwiperSlide key={`${src}-${idx + 1}`}>
-            <Image
-              alt={`${productName} - ${idx + 1}`}
-              className="h-full cursor-zoom-in"
-              height={800}
+            <button
+              className="block h-full w-full cursor-zoom-in"
               onClick={() => handleOpenModal(idx)}
-              priority={idx === 0}
-              sizes="(max-width: 640px) 100vw, 560px"
-              src={src}
-              width={800}
-            />
+              type="button"
+            >
+              <Image
+                alt={`${productName} - ${idx + 1}`}
+                className="h-full"
+                height={800}
+                priority={idx === 0}
+                sizes="(max-width: 640px) 100vw, 560px"
+                src={src}
+                width={800}
+              />
+            </button>
           </SwiperSlide>
         ))}
       </Swiper>

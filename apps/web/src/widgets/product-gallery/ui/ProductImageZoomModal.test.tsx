@@ -17,8 +17,16 @@ vi.mock("@shared/lib/hooks", () => ({
 
 // Swiper는 jsdom에서 동작하지 않으므로 children을 그대로 렌더하는 더미로 대체
 vi.mock("swiper/react", () => ({
-  Swiper: ({ children }: { children: ReactNode }) => (
-    <div data-testid="swiper">{children}</div>
+  Swiper: ({
+    children,
+    initialSlide,
+  }: {
+    children: ReactNode;
+    initialSlide?: number;
+  }) => (
+    <div data-initial-slide={initialSlide} data-testid="swiper">
+      {children}
+    </div>
   ),
   SwiperSlide: ({ children }: { children: ReactNode }) => (
     <div data-testid="slide">{children}</div>
@@ -33,7 +41,16 @@ vi.mock("swiper/modules", () => ({
 
 // next/image → 순수 img
 vi.mock("next/image", () => ({
-  default: (props: Record<string, unknown>) => {
+  default: ({
+    priority,
+    fill,
+    ...props
+  }: Record<string, unknown> & {
+    priority?: boolean;
+    fill?: boolean;
+  }) => {
+    void priority;
+    void fill;
     // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
     return <img {...(props as object)} />;
   },
@@ -92,6 +109,10 @@ describe("ProductImageZoomModal", () => {
     // then
     expect(screen.getByRole("button", { name: "닫기" })).toBeInTheDocument();
     expect(screen.getAllByTestId("slide")).toHaveLength(IMAGES.length);
+    expect(screen.getByTestId("swiper")).toHaveAttribute(
+      "data-initial-slide",
+      "1",
+    );
   });
 
   it("닫혀 있으면 아무것도 렌더하지 않는다", () => {
