@@ -110,7 +110,7 @@ export default function ProductImageZoomModal({
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
       <DialogContent
-        className="h-[90vh] max-h-[900px] w-[900px] max-w-[90vw] overflow-hidden p-0"
+        className="h-[90vh] max-h-[900px] w-[900px] max-w-[90vw] overflow-hidden p-0 sm:max-w-[900px]"
         showCloseButton={false}
       >
         <DialogTitle className="sr-only">{productName}</DialogTitle>
