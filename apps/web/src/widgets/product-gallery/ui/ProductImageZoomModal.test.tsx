@@ -34,7 +34,6 @@ vi.mock("swiper/react", () => ({
 }));
 
 vi.mock("swiper/modules", () => ({
-  Zoom: {},
   Navigation: {},
   Pagination: {},
 }));

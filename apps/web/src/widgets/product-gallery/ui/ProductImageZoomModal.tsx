@@ -4,7 +4,7 @@ import { XIcon } from "lucide-react";
 
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { Navigation, Pagination, Zoom } from "swiper/modules";
+import { Navigation, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 
 import { useMediaQuery } from "@shared/lib/hooks";
@@ -26,7 +26,6 @@ import {
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import "swiper/css/zoom";
 
 interface ProductImageZoomModalProps {
   images: string[];
@@ -50,7 +49,7 @@ export default function ProductImageZoomModal({
     <Swiper
       className="h-full w-full"
       initialSlide={startIndex}
-      modules={[Zoom, Navigation, Pagination]}
+      modules={[Navigation, Pagination]}
       navigation={!isMobile}
       pagination={isMobile ? { type: "fraction" } : false}
       spaceBetween={10}
@@ -59,23 +58,20 @@ export default function ProductImageZoomModal({
         "--swiper-pagination-color": "#fff",
         "--swiper-navigation-size": "30px",
       }}
-      zoom={{ maxRatio: 3 }}
     >
       {images.map((src, idx) => (
         <SwiperSlide
           className="flex items-center justify-center"
           key={`zoom-${src}-${idx + 1}`}
         >
-          <div className="swiper-zoom-container h-full w-full">
-            <Image
-              alt={`${productName} - ${idx + 1}`}
-              className="h-full w-full object-contain"
-              height={1200}
-              sizes="(max-width: 640px) 100vw, 900px"
-              src={src}
-              width={1200}
-            />
-          </div>
+          <Image
+            alt={`${productName} - ${idx + 1}`}
+            className="h-full w-full object-contain"
+            height={1200}
+            sizes="(max-width: 640px) 100vw, 900px"
+            src={src}
+            width={1200}
+          />
         </SwiperSlide>
       ))}
     </Swiper>
