@@ -71,6 +71,7 @@ describe("ProductImageZoomModal", () => {
     // then
     expect(screen.getByRole("dialog")).toBeInTheDocument();
     expect(screen.getAllByTestId("slide")).toHaveLength(IMAGES.length);
+    expect(screen.getByRole("button", { name: "닫기" })).toBeInTheDocument();
   });
 
   it("모바일에서 닫기 버튼(aria-label=닫기)을 렌더한다", () => {

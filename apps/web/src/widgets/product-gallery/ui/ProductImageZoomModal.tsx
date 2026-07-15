@@ -12,6 +12,7 @@ import { cn } from "@shared/lib/style";
 
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogTitle,
@@ -108,9 +109,18 @@ export default function ProductImageZoomModal({
 
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
-      <DialogContent className="h-[90vh] max-h-[900px] w-[900px] max-w-[90vw] overflow-hidden p-0">
+      <DialogContent
+        className="h-[90vh] max-h-[900px] w-[900px] max-w-[90vw] overflow-hidden p-0"
+        showCloseButton={false}
+      >
         <DialogTitle className="sr-only">{productName}</DialogTitle>
         <DialogDescription className="sr-only" />
+        <DialogClose
+          aria-label={t("close")}
+          className="absolute right-4 top-4 z-10 opacity-70 transition-opacity hover:opacity-100"
+        >
+          <XIcon className="size-6" />
+        </DialogClose>
         <div className="flex h-full w-full items-center overflow-hidden px-12">
           {viewer}
         </div>
