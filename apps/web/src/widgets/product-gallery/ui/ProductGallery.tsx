@@ -9,6 +9,8 @@ import { Swiper, SwiperSlide } from "swiper/react";
 
 import { cn } from "@shared/lib/style";
 
+import ProductImageZoomModal from "./ProductImageZoomModal";
+
 import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/navigation";
@@ -24,6 +26,13 @@ export default function ProductGallery({
   productName,
 }: ProductGalleryProps) {
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperClass | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [startIndex, setStartIndex] = useState(0);
+
+  const handleOpenModal = (index: number) => {
+    setStartIndex(index);
+    setModalOpen(true);
+  };
 
   return (
     <div
@@ -52,8 +61,9 @@ export default function ProductGallery({
           <SwiperSlide key={`${src}-${idx + 1}`}>
             <Image
               alt={`${productName} - ${idx + 1}`}
-              className="h-full"
+              className="h-full cursor-zoom-in"
               height={800}
+              onClick={() => handleOpenModal(idx)}
               priority={idx === 0}
               sizes="(max-width: 640px) 100vw, 560px"
               src={src}
@@ -86,6 +96,13 @@ export default function ProductGallery({
           ))}
         </Swiper>
       </div>
+      <ProductImageZoomModal
+        images={images}
+        onOpenChange={setModalOpen}
+        open={modalOpen}
+        productName={productName}
+        startIndex={startIndex}
+      />
     </div>
   );
 }
