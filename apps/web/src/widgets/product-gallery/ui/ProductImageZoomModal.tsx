@@ -55,8 +55,8 @@ export default function ProductImageZoomModal({
       pagination={isMobile ? { type: "fraction" } : false}
       spaceBetween={10}
       style={{
-        "--swiper-navigation-color": "var(--color-brand-foreground)",
-        "--swiper-pagination-color": "var(--color-brand-foreground)",
+        "--swiper-navigation-color": "#fff",
+        "--swiper-pagination-color": "#fff",
         "--swiper-navigation-size": "30px",
       }}
       zoom={{ maxRatio: 3 }}
@@ -86,6 +86,7 @@ export default function ProductImageZoomModal({
       <Drawer onOpenChange={onOpenChange} open={open}>
         <DrawerContent
           className={cn(
+            "bg-black",
             "data-[vaul-drawer-direction=bottom]:h-[100dvh]",
             "data-[vaul-drawer-direction=bottom]:max-h-[100dvh]",
             "data-[vaul-drawer-direction=bottom]:rounded-none",
@@ -95,7 +96,7 @@ export default function ProductImageZoomModal({
           <DrawerDescription className="sr-only" />
           <DrawerClose
             aria-label={t("close")}
-            className="absolute right-4 top-4 z-10 opacity-70 transition-opacity hover:opacity-100"
+            className="absolute right-4 top-4 z-10 text-white opacity-70 transition-opacity hover:opacity-100"
           >
             <XIcon className="size-6" />
           </DrawerClose>
@@ -110,14 +111,14 @@ export default function ProductImageZoomModal({
   return (
     <Dialog onOpenChange={onOpenChange} open={open}>
       <DialogContent
-        className="h-[90vh] max-h-[900px] w-[900px] max-w-[90vw] overflow-hidden p-0 sm:max-w-[900px]"
+        className="h-[90vh] max-h-[900px] w-[900px] max-w-[90vw] overflow-hidden border-none bg-black p-0 sm:max-w-[900px]"
         showCloseButton={false}
       >
         <DialogTitle className="sr-only">{productName}</DialogTitle>
         <DialogDescription className="sr-only" />
         <DialogClose
           aria-label={t("close")}
-          className="absolute right-4 top-4 z-10 opacity-70 transition-opacity hover:opacity-100"
+          className="absolute right-4 top-4 z-10 text-white opacity-70 transition-opacity hover:opacity-100"
         >
           <XIcon className="size-6" />
         </DialogClose>
