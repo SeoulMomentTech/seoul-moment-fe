@@ -60,18 +60,19 @@ export default function ProductImageZoomModal({
       }}
     >
       {images.map((src, idx) => (
-        <SwiperSlide
-          className="flex items-center justify-center"
-          key={`zoom-${src}-${idx + 1}`}
-        >
-          <Image
-            alt={`${productName} - ${idx + 1}`}
-            className="h-full w-full object-contain"
-            height={1200}
-            sizes="(max-width: 640px) 100vw, 900px"
-            src={src}
-            width={1200}
-          />
+        <SwiperSlide className="h-full" key={`zoom-${src}-${idx + 1}`}>
+          <div className="flex h-full w-full items-center justify-center">
+            <div className="flex aspect-square max-h-full w-full items-center justify-center bg-white sm:h-full sm:w-auto">
+              <Image
+                alt={`${productName} - ${idx + 1}`}
+                className="h-full w-full object-contain"
+                height={1200}
+                sizes="(max-width: 640px) 100vw, 810px"
+                src={src}
+                width={1200}
+              />
+            </div>
+          </div>
         </SwiperSlide>
       ))}
     </Swiper>
@@ -118,7 +119,7 @@ export default function ProductImageZoomModal({
         >
           <XIcon className="size-6" />
         </DialogClose>
-        <div className="flex h-full w-full items-center overflow-hidden px-12">
+        <div className="flex h-full w-full items-center overflow-hidden">
           {viewer}
         </div>
       </DialogContent>
