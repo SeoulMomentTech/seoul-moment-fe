@@ -9,6 +9,8 @@ import { Swiper, SwiperSlide } from "swiper/react";
 
 import { cn } from "@shared/lib/style";
 
+import ProductImageZoomModal from "./ProductImageZoomModal";
+
 import "swiper/css";
 import "swiper/css/free-mode";
 import "swiper/css/navigation";
@@ -24,6 +26,13 @@ export default function ProductGallery({
   productName,
 }: ProductGalleryProps) {
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperClass | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [startIndex, setStartIndex] = useState(0);
+
+  const handleOpenModal = (index: number) => {
+    setStartIndex(index);
+    setModalOpen(true);
+  };
 
   return (
     <div
@@ -50,15 +59,21 @@ export default function ProductGallery({
       >
         {images.map((src, idx) => (
           <SwiperSlide key={`${src}-${idx + 1}`}>
-            <Image
-              alt={`${productName} - ${idx + 1}`}
-              className="h-full"
-              height={800}
-              priority={idx === 0}
-              sizes="(max-width: 640px) 100vw, 560px"
-              src={src}
-              width={800}
-            />
+            <button
+              className="block h-full w-full cursor-zoom-in"
+              onClick={() => handleOpenModal(idx)}
+              type="button"
+            >
+              <Image
+                alt={`${productName} - ${idx + 1}`}
+                className="h-full"
+                height={800}
+                priority={idx === 0}
+                sizes="(max-width: 640px) 100vw, 560px"
+                src={src}
+                width={800}
+              />
+            </button>
           </SwiperSlide>
         ))}
       </Swiper>
@@ -86,6 +101,13 @@ export default function ProductGallery({
           ))}
         </Swiper>
       </div>
+      <ProductImageZoomModal
+        images={images}
+        onOpenChange={setModalOpen}
+        open={modalOpen}
+        productName={productName}
+        startIndex={startIndex}
+      />
     </div>
   );
 }
