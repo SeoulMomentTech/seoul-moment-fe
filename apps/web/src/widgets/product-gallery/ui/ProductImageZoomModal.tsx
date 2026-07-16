@@ -93,7 +93,7 @@ export default function ProductImageZoomModal({
           <DrawerDescription className="sr-only" />
           <DrawerClose
             aria-label={t("close")}
-            className="absolute right-4 top-4 z-10 text-white opacity-70 transition-opacity hover:opacity-100"
+            className="absolute right-4 top-4 z-10 text-white opacity-70 drop-shadow-[0_0_4px_rgba(0,0,0,0.7)] transition-opacity hover:opacity-100"
           >
             <XIcon className="size-6" />
           </DrawerClose>
@@ -115,7 +115,7 @@ export default function ProductImageZoomModal({
         <DialogDescription className="sr-only" />
         <DialogClose
           aria-label={t("close")}
-          className="absolute right-4 top-4 z-10 text-white opacity-70 transition-opacity hover:opacity-100"
+          className="absolute right-4 top-4 z-10 text-white opacity-70 drop-shadow-[0_0_4px_rgba(0,0,0,0.7)] transition-opacity hover:opacity-100"
         >
           <XIcon className="size-6" />
         </DialogClose>
