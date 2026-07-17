@@ -54,7 +54,7 @@ export default function ProductBanner() {
         slidesPerView="auto"
         spaceBetween={8}
       >
-        {data.map((item) => (
+        {data.map((item, index) => (
           <SwiperSlide key={item.banner}>
             <figure
               className={cn(
@@ -69,6 +69,7 @@ export default function ProductBanner() {
                 alt=""
                 className="h-full object-cover max-sm:hidden"
                 height={1000}
+                preload={index === 0}
                 src={item.banner}
                 width={1340}
               />
@@ -77,6 +78,7 @@ export default function ProductBanner() {
                   alt=""
                   className="hidden h-full object-cover max-sm:block"
                   height={480}
+                  preload={index === 0}
                   src={item.mobileBanner}
                   width={640}
                 />

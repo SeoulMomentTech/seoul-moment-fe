@@ -40,7 +40,7 @@ export function MainBanner({ promise }: MainBannerProps) {
           alt=""
           className="h-full object-cover object-top"
           height={600}
-          priority
+          preload
           src={imageUrl}
           width={1280}
         />

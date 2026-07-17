@@ -69,6 +69,7 @@ function Desktop() {
             alt=""
             className="h-full"
             height={24}
+            preload
             src="/logo.png"
             width={200}
           />
@@ -296,7 +297,7 @@ function Mobile() {
           </SheetContent>
         </Sheet>
         <Link className={cn()} href="/" prefetch={ENABLE_HEADER_PREFETCH}>
-          <Image alt="" height={16} src="/logo.png" width={133} />
+          <Image alt="" height={16} preload src="/logo.png" width={133} />
         </Link>
       </div>
       {hasHydrated &&

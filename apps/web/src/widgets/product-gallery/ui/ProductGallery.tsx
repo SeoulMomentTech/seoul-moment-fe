@@ -67,8 +67,10 @@ export default function ProductGallery({
               <Image
                 alt={`${productName} - ${idx + 1}`}
                 className="h-full"
+                fetchPriority={idx === 0 ? "high" : "auto"}
                 height={800}
-                priority={idx === 0}
+                loading={idx === 0 ? "eager" : "lazy"}
+                preload={idx === 0}
                 sizes="(max-width: 640px) 100vw, 560px"
                 src={src}
                 width={800}
@@ -93,6 +95,7 @@ export default function ProductGallery({
                 alt={`${productName} - thumbnail ${idx + 1}`}
                 className="object-contain"
                 height={800}
+                loading={idx === 0 ? "eager" : "lazy"}
                 sizes="80px"
                 src={src}
                 width={800}

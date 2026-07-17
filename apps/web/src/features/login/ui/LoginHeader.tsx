@@ -13,7 +13,7 @@ export function LoginHeader() {
       <Image
         alt="Seoul Moment"
         height={24}
-        priority
+        preload
         src="/logo.png"
         width={204}
       />
