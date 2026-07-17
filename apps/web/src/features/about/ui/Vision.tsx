@@ -86,7 +86,13 @@ export function Vision() {
           "max-sm:top-[20%] max-sm:w-full",
         )}
       >
-        <Image alt="" height={198} src="/about/earth.png" width={816} />
+        <Image
+          alt=""
+          className="h-auto max-sm:w-full"
+          height={198}
+          src="/about/earth.png"
+          width={816}
+        />
       </figure>
     </section>
   );

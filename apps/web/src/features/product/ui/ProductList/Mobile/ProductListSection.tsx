@@ -52,7 +52,7 @@ export default function ProductListSection({
         />
       ) : (
         <>
-          {data?.map((product) => (
+          {data?.map((product, index) => (
             <Link
               className="flex-1"
               href={`/product/${product.id}`}
@@ -64,6 +64,7 @@ export default function ProductListSection({
                 contentWrapperClassName="h-full justify-between"
                 data={product}
                 imageClassName="max-sm:w-full max-sm:max-h-[150px] max-sm:min-h-[150px]"
+                preload={index < 2}
               />
             </Link>
           ))}

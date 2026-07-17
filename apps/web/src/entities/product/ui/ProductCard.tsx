@@ -15,6 +15,7 @@ interface ProductCardProps {
   contentWrapperClassName?: string;
   contentClassName?: string;
   hideExtraInfo?: boolean;
+  preload?: boolean;
   data: ProductItem;
 }
 
@@ -23,6 +24,7 @@ export default function ProductCard({
   imageClassName,
   contentWrapperClassName,
   hideExtraInfo,
+  preload,
   data,
 }: ProductCardProps) {
   return (
@@ -62,6 +64,7 @@ export default function ProductCard({
             alt=""
             className="h-full w-full object-cover"
             height={305}
+            preload={preload}
             src={data.image}
             unoptimized
             width={305}

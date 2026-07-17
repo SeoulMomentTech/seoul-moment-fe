@@ -31,7 +31,7 @@ export function ResponsiveBanner({
           alt=""
           className={cn("h-full object-cover", desktop.className)}
           height={desktop.height}
-          priority
+          preload
           src={desktop.src}
           width={desktop.width}
         />
@@ -41,7 +41,7 @@ export function ResponsiveBanner({
           alt=""
           className={cn("h-full object-cover", mobile.className)}
           height={mobile.height}
-          priority
+          preload
           src={mobile.src}
           width={mobile.width}
         />
