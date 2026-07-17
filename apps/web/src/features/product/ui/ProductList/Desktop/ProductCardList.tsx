@@ -52,7 +52,7 @@ const ProductCardList = memo(function ProductCardList({
         />
       ) : (
         <>
-          {data?.map((product) => (
+          {data?.map((product, index) => (
             <Link
               className="h-fit w-[196px]"
               href={`/product/${product.id}`}
@@ -62,6 +62,7 @@ const ProductCardList = memo(function ProductCardList({
                 className="max-sm:flex-1"
                 data={product}
                 imageClassName="w-[196px] h-[196px]"
+                preload={index < 5}
               />
             </Link>
           ))}

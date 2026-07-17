@@ -28,7 +28,7 @@ export function MainBanner({ bannerList }: MainBannerProps) {
         alt=""
         className="h-full object-cover"
         height={727}
-        priority
+        preload
         src={imageUrl}
         width={4000}
       />

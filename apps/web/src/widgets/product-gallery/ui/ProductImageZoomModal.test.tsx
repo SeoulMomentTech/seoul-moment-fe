@@ -42,13 +42,16 @@ vi.mock("swiper/modules", () => ({
 vi.mock("next/image", () => ({
   default: ({
     priority,
+    preload,
     fill,
     ...props
   }: Record<string, unknown> & {
     priority?: boolean;
+    preload?: boolean;
     fill?: boolean;
   }) => {
     void priority;
+    void preload;
     void fill;
     // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
     return <img {...(props as object)} />;

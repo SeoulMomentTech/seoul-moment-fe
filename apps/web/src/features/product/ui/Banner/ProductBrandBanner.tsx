@@ -58,6 +58,7 @@ export default function ProductBrandBanner({ id }: ProductBrandBannerProps) {
           alt=""
           className="h-full w-full object-cover"
           height={400}
+          preload
           src={data.banner}
           width={600}
         />
