@@ -1,0 +1,74 @@
+name: Deploy web to Netlify
+
+on:
+  push:
+    branches: [main]
+    # web 앱 또는 web이 의존하는 공유 패키지가 바뀔 때만 배포한다.
+    # (apps/web/netlify.toml 의 `ignore` 규칙과 동일한 의도)
+    paths:
+      - "apps/web/**"
+      - "packages/ui/**"
+      - "packages/tailwind-config/**"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/deploy.yml"
+  workflow_dispatch: # 수동 재배포용
+
+# 같은 브랜치의 배포가 겹치면 최신 커밋만 배포한다.
+concurrency:
+  group: deploy-web-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.18.3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # netlify deploy --build 는 러너에서 빌드를 수행하므로(= Netlify 빌드 분 미소모),
+      # @netlify/plugin-nextjs 로 SSR 함수를 생성하고,
+      # Netlify 사이트에 설정된 환경변수를 빌드에 자동 주입한다.
+      - name: Deploy to Netlify (production)
+        id: deploy
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          CI: "true"
+        run: |
+          set -euo pipefail
+          output=$(pnpm dlx netlify-cli@26.2.0 deploy \
+            --build \
+            --prod \
+            --filter @seoul-moment/web \
+            --site "$NETLIFY_SITE_ID" \
+            --json)
+          echo "$output"
+          url=$(echo "$output" | jq -r '.deploy_url // .url // empty')
+          echo "deploy_url=$url" >> "$GITHUB_OUTPUT"
+
+      - name: Send Slack notification
+        if: always() # 성공/실패 상관없이 실행
+        uses: slackapi/slack-github-action@v1.26.0
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+        with:
+          payload: |
+            {
+              "text": "${{ job.status == 'success' && '✅ Seoul Moment Web 배포 성공' || '❌ Seoul Moment Web 배포 실패' }}\n• 브랜치: `${{ github.ref_name }}`\n• 커밋: <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>\n• 실행자: ${{ github.actor }}\n• 로그: <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|GitHub Actions>\n• 배포 URL: ${{ steps.deploy.outputs.deploy_url || 'N/A' }}"
+            }
