@@ -8,6 +8,7 @@ import { getMessages, getTranslations } from "next-intl/server";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Toaster } from "sonner";
 
+import { ADSENSE_CLIENT } from "@shared/constants/ads";
 import { BASE_URL } from "@shared/constants/env";
 import GlobalQueryHandler from "@shared/lib/components/GlobalQueryHandler";
 import { ReactQueryProvider } from "@shared/lib/providers";
@@ -84,6 +85,12 @@ export default async function RootLayout({
         />
         {process.env.NEXT_PUBLIC_ENV === "production" && (
           <>
+            <Script
+              async
+              crossOrigin="anonymous"
+              src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
+              strategy="afterInteractive"
+            />
             <Script
               src="https://www.googletagmanager.com/gtag/js?id=G-N4PST9C2ZV"
               strategy="afterInteractive"
