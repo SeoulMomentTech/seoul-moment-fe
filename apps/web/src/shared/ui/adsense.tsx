@@ -84,10 +84,18 @@ export function AdSense({
   style,
 }: AdSenseProps) {
   const insRef = useRef<HTMLModElement>(null);
+  const [mounted, setMounted] = useState(false);
   const [unfilled, setUnfilled] = useState(false);
 
+  // 광고 유닛은 클라이언트 마운트 이후에만 렌더한다. <ins> 를 서버에서 렌더하면
+  // async adsbygoogle 스크립트가 하이드레이션 전에 이를 변형해 hydration 불일치
+  // (React #418) 가 발생한다. 마운트 후 렌더하면 서버 HTML 과 일치한다.
   useEffect(() => {
-    if (!IS_PRODUCTION) return;
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted || !IS_PRODUCTION) return;
 
     const ins = insRef.current;
     if (!ins) return;
@@ -112,8 +120,10 @@ export function AdSense({
     });
 
     return () => observer.disconnect();
-    // 마운트 시 1회만 push 한다. props 변경으로 재푸시하지 않는다.
-  }, []);
+  }, [mounted]);
+
+  // 마운트 전(SSR + 하이드레이션 직후)에는 아무것도 렌더하지 않는다.
+  if (!mounted) return null;
 
   // no-fill: 잡아둔 영역을 제거한다.
   if (unfilled) return null;
