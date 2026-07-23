@@ -85,11 +85,10 @@ export default async function RootLayout({
         />
         {process.env.NEXT_PUBLIC_ENV === "production" && (
           <>
-            <Script
+            <script
               async
               crossOrigin="anonymous"
               src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
-              strategy="afterInteractive"
             />
             <Script
               src="https://www.googletagmanager.com/gtag/js?id=G-N4PST9C2ZV"
