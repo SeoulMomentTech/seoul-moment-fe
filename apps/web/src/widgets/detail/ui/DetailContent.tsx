@@ -1,6 +1,7 @@
 import { DEFAULT_IMAGE_SRC } from "@shared/constants/image";
 import type { ArticleSection } from "@shared/services/article";
 import type { NewsSection } from "@shared/services/news";
+import { AdSense } from "@shared/ui/adsense";
 import { BaseImage } from "@shared/ui/base-image";
 
 import { HtmlContent } from "@/shared/ui/html-content";
@@ -9,6 +10,11 @@ import { cn } from "@seoul-moment/ui";
 
 export interface DetailContentProps {
   data: NewsSection[] | ArticleSection[];
+  /**
+   * 첫 섹션(히어로 이미지) 뒤에 넣을 인아티클 광고 슬롯 ID.
+   * 미전달(undefined) 시 광고를 렌더하지 않는다. 뉴스 상세에서만 전달한다.
+   */
+  inArticleAdSlot?: string;
 }
 
 const styleMap = {
@@ -16,7 +22,7 @@ const styleMap = {
     "mx-auto w-[1280px] max-sm:w-full pt-[100px] max-sm:pt-[50px] text-center",
 };
 
-export function DetailContent({ data }: DetailContentProps) {
+export function DetailContent({ data, inArticleAdSlot }: DetailContentProps) {
   const sections = data ?? [];
   const [first, second, third, fourth] = sections;
 
@@ -61,6 +67,13 @@ export function DetailContent({ data }: DetailContentProps) {
           />
         </div>
       </div>
+      {inArticleAdSlot !== undefined && (
+        <AdSense
+          className="mb-[100px] max-sm:mb-[90px] max-sm:px-[20px]"
+          format="in-article"
+          slot={inArticleAdSlot}
+        />
+      )}
       <div
         className={cn(
           "mb-[140px] flex gap-[128px]",
