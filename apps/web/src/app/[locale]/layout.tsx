@@ -85,11 +85,13 @@ export default async function RootLayout({
         />
         {process.env.NEXT_PUBLIC_ENV === "production" && (
           <>
-            <Script
+            {/* AdSense 로더는 next/script 대신 순수 <script> 로 로드한다.
+                next/script 가 붙이는 data-nscript 속성을 adsbygoogle 가
+                지원하지 않아 콘솔 경고를 내기 때문이다. */}
+            <script
               async
               crossOrigin="anonymous"
               src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
-              strategy="afterInteractive"
             />
             <Script
               src="https://www.googletagmanager.com/gtag/js?id=G-N4PST9C2ZV"
