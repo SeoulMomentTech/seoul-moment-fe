@@ -90,37 +90,43 @@ export function AdSense({
   // 광고 유닛은 클라이언트 마운트 이후에만 렌더한다. <ins> 를 서버에서 렌더하면
   // async adsbygoogle 스크립트가 하이드레이션 전에 이를 변형해 hydration 불일치
   // (React #418) 가 발생한다. 마운트 후 렌더하면 서버 HTML 과 일치한다.
-  useEffect(() => {
+  useEffect(function markMountedOnClient() {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (!mounted || !IS_PRODUCTION) return;
+  useEffect(
+    function requestAdAndWatchFill() {
+      if (!mounted || !IS_PRODUCTION) return;
 
-    const ins = insRef.current;
-    if (!ins) return;
+      const ins = insRef.current;
+      if (!ins) return;
 
-    try {
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-    } catch {
-      // 로더 스크립트가 아직 준비되지 않은 경우 조용히 무시한다.
-    }
-
-    const syncStatus = () => {
-      if (ins.getAttribute("data-ad-status") === "unfilled") {
-        setUnfilled(true);
+      try {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      } catch {
+        // 로더 스크립트가 아직 준비되지 않은 경우 조용히 무시한다.
       }
-    };
-    syncStatus();
 
-    const observer = new MutationObserver(syncStatus);
-    observer.observe(ins, {
-      attributes: true,
-      attributeFilter: ["data-ad-status"],
-    });
+      // no-fill 이면 잡아둔 영역을 없애기 위해 unfilled 상태로 전환한다.
+      const collapseIfUnfilled = () => {
+        if (ins.getAttribute("data-ad-status") === "unfilled") {
+          setUnfilled(true);
+        }
+      };
+      collapseIfUnfilled();
 
-    return () => observer.disconnect();
-  }, [mounted]);
+      const observer = new MutationObserver(collapseIfUnfilled);
+      observer.observe(ins, {
+        attributes: true,
+        attributeFilter: ["data-ad-status"],
+      });
+
+      return function stopWatchingFill() {
+        observer.disconnect();
+      };
+    },
+    [mounted],
+  );
 
   // 마운트 전(SSR + 하이드레이션 직후)에는 아무것도 렌더하지 않는다.
   if (!mounted) return null;
