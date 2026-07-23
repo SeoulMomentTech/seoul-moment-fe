@@ -133,6 +133,9 @@ export function AdSense({
     );
   }
 
+  // production 인데 슬롯이 아직 발급되지 않았으면 빈 유닛을 만들지 않는다.
+  if (!slot) return null;
+
   const config = getInsConfig(format, layoutKey, responsive);
 
   return (

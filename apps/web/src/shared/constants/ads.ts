@@ -2,3 +2,9 @@
 // 필요 시 NEXT_PUBLIC_ADSENSE_CLIENT 로 override 할 수 있다.
 export const ADSENSE_CLIENT =
   process.env.NEXT_PUBLIC_ADSENSE_CLIENT ?? "ca-pub-1632733390772298";
+
+// 뉴스 상세 본문 인아티클 광고 슬롯(data-ad-slot).
+// AdSense 대시보드에서 슬롯이 발급되면 NEXT_PUBLIC_ADSENSE_NEWS_IN_ARTICLE_SLOT
+// 에 값을 채운다. 비어 있으면 production 에서는 렌더하지 않는다(dev 는 영역만 표시).
+export const NEWS_IN_ARTICLE_AD_SLOT =
+  process.env.NEXT_PUBLIC_ADSENSE_NEWS_IN_ARTICLE_SLOT ?? "";
