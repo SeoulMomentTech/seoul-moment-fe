@@ -337,7 +337,7 @@ export function Header() {
         className={cn(
           "h-[56px] w-screen min-w-[1280px] bg-white px-[20px]",
           "border-b border-b-black/5",
-          "fixed left-0 top-0 z-10",
+          "z-11 fixed left-0 top-0",
           "flex items-center",
           "max-sm:min-w-auto",
         )}
