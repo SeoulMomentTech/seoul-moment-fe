@@ -4,8 +4,10 @@ import { use } from "react";
 
 import Image from "next/image";
 
+import { BRAND_IN_ARTICLE_AD_SLOT } from "@shared/constants/ads";
 import { cn } from "@shared/lib/style";
 import type { BrandDetailInfo } from "@shared/services/brand";
+import { AdSense } from "@shared/ui/adsense";
 import { HtmlContent } from "@shared/ui/html-content";
 import { ResponsiveBanner } from "@shared/ui/responsive-banner";
 
@@ -146,6 +148,12 @@ export default function BrandDetailPage({ promise }: BrandDetailPageProps) {
           </div>
         </div>
       </article>
+
+      <AdSense
+        className="mb-[100px] max-sm:mb-[90px] max-sm:px-[20px]"
+        format="in-article"
+        slot={BRAND_IN_ARTICLE_AD_SLOT}
+      />
 
       <ResponsiveBanner
         containerClassName={cn(
