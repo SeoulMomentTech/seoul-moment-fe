@@ -4,6 +4,8 @@ import StyleCard from "@entities/article/ui/StyleCard";
 import type { News } from "@shared/services/news";
 import CardSlider from "@shared/ui/card-slider";
 
+import { Link } from "@/i18n/navigation";
+
 import "./editor-pick-slide.css";
 import { cn } from "@seoul-moment/ui";
 
@@ -24,16 +26,18 @@ export default function EditorPickSlide({ items }: EditorPickSlideProps) {
       getKey={(item) => `pick-${item.id}`}
       items={items}
       renderItem={(item) => (
-        <StyleCard
-          author={item.writer}
-          category={item.newsCategoryName}
-          className="h-auto min-h-[321px] max-sm:h-[257px]"
-          date={item.createDate}
-          imageClassName="min-h-[200px] max-sm:h-[142px] max-sm:min-h-[142px]"
-          imageUrl={item.homeImage}
-          subTitle={item.content}
-          title={item.title}
-        />
+        <Link className="block h-full" href={`/news/${item.id}`}>
+          <StyleCard
+            author={item.writer}
+            category={item.newsCategoryName}
+            className="h-auto min-h-[321px] max-sm:h-[257px]"
+            date={item.createDate}
+            imageClassName="min-h-[200px] max-sm:h-[142px] max-sm:min-h-[142px]"
+            imageUrl={item.homeImage}
+            subTitle={item.content}
+            title={item.title}
+          />
+        </Link>
       )}
       slideClassName="max-sm:first:pl-[20px]"
       swiperClassName="editor-pick-swiper"

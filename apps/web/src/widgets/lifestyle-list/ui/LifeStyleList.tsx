@@ -7,6 +7,8 @@ import { useInfiniteNewsByCategory } from "@features/news/model/useInfiniteNewsB
 import { useIntersectionObserver, useLanguage } from "@shared/lib/hooks";
 import { cn } from "@shared/lib/style";
 
+import { Link } from "@/i18n/navigation";
+
 interface LifeStyleListProps {
   className?: string;
 }
@@ -44,15 +46,20 @@ export default function LifeStyleList({ className }: LifeStyleListProps) {
         }}
       >
         {items.map((item) => (
-          <LifeStyleCard
-            author={item.writer}
-            category={item.newsCategoryName}
-            date={item.createDate}
-            imageUrl={item.homeImage}
+          <Link
+            className="block h-full"
+            href={`/news/${item.id}`}
             key={`lifestyle-${item.id}`}
-            subTitle={item.content}
-            title={item.title}
-          />
+          >
+            <LifeStyleCard
+              author={item.writer}
+              category={item.newsCategoryName}
+              date={item.createDate}
+              imageUrl={item.homeImage}
+              subTitle={item.content}
+              title={item.title}
+            />
+          </Link>
         ))}
       </div>
       <div aria-hidden className="h-px w-full" ref={loadMoreRef} />
