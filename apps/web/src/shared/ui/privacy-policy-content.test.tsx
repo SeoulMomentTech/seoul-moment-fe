@@ -27,6 +27,9 @@ describe("PrivacyPolicyContent", () => {
     render(<PrivacyPolicyContent />);
 
     // then
-    expect(screen.getByText(/2024年11月26日/)).toBeInTheDocument();
+    // 정책 개정 시마다 깨지지 않도록 날짜 값이 아닌 형식을 검증한다.
+    expect(
+      screen.getByText(/最後更新日期：\d{4}年\d{1,2}月\d{1,2}日/),
+    ).toBeInTheDocument();
   });
 });
