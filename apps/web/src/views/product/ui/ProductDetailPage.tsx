@@ -14,8 +14,8 @@ import {
   getProductDetail,
   type GetProductDetailRes,
 } from "@shared/services/product";
+import { LikeCount } from "@shared/ui/like-count";
 import { AvatarBadge } from "@widgets/avatar-badge/ui/AvatarBadge";
-import { LikeCount } from "@widgets/like-count/ui/LikeCount";
 
 import { Link } from "@/i18n/navigation";
 

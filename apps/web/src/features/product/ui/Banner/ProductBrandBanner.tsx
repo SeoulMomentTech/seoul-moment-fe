@@ -7,9 +7,9 @@ import { useBrandBanner } from "@entities/brand/model/hooks/useBrandBanner";
 import { useLanguage } from "@shared/lib/hooks";
 import { useModal } from "@shared/lib/hooks";
 import { cn } from "@shared/lib/style";
+import { LikeCount } from "@shared/ui/like-count";
 
 import { Link } from "@/i18n/navigation";
-import { LikeCount } from "@/widgets/like-count/ui/LikeCount";
 
 import { useBrandLikeToggle } from "@entities/brand";
 import { Button, Flex } from "@seoul-moment/ui";

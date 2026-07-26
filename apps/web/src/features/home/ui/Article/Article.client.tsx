@@ -8,12 +8,13 @@ import { useTranslations } from "next-intl";
 
 import { cn } from "@shared/lib/style";
 import type { Article, getArticleList } from "@shared/services/article";
+import { Empty } from "@shared/ui/empty";
+import { SectionWithLabel } from "@shared/ui/section-with-label";
 
 import { Skeleton } from "@seoul-moment/ui";
-import { ArticleList } from "@widgets/article-list";
-import { ArticleSlide } from "@widgets/article-slide";
-import { Empty } from "@widgets/empty";
-import { SectionWithLabel } from "@widgets/section-with-label";
+
+import { ArticleList } from "./ArticleList";
+import { ArticleSlide } from "./ArticleSlide";
 
 interface ArticleProps {
   promise: ReturnType<typeof getArticleList>;

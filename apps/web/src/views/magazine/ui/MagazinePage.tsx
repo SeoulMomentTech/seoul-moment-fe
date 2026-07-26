@@ -1,11 +1,11 @@
 import { cn } from "@shared/lib/style";
+import { SectionWithLabel } from "@shared/ui/section-with-label";
 
 import { Link } from "@/i18n/navigation";
 
 import { LookbookSection } from "@widgets/lookbook-section";
 import { MagazineFeatured } from "@widgets/magazine-featured";
 import { NewsList } from "@widgets/news-list";
-import { SectionWithLabel } from "@widgets/section-with-label";
 
 export function MagazinePage() {
   return (

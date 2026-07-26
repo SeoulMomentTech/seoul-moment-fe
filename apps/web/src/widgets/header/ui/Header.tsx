@@ -15,6 +15,7 @@ import {
 } from "@shared/lib/hooks/useUserAuthStore";
 import { cn } from "@shared/lib/style";
 import Divider from "@shared/ui/divider";
+import { LanguageSupport } from "@shared/ui/language-support";
 import {
   Sheet,
   SheetContent,
@@ -26,8 +27,6 @@ import {
 
 import { localeLabels, type LanguageType } from "@/i18n/const";
 import { Link, usePathname } from "@/i18n/navigation";
-
-import { LanguageSupport } from "@widgets/language-support";
 
 import { BrandMenuModal } from "./BrandMenuModal";
 import LoginStatus from "./LoginStatus";

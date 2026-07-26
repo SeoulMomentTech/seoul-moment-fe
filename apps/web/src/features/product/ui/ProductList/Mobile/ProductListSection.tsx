@@ -4,11 +4,11 @@ import { SearchIcon } from "lucide-react";
 
 import { cn } from "@shared/lib/style";
 import type { GetProductListReq } from "@shared/services/product";
+import { Empty } from "@shared/ui/empty";
 
 import { Link } from "@/i18n/navigation";
 
 import { ProductCard } from "@entities/product";
-import { Empty } from "@widgets/empty";
 
 import { useProductListLogic } from "../../../model/useProductListLogic";
 import { ProductCardSkeleton } from "../../ProductCardSkeleton";

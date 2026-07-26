@@ -1,7 +1,6 @@
 import { cn } from "@shared/lib/style";
+import { AuthorWithDate } from "@shared/ui/author-with-date";
 import { Card } from "@shared/ui/card";
-
-import { AuthorWithDate } from "@widgets/author-with-date";
 
 interface StyleCardProps {
   className?: string;

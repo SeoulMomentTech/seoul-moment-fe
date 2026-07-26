@@ -5,6 +5,7 @@ import { use } from "react";
 import { FeaturedMainNewsCard } from "@entities/news/ui";
 import { cn } from "@shared/lib/style";
 import type { getNewsDashboard } from "@shared/services/news";
+import { SectionWithLabel } from "@shared/ui/section-with-label";
 import LifeStyleList from "@widgets/lifestyle-list/ui/LifeStyleList";
 
 import { Link } from "@/i18n/navigation";
@@ -12,7 +13,6 @@ import { Link } from "@/i18n/navigation";
 import { EditorPickSlide } from "@widgets/editor-pick";
 import { HotKeywordList } from "@widgets/hot-list";
 import { NewsUpdate } from "@widgets/news-update";
-import { SectionWithLabel } from "@widgets/section-with-label";
 
 interface NewsPageContentProps {
   promise: ReturnType<typeof getNewsDashboard>;

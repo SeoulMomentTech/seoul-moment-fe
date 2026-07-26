@@ -11,15 +11,15 @@ import { render, screen } from "@testing-library/react";
 import { ArticleContents } from "./Article.client";
 
 // Mocks
-vi.mock("@widgets/article-list", () => ({
+vi.mock("./ArticleList", () => ({
   ArticleList: () => <div data-testid="article-list" />,
 }));
 
-vi.mock("@widgets/article-slide", () => ({
+vi.mock("./ArticleSlide", () => ({
   ArticleSlide: () => <div data-testid="article-slide" />,
 }));
 
-vi.mock("@widgets/empty", () => ({
+vi.mock("@shared/ui/empty", () => ({
   Empty: ({
     description,
     icon,

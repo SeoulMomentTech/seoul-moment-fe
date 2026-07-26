@@ -23,7 +23,7 @@ vi.mock("@entities/product", () => ({
   ),
 }));
 
-vi.mock("@widgets/empty", () => ({
+vi.mock("@shared/ui/empty", () => ({
   Empty: ({
     description,
     icon,

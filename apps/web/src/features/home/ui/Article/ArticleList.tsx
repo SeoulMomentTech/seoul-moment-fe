@@ -23,7 +23,7 @@ interface ArticleListProps {
   data: Article[];
 }
 
-export default function ArticleList({ className, data }: ArticleListProps) {
+export function ArticleList({ className, data }: ArticleListProps) {
   const swiperRef = useRef<SwiperRef>(null);
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(data.length <= 3);

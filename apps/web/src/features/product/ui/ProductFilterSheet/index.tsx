@@ -3,8 +3,8 @@
 import { type PropsWithChildren } from "react";
 
 import { Accordion } from "@seoul-moment/ui";
-import { FilterSheet } from "@widgets/filter-sheet";
 
+import { FilterSheet } from "../FilterSheet";
 import BrandFilter from "./BrandFilter";
 import CategoryFilter from "./CategoryFilter";
 import OptionalFilters from "./OptionalFilters";

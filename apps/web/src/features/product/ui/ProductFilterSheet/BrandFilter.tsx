@@ -1,7 +1,5 @@
 import { useTranslations } from "next-intl";
 
-import type { Filter } from "@widgets/filter-sheet/ui/FilterSheet";
-
 import {
   Accordion,
   AccordionContent,
@@ -12,6 +10,7 @@ import {
 } from "@seoul-moment/ui";
 
 import useBrandFilter from "../../model/useBrandFilter";
+import type { Filter } from "../FilterSheet";
 
 interface BrandFilterProps {
   filter: Filter;

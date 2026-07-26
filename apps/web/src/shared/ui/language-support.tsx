@@ -16,7 +16,7 @@ import {
 import { localeLabels, type LanguageType } from "@/i18n/const";
 import { Link, usePathname } from "@/i18n/navigation";
 
-export default function LanguageSupport() {
+export function LanguageSupport() {
   const currentLocale = useLocale() as LanguageType;
   const pathname = usePathname();
 

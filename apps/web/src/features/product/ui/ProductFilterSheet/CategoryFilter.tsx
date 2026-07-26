@@ -3,7 +3,6 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 
 import type { Category } from "@shared/services/category";
-import type { Filter } from "@widgets/filter-sheet/ui/FilterSheet";
 
 import {
   Accordion,
@@ -16,6 +15,7 @@ import {
 
 import useCategories from "../../model/useCategories";
 import useProductCategory from "../../model/useProductCategory";
+import type { Filter } from "../FilterSheet";
 
 interface CategoryInterface {
   filter: Filter;

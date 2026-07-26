@@ -11,6 +11,7 @@ import { toast } from "sonner";
 
 import { postEmailCode, verifyEmailCode } from "@shared/services/auth";
 import { postEmail, verifyRecaptcha } from "@shared/services/inquiry";
+import { AlertModal } from "@shared/ui/alert-modal";
 import {
   Select,
   SelectContent,
@@ -21,7 +22,6 @@ import {
 import type { ModalStatus } from "@/types";
 
 import { Button, cn, Input, Textarea } from "@seoul-moment/ui";
-import { AlertModal } from "@widgets/alert-modal";
 
 import { inquiryFormRezolver, type InquiryFormValues } from "../model/schema";
 

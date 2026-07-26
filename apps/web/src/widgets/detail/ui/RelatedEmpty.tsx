@@ -2,7 +2,7 @@ import { FileTextIcon, NewspaperIcon } from "lucide-react";
 
 import { useTranslations } from "next-intl";
 
-import { Empty } from "@widgets/empty";
+import { Empty } from "@shared/ui/empty";
 
 interface RelatedEmptyProps {
   type: "news" | "article";

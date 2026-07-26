@@ -4,11 +4,11 @@ import { useTranslations } from "next-intl";
 
 import { cn } from "@shared/lib/style";
 import type { ProductItem } from "@shared/services/product";
+import { Empty } from "@shared/ui/empty";
 
 import { Link } from "@/i18n/navigation";
 
 import { ProductCard } from "@entities/product";
-import { Empty } from "@widgets/empty";
 
 interface BrandProductListProps {
   data: ProductItem[];
