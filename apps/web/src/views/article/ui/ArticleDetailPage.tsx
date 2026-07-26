@@ -2,9 +2,11 @@
 
 import type { GetArticleDetailRes } from "@shared/services/article";
 
-import { ArticleDetailContent, ArticleDetailMain } from "@features/article";
 import { BrandProducts } from "@widgets/brand-products";
 import { RelatedList } from "@widgets/detail";
+
+import { ArticleDetailContent } from "./ArticleDetailContent";
+import { ArticleDetailMain } from "./ArticleDetailMain";
 
 interface ArticleDetailPageProps {
   data: GetArticleDetailRes;

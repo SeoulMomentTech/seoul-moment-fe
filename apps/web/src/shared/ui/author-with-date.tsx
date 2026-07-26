@@ -9,7 +9,7 @@ interface AuthorWithDateProps {
   className?: string;
 }
 
-export default function AuthorWithDate({
+export function AuthorWithDate({
   author,
   date,
   textColor = "black",

@@ -7,7 +7,7 @@ import { HeartIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { cn } from "@shared/lib/style";
-import Empty from "@widgets/empty/ui/Empty";
+import { Empty } from "@shared/ui/empty";
 
 import { useProductLikeToggle } from "@entities/product";
 import { Skeleton } from "@seoul-moment/ui";

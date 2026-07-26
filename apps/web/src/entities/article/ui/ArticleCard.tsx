@@ -4,10 +4,9 @@ import { useEffect, useState } from "react";
 
 import { DEFAULT_IMAGE_SRC } from "@shared/constants/image";
 import { cn } from "@shared/lib/style";
+import { AuthorWithDate } from "@shared/ui/author-with-date";
 import { BaseImage } from "@shared/ui/base-image";
 import { Card } from "@shared/ui/card";
-
-import { AuthorWithDate } from "@widgets/author-with-date";
 
 interface ArticleCardProps {
   className?: string;

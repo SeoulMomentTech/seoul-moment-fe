@@ -8,7 +8,7 @@ import { useTranslations } from "next-intl";
 
 import { useIntersectionObserver } from "@shared/lib/hooks";
 import { cn } from "@shared/lib/style";
-import Empty from "@widgets/empty/ui/Empty";
+import { Empty } from "@shared/ui/empty";
 
 import { Skeleton } from "@seoul-moment/ui";
 

@@ -7,10 +7,10 @@ import { UsersIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { cn } from "@shared/lib/style";
+import { Empty } from "@shared/ui/empty";
 
 import { PartnerCard } from "@entities/partner";
 import { Tabs, TabsList, TabsTrigger } from "@seoul-moment/ui";
-import { Empty } from "@widgets/empty";
 
 import usePartnerCategories from "../model/usePartnerCategories";
 import usePartners from "../model/usePartners";

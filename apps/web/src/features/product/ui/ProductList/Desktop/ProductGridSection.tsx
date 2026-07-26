@@ -3,14 +3,11 @@ import { Suspense } from "react";
 import type { GetProductListReq } from "@shared/services/product";
 import Divider from "@shared/ui/divider";
 
-import {
-  ProductCategoryFilter,
-  ProductCategoryFilterSkeleton,
-} from "@widgets/product-category-filter";
-
 import ProductCardList from "./ProductCardList";
 import type { FilterKey } from "../../../model/useProductFilter";
 import FilterBar from "../../FilterBar";
+import { ProductCategoryFilter } from "../../ProductCategoryFilter";
+import { ProductCategoryFilterSkeleton } from "../../ProductCategoryFilterSkeleton";
 
 interface ProductGridSectionProps {
   onOpenFilterModal(): void;

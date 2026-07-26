@@ -19,7 +19,7 @@ interface ArticleSlideProps {
   data: Article[];
 }
 
-export default function ArticleSlide({ data }: ArticleSlideProps) {
+export function ArticleSlide({ data }: ArticleSlideProps) {
   const [swiper, setSwiper] = useState<SwiperClass | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 

@@ -5,7 +5,6 @@ import { useTranslations } from "next-intl";
 import { cn } from "@shared/lib/style";
 import { mergeOptionIdList } from "@shared/lib/utils/filter";
 import type { OptionIdListValue } from "@shared/lib/utils/filter";
-import type { Filter } from "@widgets/filter-sheet/ui/FilterSheet";
 
 import {
   Accordion,
@@ -20,6 +19,7 @@ import {
   DialogTitle,
 } from "@seoul-moment/ui";
 
+import type { Filter } from "./FilterSheet";
 import Options from "./Options";
 import { getOptionMetaById } from "../lib/getOptionMetaById";
 import useCategories from "../model/useCategories";

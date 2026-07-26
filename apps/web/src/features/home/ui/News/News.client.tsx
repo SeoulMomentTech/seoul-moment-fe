@@ -8,11 +8,10 @@ import { useTranslations } from "next-intl";
 
 import { cn } from "@shared/lib/style";
 import type { getNewsList, News } from "@shared/services/news";
+import { Empty } from "@shared/ui/empty";
+import { SectionWithLabel } from "@shared/ui/section-with-label";
 
 import { Link } from "@/i18n/navigation";
-
-import { Empty } from "@widgets/empty";
-import { SectionWithLabel } from "@widgets/section-with-label";
 
 import { NewsDesktopSlider } from "./NewsDesktopSlider";
 import { NewsMobileSlider } from "./NewsMobileSlider";

@@ -81,11 +81,13 @@ app/ → views/ → widgets/ → features/ → entities/ → shared/
 - **app/** — Next.js App Router routes (`[locale]/`), providers, global config
 - **views/** — Page-level compositions (one per route)
 - **widgets/** — Reusable blocks (Header, Footer)
-- **features/** — User interaction modules (About, Article, Home, Inquiry, News, Product, Promotion, Search)
+- **features/** — User interaction modules (About, FindPassword, Home, Inquiry, Login, Mypage, News, Product, Promotion, Search, Signup)
 - **entities/** — Domain models (Article, Brand, Lookbook, Magazine, News, Partner, Product)
 - **shared/** — Services, hooks, constants, UI re-exports
 
 A feature can import from entities and shared, but **never** from widgets, views, or app.
+
+This is **enforced by ESLint** (`import/no-restricted-paths` in `apps/web/eslint.config.mjs`) — referencing a higher layer fails lint, so a misplaced component must be relocated rather than imported upward.
 
 This downward-only rule governs **internal cross-layer imports only** (the `@shared/`, `@entities/`, `@features/`, etc. aliases). It does **not** apply to third-party/`node_modules` imports — any layer may import external libraries (`next-intl`, `es-toolkit`, `lucide-react`, etc.) directly. See [Restricted Imports](#restricted-imports) for the only enforced exception (TanStack Query hooks).
 

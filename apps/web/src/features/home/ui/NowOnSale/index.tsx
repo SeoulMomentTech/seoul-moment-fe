@@ -4,11 +4,11 @@ import { getLocale } from "next-intl/server";
 
 import { cn } from "@shared/lib/style";
 import { getProductList } from "@shared/services/product";
+import { SectionWithLabel } from "@shared/ui/section-with-label";
 
 import type { LanguageType } from "@/i18n/const";
 
 import { Skeleton } from "@seoul-moment/ui";
-import { SectionWithLabel } from "@widgets/section-with-label";
 
 import { NowOnSale as NowOnSaleClient } from "./NowOnSale.client";
 

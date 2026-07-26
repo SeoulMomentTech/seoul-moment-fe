@@ -33,7 +33,7 @@ interface FilterSheetProps extends PropsWithChildren {
     | ReactNode;
 }
 
-const FilterSheet = ({
+export const FilterSheet = ({
   children,
   isOpen,
   content,
@@ -133,5 +133,3 @@ const FilterSheet = ({
     </Sheet>
   );
 };
-
-export default FilterSheet;

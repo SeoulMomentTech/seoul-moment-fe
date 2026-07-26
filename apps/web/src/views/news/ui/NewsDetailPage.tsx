@@ -2,9 +2,11 @@
 
 import type { GetNewsDetailRes } from "@shared/services/news";
 
-import { NewsDetailContent, NewsDetailMain } from "@features/news";
 import { BrandProducts } from "@widgets/brand-products";
 import { RelatedList } from "@widgets/detail";
+
+import { NewsDetailContent } from "./NewsDetailContent";
+import { NewsDetailMain } from "./NewsDetailMain";
 
 interface NewsDetailPageProps {
   data: GetNewsDetailRes;

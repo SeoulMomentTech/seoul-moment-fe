@@ -2,12 +2,12 @@ import { useTranslations } from "next-intl";
 
 import { cn } from "@shared/lib/style";
 import type { LastNews } from "@shared/services/news";
+import { SectionWithLabel } from "@shared/ui/section-with-label";
 
 import { Link } from "@/i18n/navigation";
 
 import { MegazineSlide } from "@widgets/megazine-slide";
 import { MoreMagazineList } from "@widgets/more-magazine";
-import { SectionWithLabel } from "@widgets/section-with-label";
 
 import { RelatedEmpty } from "./RelatedEmpty";
 
