@@ -48,6 +48,60 @@ const config = [
   },
 
   ...nextJsConfig,
+
+  {
+    // FSD 하향 전용 임포트 강제: app → views → widgets → features → entities → shared
+    // 상위 레이어를 참조하면 error. 외부 라이브러리 임포트에는 적용되지 않는다.
+    files: ["src/**/*.{ts,tsx}"],
+    rules: {
+      "import/no-restricted-paths": [
+        "error",
+        {
+          basePath: import.meta.dirname,
+          zones: [
+            {
+              target: "./src/shared",
+              from: [
+                "./src/entities",
+                "./src/features",
+                "./src/widgets",
+                "./src/views",
+                "./src/app",
+              ],
+            },
+            {
+              target: "./src/entities",
+              from: [
+                "./src/features",
+                "./src/widgets",
+                "./src/views",
+                "./src/app",
+              ],
+            },
+            {
+              // widgets/detail은 여러 위젯을 조합하는 진짜 위젯이라 아래로 내릴 수 없다.
+              // features/{article,news}의 래퍼를 views로 올리는 별도 작업이 필요해 예외로 둔다.
+              target: "./src/features",
+              from: "./src/widgets",
+              except: ["./detail"],
+            },
+            {
+              target: "./src/features",
+              from: ["./src/views", "./src/app"],
+            },
+            {
+              target: "./src/widgets",
+              from: ["./src/views", "./src/app"],
+            },
+            {
+              target: "./src/views",
+              from: "./src/app",
+            },
+          ],
+        },
+      ],
+    },
+  },
 ];
 
 export default config;
