@@ -3,11 +3,12 @@
 import { useRef } from "react";
 
 import LifeStyleCard from "@entities/article/ui/StyleCard";
-import { useInfiniteNewsByCategory } from "@features/news/model/useInfiniteNewsByCategory";
 import { useIntersectionObserver, useLanguage } from "@shared/lib/hooks";
 import { cn } from "@shared/lib/style";
 
 import { Link } from "@/i18n/navigation";
+
+import { useInfiniteNewsByCategory } from "@features/news";
 
 interface LifeStyleListProps {
   className?: string;

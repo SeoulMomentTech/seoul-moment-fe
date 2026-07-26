@@ -79,15 +79,8 @@ const config = [
               ],
             },
             {
-              // widgets/detail은 여러 위젯을 조합하는 진짜 위젯이라 아래로 내릴 수 없다.
-              // features/{article,news}의 래퍼를 views로 올리는 별도 작업이 필요해 예외로 둔다.
               target: "./src/features",
-              from: "./src/widgets",
-              except: ["./detail"],
-            },
-            {
-              target: "./src/features",
-              from: ["./src/views", "./src/app"],
+              from: ["./src/widgets", "./src/views", "./src/app"],
             },
             {
               target: "./src/widgets",
