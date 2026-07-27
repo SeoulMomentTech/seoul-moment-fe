@@ -17,7 +17,7 @@ vi.mock("@entities/news/ui", () => ({
   FeaturedSubNewsCard: () => <div data-testid="sub-news-card" />,
 }));
 
-vi.mock("@widgets/empty", () => ({
+vi.mock("@shared/ui/empty", () => ({
   Empty: ({
     description,
     icon,

@@ -11,9 +11,9 @@ import type {
   GetBrandPromotionBrandDetailResponse,
   GetBrandPromotionResponse,
 } from "@shared/services/brandPromotion";
+import { LikeCount } from "@shared/ui/like-count";
 
 import { Link } from "@/i18n/navigation";
-import { LikeCount } from "@/widgets/like-count/ui/LikeCount";
 
 import { useBrandLikeToggle } from "@entities/brand";
 import { VStack, HStack, cn, Flex } from "@seoul-moment/ui";

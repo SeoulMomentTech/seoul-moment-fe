@@ -6,12 +6,12 @@ import { useTranslations } from "next-intl";
 
 import { useAppQuery, useLanguage } from "@shared/lib/hooks";
 import { getProductList } from "@shared/services/product";
+import { Empty } from "@shared/ui/empty";
+import { SectionWithLabel } from "@shared/ui/section-with-label";
 
 import { Link } from "@/i18n/navigation";
 
 import { BrandProductCard } from "@entities/brand";
-import { Empty } from "@widgets/empty";
-import { SectionWithLabel } from "@widgets/section-with-label";
 
 interface BrandProductsProps {
   id: number;

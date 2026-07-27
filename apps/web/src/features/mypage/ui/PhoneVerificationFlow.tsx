@@ -8,11 +8,9 @@ import { toast } from "sonner";
 import { toTaiwanPhoneNumber } from "@shared/lib/utils";
 
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  PhoneVerificationModal,
-  PhoneVerificationResultModal,
-} from "@widgets/phone-verification-modal";
 
+import { PhoneVerificationModal } from "./PhoneVerificationModal";
+import { PhoneVerificationResultModal } from "./PhoneVerificationResultModal";
 import { usePostInfoPhoneCodeMutation } from "../api/usePostInfoPhoneCodeMutation";
 import { usePostInfoPhoneVerifyMutation } from "../api/usePostInfoPhoneVerifyMutation";
 

@@ -4,11 +4,11 @@ import { getLocale } from "next-intl/server";
 
 import { cn } from "@shared/lib/style";
 import { getNewsList } from "@shared/services/news";
+import { SectionWithLabel } from "@shared/ui/section-with-label";
 
 import type { LanguageType } from "@/i18n/const";
 
 import { Skeleton } from "@seoul-moment/ui";
-import { SectionWithLabel } from "@widgets/section-with-label";
 
 import { News as NewsClient } from "./News.client";
 

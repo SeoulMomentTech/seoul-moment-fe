@@ -1,9 +1,8 @@
 import { useMemo } from "react";
 
-import type { Filter } from "@widgets/filter-sheet/ui/FilterSheet";
-
 import { getOptionMetaById } from "../../lib/getOptionMetaById";
 import useProductFilterList from "../../model/useProductFilterList";
+import type { Filter } from "../FilterSheet";
 import Options from "../Options";
 
 interface OptionalFilters {

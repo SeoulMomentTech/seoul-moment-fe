@@ -6,6 +6,7 @@ import { StarIcon } from "lucide-react";
 
 import { useTranslations } from "next-intl";
 
+import { PRODUCT_DISPLAY_AD_SLOT } from "@shared/constants/ads";
 import { useAppQuery, useLanguage } from "@shared/lib/hooks";
 import { useUserAuthStore } from "@shared/lib/hooks/useUserAuthStore";
 import { cn } from "@shared/lib/style";
@@ -14,8 +15,9 @@ import {
   getProductDetail,
   type GetProductDetailRes,
 } from "@shared/services/product";
+import { AdSense } from "@shared/ui/adsense";
+import { LikeCount } from "@shared/ui/like-count";
 import { AvatarBadge } from "@widgets/avatar-badge/ui/AvatarBadge";
-import { LikeCount } from "@widgets/like-count/ui/LikeCount";
 
 import { Link } from "@/i18n/navigation";
 
@@ -213,6 +215,11 @@ export default function ProductDetailPage({
           </div>
         </div>
         <BrandProductList data={data.relate} />
+        <AdSense
+          className="my-[60px] max-sm:my-10 max-sm:px-5"
+          format="display"
+          slot={PRODUCT_DISPLAY_AD_SLOT}
+        />
         <ProductDetailImage imageSrc={data.detailImg} showMore={showMore}>
           <div
             className={cn(

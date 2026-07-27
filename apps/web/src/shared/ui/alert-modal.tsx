@@ -8,7 +8,7 @@ interface AlertModalProps extends PropsWithChildren {
   onClickOK(): void;
 }
 
-export default function AlertModal({
+export function AlertModal({
   children,
   open,
   onOpenChange,

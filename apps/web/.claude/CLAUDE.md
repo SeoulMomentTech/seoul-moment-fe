@@ -37,7 +37,7 @@ app/ → views/ → widgets/ → features/ → entities/ → shared/
 - **app/** — Next.js App Router routes (`[locale]/` prefix for i18n), providers, global config
 - **views/** — Page-level compositions (one per route)
 - **widgets/** — Reusable blocks (Header, Footer)
-- **features/** — User interaction modules (About, Article, FindPassword, Home, Inquiry, Login, Mypage, News, Product, Promotion, Search, Signup)
+- **features/** — User interaction modules (About, FindPassword, Home, Inquiry, Login, Mypage, News, Product, Promotion, Search, Signup)
 - **entities/** — Domain models (Article, Brand, Lookbook, Magazine, News, Partner, Product). Note: `magazine` and `megazine` dirs coexist — `megazine` is a legacy/typo slice, prefer `magazine`.
 - **shared/** — Services, hooks, constants, UI re-exports
 

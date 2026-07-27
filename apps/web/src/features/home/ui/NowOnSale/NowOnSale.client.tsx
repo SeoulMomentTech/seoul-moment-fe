@@ -8,13 +8,13 @@ import { useTranslations } from "next-intl";
 
 import { cn } from "@shared/lib/style";
 import type { getProductList, ProductItem } from "@shared/services/product";
+import { Empty } from "@shared/ui/empty";
+import { SectionWithLabel } from "@shared/ui/section-with-label";
 
 import { Link } from "@/i18n/navigation";
 
 import { ProductCard } from "@entities/product";
 import { Button } from "@seoul-moment/ui";
-import { Empty } from "@widgets/empty";
-import { SectionWithLabel } from "@widgets/section-with-label";
 
 interface NowOnSaleProps {
   promise: ReturnType<typeof getProductList>;

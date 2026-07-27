@@ -5,11 +5,11 @@ import { useState, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
 
 import { cn } from "@shared/lib/style";
+import { SectionWithLabel } from "@shared/ui/section-with-label";
 
 import { Button } from "@seoul-moment/ui";
 import { Tabs, TabsList, TabsTrigger } from "@seoul-moment/ui";
 import { LookbookGallery } from "@widgets/lookbook-gallery";
-import { SectionWithLabel } from "@widgets/section-with-label";
 
 export function LookbookSection() {
   const [filter, setFilter] = useState("all");

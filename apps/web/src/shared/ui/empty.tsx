@@ -8,7 +8,7 @@ interface EmptyProps {
   description: string;
 }
 
-export default function Empty({ className, icon, description }: EmptyProps) {
+export function Empty({ className, icon, description }: EmptyProps) {
   return (
     <div
       className={cn(

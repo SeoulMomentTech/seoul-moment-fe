@@ -3,11 +3,11 @@ import { SearchIcon } from "lucide-react";
 import Image from "next/image";
 
 import { cn } from "@shared/lib/style";
+import { LanguageSupport } from "@shared/ui/language-support";
 
 import { Link } from "@/i18n/navigation";
 
 import { Button } from "@seoul-moment/ui";
-import { LanguageSupport } from "@widgets/language-support";
 
 interface SearchHeaderProps {
   handleClose(): void;
