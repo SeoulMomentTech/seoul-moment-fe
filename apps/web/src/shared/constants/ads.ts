@@ -20,3 +20,9 @@ export const ARTICLE_IN_ARTICLE_AD_SLOT =
 // 필요 시 NEXT_PUBLIC_ADSENSE_BRAND_IN_ARTICLE_SLOT 로 override 할 수 있다.
 export const BRAND_IN_ARTICLE_AD_SLOT =
   process.env.NEXT_PUBLIC_ADSENSE_BRAND_IN_ARTICLE_SLOT ?? "3072646191";
+
+// 상품 상세 디스플레이 광고 슬롯(data-ad-slot).
+// 관련상품 목록과 상세 이미지 사이에 배치되며,
+// 필요 시 NEXT_PUBLIC_ADSENSE_PRODUCT_DISPLAY_SLOT 로 override 할 수 있다.
+export const PRODUCT_DISPLAY_AD_SLOT =
+  process.env.NEXT_PUBLIC_ADSENSE_PRODUCT_DISPLAY_SLOT ?? "3243152107";
