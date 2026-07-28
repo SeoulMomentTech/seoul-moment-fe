@@ -21,7 +21,7 @@ export default function ProductGridSection({
   filter,
 }: ProductGridSectionProps) {
   return (
-    <section className="flex flex-col gap-[20px]">
+    <section className="flex min-w-0 flex-1 flex-col gap-[20px]">
       <div>
         <div className="mb-[20px] flex items-center justify-between">
           <div />

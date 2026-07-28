@@ -31,7 +31,7 @@ const ProductCardList = memo(function ProductCardList({
     <div
       aria-busy={isLoading}
       className={cn(
-        "flex w-[1063px] flex-wrap gap-x-[20px] gap-y-[40px]",
+        "flex w-full flex-wrap gap-x-[20px] gap-y-[40px]",
         "min-h-[687px]",
       )}
       role="status"

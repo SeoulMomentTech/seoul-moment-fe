@@ -18,7 +18,7 @@ export function BrandOfflinePopupTabs({
   onSelect,
 }: BrandOfflinePopupTabsProps) {
   return (
-    <div className="no-scrollbar w-full max-sm:overflow-x-auto max-sm:px-5">
+    <div className="scrollbar-hide w-full max-sm:overflow-x-auto max-sm:px-5">
       <Flex className="max-sm:w-max" gap={10} justify="center">
         {popupList.map((event) => (
           <button

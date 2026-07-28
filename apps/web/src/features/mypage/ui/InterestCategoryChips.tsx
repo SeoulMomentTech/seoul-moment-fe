@@ -21,7 +21,7 @@ interface InterestCategoryChipsProps {
 const SCROLL_AMOUNT = 200;
 
 const CONTAINER_CLASS =
-  "no-scrollbar flex items-center gap-[10px] overflow-x-auto scrollbar-thin";
+  "scrollbar-hide flex items-center gap-[10px] overflow-x-auto";
 const CHIP_BUTTON_CLASS =
   "flex shrink-0 cursor-pointer flex-col items-center gap-[8px] px-[8px] text-body-4 font-normal sm:text-body-3";
 const CHIP_CIRCLE_CLASS =

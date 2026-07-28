@@ -18,7 +18,7 @@ interface ProductCategoryFilterProps {
 const SCROLL_AMOUNT = 200;
 
 const CONTAINER_CLASS =
-  "no-scrollbar flex items-center gap-[10px] overflow-x-auto";
+  "scrollbar-hide flex items-center gap-[10px] overflow-x-auto";
 const CHIP_BUTTON_CLASS = cn(
   "flex shrink-0 flex-col items-center gap-[8px]",
   "cursor-pointer rounded-full px-[8px] py-2 text-sm font-medium",
