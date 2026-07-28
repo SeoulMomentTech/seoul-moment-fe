@@ -2,6 +2,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 
 import { cn } from "@shared/lib/style";
+import { Reveal } from "@shared/ui/reveal";
 
 const data = [
   {
@@ -29,11 +30,13 @@ export function Vision() {
         "text-white",
       )}
     >
-      <div
+      {/* 지구 이미지와 함께 "지평선"으로 읽히도록 좌→우로 그려진다. */}
+      <Reveal
         className={cn(
-          "absolute bottom-[37%] h-px w-full bg-white/20",
+          "absolute bottom-[37%] h-px w-full origin-left bg-white/20",
           "max-sm:hidden",
         )}
+        variant="drawX"
       />
       <div className={cn("z-1 relative px-5", "mx-auto max-w-7xl")}>
         <h2
@@ -60,13 +63,15 @@ export function Vision() {
             "max-sm:flex-col max-sm:items-center max-sm:gap-4",
           )}
         >
-          {data.map((item) => (
-            <div
+          {data.map((item, index) => (
+            <Reveal
               className={cn(
                 "flex flex-col items-center justify-center rounded-full border border-white/50",
                 "h-[300px] w-[300px] gap-[50px] px-6",
-                "max-sm:px-[18px]] max-sm:h-[250px] max-sm:w-[250px] max-sm:gap-[30px]",
+                "duration-slow transition-colors hover:border-white/90",
+                "max-sm:h-[250px] max-sm:w-[250px] max-sm:gap-[30px] max-sm:px-[18px]",
               )}
+              index={index}
               key={item.title}
             >
               <h4 className="text-title-3 max-sm:text-body-1 font-bold">
@@ -75,7 +80,7 @@ export function Vision() {
               <p className="max-sm:text-body-3 text-center">
                 {t(item.contents)}
               </p>
-            </div>
+            </Reveal>
           ))}
         </div>
       </div>

@@ -2,6 +2,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 
 import { cn } from "@shared/lib/style";
+import { Reveal } from "@shared/ui/reveal";
 
 const data = [
   {
@@ -40,12 +41,18 @@ export function Company() {
           SeoulMoment Company.
         </h2>
         <div className={cn("flex flex-col gap-10")}>
-          {data.map((item) => (
-            <div
+          {data.map((item, index) => (
+            /*
+             * A/B/C는 실제 목록이므로 형제 stagger가 정당하다.
+             * 구분선은 border-b-white/5였는데 layout의 main이 bg-white라
+             * 흰 배경 위 흰 선이 되어 보이지 않았다.
+             */
+            <Reveal
               className={cn(
-                "flex h-24 justify-between border-b border-b-white/5 pb-10",
+                "flex h-24 justify-between border-b border-b-black/10 pb-10",
                 "max-sm:h-auto max-sm:flex-col max-sm:gap-5",
               )}
+              index={index}
               key={item.id}
             >
               <div className={cn("flex items-center gap-5", "max-sm:gap-2")}>
@@ -71,7 +78,7 @@ export function Company() {
               >
                 {t(item.contents)}
               </p>
-            </div>
+            </Reveal>
           ))}
         </div>
       </div>
