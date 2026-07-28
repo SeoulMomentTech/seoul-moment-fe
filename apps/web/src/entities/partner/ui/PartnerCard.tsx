@@ -27,7 +27,7 @@ export default function PartnerCard({
   return (
     <Card
       className={cn(
-        "h-[365px] flex-1 justify-between gap-5",
+        "group/card h-[365px] flex-1 justify-between gap-5",
         "max-sm:h-[390px] max-sm:w-full",
         className,
       )}
@@ -43,19 +43,27 @@ export default function PartnerCard({
           target="_blank"
         >
           More
-          <ArrowRight height={16} width={16} />
+          <ArrowRight
+            className="duration-normal transition-transform group-hover/card:translate-x-1"
+            height={16}
+            width={16}
+          />
         </a>
       }
       image={
+        // overflow-clip이 없으면 hover 확대분이 카드 밖으로 삐져나온다.
         <div
           className={cn(
-            "h-60 w-full bg-slate-300 max-sm:h-[220px]",
+            "h-60 w-full overflow-clip bg-slate-300 max-sm:h-[220px]",
             imageClassName,
           )}
         >
           <Image
             alt=""
-            className="h-[inherit] w-full object-fill"
+            className={cn(
+              "h-[inherit] w-full object-fill",
+              "duration-slow transition-transform group-hover/card:scale-105",
+            )}
             height={220}
             src={imageUrl}
             unoptimized

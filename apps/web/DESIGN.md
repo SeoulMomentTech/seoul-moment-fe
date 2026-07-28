@@ -216,6 +216,39 @@ import { Button, Dialog, Input, Card, VStack, HStack, Flex, cn } from "@seoul-mo
 - **enter/exit 유틸**: `fade-in-0` / `fade-out-0`, `zoom-in-95` / `zoom-out-95`, `slide-in-from-{top,bottom,left,right}` / `slide-out-to-{top,bottom,left,right}`, 소형 변형 `slide-in-from-*-2`(0.5rem offset)
 - **스크롤바 유틸**([globals.css](./src/app/globals.css)): `scrollbar-hide`, `scrollbar-default`, `scrollbar-medium`, `scrollbar-thin`, `scrollbar-color-transparent`, `scrollbar-transition`
 
+#### 로드 연출 유틸 (CSS 전용)
+
+한 화면에 **하나만** 쓰는 연출용입니다. JS가 없어도 동작하므로 전 브라우저에서 같고, `prefers-reduced-motion: reduce`에서는 선언 자체가 사라져 요소가 처음부터 최종 상태로 보입니다.
+
+| 유틸 | 토큰 | 동작 |
+| --- | --- | --- |
+| `shutter-settle` | `--animate-shutter-settle` | `transform: scale(1.055) → 1`, 900ms. 셔터가 눌린 뒤 프레임이 가라앉는 느낌 |
+| `wordmark-wipe` | `--animate-wordmark-wipe` | `clip-path: inset(0 100% 0 0) → inset(0)`, 760ms, 140ms delay, `fill-mode: both` |
+
+- 두 토큰은 `transform` / `clip-path`만 건드리므로 LCP 페인트 시점에 영향이 없습니다. **연출 대상에 `opacity: 0`을 쓰지 마세요** — LCP가 애니메이션 종료까지 밀립니다.
+- Tailwind의 `scale-*`는 standalone `scale` 속성이라 `shutter-settle`의 `transform: scale()`과 곱셈 합성됩니다(예: `scale-[1.04]`로 기본 여백을 주고 그 위에 연출을 얹음).
+- `@utility`는 중첩할 수 없으므로 `@media`를 유틸 **안쪽**에 둡니다.
+
+#### 스크롤 모션 프리미티브 (motion)
+
+`motion`(v12)을 사용하며 프리미티브는 [`shared/ui/`](./src/shared/ui/)에 있습니다. 서버 컴포넌트는 그대로 두고 이 클라이언트 래퍼만 감싸는 방식입니다.
+
+| 컴포넌트 | 용도 |
+| --- | --- |
+| [`MotionProvider`](./src/shared/ui/motion-provider.tsx) | `MotionConfig reducedMotion="user"` 경계. 모션을 쓰는 **화면 단위로** 감쌉니다(루트 레이아웃에 두면 모든 라우트가 번들을 지불) |
+| [`Reveal`](./src/shared/ui/reveal.tsx) | 뷰포트 진입 시 1회 재생. `variant="rise" \| "drawX"`, `index`로 형제 stagger(총 지연 0.24s 상한) |
+| [`ParallaxLayer`](./src/shared/ui/parallax-layer.tsx) | 스크롤 진행률 연동 배경 드리프트. 조상에 `overflow-clip` 필요 |
+
+규칙:
+
+- **`overflow-hidden`이 아니라 `overflow-clip`** — `hidden`은 스크롤 컨테이너를 만들어 스크롤 위치 측정 기준을 바꿉니다.
+- **`Reveal`은 콘텐츠가 실제로 목록일 때만** 씁니다. 스크롤되는 모든 섹션을 목록처럼 다루면 페이지가 계속 움직이는 인상만 남습니다. 헤딩·장식에는 붙이지 않습니다.
+- **`useReducedMotion()`으로 렌더 분기하지 마세요** — 첫 클라이언트 렌더에서 동기적으로 값을 읽어 SSR(`null`)과 어긋나 hydration 불일치가 납니다. 접근성은 `MotionProvider`에 맡깁니다.
+- `ParallaxLayer`처럼 `style`에 MotionValue를 직접 바인딩하는 경우는 애니메이션이 아니라서 `MotionConfig`가 잡아주지 않습니다 — 컴포넌트가 마운트 후 `matchMedia`로 직접 끕니다.
+- **IntersectionObserver는 두 축이 모두 겹쳐야 발동합니다.** 섹션에 `min-w-7xl`(1280px)이 걸려 있어 뷰포트가 그보다 좁으면 오른쪽 요소가 화면 밖에 놓이고, 세로로는 지나갔는데도 트리거되지 않습니다. `Reveal`은 가로 rootMargin을 크게 열어 가로 위치가 진입 판정에 영향을 주지 않게 합니다.
+- 진입 모션의 초기 상태는 `opacity: 0`입니다. 트리거가 깨지면 콘텐츠가 영구히 보이지 않으므로 [`e2e/about-motion.spec.ts`](./e2e/about-motion.spec.ts)가 최종 상태 도달을 회귀 검사합니다.
+- 뷰포트를 한 번도 지나지 않은 요소가 `opacity: 0`인 것은 정상입니다(문서 끝으로 점프하면 전부 미재생). 놓친 진입은 요소가 다시 보일 때 재생되므로 영구히 갇히지는 않습니다 — 테스트도 단정 전에 왕복 스크롤로 요소를 실제 통과시킵니다.
+
 ### 아이콘
 
 - **기본은 `lucide-react` 독점** — 다른 아이콘 라이브러리를 추가하지 않습니다.
