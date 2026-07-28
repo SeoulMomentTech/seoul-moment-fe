@@ -83,7 +83,7 @@ export function InterestBrandCard({ data, className }: InterestBrandCardProps) {
         </button>
       </header>
 
-      <div className="no-scrollbar flex gap-[8px] max-sm:overflow-x-auto">
+      <div className="scrollbar-hide flex gap-[8px] max-sm:overflow-x-auto">
         {products.map((product) => (
           <Link
             className="flex w-[100px] shrink-0 flex-col gap-[10px]"

@@ -41,7 +41,7 @@ export function BrandTab({ promotionId, selectedId }: BrandTabProps) {
           align={isMobile ? "start" : "center"}
           className={cn(
             "h-full w-full",
-            "no-scrollbar max-sm:justify-start max-sm:gap-5 max-sm:overflow-x-auto max-sm:px-5",
+            "scrollbar-hide max-sm:justify-start max-sm:gap-5 max-sm:overflow-x-auto max-sm:px-5",
           )}
           gap={isMobile ? 20 : 50}
         >

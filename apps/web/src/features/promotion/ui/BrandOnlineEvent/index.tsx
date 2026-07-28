@@ -46,7 +46,7 @@ export function BrandOnlineEvent({
             {event.title}
           </h2>
 
-          <div className="no-scrollbar w-full overflow-x-auto max-sm:px-5">
+          <div className="scrollbar-hide w-full overflow-x-auto max-sm:px-5">
             <Flex
               className="mx-auto w-fit max-sm:w-max max-sm:justify-start"
               gap={10}
