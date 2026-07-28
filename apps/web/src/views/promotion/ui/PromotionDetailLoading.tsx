@@ -20,7 +20,7 @@ export default function PromotionDetailLoading() {
         <div
           className={cn(
             "w-7xl mx-auto flex items-center gap-[50px] py-5",
-            "no-scrollbar max-sm:w-full max-sm:justify-start max-sm:gap-5 max-sm:overflow-x-auto max-sm:px-5",
+            "scrollbar-hide max-sm:w-full max-sm:justify-start max-sm:gap-5 max-sm:overflow-x-auto max-sm:px-5",
           )}
         >
           {Array.from({ length: 5 }).map((_, idx) => (
