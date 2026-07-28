@@ -70,6 +70,12 @@
   --animate-in: enter 0.2s ease-out;
   --animate-out: exit 0.2s ease-in;
 
+  /* 로드 시 1회 재생되는 연출용 토큰. JS 없이 동작하므로 전 브라우저에서 같다. */
+  --animate-shutter-settle: shutter-settle 900ms cubic-bezier(0.16, 1, 0.3, 1)
+    both;
+  --animate-wordmark-wipe: wordmark-wipe 760ms cubic-bezier(0.16, 1, 0.3, 1)
+    140ms both;
+
   @keyframes accordion-down {
     from {
       height: 0;
@@ -108,6 +114,29 @@
         )
         scale3d(var(--tw-exit-scale, 1), var(--tw-exit-scale, 1), 1)
         rotate(var(--tw-exit-rotate, 0));
+    }
+  }
+
+  /*
+   * transform만 건드리므로 LCP 페인트 시점에 영향을 주지 않는다.
+   * Tailwind의 scale-* 유틸리티는 standalone `scale` 속성을 쓰므로
+   * 여기의 `transform: scale()`과 곱셈 합성된다(= 기본 배율을 겸쳐 쓸 수 있다).
+   */
+  @keyframes shutter-settle {
+    from {
+      transform: scale(1.055);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+  /* clip-path는 같은 함수·같은 인자 수라 보간되고 컴포짓된다. */
+  @keyframes wordmark-wipe {
+    from {
+      clip-path: inset(0 100% 0 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
     }
   }
 }
@@ -159,6 +188,23 @@
 }
 @utility slide-out-to-bottom {
   --tw-exit-translate-y: 100%;
+}
+
+/*
+ * 로드 시 연출용 유틸리티.
+ * `prefers-reduced-motion: reduce`일 때는 선언 자체가 없으므로
+ * 요소가 처음부터 최종 상태(배율 1, 클립 없음)로 보인다.
+ * `@utility`는 중첩할 수 없어 `@media`를 안쪽에 둔다.
+ */
+@utility shutter-settle {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: var(--animate-shutter-settle);
+  }
+}
+@utility wordmark-wipe {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: var(--animate-wordmark-wipe);
+  }
 }
 
 button {

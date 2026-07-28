@@ -2,6 +2,8 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 
 import { cn } from "@shared/lib/style";
+import { ParallaxLayer } from "@shared/ui/parallax-layer";
+import { Reveal } from "@shared/ui/reveal";
 
 const data = [
   {
@@ -26,17 +28,20 @@ export function Mission() {
   return (
     <section
       className={cn(
-        "min-w-7xl relative min-h-[814px] text-white",
+        "min-w-7xl relative min-h-[814px] overflow-clip text-white",
         "max-sm:h-auto max-sm:min-w-full",
       )}
     >
-      <Image
-        alt=""
-        className="absolute h-full object-cover"
-        height={814}
-        src="/about/mission.webp"
-        width={4000}
-      />
+      {/* 히어로 배경과 같은 drift를 공유해 두 사진이 같은 재질로 읽히게 한다. */}
+      <ParallaxLayer className="absolute inset-0" drift={20}>
+        <Image
+          alt=""
+          className="h-full scale-[1.06] object-cover"
+          height={814}
+          src="/about/mission.webp"
+          width={4000}
+        />
+      </ParallaxLayer>
       <div
         className={cn(
           "z-1 relative mx-auto max-w-7xl px-5 py-[140px] max-sm:py-[50px]",
@@ -65,12 +70,13 @@ export function Mission() {
             {t("mission_description")}
           </h3>
           <div className="flex flex-col gap-10">
-            {data.map((item) => (
-              <div
+            {data.map((item, index) => (
+              <Reveal
                 className={cn(
                   "flex w-[570px] flex-col gap-[30px] border-b border-b-white/20 pb-10",
                   "max-sm:w-auto",
                 )}
+                index={index}
                 key={`mission-${item.id}`}
               >
                 <div className="text-title-3 max-sm:text-title-4 flex gap-5 font-bold">
@@ -80,7 +86,7 @@ export function Mission() {
                 <p className="text-title-4 max-sm:text-body-3">
                   {t(item.contents)}
                 </p>
-              </div>
+              </Reveal>
             ))}
           </div>
         </div>

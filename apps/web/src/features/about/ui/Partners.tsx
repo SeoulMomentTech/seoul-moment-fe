@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { UsersIcon } from "lucide-react";
 
+import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
 
 import { cn } from "@shared/lib/style";
@@ -16,24 +17,26 @@ import usePartnerCategories from "../model/usePartnerCategories";
 import usePartners from "../model/usePartners";
 
 export function Partners() {
-  const [id, setId] = useState<number | null>();
+  const [selectedId, setSelectedId] = useState<number | null>(null);
 
   const { data: categories = [], isEmpty } = usePartnerCategories();
+
+  /*
+   * useEffect로 첫 카테고리를 주입하면 effect가 첫 페인트 뒤에 돌아
+   * 탭이 없는 프레임이 한 번 렌더된다 — 그 빈 컨테이너에서 전환 모션이 재생돼버린다.
+   * 파생값으로 계산하면 첫 렌더부터 활성 탭이 확정된다.
+   */
+  const activeId = selectedId ?? categories[0]?.id ?? null;
+
   const { data: partners, isFetched: isPartnersFetched } = usePartners(
-    id ?? 0,
-    !isEmpty && !!id,
+    activeId ?? 0,
+    !!activeId,
   );
   const t = useTranslations();
 
   const partnerList = partners?.list ?? [];
   const shouldShowEmpty =
     isEmpty || (isPartnersFetched && partnerList.length === 0);
-
-  useEffect(() => {
-    if (categories.length > 0) {
-      setId(categories[0].id);
-    }
-  }, [categories]);
 
   return (
     <section
@@ -57,11 +60,11 @@ export function Partners() {
         </h2>
 
         <div className="flex flex-col gap-10 max-sm:gap-[30px]">
-          {id && (
+          {activeId && (
             <Tabs
               className="border-b border-b-black/10 max-sm:pl-5"
-              defaultValue={id.toString()}
-              onValueChange={(value) => setId(Number(value))}
+              onValueChange={(value) => setSelectedId(Number(value))}
+              value={activeId.toString()}
             >
               <TabsList className="flex h-[50px] items-center gap-[30px]">
                 {categories.map((category) => (
@@ -86,11 +89,20 @@ export function Partners() {
               }
             />
           ) : (
-            <div
+            /*
+             * key가 바뀌면 리마운트되어 initial → animate가 다시 재생된다.
+             * usePartners가 keepPreviousData를 쓰므로 전환 중 카드가 사라지지 않고
+             * 새 데이터가 도착한 프레임에 크로스페이드가 시작된다.
+             */
+            <motion.div
+              animate={{ opacity: 1, y: 0 }}
               className={cn(
                 "inline-flex gap-10 max-sm:px-5",
                 "max-sm:flex-col max-sm:items-center max-sm:gap-[30px]",
               )}
+              initial={{ opacity: 0, y: 8 }}
+              key={`partners-${activeId}`}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             >
               {partnerList.slice(0, 3).map((item) => (
                 <PartnerCard
@@ -102,7 +114,7 @@ export function Partners() {
                   title={item.title}
                 />
               ))}
-            </div>
+            </motion.div>
           )}
         </div>
       </div>
