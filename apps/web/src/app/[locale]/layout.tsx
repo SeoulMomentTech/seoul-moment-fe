@@ -16,6 +16,7 @@ import ScrollRestoration from "@shared/ui/scroll-restoration";
 
 import { routing } from "@/i18n/routing";
 
+import { Chatbot } from "@widgets/chatbot";
 import { Footer } from "@widgets/footer";
 import { Header } from "@widgets/header";
 
@@ -129,10 +130,28 @@ export default async function RootLayout({
               <Header />
               <main className="mx-auto min-h-[calc(100vh-200px)] bg-white">
                 {children}
-                <Toaster />
+                {/*
+                  sonner 는 기본 position 이 bottom-right 이고 z-index 가
+                  999999999 다. 챗봇 런처가 우하단이라 그대로 두면 토스트가
+                  런처를 덮고 클릭/탭까지 먹는다.
+
+                  데스크탑: 챗봇이 비운 좌하단으로 옮긴다. 오프셋을 밀어내는
+                  것보다 코너를 나누는 쪽이 구조적으로 안전하다.
+                  (`offset` prop 은 쓰지 않는다 — 객체 값을 주면 **webkit 에서
+                  페이지 load 이벤트가 끝나지 않는다**. 실측: Safari 에서
+                  page.reload() 가 30s 타임아웃, 같은 값을 제거하면 통과.)
+
+                  모바일: sonner 는 600px 이하에서 width:100% 로 깔려 좌측
+                  정렬로도 런처를 덮는다. 그래서 모바일만 런처 위로 올린다.
+                */}
+                <Toaster mobileOffset={{ bottom: 88 }} position="bottom-left" />
                 <GlobalQueryHandler />
               </main>
               <Footer />
+              {/* 전역 크롬이므로 main 안이 아니라 Header/Footer 의 형제로 둔다.
+                  Footer 다음 = 문서 마지막이라, 키보드 사용자가 푸터 마지막
+                  링크에서 Tab 한 번으로 런처에 닿는다. */}
+              <Chatbot />
             </ReactQueryProvider>
           </NextIntlClientProvider>
         </NuqsAdapter>

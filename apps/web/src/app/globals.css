@@ -134,6 +134,44 @@
   }
 }
 
+/*
+ * 챗봇 답변 대기 시 본문 폭 스켈레톤 바.
+ *
+ * `@seoul-moment/ui` 의 Skeleton 을 쓰지 않는 이유 — `animate-pulse bg-slate-200`
+ * 으로 (1) 오프토큰 색이고 (2) reduced-motion 가드가 없다.
+ *
+ * `@utility` 는 중첩할 수 없으므로 `@media` 를 안쪽에 둔다(shared-styles.css 의
+ * shutter-settle 과 같은 패턴). reduce 에서는 선언 자체가 사라져 정적 회색 바로
+ * 남는다.
+ *
+ * 루프 애니메이션이라 하우스 easing(expo-out)을 쓰지 않는다 — 매 사이클 끝에서
+ * 멈칫하는 인상이 생긴다. 연속 스윕은 linear 가 맞다.
+ */
+@keyframes chat-shimmer {
+  from {
+    background-position: 150% 0;
+  }
+  to {
+    background-position: -150% 0;
+  }
+}
+
+@utility chat-shimmer {
+  background-color: rgb(0 0 0 / 0.06);
+
+  @media (prefers-reduced-motion: no-preference) {
+    background-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgb(255 255 255 / 0.9) 50%,
+      transparent 100%
+    );
+    background-size: 150% 100%;
+    background-repeat: no-repeat;
+    animation: chat-shimmer 1.4s linear infinite;
+  }
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -155,6 +193,33 @@ body {
 * {
   box-sizing: border-box;
   @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-transparent focus-visible:ring-offset-0;
+}
+
+/*
+ * 포커스 링 — 위 `*` 리셋을 되살리는 유일한 방법.
+ *
+ * `@utility` 로 만들면 `@layer utilities` 에 들어가는데, 위 `*` 규칙은 어떤
+ * 레이어에도 속하지 않는다. CSS 캐스케이드 레이어에서 unlayered 선언은 항상
+ * layered 선언을 이기므로, Tailwind 유틸리티 클래스로는 `outline-none` 을
+ * 절대 덮을 수 없다(specificity 와 무관하게 진다).
+ *
+ * 그래서 같은 unlayered 원점에 두고 specificity 로 이긴다:
+ * `.focus-ring:focus-visible`(0,2,0) > `*:focus-visible`(0,1,0).
+ *
+ * `ring`(box-shadow) 이 아니라 `outline` 을 쓰는 이유 — 위 리셋이 이미
+ * `ring-2 ring-transparent` 를 선언해 두었고, outline 은 shadow 스택과
+ * 독립이며 border-radius 를 따른다.
+ *
+ * 링 색이 브랜드 오렌지인 이유 — 흰 배경 3.1:1, 검정 배경 6.7:1 로 양쪽 모두
+ * WCAG 1.4.11(비텍스트 3:1)을 넘는 유일한 선택이다. outline-offset 때문에
+ * 링은 요소가 아니라 **페이지 배경** 위에 그려지는데, 이 앱의 페이지 배경은
+ * 흰색(본문)과 검정(푸터·about·news 섹션) 양쪽이라 흰 링이면 흰 배경에서
+ * 사라지고 검정 링이면 검정 배경에서 사라진다. 그래서 변형을 두지 않고
+ * 하나로 통일한다.
+ */
+.focus-ring:focus-visible {
+  outline: 2px solid var(--brand-500);
+  outline-offset: 2px;
 }
 
 .swiper-button-prev,
