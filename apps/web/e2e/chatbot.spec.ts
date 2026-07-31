@@ -11,6 +11,16 @@ import { expect, test, type Page } from "@playwright/test";
  *   await page.addInitScript(() => localStorage.setItem("e2e-disable-chatbot", "1"));
  */
 
+/*
+ * 이 앱의 페이지는 SSR + 다수의 히어로/썸네일 이미지라 Playwright 기본
+ * navigationTimeout(30s)로는 부족하다. 브라우저 2개가 next start 한 대를
+ * 병렬로 두드리면 두 번째 내비게이션이 있는 테스트부터 타임아웃이 난다
+ * (실측: /ko/product goto, page.reload 에서 firefox·webkit 실패).
+ * 페이지가 실제로 무거운 것이므로 대기 시간을 현실에 맞춘다.
+ */
+test.use({ navigationTimeout: 60_000 });
+test.describe.configure({ timeout: 60_000 });
+
 const launcher = (page: Page) => page.getByTestId("chat-launcher");
 const panel = (page: Page) => page.getByTestId("chat-panel");
 const thread = (page: Page) => page.getByRole("log");
@@ -67,8 +77,9 @@ test.describe("챗봇 위젯", () => {
     expect(box!.x + box!.width).toBeGreaterThan(viewport!.width / 2);
     expect(box!.y).toBeGreaterThan(viewport!.height / 2);
 
-    // 다른 라우트에서도 마운트된다.
-    await visit(page, "/ko/product");
+    // 다른 라우트에서도 마운트된다. /ko/product 대신 가벼운 라우트를 쓴다 —
+    // 검증하려는 건 "전역 마운트"이고, 상품 그리드의 이미지 로딩은 관계가 없다.
+    await visit(page, "/ko/contact");
     await expect(launcher(page)).toBeVisible();
   });
 
@@ -77,6 +88,63 @@ test.describe("챗봇 위젯", () => {
     await expect(launcher(page)).not.toHaveAttribute("aria-label", /.*/);
     await expect(launcher(page)).toHaveAccessibleName("무엇이든 물어보세요");
     await expect(launcher(page)).toHaveAttribute("aria-expanded", "false");
+  });
+
+  test("도트 헤일로는 닫혀 있을 때만 돌고, 도트 밖에서 식별 가능하다", async ({
+    page,
+  }) => {
+    const haloState = () =>
+      page.evaluate(() => {
+        const dot = document
+          .querySelector('[data-testid="chat-launcher"]')!
+          .querySelector("span[aria-hidden]")!;
+        const style = getComputedStyle(dot, "::after");
+
+        return {
+          animationName: style.animationName,
+          opacity: Number(style.opacity),
+          scale: Number(style.transform.split("(")[1]?.split(",")[0] ?? 1),
+        };
+      });
+
+    await expect(launcher(page)).toBeVisible();
+    expect((await haloState()).animationName).toBe("chat-live-ping");
+
+    /*
+     * 한 주기를 훑어 "도트보다 커진 상태에서 식별 가능한 불투명도" 구간이
+     * 실제로 존재하는지 확인한다. opacity 와 scale 곡선이 어긋나면 헤일로가
+     * 진할 때는 도트에 가려지고 커졌을 때는 이미 사라져 아무것도 보이지 않는데,
+     * 애니메이션이 "돌고 있다"는 단정만으로는 그 회귀를 잡지 못한다.
+     */
+    let visibleFrames = 0;
+    for (let i = 0; i < 20; i++) {
+      const { opacity, scale } = await haloState();
+      if (scale >= 1.4 && opacity >= 0.3) visibleFrames += 1;
+      await page.waitForTimeout(130);
+    }
+    expect(visibleFrames).toBeGreaterThan(0);
+
+    // 열리면 멈춘다 — 대화 중 깜빡임은 상태를 전달하지 않는 순수한 소음이다.
+    await openChatbot(page);
+    expect((await haloState()).animationName).toBe("none");
+  });
+
+  test("reduced-motion 에서는 헤일로가 선언되지 않는다", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await expect(launcher(page)).toBeVisible();
+
+    const halo = await page.evaluate(() => {
+      const dot = document
+        .querySelector('[data-testid="chat-launcher"]')!
+        .querySelector("span[aria-hidden]")!;
+      const style = getComputedStyle(dot, "::after");
+
+      return { animationName: style.animationName, opacity: style.opacity };
+    });
+
+    expect(halo.animationName).toBe("none");
+    // 기본 opacity 가 0 이어야 한다 — 아니면 불투명한 오렌지 원이 도트를 덮는다.
+    expect(halo.opacity).toBe("0");
   });
 
   test("첫 화면이 의도 선택 칩을 가르친다", async ({ page }) => {

@@ -82,12 +82,18 @@ export function ChatLauncher({
         type="button"
       >
         {/* 데스크탑: 오렌지 도트가 브랜드 노트 + '지금 응답 가능' 표시.
-            모바일: 라벨이 없으니 아이콘이 어포던스를 맡고 도트는 배지로 붙는다. */}
+            모바일: 라벨이 없으니 아이콘이 어포던스를 맡고 도트는 배지로 붙는다.
+
+            헤일로는 **닫혀 있을 때만** 돈다. 패널이 열리면 "여기 있어요" 라는
+            신호는 이미 역할을 다했고, 대화 중에 계속 깜빡이는 건 순수한 소음이다
+            (operate 원칙: 모션은 상태를 전달할 때만). 덕분에 상시 노출 요소가
+            항상 움직이는 것도 아니게 된다. */}
         <span
           aria-hidden="true"
           className={cn(
-            "bg-brand duration-normal shrink-0 rounded-full transition-all",
+            "bg-brand duration-normal relative shrink-0 rounded-full transition-all",
             hasUnread ? "size-2.5" : "size-2",
+            !isOpen && "chat-live-dot",
             "max-sm:absolute max-sm:right-3.5 max-sm:top-3.5",
           )}
         />
