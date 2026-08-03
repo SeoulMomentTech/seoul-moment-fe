@@ -16,6 +16,7 @@ import ScrollRestoration from "@shared/ui/scroll-restoration";
 
 import { routing } from "@/i18n/routing";
 
+import { ChatbotLauncher } from "@widgets/chatbot";
 import { Footer } from "@widgets/footer";
 import { Header } from "@widgets/header";
 
@@ -129,10 +130,15 @@ export default async function RootLayout({
               <Header />
               <main className="mx-auto min-h-[calc(100vh-200px)] bg-white">
                 {children}
-                <Toaster />
+                {/* 우측 하단은 챗봇 플로팅 버튼 자리다. 기본값(bottom-right)이면
+                    토스트가 버튼을 덮어 클릭이 막히므로 하단 중앙으로 옮긴다. */}
+                <Toaster position="bottom-center" />
                 <GlobalQueryHandler />
               </main>
               <Footer />
+              {/* <main> 형제로 마운트해야 라우트 이동 시 언마운트되지 않는다.
+                  views/* 나 개별 page 에 두면 라우트마다 재마운트된다. */}
+              <ChatbotLauncher />
             </ReactQueryProvider>
           </NextIntlClientProvider>
         </NuqsAdapter>
