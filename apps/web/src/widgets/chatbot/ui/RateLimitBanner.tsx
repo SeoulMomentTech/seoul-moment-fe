@@ -25,20 +25,24 @@ export default function RateLimitBanner() {
     rateLimitedUntil ? remainingSeconds(rateLimitedUntil) : 0,
   );
 
-  useEffect(() => {
-    if (rateLimitedUntil === null) return;
+  useEffect(
+    // 남은 시간을 1초 단위로 줄이고, 0이 되면 스스로 차단을 해제한다.
+    function countDownUntilUnblocked() {
+      if (rateLimitedUntil === null) return;
 
-    setSeconds(remainingSeconds(rateLimitedUntil));
+      setSeconds(remainingSeconds(rateLimitedUntil));
 
-    const timer = setInterval(() => {
-      const left = remainingSeconds(rateLimitedUntil);
-      setSeconds(left);
+      const timer = setInterval(function tick() {
+        const left = remainingSeconds(rateLimitedUntil);
+        setSeconds(left);
 
-      if (left === 0) clearRateLimit();
-    }, 1000);
+        if (left === 0) clearRateLimit();
+      }, 1000);
 
-    return () => clearInterval(timer);
-  }, [clearRateLimit, rateLimitedUntil]);
+      return () => clearInterval(timer);
+    },
+    [clearRateLimit, rateLimitedUntil],
+  );
 
   if (rateLimitedUntil === null) return null;
 

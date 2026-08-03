@@ -50,17 +50,21 @@ export default function ChatMessageList({
     setHasNewMessage(false);
   };
 
-  // 사용자가 과거 대화를 보는 중이면 자동 스크롤하지 않고 "새 메시지" 버튼을 띄운다.
-  useEffect(() => {
-    const log = logRef.current;
-    if (!log) return;
+  useEffect(
+    // 바닥에 있었으면 새 메시지로 따라 내려가고, 과거 대화를 보는 중이었으면
+    // 스크롤을 건드리지 않고 "새 메시지" 버튼만 띄운다.
+    function followNewMessages() {
+      const log = logRef.current;
+      if (!log) return;
 
-    if (wasAtBottomRef.current) {
-      log.scrollTop = log.scrollHeight;
-    } else {
-      setHasNewMessage(true);
-    }
-  }, [messages, isPending]);
+      if (wasAtBottomRef.current) {
+        log.scrollTop = log.scrollHeight;
+      } else {
+        setHasNewMessage(true);
+      }
+    },
+    [messages, isPending],
+  );
 
   const isFirstVisit = messages.length === 0;
 

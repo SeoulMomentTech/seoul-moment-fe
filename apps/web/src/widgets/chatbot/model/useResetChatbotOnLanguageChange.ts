@@ -29,19 +29,22 @@ export function useResetChatbotOnLanguageChange() {
   const setLanguageCode = useChatbotStore((state) => state.setLanguageCode);
   const reset = useChatbotStore((state) => state.reset);
 
-  useEffect(() => {
-    // 최초 진입: 기준 언어만 기록하고 초기화하지 않는다.
-    if (storedLanguageCode === null) {
+  useEffect(
+    function resetWhenLanguageChanged() {
+      // 최초 진입: 기준 언어만 기록하고 초기화하지 않는다.
+      if (storedLanguageCode === null) {
+        setLanguageCode(languageCode);
+        return;
+      }
+
+      if (storedLanguageCode === languageCode) return;
+
       setLanguageCode(languageCode);
-      return;
-    }
-
-    if (storedLanguageCode === languageCode) return;
-
-    setLanguageCode(languageCode);
-    reset();
-    // 추천 질문은 언어별로 키가 다르지만, 이전 언어 캐시를 남기지 않고
-    // 새 언어로 처음부터 조회하도록 초기화한다.
-    queryClient.resetQueries({ queryKey: AI_CONSULT_QUERY_KEY });
-  }, [languageCode, queryClient, reset, setLanguageCode, storedLanguageCode]);
+      reset();
+      // 추천 질문은 언어별로 키가 다르지만, 이전 언어 캐시를 남기지 않고
+      // 새 언어로 처음부터 조회하도록 초기화한다.
+      queryClient.resetQueries({ queryKey: AI_CONSULT_QUERY_KEY });
+    },
+    [languageCode, queryClient, reset, setLanguageCode, storedLanguageCode],
+  );
 }

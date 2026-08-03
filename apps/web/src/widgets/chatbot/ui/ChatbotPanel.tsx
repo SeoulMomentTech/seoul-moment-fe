@@ -45,66 +45,79 @@ export default function ChatbotPanel({ triggerRef }: ChatbotPanelProps) {
   const isOffline =
     typeof navigator !== "undefined" && navigator.onLine === false;
 
-  // 오픈 시 패널 안으로 포커스 이동, 닫을 때 런처로 복귀
-  useEffect(() => {
-    if (!isOpen) return;
+  useEffect(
+    // 오픈 직후 입력창으로 포커스를 옮긴다. 진입 애니메이션이 끝나기 전에
+    // focus 하면 브라우저가 스크롤을 튀게 만들어 한 프레임 뒤로 미룬다.
+    function focusComposerOnOpen() {
+      if (!isOpen) return;
 
-    const timer = setTimeout(() => {
-      panelRef.current?.querySelector<HTMLTextAreaElement>("textarea")?.focus();
-    }, 120);
+      const timer = setTimeout(function focusComposer() {
+        panelRef.current
+          ?.querySelector<HTMLTextAreaElement>("textarea")
+          ?.focus();
+      }, 120);
 
-    return () => clearTimeout(timer);
-  }, [isOpen]);
+      return () => clearTimeout(timer);
+    },
+    [isOpen],
+  );
 
-  // 모바일은 패널이 전체화면이므로 배경 스크롤을 잠근다. 데스크톱 팝오버는
-  // 페이지를 읽으며 대화하는 것이 목적이라 잠그지 않는다.
-  useEffect(() => {
-    if (!isOpen || !isMobile) return;
+  useEffect(
+    // 모바일은 패널이 전체화면이므로 배경 스크롤을 잠근다. 데스크톱 팝오버는
+    // 페이지를 읽으며 대화하는 것이 목적이라 잠그지 않는다.
+    function lockBackgroundScrollOnMobile() {
+      if (!isOpen || !isMobile) return;
 
-    const { overflow, touchAction } = document.body.style;
-    document.body.style.overflow = "hidden";
-    document.body.style.touchAction = "none";
+      const { overflow, touchAction } = document.body.style;
+      document.body.style.overflow = "hidden";
+      document.body.style.touchAction = "none";
 
-    return () => {
-      document.body.style.overflow = overflow;
-      document.body.style.touchAction = touchAction;
-    };
-  }, [isMobile, isOpen]);
+      return function restoreBackgroundScroll() {
+        document.body.style.overflow = overflow;
+        document.body.style.touchAction = touchAction;
+      };
+    },
+    [isMobile, isOpen],
+  );
 
-  useEffect(() => {
-    if (!isOpen) return;
+  useEffect(
+    // Esc 로 닫고 런처로 포커스를 되돌리며, 열려 있는 동안 포커스를 패널 안에 묶는다.
+    function bindEscapeAndFocusTrap() {
+      if (!isOpen) return;
 
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        close();
-        triggerRef.current?.focus();
-        return;
+      function handleKeyDown(event: KeyboardEvent) {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          close();
+          triggerRef.current?.focus();
+          return;
+        }
+
+        if (event.key !== "Tab") return;
+
+        const focusable = [
+          ...(panelRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE) ?? []),
+        ].filter((element) => element.offsetParent !== null);
+
+        if (!focusable.length) return;
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
       }
 
-      if (event.key !== "Tab") return;
-
-      const focusable = [
-        ...(panelRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE) ?? []),
-      ].filter((element) => element.offsetParent !== null);
-
-      if (!focusable.length) return;
-
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [close, isOpen, triggerRef]);
+      document.addEventListener("keydown", handleKeyDown);
+      return () => document.removeEventListener("keydown", handleKeyDown);
+    },
+    [close, isOpen, triggerRef],
+  );
 
   if (!isOpen) return null;
 
