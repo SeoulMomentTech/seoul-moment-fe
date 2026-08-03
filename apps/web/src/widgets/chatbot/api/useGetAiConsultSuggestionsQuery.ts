@@ -6,6 +6,8 @@ import {
 
 import useAppQuery from "@/shared/lib/hooks/query/useAppQuery";
 
+import { aiConsultSuggestionsQueryKey } from "./queryKey";
+
 interface Args {
   /**
    * 패널이 열렸을 때만 true 로 넘긴다. 챗봇 위젯은 전 페이지에 마운트되므로
@@ -28,7 +30,7 @@ export function useGetAiConsultSuggestionsQuery({ enabled }: Args = {}) {
     Error,
     GetAiConsultSuggestionsRes
   >({
-    queryKey: ["ai-consult", "suggestions", languageCode],
+    queryKey: aiConsultSuggestionsQueryKey(languageCode),
     queryFn: () => getAiConsultSuggestions({ languageCode }),
     select: (res) => res.data,
     staleTime: 5 * 60 * 1000,
