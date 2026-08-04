@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-import { WifiOff, X } from "lucide-react";
+import { X } from "lucide-react";
 
 import { useTranslations } from "next-intl";
 
@@ -13,6 +13,7 @@ import { cn } from "@seoul-moment/ui";
 import ChatComposer from "./ChatComposer";
 import { type IntroSuggestionsState } from "./ChatIntroSuggestions";
 import ChatMessageList from "./ChatMessageList";
+import OfflineBanner from "./OfflineBanner";
 import RateLimitBanner from "./RateLimitBanner";
 import { useGetAiConsultSuggestionsQuery } from "../api/useGetAiConsultSuggestionsQuery";
 import { useChatbotConversation } from "../model/useChatbotConversation";
@@ -44,9 +45,6 @@ export default function ChatbotPanel({ triggerRef }: ChatbotPanelProps) {
     suggestionsStatus === "success"
       ? { status: "success", suggestions: suggestions?.list ?? [] }
       : { status: suggestionsStatus };
-
-  const isOffline =
-    typeof navigator !== "undefined" && navigator.onLine === false;
 
   useEffect(
     // 오픈 직후 입력창으로 포커스를 옮긴다. 진입 애니메이션이 끝나기 전에
@@ -165,12 +163,7 @@ export default function ChatbotPanel({ triggerRef }: ChatbotPanelProps) {
 
         <RateLimitBanner />
 
-        {isOffline && (
-          <p className="border-neutral-subtle bg-neutral-subtle/20 text-body-4 text-danger flex flex-none items-center gap-2 border-t px-4 py-2.5">
-            <WifiOff aria-hidden="true" size={15} />
-            {t("chatbot_offline_notice")}
-          </p>
-        )}
+        <OfflineBanner />
 
         <ChatComposer disabled={isPending || isRateLimited} onSend={send} />
       </div>
