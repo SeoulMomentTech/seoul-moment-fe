@@ -384,6 +384,13 @@ body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:non
 .cb-list a:first-child{border-top:0}
 .cb-list a:hover{background:var(--brand-soft)}
 .cb-list svg{flex:none; opacity:.6}
+.cb-list .list-name{flex:1}
+/* 정사각 고정 타일. 브랜드 로고는 배경색이 박혀 있고 비율이 1:1~2:1 로 섞여
+   있어서 cover 로 채우면 잘린다. 크기를 이미지가 아니라 타일에 주는 이유는
+   실제 구현이 Tailwind preflight 의 img{height:auto} 를 피해야 하는 것과 같다. */
+.cb-list .thumb{flex:none; display:flex; align-items:center; justify-content:center;
+  width:36px; height:36px; border-radius:6px; overflow:hidden; background:var(--surface)}
+.cb-list .thumb img{max-width:100%; max-height:100%; object-fit:contain}
 /* 펼치기는 링크가 아니라 버튼이다. 항목과 같은 행 높이를 쓰되 색과 배경으로
    "이동하지 않는다"를 알린다. */
 .cb-list .list-all{appearance:none; cursor:pointer; font-family:inherit; width:100%; text-align:left;
@@ -740,7 +747,13 @@ body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:non
           <li><strong>브랜드·카테고리 링크 목록</strong> — 서버가 <code>brands</code>·<code>categories</code>로 내려준 항목을 링크로 만듭니다. 목적지 매핑은 §7.4.</li>
         </ul>
       </li>
-      <li><strong><code>image</code> 필드는 쓰지 않습니다.</strong> <code>brands</code>·<code>categories</code>에 이미지 URL이 오지만, 리치 카드를 만들지 않기로 한 결정(<a href="#s9">§9</a>)을 유지해 이름만 링크로 노출합니다. 나중에 썸네일이 필요하다고 판단되면 그때 이 결정을 다시 봅니다 — 지금 쓰지 않는 것은 누락이 아니라 선택입니다.</li>
+      <li><strong><code>image</code>는 카드가 아니라 행 앞 썸네일로 씁니다.</strong> 36&times;36 정사각 타일에 <code>object-contain</code>으로 담고, <code>image</code>가 없으면 썸네일만 빠집니다.
+        <ul>
+          <li>카드로 만들지 않은 이유: 브랜드 이미지는 <strong>이름이 박힌 워드마크 로고</strong>라서(dev 실측 8개 중 7개) 카드 캡션과 이름이 중복되고, 비율이 1:1 다섯 개·약 2:1 세 개로 섞여 고정 비율 박스에서 레터박싱이 커집니다. 배경색(검정·연두·청록)도 이미지에 박혀 있어 패널 배경과 충돌합니다.</li>
+          <li><strong>대분류(<code>CATEGORY_LIST</code>)는 <code>image</code>가 3/3 모두 <code>null</code>입니다.</strong> 카드 그리드로 가면 같은 자리에서 태그별로 레이아웃이 갈리는데, 행 + 썸네일은 이미지가 없으면 그대로 텍스트 행이 되어 한 형태로 수렴합니다.</li>
+          <li>타일에 크기를 주고 이미지는 <code>max-h-full max-w-full</code>로 담습니다. Tailwind preflight의 <code>img { height: auto }</code>가 <code>next/image</code>의 <code>height</code>를 덮어써서, 이미지에만 맡기면 행 높이가 원본 비율대로 들쭉날쭉해집니다.</li>
+          <li>리치 카드를 만들지 않는다는 결정(<a href="#s9">§9</a>)은 유지됩니다. 썸네일은 답변을 카드로 바꾸는 것이 아니라 링크 행의 식별을 돕는 장치입니다.</li>
+        </ul></li>
       <li><strong>목록은 5개까지만 접어서 노출하고, 그보다 많으면 목록 안에서 펼칩니다.</strong> 실제 응답은 브랜드 8개·소분류 9개를 주는데 전부 세로로 나열하면 좁은 패널에서 목록이 대화를 밀어냅니다. 마지막 행이 <code>나머지 N개 보기</code>(펼침 시 <code>접기</code>) 버튼이고, 누르면 이동 없이 그 자리에서 전부 열립니다.</li>
       <li><strong>목록 페이지로 보내지 않습니다.</strong> 브랜드 목록 화면이 아직 없습니다 — <code>app/[locale]/brand/page.tsx</code>는 빈 화면에 <code>robots: noindex</code>가 걸린 플레이스홀더입니다. <code>/product</code>에도 브랜드 전체를 훑을 진입점이 없습니다(<code>brandId</code>는 단일 브랜드 필터). 빈 페이지로 보내는 링크는 없는 것보다 나쁘므로 제자리 펼치기를 택했습니다. 세 태그가 같은 자리에서 같은 동작을 하는 것도 이 방식의 이점입니다.</li>
       <li><strong>펼치기 버튼은 링크가 아니라 버튼입니다.</strong> <code>aria-expanded</code>로 상태를 노출하고, 항목 링크의 <code>&gt;</code>와 구분되도록 <code>⌄</code>/<code>⌃</code> 아이콘을 씁니다.</li>
@@ -1198,7 +1211,7 @@ body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:non
     <li>로그인 사용자 개인화(주문·배송 조회, 관심상품 기반 추천)</li>
     <li>FAQ 지식·답변 상수 구성, LLM 매칭 튜닝: D-2가 자체 백엔드로 확정됐으나 그 내부 설계는 백엔드·기획 소관</li>
     <li><strong>운영 로그 분석 도구·대시보드</strong> — 로그 적재는 D-7 범위, 분석 방법은 별도</li>
-    <li>리치 카드·캐러셀 — 상품 썸네일·가격이 들어간 카드형 응답은 만들지 않습니다. 응답은 텍스트와 링크로만 구성합니다(<a href="#s5">§5.2</a>). <strong><code>brands</code>·<code>categories</code>의 <code>image</code> 필드를 쓰지 않는 것도 이 결정에 따른 것입니다.</strong></li>
+    <li>리치 카드·캐러셀 — 상품 썸네일·가격이 들어간 카드형 응답, 좌우로 넘기는 캐러셀은 만들지 않습니다. 응답은 텍스트와 링크로만 구성합니다(<a href="#s5">§5.2</a>). <strong>브랜드·카테고리 링크 행의 36px 썸네일은 여기서 말하는 카드가 아닙니다.</strong></li>
     <li>음성 입력, 파일·이미지 업로드</li>
     <li>코드 구현 및 구현 계획서 — 이 문서는 PRD만 다룹니다</li>
   </ul>
@@ -1325,7 +1338,7 @@ body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:non
       <tr><td>F-4 비로그인 사용</td><td>로그인 무관. <code>persist</code> 미사용으로 브라우저에 대화 안 남김</td></tr>
       <tr><td>D-9 자리 정리</td><td><code>&lt;Toaster position="bottom-center" /&gt;</code>, ScrollToTop 을 챗봇 버튼 위 스택으로(중심축 정렬)</td></tr>
       <tr><td>API 연동</td><td>추천 질문 조회(오픈 시점) + 대화 전송. <code>tag</code> 9종 분기</td></tr>
-      <tr><td>브랜드·카테고리 안내</td><td><code>BRAND_LIST</code> · <code>CATEGORY_LIST</code> · <code>PRODUCT_CATEGORY_LIST</code> 를 링크 목록으로 렌더. 5개까지 접고 나머지는 목록 안에서 펼침. 대분류·소분류가 서로 다른 쿼리 파라미터로 연결됨(§7.4)</td></tr>
+      <tr><td>브랜드·카테고리 안내</td><td><code>BRAND_LIST</code> · <code>CATEGORY_LIST</code> · <code>PRODUCT_CATEGORY_LIST</code> 를 링크 목록으로 렌더. 행 앞 36px 썸네일(<code>image</code> 없으면 생략), 5개까지 접고 나머지는 목록 안에서 펼침. 대분류·소분류가 서로 다른 쿼리 파라미터로 연결됨(§7.4)</td></tr>
       <tr><td>상태 화면</td><td>최초 진입 · 추천 질문 로딩/실패 · 전송 중 · tag 별 응답 · 네트워크 오류+재시도 · 오프라인 · 레이트리밋 · 입력 길이</td></tr>
       <tr><td>접근성</td><td><code>aria-live</code> 메시지 영역, 포커스 트랩, Esc, <code>aria-modal</code>(모바일), 스크린리더 레이블</td></tr>
       <tr><td>i18n</td><td>시트 <code>language-pack</code> 에 20개 키 등록. 언어 변경 시 대화 초기화 + 추천 질문 재조회</td></tr>
@@ -1356,6 +1369,9 @@ body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:non
     <li><strong>대분류와 소분류는 쿼리 파라미터가 다르다</strong>: <code>categoryId</code> vs <code>productCategoryId</code>. 같은 이름으로 보내면 필터가 걸리지 않는다(§7.4).</li>
       <li><strong>목록 응답이 길다</strong>: dev 실측으로 브랜드 8개, 패션 소분류 9개다. 전부 나열하면 답변 한 건이 패널을 넘겨서 5개로 잘랐다(§5.2).</li>
       <li><strong>브랜드 목록 화면이 없다</strong>: <code>app/[locale]/brand/page.tsx</code>는 빈 <code>noindex</code> 플레이스홀더다. &ldquo;전체 보기&rdquo; 링크를 걸면 빈 페이지로 보내게 되므로 제자리 펼치기로 바꿨다(§5.2).</li>
+      <li><strong><code>image</code>가 태그마다 다르다</strong>: dev 실측으로 브랜드 8/8, 소분류 9/9 는 있고 <strong>대분류는 3/3 모두 <code>null</code></strong>이다. 카드 그리드가 아니라 행 썸네일을 택한 이유다(§5.2).</li>
+      <li><strong>브랜드 이미지는 워드마크 로고다</strong>: 8개 중 7개가 브랜드명을 이미지로 렌더한 것이고 배경색이 박혀 있다. 비율도 1:1 과 2:1 로 섞여 있어 <code>object-cover</code>로 채우면 잘린다.</li>
+      <li><strong>Tailwind preflight 가 <code>next/image</code>의 height 를 덮어쓴다</strong>: <code>img { height: auto }</code> 때문에 크기를 이미지가 아니라 감싼 타일에 줘야 행 높이가 고정된다.</li>
   </ul>
 </section>
 
@@ -1466,14 +1482,14 @@ body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:non
     role: "bot", tag: "BRAND_LIST",
     text: "현재 입점한 브랜드예요. 눌러서 브랜드 페이지로 이동할 수 있어요.",
     brands: [
-      { id: 111, name: "무신사 스탠다드", image: null },
-      { id: 110, name: "서울모먼트", image: null },
-      { id: 112, name: "올리브영", image: null },
-      { id: 113, name: "취(Chwi)", image: null },
-      { id: 115, name: "무센트", image: null },
-      { id: 2, name: "Node Labs", image: null },
-      { id: 3, name: "OSSMOVE", image: null },
-      { id: 4, name: "RUN STATE", image: null },
+      { id: 111, name: "무신사 스탠다드", image: "https://image-dev.seoulmoment.com.tw/brand/2026-02-01/01d604c1-e3bd-4a78-bc03-bae15e1d316c-aa4b4a67-00f1-41ce-90de-d21f512c0b8c.webp" },
+      { id: 110, name: "서울모먼트", image: "https://image-dev.seoulmoment.com.tw/brand/2026-02-01/21a4c95d-2dde-4cc1-a3a4-cb547f49cd84-8a62b44a-0248-4589-a210-8e12f4d3f98f.webp" },
+      { id: 112, name: "올리브영", image: "https://image-dev.seoulmoment.com.tw/brand/2026-02-01/90590812-4fd2-4e54-9b0c-14c558ff3137-98ca87fb-a7db-4fbf-ae4d-a8be02d2cba4.webp" },
+      { id: 113, name: "취(Chwi)", image: "https://image-dev.seoulmoment.com.tw/brand/2026-02-03/0b034a1d-dce5-489d-bc06-9e9904be07b2-0663bf7f-e2bc-4cb5-8d3c-8a104dd4d36c.webp" },
+      { id: 115, name: "무센트", image: "https://image-dev.seoulmoment.com.tw/brand/2026-02-04/d5e983e0-c5f9-4aad-ba07-0e3ad0f9d2fc-9a01de7c-f7b2-4199-b8dc-ed9fb94c5a40.webp" },
+      { id: 2, name: "Node Labs", image: "https://image-dev.seoulmoment.com.tw/brand/2026-06-07/e027f398-f09c-45a6-855b-95dc3ea63373-66d7af6a-4967-4ab2-a8d6-1b8e676fa287.webp" },
+      { id: 3, name: "OSSMOVE", image: "https://image-dev.seoulmoment.com.tw/brand/2026-06-11/faa5ae58-794a-4e5f-ab13-f811b4084a12-3e2d4f83-c027-4601-ab61-6307cdf69a3f.webp" },
+      { id: 4, name: "RUN STATE", image: "https://image-dev.seoulmoment.com.tw/brand/2026-06-12/ebf707eb-6041-4a2a-87fb-726b65304c2f-ee4268c0-9832-458f-b5aa-0daa8e1d6b10.webp" },
     ],
   };
   const CATEGORY_LIST = {
@@ -1490,15 +1506,15 @@ body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:non
     text: "패션 안에는 이런 하위 분류가 있어요.",
     parentCategory: { id: 1, name: "패션", image: null },
     categories: [
-      { id: 4, name: "여성 반팔", image: null },
-      { id: 6, name: "니트", image: null },
-      { id: 3, name: "여성 긴팔", image: null },
-      { id: 7, name: "후드/집업", image: null },
-      { id: 1, name: "여성 아우터", image: null },
-      { id: 5, name: "여성 민소매", image: null },
-      { id: 40, name: "버뮤다 팬츠", image: null },
-      { id: 2, name: "러닝모자", image: null },
-      { id: 41, name: "바람막이", image: null },
+      { id: 4, name: "여성 반팔", image: "https://image-dev.seoulmoment.com.tw/product-category/image/a1c5fbbe5c8794c9b4c78d312c8d3da0.jpg" },
+      { id: 6, name: "니트", image: "https://image-dev.seoulmoment.com.tw/product-category/image/52ee778c5a293cea2f275d810f6fe2b5.jpg" },
+      { id: 3, name: "여성 긴팔", image: "https://image-dev.seoulmoment.com.tw/product-category/3/55f1d4be937b852c3aa2c13cdd776411.png" },
+      { id: 7, name: "후드/집업", image: "https://image-dev.seoulmoment.com.tw/product-category/2026-02-06/dfc54951-a618-4c59-ac43-224fd2482a36-015a4ee8-de6b-4834-8f89-9d569b2ea28c.webp" },
+      { id: 1, name: "여성 아우터", image: "https://image-dev.seoulmoment.com.tw/product-category/2026-02-06/a9296121-16fe-4d94-a30c-194658f9f2b1-e8e5a0b8-49c4-4ee5-a816-d51f5d6f88e9.webp" },
+      { id: 5, name: "여성 민소매", image: "https://image-dev.seoulmoment.com.tw/product-category/2026-02-19/e3899939-e2b1-4154-a0f9-cf7dcba8d12f-a637db0a-a816-4530-a353-2b54c4159c32.webp" },
+      { id: 40, name: "버뮤다 팬츠", image: "https://image-dev.seoulmoment.com.tw/product-category/2026-02-19/aa345853-f720-4a06-aff1-2e6217c02207-858884ef-0253-4fa2-a9b1-b38ded12b800.webp" },
+      { id: 2, name: "러닝모자", image: "https://image-dev.seoulmoment.com.tw/product-category/2026-06-11/1722f1b6-2247-4975-ad22-0d05234c5bc7-4afe57ad-9060-449c-bfb2-49dea2cd7093.webp" },
+      { id: 41, name: "바람막이", image: "https://image-dev.seoulmoment.com.tw/product-category/2026-07-28/6ca603f7-df77-4f85-a65b-38ef274c7bf5-e04c2b99-5c16-4ab9-b5e4-33b9c87db75e.webp" },
     ],
   };
 
@@ -1592,7 +1608,9 @@ body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:non
       const expanded = !!m.listExpanded;
       const visible = expanded || hidden <= 0 ? listItems : listItems.slice(0, LIST_VISIBLE_MAX);
       out += '<div class="cb-list">' + parent + visible
-        .map(x => '<a href="#proto" data-demo-link="1">' + esc(x.name) + chevronSvg + "</a>")
+        .map(x => '<a href="#proto" data-demo-link="1">'
+          + (x.image ? '<span class="thumb"><img src="' + esc(x.image) + '" alt="" loading="lazy"></span>' : "")
+          + '<span class="list-name">' + esc(x.name) + "</span>" + chevronSvg + "</a>")
         .join("")
         + (hidden > 0
           ? '<button class="list-all" type="button" data-list-toggle="' + idx

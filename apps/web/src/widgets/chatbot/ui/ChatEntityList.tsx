@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { ChevronDown, ChevronRight, ChevronUp } from "lucide-react";
 
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 
 import type { AiConsultCategory } from "@shared/services/aiConsult";
@@ -16,10 +17,16 @@ import {
   type ChatbotMessage,
 } from "../model/types";
 
+/** 썸네일 한 변. 행 높이를 크게 늘리지 않는 선에서 로고를 알아볼 수 있는 크기다. */
+const THUMBNAIL_SIZE = 36;
+
 interface ChatEntityListProps {
   tag: ChatbotMessage["tag"];
-  /** 브랜드 또는 카테고리. 둘 다 `{ id, name }` 형태라 한 컴포넌트로 다룬다. */
-  items: Array<{ id: number; name: string }>;
+  /**
+   * 브랜드 또는 카테고리. 둘 다 `{ id, name, image }` 형태라 한 컴포넌트로 다룬다.
+   * `image` 는 대분류에서 항상 `null` 이므로 없을 수 있다고 보고 다뤄야 한다.
+   */
+  items: Array<{ id: number; name: string; image: string | null }>;
   /** 소분류 목록일 때의 상위 대분류. 맥락 표시용이며 링크는 아니다. */
   parentCategory?: AiConsultCategory | null;
 }
@@ -31,8 +38,10 @@ interface ChatEntityListProps {
  * 질문"이고 이 목록은 "누르면 그 페이지로 이동"이라, 같은 모양이면 사용자가 결과를
  * 예측할 수 없다.
  *
- * 서버가 `image` URL 도 주지만 쓰지 않는다. 리치 카드를 만들지 않기로 한 결정을
- * 유지해 이름만 노출한다(PRD §5.2 · §9).
+ * 카드가 아니라 **행 앞 썸네일**이다(PRD §5.2). 브랜드 이미지는 이름이 박힌 워드마크
+ * 로고이고 비율이 1:1 과 2:1 로 섞여 있어서, 카드로 만들면 이름이 캡션과 중복되고
+ * 고정 비율 박스에서 레터박싱이 커진다. 대분류는 `image` 가 아예 없어 카드 그리드로는
+ * 같은 자리에서 레이아웃이 갈린다.
  */
 export default function ChatEntityList({
   tag,
@@ -69,7 +78,26 @@ export default function ChatEntityList({
           href={entityHref(tag, item.id)}
           key={item.id}
         >
-          {item.name}
+          {/* 정사각 고정 박스 + object-contain. 로고에 배경색이 박혀 있고 비율이
+              1:1~2:1 로 섞여 있어서 cover 로 채우면 잘린다. 크기를 박스에 주는
+              이유는 Tailwind preflight 의 `img { height: auto }` 가 next/image 의
+              height 를 덮어써서, 이미지에만 맡기면 행 높이가 원본 비율대로
+              들쭉날쭉해지기 때문이다. */}
+          {item.image && (
+            <span
+              className="bg-neutral-subtle/30 flex shrink-0 items-center justify-center overflow-hidden rounded-md"
+              style={{ height: THUMBNAIL_SIZE, width: THUMBNAIL_SIZE }}
+            >
+              <Image
+                alt=""
+                className="max-h-full max-w-full object-contain"
+                height={THUMBNAIL_SIZE}
+                src={item.image}
+                width={THUMBNAIL_SIZE}
+              />
+            </span>
+          )}
+          <span className="flex-1">{item.name}</span>
           <ChevronRight aria-hidden="true" className="shrink-0" size={15} />
         </Link>
       ))}
