@@ -6,16 +6,16 @@ import { useTranslations } from "next-intl";
 
 import { cn } from "@seoul-moment/ui";
 
+import ChatIntroSuggestions, {
+  type IntroSuggestionsState,
+} from "./ChatIntroSuggestions";
 import ChatMessage from "./ChatMessage";
-import ChatSuggestions from "./ChatSuggestions";
 import { CHAT_SCROLLBAR } from "./scrollbar";
 import type { ChatbotMessage } from "../model/types";
 
 interface ChatMessageListProps {
   messages: ChatbotMessage[];
-  suggestions: string[];
-  isSuggestionsLoading: boolean;
-  isSuggestionsError: boolean;
+  suggestionsState: IntroSuggestionsState;
   isPending: boolean;
   onRetry(message: ChatbotMessage): void;
   onSelectSuggestion(suggestion: string): void;
@@ -25,9 +25,7 @@ const BOTTOM_THRESHOLD = 24;
 
 export default function ChatMessageList({
   messages,
-  suggestions,
-  isSuggestionsLoading,
-  isSuggestionsError,
+  suggestionsState,
   isPending,
   onRetry,
   onSelectSuggestion,
@@ -111,37 +109,11 @@ export default function ChatMessageList({
           />
         ))}
 
-        {/* 최초 진입 추천 질문. 조회 실패해도 직접 입력은 동작해야 하므로
-            패널 렌더를 막지 않고 인라인으로만 알린다. */}
         {isFirstVisit && !isPending && (
-          <>
-            {isSuggestionsLoading && (
-              <div
-                aria-label={t("chatbot_suggestions_loading")}
-                className="flex flex-wrap gap-1.5"
-                role="status"
-              >
-                {[148, 186, 132].map((width) => (
-                  <span
-                    className="bg-neutral-subtle/50 h-9 animate-pulse rounded-full"
-                    key={width}
-                    style={{ width }}
-                  />
-                ))}
-              </div>
-            )}
-            {isSuggestionsError && (
-              <p className="text-body-5 text-neutral">
-                {t("chatbot_suggestions_error")}
-              </p>
-            )}
-            {!isSuggestionsLoading && !isSuggestionsError && (
-              <ChatSuggestions
-                onSelect={onSelectSuggestion}
-                suggestions={suggestions}
-              />
-            )}
-          </>
+          <ChatIntroSuggestions
+            onSelect={onSelectSuggestion}
+            state={suggestionsState}
+          />
         )}
 
         {isPending && (

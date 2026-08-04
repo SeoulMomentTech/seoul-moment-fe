@@ -1,5 +1,7 @@
 "use client";
 
+import { useId } from "react";
+
 interface ChatSuggestionsProps {
   suggestions: string[];
   disabled?: boolean;
@@ -17,6 +19,8 @@ export default function ChatSuggestions({
   disabled,
   onSelect,
 }: ChatSuggestionsProps) {
+  const id = useId();
+
   if (!suggestions.length) return null;
 
   return (
@@ -25,7 +29,7 @@ export default function ChatSuggestions({
         <button
           className="border-brand/40 text-body-4 text-brand duration-fast hover:bg-brand/5 min-h-9 rounded-full border px-3 font-semibold transition-colors disabled:opacity-50"
           disabled={disabled}
-          key={suggestion}
+          key={`${id}-${suggestion}`}
           onClick={() => onSelect(suggestion)}
           type="button"
         >

@@ -4,6 +4,7 @@ export { default as useEventListener } from "./useEventListener";
 export { default as useDataLayerPush } from "./useDataLayerPush";
 export { default as useLanguage } from "./useLanguage";
 export { default as useMediaQuery } from "./useMediaQuery";
+export { default as useBodyScrollLock } from "./useBodyScrollLock";
 export { default as useModal } from "./useModal";
 export { default as useOpen } from "./useOpen";
 export { default as useIntersectionObserver } from "./useIntersectionObserver";
