@@ -303,5 +303,7 @@
   "chatbot_new_message_label": "New message",
   "chatbot_suggestions_loading": "Loading suggested questions",
   "chatbot_suggestions_error": "Couldn't load suggested questions. Type your question instead.",
-  "chatbot_rate_limit_notice": "Please try again in a moment. ({seconds}s)"
+  "chatbot_rate_limit_notice": "Please try again in a moment. ({seconds}s)",
+  "chatbot_list_expand": "Show {count} more",
+  "chatbot_list_collapse": "Show less"
 }
