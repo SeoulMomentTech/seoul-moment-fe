@@ -377,14 +377,17 @@ body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:non
   border:1px solid var(--border); border-radius:12px; overflow:hidden; background:var(--bg)}
 .cb-list .list-parent{margin:0; padding:7px 13px 5px; font-size:12px; color:var(--fg-subtle);
   border-bottom:1px solid var(--border); background:var(--surface)}
-.cb-list a{display:flex; align-items:center; justify-content:space-between; gap:10px;
+.cb-list a, .cb-list .list-all{display:flex; align-items:center; justify-content:space-between; gap:10px;
   min-height:38px; padding:8px 13px; font-size:14px; font-weight:600; color:var(--brand-ink);
   text-decoration:none; border-top:1px solid var(--border)}
 .cb-list .list-parent + a{border-top:0}
 .cb-list a:first-child{border-top:0}
 .cb-list a:hover{background:var(--brand-soft)}
 .cb-list svg{flex:none; opacity:.6}
-.cb-list .list-all{background:var(--surface); font-size:13.5px}
+/* 펼치기는 링크가 아니라 버튼이다. 항목과 같은 행 높이를 쓰되 색과 배경으로
+   "이동하지 않는다"를 알린다. */
+.cb-list .list-all{appearance:none; cursor:pointer; font-family:inherit; width:100%; text-align:left;
+  border-left:0; border-right:0; border-bottom:0; background:var(--surface); color:var(--fg-subtle); font-size:13.5px}
 .cb-list .list-all:hover{background:var(--brand-soft)}
 .cb-sugg{display:flex; flex-wrap:wrap; gap:6px; align-self:flex-start; max-width:100%}
 .cb-sugg button{
@@ -738,7 +741,9 @@ body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:non
         </ul>
       </li>
       <li><strong><code>image</code> 필드는 쓰지 않습니다.</strong> <code>brands</code>·<code>categories</code>에 이미지 URL이 오지만, 리치 카드를 만들지 않기로 한 결정(<a href="#s9">§9</a>)을 유지해 이름만 링크로 노출합니다. 나중에 썸네일이 필요하다고 판단되면 그때 이 결정을 다시 봅니다 — 지금 쓰지 않는 것은 누락이 아니라 선택입니다.</li>
-      <li><strong>목록은 5개까지만 노출하고, 그보다 많으면 “전체 보기” 링크를 붙입니다.</strong> 실제 응답은 브랜드 8개·소분류 9개를 주는데 전부 세로로 나열하면 좁은 패널에서 목록이 대화를 밀어냅니다. 5개 + 전체 보기가 대화 흐름을 지키면서 다음 행동(목록 페이지로 이동)도 만듭니다.</li>
+      <li><strong>목록은 5개까지만 접어서 노출하고, 그보다 많으면 목록 안에서 펼칩니다.</strong> 실제 응답은 브랜드 8개·소분류 9개를 주는데 전부 세로로 나열하면 좁은 패널에서 목록이 대화를 밀어냅니다. 마지막 행이 <code>나머지 N개 보기</code>(펼침 시 <code>접기</code>) 버튼이고, 누르면 이동 없이 그 자리에서 전부 열립니다.</li>
+      <li><strong>목록 페이지로 보내지 않습니다.</strong> 브랜드 목록 화면이 아직 없습니다 — <code>app/[locale]/brand/page.tsx</code>는 빈 화면에 <code>robots: noindex</code>가 걸린 플레이스홀더입니다. <code>/product</code>에도 브랜드 전체를 훑을 진입점이 없습니다(<code>brandId</code>는 단일 브랜드 필터). 빈 페이지로 보내는 링크는 없는 것보다 나쁘므로 제자리 펼치기를 택했습니다. 세 태그가 같은 자리에서 같은 동작을 하는 것도 이 방식의 이점입니다.</li>
+      <li><strong>펼치기 버튼은 링크가 아니라 버튼입니다.</strong> <code>aria-expanded</code>로 상태를 노출하고, 항목 링크의 <code>&gt;</code>와 구분되도록 <code>⌄</code>/<code>⌃</code> 아이콘을 씁니다.</li>
       <li><strong>목록 박스 폭은 답변 버블과 맞춥니다.</strong> 내용 길이에 맞춰 좁아지면 버블과 좌우 정렬이 어긋나 두 블록이 서로 다른 요소처럼 보입니다.</li>
       <li><strong>목록과 되묻기 칩은 다르게 보여야 합니다.</strong> 칩은 “누르면 그 문구를 다시 질문”, 목록은 “누르면 그 페이지로 이동”입니다. 동작이 다르므로 칩(pill)과 링크 목록(세로 나열 + 화살표)을 시각적으로 구분합니다.</li>
       <li><strong>되묻기 칩</strong>: 응답의 <code>suggestions</code>가 비어 있지 않으면 답변 아래에 칩으로 노출합니다(<code>CONFIRM_SUGGESTION</code>·<code>OFF_TOPIC</code>에서 관찰됨). 누르면 그 문구를 그대로 새 질문으로 보냅니다. 링크가 아니라 버튼입니다.</li>
@@ -906,11 +911,11 @@ body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:non
 │   ├─ ChatMessage.tsx                    tag 별 렌더(문의 링크 · 경고 · 되묻기 칩)
 │   ├─ ChatComposer.tsx                   입력부 (2~300자 검증 · 자동 높이)
 │   ├─ ChatSuggestions.tsx                추천 질문 칩 (최초 진입 · 되묻기 공용)
-│   ├─ ChatEntityList.tsx                 브랜드·카테고리 링크 목록 (5개 + 전체 보기)
+│   ├─ ChatEntityList.tsx                 브랜드·카테고리 링크 목록 (5개 + 펼치기)
 │   ├─ RateLimitBanner.tsx                레이트리밋 배너 + 카운트다운
 │   └─ scrollbar.ts                       스크롤 영역 공통 스타일 상수
 ├─ model/
-│   ├─ types.ts                           ChatbotMessage · 태그 상수 · entityHref · viewAllHref
+│   ├─ types.ts                           ChatbotMessage · 태그 상수 · entityHref
 │   ├─ useChatbotStore.ts                 zustand (persist 없음)
 │   ├─ useChatbotConversation.ts          전송 · 재시도 · tag 분기 · 레이트리밋 발동
 │   └─ useResetChatbotOnLanguageChange.ts 언어 변경 시 초기화
@@ -936,14 +941,14 @@ body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:non
   </table></div>
   <h4>브랜드·카테고리 링크 매핑</h4>
   <div class="tw"><table>
-    <thead><tr><th><code>tag</code></th><th>배열</th><th>항목 목적지</th><th>전체 보기 목적지</th></tr></thead>
+    <thead><tr><th><code>tag</code></th><th>배열</th><th>항목 목적지</th></tr></thead>
     <tbody>
-      <tr><td><code>BRAND_LIST</code></td><td><code>brands</code></td><td><code>/brand/{id}</code></td><td><code>/brand</code> (브랜드 목록)</td></tr>
-      <tr><td><code>CATEGORY_LIST</code></td><td><code>categories</code></td><td><code>/product?categoryId={id}</code></td><td><code>/product</code> (필터 없는 전체)</td></tr>
-      <tr><td><code>PRODUCT_CATEGORY_LIST</code></td><td><code>categories</code></td><td><code>/product?productCategoryId={id}</code></td><td><code>/product?categoryId={parentCategory.id}</code> (상위 대분류)</td></tr>
+      <tr><td><code>BRAND_LIST</code></td><td><code>brands</code></td><td><code>/brand/{id}</code></td></tr>
+      <tr><td><code>CATEGORY_LIST</code></td><td><code>categories</code></td><td><code>/product?categoryId={id}</code></td></tr>
+      <tr><td><code>PRODUCT_CATEGORY_LIST</code></td><td><code>categories</code></td><td><code>/product?productCategoryId={id}</code></td></tr>
     </tbody>
   </table></div>
-  <p>소분류의 “전체 보기”가 상위 대분류 필터로 가는 이유: 소분류 전체를 한 번에 거는 필터가 없으므로, 그 소분류들을 모두 포함하는 가장 가까운 상위 범위가 부모 대분류입니다.</p>
+  <p>목록 전체를 보여 주는 목적지는 두지 않습니다. 5개를 넘는 나머지는 목록 안에서 펼칩니다(§5.2).</p>
   <p><code>useProductFilter</code>(<code>src/features/product/model/useProductFilter.ts</code>)가 <code>categoryId</code>와 <code>productCategoryId</code>를 <strong>별도 쿼리 파라미터로</strong> 갖고 있습니다. 대분류와 소분류를 같은 파라미터로 보내면 필터가 걸리지 않으므로 <code>tag</code>에 따라 파라미터 이름을 바꿔야 합니다.</p>
   <p>링크는 <code>@/i18n/navigation</code>의 <code>Link</code>로 만들어 로케일 세그먼트를 유지합니다.</p>
 
@@ -1270,7 +1275,7 @@ body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:non
       <tr><td>오프라인</td><td>네트워크 연결을 확인해주세요.</td></tr>
       <tr><td><s>답변 불가 폴백</s></td><td><strong>서버 <code>answer</code>를 그대로 씁니다.</strong> <code>FALLBACK</code>·<code>OFF_TOPIC</code>·<code>UNAVAILABLE</code> 문구를 프론트에서 만들지 않습니다</td></tr>
       <tr><td>에스컬레이션</td><td>문의 남기기</td></tr>
-      <tr><td>목록 전체 보기</td><td>전체 보기 ({count}) — <code>{count}</code> 보간. 목록 아래에 붙으므로 대상(브랜드/카테고리)은 문맥으로 전달됨</td></tr>
+      <tr><td>목록 펼치기</td><td>나머지 {count}개 보기 / 접기 — <code>{count}</code>는 숨은 개수. 목록 아래에 붙으므로 대상(브랜드/카테고리)은 문맥으로 전달됨</td></tr>
       <tr><td>레이트 리밋 배너</td><td>잠시 후 다시 시도해주세요. ({seconds}초) — <code>{seconds}</code> 보간을 쓰는 유일한 키. 본문 답변은 서버 <code>answer</code></td></tr>
       <tr><td>입력 길이 초과</td><td>300자까지 입력할 수 있어요.</td></tr>
       <tr><td>새 메시지 알림</td><td>새 메시지</td></tr>
@@ -1320,10 +1325,10 @@ body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:non
       <tr><td>F-4 비로그인 사용</td><td>로그인 무관. <code>persist</code> 미사용으로 브라우저에 대화 안 남김</td></tr>
       <tr><td>D-9 자리 정리</td><td><code>&lt;Toaster position="bottom-center" /&gt;</code>, ScrollToTop 을 챗봇 버튼 위 스택으로(중심축 정렬)</td></tr>
       <tr><td>API 연동</td><td>추천 질문 조회(오픈 시점) + 대화 전송. <code>tag</code> 9종 분기</td></tr>
-      <tr><td>브랜드·카테고리 안내</td><td><code>BRAND_LIST</code> · <code>CATEGORY_LIST</code> · <code>PRODUCT_CATEGORY_LIST</code> 를 링크 목록으로 렌더. 대분류·소분류가 서로 다른 쿼리 파라미터로 연결됨(§7.4)</td></tr>
+      <tr><td>브랜드·카테고리 안내</td><td><code>BRAND_LIST</code> · <code>CATEGORY_LIST</code> · <code>PRODUCT_CATEGORY_LIST</code> 를 링크 목록으로 렌더. 5개까지 접고 나머지는 목록 안에서 펼침. 대분류·소분류가 서로 다른 쿼리 파라미터로 연결됨(§7.4)</td></tr>
       <tr><td>상태 화면</td><td>최초 진입 · 추천 질문 로딩/실패 · 전송 중 · tag 별 응답 · 네트워크 오류+재시도 · 오프라인 · 레이트리밋 · 입력 길이</td></tr>
       <tr><td>접근성</td><td><code>aria-live</code> 메시지 영역, 포커스 트랩, Esc, <code>aria-modal</code>(모바일), 스크린리더 레이블</td></tr>
-      <tr><td>i18n</td><td>시트 <code>language-pack</code> 에 19개 키 등록. 언어 변경 시 대화 초기화 + 추천 질문 재조회</td></tr>
+      <tr><td>i18n</td><td>시트 <code>language-pack</code> 에 20개 키 등록. 언어 변경 시 대화 초기화 + 추천 질문 재조회</td></tr>
     </tbody>
   </table></div>
 
@@ -1350,7 +1355,7 @@ body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:non
     <li><strong>답변은 서버 상수</strong>: LLM 은 의미 매칭만 한다. 환각 위험은 낮고 오매칭 위험이 남는다.</li>
     <li><strong>대분류와 소분류는 쿼리 파라미터가 다르다</strong>: <code>categoryId</code> vs <code>productCategoryId</code>. 같은 이름으로 보내면 필터가 걸리지 않는다(§7.4).</li>
       <li><strong>목록 응답이 길다</strong>: dev 실측으로 브랜드 8개, 패션 소분류 9개다. 전부 나열하면 답변 한 건이 패널을 넘겨서 5개로 잘랐다(§5.2).</li>
-      <li><strong>소분류를 한 번에 거는 필터가 없다</strong>: 그래서 소분류의 &ldquo;전체 보기&rdquo;는 부모 대분류 필터로 보낸다(§7.4).</li>
+      <li><strong>브랜드 목록 화면이 없다</strong>: <code>app/[locale]/brand/page.tsx</code>는 빈 <code>noindex</code> 플레이스홀더다. &ldquo;전체 보기&rdquo; 링크를 걸면 빈 페이지로 보내게 되므로 제자리 펼치기로 바꿨다(§5.2).</li>
   </ul>
 </section>
 
@@ -1551,9 +1556,11 @@ body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:non
   const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const LIST_VISIBLE_MAX = 5;
   const chevronSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>';
+  const chevronDownSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+  const chevronUpSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>';
   const linkSvg = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>';
 
-  function msgHtml(m) {
+  function msgHtml(m, idx) {
     const cls = m.role === "me" ? "msg me" : "msg bot";
     const ui = m.tag ? (TAG_UI[m.tag] || {}) : {};
     let body = "<p>" + esc(m.text) + "</p>";
@@ -1572,22 +1579,26 @@ body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:non
     }
 
     // 브랜드·카테고리 목록. tag 가 아니라 배열 유무로 판단하고, 이름만 링크로
-    // 노출한다(image 필드는 쓰지 않는다 §5.2). 5개까지만 보여주고 넘치면 전체
-    // 보기로 보낸다 — 전부 나열하면 좁은 패널에서 목록이 대화를 밀어낸다.
+    // 노출한다(image 필드는 쓰지 않는다 §5.2). 5개까지 접어 두고 나머지는 이
+    // 자리에서 펼친다 — 전부 나열하면 좁은 패널에서 목록이 대화를 밀어내고,
+    // 브랜드 목록 화면이 없어서 링크로 내보낼 곳도 없다.
     const listItems = (m.brands && m.brands.length ? m.brands : null)
       || (m.categories && m.categories.length ? m.categories : null);
     if (listItems) {
       const parent = m.parentCategory
         ? '<p class="list-parent">' + esc(m.parentCategory.name) + " &gt;</p>"
         : "";
-      const visible = listItems.slice(0, LIST_VISIBLE_MAX);
-      const overflow = listItems.length > LIST_VISIBLE_MAX;
+      const hidden = listItems.length - LIST_VISIBLE_MAX;
+      const expanded = !!m.listExpanded;
+      const visible = expanded || hidden <= 0 ? listItems : listItems.slice(0, LIST_VISIBLE_MAX);
       out += '<div class="cb-list">' + parent + visible
         .map(x => '<a href="#proto" data-demo-link="1">' + esc(x.name) + chevronSvg + "</a>")
         .join("")
-        + (overflow
-          ? '<a class="list-all" href="#proto" data-demo-link="1">전체 보기 ('
-            + listItems.length + ")" + linkSvg + "</a>"
+        + (hidden > 0
+          ? '<button class="list-all" type="button" data-list-toggle="' + idx
+            + '" aria-expanded="' + expanded + '">'
+            + (expanded ? "접기" + chevronUpSvg : "나머지 " + hidden + "개 보기" + chevronDownSvg)
+            + "</button>"
           : "")
         + "</div>";
     }
@@ -1605,7 +1616,7 @@ body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:non
   function render() {
     // D-7: 이력 복원이 없으므로 스켈레톤·"이전 대화" 구분선 상태가 존재하지 않는다
     let html = "";
-    S.convo.forEach((m) => { html += msgHtml(m); });
+    S.convo.forEach((m, i) => { html += msgHtml(m, i); });
     if (S.suggestLoading) {
       html += '<div class="sugg-skel" role="status" aria-label="추천 질문을 불러오는 중"><i></i><i></i><i></i></div>';
     } else if (S.suggestFailed) {
@@ -1718,6 +1729,12 @@ body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:non
       const lastMe = [...S.convo].reverse().find(m => m.role === "me");
       S.convo = S.convo.filter(m => !m.error);
       if (lastMe) { S.convo = S.convo.filter(m => m !== lastMe); submit(lastMe.text); }
+      return;
+    }
+    const lt = e.target.closest("[data-list-toggle]");
+    if (lt) {
+      const m = S.convo[Number(lt.dataset.listToggle)];
+      if (m) { m.listExpanded = !m.listExpanded; render(); }
       return;
     }
     const dl = e.target.closest("[data-demo-link]");

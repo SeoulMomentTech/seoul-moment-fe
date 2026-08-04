@@ -53,25 +53,9 @@ export const entityHref = (
 };
 
 /**
- * 한 목록에서 최대로 노출할 항목 수.
+ * 접힌 상태에서 노출할 항목 수.
  *
  * 실제 응답은 브랜드 8개·소분류 9개를 주는데 전부 세로로 나열하면 좁은 패널에서
- * 목록이 대화를 밀어낸다. 넘치는 만큼은 `viewAllHref`로 넘긴다(PRD §5.2).
+ * 목록이 대화를 밀어낸다. 나머지는 목록 안의 펼치기 버튼으로 연다(PRD §5.2).
  */
 export const ENTITY_LIST_VISIBLE_MAX = 5;
-
-/**
- * 잘린 나머지를 보여 줄 목록 페이지.
- *
- * 소분류는 여러 개를 한 번에 거는 필터가 없어서, 그 소분류들을 모두 포함하는 가장
- * 가까운 상위 범위인 부모 대분류로 보낸다(PRD §7.4).
- */
-export const viewAllHref = (
-  tag: AiConsultAnswerTag | undefined,
-  parentCategory?: AiConsultCategory | null,
-): string => {
-  if (tag === "BRAND_LIST") return "/brand";
-  if (tag === "PRODUCT_CATEGORY_LIST" && parentCategory)
-    return `/product?categoryId=${parentCategory.id}`;
-  return "/product";
-};

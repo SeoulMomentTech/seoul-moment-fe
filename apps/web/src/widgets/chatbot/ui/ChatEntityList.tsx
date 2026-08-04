@@ -1,6 +1,8 @@
 "use client";
 
-import { ArrowUpRight, ChevronRight } from "lucide-react";
+import { useState } from "react";
+
+import { ChevronDown, ChevronRight, ChevronUp } from "lucide-react";
 
 import { useTranslations } from "next-intl";
 
@@ -11,7 +13,6 @@ import { Link } from "@/i18n/navigation";
 import {
   ENTITY_LIST_VISIBLE_MAX,
   entityHref,
-  viewAllHref,
   type ChatbotMessage,
 } from "../model/types";
 
@@ -39,11 +40,15 @@ export default function ChatEntityList({
   parentCategory,
 }: ChatEntityListProps) {
   const t = useTranslations();
+  const [isExpanded, setIsExpanded] = useState(false);
 
   if (!items.length) return null;
 
-  const visibleItems = items.slice(0, ENTITY_LIST_VISIBLE_MAX);
-  const hasMore = items.length > ENTITY_LIST_VISIBLE_MAX;
+  const hiddenCount = items.length - ENTITY_LIST_VISIBLE_MAX;
+  const visibleItems =
+    isExpanded || hiddenCount <= 0
+      ? items
+      : items.slice(0, ENTITY_LIST_VISIBLE_MAX);
 
   return (
     <div className="border-neutral-subtle overflow-hidden rounded-xl border">
@@ -69,16 +74,25 @@ export default function ChatEntityList({
         </Link>
       ))}
 
-      {/* 항목 링크와 아이콘을 달리 준다. 항목은 그 대상 하나로 들어가고 이 링크는
-          목록 페이지로 나가므로, 같은 chevron 이면 목적지를 구분할 수 없다. */}
-      {hasMore && (
-        <Link
-          className="border-neutral-subtle bg-neutral-subtle/20 text-body-4 text-neutral hover:bg-neutral-subtle/40 flex min-h-10 items-center justify-between gap-2.5 border-t px-3.5 py-2 font-semibold transition-colors"
-          href={viewAllHref(tag, parentCategory)}
+      {/* 목록 페이지로 보내지 않고 이 자리에서 펼친다. 브랜드 목록 화면이
+          아직 없어서(`app/[locale]/brand/page.tsx` 는 빈 noindex 화면) 링크를
+          걸면 빈 페이지로 보내게 된다. */}
+      {hiddenCount > 0 && (
+        <button
+          aria-expanded={isExpanded}
+          className="border-neutral-subtle bg-neutral-subtle/20 text-body-4 text-neutral hover:bg-neutral-subtle/40 flex min-h-10 w-full items-center justify-between gap-2.5 border-t px-3.5 py-2 font-semibold transition-colors"
+          onClick={() => setIsExpanded((prev) => !prev)}
+          type="button"
         >
-          {t("chatbot_view_all", { count: items.length })}
-          <ArrowUpRight aria-hidden="true" className="shrink-0" size={15} />
-        </Link>
+          {isExpanded
+            ? t("chatbot_list_collapse")
+            : t("chatbot_list_expand", { count: hiddenCount })}
+          {isExpanded ? (
+            <ChevronUp aria-hidden="true" className="shrink-0" size={15} />
+          ) : (
+            <ChevronDown aria-hidden="true" className="shrink-0" size={15} />
+          )}
+        </button>
       )}
     </div>
   );
