@@ -6,6 +6,9 @@ import { api } from ".";
 /** 답변 종류. 레이트리밋·장애 상황도 200 으로 내려오므로 이 값으로 UI 를 분기한다. */
 export type AiConsultAnswerTag =
   | "FAQ_ANSWER"
+  | "BRAND_LIST"
+  | "CATEGORY_LIST"
+  | "PRODUCT_CATEGORY_LIST"
   | "CONFIRM_SUGGESTION"
   | "FALLBACK"
   | "OFF_TOPIC"
@@ -21,12 +24,36 @@ export interface AskAiConsultReq extends PublicLanguageCode {
   message: string;
 }
 
+export interface AiConsultBrand {
+  /** 브랜드 ID */
+  id: number;
+  /** 브랜드 이름 */
+  name: string;
+  /** 브랜드 프로필 이미지 URL. 없으면 null */
+  image: string | null;
+}
+
+export interface AiConsultCategory {
+  /** 카테고리 ID */
+  id: number;
+  /** 카테고리 이름 */
+  name: string;
+  /** 카테고리 이미지 URL. 대분류는 항상 null, 소분류도 미등록이면 null */
+  image: string | null;
+}
+
 export interface AskAiConsultRes {
   /** 고객에게 보여줄 답변. 서버 상수에서 꺼낸 문장이며 AI 가 생성하지 않는다 */
   answer: string;
   tag: AiConsultAnswerTag;
   /** 되물을 추천 질문. 그대로 message 로 다시 보내면 된다. 답변이 확실하면 빈 배열 */
   suggestions: string[];
+  /** 입점 브랜드 목록. tag 가 BRAND_LIST 일 때만 채워지고 그 외에는 빈 배열 */
+  brands: AiConsultBrand[];
+  /** 카테고리 목록. CATEGORY_LIST 면 대분류, PRODUCT_CATEGORY_LIST 면 소분류. 그 외 빈 배열 */
+  categories: AiConsultCategory[];
+  /** 소분류 목록의 상위 대분류. tag 가 PRODUCT_CATEGORY_LIST 일 때만 채워진다 */
+  parentCategory: AiConsultCategory | null;
 }
 
 /**
