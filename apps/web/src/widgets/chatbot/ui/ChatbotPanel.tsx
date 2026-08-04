@@ -2,16 +2,18 @@
 
 import { useEffect, useRef } from "react";
 
-import { WifiOff, X } from "lucide-react";
+import { X } from "lucide-react";
 
 import { useTranslations } from "next-intl";
 
-import { useMediaQuery } from "@shared/lib/hooks";
+import { useBodyScrollLock, useMediaQuery } from "@shared/lib/hooks";
 
 import { cn } from "@seoul-moment/ui";
 
 import ChatComposer from "./ChatComposer";
+import { type IntroSuggestionsState } from "./ChatIntroSuggestions";
 import ChatMessageList from "./ChatMessageList";
+import OfflineBanner from "./OfflineBanner";
 import RateLimitBanner from "./RateLimitBanner";
 import { useGetAiConsultSuggestionsQuery } from "../api/useGetAiConsultSuggestionsQuery";
 import { useChatbotConversation } from "../model/useChatbotConversation";
@@ -36,14 +38,13 @@ export default function ChatbotPanel({ triggerRef }: ChatbotPanelProps) {
 
   // 패널을 열 때만 조회한다. 위젯은 전 페이지에 마운트되므로 마운트 시점에
   // 조회하면 챗봇을 열지 않는 사용자에게도 요청이 나간다.
-  const {
-    data: suggestions,
-    isLoading: isSuggestionsLoading,
-    isError: isSuggestionsError,
-  } = useGetAiConsultSuggestionsQuery({ enabled: isOpen });
+  const { data: suggestions, status: suggestionsStatus } =
+    useGetAiConsultSuggestionsQuery({ enabled: isOpen });
 
-  const isOffline =
-    typeof navigator !== "undefined" && navigator.onLine === false;
+  const suggestionsState: IntroSuggestionsState =
+    suggestionsStatus === "success"
+      ? { status: "success", suggestions: suggestions?.list ?? [] }
+      : { status: suggestionsStatus };
 
   useEffect(
     // 오픈 직후 입력창으로 포커스를 옮긴다. 진입 애니메이션이 끝나기 전에
@@ -62,23 +63,9 @@ export default function ChatbotPanel({ triggerRef }: ChatbotPanelProps) {
     [isOpen],
   );
 
-  useEffect(
-    // 모바일은 패널이 전체화면이므로 배경 스크롤을 잠근다. 데스크톱 팝오버는
-    // 페이지를 읽으며 대화하는 것이 목적이라 잠그지 않는다.
-    function lockBackgroundScrollOnMobile() {
-      if (!isOpen || !isMobile) return;
-
-      const { overflow, touchAction } = document.body.style;
-      document.body.style.overflow = "hidden";
-      document.body.style.touchAction = "none";
-
-      return function restoreBackgroundScroll() {
-        document.body.style.overflow = overflow;
-        document.body.style.touchAction = touchAction;
-      };
-    },
-    [isMobile, isOpen],
-  );
+  // 모바일은 패널이 전체화면이므로 배경 스크롤을 잠근다. 데스크톱 팝오버는
+  // 페이지를 읽으며 대화하는 것이 목적이라 잠그지 않는다.
+  useBodyScrollLock(isOpen && isMobile);
 
   useEffect(
     // Esc 로 닫고 런처로 포커스를 되돌리며, 열려 있는 동안 포커스를 패널 안에 묶는다.
@@ -168,22 +155,15 @@ export default function ChatbotPanel({ triggerRef }: ChatbotPanelProps) {
 
         <ChatMessageList
           isPending={isPending}
-          isSuggestionsError={isSuggestionsError}
-          isSuggestionsLoading={isSuggestionsLoading}
           messages={messages}
           onRetry={retry}
           onSelectSuggestion={send}
-          suggestions={suggestions?.list ?? []}
+          suggestionsState={suggestionsState}
         />
 
         <RateLimitBanner />
 
-        {isOffline && (
-          <p className="border-neutral-subtle bg-neutral-subtle/20 text-body-4 text-danger flex flex-none items-center gap-2 border-t px-4 py-2.5">
-            <WifiOff aria-hidden="true" size={15} />
-            {t("chatbot_offline_notice")}
-          </p>
-        )}
+        <OfflineBanner />
 
         <ChatComposer disabled={isPending || isRateLimited} onSend={send} />
       </div>
