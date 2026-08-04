@@ -29,7 +29,7 @@
 
 | 메서드 | 경로 | 요청 | 응답 |
 | --- | --- | --- | --- |
-| `POST` | `/ai-consult/ask` | `{ message }` (2~300자) | `{ answer, tag, suggestions }` |
+| `POST` | `/ai-consult/ask` | `{ message }` (2~300자) | `{ answer, tag, suggestions, brands, categories, parentCategory }` |
 | `GET` | `/ai-consult/suggestions` | 없음 | `{ total, list: string[] }` |
 
 스펙에서 확인된 세 가지가 이 문서 전체에 영향을 줍니다.
@@ -38,7 +38,9 @@
 2. **레이트리밋·장애도 200으로 내려옵니다.** `tag` 값으로 분기해야 하며 HTTP 에러 경로를 타지 않습니다.
 3. **답변은 서버 상수입니다.** LLM은 의미 기반 검색만 하고 답변 문장을 생성하지 않습니다.
 
-`tag`는 `FAQ_ANSWER` · `CONFIRM_SUGGESTION` · `FALLBACK` · `OFF_TOPIC` · `RATE_LIMITED` · `UNAVAILABLE` 여섯 가지입니다(§5.3).
+`tag`는 **아홉 가지**입니다(§5.3) — `FAQ_ANSWER` · `BRAND_LIST` · `CATEGORY_LIST` · `PRODUCT_CATEGORY_LIST` · `CONFIRM_SUGGESTION` · `FALLBACK` · `OFF_TOPIC` · `RATE_LIMITED` · `UNAVAILABLE`.
+
+**2026-08-04 응답 확장**: 브랜드·카테고리 목록을 내려주는 `tag` 세 개와 그것을 담는 필드 세 개(`brands`, `categories`, `parentCategory`)가 추가되었습니다. `answer` 텍스트만 있던 이전 응답과 달리 **화면에서 이동할 목적지가 생겼습니다.** D-1이 "CS·FAQ 위주, 추후 쇼핑 어시스턴트로 확장"이었는데, 이 확장이 그 첫걸음입니다 — 상품을 추천하는 것은 아니지만 브랜드·카테고리로 안내합니다.
 
 서비스 코드는 `apps/web/src/shared/services/aiConsult.ts`에 이미 생성되어 있습니다.
 
@@ -170,9 +172,15 @@ D-1이 CS·FAQ로 확정되었으므로 목표를 그 기준으로 적습니다.
 **메시지 리스트 세부**
 
 - 새 메시지 도착 시 자동 하단 스크롤. 단 사용자가 위로 스크롤해 과거 대화를 보는 중이면 자동 스크롤하지 않고 "새 메시지" 버튼을 띄웁니다.
-- **응답은 순수 텍스트입니다.** `answer`는 문자열 하나이고 스키마에 링크·이미지 필드가 없습니다. 상품 카드·콘텐츠 카드는 물론 서버가 지정하는 링크도 없습니다.
-- **화면에 나타나는 링크는 프론트가 붙이는 것 하나뿐입니다** — 답변 불가·범위 밖·장애일 때의 `/contact` 문의 링크(D-5). `tag`를 보고 프론트가 판단해 붙입니다.
+- **`answer`는 순수 텍스트입니다.** 문자열 하나이고 스키마에 링크·HTML 필드가 없습니다. 상품 카드·콘텐츠 카드는 만들지 않습니다.
+- **링크는 두 종류입니다.**
+  - `/contact` 문의 링크 — 답변 불가·범위 밖·장애일 때 프론트가 `tag`를 보고 붙입니다(D-5).
+  - **브랜드·카테고리 링크 목록** — 서버가 `brands`·`categories`로 내려준 항목을 링크로 만듭니다. 목적지 매핑은 §7.4.
+- **`image` 필드는 쓰지 않습니다.** `brands`·`categories`에 이미지 URL이 오지만, 리치 카드를 만들지 않기로 한 결정(§9)을 유지해 이름만 링크로 노출합니다. 나중에 썸네일이 필요하면 그때 이 결정을 다시 봅니다 — 지금 쓰지 않는 것은 누락이 아니라 선택입니다.
+- **목록은 5개까지만 노출하고, 그보다 많으면 "전체 보기" 링크를 붙입니다.** 실제 응답은 브랜드 8개·소분류 9개를 주는데 전부 세로로 나열하면 좁은 패널에서 목록이 대화를 밀어냅니다. 5개 + 전체 보기가 대화 흐름을 지키면서 다음 행동(목록 페이지로 이동)도 만듭니다.
+- **목록 박스 폭은 답변 버블과 맞춥니다.** 내용 길이에 맞춰 좁아지면 버블과 좌우 정렬이 어긋나 두 블록이 서로 다른 요소처럼 보입니다.
 - **되묻기 칩**: 응답의 `suggestions`가 비어 있지 않으면 답변 아래에 칩으로 노출합니다(`CONFIRM_SUGGESTION`·`OFF_TOPIC`에서 관찰됨). 누르면 그 문구를 그대로 새 질문으로 보냅니다. 링크가 아니라 버튼입니다.
+- **목록과 되묻기 칩은 다르게 보여야 합니다.** 칩은 "누르면 그 문구를 다시 질문", 목록은 "누르면 그 페이지로 이동"입니다. 동작이 다르므로 칩(pill)과 링크 목록(세로 나열 + 화살표)을 시각적으로 구분합니다.
 - 링크·칩은 클릭 대상임이 분명해야 하므로 일반 텍스트와 확실히 구분하고(밑줄 또는 브랜드 컬러), 모바일에서 터치 가능한 높이를 확보합니다.
 
 **웰컴 메시지**
@@ -201,6 +209,9 @@ D-3 형태에 따라 갈리며, 형태 결정과 함께 정해야 합니다.
 | `tag` | 의미 | 화면 |
 | --- | --- | --- |
 | `FAQ_ANSWER` | 답변 찾음 | `answer` 텍스트만. `suggestions`는 보통 빈 배열 |
+| `BRAND_LIST` | 입점 브랜드 안내 | `answer` + **브랜드 링크 목록**(`brands`). 각 항목은 `/brand/{id}` 로 이동 |
+| `CATEGORY_LIST` | 대분류 카테고리 안내 | `answer` + **카테고리 링크 목록**(`categories`). 각 항목은 `/product?categoryId={id}` 로 이동 |
+| `PRODUCT_CATEGORY_LIST` | 소분류 카테고리 안내 | `answer` + **소분류 링크 목록**(`categories`) + 상위 대분류 맥락(`parentCategory`). 각 항목은 `/product?productCategoryId={id}` 로 이동 |
 | `CONFIRM_SUGGESTION` | 답이 애매해 되물음 | `answer` + **되묻기 칩**(`suggestions`). 누르면 그 문구를 새 질문으로 전송 |
 | `FALLBACK` | 답변 불가 | `answer` + **`/contact` 문의 링크**(D-5). 프론트가 붙입니다 |
 | `OFF_TOPIC` | 쇼핑몰 무관 질문 거절 | `answer` + **되묻기 칩**. dev 서버 확인 결과 이 `tag`에도 `suggestions`가 채워져 옵니다. 1차 범위 밖 질문(상품 추천·주문 조회)도 여기로 옵니다 |
@@ -208,6 +219,8 @@ D-3 형태에 따라 갈리며, 형태 결정과 함께 정해야 합니다.
 | `UNAVAILABLE` | LLM 장애 | `answer` + 재시도 안내 + `/contact` 링크. **정상 답변처럼 보이지 않게** 시각적으로 구분 |
 
 `answer`는 어떤 `tag`에서도 항상 채워져 옵니다(서버 상수). 프론트가 문구를 따로 만들 필요는 없고, 문구 위에 무엇을 덧붙일지만 `tag`로 정합니다.
+
+**목록도 배열 유무로 판단합니다.** `brands`·`categories`는 해당 `tag`가 아니면 빈 배열로 오므로, `tag`로 분기하지 않고 `length > 0`이면 렌더합니다. `suggestions`와 같은 규칙입니다.
 
 **칩 렌더 기준은 `tag`가 아니라 `suggestions` 유무입니다.** dev 서버 확인 결과 `OFF_TOPIC`에도 칩이 함께 옵니다. `tag`로 칩 노출을 분기하면 이런 경우를 놓치므로, `suggestions.length > 0`이면 렌더하는 편이 안전합니다.
 
@@ -334,10 +347,11 @@ src/widgets/chatbot/
 │   ├─ ChatMessage.tsx                    tag 별 렌더(문의 링크 · 경고 스타일 · 되묻기 칩)
 │   ├─ ChatComposer.tsx                   입력부 (2~300자 검증 · 자동 높이)
 │   ├─ ChatSuggestions.tsx                추천 질문 칩 (최초 진입 · 되묻기 공용)
+│   ├─ ChatEntityList.tsx                 브랜드·카테고리 링크 목록 (5개 + 전체 보기)
 │   ├─ RateLimitBanner.tsx                레이트리밋 배너 + 카운트다운
 │   └─ scrollbar.ts                       스크롤 영역 공통 스타일 상수
 ├─ model/
-│   ├─ types.ts                           ChatbotMessage · CONTACT_LINK_TAGS · WARNING_TAGS
+│   ├─ types.ts                           ChatbotMessage · 태그 상수 · entityHref · viewAllHref
 │   ├─ useChatbotStore.ts                 zustand (persist 없음)
 │   ├─ useChatbotConversation.ts          전송 · 재시도 · tag 분기 · 레이트리밋 발동
 │   └─ useResetChatbotOnLanguageChange.ts 언어 변경 시 초기화
@@ -363,6 +377,20 @@ D-7에 따라 **이력 조회·삭제 훅은 만들지 않습니다.** 운영 �
 | --- | --- | --- | --- |
 | `useGetAiConsultSuggestionsQuery` | `getAiConsultSuggestions` | **패널을 처음 열 때** | `useAppQuery` 래퍼. `staleTime` 기본 5분이므로 세션 중 재조회 없음 |
 | `useAskAiConsultMutation` | `askAiConsult` | 메시지 전송 시 | `useAppMutation` 래퍼, `toastOnError: false` |
+
+**브랜드·카테고리 링크 매핑**
+
+| `tag` | 배열 | 항목 목적지 | 전체 보기 목적지 |
+| --- | --- | --- | --- |
+| `BRAND_LIST` | `brands` | `/brand/{id}` | `/brand` (브랜드 목록) |
+| `CATEGORY_LIST` | `categories` | `/product?categoryId={id}` | `/product` (필터 없는 전체) |
+| `PRODUCT_CATEGORY_LIST` | `categories` | `/product?productCategoryId={id}` | `/product?categoryId={parentCategory.id}` (상위 대분류) |
+
+소분류의 "전체 보기"가 상위 대분류 필터로 가는 이유: 소분류 전체를 한 번에 거는 필터가 없으므로, 그 소분류들을 모두 포함하는 가장 가까운 상위 범위가 부모 대분류입니다.
+
+`useProductFilter`(`src/features/product/model/useProductFilter.ts`)가 `categoryId`와 `productCategoryId`를 **별도 쿼리 파라미터로** 갖고 있습니다. 대분류와 소분류를 같은 파라미터로 보내면 필터가 걸리지 않으므로 `tag`에 따라 파라미터 이름을 바꿔야 합니다.
+
+링크는 `@/i18n/navigation`의 `Link`로 만들어 로케일 세그먼트를 유지합니다.
 
 **구현 시 반드시 지킬 것 다섯 가지**
 
@@ -657,7 +685,7 @@ Phase 3에서 필요하다고 판단된 것. 스트리밍은 D-4에서 도입하
 | 익명 세션 ID만 남겨 삭제 요청 대응 불가 | 특정 사용자의 대화를 찾아 지울 수 없음 | 7-2에서 이 한계를 법무와 함께 명시적으로 수용하거나 식별 방식을 조정 |
 | 7-2(로그 세부)·API 스키마 확정 지연 | Phase 2 착수 불가 | Phase 1은 API 없이 완결되므로 병행 진행 |
 | 로그아웃 후 이전 사용자 대화 잔존 | 공용 PC에서 대화 노출 | `GlobalQueryHandler` 로그아웃 시점에 챗봇 상태도 초기화(§7.4) |
-| **`tag` 분기 누락** | 레이트리밋·장애 응답이 정상 답변처럼 화면에 남음. 200으로 오므로 에러 처리에 걸리지 않음 | `onSuccess`에서 `tag`를 반드시 분기(§5.3). 6개 `tag` 전부에 화면을 정의해 두었음 |
+| **`tag` 분기 누락** | 레이트리밋·장애 응답이 정상 답변처럼 화면에 남음. 200으로 오므로 에러 처리에 걸리지 않음 | `onSuccess`에서 `tag`를 반드시 분기(§5.3). 9개 `tag` 전부에 화면을 정의해 두었음 |
 | **문맥이 없다는 것을 사용자가 모름** | "그거 말고" 같은 후속 질문이 엉뚱한 답을 받음. 대화가 쌓여 보이니 이어진다고 오해함 | placeholder·웰컴 문구로 자기완결적 질문 유도(§5.2). 로그에서 지시적 질문 비중을 확인 |
 | 엉뚱한 FAQ 매칭 | 질문과 다른 정책을 안내. 답변이 사전 정의라 그럴듯해서 더 위험 | `CONFIRM_SUGGESTION`으로 되묻는 경로가 있음. 로그로 오매칭 사례를 수집해 지식베이스 보강 |
 | 토스트 위치 변경의 회귀 | 전 페이지 토스트 위치가 바뀜 | D-9(1) 적용 후 기존 토스트 노출 지점(로그인·마이페이지 저장·관심상품 등)을 QA 범위에 포함 |
@@ -692,6 +720,7 @@ Phase 3에서 필요하다고 판단된 것. 스트리밍은 D-4에서 도입하
 | 오프라인 | 네트워크 연결을 확인해주세요. |
 | ~~답변 불가 폴백~~ | **서버 `answer`를 그대로 씁니다.** `FALLBACK`·`OFF_TOPIC`·`UNAVAILABLE` 문구를 프론트에서 만들지 않습니다 |
 | 에스컬레이션 | 문의 남기기 |
+| 목록 전체 보기 | 전체 보기 ({count}) — `{count}` 보간. 목록 아래에 붙으므로 대상(브랜드/카테고리)은 문맥으로 전달됨 |
 | 레이트 리밋 배너 | 잠시 후 다시 시도해주세요. ({seconds}초) — `{seconds}` 보간을 쓰는 유일한 키. 본문 답변은 서버 `answer` |
 | 입력 길이 초과 | 300자까지 입력할 수 있어요. |
 | 새 메시지 알림 | 새 메시지 |
@@ -735,10 +764,11 @@ Phase 3에서 필요하다고 판단된 것. 스트리밍은 D-4에서 도입하
 | F-3 패널 오픈 | 팝오버(데스크톱) / 전체화면 Drawer(모바일). 포커스 트랩·Esc·포커스 복귀 |
 | F-4 비로그인 사용 | 로그인 무관. `persist` 미사용으로 브라우저에 대화 안 남김 |
 | D-9 자리 정리 | `<Toaster position="bottom-center" />`, ScrollToTop 을 챗봇 버튼 위 스택으로(중심축 정렬) |
-| API 연동 | 추천 질문 조회(오픈 시점) + 대화 전송. `tag` 6종 분기 |
+| API 연동 | 추천 질문 조회(오픈 시점) + 대화 전송. `tag` 9종 분기 |
+| 브랜드·카테고리 안내 | `BRAND_LIST` · `CATEGORY_LIST` · `PRODUCT_CATEGORY_LIST` 를 링크 목록으로 렌더. 5개까지 노출하고 넘치면 "전체 보기" 링크. 대분류·소분류가 서로 다른 쿼리 파라미터로 연결됨(§7.4) |
 | 상태 화면 | 최초 진입 · 추천 질문 로딩/실패 · 전송 중 · tag 별 응답 · 네트워크 오류+재시도 · 오프라인 · 레이트리밋 · 입력 길이 |
 | 접근성 | `aria-live` 메시지 영역, 포커스 트랩, Esc, `aria-modal`(모바일), 스크린리더 레이블 |
-| i18n | 시트 `language-pack` 에 18개 키 등록. 언어 변경 시 대화 초기화 + 추천 질문 재조회 |
+| i18n | 시트 `language-pack` 에 19개 키 등록. 언어 변경 시 대화 초기화 + 추천 질문 재조회 |
 
 ### 남은 것
 
@@ -759,6 +789,9 @@ Phase 3에서 필요하다고 판단된 것. 스트리밍은 D-4에서 도입하
 - **400 응답의 `message` 는 검증 객체 배열** — 문자열이 아니다. `toastOnError: false` 가 아니면 객체가 토스트에 들어간다.
 - **`languageCode` 는 POST 에서 자동 변환되지 않는다** — 훅이 GET 만 처리하므로 헤더를 직접 넣는다.
 - **답변은 서버 상수** — LLM 은 의미 매칭만 한다. 환각 위험은 낮고 오매칭 위험이 남는다.
+- **대분류와 소분류는 쿼리 파라미터가 다르다** — `categoryId` vs `productCategoryId`. 같은 이름으로 보내면 필터가 걸리지 않는다(§7.4).
+- **목록 응답이 길다** — dev 실측으로 브랜드 8개, 패션 소분류 9개다. 전부 나열하면 답변 한 건이 패널을 넘겨서 5개로 잘랐다(§5.2).
+- **소분류를 한 번에 거는 필터가 없다** — 그래서 소분류의 "전체 보기"는 부모 대분류 필터로 보낸다(§7.4).
 
 ---
 
