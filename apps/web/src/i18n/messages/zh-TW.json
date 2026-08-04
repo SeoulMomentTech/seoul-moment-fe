@@ -303,5 +303,7 @@
   "chatbot_new_message_label": "新訊息",
   "chatbot_suggestions_loading": "正在載入建議問題",
   "chatbot_suggestions_error": "無法載入建議問題，請直接輸入您的問題。",
-  "chatbot_rate_limit_notice": "請稍後再試。（{seconds} 秒）"
+  "chatbot_rate_limit_notice": "請稍後再試。（{seconds} 秒）",
+  "chatbot_list_expand": "查看其餘 {count} 個",
+  "chatbot_list_collapse": "收合"
 }
