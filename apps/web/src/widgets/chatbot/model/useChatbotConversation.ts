@@ -59,7 +59,14 @@ export function useChatbotConversation() {
         // 레이트리밋·LLM 장애도 200 으로 내려온다. 따라서 성공 경로에서
         // tag 를 보고 화면을 가른다. onError 는 네트워크·5xx·타임아웃 전용이다.
         onSuccess: (res) => {
-          const { answer, tag, suggestions } = res.data;
+          const {
+            answer,
+            tag,
+            suggestions,
+            brands,
+            categories,
+            parentCategory,
+          } = res.data;
 
           addMessage({
             id: nextId(),
@@ -67,6 +74,9 @@ export function useChatbotConversation() {
             text: answer,
             tag,
             suggestions,
+            brands,
+            categories,
+            parentCategory,
           });
 
           // 답변은 그대로 보여주되(서버가 안내 문구를 담아 준다) 전송만 잠시 막는다.

@@ -8,6 +8,7 @@ import { Link } from "@/i18n/navigation";
 
 import { cn } from "@seoul-moment/ui";
 
+import ChatEntityList from "./ChatEntityList";
 import ChatSuggestions from "./ChatSuggestions";
 import {
   CONTACT_LINK_TAGS,
@@ -33,6 +34,11 @@ export default function ChatMessage({
   const showContactLink =
     !!message.tag && CONTACT_LINK_TAGS.includes(message.tag);
   const isWarning = !!message.tag && WARNING_TAGS.includes(message.tag);
+  // 목록도 칩과 마찬가지로 tag 가 아니라 배열 유무로 판단한다. 해당 tag 가 아니면
+  // 서버가 빈 배열을 주므로 이 규칙이 성립한다.
+  const entityItems = message.brands?.length
+    ? message.brands
+    : (message.categories ?? []);
 
   return (
     <div
@@ -76,6 +82,14 @@ export default function ChatMessage({
             {t("chatbot_retry_label")}
           </button>
         </p>
+      )}
+
+      {!isUser && (
+        <ChatEntityList
+          items={entityItems}
+          parentCategory={message.parentCategory}
+          tag={message.tag}
+        />
       )}
 
       {/* 되묻기 칩. tag 가 아니라 배열 유무로 판단한다(OFF_TOPIC 에도 칩이 온다). */}
