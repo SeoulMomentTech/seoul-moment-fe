@@ -13,7 +13,8 @@ export type AiConsultAnswerTag =
   | "FALLBACK"
   | "OFF_TOPIC"
   | "RATE_LIMITED"
-  | "UNAVAILABLE";
+  | "UNAVAILABLE"
+  | "PRODUCT_LIST";
 
 /** 질문 길이 제한. 서버가 400 으로 거절하므로 전송 전에 막는다. */
 export const AI_CONSULT_MESSAGE_MIN_LENGTH = 2;
@@ -42,6 +43,19 @@ export interface AiConsultCategory {
   image: string | null;
 }
 
+export interface AiConsultProduct {
+  /** 상품 ID */
+  id: number;
+  /** 상품 이름 */
+  name: string;
+  /** 상품의 브랜드 이름 */
+  brandName: string;
+  /** 판매가 (NT$) */
+  price: number;
+  /** 상품 대표 이미지 URL. 없으면 null */
+  image: string | null;
+}
+
 export interface AskAiConsultRes {
   /** 고객에게 보여줄 답변. 서버 상수에서 꺼낸 문장이며 AI 가 생성하지 않는다 */
   answer: string;
@@ -54,6 +68,8 @@ export interface AskAiConsultRes {
   categories: AiConsultCategory[];
   /** 소분류 목록의 상위 대분류. tag 가 PRODUCT_CATEGORY_LIST 일 때만 채워진다 */
   parentCategory: AiConsultCategory | null;
+  /** 상품 목록. tag 가 PRODUCT_LIST 일 때만 채워지고 그 외에는 빈 배열 */
+  products: AiConsultProduct[];
 }
 
 /**

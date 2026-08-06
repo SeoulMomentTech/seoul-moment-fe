@@ -9,6 +9,7 @@ import { Link } from "@/i18n/navigation";
 import { cn } from "@seoul-moment/ui";
 
 import ChatEntityList from "./ChatEntityList";
+import ChatProductList from "./ChatProductList";
 import ChatSuggestions from "./ChatSuggestions";
 import {
   CONTACT_LINK_TAGS,
@@ -82,6 +83,10 @@ export default function ChatMessage({
             {t("chatbot_retry_label")}
           </button>
         </p>
+      )}
+
+      {!isUser && !!message.products?.length && (
+        <ChatProductList products={message.products} />
       )}
 
       {!isUser && (
