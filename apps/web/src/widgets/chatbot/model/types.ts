@@ -2,6 +2,7 @@ import type {
   AiConsultAnswerTag,
   AiConsultBrand,
   AiConsultCategory,
+  AiConsultProduct,
 } from "@shared/services/aiConsult";
 
 export interface ChatbotMessage {
@@ -21,6 +22,8 @@ export interface ChatbotMessage {
   categories?: AiConsultCategory[];
   /** 소분류 목록의 상위 대분류. PRODUCT_CATEGORY_LIST 에서만 채워진다. */
   parentCategory?: AiConsultCategory | null;
+  /** 상품 목록. PRODUCT_LIST 에서만 채워진다. */
+  products?: AiConsultProduct[];
   /** 네트워크·서버 오류로 전송이 실패한 사용자 메시지 */
   failed?: boolean;
 }

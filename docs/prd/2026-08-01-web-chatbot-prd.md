@@ -29,7 +29,7 @@
 
 | 메서드 | 경로 | 요청 | 응답 |
 | --- | --- | --- | --- |
-| `POST` | `/ai-consult/ask` | `{ message }` (2~300자) | `{ answer, tag, suggestions, brands, categories, parentCategory }` |
+| `POST` | `/ai-consult/ask` | `{ message }` (2~300자) | `{ answer, tag, suggestions, brands, categories, parentCategory, products }` |
 | `GET` | `/ai-consult/suggestions` | 없음 | `{ total, list: string[] }` |
 
 스펙에서 확인된 세 가지가 이 문서 전체에 영향을 줍니다.
@@ -38,9 +38,11 @@
 2. **레이트리밋·장애도 200으로 내려옵니다.** `tag` 값으로 분기해야 하며 HTTP 에러 경로를 타지 않습니다.
 3. **답변은 서버 상수입니다.** LLM은 의미 기반 검색만 하고 답변 문장을 생성하지 않습니다.
 
-`tag`는 **아홉 가지**입니다(§5.3) — `FAQ_ANSWER` · `BRAND_LIST` · `CATEGORY_LIST` · `PRODUCT_CATEGORY_LIST` · `CONFIRM_SUGGESTION` · `FALLBACK` · `OFF_TOPIC` · `RATE_LIMITED` · `UNAVAILABLE`.
+`tag`는 **열 가지**입니다(§5.3) — `FAQ_ANSWER` · `BRAND_LIST` · `CATEGORY_LIST` · `PRODUCT_CATEGORY_LIST` · `PRODUCT_LIST` · `CONFIRM_SUGGESTION` · `FALLBACK` · `OFF_TOPIC` · `RATE_LIMITED` · `UNAVAILABLE`. `PRODUCT_LIST`는 2026-08-06에 추가되어 상품(`products`)을 `/product/{id}` 상세로 안내합니다.
 
 **2026-08-04 응답 확장**: 브랜드·카테고리 목록을 내려주는 `tag` 세 개와 그것을 담는 필드 세 개(`brands`, `categories`, `parentCategory`)가 추가되었습니다. `answer` 텍스트만 있던 이전 응답과 달리 **화면에서 이동할 목적지가 생겼습니다.** D-1이 "CS·FAQ 위주, 추후 쇼핑 어시스턴트로 확장"이었는데, 이 확장이 그 첫걸음입니다 — 상품을 추천하는 것은 아니지만 브랜드·카테고리로 안내합니다.
+
+**2026-08-06 응답 확장**: `PRODUCT_LIST` `tag`와 상품을 담는 `products` 필드가 추가되었습니다(`{ id, name, brandName, price, image }`). 브랜드·카테고리 안내를 넘어 **개별 상품으로 안내하는 첫 단계**로, D-1의 쇼핑 어시스턴트 확장에 한 발 더 다가갑니다. 브랜드·카테고리 목록(`brands`/`categories`)이 이름만 링크로 노출하는 것과 달리, `products`는 **브랜드명·가격을 함께** 보여주는 전용 UI로 렌더하고 각 항목은 `/product/{id}` 상세로 이동합니다(§5.3, §7.4).
 
 서비스 코드는 `apps/web/src/shared/services/aiConsult.ts`에 이미 생성되어 있습니다.
 
@@ -218,6 +220,7 @@ D-3 형태에 따라 갈리며, 형태 결정과 함께 정해야 합니다.
 | `BRAND_LIST` | 입점 브랜드 안내 | `answer` + **브랜드 링크 목록**(`brands`). 각 항목은 `/brand/{id}` 로 이동 |
 | `CATEGORY_LIST` | 대분류 카테고리 안내 | `answer` + **카테고리 링크 목록**(`categories`). 각 항목은 `/product?categoryId={id}` 로 이동 |
 | `PRODUCT_CATEGORY_LIST` | 소분류 카테고리 안내 | `answer` + **소분류 링크 목록**(`categories`) + 상위 대분류 맥락(`parentCategory`). 각 항목은 `/product?productCategoryId={id}` 로 이동 |
+| `PRODUCT_LIST` | 상품 안내 (2026-08-06 추가) | `answer` + **상품 링크 목록**(`products`). 브랜드·카테고리와 달리 **브랜드명·가격을 함께** 보여주는 전용 UI. 각 항목은 `/product/{id}` 상세로 이동 |
 | `CONFIRM_SUGGESTION` | 답이 애매해 되물음 | `answer` + **되묻기 칩**(`suggestions`). 누르면 그 문구를 새 질문으로 전송 |
 | `FALLBACK` | 답변 불가 | `answer` + **`/contact` 문의 링크**(D-5). 프론트가 붙입니다 |
 | `OFF_TOPIC` | 쇼핑몰 무관 질문 거절 | `answer` + **되묻기 칩**. dev 서버 확인 결과 이 `tag`에도 `suggestions`가 채워져 옵니다. 1차 범위 밖 질문(상품 추천·주문 조회)도 여기로 옵니다 |
@@ -391,6 +394,7 @@ D-7에 따라 **이력 조회·삭제 훅은 만들지 않습니다.** 운영 �
 | `BRAND_LIST` | `brands` | `/brand/{id}` |
 | `CATEGORY_LIST` | `categories` | `/product?categoryId={id}` |
 | `PRODUCT_CATEGORY_LIST` | `categories` | `/product?productCategoryId={id}` |
+| `PRODUCT_LIST` | `products` | `/product/{id}` |
 
 목록 전체를 보여 주는 목적지는 두지 않습니다. 5개를 넘는 나머지는 목록 안에서 펼칩니다(§5.2).
 
@@ -772,6 +776,7 @@ Phase 3에서 필요하다고 판단된 것. 스트리밍은 D-4에서 도입하
 | D-9 자리 정리 | `<Toaster position="bottom-center" />`, ScrollToTop 을 챗봇 버튼 위 스택으로(중심축 정렬) |
 | API 연동 | 추천 질문 조회(오픈 시점) + 대화 전송. `tag` 9종 분기 |
 | 브랜드·카테고리 안내 | `BRAND_LIST` · `CATEGORY_LIST` · `PRODUCT_CATEGORY_LIST` 를 링크 목록으로 렌더. 행 앞 36px 썸네일(`image` 없으면 생략), 5개까지 접고 나머지는 목록 안에서 펼침. 대분류·소분류가 서로 다른 쿼리 파라미터로 연결됨(§7.4) |
+| 상품 안내 (2026-08-06) | `PRODUCT_LIST` 를 상품 전용 목록으로 렌더. 44px 상품 썸네일(`object-cover`) + 브랜드명 + 상품명 + 가격(`NT$`), 각 항목 `/product/{id}` 로 이동. 5개까지 접고 나머지는 이 자리에서 펼침. `widgets/chatbot/ui/ChatProductList.tsx` |
 | 상태 화면 | 최초 진입 · 추천 질문 로딩/실패 · 전송 중 · tag 별 응답 · 네트워크 오류+재시도 · 오프라인 · 레이트리밋 · 입력 길이 |
 | 접근성 | `aria-live` 메시지 영역, 포커스 트랩, Esc, `aria-modal`(모바일), 스크린리더 레이블 |
 | i18n | 시트 `language-pack` 에 20개 키 등록. 언어 변경 시 대화 초기화 + 추천 질문 재조회 |

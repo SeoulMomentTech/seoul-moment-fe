@@ -396,6 +396,25 @@ body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:non
 .cb-list .list-all{appearance:none; cursor:pointer; font-family:inherit; width:100%; text-align:left;
   border-left:0; border-right:0; border-bottom:0; background:var(--surface); color:var(--fg-subtle); font-size:13.5px}
 .cb-list .list-all:hover{background:var(--brand-soft)}
+/* 상품 목록. 브랜드·카테고리(.cb-list)와 달리 브랜드명·가격을 함께 노출한다.
+   썸네일은 상품 사진이라 cover 로 채운다(로고 워드마크가 아니다). */
+.cb-plist{display:flex; flex-direction:column; align-self:stretch; width:100%; margin-top:2px;
+  border:1px solid var(--border); border-radius:12px; overflow:hidden; background:var(--bg)}
+.cb-plist a{display:flex; align-items:center; gap:11px; min-height:44px; padding:9px 13px;
+  text-decoration:none; border-top:1px solid var(--border)}
+.cb-plist a:first-child{border-top:0}
+.cb-plist a:hover{background:var(--brand-soft)}
+.cb-plist svg{flex:none; opacity:.6; color:var(--brand-ink)}
+.cb-plist .pthumb{flex:none; width:44px; height:44px; border-radius:8px; overflow:hidden; background:var(--surface)}
+.cb-plist .pthumb img{width:100%; height:100%; object-fit:cover; display:block}
+.cb-plist .pinfo{flex:1; min-width:0; display:flex; flex-direction:column; gap:1px}
+.cb-plist .pbrand{font-size:12px; color:var(--fg-subtle); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.cb-plist .pname{font-size:13.5px; color:var(--fg); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.cb-plist .pprice{font-size:13.5px; font-weight:700; color:var(--brand-ink)}
+.cb-plist .list-all{appearance:none; cursor:pointer; font-family:inherit; width:100%; text-align:left;
+  display:flex; align-items:center; justify-content:space-between; gap:10px; min-height:40px; padding:8px 13px;
+  border:0; border-top:1px solid var(--border); background:var(--surface); color:var(--fg-subtle); font-size:13.5px; font-weight:600}
+.cb-plist .list-all:hover{background:var(--brand-soft)}
 .cb-sugg{display:flex; flex-wrap:wrap; gap:6px; align-self:flex-start; max-width:100%}
 .cb-sugg button{
   appearance:none; cursor:pointer; font:inherit; font-size:13.5px; font-weight:600;
@@ -553,7 +572,7 @@ body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:non
   <div class="tw"><table>
     <thead><tr><th>메서드</th><th>경로</th><th>요청</th><th>응답</th></tr></thead>
     <tbody>
-      <tr><td><code>POST</code></td><td><code>/ai-consult/ask</code></td><td><code>{ message }</code> (2~300자)</td><td><code>{ answer, tag, suggestions, brands, categories, parentCategory }</code></td></tr>
+      <tr><td><code>POST</code></td><td><code>/ai-consult/ask</code></td><td><code>{ message }</code> (2~300자)</td><td><code>{ answer, tag, suggestions, brands, categories, parentCategory, products }</code></td></tr>
       <tr><td><code>GET</code></td><td><code>/ai-consult/suggestions</code></td><td>없음</td><td><code>{ total, list: string[] }</code></td></tr>
     </tbody>
   </table></div>
@@ -563,9 +582,11 @@ body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:non
     <li><strong>레이트리밋·장애도 200으로 내려옵니다.</strong> <code>tag</code> 값으로 분기해야 하며 HTTP 에러 경로를 타지 않습니다.</li>
     <li><strong>답변은 서버 상수입니다.</strong> LLM은 의미 기반 검색만 하고 답변 문장을 생성하지 않습니다.</li>
   </ol></div>
-  <p><code>tag</code>는 <strong>아홉 가지</strong>입니다(§5.3): <code>FAQ_ANSWER</code> · <code>BRAND_LIST</code> · <code>CATEGORY_LIST</code> · <code>PRODUCT_CATEGORY_LIST</code> · <code>CONFIRM_SUGGESTION</code> · <code>FALLBACK</code> · <code>OFF_TOPIC</code> · <code>RATE_LIMITED</code> · <code>UNAVAILABLE</code>.</p>
+  <p><code>tag</code>는 <strong>열 가지</strong>입니다(§5.3): <code>FAQ_ANSWER</code> · <code>BRAND_LIST</code> · <code>CATEGORY_LIST</code> · <code>PRODUCT_CATEGORY_LIST</code> · <code>PRODUCT_LIST</code> · <code>CONFIRM_SUGGESTION</code> · <code>FALLBACK</code> · <code>OFF_TOPIC</code> · <code>RATE_LIMITED</code> · <code>UNAVAILABLE</code>. <code>PRODUCT_LIST</code>는 2026-08-06에 추가되어 상품(<code>products</code>)을 <code>/product/{id}</code> 상세로 안내합니다.</p>
   <div class="note rec"><span class="lbl">2026-08-04 응답 확장</span>
   <p>브랜드·카테고리 목록을 내려주는 <code>tag</code> 세 개와 그것을 담는 필드 세 개(<code>brands</code>, <code>categories</code>, <code>parentCategory</code>)가 추가되었습니다. <code>answer</code> 텍스트만 있던 이전 응답과 달리 <strong>화면에서 이동할 목적지가 생겼습니다.</strong> D-1이 “CS·FAQ 위주, 추후 쇼핑 어시스턴트로 확장”이었는데, 이 확장이 그 첫걸음입니다 — 상품을 추천하는 것은 아니지만 브랜드·카테고리로 안내합니다.</p></div>
+  <div class="note rec"><span class="lbl">2026-08-06 응답 확장</span>
+  <p><code>PRODUCT_LIST</code> <code>tag</code>와 상품을 담는 <code>products</code> 필드가 추가되었습니다(<code>{ id, name, brandName, price, image }</code>). 브랜드·카테고리 안내를 넘어 <strong>개별 상품으로 안내하는 첫 단계</strong>로, D-1의 쇼핑 어시스턴트 확장에 한 발 더 다가갑니다. 브랜드·카테고리 목록(<code>brands</code>/<code>categories</code>)이 이름만 링크로 노출하는 것과 달리, <code>products</code>는 <strong>브랜드명·가격을 함께</strong> 보여주는 전용 UI로 렌더하고 각 항목은 <code>/product/{id}</code> 상세로 이동합니다(§5.3, §7.4). 오른쪽 아래 프로토타입의 <code>PRODUCT_LIST</code> 상태에서 직접 확인할 수 있습니다.</p></div>
   <p>서비스 코드는 <code>apps/web/src/shared/services/aiConsult.ts</code>에 이미 생성되어 있습니다.</p>
   <p><strong>결정은 모두 끝났고 UI·API 연동까지 구현했습니다.</strong> 무엇이 되었고 무엇이 남았는지는 <a href="#s13">§13</a>에 정리했습니다. 남은 것은 서버측 로그 적재 세부(D-7의 7-2)와 약관 수정입니다.</p>
   <p>기술 구조(§7)에 적힌 내용은 실제 코드를 확인한 뒤 작성한 것으로, 인용된 파일 경로는 모두 현재 존재합니다.</p>
@@ -679,6 +700,7 @@ body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:non
           <button type="button" data-state="brandList" aria-pressed="false">BRAND_LIST</button>
           <button type="button" data-state="categoryList" aria-pressed="false">CATEGORY_LIST</button>
           <button type="button" data-state="productCategoryList" aria-pressed="false">PRODUCT_CATEGORY_LIST</button>
+          <button type="button" data-state="productList" aria-pressed="false">PRODUCT_LIST</button>
           <button type="button" data-state="fallback" aria-pressed="false">FALLBACK</button>
           <button type="button" data-state="offTopic" aria-pressed="false">OFF_TOPIC</button>
           <button type="button" data-state="rateLimited" aria-pressed="false">RATE_LIMITED</button>
@@ -789,6 +811,7 @@ body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:non
         <tr><td><code>BRAND_LIST</code></td><td>입점 브랜드 안내</td><td><code>answer</code> + <strong>브랜드 링크 목록</strong>(<code>brands</code>). 각 항목은 <code>/brand/{id}</code> 로 이동</td></tr>
         <tr><td><code>CATEGORY_LIST</code></td><td>대분류 카테고리 안내</td><td><code>answer</code> + <strong>카테고리 링크 목록</strong>(<code>categories</code>). 각 항목은 <code>/product?categoryId={id}</code> 로 이동</td></tr>
         <tr><td><code>PRODUCT_<br>CATEGORY_LIST</code></td><td>소분류 카테고리 안내</td><td><code>answer</code> + <strong>소분류 링크 목록</strong>(<code>categories</code>) + 상위 대분류 맥락(<code>parentCategory</code>). 각 항목은 <code>/product?productCategoryId={id}</code> 로 이동</td></tr>
+        <tr><td><code>PRODUCT_LIST</code></td><td>상품 안내 (2026-08-06 추가)</td><td><code>answer</code> + <strong>상품 링크 목록</strong>(<code>products</code>). 브랜드·카테고리와 달리 <strong>브랜드명·가격을 함께</strong> 보여주는 전용 UI. 각 항목은 <code>/product/{id}</code> 상세로 이동</td></tr>
         <tr><td><code>CONFIRM_<br>SUGGESTION</code></td><td>답이 애매해 되물음</td><td><code>answer</code> + <strong>되묻기 칩</strong>(<code>suggestions</code>). 누르면 그 문구를 새 질문으로 전송</td></tr>
         <tr><td><code>FALLBACK</code></td><td>답변 불가</td><td><code>answer</code> + <strong><code>/contact</code> 문의 링크</strong>(D-5). 프론트가 붙입니다</td></tr>
         <tr><td><code>OFF_TOPIC</code></td><td>쇼핑몰 무관 질문 거절</td><td><code>answer</code> + <strong>되묻기 칩</strong>. dev 서버 확인 결과 이 <code>tag</code>에도 <code>suggestions</code>가 채워져 옵니다. 1차 범위 밖 질문(상품 추천·주문 조회)도 여기로 옵니다</td></tr>
@@ -959,6 +982,7 @@ body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:non
       <tr><td><code>BRAND_LIST</code></td><td><code>brands</code></td><td><code>/brand/{id}</code></td></tr>
       <tr><td><code>CATEGORY_LIST</code></td><td><code>categories</code></td><td><code>/product?categoryId={id}</code></td></tr>
       <tr><td><code>PRODUCT_CATEGORY_LIST</code></td><td><code>categories</code></td><td><code>/product?productCategoryId={id}</code></td></tr>
+      <tr><td><code>PRODUCT_LIST</code></td><td><code>products</code></td><td><code>/product/{id}</code></td></tr>
     </tbody>
   </table></div>
   <p>목록 전체를 보여 주는 목적지는 두지 않습니다. 5개를 넘는 나머지는 목록 안에서 펼칩니다(§5.2).</p>
@@ -1339,6 +1363,7 @@ body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:non
       <tr><td>D-9 자리 정리</td><td><code>&lt;Toaster position="bottom-center" /&gt;</code>, ScrollToTop 을 챗봇 버튼 위 스택으로(중심축 정렬)</td></tr>
       <tr><td>API 연동</td><td>추천 질문 조회(오픈 시점) + 대화 전송. <code>tag</code> 9종 분기</td></tr>
       <tr><td>브랜드·카테고리 안내</td><td><code>BRAND_LIST</code> · <code>CATEGORY_LIST</code> · <code>PRODUCT_CATEGORY_LIST</code> 를 링크 목록으로 렌더. 행 앞 36px 썸네일(<code>image</code> 없으면 생략), 5개까지 접고 나머지는 목록 안에서 펼침. 대분류·소분류가 서로 다른 쿼리 파라미터로 연결됨(§7.4)</td></tr>
+      <tr><td>상품 안내 (2026-08-06)</td><td><code>PRODUCT_LIST</code> 를 상품 전용 목록으로 렌더. 44px 상품 썸네일(<code>object-cover</code>) + 브랜드명 + 상품명 + 가격(<code>NT$</code>), 각 항목 <code>/product/{id}</code> 로 이동. 5개까지 접고 나머지는 이 자리에서 펼침. <code>widgets/chatbot/ui/ChatProductList.tsx</code></td></tr>
       <tr><td>상태 화면</td><td>최초 진입 · 추천 질문 로딩/실패 · 전송 중 · tag 별 응답 · 네트워크 오류+재시도 · 오프라인 · 레이트리밋 · 입력 길이</td></tr>
       <tr><td>접근성</td><td><code>aria-live</code> 메시지 영역, 포커스 트랩, Esc, <code>aria-modal</code>(모바일), 스크린리더 레이블</td></tr>
       <tr><td>i18n</td><td>시트 <code>language-pack</code> 에 20개 키 등록. 언어 변경 시 대화 초기화 + 추천 질문 재조회</td></tr>
@@ -1517,6 +1542,21 @@ body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:non
       { id: 41, name: "바람막이", image: "https://image-dev.seoulmoment.com.tw/product-category/2026-07-28/6ca603f7-df77-4f85-a65b-38ef274c7bf5-e04c2b99-5c16-4ab9-b5e4-33b9c87db75e.webp" },
     ],
   };
+  // 2026-08-06 응답 확장: PRODUCT_LIST 는 브랜드·카테고리와 달리 브랜드명·가격을
+  // 함께 담는 products 배열을 내려준다. 각 항목은 /product/{id} 상품 상세로 이동한다.
+  const PRODUCT_LIST = {
+    role: "bot", tag: "PRODUCT_LIST",
+    text: "찾으시는 조건에 맞는 상품이에요. 눌러서 상품 상세로 이동할 수 있어요.",
+    products: [
+      { id: 132, name: "[2026 SS] 무브 쇼츠 3 레드", brandName: "OSSMOVE", price: 1530, image: "https://image-dev.seoulmoment.com.tw/product/2026-07-29/af59dd80-3793-411c-8486-b9ddd605bcaf-504562a0-4ab9-47ed-a5db-0c4b0bdd7264.webp" },
+      { id: 117, name: "[2026 SS] 네거티브 싱글렛", brandName: "RUN STATE", price: 1350, image: "https://image-dev.seoulmoment.com.tw/product/2026-07-29/0a8eca42-a5d0-4122-803d-29f163198860-9572b5ed-9960-4eae-8462-38be242ed3f9.webp" },
+      { id: 111, name: "DEV:10 선글라스 컷 캡 레드", brandName: "Node Labs", price: 1590, image: "https://image-dev.seoulmoment.com.tw/product/2026-07-28/3746ee61-230f-41bf-8d8a-4cae905e5888-86e3c663-2a67-4da1-a34f-52b16d830584.webp" },
+      { id: 81, name: "무센트 마레 7 버튼 크롭 헨리넥 가디건 레드", brandName: "무센트", price: 940, image: "https://image-dev.seoulmoment.com.tw/product/2026-02-04/b730f3cf-9278-477d-8918-625c0dd45178-3132f98a-ceaa-4e0c-9e79-03c20a4bcbda.webp" },
+      { id: 133, name: "[2026 SS] 무브 쇼츠 3 블랙", brandName: "OSSMOVE", price: 1530, image: "https://image-dev.seoulmoment.com.tw/product/2026-07-29/af59dd80-3793-411c-8486-b9ddd605bcaf-504562a0-4ab9-47ed-a5db-0c4b0bdd7264.webp" },
+      { id: 118, name: "[2026 SS] 네거티브 싱글렛 화이트", brandName: "RUN STATE", price: 1350, image: "https://image-dev.seoulmoment.com.tw/product/2026-07-29/0a8eca42-a5d0-4122-803d-29f163198860-9572b5ed-9960-4eae-8462-38be242ed3f9.webp" },
+      { id: 112, name: "DEV:10 선글라스 컷 캡 블랙", brandName: "Node Labs", price: 1590, image: "https://image-dev.seoulmoment.com.tw/product/2026-07-28/3746ee61-230f-41bf-8d8a-4cae905e5888-86e3c663-2a67-4da1-a34f-52b16d830584.webp" },
+    ],
+  };
 
   // tag별 고정 응답 (서버 answer 상수를 대신하는 값)
   const FALLBACK = {
@@ -1543,6 +1583,7 @@ body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:non
     BRAND_LIST: {},
     CATEGORY_LIST: {},
     PRODUCT_CATEGORY_LIST: {},
+    PRODUCT_LIST: {},
     CONFIRM_SUGGESTION: {},
     FALLBACK: { contact: true },
     OFF_TOPIC: { contact: true },
@@ -1585,7 +1626,7 @@ body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:non
     if (ui.contact) {
       body += '<div class="msg-links"><a href="#proto" data-demo-link="1">문의 남기기' + linkSvg + "</a></div>";
     }
-    const hasList = !!((m.brands && m.brands.length) || (m.categories && m.categories.length));
+    const hasList = !!((m.brands && m.brands.length) || (m.categories && m.categories.length) || (m.products && m.products.length));
     let out = '<div class="' + cls + (ui.warn ? " warn" : "") + (hasList ? " has-list" : "") + '">'
       + '<div class="bub">' + body + "</div>";
     if (m.tag && m.role === "bot") out += '<div class="cb-meta">tag: ' + esc(m.tag) + "</div>";
@@ -1616,6 +1657,30 @@ body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:non
           ? '<button class="list-all" type="button" data-list-toggle="' + idx
             + '" aria-expanded="' + expanded + '">'
             + (expanded ? "접기" + chevronUpSvg : "나머지 " + hidden + "개 보기" + chevronDownSvg)
+            + "</button>"
+          : "")
+        + "</div>";
+    }
+
+    // 상품 목록(PRODUCT_LIST). 브랜드·카테고리와 달리 브랜드명·가격을 함께 보여주는
+    // 전용 UI 다. 썸네일은 상품 사진이라 cover 로 채우고, 눌러서 /product/{id} 로 이동한다.
+    // 5개까지 접고 나머지는 브랜드·카테고리 목록과 같은 방식으로 이 자리에서 펼친다.
+    if (m.products && m.products.length) {
+      const hiddenP = m.products.length - LIST_VISIBLE_MAX;
+      const expandedP = !!m.listExpanded;
+      const visibleP = expandedP || hiddenP <= 0 ? m.products : m.products.slice(0, LIST_VISIBLE_MAX);
+      out += '<div class="cb-plist">' + visibleP
+        .map(p => '<a href="#proto" data-demo-link="1">'
+          + (p.image ? '<span class="pthumb"><img src="' + esc(p.image) + '" alt="" loading="lazy"></span>' : "")
+          + '<span class="pinfo"><span class="pbrand">' + esc(p.brandName) + "</span>"
+          + '<span class="pname">' + esc(p.name) + "</span>"
+          + '<span class="pprice">NT$' + p.price.toLocaleString() + "</span></span>"
+          + chevronSvg + "</a>")
+        .join("")
+        + (hiddenP > 0
+          ? '<button class="list-all" type="button" data-list-toggle="' + idx
+            + '" aria-expanded="' + expandedP + '">'
+            + (expandedP ? "접기" + chevronUpSvg : "나머지 " + hiddenP + "개 보기" + chevronDownSvg)
             + "</button>"
           : "")
         + "</div>";
@@ -1817,6 +1882,10 @@ body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:non
     },
     productCategoryList: () => {
       reset(); S.convo = [WELCOME, { role: "me", text: "패션 하위 분류 보여주세요" }, Object.assign({}, PRODUCT_CATEGORY_LIST)];
+      S.suggest = false;
+    },
+    productList: () => {
+      reset(); S.convo = [WELCOME, { role: "me", text: "빨간색 반팔 상품 보여줘" }, Object.assign({}, PRODUCT_LIST)];
       S.suggest = false;
     },
     fallback: () => {

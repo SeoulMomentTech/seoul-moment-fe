@@ -66,6 +66,7 @@ export function useChatbotConversation() {
             brands,
             categories,
             parentCategory,
+            products,
           } = res.data;
 
           addMessage({
@@ -77,6 +78,7 @@ export function useChatbotConversation() {
             brands,
             categories,
             parentCategory,
+            products,
           });
 
           // 답변은 그대로 보여주되(서버가 안내 문구를 담아 준다) 전송만 잠시 막는다.
