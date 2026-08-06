@@ -4,6 +4,8 @@ import { ArrowUpRight, CircleAlert } from "lucide-react";
 
 import { useTranslations } from "next-intl";
 
+import { useMediaQuery } from "@shared/lib/hooks";
+
 import { Link } from "@/i18n/navigation";
 
 import { cn } from "@seoul-moment/ui";
@@ -35,6 +37,13 @@ export default function ChatMessage({
   const showContactLink =
     !!message.tag && CONTACT_LINK_TAGS.includes(message.tag);
   const isWarning = !!message.tag && WARNING_TAGS.includes(message.tag);
+  // 모바일은 패널이 전체화면이라 같은 탭으로 이동하면 패널이 목적지를 덮어
+  // 사용자가 이동을 인지하지 못한다. 새 탭으로 열어 대화를 끊지 않고 목적지를
+  // 함께 보여준다. 데스크톱 팝오버는 페이지를 가리지 않으므로 같은 탭으로 이동한다.
+  const openInNewTab = useMediaQuery("(max-width: 640px)");
+  const newTabProps = openInNewTab
+    ? { rel: "noopener noreferrer", target: "_blank" }
+    : {};
   // 목록도 칩과 마찬가지로 tag 가 아니라 배열 유무로 판단한다. 해당 tag 가 아니면
   // 서버가 빈 배열을 주므로 이 규칙이 성립한다.
   const entityItems = message.brands?.length
@@ -63,6 +72,7 @@ export default function ChatMessage({
           <Link
             className="border-neutral-subtle text-body-3 text-brand mt-2 flex min-h-9 items-center gap-1 border-t pt-2 font-semibold underline underline-offset-4"
             href="/contact"
+            {...newTabProps}
           >
             {t("chatbot_escalate_label")}
             <ArrowUpRight aria-hidden="true" size={14} />
@@ -86,12 +96,16 @@ export default function ChatMessage({
       )}
 
       {!isUser && !!message.products?.length && (
-        <ChatProductList products={message.products} />
+        <ChatProductList
+          openInNewTab={openInNewTab}
+          products={message.products}
+        />
       )}
 
       {!isUser && (
         <ChatEntityList
           items={entityItems}
+          openInNewTab={openInNewTab}
           parentCategory={message.parentCategory}
           tag={message.tag}
         />

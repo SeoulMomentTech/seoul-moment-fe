@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import { X } from "lucide-react";
 
@@ -67,15 +67,6 @@ export default function ChatbotPanel({ triggerRef }: ChatbotPanelProps) {
   // 페이지를 읽으며 대화하는 것이 목적이라 잠그지 않는다.
   useBodyScrollLock(isOpen && isMobile);
 
-  const handleNavigateOnMobile = useCallback(
-    function closePanelOnLinkNavigation(event: React.MouseEvent<HTMLElement>) {
-      if (!isMobile) return;
-      if (!(event.target as HTMLElement).closest("a[href]")) return;
-      close();
-    },
-    [isMobile, close],
-  );
-
   useEffect(
     // Esc 로 닫고 런처로 포커스를 되돌리며, 열려 있는 동안 포커스를 패널 안에 묶는다.
     function bindEscapeAndFocusTrap() {
@@ -139,7 +130,6 @@ export default function ChatbotPanel({ triggerRef }: ChatbotPanelProps) {
             ? "slide-in-from-bottom-2 inset-0"
             : "zoom-in-95 bottom-24 right-6 h-[min(560px,calc(100vh-140px))] w-[380px] rounded-2xl shadow-2xl",
         )}
-        onClick={handleNavigateOnMobile}
         ref={panelRef}
         role="dialog"
       >

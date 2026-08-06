@@ -19,6 +19,8 @@ const THUMBNAIL_SIZE = 44;
 
 interface ChatProductListProps {
   products: AiConsultProduct[];
+  /** 모바일에서는 새 탭으로 열어 전체화면 패널이 목적지를 덮지 않게 한다. */
+  openInNewTab?: boolean;
 }
 
 /**
@@ -31,11 +33,18 @@ interface ChatProductListProps {
  * `ChatEntityList` 의 `object-contain` 과 다르다). 좁은 패널을 고려해 접힌 상태에서는
  * `ENTITY_LIST_VISIBLE_MAX` 개만 보이고 나머지는 목록 안에서 펼친다.
  */
-export default function ChatProductList({ products }: ChatProductListProps) {
+export default function ChatProductList({
+  products,
+  openInNewTab,
+}: ChatProductListProps) {
   const t = useTranslations();
   const [isExpanded, setIsExpanded] = useState(false);
 
   if (!products.length) return null;
+
+  const newTabProps = openInNewTab
+    ? { rel: "noopener noreferrer", target: "_blank" }
+    : {};
 
   const hiddenCount = products.length - ENTITY_LIST_VISIBLE_MAX;
   const visibleProducts =
@@ -55,6 +64,7 @@ export default function ChatProductList({ products }: ChatProductListProps) {
             .join(" ")}
           href={`/product/${product.id}`}
           key={product.id}
+          {...newTabProps}
         >
           {product.image && (
             <span
