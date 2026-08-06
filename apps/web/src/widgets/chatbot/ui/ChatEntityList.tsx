@@ -29,6 +29,8 @@ interface ChatEntityListProps {
   items: Array<{ id: number; name: string; image: string | null }>;
   /** 소분류 목록일 때의 상위 대분류. 맥락 표시용이며 링크는 아니다. */
   parentCategory?: AiConsultCategory | null;
+  /** 모바일에서는 새 탭으로 열어 전체화면 패널이 목적지를 덮지 않게 한다. */
+  openInNewTab?: boolean;
 }
 
 /**
@@ -47,11 +49,16 @@ export default function ChatEntityList({
   tag,
   items,
   parentCategory,
+  openInNewTab,
 }: ChatEntityListProps) {
   const t = useTranslations();
   const [isExpanded, setIsExpanded] = useState(false);
 
   if (!items.length) return null;
+
+  const newTabProps = openInNewTab
+    ? { rel: "noopener noreferrer", target: "_blank" }
+    : {};
 
   const hiddenCount = items.length - ENTITY_LIST_VISIBLE_MAX;
   const visibleItems =
@@ -77,6 +84,7 @@ export default function ChatEntityList({
             .join(" ")}
           href={entityHref(tag, item.id)}
           key={item.id}
+          {...newTabProps}
         >
           {/* 정사각 고정 박스 + object-contain. 로고에 배경색이 박혀 있고 비율이
               1:1~2:1 로 섞여 있어서 cover 로 채우면 잘린다. 크기를 박스에 주는
