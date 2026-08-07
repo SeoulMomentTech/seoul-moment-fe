@@ -50,6 +50,18 @@ const config = [
   ...nextJsConfig,
 
   {
+    // eslint-config-next 16이 번들하는 eslint-plugin-react-hooks v7의 React Compiler
+    // 신규 룰. 기존 코드에서 18건(set-state-in-effect 15, refs 3)이 걸리고,
+    // optimistic like 토글처럼 동작에 민감한 로직이 포함돼 의존성 업그레이드와 함께
+    // 고칠 수 없다. 별도 PR에서 effect/ref를 정리한 뒤 하나씩 다시 켠다.
+    rules: {
+      "react-hooks/set-state-in-effect": "off",
+      "react-hooks/refs": "off",
+      "react-hooks/incompatible-library": "off",
+    },
+  },
+
+  {
     // FSD 하향 전용 임포트 강제: app → views → widgets → features → entities → shared
     // 상위 레이어를 참조하면 error. 외부 라이브러리 임포트에는 적용되지 않는다.
     files: ["src/**/*.{ts,tsx}"],
