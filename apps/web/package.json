@@ -32,7 +32,7 @@
     "ky": "^1.10.0",
     "lucide-react": "^0.511.0",
     "motion": "^12.43.0",
-    "next": "16.2.10",
+    "next": "16.3.0",
     "next-intl": "^4.1.0",
     "nuqs": "^2.7.0",
     "overlay-kit": "^1.8.6",
@@ -53,7 +53,6 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
     "@playwright/test": "^1.58.0",
     "@seoul-moment/eslint-config": "workspace:*",
     "@seoul-moment/tailwind-config": "workspace:*",
