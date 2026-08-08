@@ -19,7 +19,7 @@
     "eslint-plugin-unused-imports": "^4.1.4"
   },
   "peerDependencies": {
-    "typescript": "^5"
+    "typescript": "^6"
   },
   "keywords": [],
   "author": "",
