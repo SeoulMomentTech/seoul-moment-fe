@@ -33,6 +33,7 @@ pnpm dev                  # Run dev for every workspace (turbo run dev)
 pnpm build                # Build every workspace
 pnpm lint                 # Lint every workspace
 pnpm lint:fix:all         # Auto-fix web + admin
+pnpm typecheck            # Type-check every workspace (web runs `next typegen` first)
 pnpm test:e2e             # Run all Playwright e2e suites
 pnpm i18n:sync            # Sync web translations from Google Sheets
 ```

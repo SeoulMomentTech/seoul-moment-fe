@@ -12,6 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 pnpm dev:web              # Dev server (localhost:3000), auto-syncs i18n first
 pnpm build:web            # Production build
 pnpm lint:fix:web         # ESLint auto-fix
+pnpm typecheck:web        # next typegen + tsc --noEmit (regenerates .next/types route types)
 
 # Unit tests (Vitest)
 cd apps/web
