@@ -23,6 +23,12 @@ import { Header } from "@widgets/header";
 
 import "../globals.css";
 
+// [locale] 값을 열거해야 하위 라우트가 빌드 시점에 프리렌더된다.
+// 없으면 세그먼트 값을 모르므로 전부 요청 시 렌더링된다.
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
 export async function generateMetadata(): Promise<Metadata> {
   try {
     const t = await getTranslations();
