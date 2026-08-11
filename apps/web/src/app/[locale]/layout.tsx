@@ -2,6 +2,7 @@ import type { PropsWithChildren } from "react";
 
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import * as rootParams from "next/root-params";
 import Script from "next/script";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
@@ -21,12 +22,6 @@ import { Footer } from "@widgets/footer";
 import { Header } from "@widgets/header";
 
 import "../globals.css";
-
-interface Props {
-  params: Promise<{
-    locale?: string;
-  }>;
-}
 
 export async function generateMetadata(): Promise<Metadata> {
   try {
@@ -60,11 +55,8 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-export default async function RootLayout({
-  children,
-  params,
-}: PropsWithChildren<Props>) {
-  const { locale } = await params;
+export default async function RootLayout({ children }: PropsWithChildren) {
+  const locale = await rootParams.locale();
   const messages = await getMessages();
 
   if (!hasLocale(routing.locales, locale)) {
@@ -72,7 +64,7 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang={locale ?? routing.defaultLocale}>
+    <html lang={locale}>
       <head>
         <meta
           content="tkdfXJ6-ynp9D_0x2zpVyESgoJIA3YtbN5LxrpjEGxQ"
