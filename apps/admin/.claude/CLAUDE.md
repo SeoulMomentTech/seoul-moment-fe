@@ -12,6 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 pnpm dev:admin            # Dev server (localhost:5173)
 pnpm build:admin          # Production build (tsc + vite build)
 pnpm lint:fix:admin       # ESLint auto-fix
+pnpm typecheck:admin      # tsc -b (type-check only)
 
 # Unit tests (Vitest)
 cd apps/admin

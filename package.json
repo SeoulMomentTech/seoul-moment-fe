@@ -22,7 +22,10 @@
     "test:admin-e2e:ui": "turbo run test:e2e:ui --filter=@seoul-moment/admin",
     "test:e2e": "turbo run test:e2e",
     "test:web-e2e": "turbo run test:e2e --filter=@seoul-moment/web",
-    "test:web-e2e:ui": "turbo run test:e2e:ui --filter=@seoul-moment/web"
+    "test:web-e2e:ui": "turbo run test:e2e:ui --filter=@seoul-moment/web",
+    "typecheck": "turbo run typecheck",
+    "typecheck:admin": "turbo run typecheck --filter=@seoul-moment/admin",
+    "typecheck:web": "turbo run typecheck --filter=@seoul-moment/web"
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^16.3.0",
