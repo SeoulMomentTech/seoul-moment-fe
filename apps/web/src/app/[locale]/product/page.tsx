@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import * as rootParams from "next/root-params";
 import { getTranslations } from "next-intl/server";
 
 import { getQueryClient, HydrateClient } from "@shared/lib/query";
@@ -8,7 +9,6 @@ import { getProductBanner, getProductList } from "@shared/services/product";
 
 import type { LanguageType } from "@/i18n/const";
 import { buildLocalizedAlternates } from "@/i18n/metadata";
-import type { PageParams } from "@/types";
 
 import { ProductPage } from "@views/product";
 
@@ -26,10 +26,8 @@ const PRODUCT_FILTER_KEYS = [
   "optionIdList",
 ] as const;
 
-export async function generateMetadata({
-  params,
-}: PageParams): Promise<Metadata> {
-  const { locale } = await params;
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await rootParams.locale();
 
   try {
     const t = await getTranslations();
@@ -47,12 +45,11 @@ export async function generateMetadata({
 }
 
 export default async function Product({
-  params,
   searchParams,
-}: PageParams & {
+}: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const { locale } = await params;
+  const locale = (await rootParams.locale()) as LanguageType;
   const resolvedSearchParams = await searchParams;
 
   const isFiltered = PRODUCT_FILTER_KEYS.some(
