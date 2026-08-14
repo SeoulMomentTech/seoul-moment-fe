@@ -42,6 +42,11 @@ export function PopupSection({
         }
         title="팝업 목록"
       />
+      {popups.length === 0 ? (
+        <div className="py-8 text-center text-sm text-black/35">
+          등록된 팝업이 없습니다.
+        </div>
+      ) : null}
       <div className="space-y-4">
         {popups.map((popup, index) => (
           <Card key={`popup-${index + 1}`}>

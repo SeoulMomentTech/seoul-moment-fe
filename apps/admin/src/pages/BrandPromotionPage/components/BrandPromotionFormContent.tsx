@@ -113,9 +113,7 @@ export function BrandPromotionFormContent({
           }
           onRemove={(index) =>
             form.setPopups((current) =>
-              current.length === 1
-                ? current
-                : current.filter((_, itemIndex) => itemIndex !== index),
+              current.filter((_, itemIndex) => itemIndex !== index),
             )
           }
           popups={form.popups}
