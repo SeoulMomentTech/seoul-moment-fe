@@ -20,7 +20,6 @@ import type {
 } from "../types";
 import {
   createEmptyBanner,
-  createEmptyPopup,
   createEmptySection,
   getLanguageCode,
 } from "../utils/form";
@@ -61,9 +60,7 @@ export function useBrandPromotionForm({
       : [createEmptySection()]),
   ]);
   const [popups, setPopups] = useState<PopupFormValue[]>([
-    ...(initialState?.popups?.length
-      ? initialState.popups
-      : [createEmptyPopup()]),
+    ...(initialState?.popups?.length ? initialState.popups : []),
   ]);
   const [notices, setNotices] = useState<NoticeFormValue[]>([
     ...(initialState?.notices?.length ? initialState.notices : []),

@@ -91,7 +91,7 @@ export interface PostAdminBrandPromotionRequest {
   isActive?: boolean;
   bannerList: PostAdminBrandPromotionBannerBaseDto[];
   sectionList: PostAdminBrandPromotionSectionBaseDto[];
-  popupList: PostAdminBrandPromotionPopupBaseDto[];
+  popupList?: PostAdminBrandPromotionPopupBaseDto[];
   noticeList?: PostAdminBrandPromotionNoticeBaseDto[];
   eventAndCouponList?: PostAdminBrandPromotionEventAndCouponDto[];
 }
@@ -206,7 +206,7 @@ export interface GetAdminBrandPromotionDetailResponse {
   brandDto: GetAdminBrandPromotionDetailBrandDto;
   bannerList: GetAdminBrandPromotionBannerResponse[];
   sectionList: GetAdminBrandPromotionSectionResponse[];
-  popupList: GetAdminBrandPromotionPopupResponse[];
+  popupList?: GetAdminBrandPromotionPopupResponse[];
   noticeList?: GetAdminBrandPromotionNoticeResponse[];
   eventAndCouponList?: GetAdminBrandPromotionEventAndCouponDto[];
   isActive: boolean;
@@ -431,7 +431,7 @@ export interface PatchAdminBrandPromotionRequest {
   isActive: boolean;
   bannerList: PatchAdminBrandPromotionBannerDto[];
   sectionList: PatchAdminBrandPromotionSectionDto[];
-  popupList: PatchAdminBrandPromotionPopupDto[];
+  popupList?: PatchAdminBrandPromotionPopupDto[];
   noticeList?: PatchAdminBrandPromotionNoticeDto[];
   eventAndCouponList?: PatchAdminBrandPromotionEventAndCouponDto[];
 }
