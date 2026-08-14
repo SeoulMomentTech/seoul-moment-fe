@@ -171,7 +171,7 @@ export function getBrandPromotionInitialState(
           })
         : [],
     popups:
-      detail.popupList.length > 0
+      detail.popupList && detail.popupList.length > 0
         ? detail.popupList.map((popup) => {
             const content = {
               ko: { title: "", description: "" },
