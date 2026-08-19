@@ -56,35 +56,37 @@ export interface PatchPasswordPayload {
   token: string;
 }
 
-export interface PostGoogleLoginPayload {
-  /** Google Sign-In에서 발급받은 idToken */
+export interface PostSnsLoginPayload {
+  /** SNS 로그인 SDK(Google Sign-In / LINE Login·LIFF)에서 발급받은 idToken */
   idToken: string;
 }
 
-export interface PostGoogleLoginResponse {
-  /** Google 계정 연결 확인이 필요한지 여부. true면 email/linkToken이 내려가고, 연결 확인 모달 후 /user/auth/google/link 호출 필요 */
+export interface PostSnsLoginResponse {
+  /** SNS 계정 연결 확인이 필요한지 여부. true면 email/linkToken이 내려가고, 연결 확인 모달 후 provider별 link API 호출 필요 */
   needsLinkConfirm: boolean;
-  /** 연결 확인 또는 신규 가입이 필요한 경우 표시용 Google 계정 이메일 */
+  /** 연결 확인 또는 신규 가입이 필요한 경우 표시용 SNS 계정 이메일 */
   email?: string;
-  /** 연결 확인이 필요한 경우 /user/auth/google/link에 전달할 단기 JWT (5분 만료) */
+  /** 연결 확인이 필요한 경우 provider별 link API에 전달할 단기 JWT (5분 만료) */
   linkToken?: string;
   /** 가입된 이메일이 없어 SNS 회원가입이 필요한지 여부 */
   needsSignup?: boolean;
-  /** SNS 회원가입이 필요한 경우 /user/auth/google/signup에 전달할 단기 JWT (10분 만료) */
+  /** SNS 회원가입이 필요한 경우 provider별 signup API에 전달할 단기 JWT (10분 만료) */
   signupToken?: string;
+  /** 신규 가입 시 닉네임 입력칸 기본값으로 쓰는 SNS 표시 이름. profile scope 미동의 시 내려오지 않는다 */
+  name?: string;
   /** 이미 연결된 계정인 경우 발급되는 access token */
   token?: string;
   /** 이미 연결된 계정인 경우 발급되는 refresh token */
   refreshToken?: string;
 }
 
-export interface PostGoogleLinkPayload {
-  /** /user/auth/google/login 응답으로 받은 단기 linkToken */
+export interface PostSnsLinkPayload {
+  /** SNS login 응답으로 받은 단기 linkToken */
   linkToken: string;
 }
 
-export interface PostGoogleSignupPayload {
-  /** /user/auth/google/login 응답으로 받은 단기 signupToken */
+export interface PostSnsSignupPayload {
+  /** SNS login 응답으로 받은 단기 signupToken */
   signupToken: string;
   /** 닉네임 */
   nickname: string;
@@ -95,6 +97,17 @@ export interface PostGoogleSignupPayload {
   /** 개인 맞춤 상품 추천 알림 */
   recommendAgreed?: boolean;
 }
+
+/** Google / LINE 3-step 플로우의 요청·응답 shape은 동일하다 — provider별 alias */
+export type PostGoogleLoginPayload = PostSnsLoginPayload;
+export type PostGoogleLoginResponse = PostSnsLoginResponse;
+export type PostGoogleLinkPayload = PostSnsLinkPayload;
+export type PostGoogleSignupPayload = PostSnsSignupPayload;
+
+export type PostLineLoginPayload = PostSnsLoginPayload;
+export type PostLineLoginResponse = PostSnsLoginResponse;
+export type PostLineLinkPayload = PostSnsLinkPayload;
+export type PostLineSignupPayload = PostSnsSignupPayload;
 
 /**
  * @description 유저 회원가입 (응답: 204 No Content)
@@ -280,6 +293,36 @@ export const postGoogleLink = (data: PostGoogleLinkPayload) =>
 export const postGoogleSignup = (data: PostGoogleSignupPayload) =>
   api
     .post("user/auth/google/signup", {
+      json: data,
+    })
+    .json<CommonRes<UserLoginResponse>>();
+
+/**
+ * @description LINE 로그인 / 연결확인 / 신규가입 분기 (1단계). idToken 검증 후 토큰 또는 linkToken/signupToken 발급 (401: 유효하지 않은 idToken 또는 이메일 제공 미동의)
+ */
+export const postLineLogin = (data: PostLineLoginPayload) =>
+  api
+    .post("user/auth/line/login", {
+      json: data,
+    })
+    .json<CommonRes<PostLineLoginResponse>>();
+
+/**
+ * @description LINE 계정 연결 (2-A단계). 기존 계정에 LINE 계정을 연결하고 access/refresh 토큰 발급 (401: linkToken 만료·변조 / 409: 이미 다른 계정에 연결된 LINE 계정)
+ */
+export const postLineLink = (data: PostLineLinkPayload) =>
+  api
+    .post("user/auth/line/link", {
+      json: data,
+    })
+    .json<CommonRes<UserLoginResponse>>();
+
+/**
+ * @description LINE SNS 회원가입 (2-B단계). signupToken + 닉네임/약관동의로 신규 가입 후 access/refresh 토큰 발급 (401: signupToken 만료·변조 / 409: 이미 존재하는 닉네임 또는 가입된 이메일)
+ */
+export const postLineSignup = (data: PostLineSignupPayload) =>
+  api
+    .post("user/auth/line/signup", {
       json: data,
     })
     .json<CommonRes<UserLoginResponse>>();
