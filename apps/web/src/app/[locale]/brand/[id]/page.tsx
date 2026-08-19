@@ -9,7 +9,7 @@ import { getBrandDetail } from "@shared/services/brand";
 
 import type { LanguageType } from "@/i18n/const";
 import { buildLocalizedAlternates } from "@/i18n/metadata";
-import type { PageParams } from "@/types";
+import { resolveLocale } from "@/i18n/routing";
 
 import { BrandDetailPage } from "@views/brand";
 
@@ -19,8 +19,9 @@ const fetchBrandDetail = cache((id: number, languageCode: LanguageType) => {
 
 export async function generateMetadata({
   params,
-}: PageParams<{ id: string }>): Promise<Metadata> {
-  const { id, locale } = await params;
+}: PageProps<"/[locale]/brand/[id]">): Promise<Metadata> {
+  const { id, locale: rawLocale } = await params;
+  const locale = resolveLocale(rawLocale);
   const brandId = Number(id);
   const t = await getTranslations();
 
@@ -59,17 +60,16 @@ export async function generateMetadata({
 
 export default async function BrandDetail({
   params,
-}: PageParams<{ id: string }>) {
-  const { id, locale } = await params;
+}: PageProps<"/[locale]/brand/[id]">) {
+  const { id, locale: rawLocale } = await params;
+  const locale = resolveLocale(rawLocale);
   const brandId = Number(id);
 
   if (!Number.isInteger(brandId) || brandId <= 0) {
     notFound();
   }
 
-  const promise = fetchBrandDetail(brandId, locale as LanguageType).catch(() =>
-    notFound(),
-  );
+  const promise = fetchBrandDetail(brandId, locale).catch(() => notFound());
 
   return <BrandDetailPage promise={promise} />;
 }

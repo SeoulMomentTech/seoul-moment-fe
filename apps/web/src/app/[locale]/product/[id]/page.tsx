@@ -9,7 +9,7 @@ import { getProductDetail } from "@shared/services/product";
 
 import type { LanguageType } from "@/i18n/const";
 import { buildLocalizedAlternates } from "@/i18n/metadata";
-import type { PageParams } from "@/types";
+import { resolveLocale } from "@/i18n/routing";
 
 import { ProductDetailPage } from "@views/product";
 
@@ -19,8 +19,9 @@ const fetchProductDetail = cache((id: number, languageCode: LanguageType) =>
 
 export async function generateMetadata({
   params,
-}: PageParams<{ id: string }>): Promise<Metadata> {
-  const { id, locale } = await params;
+}: PageProps<"/[locale]/product/[id]">): Promise<Metadata> {
+  const { id, locale: rawLocale } = await params;
+  const locale = resolveLocale(rawLocale);
   const productId = parseInt(id);
   const t = await getTranslations();
 
@@ -59,8 +60,9 @@ export async function generateMetadata({
 
 export default async function ProductDetail({
   params,
-}: PageParams<{ id: string }>) {
-  const { id, locale } = await params;
+}: PageProps<"/[locale]/product/[id]">) {
+  const { id, locale: rawLocale } = await params;
+  const locale = resolveLocale(rawLocale);
   const productId = Number(id);
 
   if (!Number.isInteger(productId) || !productId) {
