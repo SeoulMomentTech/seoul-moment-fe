@@ -12,8 +12,7 @@ import { StructuredDataScript } from "@shared/ui/structured-data-script";
 
 import type { LanguageType } from "@/i18n/const";
 import { buildLocalizedAlternates } from "@/i18n/metadata";
-import { routing } from "@/i18n/routing";
-import type { PageParams } from "@/types";
+import { resolveLocale, routing } from "@/i18n/routing";
 
 import { NewsDetailPage } from "@views/news";
 
@@ -45,8 +44,9 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({
   params,
-}: PageParams<{ id: string }>): Promise<Metadata> {
-  const { id, locale } = await params;
+}: PageProps<"/[locale]/news/[id]">): Promise<Metadata> {
+  const { id, locale: rawLocale } = await params;
+  const locale = resolveLocale(rawLocale);
   const newsId = Number(id);
   const t = await getTranslations();
 
@@ -87,16 +87,17 @@ export async function generateMetadata({
 
 export default async function NewsDetail({
   params,
-}: PageParams<{ id: string }>) {
-  const { id, locale } = await params;
+}: PageProps<"/[locale]/news/[id]">) {
+  const { id, locale: rawLocale } = await params;
+  const locale = resolveLocale(rawLocale);
   const newsId = Number(id);
 
   if (!Number.isInteger(newsId) || newsId <= 0) {
     notFound();
   }
 
-  const response = await fetchNewsDetail(newsId, locale as LanguageType).catch(
-    () => notFound(),
+  const response = await fetchNewsDetail(newsId, locale).catch(() =>
+    notFound(),
   );
 
   const news = response.data;

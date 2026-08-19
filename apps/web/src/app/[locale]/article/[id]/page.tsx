@@ -12,8 +12,7 @@ import { StructuredDataScript } from "@shared/ui/structured-data-script";
 
 import type { LanguageType } from "@/i18n/const";
 import { buildLocalizedAlternates } from "@/i18n/metadata";
-import { routing } from "@/i18n/routing";
-import type { PageParams } from "@/types";
+import { resolveLocale, routing } from "@/i18n/routing";
 
 import { ArticleDetailPage } from "@views/article";
 
@@ -45,8 +44,9 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({
   params,
-}: PageParams<{ id: string }>): Promise<Metadata> {
-  const { id, locale } = await params;
+}: PageProps<"/[locale]/article/[id]">): Promise<Metadata> {
+  const { id, locale: rawLocale } = await params;
+  const locale = resolveLocale(rawLocale);
   const articleId = Number(id);
   const t = await getTranslations();
 
@@ -87,18 +87,18 @@ export async function generateMetadata({
 
 export default async function ArticleDetail({
   params,
-}: PageParams<{ id: string }>) {
-  const { id, locale } = await params;
+}: PageProps<"/[locale]/article/[id]">) {
+  const { id, locale: rawLocale } = await params;
+  const locale = resolveLocale(rawLocale);
   const articleId = Number(id);
 
   if (!Number.isInteger(articleId) || articleId <= 0) {
     notFound();
   }
 
-  const response = await fetchArticleDetail(
-    articleId,
-    locale as LanguageType,
-  ).catch(() => notFound());
+  const response = await fetchArticleDetail(articleId, locale).catch(() =>
+    notFound(),
+  );
 
   const article = response.data;
   const pageUrl = `${BASE_URL}/${locale}/article/${articleId}`;

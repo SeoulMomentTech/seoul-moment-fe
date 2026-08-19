@@ -86,6 +86,37 @@ available, falling back to `err.message` otherwise.
 - Translations sync from Google Sheets via `scripts/syncLocaleFromSheet.js`
 - Request interfaces extend `PublicLanguageCode` when locale-aware
 
+### Reading the locale
+
+`[locale]` is the only root dynamic segment, so read it with
+`next/root-params` — `setRequestLocale` is not used anywhere:
+
+```ts
+import * as rootParams from "next/root-params";
+const locale = await rootParams.locale();
+```
+
+`i18n/request.ts` does the same (next-intl's `requestLocale` is
+request-scoped and blocks static rendering; it is legacy in next-intl v4).
+Routes that also read a child segment (`[id]`, `[brandPromotionId]`) keep
+`await params` — root-params only exposes root segments, so switching
+those would add a second await, not remove one.
+
+Root param getters are Server-Component-only: not in Client Components,
+Server Actions, Route Handlers, or `unstable_cache`.
+
+Both `params.locale` and `rootParams.locale()` are unvalidated `string`.
+Narrow with `resolveLocale()` from `@/i18n/routing` instead of casting
+`as LanguageType`.
+
+### Page prop types
+
+Use the globals `next typegen` writes to `.next/types/routes.d.ts` —
+`PageProps<"/[locale]/product/[id]">`, `LayoutProps<"/[locale]">`,
+`RouteContext<"/api/health">`. They need no import and their route
+literal is checked against the real route tree, so a moved folder
+fails typecheck. Do not hand-roll params types.
+
 ### Routing
 
 Always import `useRouter`, `Link`, `redirect`, `usePathname` from
