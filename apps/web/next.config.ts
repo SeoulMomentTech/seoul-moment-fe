@@ -6,7 +6,8 @@ import { withSentryConfig } from "@sentry/nextjs";
 const nextConfig: NextConfig = {
   transpilePackages: ["@seoul-moment/ui"],
   compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
+    removeConsole:
+      process.env.NODE_ENV === "production" ? { exclude: ["error"] } : false,
   },
   async redirects() {
     return [
@@ -40,6 +41,15 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 86400,
   },
   productionBrowserSourceMaps: true,
+  // TS 7은 컴파일러 API를 제공하지 않아(안정 API는 7.1 예정) typescript-eslint 등이 쓰지 못한다.
+  // 그래서 `typescript` 이름은 @typescript/typescript6(TS 6 API)에 묶어두고, 실제 TS 7은
+  // @typescript/native alias로 설치해 `tsc` CLI만 가져간다.
+  // 그런데 Next 16의 기본값(experimental.useTypeScriptCli: true)은 `typescript` 패키지의
+  // bin.tsc를 찾아 spawn하는데 호환 패키지에는 tsc6뿐이라 빌드가 깨진다. 그래서 API 모드로 되돌린다.
+  // → next build의 타입체크는 TS 6로 수행된다(변경 전과 동일). TS 7.1에서 안정 API가 나오면 이 옵션 제거 검토.
+  experimental: {
+    useTypeScriptCli: false,
+  },
 };
 
 const withNextIntl = createNextIntlPlugin();

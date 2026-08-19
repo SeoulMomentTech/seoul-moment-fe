@@ -48,7 +48,9 @@ export default function PromotionPage({
         logoImage={data.brand.profileImageUrl}
         noticeList={data.noticeList}
       />
-      <ScrollToTop className="bottom-20 right-[5%] z-50 mx-auto size-10 shadow-2xl" />
+      {/* 챗봇 플로팅 버튼(우측 하단, z-40) 위에 세로로 쌓는다.
+          right 는 뷰포트 비율이 아니라 챗봇 버튼과 같은 중심축에 맞춘 고정값이다. */}
+      <ScrollToTop className="bottom-23 max-sm:bottom-18 right-8 z-40 mx-auto size-10 shadow-2xl max-sm:right-5" />
     </>
   );
 }

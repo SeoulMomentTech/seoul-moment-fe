@@ -22,7 +22,41 @@ App-specific guides (commands, architecture, API layer, conventions):
 
 - **pnpm workspaces** (v10) with **Turborepo** for task orchestration and caching
 - **Husky** pre-commit hooks run lint-staged (ESLint + Prettier on staged files); the formatter may reorder/remove imports during commit, so re-read modified files before chained edits
+- **GitHub Actions** `ci.yml` runs `pnpm typecheck` + `pnpm lint` on PRs to `develop`
 - Package references use `workspace:*` protocol
+
+## TypeScript 6/7 Dual Setup
+
+TypeScript 7 is the Go-native compiler. It ships **no compiler API** (stable API lands in 7.1),
+so anything that does `require("typescript")` — typescript-eslint, Next.js, tsconfck — cannot run
+on it. `apps/web`, `apps/admin`, and `packages/ui` therefore install both, via npm aliases:
+
+```jsonc
+"@typescript/native": "npm:typescript@~7.0.2",          // real TS 7  -> `tsc`  binary
+"typescript": "npm:@typescript/typescript6@~6.0.2"      // TS 6 API   -> `tsc6` binary
+```
+
+| Runs on | What |
+| --- | --- |
+| **TS 7** (`tsc`) | `pnpm typecheck`, `apps/admin` `tsc -b`, `packages/ui` `.d.ts` emit |
+| **TS 6** (`typescript` API) | ESLint / typescript-eslint, `next build` type check, editor |
+
+**Never point the `typescript` name at TS 7.** typescript-eslint hard-errors
+(`typescript-eslint does not support TS 7.0`) and pnpm `overrides` cannot fix it — `typescript`
+is a *peerDependency*, so it always resolves from the importing package.
+
+`apps/web/next.config.ts` sets `experimental.useTypeScriptCli: false` for the same reason: Next 16
+defaults to spawning `typescript`'s `bin.tsc`, and the compat package only exposes `tsc6`, which
+would break `next build`. API mode costs ~8s extra on `next build` (10s → 18s).
+
+**When TS 7.1 ships a stable API**: drop the aliases back to a plain `"typescript": "~7.x"`, remove
+`useTypeScriptCli` from `next.config.ts`, and delete the `typecheck:ts6` scripts.
+
+Each package has a `typecheck:ts6` script (`tsc6`) to cross-check TS 7 results against TS 6 when a
+diagnostic looks suspicious. Editors use VS Code's bundled TypeScript; the compat package ships no
+`tsserver.js`, so do **not** set `typescript.tsdk` to `node_modules/typescript/lib`. For a TS 7
+language server, install the official "TypeScript 7" VS Code extension — note the Next.js LS plugin
+(`plugins: [{ "name": "next" }]`) only works under the TS 6 tsserver.
 
 ## Root Commands
 
@@ -33,6 +67,7 @@ pnpm dev                  # Run dev for every workspace (turbo run dev)
 pnpm build                # Build every workspace
 pnpm lint                 # Lint every workspace
 pnpm lint:fix:all         # Auto-fix web + admin
+pnpm typecheck            # Type-check every workspace with TS 7 (web runs `next typegen` first)
 pnpm test:e2e             # Run all Playwright e2e suites
 pnpm i18n:sync            # Sync web translations from Google Sheets
 ```

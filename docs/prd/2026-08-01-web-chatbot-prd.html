@@ -1,0 +1,1948 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>웹 챗봇 도입 PRD — Seoul Moment</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+<style>
+/* ─────────────────────────────────────────────
+   토큰 — apps/web/DESIGN.md 값을 기준으로 함
+   brand #f37b2a · neutral #707070 · neutral-subtle #dddddd
+   surface-soft #f0f6ff · info #0088ff · danger #ff383c
+   duration fast 100 / normal 200 / slow 300 / slower 500
+   ───────────────────────────────────────────── */
+:root{
+  --brand:#f37b2a;
+  --brand-ink:#b44e00;      /* 흰 배경에서 4.5:1을 넘기기 위해 어둡게 조정한 브랜드 톤 */
+  --brand-soft:#fff2e7;
+  --brand-line:#f6c7a1;
+  --fg:#171717;
+  --fg-muted:#565658;
+  --fg-subtle:#6f6f73;
+  --bg:#ffffff;
+  --surface:#f7f7f8;
+  --surface-2:#efeff1;
+  --border:#e3e3e6;
+  --border-strong:#cfcfd4;
+  --info-ink:#0060bd;
+  --danger-ink:#c0221f;
+  --ok-ink:#186a44;
+  --ok-soft:#eaf6ef;
+  --shadow-sm:0 1px 2px rgba(16,16,20,.08), 0 2px 6px rgba(16,16,20,.05);
+  --shadow-lg:0 8px 16px rgba(16,16,20,.10), 0 24px 56px rgba(16,16,20,.20);
+  --d-fast:100ms; --d-normal:200ms; --d-slow:300ms;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --font:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --brand:#f37b2a;
+    --brand-ink:#ffa864;
+    --brand-soft:#2b1a0d;
+    --brand-line:#5a3418;
+    --fg:#ededee;
+    --fg-muted:#a9a9ae;
+    --fg-subtle:#8e8e95;
+    --bg:#141416;
+    --surface:#1c1c1f;
+    --surface-2:#242428;
+    --border:#2f2f35;
+    --border-strong:#43434b;
+    --info-ink:#69b4ff;
+    --danger-ink:#ff7b7e;
+    --ok-ink:#5ac68e;
+    --ok-soft:#14261d;
+    --shadow-sm:0 1px 2px rgba(0,0,0,.5), 0 2px 6px rgba(0,0,0,.35);
+    --shadow-lg:0 6px 12px rgba(0,0,0,.45), 0 20px 48px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="light"]{
+  --brand-ink:#b44e00; --brand-soft:#fff2e7; --brand-line:#f6c7a1;
+  --fg:#171717; --fg-muted:#565658; --fg-subtle:#6f6f73;
+  --bg:#ffffff; --surface:#f7f7f8; --surface-2:#efeff1;
+  --border:#e3e3e6; --border-strong:#cfcfd4;
+  --info-ink:#0060bd; --danger-ink:#c0221f; --ok-ink:#186a44; --ok-soft:#eaf6ef;
+  --shadow-sm:0 1px 2px rgba(16,16,20,.08), 0 2px 6px rgba(16,16,20,.05);
+  --shadow-lg:0 8px 16px rgba(16,16,20,.10), 0 24px 56px rgba(16,16,20,.20);
+}
+:root[data-theme="dark"]{
+  --brand-ink:#ffa864; --brand-soft:#2b1a0d; --brand-line:#5a3418;
+  --fg:#ededee; --fg-muted:#a9a9ae; --fg-subtle:#8e8e95;
+  --bg:#141416; --surface:#1c1c1f; --surface-2:#242428;
+  --border:#2f2f35; --border-strong:#43434b;
+  --info-ink:#69b4ff; --danger-ink:#ff7b7e; --ok-ink:#5ac68e; --ok-soft:#14261d;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.5), 0 2px 6px rgba(0,0,0,.35);
+  --shadow-lg:0 6px 12px rgba(0,0,0,.45), 0 20px 48px rgba(0,0,0,.6);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--fg);
+  font-family:var(--font); font-size:16px; line-height:1.72;
+  -webkit-font-smoothing:antialiased; letter-spacing:-.01em;
+}
+::selection{background:var(--brand); color:#fff}
+
+/* 레이아웃 */
+.wrap{display:grid; grid-template-columns:minmax(0,1fr); max-width:1180px; margin:0 auto; padding:0 24px}
+@media (min-width:1000px){
+  .wrap{grid-template-columns:232px minmax(0,1fr); gap:56px; padding:0 40px}
+}
+main{min-width:0; padding-bottom:120px}
+.measure{max-width:70ch}
+
+/* 문서 헤더 */
+.masthead{padding:72px 0 34px; max-width:70ch}
+.masthead h1{
+  font-size:clamp(30px,4.4vw,44px); line-height:1.14; letter-spacing:-.03em;
+  font-weight:800; margin:0 0 20px; text-wrap:balance;
+}
+.meta{display:flex; flex-wrap:wrap; gap:6px 20px; font-size:14px; color:var(--fg-muted); margin:0 0 26px}
+.meta b{color:var(--fg); font-weight:600}
+.masthead .lede{font-size:18px; color:var(--fg-muted); margin:0}
+
+.tryline{
+  display:flex; gap:12px; align-items:flex-start; margin:30px 0 0;
+  padding:16px 18px; background:var(--brand-soft); border:1px solid var(--brand-line);
+  border-radius:12px; font-size:14.5px; line-height:1.6; color:var(--fg);
+}
+.tryline svg{flex:none; margin-top:3px; color:var(--brand-ink)}
+.tryline b{font-weight:700}
+
+/* 목차 */
+.toc{display:none}
+@media (min-width:1000px){
+  .toc{
+    display:block; position:sticky; top:0; align-self:start;
+    max-height:100vh; overflow-y:auto; padding:80px 0 60px;
+    scrollbar-width:thin;
+  }
+  .toc h2{font-size:11.5px; letter-spacing:.09em; text-transform:uppercase; color:var(--fg-subtle); margin:0 0 12px; font-weight:700}
+  .toc ol{list-style:none; margin:0; padding:0}
+  .toc a{
+    display:block; padding:5px 10px; margin-left:-10px; border-radius:7px;
+    font-size:13.5px; line-height:1.45; color:var(--fg-muted); text-decoration:none;
+    transition:color var(--d-fast), background var(--d-fast);
+  }
+  .toc a:hover{color:var(--fg); background:var(--surface)}
+  .toc a.on{color:var(--brand-ink); background:var(--brand-soft); font-weight:600}
+  .toc .sub a{padding-left:22px; font-size:13px}
+  .toc-foot{margin-top:18px; padding-top:16px; border-top:1px solid var(--border)}
+}
+
+/* 섹션 */
+section{padding:52px 0 0; scroll-margin-top:24px}
+section+section{border-top:1px solid var(--border); margin-top:52px}
+h2.sec{font-size:26px; line-height:1.28; letter-spacing:-.025em; font-weight:750; margin:0 0 8px}
+h2.sec .num{color:var(--fg-subtle); font-weight:600; margin-right:10px; font-variant-numeric:tabular-nums}
+h3{font-size:19px; line-height:1.4; letter-spacing:-.02em; font-weight:700; margin:44px 0 10px}
+h4{font-size:16px; line-height:1.5; font-weight:700; margin:30px 0 8px}
+p{margin:0 0 16px}
+.measure p, .measure ul, .measure ol{max-width:70ch}
+ul,ol{margin:0 0 18px; padding-left:22px}
+li{margin:0 0 8px}
+li>ul,li>ol{margin-top:8px}
+strong{font-weight:700}
+em{font-style:normal; color:var(--fg-muted)}
+a{color:var(--brand-ink); text-underline-offset:3px}
+a:hover{text-decoration-thickness:2px}
+code{
+  font-family:var(--mono); font-size:.875em; background:var(--surface-2);
+  padding:.14em .38em; border-radius:5px; word-break:break-word;
+}
+pre{
+  margin:0 0 22px; padding:18px 20px; overflow-x:auto;
+  background:var(--surface); border-radius:12px; font-size:13px; line-height:1.62;
+}
+pre code{background:none; padding:0; font-size:13px; white-space:pre}
+
+/* 표 */
+.tw{overflow-x:auto; margin:0 0 24px; border-radius:12px; border:1px solid var(--border)}
+table{border-collapse:collapse; width:100%; font-size:14.5px; line-height:1.6}
+th,td{text-align:left; padding:12px 16px; vertical-align:top; border-bottom:1px solid var(--border)}
+th{background:var(--surface); font-weight:700; font-size:13px; letter-spacing:-.005em; white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+td code{font-size:12.5px}
+table.opts td:first-child{white-space:nowrap; font-weight:600}
+@media (max-width:640px){
+  th,td{padding:10px 12px; font-size:13.5px}
+  table.opts td:first-child{white-space:normal}
+}
+
+/* 배지 */
+.badge{
+  display:inline-flex; align-items:center; gap:5px; vertical-align:middle;
+  font-size:11.5px; font-weight:700; letter-spacing:.02em;
+  padding:3px 9px; border-radius:999px; white-space:nowrap;
+}
+.badge.f,.badge.ok{background:var(--ok-soft); color:var(--ok-ink)}
+.badge.d{background:var(--brand-soft); color:var(--brand-ink)}
+.badge.warn{background:var(--brand); color:#3a1a00}
+h3 .badge{margin-left:8px; transform:translateY(-2px)}
+
+/* 콜아웃 */
+.note{
+  margin:0 0 22px; padding:16px 18px; border-radius:12px;
+  background:var(--surface); font-size:14.5px; line-height:1.66;
+}
+.note.rec{background:var(--brand-soft); border:1px solid var(--brand-line)}
+.note.rec .lbl{color:var(--brand-ink)}
+.note .lbl{display:block; font-weight:700; margin-bottom:4px; font-size:13px; letter-spacing:.01em}
+.note p:last-child{margin-bottom:0}
+.cond{font-size:13.5px; color:var(--fg-muted); margin:-2px 0 14px}
+
+/* ─────────────────────────────────────────────
+   프로토타입 컨트롤
+   ───────────────────────────────────────────── */
+.proto{
+  margin:26px 0 32px; border:1px solid var(--border); border-radius:14px;
+  background:var(--surface); overflow:hidden;
+  /* 레이어: 딤(38) < 컨트롤(39) < 패널·런처(40). 딤 위에 남아 형태를 되돌릴 수 있고,
+     패널 자체에는 가려진다(전체화면 형태에서는 Esc·X로 닫고 돌아온다) */
+  position:relative; z-index:39;
+}
+.proto-head{padding:16px 18px 14px; border-bottom:1px solid var(--border)}
+.proto-head > strong{font-size:14.5px; display:block; margin-bottom:3px}
+.proto-head span{font-size:13.5px; color:var(--fg-muted)}
+.proto-body{padding:16px 18px 18px; display:grid; gap:16px}
+.ctl-row{display:grid; gap:7px}
+.ctl-row>.k{font-size:11.5px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--fg-subtle)}
+.seg{display:inline-flex; flex-wrap:wrap; gap:4px; padding:4px; background:var(--bg); border:1px solid var(--border); border-radius:10px}
+.seg button{
+  appearance:none; border:0; background:none; cursor:pointer;
+  font:inherit; font-size:13.5px; font-weight:600; color:var(--fg-muted);
+  padding:7px 13px; border-radius:7px; transition:background var(--d-fast), color var(--d-fast);
+}
+.seg button:hover{background:var(--surface-2); color:var(--fg)}
+.seg button[aria-pressed="true"]{background:var(--fg); color:var(--bg)}
+.seg button:focus-visible{outline:2px solid var(--brand-ink); outline-offset:2px}
+.ctl-row .hint{margin:2px 0 0; font-size:13px; line-height:1.55; color:var(--fg-subtle); max-width:68ch}
+.chips{display:flex; flex-wrap:wrap; gap:6px}
+.chips button{
+  appearance:none; cursor:pointer; font:inherit; font-size:13px; font-weight:600;
+  padding:7px 12px; border-radius:999px;
+  background:var(--bg); color:var(--fg-muted); border:1px solid var(--border);
+  transition:border-color var(--d-fast), color var(--d-fast), background var(--d-fast);
+}
+.chips button:hover{color:var(--fg); border-color:var(--border-strong)}
+.chips button[aria-pressed="true"]{background:var(--brand-soft); border-color:var(--brand-line); color:var(--brand-ink)}
+.chips button:focus-visible{outline:2px solid var(--brand-ink); outline-offset:2px}
+.proto-foot{
+  padding:13px 18px; border-top:1px solid var(--border); background:var(--bg);
+  font-size:13.5px; color:var(--fg-muted); display:flex; gap:10px; align-items:flex-start;
+}
+.proto-foot svg{flex:none; margin-top:2px}
+kbd{font-family:var(--mono); font-size:11.5px; padding:1px 5px; border:1px solid var(--border-strong); border-radius:5px; background:var(--surface)}
+
+/* ─────────────────────────────────────────────
+   챗봇 프로토타입 — 실제 동작
+   z 위계: 문서 §7.2 기준 (버튼 z-40, 패널 z-40, 오버레이 z-50 아래)
+   ───────────────────────────────────────────── */
+#cbLauncher{
+  position:fixed; right:24px; bottom:24px; z-index:40;
+  width:56px; height:56px; border-radius:999px; border:0; cursor:pointer;
+  background:var(--brand); color:#fff;
+  display:grid; place-items:center;
+  box-shadow:0 2px 6px rgba(120,58,10,.24), 0 10px 24px rgba(120,58,10,.26);
+  transition:transform var(--d-normal) var(--ease), box-shadow var(--d-normal) var(--ease);
+}
+#cbLauncher:hover{transform:translateY(-2px); box-shadow:0 3px 8px rgba(120,58,10,.26), 0 14px 32px rgba(120,58,10,.3)}
+#cbLauncher:active{transform:translateY(0) scale(.97)}
+#cbLauncher:focus-visible{outline:3px solid var(--brand-ink); outline-offset:3px}
+#cbLauncher svg{position:absolute; transition:opacity var(--d-normal) var(--ease), transform var(--d-normal) var(--ease)}
+#cbLauncher .ic-x{opacity:0; transform:rotate(-90deg) scale(.7)}
+#cbLauncher[aria-expanded="true"] .ic-chat{opacity:0; transform:rotate(90deg) scale(.7)}
+#cbLauncher[aria-expanded="true"] .ic-x{opacity:1; transform:none}
+@media (max-width:640px){
+  #cbLauncher{right:16px; bottom:16px; width:48px; height:48px}
+  body[data-cb-open="true"] #cbLauncher{opacity:0; pointer-events:none}
+}
+body[data-cb-view="mobile"] #cbLauncher{right:16px; bottom:16px; width:48px; height:48px}
+body[data-cb-view="mobile"][data-cb-open="true"] #cbLauncher{opacity:0; pointer-events:none}
+
+#cbScrim{
+  position:fixed; inset:0; z-index:38; background:rgba(10,10,12,.44);
+  opacity:0; pointer-events:none; transition:opacity var(--d-slow) var(--ease);
+  backdrop-filter:blur(1.5px);
+}
+#cbScrim[data-on="true"]{opacity:1; pointer-events:auto}
+
+#cbPanel{
+  position:fixed; z-index:40; display:flex; flex-direction:column;
+  background:var(--bg); box-shadow:var(--shadow-lg);
+  opacity:0; pointer-events:none; visibility:hidden;
+  transition:opacity var(--d-slow) var(--ease), transform var(--d-slow) var(--ease), visibility var(--d-slow);
+}
+#cbPanel[data-open="true"]{opacity:1; pointer-events:auto; visibility:visible; transform:none}
+
+/* A. 버튼 앵커 팝오버 */
+#cbPanel[data-shape="popover"]{
+  right:24px; bottom:96px; width:380px; height:min(560px, calc(100vh - 140px));
+  border-radius:16px; transform:translateY(14px) scale(.97); transform-origin:100% 100%;
+}
+/* B. 우측 사이드 시트 */
+#cbPanel[data-shape="side"]{
+  right:0; top:0; bottom:0; width:400px; max-width:92vw;
+  border-radius:0; transform:translateX(24px);
+}
+/* C. 전체화면 */
+#cbPanel[data-shape="full"]{
+  left:50%; top:50%; width:min(760px,92vw); height:min(78vh,720px);
+  border-radius:16px; transform:translate(-50%,-50%) scale(.97);
+}
+/* 열림 상태 transform은 형태별로 명시한다 — 아래 형태 규칙과 specificity가 같아
+   공통 [data-open] 규칙만으로는 초기 transform이 리셋되지 않는다 */
+#cbPanel[data-shape="popover"][data-open="true"],
+#cbPanel[data-shape="side"][data-open="true"]{transform:none}
+#cbPanel[data-shape="full"][data-open="true"]{transform:translate(-50%,-50%)}
+
+/* 모바일 — 어떤 형태든 전체화면 Drawer */
+@media (max-width:640px){
+  #cbPanel[data-shape]{
+    left:0; right:0; bottom:0; top:0; width:auto; height:auto; max-width:none;
+    border-radius:0; transform:translateY(16px);
+  }
+  #cbPanel[data-shape="full"][data-open="true"],
+  #cbPanel[data-shape][data-open="true"]{transform:none}
+}
+/* 미리보기도 우측 하단에 앵커한다 — F-1(우측 하단)과 같은 쪽이어야 한다 */
+body[data-cb-view="mobile"] #cbPanel[data-shape]{
+  right:20px; left:auto; top:auto; bottom:20px;
+  width:390px; max-width:calc(100vw - 40px); height:min(680px, calc(100vh - 40px));
+  border-radius:22px; transform:translateY(16px);
+  border:1px solid var(--border-strong);
+}
+body[data-cb-view="mobile"] #cbPanel[data-shape][data-open="true"]{transform:none}
+@media (prefers-reduced-motion:reduce){
+  #cbPanel,#cbLauncher,#cbLauncher svg,#cbScrim{transition-duration:1ms !important}
+  #cbPanel[data-shape]{transform:none !important}
+}
+
+/* 패널 내부 */
+.cb-head{
+  flex:none; display:flex; align-items:center; gap:10px;
+  padding:14px 14px 14px 18px; border-bottom:1px solid var(--border);
+}
+.cb-head h2{margin:0; font-size:15px; font-weight:700; letter-spacing:-.015em; flex:1; min-width:0}
+.cb-head .sub{display:block; font-size:12.5px; font-weight:500; color:var(--fg-subtle); margin-top:1px}
+.cb-iconbtn{
+  appearance:none; border:0; background:none; cursor:pointer; color:var(--fg-muted);
+  width:34px; height:34px; border-radius:8px; display:grid; place-items:center; flex:none;
+  transition:background var(--d-fast), color var(--d-fast);
+}
+.cb-iconbtn:hover{background:var(--surface-2); color:var(--fg)}
+.cb-iconbtn:focus-visible{outline:2px solid var(--brand-ink); outline-offset:1px}
+
+.cb-log{
+  flex:1; min-height:0; overflow-y:auto; padding:18px;
+  display:flex; flex-direction:column; gap:14px;
+  scrollbar-width:thin; scrollbar-color:var(--border-strong) transparent;
+}
+.cb-log::-webkit-scrollbar{width:8px}
+.cb-log::-webkit-scrollbar-thumb{background:var(--border-strong); border-radius:99px}
+.cb-log::-webkit-scrollbar-track{background:transparent}
+
+.msg{max-width:86%; font-size:14.5px; line-height:1.66}
+.msg.bot{align-self:flex-start}
+.msg.me{align-self:flex-end}
+.bub{padding:11px 14px; border-radius:14px}
+.msg.bot .bub{background:var(--surface); border-bottom-left-radius:5px}
+.msg.warn .bub{background:var(--brand-soft); border:1px solid var(--brand-line)}  /* UNAVAILABLE: 정상 답변과 구분 */
+.msg.me .bub{background:var(--brand-soft); color:var(--fg); border:1px solid var(--brand-line); border-bottom-right-radius:5px}
+.msg .bub p{margin:0 0 8px}
+.msg .bub p:last-child{margin:0}
+.msg-links{display:flex; flex-direction:column; gap:2px; margin-top:9px; padding-top:9px; border-top:1px solid var(--border)}
+.msg.bot .bub .msg-links{border-top-color:var(--border-strong)}
+.msg-links a{
+  display:inline-flex; align-items:center; gap:6px; min-height:34px;
+  font-size:14px; font-weight:600; color:var(--brand-ink);
+  text-decoration:underline; text-underline-offset:3px; text-decoration-thickness:1px;
+}
+.msg-links a:hover{text-decoration-thickness:2px}
+.msg-links svg{flex:none; opacity:.7}
+
+.cb-meta{font-size:12px; color:var(--fg-subtle); margin-top:5px; padding-left:2px}
+.msg.me .cb-meta{text-align:right}
+.cb-privacy{font-size:12.5px; color:var(--fg-subtle); margin-top:7px}
+
+/* 목록이 붙은 메시지는 버블과 목록 폭을 같게 둔다. 서로 다르면 두 블록이
+   별개 요소처럼 보인다(§5.2). */
+.msg.has-list{width:100%}
+.msg.has-list .bub{width:100%}
+.cb-list{display:flex; flex-direction:column; align-self:stretch; width:100%; margin-top:2px;
+  border:1px solid var(--border); border-radius:12px; overflow:hidden; background:var(--bg)}
+.cb-list .list-parent{margin:0; padding:7px 13px 5px; font-size:12px; color:var(--fg-subtle);
+  border-bottom:1px solid var(--border); background:var(--surface)}
+.cb-list a, .cb-list .list-all{display:flex; align-items:center; justify-content:space-between; gap:10px;
+  min-height:38px; padding:8px 13px; font-size:14px; font-weight:600; color:var(--brand-ink);
+  text-decoration:none; border-top:1px solid var(--border)}
+.cb-list .list-parent + a{border-top:0}
+.cb-list a:first-child{border-top:0}
+.cb-list a:hover{background:var(--brand-soft)}
+.cb-list svg{flex:none; opacity:.6}
+.cb-list .list-name{flex:1}
+/* 정사각 고정 타일. 브랜드 로고는 배경색이 박혀 있고 비율이 1:1~2:1 로 섞여
+   있어서 cover 로 채우면 잘린다. 크기를 이미지가 아니라 타일에 주는 이유는
+   실제 구현이 Tailwind preflight 의 img{height:auto} 를 피해야 하는 것과 같다. */
+.cb-list .thumb{flex:none; display:flex; align-items:center; justify-content:center;
+  width:36px; height:36px; border-radius:6px; overflow:hidden; background:var(--surface)}
+.cb-list .thumb img{max-width:100%; max-height:100%; object-fit:contain}
+/* 펼치기는 링크가 아니라 버튼이다. 항목과 같은 행 높이를 쓰되 색과 배경으로
+   "이동하지 않는다"를 알린다. */
+.cb-list .list-all{appearance:none; cursor:pointer; font-family:inherit; width:100%; text-align:left;
+  border-left:0; border-right:0; border-bottom:0; background:var(--surface); color:var(--fg-subtle); font-size:13.5px}
+.cb-list .list-all:hover{background:var(--brand-soft)}
+/* 상품 목록. 브랜드·카테고리(.cb-list)와 달리 브랜드명·가격을 함께 노출한다.
+   썸네일은 상품 사진이라 cover 로 채운다(로고 워드마크가 아니다). */
+.cb-plist{display:flex; flex-direction:column; align-self:stretch; width:100%; margin-top:2px;
+  border:1px solid var(--border); border-radius:12px; overflow:hidden; background:var(--bg)}
+.cb-plist a{display:flex; align-items:center; gap:11px; min-height:44px; padding:9px 13px;
+  text-decoration:none; border-top:1px solid var(--border)}
+.cb-plist a:first-child{border-top:0}
+.cb-plist a:hover{background:var(--brand-soft)}
+.cb-plist svg{flex:none; opacity:.6; color:var(--brand-ink)}
+.cb-plist .pthumb{flex:none; width:44px; height:44px; border-radius:8px; overflow:hidden; background:var(--surface)}
+.cb-plist .pthumb img{width:100%; height:100%; object-fit:cover; display:block}
+.cb-plist .pinfo{flex:1; min-width:0; display:flex; flex-direction:column; gap:1px}
+.cb-plist .pbrand{font-size:12px; color:var(--fg-subtle); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.cb-plist .pname{font-size:13.5px; color:var(--fg); overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.cb-plist .pprice{font-size:13.5px; font-weight:700; color:var(--brand-ink)}
+.cb-plist .list-all{appearance:none; cursor:pointer; font-family:inherit; width:100%; text-align:left;
+  display:flex; align-items:center; justify-content:space-between; gap:10px; min-height:40px; padding:8px 13px;
+  border:0; border-top:1px solid var(--border); background:var(--surface); color:var(--fg-subtle); font-size:13.5px; font-weight:600}
+.cb-plist .list-all:hover{background:var(--brand-soft)}
+.cb-sugg{display:flex; flex-wrap:wrap; gap:6px; align-self:flex-start; max-width:100%}
+.cb-sugg button{
+  appearance:none; cursor:pointer; font:inherit; font-size:13.5px; font-weight:600;
+  padding:8px 13px; border-radius:999px; min-height:36px;
+  background:var(--bg); color:var(--brand-ink); border:1px solid var(--brand-line);
+  transition:background var(--d-fast);
+}
+.cb-sugg button:hover{background:var(--brand-soft)}
+.cb-sugg button:focus-visible{outline:2px solid var(--brand-ink); outline-offset:2px}
+
+.sugg-skel{display:flex; flex-wrap:wrap; gap:6px; align-self:flex-start}
+.sugg-skel i{display:block; height:36px; border-radius:999px; background:var(--surface-2); animation:pulse 1.5s ease-in-out infinite}
+.sugg-skel i:nth-child(1){width:148px} .sugg-skel i:nth-child(2){width:186px} .sugg-skel i:nth-child(3){width:132px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+@media (prefers-reduced-motion:reduce){.sugg-skel i{animation:none}}
+.sugg-fail{font-size:12.5px; color:var(--fg-subtle); align-self:flex-start; padding-left:2px}
+.typing{display:inline-flex; gap:4px; align-items:center; padding:13px 15px; background:var(--surface); border-radius:14px; border-bottom-left-radius:5px}
+.typing i{width:6px; height:6px; border-radius:99px; background:var(--fg-subtle); animation:bl 1.25s infinite ease-in-out}
+.typing i:nth-child(2){animation-delay:.16s}
+.typing i:nth-child(3){animation-delay:.32s}
+@keyframes bl{0%,60%,100%{opacity:.28; transform:translateY(0)}30%{opacity:1; transform:translateY(-3px)}}
+@media (prefers-reduced-motion:reduce){.typing i{animation:none; opacity:.6}}
+.sr{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0}
+
+.err{font-size:13px; color:var(--danger-ink); margin-top:6px; display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+.err button{
+  appearance:none; cursor:pointer; font:inherit; font-size:13px; font-weight:700;
+  color:var(--danger-ink); background:none; border:1px solid currentColor;
+  border-radius:7px; padding:4px 10px; min-height:30px;
+}
+.err button:hover{background:var(--surface)}
+
+.cb-banner{
+  flex:none; display:flex; align-items:center; gap:9px; padding:10px 18px;
+  font-size:13.5px; border-top:1px solid var(--border); background:var(--surface);
+  color:var(--fg-muted);
+}
+.cb-banner[hidden]{display:none}  /* display:flex가 hidden 속성을 덮지 않도록 */
+.cb-banner.warn{color:var(--danger-ink)}
+.cb-banner svg{flex:none}
+.newmsg{
+  position:absolute; left:50%; transform:translateX(-50%); bottom:96px;
+  appearance:none; cursor:pointer; font:inherit; font-size:13px; font-weight:700;
+  background:var(--fg); color:var(--bg); border:0; border-radius:999px; padding:7px 15px;
+  box-shadow:var(--shadow-sm);
+}
+
+.cb-foot{flex:none; padding:12px 14px 14px; border-top:1px solid var(--border)}
+.cb-inputrow{display:flex; gap:8px; align-items:flex-end}
+.cb-foot textarea{
+  flex:1; min-width:0; resize:none; font:inherit; font-size:14.5px; line-height:1.55;
+  padding:10px 13px; border-radius:11px; border:1px solid var(--border-strong);
+  background:var(--bg); color:var(--fg); max-height:118px; min-height:44px;
+}
+.cb-foot textarea::placeholder{color:var(--fg-subtle)}
+.cb-foot textarea:focus{outline:2px solid var(--brand-ink); outline-offset:-1px; border-color:transparent}
+.cb-foot textarea[aria-invalid="true"]{border-color:var(--danger-ink)}
+.cb-send{
+  appearance:none; cursor:pointer; border:0; border-radius:11px; flex:none;
+  width:44px; height:44px; display:grid; place-items:center;
+  background:var(--brand); color:#fff; transition:opacity var(--d-fast), transform var(--d-fast)
+}
+.cb-send:hover{transform:translateY(-1px)}
+.cb-send:disabled{opacity:.42; cursor:not-allowed; transform:none}
+.cb-send:focus-visible{outline:3px solid var(--brand-ink); outline-offset:2px}
+.cb-counter{font-size:12px; color:var(--fg-subtle); margin:7px 2px 0; text-align:right}
+.cb-counter[data-over="true"]{color:var(--danger-ink); font-weight:700}
+
+/* 테마 토글 */
+.themebtn{
+  /* 패널(40)·딤(38) 아래에 둔다 — 모바일 전체화면에서 패널 닫기 버튼을 덮지 않도록 */
+  position:fixed; right:20px; top:20px; z-index:37;
+  appearance:none; cursor:pointer; border:1px solid var(--border);
+  background:var(--bg); color:var(--fg-muted); border-radius:10px;
+  width:38px; height:38px; display:grid; place-items:center; box-shadow:var(--shadow-sm);
+}
+.themebtn:hover{color:var(--fg)}
+.themebtn:focus-visible{outline:2px solid var(--brand-ink); outline-offset:2px}
+@media print{.themebtn,#cbLauncher,#cbPanel,#cbScrim,.toc{display:none !important}}
+</style>
+</head>
+<body>
+
+<button class="themebtn" id="themeBtn" type="button" aria-label="라이트/다크 테마 전환">
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+</button>
+
+<div class="wrap">
+
+<nav class="toc" aria-label="목차">
+  <h2>목차</h2>
+  <ol id="tocList">
+    <li><a href="#s0">0. 이 문서를 읽는 방법</a></li>
+    <li><a href="#s1">1. 배경</a></li>
+    <li><a href="#s2">2. 목표</a></li>
+    <li><a href="#s3">3. 사용자와 시나리오</a></li>
+    <li><a href="#s4">4. 확정 요구사항</a></li>
+    <li><a href="#s5">5. 화면 · 인터랙션 명세</a>
+      <ol class="sub"><li><a href="#proto">프로토타입</a></li></ol>
+    </li>
+    <li><a href="#s6">6. 비기능 요구</a></li>
+    <li><a href="#s7">7. 기술 구조 제안</a></li>
+    <li><a href="#s8">8. 결정 필요 항목</a></li>
+    <li><a href="#s9">9. 범위 밖</a></li>
+    <li><a href="#s10">10. 릴리스 단계</a></li>
+    <li><a href="#s11">11. 리스크</a></li>
+    <li><a href="#s12">12. 부록</a></li>
+    <li><a href="#s13">13. 구현 현황</a></li>
+    <li><a href="#s14">다음 단계</a></li>
+  </ol>
+  <div class="toc-foot">
+    <a href="2026-08-01-web-chatbot-prd.md">마크다운 원본 →</a>
+  </div>
+</nav>
+
+<main>
+
+<header class="masthead">
+  <h1>웹 챗봇 도입 PRD</h1>
+  <p class="meta">
+    <span>작성일 <b>2026-08-01</b></span>
+    <span>최종 갱신 <b>2026-08-04</b></span>
+    <span>대상 앱 <b>apps/web</b></span>
+    <span>상태 <b>구현 완료 (UI + API 연동)</b></span>
+  </p>
+  <p class="lede">모든 페이지 우측 하단에 상시 노출되는 챗봇 진입점을 도입하기 위한 요구사항과 결정 항목입니다. 확정된 것과 논의가 필요한 것을 분리해 적었습니다.</p>
+  <div class="tryline">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <span><b>이 페이지 오른쪽 아래 버튼은 실제로 동작하는 프로토타입입니다.</b> 눌러서 패널을 열고, 스크롤해도 버튼이 유지되는지 확인해보세요. 패널 형태와 상태는 <a href="#proto">§5 프로토타입</a>에서 바꿀 수 있습니다.</span>
+  </div>
+</header>
+
+<!-- 0 -->
+<section id="s0" class="measure">
+  <h2 class="sec"><span class="num">0</span>이 문서를 읽는 방법</h2>
+  <p><strong>D-1 ~ D-9가 모두 결정되었습니다.</strong> 각 항목은 결정 내용이 첫 줄에 있고, 선택 근거로 옵션 비교를 아래에 남겨 두었습니다. <strong>F-n</strong>은 처음부터 확정된 요구사항입니다.</p>
+
+  <h3>결정 현황</h3>
+  <div class="tw"><table>
+    <thead><tr><th>항목</th><th>결정</th></tr></thead>
+    <tbody>
+      <tr><td>D-1 챗봇의 1차 목적</td><td>CS·FAQ 위주로 시작, 추후 쇼핑 어시스턴트로 확장</td></tr>
+      <tr><td>D-2 응답 엔진</td><td>자체 백엔드 API + LLM</td></tr>
+      <tr><td>D-3 패널 형태</td><td>A. 버튼 앵커 팝오버</td></tr>
+      <tr><td>D-4 스트리밍 응답</td><td><strong>단발 응답 + 로딩 인디케이터</strong> (스트리밍 미도입)</td></tr>
+      <tr><td>D-5 에스컬레이션</td><td><strong><code>/contact</code> 문의 폼으로 유도</strong></td></tr>
+      <tr><td>D-6 노출 예외 페이지</td><td><strong>예외 없음</strong> — 전 라우트 노출</td></tr>
+      <tr><td>D-7 대화 이력 저장</td><td>사용자 이력 복원 없음 + 운영 로그로만 서버 보관. <strong>약관·처리방침 수정 진행</strong></td></tr>
+      <tr><td>D-8 최초 진입 유도</td><td><strong>추천 질문 칩만</strong> — 자동 툴팁·미읽음 뱃지 없음</td></tr>
+      <tr><td>D-9 우측 하단 자리 정리</td><td><strong>(1) 토스트 <code>position="bottom-center"</code> / (2) ScrollToTop을 챗봇 버튼 위 세로 스택</strong></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>확정된 API</h3>
+  <div class="tw"><table>
+    <thead><tr><th>메서드</th><th>경로</th><th>요청</th><th>응답</th></tr></thead>
+    <tbody>
+      <tr><td><code>POST</code></td><td><code>/ai-consult/ask</code></td><td><code>{ message }</code> (2~300자)</td><td><code>{ answer, tag, suggestions, brands, categories, parentCategory, products }</code></td></tr>
+      <tr><td><code>GET</code></td><td><code>/ai-consult/suggestions</code></td><td>없음</td><td><code>{ total, list: string[] }</code></td></tr>
+    </tbody>
+  </table></div>
+  <div class="note rec"><span class="lbl">스펙에서 확인된 세 가지가 이 문서 전체에 영향을 줍니다</span>
+  <ol style="margin-bottom:0">
+    <li><strong>이전 대화를 기억하지 않습니다.</strong> 매 질문이 독립적이고 서버에 문맥이 없습니다.</li>
+    <li><strong>레이트리밋·장애도 200으로 내려옵니다.</strong> <code>tag</code> 값으로 분기해야 하며 HTTP 에러 경로를 타지 않습니다.</li>
+    <li><strong>답변은 서버 상수입니다.</strong> LLM은 의미 기반 검색만 하고 답변 문장을 생성하지 않습니다.</li>
+  </ol></div>
+  <p><code>tag</code>는 <strong>열 가지</strong>입니다(§5.3): <code>FAQ_ANSWER</code> · <code>BRAND_LIST</code> · <code>CATEGORY_LIST</code> · <code>PRODUCT_CATEGORY_LIST</code> · <code>PRODUCT_LIST</code> · <code>CONFIRM_SUGGESTION</code> · <code>FALLBACK</code> · <code>OFF_TOPIC</code> · <code>RATE_LIMITED</code> · <code>UNAVAILABLE</code>. <code>PRODUCT_LIST</code>는 2026-08-06에 추가되어 상품(<code>products</code>)을 <code>/product/{id}</code> 상세로 안내합니다.</p>
+  <div class="note rec"><span class="lbl">2026-08-04 응답 확장</span>
+  <p>브랜드·카테고리 목록을 내려주는 <code>tag</code> 세 개와 그것을 담는 필드 세 개(<code>brands</code>, <code>categories</code>, <code>parentCategory</code>)가 추가되었습니다. <code>answer</code> 텍스트만 있던 이전 응답과 달리 <strong>화면에서 이동할 목적지가 생겼습니다.</strong> D-1이 “CS·FAQ 위주, 추후 쇼핑 어시스턴트로 확장”이었는데, 이 확장이 그 첫걸음입니다 — 상품을 추천하는 것은 아니지만 브랜드·카테고리로 안내합니다.</p></div>
+  <div class="note rec"><span class="lbl">2026-08-06 응답 확장</span>
+  <p><code>PRODUCT_LIST</code> <code>tag</code>와 상품을 담는 <code>products</code> 필드가 추가되었습니다(<code>{ id, name, brandName, price, image }</code>). 브랜드·카테고리 안내를 넘어 <strong>개별 상품으로 안내하는 첫 단계</strong>로, D-1의 쇼핑 어시스턴트 확장에 한 발 더 다가갑니다. 브랜드·카테고리 목록(<code>brands</code>/<code>categories</code>)이 이름만 링크로 노출하는 것과 달리, <code>products</code>는 <strong>브랜드명·가격을 함께</strong> 보여주는 전용 UI로 렌더하고 각 항목은 <code>/product/{id}</code> 상세로 이동합니다(§5.3, §7.4). 오른쪽 아래 프로토타입의 <code>PRODUCT_LIST</code> 상태에서 직접 확인할 수 있습니다.</p></div>
+  <p>서비스 코드는 <code>apps/web/src/shared/services/aiConsult.ts</code>에 이미 생성되어 있습니다.</p>
+  <p><strong>결정은 모두 끝났고 UI·API 연동까지 구현했습니다.</strong> 무엇이 되었고 무엇이 남았는지는 <a href="#s13">§13</a>에 정리했습니다. 남은 것은 서버측 로그 적재 세부(D-7의 7-2)와 약관 수정입니다.</p>
+  <p>기술 구조(§7)에 적힌 내용은 실제 코드를 확인한 뒤 작성한 것으로, 인용된 파일 경로는 모두 현재 존재합니다.</p>
+</section>
+
+<!-- 1 -->
+<section id="s1" class="measure">
+  <h2 class="sec"><span class="num">1</span>배경</h2>
+  <p>Seoul Moment 웹은 상품·브랜드·매거진·뉴스·프로모션이 함께 놓인 콘텐츠 커머스입니다. 현재 사용자가 도움을 요청할 수 있는 창구는 <code>/contact</code> 문의 폼 하나뿐이고, 이는 비동기이며 사용자가 스스로 찾아 들어가야 합니다.</p>
+  <p>챗봇은 <strong>모든 페이지에서 즉시 닿는 단일 진입점</strong>을 만듭니다. 1차 역할은 <strong>CS·FAQ 응대</strong>로 정했습니다(D-1). 배송·교환·환불·회원 정책처럼 답이 이미 문서로 존재하는 질문을 사용자가 정책 페이지를 뒤지지 않고 해결하게 합니다. 상품 추천(쇼핑 어시스턴트)은 정확도가 확보된 뒤 확장합니다.</p>
+</section>
+
+<!-- 2 -->
+<section id="s2" class="measure">
+  <h2 class="sec"><span class="num">2</span>목표</h2>
+  <p>D-1이 CS·FAQ로 확정되었으므로 목표를 그 기준으로 적습니다.</p>
+  <ul>
+    <li><strong>자기해결</strong>: 배송·교환·환불·회원 정책 질문을 사용자가 정책 페이지를 읽지 않고 챗봇 안에서 끝낸다.</li>
+    <li><strong>접근성</strong>: 어느 페이지에 있든 도움을 요청할 창구가 <strong>한 번의 클릭 안에</strong> 있다.</li>
+    <li><strong>연속성</strong>: 페이지를 이동해도 대화가 끊기지 않는다.</li>
+    <li><strong>막다른 길 없음</strong>: 챗봇이 답하지 못하는 질문에도 다음 행동이 항상 제시된다(D-5).</li>
+  </ul>
+  <div class="note"><span class="lbl">정성 목표</span><p>“무엇을 물어봐야 할지 모르겠다”는 상태를 만들지 않는다. 최초 진입 화면이 챗봇의 역할을 스스로 설명해야 합니다(D-8).</p></div>
+  <p><strong>범위 경계</strong>: 상품 추천·재고 조회·주문 상태 확인은 1차 범위가 아닙니다. 사용자가 물으면 <code>OFF_TOPIC</code>으로 안내하고(§5.3), 어떤 질문이 실제로 많이 들어오는지는 D-7의 운영 로그로 확인해 확장 시점을 판단합니다.</p>
+</section>
+
+<!-- 3 -->
+<section id="s3" class="measure">
+  <h2 class="sec"><span class="num">3</span>사용자와 시나리오</h2>
+  <p><strong>주 사용자</strong>: 비로그인 방문자. 현재 서비스는 로그인 없이도 상품·콘텐츠 전체를 볼 수 있고, 챗봇도 로그인 없이 사용합니다(F-4). 다수 사용자가 비로그인이므로 <strong>운영 로그(D-7)에도 비로그인 사용자의 대화가 대부분을 차지합니다</strong> — 로그 설계를 계정 기준으로 잡으면 실제 데이터의 소수만 담깁니다.</p>
+  <h4>우선 시나리오 (D-1 = CS·FAQ)</h4>
+  <ol>
+    <li>배송이 언제 오는지 알고 싶은 방문자 — “대만까지 며칠 걸려요?”</li>
+    <li>교환·환불 가능 여부와 조건을 확인하려는 방문자</li>
+    <li>회원 혜택·적립·쿠폰 조건을 묻는 방문자</li>
+    <li>문의 폼을 쓰기 전 “이걸 물어봐도 되나” 확인하려는 방문자</li>
+  </ol>
+  <h4>후순위 (쇼핑 어시스턴트 확장 시)</h4>
+  <ol start="5">
+    <li>조건을 말로 설명해 상품을 찾고 싶은 방문자 — “선물용 20만원대 스킨케어 있어?”</li>
+    <li>매거진을 읽다 관련 브랜드로 넘어가고 싶은 방문자</li>
+  </ol>
+  <p>5·6번 질문이 실제로 얼마나 들어오는지는 운영 로그(D-7)로 확인해 확장 시점을 판단합니다.</p>
+</section>
+
+<!-- 4 -->
+<section id="s4" class="measure">
+  <h2 class="sec"><span class="num">4</span>확정 요구사항</h2>
+
+  <h3>F-1. 모든 페이지에 우측 하단 플로팅 버튼 상시 노출 <span class="badge f">확정</span></h3>
+  <p><code>[locale]</code> 하위 전 라우트(홈, 상품, 브랜드, 매거진, 뉴스, 프로모션, 마이페이지, 약관·정책, 로그인·가입, 404·에러 화면 포함)에서 화면 <strong>우측 하단</strong>에 플로팅 버튼이 보입니다.</p>
+  <p><strong>노출 예외는 없습니다</strong>(D-6). 로그인·가입·정책·약관 화면에도 그대로 노출합니다.</p>
+  <div class="note"><span class="lbl">우측 하단은 이미 점유되어 있어 자리 정리가 선행됩니다</span>
+  <p>Sonner 토스트를 하단 중앙으로 옮기고 <code>ScrollToTop</code>을 챗봇 버튼 위로 쌓습니다(D-9). 상세는 <a href="#s7">§7.2</a>.</p></div>
+
+  <h3>F-2. 라우트 이동 시 버튼·패널 상태 유지 <span class="badge f">확정</span></h3>
+  <p>클라이언트 라우팅으로 페이지를 이동해도 버튼이 사라지거나 다시 나타나지 않습니다. 깜빡임(remount flash)도 없어야 합니다.</p>
+  <p><strong>패널이 열린 상태에서 사용자가 페이지를 이동한 경우</strong>: 패널은 열린 채로 유지되고 대화 내용도 그대로 남습니다. 챗봇이 안내한 링크를 눌러 이동했을 때 대화가 끊기면 안내 자체가 무의미해지므로, 이는 F-2에 포함되는 확정 요구사항입니다.</p>
+
+  <h3>F-3. 버튼 클릭 시 채팅 패널 오픈 <span class="badge f">확정</span></h3>
+  <p>버튼을 누르면 챗봇과 대화할 수 있는 패널이 열립니다. 열린 상태에서 다시 누르면 닫힙니다. 패널의 형태·크기는 <strong>D-3</strong>에서 결정합니다.</p>
+
+  <h3>F-4. 비로그인 사용 허용 <span class="badge f">확정</span></h3>
+  <p>로그인 여부와 무관하게 누구나 챗봇을 사용합니다. 미로그인 사용자를 로그인 화면으로 보내거나 기능을 제한하지 않습니다.</p>
+  <p><strong>대화는 세션 한정입니다</strong>(D-7). 로그인 여부와 무관하게 이력을 복원하지 않으며, 브라우저에도 남기지 않습니다.</p>
+  <ul>
+    <li>라우트 이동 중에도, 패널을 닫고 다시 열어도 대화는 유지됩니다. 이것은 <em>저장</em>이 아니라 클라이언트 메모리 상태의 연속성입니다(F-2).</li>
+    <li><strong>새로고침·탭 종료 시 대화가 사라집니다.</strong> 다시 열면 최초 진입 상태이며 이전 방문의 대화는 복원되지 않습니다.</li>
+    <li>단, <strong>대화는 운영 로그로 서버에 보관됩니다</strong>(D-7). 사용자 기능이 아니라 방향 논의용이며, 그래서 개인정보 검토가 여전히 필요합니다(<a href="#s6">§6</a>).</li>
+    <li>로그인 사용자 개인화(주문 내역 기반 응답 등)는 이번 범위 밖입니다(<a href="#s9">§9</a>).</li>
+  </ul>
+</section>
+
+<!-- 5 -->
+<section id="s5">
+  <div class="measure">
+    <h2 class="sec"><span class="num">5</span>화면 · 인터랙션 명세</h2>
+  </div>
+
+  <div class="proto" id="proto">
+    <div class="proto-head">
+      <strong>프로토타입 컨트롤</strong>
+      <span>오른쪽 아래 버튼이 실제 프로토타입입니다. 형태는 <strong>A. 팝오버로 확정</strong>됐고(D-3), B·C는 결정 근거를 확인할 수 있도록 남겨 두었습니다. 추천 질문 칩은 실제로는 <code>GET /ai-consult/suggestions</code>에서 옵니다.</span>
+    </div>
+    <div class="proto-body">
+      <div class="ctl-row">
+        <span class="k">패널 형태 (D-3)</span>
+        <div class="seg" id="shapeSeg" role="group" aria-label="패널 형태">
+          <button type="button" data-shape="popover" aria-pressed="true">A. 버튼 앵커 팝오버</button>
+          <button type="button" data-shape="side" aria-pressed="false">B. 우측 사이드 시트</button>
+          <button type="button" data-shape="full" aria-pressed="false">C. 전체화면</button>
+        </div>
+      </div>
+      <div class="ctl-row">
+        <span class="k">뷰포트</span>
+        <div class="seg" id="viewSeg" role="group" aria-label="뷰포트">
+          <button type="button" data-view="auto" aria-pressed="true">현재 창 기준</button>
+          <button type="button" data-view="mobile" aria-pressed="false">모바일 패널 미리보기</button>
+        </div>
+        <p class="hint">미리보기는 패널 크기만 모바일 기준으로 재현합니다. 실제 동작은 브라우저 창을 640px 아래로 줄여 확인하세요 — 패널이 전체화면 Drawer가 되고 플로팅 버튼은 숨습니다(§5.5).</p>
+      </div>
+      <div class="ctl-row">
+        <span class="k">상태 · tag (§5.3)</span>
+        <div class="chips" id="stateChips" role="group" aria-label="상태 프리셋">
+          <button type="button" data-state="welcome" aria-pressed="true">최초 진입</button>
+          <button type="button" data-state="suggestLoading" aria-pressed="false">추천 질문 로딩</button>
+          <button type="button" data-state="suggestFailed" aria-pressed="false">추천 질문 실패</button>
+          <button type="button" data-state="sending" aria-pressed="false">전송 중</button>
+          <button type="button" data-state="faqAnswer" aria-pressed="false">FAQ_ANSWER</button>
+          <button type="button" data-state="confirmSuggestion" aria-pressed="false">CONFIRM_SUGGESTION</button>
+          <button type="button" data-state="brandList" aria-pressed="false">BRAND_LIST</button>
+          <button type="button" data-state="categoryList" aria-pressed="false">CATEGORY_LIST</button>
+          <button type="button" data-state="productCategoryList" aria-pressed="false">PRODUCT_CATEGORY_LIST</button>
+          <button type="button" data-state="productList" aria-pressed="false">PRODUCT_LIST</button>
+          <button type="button" data-state="fallback" aria-pressed="false">FALLBACK</button>
+          <button type="button" data-state="offTopic" aria-pressed="false">OFF_TOPIC</button>
+          <button type="button" data-state="rateLimited" aria-pressed="false">RATE_LIMITED</button>
+          <button type="button" data-state="unavailable" aria-pressed="false">UNAVAILABLE</button>
+          <button type="button" data-state="httpError" aria-pressed="false">네트워크 오류</button>
+          <button type="button" data-state="offline" aria-pressed="false">오프라인</button>
+          <button type="button" data-state="inputLimit" aria-pressed="false">입력 300자 초과</button>
+          <button type="button" data-state="longConvo" aria-pressed="false">긴 대화</button>
+        </div>
+      </div>
+    </div>
+    <div class="proto-foot">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>
+      <span>직접 입력해서 답변을 받아볼 수도 있습니다(응답은 프로토타입용 고정 답변이며 CS·FAQ 범위입니다). D-7에 따라 <strong>닫고 다시 열면 대화가 남아 있지만, 새로고침하면 사라집니다</strong> — 이력 복원 상태는 사양에 없습니다. <strong>C. 전체화면</strong>은 이 컨트롤까지 덮으므로 <kbd>Esc</kbd> 또는 패널의 닫기로 빠져나온 뒤 다른 형태를 선택하세요.</span>
+    </div>
+  </div>
+
+  <div class="measure">
+    <h3>5.1 플로팅 버튼</h3>
+    <div class="tw"><table>
+      <thead><tr><th>항목</th><th>명세</th></tr></thead>
+      <tbody>
+        <tr><td>위치</td><td>화면 우측 하단 고정. 데스크톱 <code>right: 24px / bottom: 24px</code>, 모바일 <code>right: 16px / bottom: 16px</code> (제안값)</td></tr>
+        <tr><td>크기</td><td>데스크톱 56px, 모바일 48px 원형 (터치 타깃 최소 44px 충족)</td></tr>
+        <tr><td>색상</td><td>브랜드 오렌지 <code>brand #f37b2a</code> 배경 + 흰색 아이콘</td></tr>
+        <tr><td>아이콘</td><td>닫힘 상태 말풍선, 열림 상태 X (<code>lucide-react</code> 사용)</td></tr>
+        <tr><td>그림자</td><td>기존 <code>ScrollToTop</code>의 소프트 섀도 톤을 따름</td></tr>
+        <tr><td>레이블</td><td><code>aria-label</code> 필수. 아이콘만으로는 스크린리더 대응 불가</td></tr>
+        <tr><td>전환</td><td>아이콘 회전·크로스페이드 <code>duration-normal</code>(200ms). <code>prefers-reduced-motion</code> 시 즉시 전환</td></tr>
+        <tr><td>미읽음 표시</td><td><strong>없음</strong>(D-8). 자동 툴팁·뱃지를 띄우지 않고, 유도는 패널 안 추천 질문 칩으로만 합니다</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>5.2 패널 구조</h3>
+    <p>형태는 팝오버로 확정(D-3). 구조는 3단입니다.</p>
+<pre><code>┌─────────────────────────────┐
+│ 헤더  제목 · 닫기              │
+├─────────────────────────────┤
+│                             │
+│ 메시지 리스트 (스크롤)         │
+│  - 봇 메시지 / 사용자 메시지    │
+│  - 추천 질문 칩               │
+│  - 인라인 링크(상품·콘텐츠)     │
+│                             │
+├─────────────────────────────┤
+│ 입력부  textarea · 전송 버튼    │
+└─────────────────────────────┘</code></pre>
+
+    <h4>입력부 세부</h4>
+    <ul>
+      <li>Enter 전송, Shift+Enter 줄바꿈. 모바일에서는 전송 버튼 탭이 기본.</li>
+      <li><strong>각 질문은 독립적으로 처리됩니다</strong>(스펙: 이전 대화를 기억하지 않음). “그거 말고”, “그럼 얼마예요?” 같은 지시적 질문은 답을 얻지 못합니다. placeholder와 웰컴 문구로 자기완결적 질문을 유도합니다.</li>
+      <li>입력 중 자동 높이 확장(최대 5줄), 이후 내부 스크롤.</li>
+      <li><strong>전송 중에는 전송 버튼만 비활성</strong>하고 입력은 계속 가능하게 합니다. 단발 응답(D-4)이므로 중지 버튼은 두지 않습니다. 취소할 스트림이 없고, 응답을 버리는 버튼은 기대를 잘못 만듭니다.</li>
+      <li><strong>입력 길이는 2~300자입니다.</strong> 서버가 이 범위를 벗어나면 400으로 거절하므로 전송 전에 클라이언트에서 막습니다. 300자 초과 시 카운터를 경고색으로, 2자 미달이면 전송 버튼을 비활성합니다.</li>
+      <li>300자는 짧은 편이라 카운터를 240자 정도부터 미리 보여주는 편이 낫습니다. 다 쓰고 나서 막히면 다시 줄여야 합니다.</li>
+    </ul>
+
+    <h4>메시지 리스트 세부</h4>
+    <ul>
+      <li>새 메시지 도착 시 자동 하단 스크롤. 단 사용자가 위로 스크롤해 과거 대화를 보는 중이면 자동 스크롤하지 않고 “새 메시지” 버튼을 띄웁니다.</li>
+      <li><strong>응답은 순수 텍스트입니다.</strong> <code>answer</code>는 문자열 하나이고 스키마에 링크·이미지 필드가 없습니다. 상품 카드·콘텐츠 카드는 물론 서버가 지정하는 링크도 없습니다.</li>
+      <li><strong>링크는 두 종류입니다.</strong>
+        <ul>
+          <li><code>/contact</code> 문의 링크 — 답변 불가·범위 밖·장애일 때 프론트가 <code>tag</code>를 보고 붙입니다(D-5).</li>
+          <li><strong>브랜드·카테고리 링크 목록</strong> — 서버가 <code>brands</code>·<code>categories</code>로 내려준 항목을 링크로 만듭니다. 목적지 매핑은 §7.4.</li>
+        </ul>
+      </li>
+      <li><strong><code>image</code>는 카드가 아니라 행 앞 썸네일로 씁니다.</strong> 36&times;36 정사각 타일에 <code>object-contain</code>으로 담고, <code>image</code>가 없으면 썸네일만 빠집니다.
+        <ul>
+          <li>카드로 만들지 않은 이유: 브랜드 이미지는 <strong>이름이 박힌 워드마크 로고</strong>라서(dev 실측 8개 중 7개) 카드 캡션과 이름이 중복되고, 비율이 1:1 다섯 개·약 2:1 세 개로 섞여 고정 비율 박스에서 레터박싱이 커집니다. 배경색(검정·연두·청록)도 이미지에 박혀 있어 패널 배경과 충돌합니다.</li>
+          <li><strong>대분류(<code>CATEGORY_LIST</code>)는 <code>image</code>가 3/3 모두 <code>null</code>입니다.</strong> 카드 그리드로 가면 같은 자리에서 태그별로 레이아웃이 갈리는데, 행 + 썸네일은 이미지가 없으면 그대로 텍스트 행이 되어 한 형태로 수렴합니다.</li>
+          <li>타일에 크기를 주고 이미지는 <code>max-h-full max-w-full</code>로 담습니다. Tailwind preflight의 <code>img { height: auto }</code>가 <code>next/image</code>의 <code>height</code>를 덮어써서, 이미지에만 맡기면 행 높이가 원본 비율대로 들쭉날쭉해집니다.</li>
+          <li>리치 카드를 만들지 않는다는 결정(<a href="#s9">§9</a>)은 유지됩니다. 썸네일은 답변을 카드로 바꾸는 것이 아니라 링크 행의 식별을 돕는 장치입니다.</li>
+        </ul></li>
+      <li><strong>목록은 5개까지만 접어서 노출하고, 그보다 많으면 목록 안에서 펼칩니다.</strong> 실제 응답은 브랜드 8개·소분류 9개를 주는데 전부 세로로 나열하면 좁은 패널에서 목록이 대화를 밀어냅니다. 마지막 행이 <code>나머지 N개 보기</code>(펼침 시 <code>접기</code>) 버튼이고, 누르면 이동 없이 그 자리에서 전부 열립니다.</li>
+      <li><strong>목록 페이지로 보내지 않습니다.</strong> 브랜드 목록 화면이 아직 없습니다 — <code>app/[locale]/brand/page.tsx</code>는 빈 화면에 <code>robots: noindex</code>가 걸린 플레이스홀더입니다. <code>/product</code>에도 브랜드 전체를 훑을 진입점이 없습니다(<code>brandId</code>는 단일 브랜드 필터). 빈 페이지로 보내는 링크는 없는 것보다 나쁘므로 제자리 펼치기를 택했습니다. 세 태그가 같은 자리에서 같은 동작을 하는 것도 이 방식의 이점입니다.</li>
+      <li><strong>펼치기 버튼은 링크가 아니라 버튼입니다.</strong> <code>aria-expanded</code>로 상태를 노출하고, 항목 링크의 <code>&gt;</code>와 구분되도록 <code>⌄</code>/<code>⌃</code> 아이콘을 씁니다.</li>
+      <li><strong>목록 박스 폭은 답변 버블과 맞춥니다.</strong> 내용 길이에 맞춰 좁아지면 버블과 좌우 정렬이 어긋나 두 블록이 서로 다른 요소처럼 보입니다.</li>
+      <li><strong>목록과 되묻기 칩은 다르게 보여야 합니다.</strong> 칩은 “누르면 그 문구를 다시 질문”, 목록은 “누르면 그 페이지로 이동”입니다. 동작이 다르므로 칩(pill)과 링크 목록(세로 나열 + 화살표)을 시각적으로 구분합니다.</li>
+      <li><strong>되묻기 칩</strong>: 응답의 <code>suggestions</code>가 비어 있지 않으면 답변 아래에 칩으로 노출합니다(<code>CONFIRM_SUGGESTION</code>·<code>OFF_TOPIC</code>에서 관찰됨). 누르면 그 문구를 그대로 새 질문으로 보냅니다. 링크가 아니라 버튼입니다.</li>
+      <li>링크·칩은 클릭 대상임이 분명해야 하므로 일반 텍스트와 확실히 구분하고(밑줄 또는 브랜드 컬러), 모바일에서 터치 가능한 높이를 확보합니다.</li>
+    </ul>
+
+    <h4>웰컴 메시지</h4>
+    <ul>
+      <li>대화가 시작된 뒤에도 <strong>맨 위에 남깁니다.</strong> 개인정보 안내와 “창을 닫으면 사라져요”는 대화 중에도 유효한 정보이고, 챗봇의 역할 설명이 남아 있으면 범위 밖 질문도 줄어듭니다.</li>
+      <li>대화 목록의 첫 항목으로 남기는 방식이므로 대화가 길어지면 위로 스크롤해야 보입니다. 상시 고정(sticky)은 좁은 팝오버에서 대화 영역을 계속 잠식해 채택하지 않았습니다.</li>
+    </ul>
+
+    <h4>배경 딤 · 스크롤 잠금 · 스크롤 체이닝</h4>
+    <ul>
+      <li><strong>팝오버(데스크톱)</strong>: 딤 없음, 배경 스크롤 잠그지 않음. 페이지를 읽으며 대화하는 것이 이 형태의 목적입니다.</li>
+      <li><strong>전체화면(모바일)</strong>: 딤 + 배경 스크롤 잠금. 잠그지 않으면 뒤 콘텐츠가 스크롤돼 어느 것이 활성인지 모호해집니다. 딤 클릭으로 닫힙니다.</li>
+      <li>메시지 리스트와 입력창 모두 <code>overscroll-contain</code>을 적용해, 끝에 닿았을 때 스크롤이 배경 페이지로 전파되지 않게 합니다.</li>
+    </ul>
+
+    <div class="note"><span class="lbl">프로토타입에서 발견한 것</span><p>브랜드 오렌지 원색 <code>#f37b2a</code>는 흰 배경에서 본문 대비 4.5:1을 넘지 못합니다. 링크와 칩 텍스트에는 어둡게 조정한 톤(<code>#b44e00</code> 수준)이 필요하고, 원색은 버튼 배경처럼 면으로 쓸 때만 적합합니다. 구현 시 링크 색을 별도 토큰으로 두는 것을 권합니다.</p></div>
+
+    <h3>5.3 상태 명세</h3>
+    <p><strong>응답 상태는 <code>tag</code>가 결정합니다.</strong> 레이트리밋·장애까지 200으로 내려오므로, HTTP 에러로 처리되는 상태와 <code>tag</code>로 처리되는 상태를 구분해야 합니다. 이 구분을 놓치면 장애 응답이 정상 답변처럼 화면에 남습니다.</p>
+
+    <h4><code>tag</code>별 화면 (모두 HTTP 200)</h4>
+    <div class="tw"><table class="opts">
+      <thead><tr><th><code>tag</code></th><th>의미</th><th>화면</th></tr></thead>
+      <tbody>
+        <tr><td><code>FAQ_ANSWER</code></td><td>답변 찾음</td><td><code>answer</code> 텍스트만. <code>suggestions</code>는 보통 빈 배열</td></tr>
+        <tr><td><code>BRAND_LIST</code></td><td>입점 브랜드 안내</td><td><code>answer</code> + <strong>브랜드 링크 목록</strong>(<code>brands</code>). 각 항목은 <code>/brand/{id}</code> 로 이동</td></tr>
+        <tr><td><code>CATEGORY_LIST</code></td><td>대분류 카테고리 안내</td><td><code>answer</code> + <strong>카테고리 링크 목록</strong>(<code>categories</code>). 각 항목은 <code>/product?categoryId={id}</code> 로 이동</td></tr>
+        <tr><td><code>PRODUCT_<br>CATEGORY_LIST</code></td><td>소분류 카테고리 안내</td><td><code>answer</code> + <strong>소분류 링크 목록</strong>(<code>categories</code>) + 상위 대분류 맥락(<code>parentCategory</code>). 각 항목은 <code>/product?productCategoryId={id}</code> 로 이동</td></tr>
+        <tr><td><code>PRODUCT_LIST</code></td><td>상품 안내 (2026-08-06 추가)</td><td><code>answer</code> + <strong>상품 링크 목록</strong>(<code>products</code>). 브랜드·카테고리와 달리 <strong>브랜드명·가격을 함께</strong> 보여주는 전용 UI. 각 항목은 <code>/product/{id}</code> 상세로 이동</td></tr>
+        <tr><td><code>CONFIRM_<br>SUGGESTION</code></td><td>답이 애매해 되물음</td><td><code>answer</code> + <strong>되묻기 칩</strong>(<code>suggestions</code>). 누르면 그 문구를 새 질문으로 전송</td></tr>
+        <tr><td><code>FALLBACK</code></td><td>답변 불가</td><td><code>answer</code> + <strong><code>/contact</code> 문의 링크</strong>(D-5). 프론트가 붙입니다</td></tr>
+        <tr><td><code>OFF_TOPIC</code></td><td>쇼핑몰 무관 질문 거절</td><td><code>answer</code> + <strong>되묻기 칩</strong>. dev 서버 확인 결과 이 <code>tag</code>에도 <code>suggestions</code>가 채워져 옵니다. 1차 범위 밖 질문(상품 추천·주문 조회)도 여기로 옵니다</td></tr>
+        <tr><td><code>RATE_LIMITED</code></td><td>요청 제한</td><td><code>answer</code> + 입력부 위 배너에 남은 시간 카운트다운. <strong>전송만 차단하고 입력·타이핑은 유지</strong>. 차단 시간은 60초 — 응답 스키마에 대기 시간 필드가 없어 클라이언트가 정한 값이다(§7.4)</td></tr>
+        <tr><td><code>UNAVAILABLE</code></td><td>LLM 장애</td><td><code>answer</code> + 재시도 안내 + <code>/contact</code> 링크. <strong>정상 답변처럼 보이지 않게</strong> 시각적으로 구분</td></tr>
+      </tbody>
+    </table></div>
+    <p><code>answer</code>는 어떤 <code>tag</code>에서도 항상 채워져 옵니다(서버 상수). 프론트가 문구를 따로 만들 필요는 없고, 문구 위에 무엇을 덧붙일지만 <code>tag</code>로 정합니다.</p>
+    <div class="note"><span class="lbl">목록도 배열 유무로 판단합니다</span>
+    <p><code>brands</code>·<code>categories</code>는 해당 <code>tag</code>가 아니면 빈 배열로 오므로, <code>tag</code>로 분기하지 않고 <code>length &gt; 0</code>이면 렌더합니다. <code>suggestions</code>와 같은 규칙입니다.</p></div>
+    <div class="note rec"><span class="lbl">칩 렌더 기준은 <code>tag</code>가 아니라 <code>suggestions</code> 유무입니다</span>
+    <p>dev 서버 확인 결과 <code>OFF_TOPIC</code>에도 칩이 함께 옵니다. <code>tag</code>로 칩 노출을 분기하면 이런 경우를 놓치므로, <code>suggestions.length &gt; 0</code>이면 렌더하는 편이 안전합니다.</p></div>
+
+    <h4>그 밖의 상태</h4>
+    <div class="tw"><table>
+      <thead><tr><th>상태</th><th>화면</th></tr></thead>
+      <tbody>
+        <tr><td>최초 진입</td><td>웰컴 메시지 + 추천 질문 칩. <strong>새 방문·새로고침 후 처음 열 때 이 상태입니다</strong>: 이전 방문의 대화를 복원하지 않습니다(D-7)</td></tr>
+        <tr><td>첫 질문 이후</td><td><strong>웰컴 메시지는 맨 위에 남고, 최초 진입 칩만 사라집니다.</strong> 이미 질문을 시작한 사용자에게 “무엇을 물어볼까” 목록은 방해입니다. 응답에 딸려 오는 되묻기 칩은 별개이므로 계속 노출합니다</td></tr>
+        <tr><td><strong>언어 변경</strong></td><td>대화를 비우고 추천 질문을 새 언어로 다시 조회합니다. 서버가 <code>Accept-language</code>에 따라 답변 언어를 바꾸므로 초기화하지 않으면 한 대화에 두 언어가 섞입니다. 패널은 열린 채로 유지됩니다</td></tr>
+        <tr><td>추천 질문 로딩 중</td><td><code>GET /ai-consult/suggestions</code> 응답 대기. 칩 자리에 스켈레톤을 두고 웰컴 메시지는 먼저 보여줍니다</td></tr>
+        <tr><td>추천 질문 조회 실패</td><td>칩 없이 웰컴 메시지 + 입력창만. <strong>패널을 못 쓰게 만들지 않습니다</strong>: 직접 입력은 그대로 동작해야 합니다</td></tr>
+        <tr><td>전송 중</td><td>사용자 메시지 즉시 표시(낙관적) + 봇 영역에 로딩 인디케이터. 단발 응답이므로 중지 버튼 없음(D-4)</td></tr>
+        <tr><td><strong>네트워크·서버 오류</strong></td><td>HTTP 에러(네트워크 끊김, 5xx, 타임아웃)일 때만 이 상태. 실패한 메시지 옆 인라인 에러 + 재시도 버튼. 전역 토스트로 띄우지 않음</td></tr>
+        <tr><td>입력 길이 미달</td><td>2자 미만이면 전송 버튼 비활성. 별도 메시지 없이 버튼 상태로만 알림</td></tr>
+        <tr><td>입력 길이 초과</td><td>300자 초과 시 카운터 경고 + 전송 차단. 240자쯤부터 카운터를 미리 노출</td></tr>
+        <tr><td>오프라인</td><td>입력부 위 배너 “네트워크 연결을 확인해주세요”. 온라인 복귀 시 자동 제거</td></tr>
+        <tr><td>긴 대화</td><td>메시지 100건 초과 시 오래된 메시지 접기 또는 가상화</td></tr>
+        <tr><td>패널 닫고 다시 열기</td><td>대화가 그대로 남아 있고 하단으로 스크롤된 상태. 실수로 닫는 경우를 고려한 것이며 저장이 아니라 메모리 유지입니다(D-7)</td></tr>
+        <tr><td>새로고침 후</td><td>대화가 사라지고 최초 진입 상태. <strong>닫기 시점에 소멸을 경고하지 않습니다</strong>: 세션 한정임을 웰컴 문구에서 이미 전제하고, 닫을 때마다 경고를 띄우면 마찰만 커집니다</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3>5.4 접근성</h3>
+    <ul>
+      <li>패널 오픈 시 포커스를 패널 내부로 이동, 내부에서 포커스 트랩. Esc로 닫고 닫을 때 포커스를 버튼으로 복귀.</li>
+      <li>메시지 영역 <code>aria-live="polite"</code>로 새 응답을 스크린리더에 전달. 단발 응답이므로 완료 시점에 한 번 읽히면 됩니다(D-4).</li>
+      <li>키보드만으로 열기 → 입력 → 전송 → 링크 이동 → 닫기 전 과정 가능.</li>
+      <li>브랜드 오렌지 위 흰색 아이콘의 대비비를 실측 확인(오렌지 <code>#f37b2a</code>는 흰 텍스트 대비가 낮은 편이므로 아이콘 두께·크기로 보완).</li>
+      <li>모션은 <code>prefers-reduced-motion</code> 사용자 설정을 따릅니다. 프로젝트에 <code>reducedMotion="user"</code>로 설정된 <code>src/shared/ui/motion-provider.tsx</code>가 이미 있습니다.</li>
+    </ul>
+
+    <h3>5.5 반응형</h3>
+    <p>프로젝트는 모바일 퍼스트이며 <code>sm</code>(640px) 단일 경계를 씁니다.</p>
+    <ul>
+      <li><strong>모바일(≤640px)</strong>: 패널은 화면을 거의 다 차지합니다. 패널이 열려 있는 동안 플로팅 버튼은 숨기거나 패널 헤더의 닫기 버튼으로 대체합니다(작은 화면에서 버튼과 패널이 겹치는 것을 피하기 위함).</li>
+      <li><strong>데스크톱(&gt;640px)</strong>: 패널이 우측 하단에 뜨고 버튼은 그대로 보입니다.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 6 -->
+<section id="s6" class="measure">
+  <h2 class="sec"><span class="num">6</span>비기능 요구</h2>
+
+  <h4>성능</h4>
+  <ul>
+    <li>챗봇은 전 페이지에 마운트되므로 <strong>초기 번들 증가가 전 라우트에 과금됩니다.</strong> 패널 본체와 대화 로직은 버튼 클릭 시점에 동적 로드하고, 초기 로드에는 버튼만 포함합니다.</li>
+    <li>챗봇 도입 전후로 홈·상품 상세의 LCP / INP를 비교해 회귀가 없음을 확인합니다.</li>
+    <li>플로팅 버튼은 레이아웃 시프트를 만들지 않아야 합니다(<code>fixed</code> 요소이므로 CLS 영향 없음이 기대되나 실측 확인).</li>
+  </ul>
+
+  <h4>개인정보 · 보안</h4>
+  <div class="note rec"><span class="lbl">주의 — “저장하지 않음”은 사용자 기능에 관한 말입니다</span>
+  <p>D-7이 “사용자 이력 복원 없음”으로 정해졌지만 <strong>대화는 운영 로그로 서버에 쌓입니다.</strong> 사용자에게 복원 기능을 주지 않는 것과 서버에 저장하지 않는 것은 다릅니다. <strong>개인정보 검토는 사라지지 않고, 오히려 사용자가 인지하지 못하는 저장이라 더 조심해야 합니다.</strong></p></div>
+  <ul>
+    <li><strong>로그도 개인정보입니다.</strong> 대화 원문에는 이름·주문번호·연락처가 사용자 손으로 입력될 수 있습니다. 보관 기간·파기 절차·접근 권한이 정의되어야 합니다(D-7의 7-2).</li>
+    <li><strong>고지 의무를 확인해야 합니다.</strong> 사용자는 화면에서 대화가 사라지므로 서버에 남는다고 인지하지 못합니다. 개인정보 처리방침에 챗봇 대화 로그 항목을 명시할지 <strong>법무 확인이 필요합니다.</strong></li>
+    <li><strong>삭제 요청 대응 경로가 필요합니다.</strong> 로그가 계정에 귀속되지 않으면(익명 세션 ID) 특정 사용자의 대화를 찾아 지우는 것이 불가능에 가깝습니다. 이 점을 7-2에서 감안해야 합니다.</li>
+    <li><strong>입력 유도</strong>: 사용자가 개인정보를 입력하지 않도록 웰컴 메시지에 안내를 넣습니다. 저장이 없다고 오해하게 만드는 문구는 쓰지 않습니다.</li>
+    <li><strong>LLM 제공자 전송</strong>: 자체 백엔드를 거쳐(D-2) LLM에 전달되므로 제3자 제공 해당 여부를 검토해야 합니다.</li>
+    <li><strong>로그 접근 통제</strong>: 운영 로그는 방향 논의용이므로 열람 권한을 최소 인원으로 제한하고 접근 기록을 남깁니다.</li>
+    <li><strong>화면에 대화 삭제 버튼을 두지 않습니다.</strong> 창을 닫거나 새로고침하면 대화가 사라지므로 별도 버튼이 필요하지 않고, “삭제” 버튼은 서버 로그까지 지워진다는 오해를 만듭니다. 로그 삭제 요청은 D-7의 7-2 경로로 처리합니다.</li>
+  </ul>
+
+  <h4>에러 관측</h4>
+  <ul>
+    <li>프로젝트는 Sentry가 붙어 있고 5xx 응답은 <code>beforeError</code> 훅에서 자동 리포트됩니다. 챗봇 API 실패도 같은 경로를 탑니다.</li>
+  </ul>
+</section>
+
+<!-- 7 -->
+<section id="s7" class="measure">
+  <h2 class="sec"><span class="num">7</span>기술 구조 제안</h2>
+  <p>이 절은 구현 확정안이 아니라 <strong>코드베이스 확인 결과에 기반한 제약과 권장 경로</strong>입니다.</p>
+
+  <h3>7.1 마운트 지점 — F-2를 만족하는 유일한 위치</h3>
+  <p><code>apps/web/src/app/[locale]/layout.tsx</code>가 유일한 루트 레이아웃입니다(<code>src/app/layout.tsx</code>는 존재하지 않습니다). 이 레이아웃 안, <code>&lt;Header /&gt;</code>와 <code>&lt;main&gt;</code>의 <strong>형제</strong>로 마운트하면 클라이언트 라우팅 시 언마운트되지 않습니다.</p>
+<pre><code>&lt;ReactQueryProvider&gt;
+  &lt;Header /&gt;
+  &lt;main&gt;{children}&lt;/main&gt;
+  &lt;Footer /&gt;
+  &lt;ChatbotLauncher /&gt;   {/* ← 여기 */}
+&lt;/ReactQueryProvider&gt;</code></pre>
+  <p><strong>금지</strong>: <code>views/*</code>, 개별 <code>page.tsx</code>, 또는 <code>contact/layout.tsx</code> 같은 중첩 레이아웃에 두면 라우트가 바뀔 때마다 재마운트되어 F-2를 위반합니다.</p>
+
+  <h3>7.2 레이어(z-index)와 충돌 검토</h3>
+  <p>현재 프로젝트의 레이어는 3단뿐입니다.</p>
+  <div class="tw"><table>
+    <thead><tr><th>레이어</th><th>값</th><th>대상</th></tr></thead>
+    <tbody>
+      <tr><td>콘텐츠</td><td><code>z-1</code> ~ <code>z-11</code></td><td>일반 요소</td></tr>
+      <tr><td>헤더</td><td><code>z-11</code></td><td><code>fixed</code>, 높이 56px</td></tr>
+      <tr><td>오버레이·포털</td><td><code>z-50</code></td><td>Dialog / Drawer / Sheet / Select / DropdownMenu</td></tr>
+    </tbody>
+  </table></div>
+  <p>권장: <strong>버튼 <code>z-40</code></strong> — 콘텐츠보다 위, 모달보다 아래. 상품 이미지 확대 모달이 열렸을 때 챗봇 버튼이 그 위에 뜨면 안 됩니다.</p>
+  <p><strong>충돌 점검 결과: 우측 하단은 이미 두 요소가 쓰고 있습니다.</strong> F-1을 우측 하단으로 확정했으므로 자리 정리가 구현의 선행 조건입니다.</p>
+  <div class="tw"><table>
+    <thead><tr><th>기존 요소</th><th>위치</th><th>범위</th><th>충돌 내용</th></tr></thead>
+    <tbody>
+      <tr><td>Sonner <code>Toaster</code></td><td>기본값 <code>bottom-right</code><br>(<code>src/app/[locale]/layout.tsx</code>에 옵션 없이 마운트)</td><td><strong>전 페이지</strong></td><td>토스트가 챗봇 버튼 위에 겹쳐 뜹니다. sonner는 매우 높은 z-index를 쓰므로 토스트가 떠 있는 동안 <strong>버튼 클릭이 막힙니다</strong></td></tr>
+      <tr><td><code>ScrollToTop</code></td><td><code>bottom-20 right-[5%] z-50 size-10</code><br>(<code>src/views/promotion/ui/PromotionPage.tsx</code>)</td><td>프로모션 페이지</td><td>같은 우측 하단 영역. 버튼 두 개가 세로로 근접해 오조작 위험</td></tr>
+    </tbody>
+  </table></div>
+  <p>그 외에는 비어 있습니다. 모바일 하단 내비게이션, 쿠키 배너, 기존 채팅 위젯(Channel Talk 등)이 없고, 화면에 고정된 광고도 없습니다(AdSense는 모두 인플로우).</p>
+  <div class="note"><span class="lbl">해소 방법 (D-9에서 확정)</span>
+  <ul style="margin-bottom:0">
+    <li><strong>토스트</strong>: <code>&lt;Toaster position="bottom-center" /&gt;</code>로 변경. 전 페이지 영향이므로 기존 토스트 노출 지점을 QA 범위에 포함합니다.</li>
+    <li><strong>ScrollToTop</strong>: 우측 축을 챗봇 버튼과 맞추고(<code>right: 24px</code>) 챗봇 버튼 위 8~12px에 배치해 하나의 스택으로 정렬합니다.</li>
+    <li>두 조치 모두 <strong>챗봇이 아닌 기존 컴포넌트를 수정합니다.</strong> Phase 1 범위에 포함됩니다.</li>
+  </ul></div>
+  <p><strong>남은 주의사항</strong>: 데스크톱 헤더가 <code>min-w-[1280px]</code>를 강제해 1280px보다 좁은 뷰포트에서는 가로 스크롤바가 생깁니다. 또한 우측 하단은 <strong>세로 스크롤바와 인접</strong>하므로 버튼이 스크롤바를 덮거나 스크롤 조작을 방해하지 않는지 실기기 확인이 필요합니다.</p>
+
+  <h3>7.3 FSD 배치 제안</h3>
+  <p>프로젝트는 FSD를 쓰고 상위 레이어 import가 ESLint로 금지됩니다(<code>app → views → widgets → features → entities → shared</code>).</p>
+<pre><code>src/widgets/chatbot/
+├─ index.tsx                              배럴 (ChatbotLauncher 만 노출)
+├─ ui/
+│   ├─ ChatbotLauncher.tsx                "use client" · 버튼 + 패널 동적 로드
+│   ├─ ChatbotPanel.tsx                   패널 셸 (반응형 · 포커스 트랩 · 스크롤 잠금)
+│   ├─ ChatMessageList.tsx                웰컴 · 메시지 · 칩 · 로딩 · 새 메시지 버튼
+│   ├─ ChatMessage.tsx                    tag 별 렌더(문의 링크 · 경고 · 되묻기 칩)
+│   ├─ ChatComposer.tsx                   입력부 (2~300자 검증 · 자동 높이)
+│   ├─ ChatSuggestions.tsx                추천 질문 칩 (최초 진입 · 되묻기 공용)
+│   ├─ ChatEntityList.tsx                 브랜드·카테고리 링크 목록 (5개 + 펼치기)
+│   ├─ RateLimitBanner.tsx                레이트리밋 배너 + 카운트다운
+│   └─ scrollbar.ts                       스크롤 영역 공통 스타일 상수
+├─ model/
+│   ├─ types.ts                           ChatbotMessage · 태그 상수 · entityHref
+│   ├─ useChatbotStore.ts                 zustand (persist 없음)
+│   ├─ useChatbotConversation.ts          전송 · 재시도 · tag 분기 · 레이트리밋 발동
+│   └─ useResetChatbotOnLanguageChange.ts 언어 변경 시 초기화
+└─ api/
+    ├─ queryKey.ts                        쿼리 키 (조회·초기화가 공유)
+    ├─ useAskAiConsultMutation.ts         POST /ai-consult/ask
+    └─ useGetAiConsultSuggestionsQuery.ts GET  /ai-consult/suggestions
+</code></pre>
+  <p>서비스 함수는 기존 관례대로 <code>src/shared/services/aiConsult.ts</code>에 둡니다(<code>api</code> ky 인스턴스 사용, <code>src/shared/services/index.ts</code>에 배럴 추가).</p>
+  <div class="note"><span class="lbl">네이밍</span>
+  <p>제품 명칭은 “챗봇”이지만 API 도메인은 <code>ai-consult</code>입니다. 서비스·훅 이름은 API를 따르고(<code>aiConsult</code>, <code>useAskAiConsultMutation</code>), 위젯·UI 컴포넌트는 화면 용어를 따릅니다(<code>widgets/chatbot</code>, <code>ChatbotPanel</code>). 팀이 한쪽으로 통일하고 싶다면 착수 전에 정해야 합니다.</p></div>
+  <p>D-7에 따라 <strong>이력 조회·삭제 훅은 만들지 않습니다.</strong> 운영 로그 적재는 <code>POST /ai-consult/ask</code> 안에서 서버가 처리하므로 프론트에 별도 호출이 없습니다. 프론트가 로그 전송을 따로 하면 사용자가 차단할 수 있고 실패 처리도 이중이 됩니다.</p>
+  <p><code>widgets</code> 레이어가 맞습니다. 전역 셸 요소이며 특정 도메인에 묶이지 않고, 기존 <code>widgets/scroll-to-top</code>, <code>widgets/header</code>와 성격이 같습니다.</p>
+
+  <h3>7.4 API 연동과 상태</h3>
+  <p><strong>엔드포인트 두 개로 완결됩니다.</strong> 서비스 함수는 <code>apps/web/src/shared/services/aiConsult.ts</code>에 생성되어 있습니다.</p>
+  <div class="tw"><table>
+    <thead><tr><th>훅</th><th>호출</th><th>시점</th><th>비고</th></tr></thead>
+    <tbody>
+      <tr><td><code>useGetAiConsult<br>SuggestionsQuery</code></td><td><code>getAiConsultSuggestions</code></td><td><strong>패널을 처음 열 때</strong></td><td><code>useAppQuery</code> 래퍼. <code>staleTime</code> 기본 5분이므로 세션 중 재조회 없음</td></tr>
+      <tr><td><code>useAskAiConsult<br>Mutation</code></td><td><code>askAiConsult</code></td><td>메시지 전송 시</td><td><code>useAppMutation</code> 래퍼, <code>toastOnError: false</code></td></tr>
+    </tbody>
+  </table></div>
+  <h4>브랜드·카테고리 링크 매핑</h4>
+  <div class="tw"><table>
+    <thead><tr><th><code>tag</code></th><th>배열</th><th>항목 목적지</th></tr></thead>
+    <tbody>
+      <tr><td><code>BRAND_LIST</code></td><td><code>brands</code></td><td><code>/brand/{id}</code></td></tr>
+      <tr><td><code>CATEGORY_LIST</code></td><td><code>categories</code></td><td><code>/product?categoryId={id}</code></td></tr>
+      <tr><td><code>PRODUCT_CATEGORY_LIST</code></td><td><code>categories</code></td><td><code>/product?productCategoryId={id}</code></td></tr>
+      <tr><td><code>PRODUCT_LIST</code></td><td><code>products</code></td><td><code>/product/{id}</code></td></tr>
+    </tbody>
+  </table></div>
+  <p>목록 전체를 보여 주는 목적지는 두지 않습니다. 5개를 넘는 나머지는 목록 안에서 펼칩니다(§5.2).</p>
+  <p><code>useProductFilter</code>(<code>src/features/product/model/useProductFilter.ts</code>)가 <code>categoryId</code>와 <code>productCategoryId</code>를 <strong>별도 쿼리 파라미터로</strong> 갖고 있습니다. 대분류와 소분류를 같은 파라미터로 보내면 필터가 걸리지 않으므로 <code>tag</code>에 따라 파라미터 이름을 바꿔야 합니다.</p>
+  <p>링크는 <code>@/i18n/navigation</code>의 <code>Link</code>로 만들어 로케일 세그먼트를 유지합니다.</p>
+
+  <div class="note rec"><span class="lbl">구현 시 반드시 지킬 것 다섯 가지</span>
+  <ol style="margin-bottom:0">
+    <li><strong><code>tag</code>로 분기해야 합니다.</strong> 레이트리밋·LLM 장애가 200으로 내려오므로 <code>useAppMutation</code>의 <code>onError</code>를 타지 않습니다. <code>onSuccess</code> 안에서 <code>tag</code>를 보고 화면을 갈라야 하고, 이걸 놓치면 장애 응답이 정상 답변처럼 보입니다(§5.3).</li>
+    <li><strong>문맥을 보내지 않습니다.</strong> 요청 본문은 <code>{ message }</code> 하나뿐이고 서버가 이전 대화를 기억하지 않습니다. 이전 메시지를 모아 보내려는 시도는 스펙에 없습니다.</li>
+    <li><strong>400 응답의 <code>message</code>는 문자열이 아니라 검증 객체 배열입니다.</strong> 전역 <code>MutationCache.onError</code>가 <code>message</code>를 토스트에 쓰므로, <code>toastOnError: false</code>가 아니면 객체가 토스트에 들어갑니다. 애초에 길이는 클라이언트에서 막아 400이 나지 않게 합니다.</li>
+    <li><strong><code>languageCode</code>는 POST에서 자동 변환되지 않습니다.</strong> <code>index.ts</code>의 <code>beforeRequest</code> 훅이 GET만 처리하므로(<code>if (method === "GET")</code>), <code>askAiConsult</code>는 <code>Accept-language</code> 헤더를 직접 설정합니다. 서비스 파일에 주석으로 남겨 두었습니다.</li>
+    <li><strong>suggestions 조회는 마운트 시점이 아니라 오픈 시점입니다.</strong> 위젯이 전 페이지에 마운트되므로 마운트 시 조회하면 챗봇을 열지 않는 대다수에게도 요청이 나갑니다(<a href="#s6">§6</a> 성능 요구 위반). <code>enabled: isOpen</code>으로 처리하고, 실패해도 패널 렌더를 막지 않습니다.</li>
+  </ol></div>
+  <p><code>useQuery</code>/<code>useMutation</code> 직접 사용은 ESLint로 금지되어 있으므로 반드시 래퍼(<code>src/shared/lib/hooks/query/</code>)를 씁니다. 챗봇 에러는 전역 토스트가 아니라 패널 내부에서 처리하므로 <code>toastOnError: false</code>가 맞습니다.</p>
+  <p><strong>상태 관리</strong>: D-7에 따라 단순합니다.</p>
+  <ul>
+    <li><strong>패널 열림 + 대화 상태</strong>: zustand. 기존 스토어(<code>src/shared/lib/hooks/useModal.ts</code>, <code>useUserAuthStore.ts</code>)와 같은 방식. 이 메모리 상태만으로 F-2(라우트 이동 중 유지)가 충족됩니다.</li>
+    <li><strong><code>persist</code> 미들웨어를 쓰지 않습니다.</strong> 브라우저에 대화를 남기지 않는 것이 D-7의 결정이므로 순수 메모리 상태여야 합니다.</li>
+    <li><strong>메시지에 <code>tag</code>를 함께 보관합니다.</strong> 응답 렌더가 <code>tag</code>에 따라 달라지므로(§5.3) 화면 상태를 다시 만들 수 있게 메시지 단위로 들고 있어야 합니다.</li>
+    <li><strong>스토어가 들고 있는 것</strong>: <code>isOpen</code>, <code>messages</code>, <code>languageCode</code>(언어 변경 감지 기준), <code>rateLimitedUntil</code>(차단 해제 시각).</li>
+    <li><strong>언어 변경 감지 기준을 스토어에 둡니다.</strong> 컴포넌트 <code>useRef</code> 로 비교하면 <code>[locale]</code> 세그먼트가 바뀔 때 런처가 리마운트되어 ref 가 새 언어로 초기화되고, “바뀌었다”를 영영 감지하지 못합니다. 실제로 이 방식으로 먼저 구현했다가 초기화가 전혀 동작하지 않아 스토어로 옮겼습니다.</li>
+    <li><strong>레이트리밋 차단 시간은 60초</strong>이며 <code>useChatbotConversation</code> 의 <code>RATE_LIMIT_BLOCK_MS</code> 상수입니다. 서버가 남은 시간을 내려주게 되면 이 상수만 교체합니다.</li>
+    <li><strong>로그아웃 시 처리</strong>: <code>GlobalQueryHandler</code>가 로그아웃 시 쿼리를 비웁니다. 챗봇 대화 상태도 같은 시점에 초기화해야 합니다.</li>
+  </ul>
+
+  <h3>7.5 트랜스포트 — 기존 규약 그대로</h3>
+  <p>D-4가 단발 응답으로 확정되어 <strong>실시간 통신을 도입하지 않습니다.</strong> <code>ky</code> 기반 기존 서비스 레이어(<code>src/shared/services/</code>, 베이스 <code>https://api.seoulmoment.com.tw</code>, <code>CommonRes&lt;T&gt;</code> 래핑)를 그대로 씁니다.</p>
+  <ul>
+    <li>스트리밍용 <code>src/app/api/</code> Route Handler 프록시, Netlify 스트리밍 검증, SSE 도입은 <strong>모두 불필요해졌습니다.</strong></li>
+    <li>대신 <strong>단발 응답의 지연을 UI로 흡수해야 합니다</strong>: LLM 응답은 3~5초가 걸릴 수 있으므로 로딩 인디케이터가 살아 있어야 하고, <code>ky</code> 기본 타임아웃 10초가 LLM 응답에 충분한지 확인해 필요하면 이 엔드포인트만 늘립니다.</li>
+    <li>응답이 길어질 때를 대비해 UI는 나중에 토큰 누적 렌더로 바꿀 수 있는 구조로 둡니다(메시지 텍스트를 통째로 교체 가능한 형태).</li>
+  </ul>
+
+  <h3>7.6 재사용 자산</h3>
+  <p>새로 만들지 않아도 되는 것들입니다.</p>
+  <div class="tw"><table>
+    <thead><tr><th>용도</th><th>재사용 대상</th></tr></thead>
+    <tbody>
+      <tr><td>플로팅 컨테이너</td><td><code>src/shared/ui/floating.tsx</code> — <code>fixed</code> + 중앙정렬만 제공, 위치는 caller가 지정</td></tr>
+      <tr><td>표시/숨김 전환 선례</td><td><code>src/widgets/scroll-to-top/ui/ScrollToTop.tsx</code> — opacity + translate-y + <code>duration-300</code></td></tr>
+      <tr><td>패널 셸 후보</td><td><code>src/shared/ui/sheet.tsx</code>(side sheet, <code>side</code> prop), <code>src/shared/ui/bottom-sheet.tsx</code>(vaul Drawer 래퍼), <code>@seoul-moment/ui</code>의 <code>Dialog</code></td></tr>
+      <tr><td>반응형 분기 선례</td><td><code>src/shared/lib/hooks/useMediaQuery.ts</code> + <code>src/widgets/product-gallery/ui/ProductImageZoomModal.tsx</code></td></tr>
+      <tr><td>메시지 리스트 스크롤</td><td><code>overflow-y-auto</code> + <code>scrollbar-thin</code> (globals.css 유틸리티. ScrollArea 컴포넌트는 없음)</td></tr>
+      <tr><td>입력 · 버튼</td><td><code>@seoul-moment/ui</code>의 <code>Textarea</code>(자동 높이 확장 없음 → 직접 구현), <code>Button</code></td></tr>
+      <tr><td>아이콘</td><td><code>lucide-react</code> (프로젝트 전용 아이콘 라이브러리)</td></tr>
+      <tr><td>디자인 토큰</td><td><code>brand</code>, <code>text-body-3/4</code>, <code>duration-fast/normal/slow</code>. 상세는 <code>apps/web/DESIGN.md</code></td></tr>
+      <tr><td>모션</td><td><code>src/shared/ui/motion-provider.tsx</code> (<code>reducedMotion="user"</code>)</td></tr>
+      <tr><td>에스컬레이션 대상</td><td><code>src/features/inquiry/ui/InquiryForm.tsx</code>, <code>/contact</code> 라우트</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 8 -->
+<section id="s8" class="measure">
+  <h2 class="sec"><span class="num">8</span>결정 사항</h2>
+
+  <h3>D-1. 챗봇의 1차 목적 <span class="badge ok">결정</span></h3>
+  <div class="note rec"><span class="lbl">결정</span><p>CS·FAQ 위주로 시작하고, 추후 쇼핑 어시스턴트로 확장합니다.</p></div>
+  <p>아래 옵션 비교는 선택 근거로 남겨 둡니다.</p>
+  <div class="tw"><table class="opts">
+    <thead><tr><th>옵션</th><th>장점</th><th>단점</th></tr></thead>
+    <tbody>
+      <tr><td>A. 쇼핑 어시스턴트</td><td>매출에 직접 연결. 상품 데이터가 이미 API로 존재</td><td>상품 카탈로그 임베딩·검색 인프라 필요. 오답 시 신뢰 손상이 큼</td></tr>
+      <tr><td>B. CS·FAQ 응대</td><td>범위가 좁아 정확도 확보 쉬움. 지식베이스가 정책·약관 페이지로 이미 존재</td><td>매출 기여를 증명하기 어려움. 문의량이 적으면 효과 미미</td></tr>
+      <tr><td>C. 콘텐츠 큐레이션</td><td>매거진·뉴스·룩북 자산 활용. 브랜드 톤과 잘 맞음</td><td>효과가 간접적. 사용자가 챗봇에 기대하는 역할과 어긋날 수 있음</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><span class="lbl">선택 근거 (B → A)</span>
+  <p>범위가 좁아 첫 버전의 정확도를 확보할 수 있고, 정책·약관·FAQ라는 지식베이스가 이미 문서 형태로 존재합니다. A는 오답 비용이 크고 카탈로그 검색 인프라가 선행되어야 합니다.</p>
+  <p><strong>확장 판단 기준</strong>: 상품·콘텐츠 관련 질문이 운영 로그(D-7)에서 유의미하게 관찰되면 A로 확장을 검토합니다.</p></div>
+
+  <h3>D-2. 응답 엔진 <span class="badge ok">결정</span></h3>
+  <div class="note rec"><span class="lbl">결정</span><p>자체 백엔드 API + LLM. 프론트는 자체 백엔드와만 통신하고, LLM 호출·레이트 리밋은 백엔드가 담당합니다. 서드파티 위젯은 채택하지 않습니다.</p></div>
+  <p><strong>스펙 확인 결과 LLM의 역할이 좁습니다.</strong> 답변 문장은 서버에 사전 정의된 상수이고, LLM은 질문을 FAQ 지식과 의미 기반으로 매칭하는 데만 쓰입니다. 답변을 생성하지 않으므로 <strong>환각(없는 정책을 만들어내는 오답)의 위험이 낮습니다.</strong> 대신 위험이 “엉뚱한 FAQ를 매칭하는 것”으로 옮겨갑니다.</p>
+  <p><strong>따라오는 것</strong></p>
+  <ul>
+    <li>백엔드에 대화 전송 엔드포인트와 운영 로그 적재가 필요합니다(<a href="#s7">§7.4</a>).</li>
+    <li><strong>멀티턴 문맥이 없습니다.</strong> 서버가 이전 대화를 기억하지 않으므로 합의할 것도 없습니다. 화면에는 대화가 쌓이지만 각 질문은 독립 처리됩니다(§5.2).</li>
+    <li>FAQ 지식·답변 상수 구성은 이 문서 범위 밖이며 백엔드·기획이 별도로 정합니다(<a href="#s9">§9</a>). <strong>답변 문구 품질이 곧 챗봇 품질</strong>이므로 이쪽 비중이 큽니다.</li>
+    <li><strong>D-1의 쇼핑 어시스턴트 확장은 이 구조로는 안 됩니다.</strong> 사전 정의 답변으로는 상품 추천을 할 수 없어, 확장 시 카탈로그 검색과 생성형 응답이 새로 필요합니다.</li>
+    <li>목업 단계는 건너뛰었습니다 — 스펙과 dev 서버가 이미 준비되어 있어 처음부터 실제 API에 붙였습니다(<a href="#s13">§13</a>).</li>
+  </ul>
+  <p>아래 옵션 비교는 선택 근거로 남겨 둡니다.</p>
+  <div class="tw"><table class="opts">
+    <thead><tr><th>옵션</th><th>장점</th><th>단점</th></tr></thead>
+    <tbody>
+      <tr><td>자체 백엔드 API + LLM</td><td>UI·디자인 완전 통제, 데이터·프롬프트 통제, 서비스 데이터 연동 가능</td><td>백엔드 개발 필요, LLM 비용 관리·레이트 리밋 직접 구현</td></tr>
+      <tr><td>서드파티 위젯<br>(Channel Talk 등)</td><td>빠른 도입, 상담원 기능 포함. <strong>대부분 우측 하단이 기본값이라 F-1 위치 요구와는 맞습니다</strong></td><td>디자인·패널 형태 커스터마이즈가 제한적(D-3 선택이 좁아짐). 기존 우하단 요소와의 자리 정리(D-9)를 위젯 설정 범위 안에서 해결해야 함</td></tr>
+      <tr><td>프론트 목업 선행</td><td>UI/UX와 F-1~F-4를 먼저 확정, 백엔드와 병렬 진행</td><td>목업 상태로는 사용자 검증 불가</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><span class="lbl">선택 근거</span>
+  <p>서드파티 위젯은 위치(우측 하단)가 기본값과 맞아 F-1과는 충돌하지 않지만, 패널 형태(D-3)와 상태 화면(§5.3)을 이 문서 수준으로 통제할 수 없습니다. 자체 구현은 개발 비용이 들지만 UI·데이터·프롬프트를 모두 통제할 수 있어 CS·FAQ 정확도를 직접 관리할 수 있습니다.</p></div>
+
+  <h3>D-3. 패널 형태 <span class="badge ok">결정</span></h3>
+  <div class="note rec"><span class="lbl">결정: A. 버튼 앵커 팝오버</span>
+  <p>데스크톱은 버튼 위로 솟아오르는 380×560px 내외 패널, 모바일(≤640px)은 전체화면 Drawer.</p></div>
+  <p><strong>따라오는 것</strong></p>
+  <ul>
+    <li>딤(배경 어둡게)과 배경 스크롤 잠금을 <strong>쓰지 않습니다</strong>(§5.2). 페이지를 읽으며 대화하는 것이 이 형태의 목적입니다.</li>
+    <li>모바일은 전체화면이므로 딤·스크롤 잠금이 필요하고, <code>src/shared/ui/bottom-sheet.tsx</code>(vaul Drawer)를 재사용합니다.</li>
+    <li>패널이 우측 하단 콘텐츠를 가립니다. 상품 목록·표가 가려져도 되는지는 이 형태를 택한 대가로 수용합니다.</li>
+  </ul>
+  <p><a href="#proto">프로토타입 컨트롤</a>에서 세 형태를 직접 열어 비교할 수 있습니다. 아래 옵션 비교는 선택 근거로 남겨 둡니다.</p>
+  <div class="tw"><table class="opts">
+    <thead><tr><th>옵션</th><th>데스크톱</th><th>모바일</th></tr></thead>
+    <tbody>
+      <tr><td>A. 버튼 앵커 팝오버</td><td>버튼 위로 솟아오르는 패널 (380×560px 내외)</td><td>전체화면 Drawer</td></tr>
+      <tr><td>B. 우측 사이드 시트</td><td>우측에서 밀려 나오는 full-height 시트 (400px)</td><td>전체화면 Drawer</td></tr>
+      <tr><td>C. 항상 전체화면</td><td>화면 전체 모달</td><td>전체화면 Drawer</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><span class="lbl">선택 근거</span>
+  <p>버튼과 패널의 공간적 연결이 명확해 “이 버튼이 이 패널을 열었다”가 직관적이고, 페이지 콘텐츠를 가리는 면적이 가장 작습니다. C는 콘텐츠 탐색과 병행이 불가능합니다.</p></div>
+
+  <h3>D-4. 스트리밍 응답 여부 <span class="badge ok">결정</span></h3>
+  <div class="note rec"><span class="lbl">결정: 단발 응답 + 로딩 인디케이터</span><p>스트리밍(SSE)은 도입하지 않습니다.</p></div>
+  <p><strong>따라오는 것</strong></p>
+  <ul>
+    <li>실시간 통신 도입이 없어 <code>ky</code> 기존 규약을 그대로 씁니다(§7.5). Netlify 스트리밍 검증·Route Handler 프록시가 불필요해집니다.</li>
+    <li>중지 버튼을 두지 않습니다(§5.2). 취소할 스트림이 없습니다.</li>
+    <li><strong>지연을 UI로 흡수해야 합니다</strong>: LLM 응답 3~5초 동안 로딩 인디케이터가 살아 있어야 하고, <code>ky</code> 기본 타임아웃 10초가 충분한지 확인이 필요합니다.</li>
+    <li>스크린리더는 완료 시점에 한 번만 읽습니다(§5.4).</li>
+  </ul>
+  <p>아래 옵션 비교는 선택 근거로 남겨 둡니다.</p>
+  <div class="tw"><table class="opts">
+    <thead><tr><th>옵션</th><th>장점</th><th>단점</th></tr></thead>
+    <tbody>
+      <tr><td>SSE 토큰 스트리밍</td><td>체감 응답속도 크게 개선, 긴 답변에서 이탈 감소</td><td>레포 최초 실시간 통신 도입(§7.5). Netlify 배포 환경 검증 필요. 중지 버튼·부분 응답 처리 등 상태 복잡도 증가</td></tr>
+      <tr><td>단발 응답 + 로딩 인디케이터</td><td>기존 <code>ky</code> + <code>useAppMutation</code> 규약 그대로 사용</td><td>3~5초 침묵 구간에서 이탈 발생</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><span class="lbl">선택 근거</span>
+  <p>단발 응답으로도 F-3은 완전히 충족되며, 스트리밍의 배포 환경 리스크를 릴리스 경로에서 뺄 수 있습니다. 단 UI는 나중에 토큰 누적 렌더로 전환할 수 있는 구조로 설계해 전환 비용을 낮춥니다.</p></div>
+
+  <h3>D-5. 답변 불가 시 에스컬레이션 <span class="badge ok">결정</span></h3>
+  <div class="note rec"><span class="lbl">결정: <code>/contact</code> 문의 폼으로 유도</span>
+  <p>기존 <code>InquiryForm</code>을 재사용합니다.</p></div>
+  <p><strong>링크는 서버가 주지 않습니다.</strong> 응답 스키마에 링크 필드가 없으므로(§5.2) 프론트가 <code>tag</code>를 보고 붙입니다: <code>FALLBACK</code>·<code>OFF_TOPIC</code>·<code>UNAVAILABLE</code>일 때 노출하고, <code>@/i18n/navigation</code>의 <code>Link</code>를 씁니다.</p>
+  <p><strong>남은 실무 판단</strong>: 대화 맥락을 문의 폼에 미리 채워 넣을지. <strong>권장: Phase 1에서는 넣지 않음.</strong> 폼 프리필은 개인정보가 섞인 대화를 폼 필드로 옮기는 일이라 D-7의 로그 정책과 함께 봐야 하고, 없어도 에스컬레이션은 성립합니다.</p>
+  <p><em>검토했던 대안</em>: (b) 이메일 안내. 문의 폼이 이미 있어 중복. (c) 폴백 문구만: 막다른 길이 됩니다.</p>
+
+  <h3>D-6. 노출 예외 페이지 <span class="badge ok">결정</span></h3>
+  <div class="note rec"><span class="lbl">결정: 예외 없음</span><p><code>[locale]</code> 하위 전 라우트에 노출합니다.</p></div>
+  <p><strong>선택 근거</strong>: 가입·로그인 중 막힌 사용자가 도움을 가장 필요로 합니다. 예외 목록을 두면 라우트가 늘어날 때마다 관리 대상이 됩니다.</p>
+  <p><strong>확인 필요</strong>: 로그인·가입 화면의 폼 하단 버튼(제출 버튼)과 우하단 챗봇 버튼이 겹치지 않는지 실기기 확인. 모바일에서 특히 확인해야 합니다.</p>
+
+  <h3>D-7. 대화 이력 저장 정책 <span class="badge ok">결정</span></h3>
+  <div class="note rec"><span class="lbl">결정</span>
+  <p><strong>사용자 대상 이력 복원은 제공하지 않습니다.</strong> 대화는 세션 한정이며 새로고침·탭 종료 시 사라집니다.</p>
+  <p><strong>단, 대화는 운영 로그로 서버에 보관합니다.</strong> 어떤 질문이 들어오고 무엇을 못 답하는지 확인해 챗봇의 방향(D-1 확장 여부, 지식베이스 보강, 폴백 문구)을 재논의하기 위한 것입니다.</p></div>
+
+  <h4>7-1. 확정된 것과 그 함의</h4>
+  <div class="tw"><table>
+    <thead><tr><th>구분</th><th>결정</th></tr></thead>
+    <tbody>
+      <tr><td>라우트 이동 중</td><td><strong>유지</strong>(F-2). 메모리 상태이며 저장이 아닙니다</td></tr>
+      <tr><td>패널 닫고 다시 열기</td><td><strong>유지</strong>. 실수로 닫았을 때 대화를 잃지 않아야 하므로 탭 세션 동안은 메모리에 남깁니다</td></tr>
+      <tr><td>새로고침 · 탭 종료 후</td><td><strong>소멸</strong>. 다시 열면 최초 진입 상태</td></tr>
+      <tr><td>브라우저 저장</td><td>없음. <code>localStorage</code>·<code>sessionStorage</code> 모두 사용하지 않음</td></tr>
+      <tr><td>서버</td><td><strong>운영 로그로 보관</strong> — 사용자에게 노출되지 않는 분석·개선용</td></tr>
+      <tr><td>로그인 여부</td><td>무관. 비로그인 대화도 로그 대상</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>이 결정의 실질적 의미를 오해하지 말아야 합니다.</strong> “저장하지 않음”은 <em>사용자 기능</em>에 관한 말이고, 서버에는 대화가 쌓입니다. 따라서 다음이 <strong>여전히 필요합니다.</strong></p>
+  <ul>
+    <li>개인정보 처리방침 검토. 사용자가 화면에서 대화가 사라지는 것을 보고 “기록이 없다”고 이해할 수 있어, 고지 필요성을 법무가 판단해야 합니다.</li>
+    <li>보관 기간과 파기 절차, 로그 접근 권한 통제(<a href="#s6">§6</a>).</li>
+    <li>로그에 개인정보가 섞여 들어오는 것에 대한 대비. 사용자가 이름·주문번호·연락처를 입력할 수 있습니다.</li>
+  </ul>
+  <p><strong>얻는 것</strong>: 프론트 구현이 가장 단순해지고(이력 조회·삭제 API 없음, <code>persist</code> 없음), Phase 1을 백엔드 이력 기능 없이 완결할 수 있습니다. 나중에 사용자 이력 복원을 도입하더라도 버릴 코드가 없습니다.</p>
+  <p><strong>포기하는 것</strong>: 사용자가 대화를 이어갈 수 없습니다. CS·FAQ는 한 번에 끝나는 질문이 많아 손실이 크지 않지만, 긴 상담이 끊기면 처음부터 다시 물어야 합니다. 로그에서 “같은 사용자가 반복 질문하는 패턴”이 관찰되면 이력 복원 도입을 재검토합니다.</p>
+
+  <h4>7-2. 로그 범위와 보관 정책 — 실무 확정 필요</h4>
+  <p><strong>약관·개인정보 처리방침 수정은 진행하기로 확정되었습니다.</strong> 아래는 그 수정 내용을 채우기 위해 백엔드·법무와 함께 확정할 실무 항목입니다.</p>
+  <div class="tw"><table>
+    <thead><tr><th>결정 사항</th><th>옵션 · 권장안</th></tr></thead>
+    <tbody>
+      <tr><td><strong>로그에 담을 내용</strong></td><td>(a) 대화 원문 전체 / (b) 사용자 질문만 원문, 응답은 식별자 / (c) 원문 없이 분류·성공여부만.<br><strong>권장: (a) 원문 전체.</strong> 방향 논의가 목적이라면 “무엇을 어떻게 물었는지”가 핵심이고, (c)는 개선에 쓸 정보가 남지 않습니다. 대신 보관 기간을 짧게 잡습니다</td></tr>
+      <tr><td><strong>보관 기간</strong></td><td><strong>권장: 90일</strong> 후 자동 파기. 방향 논의는 분기 단위로 충분하고, 무기한 보관은 파기 의무와 저장 비용 양쪽에서 불리합니다</td></tr>
+      <tr><td><strong>식별자</strong></td><td>(a) 익명 세션 ID만 / (b) 로그인 사용자는 userId 연결.<br><strong>권장: (a) 익명 세션 ID.</strong> 멀티턴 대화를 묶어 보려면 세션 단위 식별자는 필요하지만, 계정 연결은 개인정보 부담을 키우고 방향 논의에는 불필요합니다</td></tr>
+      <tr><td><strong>개인정보 마스킹</strong></td><td>적재 시점에 이메일·전화번호·주문번호 패턴을 자동 마스킹할지. <strong>권장: 적용.</strong> 사용자가 무엇을 입력할지 통제할 수 없으므로 서버 적재 단계에서 걸러내는 것이 가장 확실합니다</td></tr>
+      <tr><td><strong>약관·처리방침 수정</strong></td><td><strong>진행 확정.</strong> 명시할 내용 = 챗봇 대화 로그 수집 사실, 수집 항목(대화 내용), 보관 기간, 이용 목적(서비스 개선), LLM 제공자 제3자 제공 여부. 문안은 법무가 작성</td></tr>
+      <tr><td><strong>접근 권한</strong></td><td>로그 열람을 최소 인원으로 제한하고 접근 기록을 남길지. <strong>권장: 적용</strong></td></tr>
+      <tr><td><strong>삭제 요청 대응</strong></td><td>익명 세션 ID만 남기면 특정 사용자의 대화를 찾아 지우는 것이 사실상 불가능합니다. 이를 수용할지 법무와 함께 확인해야 합니다</td></tr>
+    </tbody>
+  </table></div>
+
+  <h4>7-3. 로그 확인 후 재논의 — Phase 3</h4>
+  <p>운영 로그를 일정 기간 관찰한 뒤 아래를 다시 판단합니다. 이때 이 절을 갱신합니다.</p>
+  <ul>
+    <li>사용자 이력 복원(재방문 시 이어가기)이 필요한가? 반복 질문 패턴이 근거가 됩니다.</li>
+    <li>D-1을 쇼핑 어시스턴트로 확장할 시점인가? 상품 관련 질문 비중이 근거가 됩니다.</li>
+    <li>지식베이스에서 무엇이 비어 있는가? 폴백으로 처리된 질문이 근거가 됩니다.</li>
+    <li>추천 질문 칩(D-8)을 무엇으로 바꿔야 하는가?</li>
+  </ul>
+
+  <h3>D-8. 최초 진입 유도 <span class="badge ok">결정</span></h3>
+  <div class="note rec"><span class="lbl">결정: 추천 질문 칩만</span><p>자동 툴팁·미읽음 뱃지를 띄우지 않습니다.</p></div>
+  <p><strong>따라오는 것</strong></p>
+  <ul>
+    <li>칩 내용은 하드코딩이 아니라 <strong><code>GET /ai-consult/suggestions</code>에서 받아옵니다.</strong> 문구를 배포 없이 조정할 수 있다는 뜻이므로, 운영 로그(D-7)로 확인한 질문 패턴을 칩에 반영하는 루프가 성립합니다.</li>
+    <li><strong>칩은 두 곳에 나옵니다</strong>: 최초 진입(suggestions API)과 응답 후 되묻기(<code>CONFIRM_SUGGESTION</code>의 <code>suggestions</code>). 같은 컴포넌트로 처리하고 출처만 다릅니다(§5.3).</li>
+    <li>버튼 자체는 아무 유도도 하지 않습니다(§5.1의 미읽음 표시 없음).</li>
+    <li>조회 실패 시 칩 없이 시작하되 직접 입력은 그대로 동작해야 합니다(§5.3).</li>
+  </ul>
+  <p>아래 옵션 비교는 선택 근거로 남겨 둡니다.</p>
+  <div class="tw"><table class="opts">
+    <thead><tr><th>옵션</th><th>설명</th></tr></thead>
+    <tbody>
+      <tr><td>A. 자동 툴팁 · 미읽음 뱃지</td><td>첫 방문 후 N초 뒤 말풍선 자동 노출</td></tr>
+      <tr><td>B. 추천 질문 칩만</td><td>패널을 열었을 때만 안내. 밖에서는 조용함</td></tr>
+      <tr><td>C. 완전 수동</td><td>아무 유도 없음</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><span class="lbl">선택 근거</span>
+  <p>자동 툴팁은 초기 사용률을 올리지만 콘텐츠를 가리고 광고처럼 인식됩니다. 특히 모바일 우측 하단에서 자동으로 튀어나오면 오조작을 유발합니다. 사용률이 낮다면 A를 나중에 실험으로 추가할 수 있습니다.</p></div>
+
+  <h3>D-9. 우측 하단 자리 정리 <span class="badge ok">결정</span></h3>
+  <div class="note rec"><span class="lbl">결정</span>
+  <p><strong>(1) 토스트</strong>: Sonner <code>Toaster</code>를 <code>position="bottom-center"</code>로 변경합니다.</p>
+  <p><strong>(2) ScrollToTop</strong>: 챗봇 버튼 위로 세로 스택 정렬합니다.</p></div>
+  <p>F-1이 우측 하단으로 확정되면서 기존 두 요소와 자리가 겹치던 문제를 이렇게 해소합니다(<a href="#s7">§7.2</a>).</p>
+
+  <h4>(1) 토스트 — <code>position="bottom-center"</code></h4>
+  <p><strong>변경 지점</strong>: <code>apps/web/src/app/[locale]/layout.tsx</code>의 <code>&lt;Toaster /&gt;</code>에 <code>position="bottom-center"</code>를 추가합니다. 현재 옵션 없이 마운트되어 기본값(<code>bottom-right</code>)이 적용된 상태입니다.</p>
+  <ul>
+    <li><strong>전 페이지 영향</strong>입니다. 성공·실패 토스트 위치가 모두 바뀌므로 QA 범위에 기존 토스트 노출 지점(로그인, 마이페이지 저장, 관심상품 등)을 포함해야 합니다.</li>
+    <li>하단 중앙은 챗봇 버튼과 완전히 분리되고 모바일에서도 읽기 편합니다.</li>
+    <li>오프셋으로 밀어올리는 방식(a안)은 버튼 크기가 바뀔 때마다 다시 맞춰야 해서 택하지 않았습니다.</li>
+  </ul>
+
+  <h4>(2) <code>ScrollToTop</code> — 챗봇 버튼 위 세로 스택</h4>
+  <p><strong>변경 지점</strong>: <code>apps/web/src/views/promotion/ui/PromotionPage.tsx</code>의 <code>&lt;ScrollToTop className="bottom-20 right-[5%] ..." /&gt;</code>. 우측 정렬을 챗봇 버튼과 같은 축(<code>right: 24px</code>)으로 맞추고, <code>bottom</code>을 챗봇 버튼(56px) 위 8~12px로 조정합니다.</p>
+  <ul>
+    <li>두 버튼이 하나의 스택으로 읽히도록 우측 축을 맞추는 것이 핵심입니다. <code>right-[5%]</code>는 뷰포트 폭에 따라 축이 흔들립니다.</li>
+    <li>크기도 함께 볼 필요가 있습니다. 현재 <code>size-10</code>(40px)이고 챗봇 버튼은 56px이라 축을 맞춰도 시각적으로 어긋납니다. 같은 크기로 맞추거나 의도적으로 위계를 두되 중앙축은 정렬합니다.</li>
+    <li><strong>모바일 확인 필요</strong>: 두 버튼이 세로로 쌓이면 작은 화면에서 높이를 잡아먹습니다. 프로모션 페이지 모바일에서 실기기 확인이 필요합니다.</li>
+  </ul>
+</section>
+
+<!-- 9 -->
+<section id="s9" class="measure">
+  <h2 class="sec"><span class="num">9</span>범위 밖 (Out of scope)</h2>
+  <ul>
+    <li><strong>사용자 대상 대화 이력 복원</strong> — D-7에서 제공하지 않기로 확정. 로그 확인 후 재논의(7-3)</li>
+    <li><strong>상품 추천·재고·주문 상태 조회</strong>: D-1이 CS·FAQ이므로 1차 범위 밖. <code>OFF_TOPIC</code>으로 처리(§5.3). 서버 응답이 사전 정의 상수라 구조적으로도 불가능합니다</li>
+    <li>상담원 실시간 채팅(휴먼 핸드오프). D-5의 에스컬레이션은 문의 폼 유도까지만 포함</li>
+    <li>로그인 사용자 개인화(주문·배송 조회, 관심상품 기반 추천)</li>
+    <li>FAQ 지식·답변 상수 구성, LLM 매칭 튜닝: D-2가 자체 백엔드로 확정됐으나 그 내부 설계는 백엔드·기획 소관</li>
+    <li><strong>운영 로그 분석 도구·대시보드</strong> — 로그 적재는 D-7 범위, 분석 방법은 별도</li>
+    <li>리치 카드·캐러셀 — 상품 썸네일·가격이 들어간 카드형 응답, 좌우로 넘기는 캐러셀은 만들지 않습니다. 응답은 텍스트와 링크로만 구성합니다(<a href="#s5">§5.2</a>). <strong>브랜드·카테고리 링크 행의 36px 썸네일은 여기서 말하는 카드가 아닙니다.</strong></li>
+    <li>음성 입력, 파일·이미지 업로드</li>
+    <li>코드 구현 및 구현 계획서 — 이 문서는 PRD만 다룹니다</li>
+  </ul>
+</section>
+
+<!-- 10 -->
+<section id="s10" class="measure">
+  <h2 class="sec"><span class="num">10</span>릴리스 단계</h2>
+
+  <h4>Phase 1 — UI 셸과 자리 정리 <span class="badge ok">완료</span></h4>
+  <p>우하단 자리 정리(D-9: 토스트 위치 변경 + ScrollToTop 스택), 루트 레이아웃 마운트, 플로팅 버튼, 팝오버 패널(D-3), 상태 화면, 접근성, UI 문구. <strong>F-1 ~ F-4가 여기서 완결되었습니다.</strong></p>
+  <p>D-9를 맨 앞에 둔 이유: 토스트가 챗봇 버튼 클릭을 막기 때문에, 자리 정리 전에는 버튼을 붙여도 제대로 테스트할 수 없습니다.</p>
+
+  <h4>Phase 2 — API 연동 <span class="badge ok">완료 (프론트)</span></h4>
+  <p><code>GET /ai-consult/suggestions</code>로 추천 질문 칩, <code>POST /ai-consult/ask</code>로 대화 처리. 목업을 건너뛰고 처음부터 실제 API에 붙였습니다 — 스펙과 dev 서버가 이미 준비되어 있어 목업이 불필요했습니다.</p>
+  <p><em>남은 것</em>: 서버측 운영 로그 적재(D-7)와 7-2의 로그 정책, 약관·처리방침 수정. 프론트는 로그에 관여하지 않습니다(§7.4).</p>
+
+  <h4>Phase 3 — 로그 기반 방향 재논의 <span class="badge d">대기</span></h4>
+  <p>일정 기간 로그를 관찰한 뒤 7-3의 네 가지를 판단합니다. 이력 복원 필요성, 쇼핑 어시스턴트 확장 시점, 지식베이스 공백, 추천 질문 재구성. <strong>다음 단계는 여기서 나오는 결론이 정합니다.</strong></p>
+
+  <h4>Phase 4 — 고도화 (방향 확정 후)</h4>
+  <p>Phase 3에서 필요하다고 판단된 것. 스트리밍은 D-4에서 도입하지 않기로 했으므로, 응답 지연이 실제 이탈 요인으로 확인될 때만 재검토합니다.</p>
+</section>
+
+<!-- 11 -->
+<section id="s11" class="measure">
+  <h2 class="sec"><span class="num">11</span>리스크</h2>
+  <div class="tw"><table>
+    <thead><tr><th>리스크</th><th>영향</th><th>완화</th></tr></thead>
+    <tbody>
+      <tr><td>전 페이지 마운트로 인한 초기 번들 증가</td><td>모든 라우트의 로딩 성능 저하</td><td>패널 본체를 클릭 시점에 동적 로드. 도입 전후 LCP/INP 실측 비교</td></tr>
+      <tr><td><strong>LLM 응답이 <code>ky</code> 기본 타임아웃 10초를 넘김</strong></td><td>정상 응답이 에러로 처리됨</td><td>Phase 2에서 실제 응답시간 측정 후 이 엔드포인트 타임아웃만 상향(§7.5)</td></tr>
+      <tr><td><code>GET /ai-consult/suggestions</code> 실패</td><td>칩이 안 뜸</td><td>칩 없이도 직접 입력이 동작하도록 인라인 처리(§5.3). 패널 렌더를 막지 않음</td></tr>
+      <tr><td>300자 제한이 짧게 느껴짐</td><td>다 쓰고 나서 막혀 다시 줄여야 함</td><td>240자쯤부터 카운터를 미리 노출(§5.2)</td></tr>
+      <tr><td>토스트 위치 변경의 회귀</td><td>전 페이지 토스트 위치가 바뀜</td><td>D-9(1) 적용 후 기존 토스트 노출 지점(로그인·마이페이지 저장·관심상품 등)을 QA 범위에 포함</td></tr>
+      <tr><td>프로모션 페이지에서 <code>ScrollToTop</code>과 근접</td><td>두 버튼 오조작</td><td>D-9(2)대로 우측 스택 정렬. 크기 차이(40px vs 56px)도 함께 조정</td></tr>
+      <tr><td><strong>운영 로그에 개인정보가 섞여 들어옴</strong></td><td>사용자가 이름·주문번호·연락처를 입력. 유출 시 파급이 큼</td><td>7-2 권장안대로 적재 시점 자동 마스킹 + 접근 권한 제한 + 90일 파기</td></tr>
+      <tr><td><strong>사용자가 “기록이 없다”고 오인</strong></td><td>화면에서 대화가 사라지므로 서버 보관을 인지하지 못함</td><td>약관·처리방침 수정으로 고지(D-7 확정). 삭제로 오해될 수 있는 버튼을 화면에 두지 않음</td></tr>
+      <tr><td>익명 세션 ID만 남겨 삭제 요청 대응 불가</td><td>특정 사용자의 대화를 찾아 지울 수 없음</td><td>7-2에서 이 한계를 법무와 함께 명시적으로 수용하거나 식별 방식을 조정</td></tr>
+      <tr><td>7-2(로그 세부)·API 스키마 확정 지연</td><td>Phase 2 착수 불가</td><td>Phase 1은 API 없이 완결되므로 병행 진행</td></tr>
+      <tr><td><strong><code>tag</code> 분기 누락</strong></td><td>레이트리밋·장애 응답이 정상 답변처럼 화면에 남음. 200으로 오므로 에러 처리에 걸리지 않음</td><td><code>onSuccess</code>에서 <code>tag</code>를 반드시 분기(§5.3). 9개 <code>tag</code> 전부에 화면을 정의해 두었음</td></tr>
+      <tr><td><strong>문맥이 없다는 것을 사용자가 모름</strong></td><td>“그거 말고” 같은 후속 질문이 엉뚱한 답을 받음. 대화가 쌓여 보이니 이어진다고 오해함</td><td>placeholder·웰컴 문구로 자기완결적 질문 유도(§5.2). 로그에서 지시적 질문 비중을 확인</td></tr>
+      <tr><td>엉뚱한 FAQ 매칭</td><td>질문과 다른 정책을 안내. 답변이 사전 정의라 그럴듯해서 더 위험</td><td><code>CONFIRM_SUGGESTION</code>으로 되묻는 경로가 있음. 로그로 오매칭 사례를 수집해 지식베이스 보강</td></tr>
+      <tr><td>로그아웃 후 이전 사용자 대화 잔존</td><td>공용 PC에서 대화 노출</td><td><code>GlobalQueryHandler</code> 로그아웃 시점에 챗봇 상태도 초기화(§7.4)</td></tr>
+      <tr><td>데스크톱 <code>min-w-[1280px]</code> 가로 스크롤바 + 우측 세로 스크롤바 인접</td><td>좁은 데스크톱에서 버튼이 스크롤바를 덮거나 오조작</td><td>Phase 1에서 1024·1280px 실기기 확인</td></tr>
+      <tr><td>오답으로 인한 브랜드 신뢰 손상</td><td>챗봇 사용 중단</td><td>답변이 서버 상수라 환각 위험은 낮음. 남는 위험은 오매칭이며 위 항목으로 관리</td></tr>
+      <tr><td>1차 범위 밖 질문이 폴백만 반복</td><td>“도움이 안 된다”는 인식</td><td><code>OFF_TOPIC</code> 화면에서 도울 수 있는 범위를 다시 안내(§5.3). 로그로 비중을 확인해 확장 시점 판단(7-3)</td></tr>
+      <tr><td>챗봇 도입 후 사용률 저조</td><td>유지 비용만 발생</td><td>Phase 2 이후 D-8의 진입 유도 방식을 순차 적용</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 12 -->
+<section id="s12" class="measure">
+  <h2 class="sec"><span class="num">12</span>부록</h2>
+
+  <h3>12.1 UI 문구 초안</h3>
+  <p><strong>추천 질문 칩 문구는 이 표에 없습니다</strong> — <code>GET /ai-consult/suggestions</code>가 제공하므로 프론트에 하드코딩하지 않습니다(D-8). 아래는 프론트가 소유하는 문구입니다.</p>
+  <div class="tw"><table>
+    <thead><tr><th>위치</th><th>문구</th></tr></thead>
+    <tbody>
+      <tr><td>버튼 레이블 (닫힘)</td><td>챗봇 열기</td></tr>
+      <tr><td>버튼 레이블 (열림)</td><td>챗봇 닫기</td></tr>
+      <tr><td>패널 제목</td><td>무엇을 도와드릴까요?</td></tr>
+      <tr><td>웰컴 메시지</td><td>배송·교환·환불·회원 혜택처럼 자주 묻는 내용을 바로 알려드려요.</td></tr>
+      <tr><td>개인정보 안내</td><td>개인정보는 입력하지 말아주세요.</td></tr>
+      <tr><td>세션 한정 안내</td><td>이 대화는 창을 닫으면 사라져요.</td></tr>
+      <tr><td>입력창 placeholder</td><td>메시지를 입력하세요</td></tr>
+      <tr><td>전송 버튼</td><td>전송</td></tr>
+      <tr><td>중지 버튼</td><td>중지</td></tr>
+      <tr><td>응답 대기</td><td>답변을 준비하고 있어요</td></tr>
+      <tr><td>에러</td><td>답변을 가져오지 못했어요.</td></tr>
+      <tr><td>재시도</td><td>다시 시도</td></tr>
+      <tr><td>오프라인</td><td>네트워크 연결을 확인해주세요.</td></tr>
+      <tr><td><s>답변 불가 폴백</s></td><td><strong>서버 <code>answer</code>를 그대로 씁니다.</strong> <code>FALLBACK</code>·<code>OFF_TOPIC</code>·<code>UNAVAILABLE</code> 문구를 프론트에서 만들지 않습니다</td></tr>
+      <tr><td>에스컬레이션</td><td>문의 남기기</td></tr>
+      <tr><td>목록 펼치기</td><td>나머지 {count}개 보기 / 접기 — <code>{count}</code>는 숨은 개수. 목록 아래에 붙으므로 대상(브랜드/카테고리)은 문맥으로 전달됨</td></tr>
+      <tr><td>레이트 리밋 배너</td><td>잠시 후 다시 시도해주세요. ({seconds}초) — <code>{seconds}</code> 보간을 쓰는 유일한 키. 본문 답변은 서버 <code>answer</code></td></tr>
+      <tr><td>입력 길이 초과</td><td>300자까지 입력할 수 있어요.</td></tr>
+      <tr><td>새 메시지 알림</td><td>새 메시지</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>12.2 참고 파일</h3>
+  <div class="tw"><table>
+    <thead><tr><th>목적</th><th>경로</th></tr></thead>
+    <tbody>
+      <tr><td>마운트 지점</td><td><code>apps/web/src/app/[locale]/layout.tsx</code></td></tr>
+      <tr><td>플로팅 프리미티브</td><td><code>apps/web/src/shared/ui/floating.tsx</code></td></tr>
+      <tr><td>플로팅 전환 선례</td><td><code>apps/web/src/widgets/scroll-to-top/ui/ScrollToTop.tsx</code></td></tr>
+      <tr><td>패널 셸 후보</td><td><code>apps/web/src/shared/ui/sheet.tsx</code>, <code>apps/web/src/shared/ui/bottom-sheet.tsx</code></td></tr>
+      <tr><td>반응형 분기 선례</td><td><code>apps/web/src/widgets/product-gallery/ui/ProductImageZoomModal.tsx</code>, <code>apps/web/src/shared/lib/hooks/useMediaQuery.ts</code></td></tr>
+      <tr><td>로그인 상태 · hydration 가드</td><td><code>apps/web/src/shared/lib/hooks/useUserAuthStore.ts</code> (<code>useUserAuthHydrated</code>)</td></tr>
+      <tr><td>로그아웃 시 상태 정리 선례</td><td><code>apps/web/src/shared/lib/components/GlobalQueryHandler.tsx</code></td></tr>
+      <tr><td>모달 스토어 패턴</td><td><code>apps/web/src/shared/lib/hooks/useModal.ts</code></td></tr>
+      <tr><td>뮤테이션 래퍼</td><td><code>apps/web/src/shared/lib/hooks/query/useAppMutation.ts</code></td></tr>
+      <tr><td>API 라우트 핸들러 선례</td><td><code>apps/web/src/app/api/health/route.ts</code></td></tr>
+      <tr><td>모션 설정</td><td><code>apps/web/src/shared/ui/motion-provider.tsx</code></td></tr>
+      <tr><td>에스컬레이션 대상 (D-5)</td><td><code>apps/web/src/features/inquiry/ui/InquiryForm.tsx</code>, <code>/contact</code> 라우트</td></tr>
+      <tr><td><strong>토스트 위치 변경 (D-9)</strong></td><td><code>apps/web/src/app/[locale]/layout.tsx</code> — <code>&lt;Toaster /&gt;</code>에 <code>position="bottom-center"</code></td></tr>
+      <tr><td><strong>ScrollToTop 스택 정렬 (D-9)</strong></td><td><code>apps/web/src/views/promotion/ui/PromotionPage.tsx</code> — <code>right-[5%]</code>·<code>bottom-20</code>·<code>size-10</code> 조정</td></tr>
+      <tr><td>서비스 레이어 관례</td><td><code>apps/web/src/shared/services/inquiry.ts</code> (ky <code>api</code> 인스턴스 사용 예), <code>index.ts</code> 배럴</td></tr>
+      <tr><td><strong>구현: 위젯</strong></td><td><code>apps/web/src/widgets/chatbot/</code> (§7.3 트리)</td></tr>
+      <tr><td><strong>구현: 서비스</strong></td><td><code>apps/web/src/shared/services/aiConsult.ts</code></td></tr>
+      <tr><td>디자인 토큰 문서</td><td><code>apps/web/DESIGN.md</code></td></tr>
+      <tr><td>아키텍처 문서</td><td><code>apps/web/.claude/CLAUDE.md</code></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 13 -->
+<!-- 13 -->
+<section id="s13" class="measure">
+  <h2 class="sec"><span class="num">13</span>구현 현황</h2>
+  <p>2026-08-04 기준. 브랜치 <code>feat/web-ai-consult-chatbot</code>.</p>
+
+  <h3>구현된 것</h3>
+  <div class="tw"><table>
+    <thead><tr><th>항목</th><th>내용</th></tr></thead>
+    <tbody>
+      <tr><td>F-1 우하단 버튼</td><td>전 라우트 노출. 데스크톱 56px / 모바일 48px</td></tr>
+      <tr><td>F-2 라우트 이동 유지</td><td><code>[locale]/layout.tsx</code> 의 <code>&lt;main&gt;</code> 형제로 마운트. 라우트 이동 후에도 패널·대화 유지 확인</td></tr>
+      <tr><td>F-3 패널 오픈</td><td>팝오버(데스크톱) / 전체화면 Drawer(모바일). 포커스 트랩·Esc·포커스 복귀</td></tr>
+      <tr><td>F-4 비로그인 사용</td><td>로그인 무관. <code>persist</code> 미사용으로 브라우저에 대화 안 남김</td></tr>
+      <tr><td>D-9 자리 정리</td><td><code>&lt;Toaster position="bottom-center" /&gt;</code>, ScrollToTop 을 챗봇 버튼 위 스택으로(중심축 정렬)</td></tr>
+      <tr><td>API 연동</td><td>추천 질문 조회(오픈 시점) + 대화 전송. <code>tag</code> 9종 분기</td></tr>
+      <tr><td>브랜드·카테고리 안내</td><td><code>BRAND_LIST</code> · <code>CATEGORY_LIST</code> · <code>PRODUCT_CATEGORY_LIST</code> 를 링크 목록으로 렌더. 행 앞 36px 썸네일(<code>image</code> 없으면 생략), 5개까지 접고 나머지는 목록 안에서 펼침. 대분류·소분류가 서로 다른 쿼리 파라미터로 연결됨(§7.4)</td></tr>
+      <tr><td>상품 안내 (2026-08-06)</td><td><code>PRODUCT_LIST</code> 를 상품 전용 목록으로 렌더. 44px 상품 썸네일(<code>object-cover</code>) + 브랜드명 + 상품명 + 가격(<code>NT$</code>), 각 항목 <code>/product/{id}</code> 로 이동. 5개까지 접고 나머지는 이 자리에서 펼침. <code>widgets/chatbot/ui/ChatProductList.tsx</code></td></tr>
+      <tr><td>상태 화면</td><td>최초 진입 · 추천 질문 로딩/실패 · 전송 중 · tag 별 응답 · 네트워크 오류+재시도 · 오프라인 · 레이트리밋 · 입력 길이</td></tr>
+      <tr><td>접근성</td><td><code>aria-live</code> 메시지 영역, 포커스 트랩, Esc, <code>aria-modal</code>(모바일), 스크린리더 레이블</td></tr>
+      <tr><td>i18n</td><td>시트 <code>language-pack</code> 에 20개 키 등록. 언어 변경 시 대화 초기화 + 추천 질문 재조회</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>남은 것</h3>
+  <div class="tw"><table>
+    <thead><tr><th>항목</th><th>성격</th></tr></thead>
+    <tbody>
+      <tr><td>서버측 운영 로그 적재</td><td>백엔드. 프론트는 관여하지 않음</td></tr>
+      <tr><td>7-2 로그 정책 확정</td><td>백엔드·법무</td></tr>
+      <tr><td>약관·처리방침 수정</td><td>법무</td></tr>
+      <tr><td>문의 폼에 대화 맥락 전달</td><td>D-5 의 남은 실무 판단. 현재는 링크만</td></tr>
+      <tr><td>긴 대화 접기·가상화</td><td>§5.3. 세션 한정 대화라 100건까지 갈 일이 드물어 후순위</td></tr>
+      <tr><td>세션 만료 안내</td><td>§5.3. 현재는 일반 네트워크 오류와 같게 보임</td></tr>
+      <tr><td>프로모션 페이지 실기기 확인</td><td>dev API 에 프로모션 데이터가 없어 미확인. 클래스 계산값으로 중심축만 검증</td></tr>
+      <tr><td>토스트 위치 변경 회귀 QA</td><td>전 페이지 영향. 기존 토스트 노출 지점 확인 필요</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>구현 중 확인된 것</h3>
+  <ul>
+    <li><strong><code>OFF_TOPIC</code> 에도 <code>suggestions</code> 가 온다</strong>: dev 서버 실측. 그래서 칩 노출은 <code>tag</code> 가 아니라 배열 유무로 판단한다(§5.2).</li>
+    <li><strong>400 응답의 <code>message</code> 는 검증 객체 배열</strong>: 문자열이 아니다. <code>toastOnError: false</code> 가 아니면 객체가 토스트에 들어간다.</li>
+    <li><strong><code>languageCode</code> 는 POST 에서 자동 변환되지 않는다</strong>: 훅이 GET 만 처리하므로 헤더를 직접 넣는다.</li>
+    <li><strong>답변은 서버 상수</strong>: LLM 은 의미 매칭만 한다. 환각 위험은 낮고 오매칭 위험이 남는다.</li>
+    <li><strong>대분류와 소분류는 쿼리 파라미터가 다르다</strong>: <code>categoryId</code> vs <code>productCategoryId</code>. 같은 이름으로 보내면 필터가 걸리지 않는다(§7.4).</li>
+      <li><strong>목록 응답이 길다</strong>: dev 실측으로 브랜드 8개, 패션 소분류 9개다. 전부 나열하면 답변 한 건이 패널을 넘겨서 5개로 잘랐다(§5.2).</li>
+      <li><strong>브랜드 목록 화면이 없다</strong>: <code>app/[locale]/brand/page.tsx</code>는 빈 <code>noindex</code> 플레이스홀더다. &ldquo;전체 보기&rdquo; 링크를 걸면 빈 페이지로 보내게 되므로 제자리 펼치기로 바꿨다(§5.2).</li>
+      <li><strong><code>image</code>가 태그마다 다르다</strong>: dev 실측으로 브랜드 8/8, 소분류 9/9 는 있고 <strong>대분류는 3/3 모두 <code>null</code></strong>이다. 카드 그리드가 아니라 행 썸네일을 택한 이유다(§5.2).</li>
+      <li><strong>브랜드 이미지는 워드마크 로고다</strong>: 8개 중 7개가 브랜드명을 이미지로 렌더한 것이고 배경색이 박혀 있다. 비율도 1:1 과 2:1 로 섞여 있어 <code>object-cover</code>로 채우면 잘린다.</li>
+      <li><strong>Tailwind preflight 가 <code>next/image</code>의 height 를 덮어쓴다</strong>: <code>img { height: auto }</code> 때문에 크기를 이미지가 아니라 감싼 타일에 줘야 행 높이가 고정된다.</li>
+  </ul>
+</section>
+
+<section id="s14" class="measure">
+  <h2 class="sec">다음 단계</h2>
+  <p>프론트 구현은 끝났습니다. 남은 것은 대부분 프론트 밖입니다(<a href="#s13">§13</a>).</p>
+  <ol>
+    <li><strong>서버측 운영 로그 적재를 확인합니다.</strong> 프론트는 <code>POST /ai-consult/ask</code> 만 호출하고 로그에 관여하지 않으므로, 실제로 쌓이고 있는지 백엔드와 맞춰야 합니다.</li>
+    <li><strong>7-2의 로그 정책을 확정하고 약관·처리방침 수정을 법무에 요청합니다.</strong> 대화가 서버에 남는다는 사실을 고지할지가 여기서 결정됩니다.</li>
+    <li><strong>QA 범위에 토스트 위치 변경을 포함합니다</strong>: 전 페이지 영향입니다(로그인·마이페이지 저장·관심상품 등).</li>
+    <li><strong>프로모션 페이지를 데이터가 있는 환경에서 확인합니다</strong>: ScrollToTop 스택이 모바일에서 화면 높이를 잡아먹지 않는지.</li>
+    <li>로그가 쌓이면 Phase 3(<a href="#s10">§10</a>)로 넘어가 7-3의 네 가지를 판단합니다.</li>
+  </ol>
+  <div class="note"><span class="lbl">착수 전 확인으로 남겨둔 것</span>
+  <p>위젯·훅 네이밍을 <code>chatbot</code>(화면 용어)과 <code>ai-consult</code>(API 도메인) 중 하나로 통일할지(§7.3). 현재는 위젯은 <code>chatbot</code>, 서비스·훅은 <code>aiConsult</code> 로 갈라져 있습니다.</p></div>
+</section>
+
+</main>
+</div>
+
+<!-- ───────── 챗봇 프로토타입 ───────── -->
+<div id="cbScrim" data-on="false" aria-hidden="true"></div>
+
+<button id="cbLauncher" type="button" aria-expanded="false" aria-controls="cbPanel" aria-label="챗봇 열기">
+  <svg class="ic-chat" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8z"/></svg>
+  <svg class="ic-x" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+</button>
+
+<div id="cbPanel" role="dialog" aria-labelledby="cbTitle" data-shape="popover" data-open="false">
+  <div class="cb-head">
+    <h2 id="cbTitle">무엇을 도와드릴까요?<span class="sub" id="cbSub">프로토타입 · 실제 응답이 아닙니다</span></h2>
+    <button class="cb-iconbtn" type="button" id="cbClose" aria-label="챗봇 닫기" title="닫기">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+
+  <div class="cb-log" id="cbLog" aria-live="polite" aria-atomic="false" data-note="D-7: 이력 복원 없음 — 새로고침하면 최초 진입 상태"></div>
+  <button class="newmsg" id="cbNewMsg" type="button" hidden>새 메시지 ↓</button>
+
+  <div id="cbBanner" hidden></div>
+
+  <div class="cb-foot">
+    <div class="cb-inputrow">
+      <label class="sr" for="cbInput">메시지 입력</label>
+      <textarea id="cbInput" rows="1" placeholder="메시지를 입력하세요"></textarea>
+      <button class="cb-send" id="cbSend" type="button" aria-label="전송" disabled>
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></svg>
+      </button>
+    </div>
+    <p class="cb-counter" id="cbCounter" hidden>0 / 1,000</p>
+  </div>
+</div>
+
+<script>
+(() => {
+  "use strict";
+  const MAX = 300;   // 스펙: 2~300자
+  const MIN = 2;
+  const $ = (s) => document.querySelector(s);
+
+  /* ── 테마 ── */
+  const themeBtn = $("#themeBtn");
+  try {
+    const saved = localStorage.getItem("prd-theme");
+    if (saved) document.documentElement.dataset.theme = saved;
+  } catch (_) {}
+  themeBtn.addEventListener("click", () => {
+    const cur = document.documentElement.dataset.theme
+      || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    const next = cur === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    try { localStorage.setItem("prd-theme", next); } catch (_) {}
+  });
+
+  /* ── 목차 현재 위치 ── */
+  const links = [...document.querySelectorAll("#tocList a[href^='#s']")];
+  const secs = links.map(a => document.getElementById(a.getAttribute("href").slice(1))).filter(Boolean);
+  if ("IntersectionObserver" in window && secs.length) {
+    const io = new IntersectionObserver((es) => {
+      es.forEach(e => {
+        if (!e.isIntersecting) return;
+        links.forEach(l => l.classList.toggle("on", l.getAttribute("href") === "#" + e.target.id));
+      });
+    }, { rootMargin: "-10% 0px -80% 0px" });
+    secs.forEach(s => io.observe(s));
+  }
+
+  /* ── 프로토타입 데이터 ── */
+  const WELCOME = {
+    role: "bot",
+    text: "안녕하세요. 배송·교환·환불·회원 혜택처럼 자주 묻는 내용을 바로 알려드려요.",
+    privacy: "개인정보는 입력하지 말아주세요. 이 대화는 창을 닫으면 사라져요.",
+  };
+  const SUGGESTIONS = ["배송은 얼마나 걸려요?", "교환·환불 규정 알려주세요", "회원 혜택이 뭐가 있어요?"];
+  const REPLIES = [
+    { k: ["배송", "언제", "얼마나", "도착"], tag: "FAQ_ANSWER",
+      text: "결제가 완료되면 영업일 기준 2~4일 내에 출고되고, 출고 후 배송에 2~5일이 더 걸립니다." },
+    { k: ["교환", "환불", "반품", "취소"], tag: "FAQ_ANSWER",
+      text: "상품을 받은 날부터 7일 안에 신청할 수 있어요. 개봉한 화장품은 예외가 있어 규정을 확인해주세요." },
+    { k: ["회원", "혜택", "적립", "쿠폰", "가입"], tag: "FAQ_ANSWER",
+      text: "회원가입하면 첫 구매 쿠폰과 구매 적립 혜택을 받을 수 있어요." },
+    { k: ["사이즈", "치수", "크기"], tag: "CONFIRM_SUGGESTION",
+      text: "어느 쪽을 알고 싶으신지 알려주시면 정확히 안내할 수 있어요.",
+      suggestions: ["사이즈 확인 방법", "교환 규정"] },
+  ];
+
+  const BRAND_LIST = {
+    role: "bot", tag: "BRAND_LIST",
+    text: "현재 입점한 브랜드예요. 눌러서 브랜드 페이지로 이동할 수 있어요.",
+    brands: [
+      { id: 111, name: "무신사 스탠다드", image: "https://image-dev.seoulmoment.com.tw/brand/2026-02-01/01d604c1-e3bd-4a78-bc03-bae15e1d316c-aa4b4a67-00f1-41ce-90de-d21f512c0b8c.webp" },
+      { id: 110, name: "서울모먼트", image: "https://image-dev.seoulmoment.com.tw/brand/2026-02-01/21a4c95d-2dde-4cc1-a3a4-cb547f49cd84-8a62b44a-0248-4589-a210-8e12f4d3f98f.webp" },
+      { id: 112, name: "올리브영", image: "https://image-dev.seoulmoment.com.tw/brand/2026-02-01/90590812-4fd2-4e54-9b0c-14c558ff3137-98ca87fb-a7db-4fbf-ae4d-a8be02d2cba4.webp" },
+      { id: 113, name: "취(Chwi)", image: "https://image-dev.seoulmoment.com.tw/brand/2026-02-03/0b034a1d-dce5-489d-bc06-9e9904be07b2-0663bf7f-e2bc-4cb5-8d3c-8a104dd4d36c.webp" },
+      { id: 115, name: "무센트", image: "https://image-dev.seoulmoment.com.tw/brand/2026-02-04/d5e983e0-c5f9-4aad-ba07-0e3ad0f9d2fc-9a01de7c-f7b2-4199-b8dc-ed9fb94c5a40.webp" },
+      { id: 2, name: "Node Labs", image: "https://image-dev.seoulmoment.com.tw/brand/2026-06-07/e027f398-f09c-45a6-855b-95dc3ea63373-66d7af6a-4967-4ab2-a8d6-1b8e676fa287.webp" },
+      { id: 3, name: "OSSMOVE", image: "https://image-dev.seoulmoment.com.tw/brand/2026-06-11/faa5ae58-794a-4e5f-ab13-f811b4084a12-3e2d4f83-c027-4601-ab61-6307cdf69a3f.webp" },
+      { id: 4, name: "RUN STATE", image: "https://image-dev.seoulmoment.com.tw/brand/2026-06-12/ebf707eb-6041-4a2a-87fb-726b65304c2f-ee4268c0-9832-458f-b5aa-0daa8e1d6b10.webp" },
+    ],
+  };
+  const CATEGORY_LIST = {
+    role: "bot", tag: "CATEGORY_LIST",
+    text: "이런 카테고리가 있어요.",
+    categories: [
+      { id: 1, name: "패션", image: null },
+      { id: 2, name: "화장품", image: null },
+      { id: 3, name: "악세서리", image: null },
+    ],
+  };
+  const PRODUCT_CATEGORY_LIST = {
+    role: "bot", tag: "PRODUCT_CATEGORY_LIST",
+    text: "패션 안에는 이런 하위 분류가 있어요.",
+    parentCategory: { id: 1, name: "패션", image: null },
+    categories: [
+      { id: 4, name: "여성 반팔", image: "https://image-dev.seoulmoment.com.tw/product-category/image/a1c5fbbe5c8794c9b4c78d312c8d3da0.jpg" },
+      { id: 6, name: "니트", image: "https://image-dev.seoulmoment.com.tw/product-category/image/52ee778c5a293cea2f275d810f6fe2b5.jpg" },
+      { id: 3, name: "여성 긴팔", image: "https://image-dev.seoulmoment.com.tw/product-category/3/55f1d4be937b852c3aa2c13cdd776411.png" },
+      { id: 7, name: "후드/집업", image: "https://image-dev.seoulmoment.com.tw/product-category/2026-02-06/dfc54951-a618-4c59-ac43-224fd2482a36-015a4ee8-de6b-4834-8f89-9d569b2ea28c.webp" },
+      { id: 1, name: "여성 아우터", image: "https://image-dev.seoulmoment.com.tw/product-category/2026-02-06/a9296121-16fe-4d94-a30c-194658f9f2b1-e8e5a0b8-49c4-4ee5-a816-d51f5d6f88e9.webp" },
+      { id: 5, name: "여성 민소매", image: "https://image-dev.seoulmoment.com.tw/product-category/2026-02-19/e3899939-e2b1-4154-a0f9-cf7dcba8d12f-a637db0a-a816-4530-a353-2b54c4159c32.webp" },
+      { id: 40, name: "버뮤다 팬츠", image: "https://image-dev.seoulmoment.com.tw/product-category/2026-02-19/aa345853-f720-4a06-aff1-2e6217c02207-858884ef-0253-4fa2-a9b1-b38ded12b800.webp" },
+      { id: 2, name: "러닝모자", image: "https://image-dev.seoulmoment.com.tw/product-category/2026-06-11/1722f1b6-2247-4975-ad22-0d05234c5bc7-4afe57ad-9060-449c-bfb2-49dea2cd7093.webp" },
+      { id: 41, name: "바람막이", image: "https://image-dev.seoulmoment.com.tw/product-category/2026-07-28/6ca603f7-df77-4f85-a65b-38ef274c7bf5-e04c2b99-5c16-4ab9-b5e4-33b9c87db75e.webp" },
+    ],
+  };
+  // 2026-08-06 응답 확장: PRODUCT_LIST 는 브랜드·카테고리와 달리 브랜드명·가격을
+  // 함께 담는 products 배열을 내려준다. 각 항목은 /product/{id} 상품 상세로 이동한다.
+  const PRODUCT_LIST = {
+    role: "bot", tag: "PRODUCT_LIST",
+    text: "찾으시는 조건에 맞는 상품이에요. 눌러서 상품 상세로 이동할 수 있어요.",
+    products: [
+      { id: 132, name: "[2026 SS] 무브 쇼츠 3 레드", brandName: "OSSMOVE", price: 1530, image: "https://image-dev.seoulmoment.com.tw/product/2026-07-29/af59dd80-3793-411c-8486-b9ddd605bcaf-504562a0-4ab9-47ed-a5db-0c4b0bdd7264.webp" },
+      { id: 117, name: "[2026 SS] 네거티브 싱글렛", brandName: "RUN STATE", price: 1350, image: "https://image-dev.seoulmoment.com.tw/product/2026-07-29/0a8eca42-a5d0-4122-803d-29f163198860-9572b5ed-9960-4eae-8462-38be242ed3f9.webp" },
+      { id: 111, name: "DEV:10 선글라스 컷 캡 레드", brandName: "Node Labs", price: 1590, image: "https://image-dev.seoulmoment.com.tw/product/2026-07-28/3746ee61-230f-41bf-8d8a-4cae905e5888-86e3c663-2a67-4da1-a34f-52b16d830584.webp" },
+      { id: 81, name: "무센트 마레 7 버튼 크롭 헨리넥 가디건 레드", brandName: "무센트", price: 940, image: "https://image-dev.seoulmoment.com.tw/product/2026-02-04/b730f3cf-9278-477d-8918-625c0dd45178-3132f98a-ceaa-4e0c-9e79-03c20a4bcbda.webp" },
+      { id: 133, name: "[2026 SS] 무브 쇼츠 3 블랙", brandName: "OSSMOVE", price: 1530, image: "https://image-dev.seoulmoment.com.tw/product/2026-07-29/af59dd80-3793-411c-8486-b9ddd605bcaf-504562a0-4ab9-47ed-a5db-0c4b0bdd7264.webp" },
+      { id: 118, name: "[2026 SS] 네거티브 싱글렛 화이트", brandName: "RUN STATE", price: 1350, image: "https://image-dev.seoulmoment.com.tw/product/2026-07-29/0a8eca42-a5d0-4122-803d-29f163198860-9572b5ed-9960-4eae-8462-38be242ed3f9.webp" },
+      { id: 112, name: "DEV:10 선글라스 컷 캡 블랙", brandName: "Node Labs", price: 1590, image: "https://image-dev.seoulmoment.com.tw/product/2026-07-28/3746ee61-230f-41bf-8d8a-4cae905e5888-86e3c663-2a67-4da1-a34f-52b16d830584.webp" },
+    ],
+  };
+
+  // tag별 고정 응답 (서버 answer 상수를 대신하는 값)
+  const FALLBACK = {
+    role: "bot", tag: "FALLBACK",
+    text: "제가 답변드리기 어려운 내용이에요. 문의를 남겨주시면 담당자가 확인 후 연락드립니다.",
+  };
+  const OFF_TOPIC = {
+    role: "bot", tag: "OFF_TOPIC",
+    text: "저는 서울 모먼트 쇼핑 관련 문의(주문·배송·교환·환불·사이즈 등)만 도와드릴 수 있어요.",
+    suggestions: ["배송 기간", "환불 방법", "사이즈 확인"],
+  };
+  const UNAVAILABLE = {
+    role: "bot", tag: "UNAVAILABLE",
+    text: "지금 답변을 준비할 수 없어요. 잠시 후 다시 시도하거나 문의를 남겨주세요.",
+  };
+  const RATE_LIMITED = {
+    role: "bot", tag: "RATE_LIMITED",
+    text: "질문이 너무 빠르게 들어왔어요. 잠시 후 다시 물어봐주세요.",
+  };
+
+  // tag별 UI 규칙 (§5.3)
+  const TAG_UI = {
+    FAQ_ANSWER: {},
+    BRAND_LIST: {},
+    CATEGORY_LIST: {},
+    PRODUCT_CATEGORY_LIST: {},
+    PRODUCT_LIST: {},
+    CONFIRM_SUGGESTION: {},
+    FALLBACK: { contact: true },
+    OFF_TOPIC: { contact: true },
+    RATE_LIMITED: { banner: "ratelimit" },
+    UNAVAILABLE: { contact: true, warn: true },
+  };
+
+  /* ── 상태 ── */
+  const S = {
+    open: false,
+    shape: "popover",
+    view: "auto",
+    convo: [WELCOME],
+    suggest: true,
+    suggestLoading: false,
+    suggestFailed: false,
+    typing: false,
+    banner: null,      // 'offline' | 'ratelimit' | null
+    newMsg: false,
+    timer: null,
+  };
+
+  const panel = $("#cbPanel"), launcher = $("#cbLauncher"), scrim = $("#cbScrim");
+  const log = $("#cbLog"), input = $("#cbInput"), send = $("#cbSend");
+  const counter = $("#cbCounter"), banner = $("#cbBanner"), newMsgBtn = $("#cbNewMsg");
+
+  const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const LIST_VISIBLE_MAX = 5;
+  const chevronSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>';
+  const chevronDownSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+  const chevronUpSvg = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>';
+  const linkSvg = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>';
+
+  function msgHtml(m, idx) {
+    const cls = m.role === "me" ? "msg me" : "msg bot";
+    const ui = m.tag ? (TAG_UI[m.tag] || {}) : {};
+    let body = "<p>" + esc(m.text) + "</p>";
+    if (m.privacy) body += '<p class="cb-privacy">' + esc(m.privacy) + "</p>";
+    // 서버 응답에 링크 필드가 없다(§5.2). /contact 링크만 프론트가 tag를 보고 붙인다.
+    if (ui.contact) {
+      body += '<div class="msg-links"><a href="#proto" data-demo-link="1">문의 남기기' + linkSvg + "</a></div>";
+    }
+    const hasList = !!((m.brands && m.brands.length) || (m.categories && m.categories.length) || (m.products && m.products.length));
+    let out = '<div class="' + cls + (ui.warn ? " warn" : "") + (hasList ? " has-list" : "") + '">'
+      + '<div class="bub">' + body + "</div>";
+    if (m.tag && m.role === "bot") out += '<div class="cb-meta">tag: ' + esc(m.tag) + "</div>";
+    if (m.error) {
+      out += '<div class="err"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>'
+        + "답변을 가져오지 못했어요." + '<button type="button" data-retry="1">다시 시도</button></div>';
+    }
+
+    // 브랜드·카테고리 목록. tag 가 아니라 배열 유무로 판단하고, 이름만 링크로
+    // 노출한다(image 필드는 쓰지 않는다 §5.2). 5개까지 접어 두고 나머지는 이
+    // 자리에서 펼친다 — 전부 나열하면 좁은 패널에서 목록이 대화를 밀어내고,
+    // 브랜드 목록 화면이 없어서 링크로 내보낼 곳도 없다.
+    const listItems = (m.brands && m.brands.length ? m.brands : null)
+      || (m.categories && m.categories.length ? m.categories : null);
+    if (listItems) {
+      const parent = m.parentCategory
+        ? '<p class="list-parent">' + esc(m.parentCategory.name) + " &gt;</p>"
+        : "";
+      const hidden = listItems.length - LIST_VISIBLE_MAX;
+      const expanded = !!m.listExpanded;
+      const visible = expanded || hidden <= 0 ? listItems : listItems.slice(0, LIST_VISIBLE_MAX);
+      out += '<div class="cb-list">' + parent + visible
+        .map(x => '<a href="#proto" data-demo-link="1">'
+          + (x.image ? '<span class="thumb"><img src="' + esc(x.image) + '" alt="" loading="lazy"></span>' : "")
+          + '<span class="list-name">' + esc(x.name) + "</span>" + chevronSvg + "</a>")
+        .join("")
+        + (hidden > 0
+          ? '<button class="list-all" type="button" data-list-toggle="' + idx
+            + '" aria-expanded="' + expanded + '">'
+            + (expanded ? "접기" + chevronUpSvg : "나머지 " + hidden + "개 보기" + chevronDownSvg)
+            + "</button>"
+          : "")
+        + "</div>";
+    }
+
+    // 상품 목록(PRODUCT_LIST). 브랜드·카테고리와 달리 브랜드명·가격을 함께 보여주는
+    // 전용 UI 다. 썸네일은 상품 사진이라 cover 로 채우고, 눌러서 /product/{id} 로 이동한다.
+    // 5개까지 접고 나머지는 브랜드·카테고리 목록과 같은 방식으로 이 자리에서 펼친다.
+    if (m.products && m.products.length) {
+      const hiddenP = m.products.length - LIST_VISIBLE_MAX;
+      const expandedP = !!m.listExpanded;
+      const visibleP = expandedP || hiddenP <= 0 ? m.products : m.products.slice(0, LIST_VISIBLE_MAX);
+      out += '<div class="cb-plist">' + visibleP
+        .map(p => '<a href="#proto" data-demo-link="1">'
+          + (p.image ? '<span class="pthumb"><img src="' + esc(p.image) + '" alt="" loading="lazy"></span>' : "")
+          + '<span class="pinfo"><span class="pbrand">' + esc(p.brandName) + "</span>"
+          + '<span class="pname">' + esc(p.name) + "</span>"
+          + '<span class="pprice">NT$' + p.price.toLocaleString() + "</span></span>"
+          + chevronSvg + "</a>")
+        .join("")
+        + (hiddenP > 0
+          ? '<button class="list-all" type="button" data-list-toggle="' + idx
+            + '" aria-expanded="' + expandedP + '">'
+            + (expandedP ? "접기" + chevronUpSvg : "나머지 " + hiddenP + "개 보기" + chevronDownSvg)
+            + "</button>"
+          : "")
+        + "</div>";
+    }
+
+    // 되묻기 칩. tag 가 아니라 suggestions 유무로 판단한다 (OFF_TOPIC 에도 온다)
+    if (m.suggestions && m.suggestions.length) {
+      out += '<div class="cb-sugg">' + m.suggestions
+        .map(x => '<button type="button" data-sugg="' + esc(x) + '">' + esc(x) + "</button>").join("") + "</div>";
+    }
+
+    out += "</div>";
+    return out;
+  }
+
+  function render() {
+    // D-7: 이력 복원이 없으므로 스켈레톤·"이전 대화" 구분선 상태가 존재하지 않는다
+    let html = "";
+    S.convo.forEach((m, i) => { html += msgHtml(m, i); });
+    if (S.suggestLoading) {
+      html += '<div class="sugg-skel" role="status" aria-label="추천 질문을 불러오는 중"><i></i><i></i><i></i></div>';
+    } else if (S.suggestFailed) {
+      html += '<p class="sugg-fail">추천 질문을 불러오지 못했어요. 직접 입력해 물어보세요.</p>';
+    } else if (S.suggest && !S.typing) {
+      html += '<div class="cb-sugg">' + SUGGESTIONS
+        .map(s => '<button type="button" data-sugg="' + esc(s) + '">' + esc(s) + "</button>").join("") + "</div>";
+    }
+    if (S.typing) {
+      html += '<div class="msg bot"><div class="typing" role="status" aria-label="답변을 준비하고 있어요"><i></i><i></i><i></i></div></div>';
+    }
+    log.innerHTML = html;
+
+    banner.hidden = !S.banner;
+    banner.className = "cb-banner" + (S.banner ? " warn" : "");
+    if (S.banner === "offline") {
+      banner.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M2 2l20 20M8.5 16.5a5 5 0 0 1 7 0M5 12.9a10 10 0 0 1 4-2.6M1.4 9.2a15 15 0 0 1 5.6-3.6M22.6 9.2A15 15 0 0 0 12 5M19 12.9a10 10 0 0 0-3-2.3M12 20h.01"/></svg>네트워크 연결을 확인해주세요.';
+    } else if (S.banner === "ratelimit") {
+      banner.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>잠시 후 다시 시도해주세요. (12초)';
+    }
+
+    newMsgBtn.hidden = !S.newMsg;
+    const over = input.value.length > MAX;
+    const tooShort = input.value.trim().length > 0 && input.value.trim().length < MIN;
+    send.disabled = !input.value.trim() || tooShort || over || S.typing || !!S.banner;
+    input.setAttribute("aria-invalid", over ? "true" : "false");
+    counter.hidden = input.value.length < MAX * 0.8;   // 240자부터 노출
+    counter.dataset.over = over ? "true" : "false";
+    counter.textContent = input.value.length + " / " + MAX
+      + (over ? " · 300자까지 입력할 수 있어요." : "");
+
+    if (!S.newMsg) log.scrollTop = log.scrollHeight;
+  }
+
+  /* ── 열기 / 닫기 ── */
+  const isSheet = () => S.shape !== "popover" || matchMedia("(max-width: 640px)").matches;
+  let lastFocus = null;
+
+  function open() {
+    S.open = true;
+    lastFocus = document.activeElement;
+    panel.dataset.open = "true";
+    panel.setAttribute("aria-modal", isSheet() ? "true" : "false");
+    launcher.setAttribute("aria-expanded", "true");
+    launcher.setAttribute("aria-label", "챗봇 닫기");
+    document.body.dataset.cbOpen = "true";
+    scrim.dataset.on = isSheet() ? "true" : "false";
+    setTimeout(() => input.focus(), 120);
+    render();
+  }
+  function close() {
+    S.open = false;
+    panel.dataset.open = "false";
+    launcher.setAttribute("aria-expanded", "false");
+    launcher.setAttribute("aria-label", "챗봇 열기");
+    document.body.dataset.cbOpen = "false";
+    scrim.dataset.on = "false";
+    if (lastFocus === launcher || !lastFocus) launcher.focus();
+  }
+  launcher.addEventListener("click", () => (S.open ? close() : open()));
+  $("#cbClose").addEventListener("click", close);
+  scrim.addEventListener("click", close);
+
+  document.addEventListener("keydown", (e) => {
+    if (!S.open) return;
+    if (e.key === "Escape") { e.preventDefault(); close(); return; }
+    if (e.key !== "Tab") return;
+    const f = [...panel.querySelectorAll('button:not([disabled]):not([hidden]), textarea, a[href]')]
+      .filter(el => el.offsetParent !== null);
+    if (!f.length) return;
+    const first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+
+  /* ── 대화 ── */
+  function replyFor(q) {
+    const hit = REPLIES.find(r => r.k.some(k => q.includes(k)));
+    if (!hit) return Object.assign({}, FALLBACK);
+    return { role: "bot", text: hit.text, tag: hit.tag, suggestions: hit.suggestions || [] };
+  }
+  function submit(text) {
+    const q = (text != null ? text : input.value).trim();
+    if (!q || q.length > MAX || S.banner) return;
+    clearTimeout(S.timer);
+    S.convo.push({ role: "me", text: q });
+    S.suggest = false; S.typing = true; S.newMsg = false;
+    input.value = ""; input.style.height = "";
+    render();
+    S.timer = setTimeout(() => {
+      S.typing = false;
+      S.convo.push(replyFor(q));
+      render();
+      syncChips(null);
+    }, 1100);
+  }
+  send.addEventListener("click", () => submit());
+  input.addEventListener("input", () => {
+    input.style.height = "auto";
+    input.style.height = Math.min(input.scrollHeight, 118) + "px";
+    render();
+  });
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); submit(); }
+  });
+  log.addEventListener("click", (e) => {
+    const s = e.target.closest("[data-sugg]");
+    if (s) { submit(s.dataset.sugg); return; }
+    if (e.target.closest("[data-retry]")) {
+      const lastMe = [...S.convo].reverse().find(m => m.role === "me");
+      S.convo = S.convo.filter(m => !m.error);
+      if (lastMe) { S.convo = S.convo.filter(m => m !== lastMe); submit(lastMe.text); }
+      return;
+    }
+    const lt = e.target.closest("[data-list-toggle]");
+    if (lt) {
+      const m = S.convo[Number(lt.dataset.listToggle)];
+      if (m) { m.listExpanded = !m.listExpanded; render(); }
+      return;
+    }
+    const dl = e.target.closest("[data-demo-link]");
+    if (dl) { e.preventDefault(); dl.animate([{ opacity: 1 }, { opacity: .35 }, { opacity: 1 }], { duration: 320 }); }
+  });
+  newMsgBtn.addEventListener("click", () => { S.newMsg = false; render(); });
+
+  /* ── 컨트롤: 형태 / 뷰 / 상태 ── */
+  function segment(sel, apply) {
+    const box = $(sel);
+    box.addEventListener("click", (e) => {
+      const b = e.target.closest("button"); if (!b) return;
+      [...box.querySelectorAll("button")].forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+      apply(b.dataset);
+    });
+  }
+  segment("#shapeSeg", (d) => {
+    S.shape = d.shape;
+    panel.dataset.shape = S.shape;
+    if (S.open) { panel.setAttribute("aria-modal", isSheet() ? "true" : "false"); scrim.dataset.on = isSheet() ? "true" : "false"; }
+    else open();
+  });
+  segment("#viewSeg", (d) => {
+    S.view = d.view;
+    if (S.view === "mobile") document.body.dataset.cbView = "mobile";
+    else delete document.body.dataset.cbView;
+    if (!S.open) open();
+  });
+
+  function syncChips(name) {
+    document.querySelectorAll("#stateChips button")
+      .forEach(b => b.setAttribute("aria-pressed", String(b.dataset.state === name)));
+  }
+  function reset(name) {
+    clearTimeout(S.timer);
+    Object.assign(S, { convo: [WELCOME], suggest: true, suggestLoading: false, suggestFailed: false, typing: false, banner: null, newMsg: false });
+    input.value = ""; input.style.height = "";
+    if (name) syncChips(name);
+    render();
+  }
+  const PRESETS = {
+    welcome: () => reset("welcome"),
+    sending: () => {
+      reset(); S.convo = [WELCOME, { role: "me", text: "배송은 얼마나 걸려요?" }];
+      S.suggest = false; S.typing = true;
+    },
+    faqAnswer: () => {
+      reset(); S.convo = [WELCOME, { role: "me", text: "배송은 얼마나 걸려요?" }, replyFor("배송")];
+      S.suggest = false;
+    },
+    confirmSuggestion: () => {
+      reset(); S.convo = [WELCOME, { role: "me", text: "사이즈요" }, replyFor("사이즈")];
+      S.suggest = false;
+    },
+    brandList: () => {
+      reset(); S.convo = [WELCOME, { role: "me", text: "어떤 브랜드가 있어요?" }, Object.assign({}, BRAND_LIST)];
+      S.suggest = false;
+    },
+    categoryList: () => {
+      reset(); S.convo = [WELCOME, { role: "me", text: "카테고리 알려주세요" }, Object.assign({}, CATEGORY_LIST)];
+      S.suggest = false;
+    },
+    productCategoryList: () => {
+      reset(); S.convo = [WELCOME, { role: "me", text: "패션 하위 분류 보여주세요" }, Object.assign({}, PRODUCT_CATEGORY_LIST)];
+      S.suggest = false;
+    },
+    productList: () => {
+      reset(); S.convo = [WELCOME, { role: "me", text: "빨간색 반팔 상품 보여줘" }, Object.assign({}, PRODUCT_LIST)];
+      S.suggest = false;
+    },
+    fallback: () => {
+      reset(); S.convo = [WELCOME, { role: "me", text: "선물 포장도 되나요?" }, Object.assign({}, FALLBACK)];
+      S.suggest = false;
+    },
+    offTopic: () => {
+      reset(); S.convo = [WELCOME, { role: "me", text: "20만원대 선물용 스킨케어 추천해줘" }, Object.assign({}, OFF_TOPIC)];
+      S.suggest = false;
+    },
+    rateLimited: () => {
+      reset(); S.convo = [WELCOME, { role: "me", text: "회원 혜택이 뭐가 있어요?" }, Object.assign({}, RATE_LIMITED)];
+      S.suggest = false; S.banner = "ratelimit";
+    },
+    unavailable: () => {
+      reset(); S.convo = [WELCOME, { role: "me", text: "교환 규정 알려주세요" }, Object.assign({}, UNAVAILABLE)];
+      S.suggest = false;
+    },
+    httpError: () => {
+      reset(); S.convo = [WELCOME, { role: "me", text: "배송은 얼마나 걸려요?", error: true }];
+      S.suggest = false;
+    },
+    offline: () => {
+      reset(); S.convo = [WELCOME, { role: "me", text: "교환 규정 알려주세요" }, replyFor("교환")];
+      S.suggest = false; S.banner = "offline";
+    },
+    inputLimit: () => {
+      reset(); S.suggest = false;
+      input.value = "배송 문의드립니다. ".repeat(30).slice(0, 312);
+      input.style.height = "auto"; input.style.height = Math.min(input.scrollHeight, 118) + "px";
+    },
+    suggestLoading: () => { reset(); S.suggestLoading = true; },
+    suggestFailed: () => { reset(); S.suggestFailed = true; },
+    longConvo: () => {
+      reset(); S.suggest = false; S.convo = [];
+      for (let i = 0; i < 6; i++) {
+        S.convo.push({ role: "me", text: ["배송은 얼마나 걸려요?", "교환 규정 알려주세요", "회원 혜택이 뭐가 있어요?"][i % 3] });
+        S.convo.push(replyFor(["배송", "교환", "회원"][i % 3]));
+      }
+      S.newMsg = true;
+    },
+  };
+  $("#stateChips").addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    const fn = PRESETS[b.dataset.state]; if (!fn) return;
+    fn();
+    syncChips(b.dataset.state);
+    render();
+    if (!S.open) open();
+  });
+
+  log.addEventListener("scroll", () => {
+    if (log.scrollTop + log.clientHeight >= log.scrollHeight - 24) { S.newMsg = false; newMsgBtn.hidden = true; }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

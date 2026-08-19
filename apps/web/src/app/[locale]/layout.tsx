@@ -2,6 +2,7 @@ import type { PropsWithChildren } from "react";
 
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import * as rootParams from "next/root-params";
 import Script from "next/script";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
@@ -16,15 +17,16 @@ import ScrollRestoration from "@shared/ui/scroll-restoration";
 
 import { routing } from "@/i18n/routing";
 
+import { ChatbotLauncher } from "@widgets/chatbot";
 import { Footer } from "@widgets/footer";
 import { Header } from "@widgets/header";
 
 import "../globals.css";
 
-interface Props {
-  params: Promise<{
-    locale?: string;
-  }>;
+// [locale] 값을 열거해야 하위 라우트가 빌드 시점에 프리렌더된다.
+// 없으면 세그먼트 값을 모르므로 전부 요청 시 렌더링된다.
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
 }
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -59,11 +61,8 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-export default async function RootLayout({
-  children,
-  params,
-}: PropsWithChildren<Props>) {
-  const { locale } = await params;
+export default async function RootLayout({ children }: PropsWithChildren) {
+  const locale = await rootParams.locale();
   const messages = await getMessages();
 
   if (!hasLocale(routing.locales, locale)) {
@@ -71,7 +70,7 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang={locale ?? routing.defaultLocale}>
+    <html lang={locale}>
       <head>
         <meta
           content="tkdfXJ6-ynp9D_0x2zpVyESgoJIA3YtbN5LxrpjEGxQ"
@@ -129,10 +128,15 @@ export default async function RootLayout({
               <Header />
               <main className="mx-auto min-h-[calc(100vh-200px)] bg-white">
                 {children}
-                <Toaster />
+                {/* 우측 하단은 챗봇 플로팅 버튼 자리다. 기본값(bottom-right)이면
+                    토스트가 버튼을 덮어 클릭이 막히므로 하단 중앙으로 옮긴다. */}
+                <Toaster position="bottom-center" />
                 <GlobalQueryHandler />
               </main>
               <Footer />
+              {/* <main> 형제로 마운트해야 라우트 이동 시 언마운트되지 않는다.
+                  views/* 나 개별 page 에 두면 라우트마다 재마운트된다. */}
+              <ChatbotLauncher />
             </ReactQueryProvider>
           </NextIntlClientProvider>
         </NuqsAdapter>

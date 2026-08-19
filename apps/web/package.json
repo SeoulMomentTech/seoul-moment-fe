@@ -11,7 +11,9 @@
     "start": "next start",
     "test": "vitest",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui"
+    "test:e2e:ui": "playwright test --ui",
+    "typecheck": "next typegen && tsc --noEmit",
+    "typecheck:ts6": "next typegen && tsc6 --noEmit"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -32,8 +34,8 @@
     "ky": "^1.10.0",
     "lucide-react": "^0.511.0",
     "motion": "^12.43.0",
-    "next": "16.2.10",
-    "next-intl": "^4.1.0",
+    "next": "16.3.0",
+    "next-intl": "^4.13.5",
     "nuqs": "^2.7.0",
     "overlay-kit": "^1.8.6",
     "react": "19.2.7",
@@ -53,7 +55,6 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
     "@playwright/test": "^1.58.0",
     "@seoul-moment/eslint-config": "workspace:*",
     "@seoul-moment/tailwind-config": "workspace:*",
@@ -61,6 +62,7 @@
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
+    "@typescript/native": "npm:typescript@~7.0.2",
     "@types/node": "^20",
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
@@ -72,7 +74,7 @@
     "googleapis": "^150.0.1",
     "jsdom": "26.0.0",
     "tailwindcss": "^4",
-    "typescript": "^5",
+    "typescript": "npm:@typescript/typescript6@~6.0.2",
     "vite-tsconfig-paths": "^6.0.5",
     "vitest": "^4.0.18"
   }

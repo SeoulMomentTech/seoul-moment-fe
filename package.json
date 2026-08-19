@@ -22,10 +22,13 @@
     "test:admin-e2e:ui": "turbo run test:e2e:ui --filter=@seoul-moment/admin",
     "test:e2e": "turbo run test:e2e",
     "test:web-e2e": "turbo run test:e2e --filter=@seoul-moment/web",
-    "test:web-e2e:ui": "turbo run test:e2e:ui --filter=@seoul-moment/web"
+    "test:web-e2e:ui": "turbo run test:e2e:ui --filter=@seoul-moment/web",
+    "typecheck": "turbo run typecheck",
+    "typecheck:admin": "turbo run typecheck --filter=@seoul-moment/admin",
+    "typecheck:web": "turbo run typecheck --filter=@seoul-moment/web"
   },
   "devDependencies": {
-    "@next/eslint-plugin-next": "^15.3.1",
+    "@next/eslint-plugin-next": "^16.3.0",
     "@seoul-moment/prettier-config": "workspace:*",
     "eslint-plugin-react-hooks": "^5.2.0",
     "husky": "^9.1.7",
@@ -37,9 +40,15 @@
   },
   "packageManager": "pnpm@10.18.3",
   "pnpm": {
+    "peerDependencyRules": {
+      "allowedVersions": {
+        "tsconfck>typescript": "6"
+      }
+    },
     "overrides": {
       "@types/react": "19.2.17",
       "@types/react-dom": "19.2.3",
+      "postcss": "^8.5.26",
       "react": "19.2.7",
       "react-dom": "19.2.7"
     }

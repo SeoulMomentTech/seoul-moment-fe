@@ -13,14 +13,13 @@
   },
   "devDependencies": {
     "eslint": "^9",
-    "eslint-config-next": "15.3.1",
+    "eslint-config-next": "16.3.0",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-unused-imports": "^4.1.4",
-    "@eslint/eslintrc": "^3"
+    "eslint-plugin-unused-imports": "^4.1.4"
   },
   "peerDependencies": {
-    "typescript": "^5"
+    "typescript": "^6"
   },
   "keywords": [],
   "author": "",

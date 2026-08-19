@@ -15,8 +15,12 @@ pnpm build                     # or: pnpm -F @seoul-moment/ui build
 # Dev (watches and rebuilds CSS only)
 pnpm dev
 
+# Type-check only (TS 7; `pnpm typecheck:ts6` cross-checks with TS 6)
+pnpm typecheck
+
 # Lint
 pnpm lint
+pnpm lint:fix
 ```
 
 After modifying components, run `pnpm build` to regenerate `dist/` before testing in consuming apps.
@@ -26,7 +30,7 @@ After modifying components, run `pnpm build` to regenerate `dist/` before testin
 Three sequential steps in `pnpm build`:
 
 1. **`vite build`** - Bundles to `dist/index.js` (ES) and `dist/index.cjs` (CJS) with sourcemaps. React, react-dom, and all `@radix-ui/*` packages are externalized.
-2. **`tsc -b --force`** - Emits declaration files to `dist/types/` (declaration-only, no JS output).
+2. **`tsc -b --force`** - Emits declaration files to `dist/types/` (declaration-only, no JS output). `tsc` here is TypeScript 7 — see the "TypeScript 6/7 Dual Setup" section in the root `.claude/CLAUDE.md`.
 3. **`@tailwindcss/cli`** - Compiles `src/styles.css` to `dist/styles.css`.
 
 ## Component Patterns

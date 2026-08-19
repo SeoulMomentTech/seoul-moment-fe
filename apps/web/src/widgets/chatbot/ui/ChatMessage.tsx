@@ -1,0 +1,124 @@
+"use client";
+
+import { ArrowUpRight, CircleAlert } from "lucide-react";
+
+import { useTranslations } from "next-intl";
+
+import { useMediaQuery } from "@shared/lib/hooks";
+
+import { Link } from "@/i18n/navigation";
+
+import { cn } from "@seoul-moment/ui";
+
+import ChatEntityList from "./ChatEntityList";
+import ChatProductList from "./ChatProductList";
+import ChatSuggestions from "./ChatSuggestions";
+import {
+  CONTACT_LINK_TAGS,
+  WARNING_TAGS,
+  type ChatbotMessage,
+} from "../model/types";
+
+interface ChatMessageProps {
+  message: ChatbotMessage;
+  disabled?: boolean;
+  onRetry(message: ChatbotMessage): void;
+  onSelectSuggestion(suggestion: string): void;
+}
+
+export default function ChatMessage({
+  message,
+  disabled,
+  onRetry,
+  onSelectSuggestion,
+}: ChatMessageProps) {
+  const t = useTranslations();
+  const isUser = message.role === "user";
+  const showContactLink =
+    !!message.tag && CONTACT_LINK_TAGS.includes(message.tag);
+  const isWarning = !!message.tag && WARNING_TAGS.includes(message.tag);
+  // 모바일은 패널이 전체화면이라 같은 탭으로 이동하면 패널이 목적지를 덮어
+  // 사용자가 이동을 인지하지 못한다. 새 탭으로 열어 대화를 끊지 않고 목적지를
+  // 함께 보여준다. 데스크톱 팝오버는 페이지를 가리지 않으므로 같은 탭으로 이동한다.
+  const openInNewTab = useMediaQuery("(max-width: 640px)");
+  const newTabProps = openInNewTab
+    ? { rel: "noopener noreferrer", target: "_blank" }
+    : {};
+  // 목록도 칩과 마찬가지로 tag 가 아니라 배열 유무로 판단한다. 해당 tag 가 아니면
+  // 서버가 빈 배열을 주므로 이 규칙이 성립한다.
+  const entityItems = message.brands?.length
+    ? message.brands
+    : (message.categories ?? []);
+
+  return (
+    <div
+      className={cn(
+        "flex max-w-[86%] flex-col gap-1.5",
+        isUser ? "self-end" : "self-start",
+      )}
+    >
+      <div
+        className={cn(
+          "text-body-3 whitespace-pre-wrap rounded-xl px-3.5 py-2.5 leading-relaxed",
+          isUser
+            ? "border-brand/30 bg-brand/8 text-foreground rounded-br-sm border"
+            : "bg-neutral-subtle/30 text-foreground rounded-bl-sm",
+          isWarning && "border-brand/40 bg-brand/8 border",
+        )}
+      >
+        {message.text}
+
+        {showContactLink && (
+          <Link
+            className="border-neutral-subtle text-body-3 text-brand mt-2 flex min-h-9 items-center gap-1 border-t pt-2 font-semibold underline underline-offset-4"
+            href="/contact"
+            {...newTabProps}
+          >
+            {t("chatbot_escalate_label")}
+            <ArrowUpRight aria-hidden="true" size={14} />
+          </Link>
+        )}
+      </div>
+
+      {message.failed && (
+        <p className="text-body-5 text-danger flex flex-wrap items-center gap-2">
+          <CircleAlert aria-hidden="true" size={14} />
+          {t("chatbot_error_message")}
+          <button
+            className="min-h-8 rounded-md border border-current px-2 font-bold"
+            disabled={disabled}
+            onClick={() => onRetry(message)}
+            type="button"
+          >
+            {t("chatbot_retry_label")}
+          </button>
+        </p>
+      )}
+
+      {!isUser && !!message.products?.length && (
+        <ChatProductList
+          openInNewTab={openInNewTab}
+          products={message.products}
+        />
+      )}
+
+      {!isUser && (
+        <ChatEntityList
+          items={entityItems}
+          openInNewTab={openInNewTab}
+          parentCategory={message.parentCategory}
+          tag={message.tag}
+        />
+      )}
+
+      {/* 되묻기 칩. tag 가 아니라 배열 유무로 판단한다(OFF_TOPIC 에도 칩이 온다). */}
+      {!isUser && !!message.suggestions?.length && (
+        <ChatSuggestions
+          disabled={disabled}
+          onSelect={onSelectSuggestion}
+          suggestions={message.suggestions}
+        />
+      )}
+    </div>
+  );
+}
