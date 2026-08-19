@@ -49,6 +49,17 @@ You understand how to analyze local changes, compare them with a target branch (
    | `apps/admin/**`                     | `admin` |
    | `messages/**` or i18n-related files | `i18n`  |
 
+   **PR title prefix → Label mapping:**
+
+   | Title Prefix | Label     |
+   | ------------ | --------- |
+   | `release:`   | `release` |
+
+   This is matched on the **PR title**, not on commit types, and is additive to the two
+   tables above. It fires only on a bare `release:` prefix — `chore(release):` is a
+   version-bump PR into `develop`, not a production promotion, and gets no `release`
+   label.
+
    Combine all detected labels into a comma-separated string (e.g., `refactor,admin`).
 
 4. **PR Creation**
