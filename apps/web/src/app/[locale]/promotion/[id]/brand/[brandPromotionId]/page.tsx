@@ -9,7 +9,7 @@ import { reportMetadataError } from "@shared/lib/utils/log/report-metadata-error
 import { getBrandPromotionDetailV1 } from "@shared/services/brandPromotion";
 
 import type { LanguageType } from "@/i18n/const";
-import type { PageParams } from "@/types";
+import { resolveLocale } from "@/i18n/routing";
 
 import { PromotionPage } from "@views/promotion";
 
@@ -19,8 +19,9 @@ const fetchBrandPromotion = cache((id: number, languageCode: LanguageType) => {
 
 export async function generateMetadata({
   params,
-}: PageParams<{ id: string; brandPromotionId: string }>): Promise<Metadata> {
-  const { id, brandPromotionId, locale } = await params;
+}: PageProps<"/[locale]/promotion/[id]/brand/[brandPromotionId]">): Promise<Metadata> {
+  const { id, brandPromotionId, locale: rawLocale } = await params;
+  const locale = resolveLocale(rawLocale);
   const promotionId = Number(id);
   const parsedBrandPromotionId = Number(brandPromotionId);
 
@@ -61,8 +62,9 @@ export async function generateMetadata({
 
 export default async function PromotionBrand({
   params,
-}: PageParams<{ id: string; brandPromotionId: string }>) {
-  const { id, brandPromotionId, locale } = await params;
+}: PageProps<"/[locale]/promotion/[id]/brand/[brandPromotionId]">) {
+  const { id, brandPromotionId, locale: rawLocale } = await params;
+  const locale = resolveLocale(rawLocale);
   const promotionId = Number(id);
   const parsedBrandId = Number(brandPromotionId);
 
@@ -70,7 +72,7 @@ export default async function PromotionBrand({
     notFound();
   }
 
-  const promise = fetchBrandPromotion(parsedBrandId, locale as LanguageType)
+  const promise = fetchBrandPromotion(parsedBrandId, locale)
     .then((res) => {
       if (res.data.promotionId !== promotionId) {
         notFound();

@@ -5,9 +5,8 @@ import { notFound } from "next/navigation";
 import { isValidId } from "@shared/lib/utils";
 import { getBrandPromotionListById } from "@shared/services/brandPromotion";
 
-import type { LanguageType } from "@/i18n/const";
 import { redirect } from "@/i18n/navigation";
-import type { PageParams } from "@/types";
+import { resolveLocale } from "@/i18n/routing";
 
 const fetchBrandPromotionList = cache((id: number) => {
   return getBrandPromotionListById(id);
@@ -15,8 +14,9 @@ const fetchBrandPromotionList = cache((id: number) => {
 
 export default async function Promotion({
   params,
-}: PageParams<{ id: string }>) {
-  const { id, locale } = await params;
+}: PageProps<"/[locale]/promotion/[id]">) {
+  const { id, locale: rawLocale } = await params;
+  const locale = resolveLocale(rawLocale);
   const promotionId = Number(id);
 
   if (!isValidId(promotionId)) {
@@ -39,6 +39,6 @@ export default async function Promotion({
 
   redirect({
     href: `/promotion/${id}/brand/${brand.id}`,
-    locale: locale as LanguageType,
+    locale,
   });
 }

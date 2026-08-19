@@ -7,8 +7,8 @@ import { getBrandFilter } from "@shared/services/brand";
 import { getCategories } from "@shared/services/category";
 import { getProductBanner, getProductList } from "@shared/services/product";
 
-import type { LanguageType } from "@/i18n/const";
 import { buildLocalizedAlternates } from "@/i18n/metadata";
+import { resolveLocale } from "@/i18n/routing";
 
 import { ProductPage } from "@views/product";
 
@@ -46,10 +46,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Product({
   searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
-  const locale = (await rootParams.locale()) as LanguageType;
+}: PageProps<"/[locale]/product">) {
+  const locale = resolveLocale(await rootParams.locale());
   const resolvedSearchParams = await searchParams;
 
   const isFiltered = PRODUCT_FILTER_KEYS.some(
@@ -73,7 +71,7 @@ export default async function Product({
       productCategoryId: undefined,
       sortColumn: undefined,
       optionIdList: [],
-      languageCode: locale as LanguageType,
+      languageCode: locale,
     };
 
     await Promise.all([
