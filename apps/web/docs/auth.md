@@ -31,15 +31,20 @@ apps/web/src/
 │   │   ├── useUserLoginMutation.ts      # 이메일/비밀번호 로그인
 │   │   ├── useGoogleLoginMutation.ts    # Google 1-step (분기 응답)
 │   │   ├── useGoogleLinkMutation.ts     # Google 2-A (계정 연결)
-│   │   └── useGoogleSignupMutation.ts   # Google 2-B (신규 가입)
+│   │   ├── useGoogleSignupMutation.ts   # Google 2-B (신규 가입)
+│   │   ├── useLineLoginMutation.ts      # LINE 1-step (분기 응답)
+│   │   ├── useLineLinkMutation.ts       # LINE 2-A (계정 연결)
+│   │   └── useLineSignupMutation.ts     # LINE 2-B (신규 가입)
 │   ├── lib/
-│   │   ├── googleIdentity.ts            # GIS 초기화 + idToken 요청
-│   │   └── snsAuthStorage.ts            # signupToken/email sessionStorage
+│   │   ├── googleIdentity.ts            # GIS 초기화 + idToken 요청 (팝업)
+│   │   ├── lineIdentity.ts              # LIFF 동적 로드 + idToken (리다이렉트)
+│   │   ├── snsAuthStorage.ts            # provider/signupToken/email sessionStorage
+│   │   └── snsAuthStorage.test.ts
 │   ├── model/schema.ts                  # loginFormResolver
 │   └── ui/
 │       ├── LoginForm.tsx                # 이메일/비번 폼
-│       ├── SocialLoginButtons.tsx       # Google 버튼 + 응답 3분기 처리
-│       └── GoogleLinkConfirmDialog.tsx  # 계정 연결 확인 다이얼로그
+│       ├── SocialLoginButtons.tsx       # Google/LINE 버튼 + 응답 3분기 처리
+│       └── SnsLinkConfirmDialog.tsx     # 계정 연결 확인 다이얼로그 (provider 공통)
 ├── features/signup/
 │   ├── api/
 │   │   ├── usePostUserEmailCodeMutation.ts   # 가입용 이메일 코드 발송
@@ -86,13 +91,15 @@ sequenceDiagram
     Note over Form: 실패 시 onError → toast "login_failed"
 ```
 
-### 2) SNS Google 3-step (login / link / signup)
+### 2) SNS 3-step (login / link / signup) — Google / LINE
 
-`SocialLoginButtons.handleGoogleClick`이 `requestGoogleIdToken()`으로 GIS 팝업을 띄워 idToken을 얻고, `useGoogleLoginMutation`으로 `POST user/auth/google/login`을 호출한다. 응답 `PostGoogleLoginResponse`는 **3분기**로 처리된다.
+provider는 **Google**과 **LINE** 두 개다. 요청·응답 shape이 동일해 `shared/services/auth.ts`가 `PostSns*` 공통 타입을 정의하고 provider별 이름을 alias로 둔다. **id_token을 얻는 계층만** 갈린다.
+
+`SocialLoginButtons.handleGoogleClick`이 `requestGoogleIdToken()`으로 GIS 팝업을 띄워 idToken을 얻고, `useGoogleLoginMutation`으로 `POST user/auth/google/login`을 호출한다. 응답 `PostSnsLoginResponse`는 **3분기**로 처리되며, 분기 처리는 `handleSnsLoginSuccess(provider, data)`가 provider 공통으로 담당한다.
 
 - **분기 C — 이미 연결된 계정**: `token && refreshToken` → 호출부(`SocialLoginButtons.onSuccess`)에서 직접 `login()` 호출.
-- **분기 A — 연결 확인 필요**: `needsLinkConfirm && linkToken && email` → `linkPrompt` state로 `GoogleLinkConfirmDialog` 오픈 → "연결하기" 클릭 시 `useGoogleLinkMutation`(`POST user/auth/google/link`). 이 훅은 **훅 내부에서** `login()`을 호출한다. `linkToken`은 sessionStorage에 저장하지 않고 컴포넌트 state로만 보유(5분 만료).
-- **분기 B — 신규 가입 필요**: `needsSignup && signupToken && email` → `saveSnsSignupContext()`로 sessionStorage에 저장 후 `/signup/sns`로 `router.push`. `SnsSignupForm`이 마운트 시 `readSnsSignupContext()`로 복원(없으면 `/login` replace), 닉네임+약관 입력 후 `useGoogleSignupMutation`(`POST user/auth/google/signup`)을 호출한다. 이 훅도 **내부에서** `login()`을 호출하며 `toastOnError: true`. 성공 시 `clearSnsSignupContext()` + 토스트 후 `/login` replace.
+- **분기 A — 연결 확인 필요**: `needsLinkConfirm && linkToken && email` → `linkPrompt` state로 `SnsLinkConfirmDialog` 오픈 → "연결하기" 클릭 시 `useGoogleLinkMutation`(`POST user/auth/google/link`). 이 훅은 **훅 내부에서** `login()`을 호출한다. `linkToken`은 sessionStorage에 저장하지 않고 컴포넌트 state로만 보유(5분 만료).
+- **분기 B — 신규 가입 필요**: `needsSignup && signupToken` (LINE은 이메일이 없을 수 있어 `email`을 요구하지 않는다) → `saveSnsSignupContext()`로 sessionStorage에 저장 후 `/signup/sns`로 `router.push`. `SnsSignupForm`이 마운트 시 `readSnsSignupContext()`로 복원(없으면 `/login` replace), 닉네임+약관 입력 후 `context.provider`에 따라 `use{Google,Line}SignupMutation`을 골라 호출한다. 이 훅들도 **내부에서** `login()`을 호출하며 `toastOnError: true`. 성공 시 `clearSnsSignupContext()` + 토스트 후 `/login` replace.
 
 > `login()` 호출 위치가 일관되지 않음에 주의: 분기 C(login)는 **호출부**에서, 분기 A/B(link·signup)는 **훅 내부**에서 호출한다. (정리 후보는 SNS 레퍼런스 §8 참조)
 
@@ -104,7 +111,7 @@ sequenceDiagram
     participant GI as googleIdentity
     participant API as POST user/auth/google/login
     participant Store as useUserAuthStore
-    participant Dlg as GoogleLinkConfirmDialog
+    participant Dlg as SnsLinkConfirmDialog
     participant SS as snsAuthStorage
     participant Form as SnsSignupForm
 
@@ -122,8 +129,8 @@ sequenceDiagram
         Dlg->>API: useGoogleLinkMutation.mutate({ linkToken })
         API-->>Dlg: UserLoginResponse { token, refreshToken }
         Dlg->>Store: login(...) (훅 내부 자동 호출)
-    else 분기 B — needsSignup + signupToken + email
-        SB->>SS: saveSnsSignupContext({ signupToken, email })
+    else 분기 B — needsSignup + signupToken
+        SB->>SS: saveSnsSignupContext({ provider, signupToken, email? })
         SB->>U: router.push("/signup/sns")
         U->>Form: 닉네임 + 마케팅 동의 입력
         Form->>SS: readSnsSignupContext()
@@ -135,6 +142,21 @@ sequenceDiagram
         SB->>U: toast "google_login_response_error"
     end
 ```
+
+#### LINE만 다른 점 — 리다이렉트
+
+Google GIS는 팝업이라 페이지를 떠나지 않지만, LIFF는 `liff.login()`이 LINE 인증 화면으로 **네비게이션**하고 등록된 Endpoint URL로 되돌아온다. 그래서 `SocialLoginButtons`에 복귀를 이어받는 단계가 하나 더 있다.
+
+- 나갈 때: `markLineLoginPending()`으로 `sns:linePending` 플래그를 심고 `startLineLogin()`.
+- 돌아올 때: 마운트 effect가 플래그가 있을 때만 `getValidLineIdToken()` → login mutation. 플래그는 읽는 즉시 소비되어 StrictMode 이중 실행에 안전하다.
+
+플래그 없이 LIFF 세션 유무로 판단하면, 이메일로 로그인하려고 들어온 사용자까지 LINE 플로우로 끌려간다.
+
+또 **id_token은 1시간, LIFF 세션은 12시간**이라 `isLoggedIn()`이 true인데 토큰만 만료된 구간이 생긴다. LIFF에 갱신 API가 없으므로 `getValidLineIdToken()`이 `exp`를 미리 검사하고, `startLineLogin()`이 `liff.login()` 전에 `liff.logout()`을 호출해 새 토큰을 강제한다.
+
+LINE 버튼은 `NEXT_PUBLIC_LINE_LIFF_ID`가 있을 때만 렌더된다.
+
+자세한 내용은 [`.claude/references/sns-auth-flow.md`](../../../.claude/references/sns-auth-flow.md) 참조.
 
 ### 3) 토큰 갱신 (401 → refresh → 재시도)
 
@@ -207,8 +229,16 @@ stateDiagram-v2
 | `useGoogleLoginMutation` | Google 1-step. 분기 응답을 콜백으로만 전달(login은 호출부 책임) | `features/login/api/useGoogleLoginMutation.ts` |
 | `useGoogleLinkMutation` | Google 계정 연결(2-A). 훅 내부에서 `login()` | `features/login/api/useGoogleLinkMutation.ts` |
 | `useGoogleSignupMutation` | Google 신규 가입(2-B). 훅 내부에서 `login()` + `toastOnError` | `features/login/api/useGoogleSignupMutation.ts` |
+| `useLineLoginMutation` | LINE 1-step. 분기 응답을 콜백으로만 전달(login은 호출부 책임) | `features/login/api/useLineLoginMutation.ts` |
+| `useLineLinkMutation` | LINE 계정 연결(2-A). 훅 내부에서 `login()` | `features/login/api/useLineLinkMutation.ts` |
+| `useLineSignupMutation` | LINE 신규 가입(2-B). 훅 내부에서 `login()` + `toastOnError` | `features/login/api/useLineSignupMutation.ts` |
 | `requestGoogleIdToken` | GIS 초기화 후 prompt 트리거, idToken resolve. 취소/미표시 시 `GoogleSignInCancelledError` | `features/login/lib/googleIdentity.ts` |
-| `saveSnsSignupContext` / `readSnsSignupContext` / `clearSnsSignupContext` | SNS 가입 `signupToken`+`email` sessionStorage 저장/복원/삭제 | `features/login/lib/snsAuthStorage.ts` |
+| `isLineLoginConfigured` | `NEXT_PUBLIC_LINE_LIFF_ID` 유무. false면 LINE 버튼 미렌더 | `features/login/lib/lineIdentity.ts` |
+| `getValidLineIdToken` | LIFF init 후 만료되지 않은 id_token 반환, 없으면 `null` | `features/login/lib/lineIdentity.ts` |
+| `startLineLogin` | `liff.logout()` 후 `liff.login()` — LINE 인증 화면으로 리다이렉트 | `features/login/lib/lineIdentity.ts` |
+| `clearLineSession` | `liff.logout()`. 서버가 id_token을 거절했을 때 세션 폐기 | `features/login/lib/lineIdentity.ts` |
+| `saveSnsSignupContext` / `readSnsSignupContext` / `clearSnsSignupContext` | SNS 가입 `provider`+`signupToken`+`email?` sessionStorage 저장/복원/삭제 | `features/login/lib/snsAuthStorage.ts` |
+| `markLineLoginPending` / `consumeLineLoginPending` | LIFF 리다이렉트 왕복 식별 플래그 (`sns:linePending`) | `features/login/lib/snsAuthStorage.ts` |
 | `usePostUserEmailCodeMutation` | 가입용 이메일 코드 발송. `toastOnError` | `features/signup/api/usePostUserEmailCodeMutation.ts` |
 | `useVerifyEmailCodeMutation` | 이메일 코드 검증 (legacy `auth/email/verify`) | `features/signup/api/useVerifyEmailCodeMutation.ts` |
 | `usePostUserPhoneCodeMutation` | 가입용 휴대폰 코드 발송 (현재 폼 미연동) | `features/signup/api/usePostUserPhoneCodeMutation.ts` |
@@ -216,6 +246,7 @@ stateDiagram-v2
 | `useUserSignUpMutation` | 최종 회원가입 제출. `toastOnError` | `features/signup/api/useUserSignUpMutation.ts` |
 | `postUserLogin` / `postUserSignUp` | 로그인 / 가입 API 함수 | `shared/services/auth.ts` |
 | `postGoogleLogin` / `postGoogleLink` / `postGoogleSignup` | Google 3-step API 함수 | `shared/services/auth.ts` |
+| `postLineLogin` / `postLineLink` / `postLineSignup` | LINE 3-step API 함수 | `shared/services/auth.ts` |
 | `getUserOneTimeToken` | one-time-token(access 재발급) API 함수 | `shared/services/auth.ts` |
 | `refreshAccessToken` | 401 시 `refreshApi`로 토큰 갱신, `refreshPromise` 단일화 | `shared/services/index.ts` |
 | `useUserAuthStore` | 인증 상태(accessToken/refreshToken/id/exp) Zustand persist. `login`/`logout`/`updateAccessToken` | `shared/lib/hooks/useUserAuthStore.ts` |
@@ -227,7 +258,7 @@ stateDiagram-v2
 | --- | --- | --- | --- |
 | `accessToken`, `refreshToken` | `useUserAuthStore` → localStorage (persist key `user-auth`) | 로그아웃까지 | 갱신 시 `updateAccessToken`이 새 토큰의 `id`/`exp` 재추출 |
 | `id`, `exp` (JWT claims) | `useUserAuthStore` (persist 대상) | accessToken과 동일 | `decodeJWT`(`shared/lib/utils.ts`)로 추출 |
-| `signupToken` + `email` | `snsAuthStorage` → sessionStorage (`sns:signupToken`, `sns:signupEmail`) | 탭 종료 / `clearSnsSignupContext()` | JWT 자체는 10분 만료 |
+| `provider` + `signupToken` + `email?` | `snsAuthStorage` → sessionStorage (`sns:provider`, `sns:signupToken`, `sns:signupEmail`) | 탭 종료 / `clearSnsSignupContext()` | JWT 자체는 10분 만료. `email`은 LINE에서 없을 수 있음 |
 | `linkToken` + `email` | `SocialLoginButtons` 컴포넌트 state(`linkPrompt`) | 다이얼로그 닫힘 / unmount | sessionStorage 미저장, JWT 5분 만료 |
 
 ## 참고

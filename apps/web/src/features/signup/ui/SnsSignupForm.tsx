@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 import { useGoogleSignupMutation } from "@features/login/api/useGoogleSignupMutation";
+import { useLineSignupMutation } from "@features/login/api/useLineSignupMutation";
 import {
   clearSnsSignupContext,
   readSnsSignupContext,
@@ -66,13 +67,21 @@ export function SnsSignupForm() {
   const { status: nicknameStatus, message: nicknameMessage } =
     useNicknameValidate({ nickname });
 
-  const signupMutation = useGoogleSignupMutation({
-    onSuccess: () => {
-      clearSnsSignupContext();
-      toast.success(t("registration_completed"), { position: "top-center" });
-      router.replace("/login");
-    },
+  const handleSignupSuccess = () => {
+    clearSnsSignupContext();
+    toast.success(t("registration_completed"), { position: "top-center" });
+    router.replace("/login");
+  };
+
+  // 훅은 조건부로 호출할 수 없으므로 둘 다 생성하고 provider 로 골라 쓴다.
+  const googleSignupMutation = useGoogleSignupMutation({
+    onSuccess: handleSignupSuccess,
   });
+  const lineSignupMutation = useLineSignupMutation({
+    onSuccess: handleSignupSuccess,
+  });
+  const signupMutation =
+    context?.provider === "line" ? lineSignupMutation : googleSignupMutation;
 
   const onSubmit: SubmitHandler<SnsSignupFormValues> = (values) => {
     if (!context) return;
@@ -93,17 +102,20 @@ export function SnsSignupForm() {
   return (
     <form className="w-full" onSubmit={handleSubmit(onSubmit)}>
       <VStack className="w-full pt-[64px]" gap={16}>
-        <Flex className="w-full" direction="column" gap={6}>
-          <p className="text-body-3 leading-none text-black/60">
-            {t("account")}
-          </p>
-          <Input
-            className="bg-black/5 max-sm:h-12"
-            disabled
-            readOnly
-            value={context.email}
-          />
-        </Flex>
+        {/* LINE 은 이메일을 주지 않을 수 있다. 없으면 계정 필드를 노출하지 않는다. */}
+        {context.email && (
+          <Flex className="w-full" direction="column" gap={6}>
+            <p className="text-body-3 leading-none text-black/60">
+              {t("account")}
+            </p>
+            <Input
+              className="bg-black/5 max-sm:h-12"
+              disabled
+              readOnly
+              value={context.email}
+            />
+          </Flex>
+        )}
 
         <Flex className="w-full" direction="column" gap={6}>
           <Input

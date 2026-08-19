@@ -167,7 +167,19 @@ password flows.
   `user/auth/email/verify` swagger entry is published. The legacy
   `postEmailCode` (`auth/email/code`) function is kept as a fallback but
   no longer wired to signup.
-- **SNS auth (Google only).** Login/signup via `/user/auth/google/{login,link,signup}`
-  3-step flow. Shared signup UI (`/signup/sns`, `snsAuthStorage`, `SnsSignupForm`)
-  wraps a Google-only comms layer (`google*` hooks). Apple/Kakao/Naver not implemented.
-  See `.claude/references/sns-auth-flow.md`.
+- **SNS auth (Google + LINE).** Login/signup via `/user/auth/{google,line}/{login,link,signup}`
+  3-step flow. Both providers share the request/response shape, so `services/auth.ts`
+  defines `PostSns*` types with per-provider aliases; only the id_token layer differs
+  (`googleIdentity.ts` popup vs `lineIdentity.ts` redirect). Apple/Kakao/Naver not
+  implemented. See `.claude/references/sns-auth-flow.md`.
+  - **LINE is redirect-based, not popup.** `liff.login()` leaves the page, so
+    `SocialLoginButtons` resumes on mount — but only when it set the `sns:linePending`
+    flag itself. Judging by LIFF session alone would hijack `/login` for anyone with a
+    live LIFF session.
+  - **LINE id_token lives 1h, the LIFF session 12h.** `isLoggedIn()` stays true after
+    the token dies and LIFF has no renew API, so `getValidLineIdToken()` checks `exp`
+    up front and `startLineLogin()` calls `liff.logout()` before `liff.login()`.
+  - **LINE may not provide an email** (scope unapproved / user declined / no email on
+    the account). `SnsSignupContext.email` is optional and the signup form hides the
+    account field when it is missing.
+  - The LINE button renders only when `NEXT_PUBLIC_LINE_LIFF_ID` is set.
