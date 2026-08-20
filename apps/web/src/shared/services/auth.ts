@@ -74,6 +74,10 @@ export interface PostSnsLoginResponse {
   signupToken?: string;
   /** 신규 가입 시 닉네임 입력칸 기본값으로 쓰는 SNS 표시 이름. profile scope 미동의 시 내려오지 않는다 */
   name?: string;
+  /** provider가 이메일을 주지 않아(동의 화면에서 거부) 이메일을 직접 입력받아야 하는지 여부. true면 emailToken이 내려가고, 이메일 입력 화면에서 email/code → email/verify 순으로 호출 필요 */
+  needsEmail?: boolean;
+  /** 이메일 직접 입력이 필요한 경우 code/verify API에 전달할 단기 JWT (10분 만료). SNS 계정 식별자(sub)를 담고 있다 */
+  emailToken?: string;
   /** 이미 연결된 계정인 경우 발급되는 access token */
   token?: string;
   /** 이미 연결된 계정인 경우 발급되는 refresh token */
@@ -108,6 +112,18 @@ export type PostLineLoginPayload = PostSnsLoginPayload;
 export type PostLineLoginResponse = PostSnsLoginResponse;
 export type PostLineLinkPayload = PostSnsLinkPayload;
 export type PostLineSignupPayload = PostSnsSignupPayload;
+
+export interface PostLineEmailCodePayload {
+  /** LINE login 응답으로 받은 단기 emailToken */
+  emailToken: string;
+  /** 사용자가 직접 입력한 이메일 */
+  email: string;
+}
+
+export interface PostLineEmailVerifyPayload extends PostLineEmailCodePayload {
+  /** 메일로 받은 6자리 인증 코드 */
+  code: string;
+}
 
 /**
  * @description 유저 회원가입 (응답: 204 No Content)
@@ -298,11 +314,29 @@ export const postGoogleSignup = (data: PostGoogleSignupPayload) =>
     .json<CommonRes<UserLoginResponse>>();
 
 /**
- * @description LINE 로그인 / 연결확인 / 신규가입 분기 (1단계). idToken 검증 후 토큰 또는 linkToken/signupToken 발급 (401: 유효하지 않은 idToken 또는 이메일 제공 미동의)
+ * @description LINE 로그인 / 이메일입력 / 연결확인 / 신규가입 분기 (1단계). idToken 검증 후 토큰 또는 emailToken/linkToken/signupToken 발급 (401: 유효하지 않은 idToken)
  */
 export const postLineLogin = (data: PostLineLoginPayload) =>
   api
     .post("user/auth/line/login", {
+      json: data,
+    })
+    .json<CommonRes<PostLineLoginResponse>>();
+
+/**
+ * @description LINE 이메일 직접 입력용 인증 코드 발송 (1-B단계). LINE이 이메일을 주지 않은 경우 사용. 회원가입용 email/code 와 달리 이미 가입된 이메일이어도 409를 내지 않는다. 코드는 5분간 유효 (응답 없음 / 401: emailToken 만료·변조 / 500: 메일 발송 실패)
+ */
+export const postLineEmailCode = (data: PostLineEmailCodePayload) =>
+  api.post("user/auth/line/email/code", {
+    json: data,
+  });
+
+/**
+ * @description LINE 이메일 직접 입력용 인증 코드 검증 (1-B단계). 검증 성공 시 login 과 동일한 shape으로 연결확인(linkToken) / 신규가입(signupToken) 분기 응답 (401: emailToken 만료·변조 또는 인증 코드 만료·불일치)
+ */
+export const postLineEmailVerify = (data: PostLineEmailVerifyPayload) =>
+  api
+    .post("user/auth/line/email/verify", {
       json: data,
     })
     .json<CommonRes<PostLineLoginResponse>>();
