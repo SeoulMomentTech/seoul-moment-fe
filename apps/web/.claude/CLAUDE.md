@@ -176,6 +176,15 @@ password flows.
     `SocialLoginButtons` resumes on mount — but only when it set the `sns:linePending`
     flag itself. Judging by LIFF session alone would hijack `/login` for anyone with a
     live LIFF session.
+  - **Never consume `sns:linePending` when reading it.** The resume is interrupted
+    twice: StrictMode double-invokes the effect, and LIFF reloads the page from the
+    primary redirect URL to the secondary one. Clearing the flag up front means the
+    holder is always the side that gets discarded, so nobody finishes the login — this
+    was a real bug. `readLineLoginPending()` only peeks (TTL 5min) and
+    `clearLineLoginPending()` runs at terminal outcomes only; the in-flight token
+    lookup is shared through a `useRef` so the second invocation joins it. On a load
+    where `isLineRedirectPending()` is true, a missing token is not a cancellation.
+    Regression test: `SocialLoginButtons.test.tsx`.
   - **LINE id_token lives 1h, the LIFF session 12h.** `isLoggedIn()` stays true after
     the token dies and LIFF has no renew API, so `getValidLineIdToken()` checks `exp`
     up front and `startLineLogin()` calls `liff.logout()` before `liff.login()`.

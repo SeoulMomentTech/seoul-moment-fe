@@ -66,6 +66,19 @@ const isIdTokenExpired = (idToken: string) => {
 };
 
 /**
+ * LIFF 가 primary redirect URL(= 콘솔에 등록한 Endpoint URL) 로 보낸 로드인지.
+ *
+ * 외부 브라우저 로그인은 복귀 시 페이지를 두 번 로드한다. 먼저 인증 코드가
+ * 실린 primary URL 이 열리고, 그 로드의 liff.init() 이 코드를 교환한 뒤
+ * liffRedirectUri(= 우리가 넘긴 redirectUri) 로 다시 이동한다. 따라서 이
+ * 로드에서 아직 토큰을 못 얻는 것은 실패가 아니라 정상 중간 단계다.
+ */
+export const isLineRedirectPending = (): boolean => {
+  if (typeof window === "undefined") return false;
+  return new URLSearchParams(window.location.search).has("liffRedirectUri");
+};
+
+/**
  * 바로 쓸 수 있는 id_token 이 있으면 반환한다.
  * LIFF 세션이 없거나 id_token 이 만료됐으면 null 이며,
  * 이때 호출부는 startLineLogin() 으로 재인증해야 한다.

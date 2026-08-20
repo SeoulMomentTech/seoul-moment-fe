@@ -2,9 +2,10 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import {
   clearSnsSignupContext,
-  consumeLineLoginPending,
+  clearLineLoginPending,
   isSnsSignupReady,
   markLineLoginPending,
+  readLineLoginPending,
   readSnsSignupContext,
   saveSnsSignupContext,
 } from "./snsAuthStorage";
@@ -141,22 +142,52 @@ describe("clearSnsSignupContext", () => {
   });
 });
 
-describe("markLineLoginPending / consumeLineLoginPending", () => {
+describe("LINE pending 플래그", () => {
   it("표시하지 않았으면 false를 반환한다", () => {
-    expect(consumeLineLoginPending()).toBe(false);
+    expect(readLineLoginPending()).toBe(false);
   });
 
-  it("표시한 뒤 첫 호출만 true이고 이후에는 false다", () => {
+  it("읽어도 소비되지 않아 여러 번 true다", () => {
+    // 복귀 처리는 StrictMode 이중 실행과 LIFF 2회 로드를 거치므로, 읽는
+    // 것만으로 플래그가 사라지면 정작 토큰을 쓸 수 있는 쪽이 놓친다.
     markLineLoginPending();
 
-    expect(consumeLineLoginPending()).toBe(true);
-    expect(consumeLineLoginPending()).toBe(false);
+    expect(readLineLoginPending()).toBe(true);
+    expect(readLineLoginPending()).toBe(true);
+  });
+
+  it("clearLineLoginPending 이후에는 false다", () => {
+    markLineLoginPending();
+    clearLineLoginPending();
+
+    expect(readLineLoginPending()).toBe(false);
   });
 
   it("가입 컨텍스트를 지워도 pending 플래그는 남는다", () => {
     markLineLoginPending();
     clearSnsSignupContext();
 
-    expect(consumeLineLoginPending()).toBe(true);
+    expect(readLineLoginPending()).toBe(true);
+  });
+
+  it("TTL(5분)을 넘긴 플래그는 무시하고 제거한다", () => {
+    const sixMinutesAgo = Date.now() - 6 * 60 * 1000;
+    window.sessionStorage.setItem("sns:linePending", String(sixMinutesAgo));
+
+    expect(readLineLoginPending()).toBe(false);
+    expect(window.sessionStorage.getItem("sns:linePending")).toBeNull();
+  });
+
+  it("숫자가 아닌 값은 깨진 플래그로 보고 무시한다", () => {
+    window.sessionStorage.setItem("sns:linePending", "yes");
+
+    expect(readLineLoginPending()).toBe(false);
+  });
+
+  it('타임스탬프가 없던 구버전 플래그("1")도 무시한다', () => {
+    // 배포 시점에 남아 있던 이전 형식. 1970년으로 읽혀 TTL 로 걸러진다.
+    window.sessionStorage.setItem("sns:linePending", "1");
+
+    expect(readLineLoginPending()).toBe(false);
   });
 });

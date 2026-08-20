@@ -161,7 +161,9 @@ sequenceDiagram
 Google GIS는 팝업이라 페이지를 떠나지 않지만, LIFF는 `liff.login()`이 LINE 인증 화면으로 **네비게이션**하고 등록된 Endpoint URL로 되돌아온다. 그래서 `SocialLoginButtons`에 복귀를 이어받는 단계가 하나 더 있다.
 
 - 나갈 때: `markLineLoginPending()`으로 `sns:linePending` 플래그를 심고 `startLineLogin()`.
-- 돌아올 때: 마운트 effect가 플래그가 있을 때만 `getValidLineIdToken()` → login mutation. 플래그는 읽는 즉시 소비되어 StrictMode 이중 실행에 안전하다.
+- 돌아올 때: 마운트 effect가 플래그가 있을 때만 `getValidLineIdToken()` → login mutation.
+
+플래그는 **읽을 때 소비하지 않는다.** StrictMode의 effect 이중 실행과 LIFF의 2회 로드(primary → secondary) 때문에, 시작 시점에 지우면 정작 토큰을 쓸 수 있는 쪽에 플래그가 남지 않아 로그인이 완료되지 않는다. 제거는 종료 시점에만 하고, 중복 실행은 진행 중 작업을 `useRef`로 공유해 막는다. 방치된 플래그는 TTL 5분으로 무효화한다.
 
 플래그 없이 LIFF 세션 유무로 판단하면, 이메일로 로그인하려고 들어온 사용자까지 LINE 플로우로 끌려간다.
 
@@ -251,7 +253,8 @@ stateDiagram-v2
 | `startLineLogin` | `liff.logout()` 후 `liff.login()` — LINE 인증 화면으로 리다이렉트 | `features/login/lib/lineIdentity.ts` |
 | `clearLineSession` | `liff.logout()`. 서버가 id_token을 거절했을 때 세션 폐기 | `features/login/lib/lineIdentity.ts` |
 | `saveSnsSignupContext` / `readSnsSignupContext` / `clearSnsSignupContext` | SNS 가입 `provider`+`signupToken`+`email?` sessionStorage 저장/복원/삭제 | `features/login/lib/snsAuthStorage.ts` |
-| `markLineLoginPending` / `consumeLineLoginPending` | LIFF 리다이렉트 왕복 식별 플래그 (`sns:linePending`) | `features/login/lib/snsAuthStorage.ts` |
+| `markLineLoginPending` / `readLineLoginPending` / `clearLineLoginPending` | LIFF 리다이렉트 왕복 식별 플래그 (`sns:linePending`, TTL 5분). 읽어도 소비하지 않는다 | `features/login/lib/snsAuthStorage.ts` |
+| `isLineRedirectPending` | URL의 `liffRedirectUri`로 primary redirect 로드 판별 | `features/login/lib/lineIdentity.ts` |
 | `usePostUserEmailCodeMutation` | 가입용 이메일 코드 발송. `toastOnError` | `features/signup/api/usePostUserEmailCodeMutation.ts` |
 | `useVerifyEmailCodeMutation` | 이메일 코드 검증 (legacy `auth/email/verify`) | `features/signup/api/useVerifyEmailCodeMutation.ts` |
 | `usePostUserPhoneCodeMutation` | 가입용 휴대폰 코드 발송 (현재 폼 미연동) | `features/signup/api/usePostUserPhoneCodeMutation.ts` |

@@ -91,6 +91,12 @@ export const clearSnsSignupContext = () => {
 };
 
 /**
+ * 소비하지 않고 확인만 했을 때, 방치된 시도가 나중 방문에서 갑자기 로그인으로
+ * 이어지지 않도록 두는 상한. 동의 화면 체류 + LIFF 2회 로드를 덮을 만큼 넉넉하다.
+ */
+const LINE_PENDING_TTL_MS = 5 * 60 * 1000;
+
+/**
  * LINE 인증 화면으로 나가기 직전에 표시한다. LIFF 로그인은 리다이렉트라서
  * 복귀 시점에 "우리가 시작한 로그인인지"를 이 플래그로만 판단한다.
  * 플래그 없이 LIFF 세션 유무로 판단하면, 이메일 로그인을 하려고 들어온
@@ -98,19 +104,38 @@ export const clearSnsSignupContext = () => {
  */
 export const markLineLoginPending = () => {
   if (typeof window === "undefined") return;
-  window.sessionStorage.setItem(LINE_PENDING_KEY, "1");
+  window.sessionStorage.setItem(LINE_PENDING_KEY, String(Date.now()));
 };
 
 /**
- * 플래그를 읽고 즉시 제거한다. StrictMode 의 effect 이중 실행에서도
- * 한 번만 true 가 된다.
+ * 플래그를 **소비하지 않고** 확인한다.
+ *
+ * 복귀 처리는 두 번 중단될 수 있다. StrictMode 는 effect 를 mount → cleanup →
+ * mount 로 이중 실행하고, LIFF 는 primary redirect URL 에서 인증 코드를 교환한
+ * 뒤 secondary URL 로 다시 이동시킨다. 시작 시점에 플래그를 지우면 정작
+ * 토큰을 쓸 수 있는 쪽에는 플래그가 남지 않아 로그인이 완료되지 않는다.
+ * 그래서 제거는 종료 시점(clearLineLoginPending)에만 한다.
  */
-export const consumeLineLoginPending = (): boolean => {
+export const readLineLoginPending = (): boolean => {
   if (typeof window === "undefined") return false;
 
-  const pending = window.sessionStorage.getItem(LINE_PENDING_KEY);
-  if (!pending) return false;
+  const raw = window.sessionStorage.getItem(LINE_PENDING_KEY);
+  if (!raw) return false;
 
-  window.sessionStorage.removeItem(LINE_PENDING_KEY);
+  const startedAt = Number(raw);
+  if (
+    !Number.isFinite(startedAt) ||
+    Date.now() - startedAt > LINE_PENDING_TTL_MS
+  ) {
+    window.sessionStorage.removeItem(LINE_PENDING_KEY);
+    return false;
+  }
+
   return true;
+};
+
+/** 복귀 처리가 끝났을 때(로그인 발사 · 취소 확정 · 오류)만 호출한다. */
+export const clearLineLoginPending = () => {
+  if (typeof window === "undefined") return;
+  window.sessionStorage.removeItem(LINE_PENDING_KEY);
 };

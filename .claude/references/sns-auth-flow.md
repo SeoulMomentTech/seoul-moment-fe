@@ -127,7 +127,7 @@ sequenceDiagram
 `apps/web/src/features/login/lib/snsAuthStorage.ts`
 
 - 키: `sns:provider`, `sns:signupToken`, `sns:signupEmail`, `sns:emailToken`, `sns:linePending` (모두 sessionStorage)
-- 함수: `saveSnsSignupContext`, `readSnsSignupContext`, `clearSnsSignupContext`, `isSnsSignupReady`, `markLineLoginPending`, `consumeLineLoginPending`
+- 함수: `saveSnsSignupContext`, `readSnsSignupContext`, `clearSnsSignupContext`, `isSnsSignupReady`, `markLineLoginPending`, `readLineLoginPending`, `clearLineLoginPending`
 - 수명: 탭이 닫히거나 `clearSnsSignupContext()` 호출 시까지 (토큰 JWT 자체는 10분 만료)
 
 가입 컨텍스트는 **두 상태의 유니온**이다. 토큰이 하나도 없는 무효 상태를 타입으로 막기 위해 옵셔널 필드가 아니라 유니온으로 둔다.
@@ -150,14 +150,30 @@ type SnsSignupContext =
 
 LIFF 로그인은 페이지를 떠났다가 돌아온다. `SocialLoginButtons`가 두 지점에서 처리한다.
 
-1. **나갈 때** — `handleLineClick`이 `markLineLoginPending()`으로 `sns:linePending` 플래그를 심고 `startLineLogin()`을 호출한다. 리다이렉트가 실패하면 `consumeLineLoginPending()`으로 플래그를 되돌린다.
-2. **돌아올 때** — 마운트 effect가 `consumeLineLoginPending()`이 true일 때만 `getValidLineIdToken()` → login mutation으로 이어받는다.
+1. **나갈 때** — `handleLineClick`이 `markLineLoginPending()`으로 `sns:linePending` 플래그(타임스탬프)를 심고 `startLineLogin()`을 호출한다. 리다이렉트가 실패하면 `clearLineLoginPending()`으로 되돌린다.
+2. **돌아올 때** — 마운트 effect가 `readLineLoginPending()`이 true일 때만 `getValidLineIdToken()` → login mutation으로 이어받는다.
 
 **플래그 없이 LIFF 세션 유무로 판단하면 안 된다.** 백엔드 테스트 페이지(`/line_oauth`)는 init 직후 `if (liff.isLoggedIn()) handleLogin()`으로 무조건 자동 로그인하지만, 실제 로그인 페이지에 그대로 옮기면 LIFF 세션이 남은 사용자가 **이메일로 로그인하려고 `/login`에 들어오기만 해도** LINE 플로우가 페이지를 낚아챈다.
 
-플래그는 읽는 즉시 소비되므로 StrictMode의 effect 이중 실행에서도 한 번만 동작한다.
+**플래그는 읽을 때 소비하지 않는다.** 복귀 처리는 두 번 중단될 수 있다.
+
+- StrictMode 는 effect 를 mount → cleanup → mount 로 이중 실행한다.
+- LIFF 는 primary redirect URL 에서 인증 코드를 교환한 뒤 secondary URL 로 페이지를 다시 이동시킨다.
+
+시작 시점에 플래그를 지우면, 플래그를 가져간 쪽이 곧 폐기되는 쪽이라 **아무도 로그인을 완료하지 못한다** (실제로 이 버그가 있었다). 그래서 제거는 종료 시점 — 로그인 발사 · 취소 확정 · 오류 — 에만 한다.
+
+중복 실행은 대신 두 장치로 막는다.
+
+- 진행 중인 토큰 조회를 `useRef` 에 담아, StrictMode 두 번째 실행이 **같은 작업에 합류**한다. StrictMode 이중 실행은 같은 컴포넌트 인스턴스에서 일어나므로 ref 가 유지되고, 실제 페이지 재로드에서는 초기화되어 새 시도가 자연스럽게 이어진다.
+- `readLineLoginPending()` 은 **TTL 5분**을 적용한다. eager consume 를 없앤 대가로 방치된 플래그가 남을 수 있어, 나중 방문에서 갑작스러운 자동 로그인이 되지 않게 상한을 둔다.
+
+`isLineRedirectPending()`(URL 에 `liffRedirectUri` 존재)이 true 인 로드에서는 토큰이 없어도 취소로 보지 않고 플래그를 남겨, secondary 로드가 이어받게 한다.
+
+회귀 테스트: `SocialLoginButtons.test.tsx` (StrictMode 하에서 login mutation 이 정확히 1회 발사되는지)
 
 복귀했는데 유효 토큰이 없으면(동의 화면 취소 등) **토스트 없이 조용히 종료한다** — 사용자가 의도한 중단일 수 있다.
+
+복귀 처리 중에는 LINE 버튼 라벨이 진행 표시로 바뀌고 **두 소셜 버튼이 모두 잠긴다**(`isBusy`). 화면을 통째로 교체하지 않으므로 레이아웃이 튀지 않고, 두 provider 플로우가 겹치는 것도 막는다.
 
 ### 3.5 Mutation 훅 8개
 
