@@ -194,6 +194,9 @@ export function SnsSignupForm() {
           )}
 
           <Flex className="w-full" direction="column" gap={6}>
+            <p className="text-body-3 leading-none text-black/60">
+              {t("nickname")}
+            </p>
             <Input
               className="max-sm:h-12"
               maxLength={NICKNAME_MAX_LENGTH}
