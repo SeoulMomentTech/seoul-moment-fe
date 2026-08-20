@@ -305,5 +305,11 @@
   "chatbot_suggestions_error": "추천 질문을 불러오지 못했어요. 직접 입력해 물어보세요.",
   "chatbot_rate_limit_notice": "잠시 후 다시 시도해주세요. ({seconds}초)",
   "chatbot_list_expand": "나머지 {count}개 보기",
-  "chatbot_list_collapse": "접기"
+  "chatbot_list_collapse": "접기",
+  "connect_line_to_existing_account": "기존 계정에 LINE 연결",
+  "connect_line_failed": "LINE 계정 연결에 실패했습니다. 다시 시도해주세요.",
+  "connect_account_to_line": "이 계정에 LINE 로그인을 연결하시겠습니까?",
+  "line_login_response_error": "LINE 로그인 응답을 처리할 수 없습니다.",
+  "line_login_failed": "LINE 로그인에 실패했습니다. 다시 시도해주세요.",
+  "line_login_start_error": "LINE 로그인을 시작할 수 없습니다."
 }
