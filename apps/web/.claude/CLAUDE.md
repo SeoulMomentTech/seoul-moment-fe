@@ -180,6 +180,13 @@ password flows.
     the token dies and LIFF has no renew API, so `getValidLineIdToken()` checks `exp`
     up front and `startLineLogin()` calls `liff.logout()` before `liff.login()`.
   - **LINE may not provide an email** (scope unapproved / user declined / no email on
-    the account). `SnsSignupContext.email` is optional and the signup form hides the
-    account field when it is missing.
+    the account). The server then returns `needsEmail`/`emailToken` instead of a
+    signupToken, and the user verifies an email inside the SNS signup form via
+    `line/email/{code,verify}`. That verify response is shaped like `line/login`, so it
+    re-branches into link (existing account) or signup. `SnsSignupContext` is a union of
+    "ready" (`signupToken`) and "email pending" (`emailToken`) — narrow with
+    `isSnsSignupReady()`.
+  - **The server answers 401 for both an expired token and a wrong code.** Callers must
+    pre-check `exp` with `isSnsTokenExpired()` (`login/lib/snsToken.ts`) so a remaining
+    401 can be read as a code mismatch.
   - The LINE button renders only when `NEXT_PUBLIC_LINE_LIFF_ID` is set.

@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import {
   clearSnsSignupContext,
   consumeLineLoginPending,
+  isSnsSignupReady,
   markLineLoginPending,
   readSnsSignupContext,
   saveSnsSignupContext,
@@ -45,11 +46,59 @@ describe("saveSnsSignupContext / readSnsSignupContext", () => {
     });
     saveSnsSignupContext({ provider: "line", signupToken: "token" });
 
-    expect(readSnsSignupContext()?.email).toBeUndefined();
+    expect(readSnsSignupContext()).toEqual({
+      provider: "line",
+      signupToken: "token",
+      email: undefined,
+    });
   });
 
-  it("signupToken이 없으면 null을 반환한다", () => {
+  it("토큰이 하나도 없으면 null을 반환한다", () => {
     expect(readSnsSignupContext()).toBeNull();
+  });
+
+  it("emailToken만 저장한 이메일 인증 대기 상태를 그대로 읽는다", () => {
+    saveSnsSignupContext({ provider: "line", emailToken: "email-token" });
+
+    const context = readSnsSignupContext();
+
+    expect(context).toEqual({ provider: "line", emailToken: "email-token" });
+    expect(context && isSnsSignupReady(context)).toBe(false);
+  });
+
+  it("이메일 인증 대기 상태는 이전 단계의 signupToken·이메일을 남기지 않는다", () => {
+    saveSnsSignupContext({
+      provider: "line",
+      signupToken: "stale-token",
+      email: "stale@test.com",
+    });
+
+    saveSnsSignupContext({ provider: "line", emailToken: "email-token" });
+
+    expect(readSnsSignupContext()).toEqual({
+      provider: "line",
+      emailToken: "email-token",
+    });
+  });
+
+  it("인증을 마쳐 signupToken을 저장하면 emailToken이 남지 않는다", () => {
+    saveSnsSignupContext({ provider: "line", emailToken: "email-token" });
+
+    saveSnsSignupContext({
+      provider: "line",
+      signupToken: "signup-token",
+      email: "verified@test.com",
+    });
+
+    const context = readSnsSignupContext();
+
+    expect(context).toEqual({
+      provider: "line",
+      signupToken: "signup-token",
+      email: "verified@test.com",
+    });
+    expect(context && isSnsSignupReady(context)).toBe(true);
+    expect(window.sessionStorage.getItem("sns:emailToken")).toBeNull();
   });
 
   it("provider 키가 없는 과거 세션은 google로 폴백한다", () => {
@@ -80,6 +129,15 @@ describe("clearSnsSignupContext", () => {
     expect(readSnsSignupContext()).toBeNull();
     expect(window.sessionStorage.getItem("sns:provider")).toBeNull();
     expect(window.sessionStorage.getItem("sns:signupEmail")).toBeNull();
+  });
+
+  it("이메일 인증 대기 상태도 제거한다", () => {
+    saveSnsSignupContext({ provider: "line", emailToken: "email-token" });
+
+    clearSnsSignupContext();
+
+    expect(readSnsSignupContext()).toBeNull();
+    expect(window.sessionStorage.getItem("sns:emailToken")).toBeNull();
   });
 });
 

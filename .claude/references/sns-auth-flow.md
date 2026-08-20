@@ -8,7 +8,8 @@
 
 - **구현된 provider**: **Google**, **LINE**. Apple/Kakao/Naver 등은 미구현.
 - **백엔드 엔드포인트 prefix**: `/user/auth/{google,line}/*` — 1) `login` 2) `link` 3) `signup` 의 3-step. 두 provider의 요청·응답 shape이 **동일**하므로 `shared/services/auth.ts`가 `PostSns{Login,Link,Signup}*` 공통 타입을 정의하고 provider별 이름을 alias로 둔다.
-- **공통 vs provider별**: 응답 3분기 처리, 가입 화면(`/signup/sns`), 임시 저장소(`snsAuthStorage`), 연결 확인 다이얼로그(`SnsLinkConfirmDialog`)는 provider 공통이다. **id_token을 획득하는 계층만** provider별로 갈린다(`googleIdentity.ts` / `lineIdentity.ts`).
+- **LINE 전용 추가 엔드포인트**: `line/email/{code,verify}` — provider가 이메일을 주지 않은 경우 서비스가 직접 입력받아 인증하는 1-B 단계다(§7).
+- **공통 vs provider별**: 응답 분기 처리, 가입 화면(`/signup/sns`), 임시 저장소(`snsAuthStorage`), 연결 확인 다이얼로그(`SnsLinkConfirmDialog`)는 provider 공통이다. **id_token을 획득하는 계층과 이메일 인증 단계만** provider별로 갈린다(`googleIdentity.ts` / `lineIdentity.ts`).
 
 ### Google과 LINE의 결정적 차이 — 팝업 vs 리다이렉트
 
@@ -24,9 +25,9 @@
 
 ---
 
-## 2. 시퀀스 (응답에 따른 3분기)
+## 2. 시퀀스 (응답에 따른 4분기)
 
-provider와 무관하게 동일하다. 아래는 Google 기준이며, LINE은 1번 단계(id_token 획득)만 §3.4로 대체된다.
+provider와 무관하게 동일하다. 아래는 Google 기준이며, LINE은 1번 단계(id_token 획득)만 §3.4로 대체된다. `needsEmail` 분기는 현재 LINE에서만 발생한다.
 
 ```mermaid
 sequenceDiagram
@@ -64,6 +65,14 @@ sequenceDiagram
         API-->>Form: { token, refreshToken }
         Form->>Store: login(...)
         Form->>SS: clearSnsSignupContext()
+    else 이메일 직접 입력 필요 (needsEmail + emailToken, LINE only)
+        SB->>SS: saveSnsSignupContext({ provider, emailToken })
+        SB->>U: router.push("/signup/sns")
+        U->>Form: 이메일 입력 → 인증 코드 발송/검증
+        Form->>API: POST /user/auth/line/email/code { emailToken, email }
+        Form->>API: POST /user/auth/line/email/verify { emailToken, email, code }
+        API-->>Form: PostSnsLoginResponse (login 과 동일 shape)
+        Note over Form: 여기서 다시 needsLinkConfirm(2-A) /<br/>needsSignup(2-B) 으로 갈린다
     end
 ```
 
@@ -117,13 +126,25 @@ sequenceDiagram
 
 `apps/web/src/features/login/lib/snsAuthStorage.ts`
 
-- 키: `sns:provider`, `sns:signupToken`, `sns:signupEmail`, `sns:linePending` (모두 sessionStorage)
-- `SnsProvider = "google" | "line"`, `SnsSignupContext = { provider, signupToken, email? }`
-- 함수: `saveSnsSignupContext`, `readSnsSignupContext`, `clearSnsSignupContext`, `markLineLoginPending`, `consumeLineLoginPending`
-- 수명: 탭이 닫히거나 `clearSnsSignupContext()` 호출 시까지 (signupToken JWT 자체는 10분 만료)
-- **`email`은 옵셔널이다** — LINE이 이메일을 주지 않을 수 있어서, 필수 조건은 `signupToken`만이다.
+- 키: `sns:provider`, `sns:signupToken`, `sns:signupEmail`, `sns:emailToken`, `sns:linePending` (모두 sessionStorage)
+- 함수: `saveSnsSignupContext`, `readSnsSignupContext`, `clearSnsSignupContext`, `isSnsSignupReady`, `markLineLoginPending`, `consumeLineLoginPending`
+- 수명: 탭이 닫히거나 `clearSnsSignupContext()` 호출 시까지 (토큰 JWT 자체는 10분 만료)
+
+가입 컨텍스트는 **두 상태의 유니온**이다. 토큰이 하나도 없는 무효 상태를 타입으로 막기 위해 옵셔널 필드가 아니라 유니온으로 둔다.
+
+```ts
+type SnsSignupContext =
+  | { provider; signupToken: string; email? }  // 가입 가능 (Ready)
+  | { provider; emailToken: string };          // 이메일 인증 대기 (EmailPending)
+```
+
+- 좁히기는 `isSnsSignupReady(context)` 로 한다.
+- **두 토큰은 배타적으로 저장된다** — `save`가 반대쪽 키를 지운다. 남겨두면 만료된 이전 단계 토큰으로 요청하게 된다.
+- Ready 의 `email`은 여전히 옵셔널이다 — LINE 이 이메일을 준 적 없는 과거 세션이 남아 있을 수 있다.
 - **`sns:provider`가 없는 세션은 `"google"`로 폴백한다** — LINE 도입 전에 가입을 시작한 사용자가 배포 시점에 튕기지 않게 하기 위함.
 - 단위 테스트: `snsAuthStorage.test.ts`
+
+**`snsToken.ts` — `isSnsTokenExpired(token)`**: 단기 토큰(email/link/signup)의 `exp`를 요청 전에 검사한다. 서버가 "토큰 만료"와 "인증 코드 불일치"에 **모두 401**을 주고 본문으로 구분할 수 없기 때문에, 선검사로 만료를 걸러내야 남은 401을 코드 불일치로 해석할 수 있다. 단위 테스트: `snsToken.test.ts`
 
 ### 3.4 LIFF 리다이렉트 복귀 처리
 
@@ -138,7 +159,7 @@ LIFF 로그인은 페이지를 떠났다가 돌아온다. `SocialLoginButtons`�
 
 복귀했는데 유효 토큰이 없으면(동의 화면 취소 등) **토스트 없이 조용히 종료한다** — 사용자가 의도한 중단일 수 있다.
 
-### 3.5 Mutation 훅 6개
+### 3.5 Mutation 훅 8개
 
 `apps/web/src/features/login/api/`
 
@@ -150,6 +171,8 @@ LIFF 로그인은 페이지를 떠났다가 돌아온다. `SocialLoginButtons`�
 | `useLineLoginMutation` | `POST /user/auth/line/login` | Google과 동일 — 콜백으로만 전달. |
 | `useLineLinkMutation` | `POST /user/auth/line/link` | 훅 내부에서 `login()` 자동 호출. |
 | `useLineSignupMutation` | `POST /user/auth/line/signup` | 훅 내부에서 `login()` + `toastOnError: true`. |
+| `useLineEmailCodeMutation` | `POST /user/auth/line/email/code` | 응답 본문 없음. `toastOnError: true`. |
+| `useLineEmailVerifyMutation` | `POST /user/auth/line/email/verify` | login 과 같은 shape 을 콜백으로 전달 — 재분기는 호출부 책임. |
 
 ⚠️ 로그인은 호출부에서, 링크/가입은 훅에서 `login()`을 호출한다 — provider 양쪽 모두 동일하게 불일치한다. ([§9 정리 후보](#9-알려진-정리-후보) 참고)
 
@@ -157,8 +180,9 @@ LIFF 로그인은 페이지를 떠났다가 돌아온다. `SocialLoginButtons`�
 
 `apps/web/src/features/login/ui/SocialLoginButtons.tsx`
 
-- `handleSnsLoginSuccess(provider, data)`: 응답 3분기를 provider 공통으로 처리한다.
+- `handleSnsLoginSuccess(provider, data)`: 응답 4분기를 provider 공통으로 처리한다.
   - `token && refreshToken` → `login()`
+  - `needsEmail && emailToken` → `saveSnsSignupContext({ provider, emailToken })` + `router.push("/signup/sns")`. **`needsLinkConfirm` 검사보다 먼저** 온다 — 이메일이 없으면 연결·가입 판정 자체가 불가능하기 때문.
   - `needsLinkConfirm && linkToken && email` → `setLinkPrompt({ provider, ... })` (다이얼로그 오픈)
   - `needsSignup && signupToken` → `saveSnsSignupContext()` + `router.push("/signup/sns")`. **`email`을 요구하지 않는다** — LINE은 없을 수 있다.
   - 그 외 → provider별 `*_login_response_error` 토스트
@@ -171,18 +195,39 @@ LIFF 로그인은 페이지를 떠났다가 돌아온다. `SocialLoginButtons`�
 
 `apps/web/src/features/login/ui/SnsLinkConfirmDialog.tsx`
 
-- props: `{ open, provider, email, linkToken, onOpenChange, onLinked? }`
+- props: `{ open, provider, email, linkToken, onOpenChange, onLinked?, onCancel? }`
 - 훅은 조건부 호출이 불가하므로 Google/LINE link mutation을 **둘 다 생성**하고 `provider`로 골라 `mutate`한다. 요청을 보내는 쪽만 동작하므로 부작용은 없다.
 - 문구는 `TEXT_KEYS[provider]`로 i18n 키를 분기한다.
+- `onCancel`은 **사용자가 연결을 거부하고 닫았을 때만** 호출된다(취소 버튼·배경·ESC). 성공/실패 경로에서는 호출되지 않는다 — `onOpenChange(false)`만으로는 세 경우를 구분할 수 없어서 분리했다.
 
 ### 3.8 신규 가입 폼 — `SnsSignupPage` / `SnsSignupForm`
 
 - 라우트: `apps/web/src/app/[locale]/signup/sns/page.tsx` → `SnsSignupPage` (`views/signup/ui/SnsSignupPage.tsx`)
 - 페이지는 `GuestOnly` 가드 + 제목/설명만, 실제 폼은 `apps/web/src/features/signup/ui/SnsSignupForm.tsx`.
-- 마운트 시 `readSnsSignupContext()`. 없으면 토스트 후 `/login` 으로 replace.
+- 마운트 시 `readSnsSignupContext()`. 없으면 토스트 후 `/login` 으로 replace. **emailToken 상태인데 provider가 LINE이 아니면** 같은 처리 — 만들어질 수 없는 세션이다.
 - 입력: 닉네임(검증: `useNicknameValidate`) + 마케팅 약관 3종 (`MarketingConsent`).
 - signup mutation을 **둘 다 생성**하고 `context.provider`로 골라 제출한다.
-- **`context.email`이 없으면 "계정" 필드 블록을 렌더하지 않는다.**
+- 컨텍스트 상태에 따라 폼 상단이 갈린다.
+  - **Ready** → `context.email`이 있으면 읽기 전용 "계정" 필드, 없으면 블록 자체를 렌더하지 않는다.
+  - **EmailPending** → `SnsEmailVerification` 블록. 닉네임·약관은 그대로 보이고 **제출 버튼만 잠긴다**(`!isSnsSignupReady(context)`).
+- 인증 성공 응답(`handleEmailVerified`)은 login 응답과 같은 shape 이라 여기서 다시 갈린다.
+  - `needsSignup && signupToken` → 컨텍스트를 Ready 로 교체 저장(새로고침 내성) → 제출 잠금 해제
+  - `needsLinkConfirm && linkToken` → `SnsLinkConfirmDialog` 오픈. 연결 성공 시 `GuestOnly`가 홈으로 보낸다.
+  - `token && refreshToken` → 방어적으로 즉시 로그인
+  - 그 외 → `line_login_response_error` 토스트
+- 연결을 **거부하면** `account_exists` 토스트 + `verificationKey` 를 올려 인증 블록을 remount 한다. 그 이메일로는 가입할 수 없으므로 다른 이메일로 다시 시도할 수 있게 비워주는 것이다.
+
+### 3.9 이메일 직접 입력 — `SnsEmailVerification`
+
+`apps/web/src/features/signup/ui/SnsEmailVerification.tsx`
+
+- props: `{ emailToken, onVerified(data, email), onExpired }` — 결과 분기는 부모(`SnsSignupForm`)가 맡는다.
+- 이메일 입력 / 코드 발송 / 재발송 카운트다운(`RESEND_INITIAL_SECONDS` 28초) / 코드 검증 / 인라인 메시지를 전부 소유한다. 스키마는 `model/snsEmailSchema.ts`.
+- 인증 통과 판정은 서버가 주는 signupToken 이 하므로 스키마에 `isVerified` 같은 플래그를 두지 않는다(일반 `SignupForm`과 다른 점).
+- 요청 전에 `isSnsTokenExpired(emailToken)`을 검사한다 → 만료면 `onExpired()`.
+- **401 해석**: `email/code`의 401은 emailToken 만료뿐이라 `onExpired()`. `email/verify`의 401은 만료를 이미 걸러냈으므로 **코드 불일치**로 보고 인라인 표시(`code_not_match`).
+- 이메일을 수정하면 발송·인증 상태를 초기화한다 — 이전 이메일로 받은 코드는 의미가 없다.
+- 새 i18n 키가 없다. 일반 `SignupForm`의 이메일 인증 키를 그대로 재사용한다.
 
 ---
 
@@ -196,12 +241,19 @@ Google/LINE이 동일하므로 공통 타입 + provider별 alias 구조다.
 
 ```ts
 PostSnsLoginPayload   // { idToken }
-PostSnsLoginResponse  // { needsLinkConfirm, email?, linkToken?, needsSignup?, signupToken?, name?, token?, refreshToken? }
+PostSnsLoginResponse  // { needsLinkConfirm, email?, linkToken?, needsSignup?, signupToken?,
+                      //   name?, needsEmail?, emailToken?, token?, refreshToken? }
 PostSnsLinkPayload    // { linkToken }
 PostSnsSignupPayload  // { signupToken, nickname, newProductAgreed?, adAgreed?, recommendAgreed? }
 
 export type PostGoogleLoginPayload = PostSnsLoginPayload;  // ... 8개 alias
+
+// LINE 전용 (alias 없음 — google 에는 대응 엔드포인트가 없다)
+PostLineEmailCodePayload    // { emailToken, email }
+PostLineEmailVerifyPayload  // { emailToken, email, code }
 ```
+
+`needsEmail`/`emailToken`은 두 provider의 스키마에 모두 있어 공통 타입에 두지만, 실제로 내려주는 쪽은 LINE 뿐이다.
 
 `name`은 "닉네임 입력칸 기본값으로 쓰라"고 서버가 주는 SNS 표시 이름이다. **현재 UI에서 사용하지 않는다.**
 
@@ -215,6 +267,8 @@ export type PostGoogleLoginPayload = PostSnsLoginPayload;  // ... 8개 alias
 | `postLineLogin`   | `POST user/auth/line/login`   |
 | `postLineLink`    | `POST user/auth/line/link`    |
 | `postLineSignup`  | `POST user/auth/line/signup`  |
+| `postLineEmailCode`   | `POST user/auth/line/email/code`   |
+| `postLineEmailVerify` | `POST user/auth/line/email/verify` |
 
 응답 `token` 은 `useUserAuthStore.login({ accessToken: token, refreshToken })` 로 흡수된다. store 내부에서 `decodeJWT` (`apps/web/src/shared/lib/utils.ts`)로 JWT payload의 `id`, `exp` 를 추출해 함께 저장한다.
 
@@ -227,6 +281,7 @@ export type PostGoogleLoginPayload = PostSnsLoginPayload;  // ... 8개 alias
 | `accessToken`, `refreshToken` | `useUserAuthStore` → localStorage (persist) | 로그아웃까지 | refresh 시 `updateAccessToken()`이 새 토큰의 `id/exp`도 재추출. |
 | `id`, `exp` (JWT claims) | `useUserAuthStore` (persist 대상) | accessToken과 동일 | mypage `useGet*Query` 의 queryKey 스코핑에 사용. |
 | `provider` + `signupToken` + `email?` | `snsAuthStorage` → sessionStorage | 탭 종료 / `clearSnsSignupContext()` | signupToken JWT는 10분 만료. |
+| `provider` + `emailToken` | `snsAuthStorage` → sessionStorage | 탭 종료 / 인증 성공 시 signupToken 으로 교체 | emailToken JWT도 10분 만료. signupToken과 배타적. |
 | `linkToken` + `email` | `SocialLoginButtons` 컴포넌트 state (`linkPrompt`) | 다이얼로그 닫힘 / 컴포넌트 unmount | sessionStorage에는 저장하지 않음. |
 | `sns:linePending` | sessionStorage | 복귀 시 즉시 소비 | LIFF 리다이렉트 왕복 식별용. |
 | LINE id_token | LIFF 내부 저장소 | **1시간** | 갱신 API 없음. 만료 시 logout → login. |
@@ -249,6 +304,9 @@ export type PostGoogleLoginPayload = PostSnsLoginPayload;  // ... 8개 alias
 | Google login mutation | 실패 | toast `google_login_failed` |
 | `SnsLinkConfirmDialog` | link mutation 실패 | toast `connect_{google,line}_failed` + close |
 | `SnsSignupForm` | sessionStorage 컨텍스트 없음 | toast + `/login` replace |
+| `SnsEmailVerification` | `emailToken` 만료 (선검사 또는 code 401) | toast `session_has_expired` + 컨텍스트 정리 + `/login` replace |
+| `SnsEmailVerification` | `email/verify` 401 | 인라인 `code_not_match` — 만료는 선검사가 걸러냈으므로 코드 불일치로 본다 |
+| `SnsSignupForm` | 연결 확인 다이얼로그 거부 | toast `account_exists` + 인증 블록 remount |
 | `use{Google,Line}SignupMutation` | mutation 실패 | `toastOnError: true` (글로벌 핸들러가 서버 message 표시) |
 | link / login mutation | 실패 | `toastOnError` 미사용 — 호출부에서 onError로 처리 |
 
@@ -262,9 +320,24 @@ Google idToken은 항상 검증된 이메일을 실어 오지만, LINE은 세 �
 2. **사용자가 이메일 동의를 거부했다.** 심사를 통과해도 동의 화면에서 거절 가능한 항목이다.
 3. **LINE 계정에 이메일이 없다.** LINE은 전화번호만으로 계정을 만들 수 있다.
 
-그래서 `PostSnsLoginResponse.email`은 옵셔널이고, `SnsSignupContext.email`도 옵셔널이며, `SnsSignupForm`은 이메일이 없으면 계정 필드를 숨긴다.
+그래서 `PostSnsLoginResponse.email`은 옵셔널이다.
 
-**⚠️ 미해결**: 서버 문서가 모순된다. swagger 산문은 *"LINE은 이메일 제공이 필수이며, 미동의 시 401"*이라 하지만, 테스트 페이지는 *"이메일이 없으면 서버가 placeholder로 가입"*이라 한다. 후자가 최신으로 보이나(스키마 `email?` 옵셔널 + 테스트 페이지가 `'(이메일 없음)'` 렌더) 401 핸들러도 살아 있다. **서버가 placeholder 이메일을 생성해 내려주는 경우, 그 값이 가입 화면에 그대로 노출된다** — placeholder 형식을 백엔드에서 확인하면 필터를 넣어야 한다.
+**서버 정책 (확정)**: 이메일 미동의로 로그인을 막지 않고, **서비스가 직접 이메일을 입력받아 인증한다**. 예전의 "미동의 시 401" / "placeholder 이메일로 가입" 동작은 모두 폐기됐다.
+
+```
+line/login { idToken }
+  → { needsEmail: true, emailToken }          ← signupToken 이 없다
+      → line/email/code   { emailToken, email }         인증 코드 발송 (5분 유효)
+      → line/email/verify { emailToken, email, code }
+          → { needsSignup, signupToken, email }   신규 → 2-B 가입
+          → { needsLinkConfirm, linkToken, email } 기존 계정 → 2-A 연결
+```
+
+즉 **이메일 없이는 가입 토큰이 발급되지 않는다.** 클라이언트는 `/signup/sns` 가입 폼 안에서 인증을 진행한다(§3.8, §3.9).
+
+일반 회원가입용 `email/code`와 달리 **이미 가입된 이메일에 409를 주지 않는다** — 기존 계정에 LINE을 연결하는 것이 정상 경로이기 때문이다.
+
+이메일을 받아온 경우(Google 전체 + scope 승인된 LINE)는 종전대로 `needsSignup` 으로 바로 가입 화면에 간다. `SnsSignupContext` Ready 상태의 `email`이 옵셔널로 남아 있는 것은 그 이전에 시작된 세션 때문이다.
 
 ---
 
@@ -278,14 +351,14 @@ Google idToken은 항상 검증된 이메일을 실어 오지만, LINE은 세 �
 | LIFF SDK | `@line/liff` (동적 import) |
 | 라우트 (가입) | `/[locale]/signup/sns` |
 | persist key | `user-auth` (localStorage) |
-| sessionStorage keys | `sns:provider`, `sns:signupToken`, `sns:signupEmail`, `sns:linePending` |
+| sessionStorage keys | `sns:provider`, `sns:signupToken`, `sns:signupEmail`, `sns:emailToken`, `sns:linePending` |
 | 아이콘 | `/public/login/google.svg`, `/public/login/line.png` |
 
 ### LIFF 앱 등록 (LINE Developers Console)
 
 1. 해당 LINE Login 채널 → **LIFF 탭** → LIFF 앱 추가
 2. **Endpoint URL**: 우리 사이트 주소. `liff.login({ redirectUri })`의 redirectUri는 이 URL 하위여야 한다. 로그인 페이지가 `/{locale}/login`이므로 **사이트 루트**로 두는 것이 맞다. 개발 중에는 `http://localhost`도 허용된다.
-3. **Scope**: `openid` + `profile` (이메일까지 받으려면 `email` 권한 신청 필요 — §7)
+3. **Scope**: `openid` + `profile`. `email` 권한을 신청·승인받으면 이메일 직접 입력 단계를 건너뛴다 — 없어도 가입은 가능하다(§7).
 4. 발급된 LIFF ID를 `NEXT_PUBLIC_LINE_LIFF_ID`에 넣는다.
 
 ---
@@ -299,7 +372,7 @@ Google idToken은 항상 검증된 이메일을 실어 오지만, LINE은 세 �
 3. **Provider별 훅·함수 중복** — 통신 계층 타입은 `PostSns*`로 일반화됐지만 훅(`use{Google,Line}XxxMutation`)과 서비스 함수(`post{Google,Line}Xxx`)는 여전히 provider별이다. 다이얼로그/폼이 "훅 둘 다 생성하고 골라 쓰는" 패턴을 쓰는 것도 이 때문. 3번째 provider 추가 시 `useSnsLoginMutation({ provider })` 로 일반화 검토.
 4. **signup 성공 후 라우팅** — `SnsSignupForm.onSuccess` 가 토스트 후 `/login` replace. 자동 로그인이 되어 있으므로 `/` 또는 `/mypage` 가 더 자연스러울 수 있음.
 5. **`name` 필드 미사용** — 서버가 닉네임 기본값용으로 내려주는데 폼이 쓰지 않는다. 적용하면 Google 경로 동작도 함께 바뀌므로 별도 판단 필요.
-6. **placeholder 이메일 노출** — §7 참조.
+6. **`line/email/*` 이 LINE 전용** — 다른 provider가 이메일을 안 주기 시작하면 `sns/email/*` 로 일반화가 필요하다. swagger 산문은 이미 `sns/email/code` 라고 부르고 있다.
 
 ---
 
@@ -311,8 +384,10 @@ Google idToken은 항상 검증된 이메일을 실어 오지만, LINE은 세 �
 - **LINE 인증 후 돌아왔는데 아무 일도 안 일어난다** → `sns:linePending` 플래그가 소비됐는지 확인. 리다이렉트 URL이 LIFF Endpoint URL 하위가 아니면 LIFF가 복귀를 처리하지 못한다.
 - **`/login` 들어가자마자 LINE 플로우가 시작된다** → pending 플래그 없이 `isLoggedIn()`으로 복귀를 판단하는 코드가 들어갔는지 확인(§3.4).
 - **로그인 후 무한 로딩** → `useUserAuthStore` rehydration 전(`hasHydrated: false`)에 보호된 컴포넌트가 렌더되는지 확인.
-- **`/signup/sns` 진입 시 즉시 `/login` 으로 튕김** → sessionStorage에 `sns:signupToken` 이 없거나 다른 탭에서 만료됨.
-- **가입 화면에 계정 이메일이 안 보인다** → LINE에서 이메일이 안 내려온 경우다(§7). 의도된 동작.
+- **`/signup/sns` 진입 시 즉시 `/login` 으로 튕김** → sessionStorage에 `sns:signupToken`·`sns:emailToken` 이 둘 다 없거나 다른 탭에서 지워짐.
+- **가입 화면에 계정 대신 이메일 입력칸이 보인다** → LINE에서 이메일이 안 내려와 `needsEmail` 분기를 탄 경우다(§7). 의도된 동작.
+- **인증 코드를 넣었는데 계속 "일치하지 않습니다"** → 진짜 코드 불일치이거나, `emailToken` 이 만료됐는데 선검사를 통과한 경계 케이스다(서버가 양쪽에 401을 준다). 10분이 지났다면 LINE 로그인부터 다시 한다.
+- **인증 직후 연결 다이얼로그가 뜬다** → 입력한 이메일로 이미 가입된 계정이 있다는 뜻이다(2-A 분기). 거부하면 다른 이메일로 다시 인증해야 한다.
 - **링크 다이얼로그에서 새로고침 시 사라짐** — `linkToken` 이 state로만 있어 의도된 동작. 이 경우 다시 로그인 버튼 클릭 필요.
 
 ---

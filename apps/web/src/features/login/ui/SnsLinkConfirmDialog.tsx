@@ -38,6 +38,8 @@ interface SnsLinkConfirmDialogProps {
   linkToken: string;
   onOpenChange(open: boolean): void;
   onLinked?(): void;
+  /** 사용자가 연결을 거부하고 닫았다. 연결 실패나 성공 시에는 호출되지 않는다. */
+  onCancel?(): void;
 }
 
 export function SnsLinkConfirmDialog({
@@ -47,6 +49,7 @@ export function SnsLinkConfirmDialog({
   linkToken,
   onOpenChange,
   onLinked,
+  onCancel,
 }: SnsLinkConfirmDialogProps) {
   const t = useTranslations();
   const textKeys = TEXT_KEYS[provider];
@@ -81,6 +84,7 @@ export function SnsLinkConfirmDialog({
 
   const handleCancel = () => {
     if (linkMutation.isPending) return;
+    onCancel?.();
     onOpenChange(false);
   };
 
@@ -88,6 +92,8 @@ export function SnsLinkConfirmDialog({
     <Dialog
       onOpenChange={(next) => {
         if (linkMutation.isPending) return;
+        // 배경 클릭·ESC 로 닫은 것도 연결 거부다.
+        if (!next) onCancel?.();
         onOpenChange(next);
       }}
       open={open}

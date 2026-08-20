@@ -56,8 +56,8 @@ export function SocialLoginButtons() {
   const [linkPrompt, setLinkPrompt] = useState<LinkPromptState | null>(null);
 
   /**
-   * login 응답의 3분기는 provider 와 무관하게 동일하다.
-   * 토큰이 있으면 즉시 로그인, 없으면 needsLinkConfirm / needsSignup 으로 갈린다.
+   * login 응답의 분기는 provider 와 무관하게 동일하다. 토큰이 있으면 즉시
+   * 로그인, 없으면 needsEmail / needsLinkConfirm / needsSignup 으로 갈린다.
    */
   const handleSnsLoginSuccess = (
     provider: SnsProvider,
@@ -65,6 +65,13 @@ export function SocialLoginButtons() {
   ) => {
     if (data.token && data.refreshToken) {
       login({ accessToken: data.token, refreshToken: data.refreshToken });
+      return;
+    }
+    // provider 가 이메일을 주지 않은 경우다. 가입 화면에서 직접 입력받아
+    // 인증하고, 그 결과로 연결/가입 분기가 다시 정해진다.
+    if (data.needsEmail && data.emailToken) {
+      saveSnsSignupContext({ provider, emailToken: data.emailToken });
+      router.push("/signup/sns");
       return;
     }
     if (data.needsLinkConfirm && data.linkToken && data.email) {
@@ -75,7 +82,6 @@ export function SocialLoginButtons() {
       });
       return;
     }
-    // LINE 은 이메일을 주지 않을 수 있으므로 email 없이도 가입으로 넘어간다.
     if (data.needsSignup && data.signupToken) {
       saveSnsSignupContext({
         provider,
