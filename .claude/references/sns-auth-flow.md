@@ -72,7 +72,7 @@ sequenceDiagram
         Form->>API: POST /user/auth/line/email/code { emailToken, email }
         Form->>API: POST /user/auth/line/email/verify { emailToken, email, code }
         API-->>Form: PostSnsLoginResponse (login 과 동일 shape)
-        Note over Form: 여기서 다시 needsLinkConfirm(2-A) /<br/>needsSignup(2-B) 으로 갈린다
+        Note over Form: 인증 통과 → 제출 잠금 해제<br/>가입 가능 여부는 signup 응답으로 판정
     end
 ```
 
@@ -188,7 +188,7 @@ LIFF 로그인은 페이지를 떠났다가 돌아온다. `SocialLoginButtons`�
 | `useLineLinkMutation` | `POST /user/auth/line/link` | 훅 내부에서 `login()` 자동 호출. |
 | `useLineSignupMutation` | `POST /user/auth/line/signup` | 훅 내부에서 `login()` + `toastOnError: true`. |
 | `useLineEmailCodeMutation` | `POST /user/auth/line/email/code` | 응답 본문 없음. `toastOnError: true`. |
-| `useLineEmailVerifyMutation` | `POST /user/auth/line/email/verify` | login 과 같은 shape 을 콜백으로 전달 — 재분기는 호출부 책임. |
+| `useLineEmailVerifyMutation` | `POST /user/auth/line/email/verify` | login 과 같은 shape 을 콜백으로 전달 — 후처리는 호출부 책임. |
 
 ⚠️ 로그인은 호출부에서, 링크/가입은 훅에서 `login()`을 호출한다 — provider 양쪽 모두 동일하게 불일치한다. ([§9 정리 후보](#9-알려진-정리-후보) 참고)
 
@@ -214,7 +214,7 @@ LIFF 로그인은 페이지를 떠났다가 돌아온다. `SocialLoginButtons`�
 - props: `{ open, provider, email, linkToken, onOpenChange, onLinked?, onCancel? }`
 - 훅은 조건부 호출이 불가하므로 Google/LINE link mutation을 **둘 다 생성**하고 `provider`로 골라 `mutate`한다. 요청을 보내는 쪽만 동작하므로 부작용은 없다.
 - 문구는 `TEXT_KEYS[provider]`로 i18n 키를 분기한다.
-- `onCancel`은 **사용자가 연결을 거부하고 닫았을 때만** 호출된다(취소 버튼·배경·ESC). 성공/실패 경로에서는 호출되지 않는다 — `onOpenChange(false)`만으로는 세 경우를 구분할 수 없어서 분리했다.
+- **`/login` 진입점에서만 쓴다.** 가입 화면의 이메일 인증 뒤에는 띄우지 않는다(§3.8).
 
 ### 3.8 신규 가입 폼 — `SnsSignupPage` / `SnsSignupForm`
 
@@ -225,19 +225,19 @@ LIFF 로그인은 페이지를 떠났다가 돌아온다. `SocialLoginButtons`�
 - signup mutation을 **둘 다 생성**하고 `context.provider`로 골라 제출한다.
 - 컨텍스트 상태에 따라 폼 상단이 갈린다.
   - **Ready** → `context.email`이 있으면 읽기 전용 "계정" 필드, 없으면 블록 자체를 렌더하지 않는다.
-  - **EmailPending** → `SnsEmailVerification` 블록. 닉네임·약관은 그대로 보이고 **제출 버튼만 잠긴다**(`!isSnsSignupReady(context)`).
-- 인증 성공 응답(`handleEmailVerified`)은 login 응답과 같은 shape 이라 여기서 다시 갈린다.
-  - `needsSignup && signupToken` → 컨텍스트를 Ready 로 교체 저장(새로고침 내성) → 제출 잠금 해제
-  - `needsLinkConfirm && linkToken` → `SnsLinkConfirmDialog` 오픈. 연결 성공 시 `GuestOnly`가 홈으로 보낸다.
-  - `token && refreshToken` → 방어적으로 즉시 로그인
-  - 그 외 → `line_login_response_error` 토스트
-- 연결을 **거부하면** `account_exists` 토스트 + `verificationKey` 를 올려 인증 블록을 remount 한다. 그 이메일로는 가입할 수 없으므로 다른 이메일로 다시 시도할 수 있게 비워주는 것이다.
+  - **EmailPending** → `SnsEmailVerification` 블록. 닉네임·약관은 그대로 보이고 **제출 버튼만 잠긴다.**
+- 인증 성공(`handleEmailVerified`) 처리는 **분기하지 않는다.**
+  - 인증을 통과하면 `isEmailVerified`로 제출 잠금을 푼다 — **인증한 이메일에 계정이 있는지 없는지로 여기서 막지 않는다.**
+  - `signupToken` 이 함께 오면 컨텍스트를 Ready 로 교체 저장한다(새로고침 내성).
+  - `token && refreshToken` 이면 방어적으로 즉시 로그인한다(`GuestOnly`가 홈으로 보낸다).
+- **가입 가능 여부는 제출 응답으로 판정한다.** 이미 가입된 이메일이면 `line/signup` 이 409를 주고, `useLineSignupMutation` 의 `toastOnError` 가 서버 message 를 띄운다. 인증은 됐지만 서버가 `signupToken` 을 주지 않은 경우(= 그 이메일에 계정이 있어 연결이 정상 경로인 경우)도 그대로 제출해 응답으로 판정한다.
+- **연결 확인 다이얼로그를 띄우지 않는다.** 인증 단계에서 계정 존재를 UI로 먼저 알리지 않는다는 결정이다. `/login` 진입점의 연결 플로우(§3.7)는 그대로 유지된다.
 
 ### 3.9 이메일 직접 입력 — `SnsEmailVerification`
 
 `apps/web/src/features/signup/ui/SnsEmailVerification.tsx`
 
-- props: `{ emailToken, onVerified(data, email), onExpired }` — 결과 분기는 부모(`SnsSignupForm`)가 맡는다.
+- props: `{ emailToken, onVerified(data, email), onExpired }` — 인증 결과의 후처리는 부모(`SnsSignupForm`)가 맡는다.
 - 이메일 입력 / 코드 발송 / 재발송 카운트다운(`RESEND_INITIAL_SECONDS` 28초) / 코드 검증 / 인라인 메시지를 전부 소유한다. 스키마는 `model/snsEmailSchema.ts`.
 - 인증 통과 판정은 서버가 주는 signupToken 이 하므로 스키마에 `isVerified` 같은 플래그를 두지 않는다(일반 `SignupForm`과 다른 점).
 - 요청 전에 `isSnsTokenExpired(emailToken)`을 검사한다 → 만료면 `onExpired()`.
@@ -322,7 +322,7 @@ PostLineEmailVerifyPayload  // { emailToken, email, code }
 | `SnsSignupForm` | sessionStorage 컨텍스트 없음 | toast + `/login` replace |
 | `SnsEmailVerification` | `emailToken` 만료 (선검사 또는 code 401) | toast `session_has_expired` + 컨텍스트 정리 + `/login` replace |
 | `SnsEmailVerification` | `email/verify` 401 | 인라인 `code_not_match` — 만료는 선검사가 걸러냈으므로 코드 불일치로 본다 |
-| `SnsSignupForm` | 연결 확인 다이얼로그 거부 | toast `account_exists` + 인증 블록 remount |
+| `SnsSignupForm` | 이미 가입된 이메일로 제출 (`line/signup` 409 등) | `toastOnError` 가 서버 message 표시 — 인증 단계에서 미리 막지 않는다 |
 | `use{Google,Line}SignupMutation` | mutation 실패 | `toastOnError: true` (글로벌 핸들러가 서버 message 표시) |
 | link / login mutation | 실패 | `toastOnError` 미사용 — 호출부에서 onError로 처리 |
 

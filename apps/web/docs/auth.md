@@ -36,7 +36,7 @@ apps/web/src/
 │   │   ├── useLineLinkMutation.ts       # LINE 2-A (계정 연결)
 │   │   ├── useLineSignupMutation.ts     # LINE 2-B (신규 가입)
 │   │   ├── useLineEmailCodeMutation.ts  # LINE 1-B 이메일 코드 발송
-│   │   └── useLineEmailVerifyMutation.ts # LINE 1-B 코드 검증 (응답 재분기)
+│   │   └── useLineEmailVerifyMutation.ts # LINE 1-B 코드 검증
 │   ├── lib/
 │   │   ├── googleIdentity.ts            # GIS 초기화 + idToken 요청 (팝업)
 │   │   ├── lineIdentity.ts              # LIFF 동적 로드 + idToken (리다이렉트)
@@ -105,7 +105,7 @@ provider는 **Google**과 **LINE** 두 개다. 요청·응답 shape이 동일해
 - **분기 C — 이미 연결된 계정**: `token && refreshToken` → 호출부(`SocialLoginButtons.onSuccess`)에서 직접 `login()` 호출.
 - **분기 A — 연결 확인 필요**: `needsLinkConfirm && linkToken && email` → `linkPrompt` state로 `SnsLinkConfirmDialog` 오픈 → "연결하기" 클릭 시 `useGoogleLinkMutation`(`POST user/auth/google/link`). 이 훅은 **훅 내부에서** `login()`을 호출한다. `linkToken`은 sessionStorage에 저장하지 않고 컴포넌트 state로만 보유(5분 만료).
 - **분기 B — 신규 가입 필요**: `needsSignup && signupToken` (LINE은 이메일이 없을 수 있어 `email`을 요구하지 않는다) → `saveSnsSignupContext()`로 sessionStorage에 저장 후 `/signup/sns`로 `router.push`. `SnsSignupForm`이 마운트 시 `readSnsSignupContext()`로 복원(없으면 `/login` replace), 닉네임+약관 입력 후 `context.provider`에 따라 `use{Google,Line}SignupMutation`을 골라 호출한다. 이 훅들도 **내부에서** `login()`을 호출하며 `toastOnError: true`. 성공 시 `clearSnsSignupContext()` + 토스트 후 `/login` replace.
-- **분기 D — 이메일 직접 입력 필요 (LINE 전용)**: `needsEmail && emailToken` → `saveSnsSignupContext({ provider, emailToken })` 후 `/signup/sns`로 이동. 가입 폼이 `SnsEmailVerification` 블록을 렌더해 `line/email/{code,verify}`로 인증하고, verify 응답이 login과 같은 shape이라 **분기 A 또는 B로 다시 갈린다**. 인증 전에는 제출 버튼만 잠긴다. 자세한 내용은 SNS 레퍼런스 §3.9, §7.
+- **분기 D — 이메일 직접 입력 필요 (LINE 전용)**: `needsEmail && emailToken` → `saveSnsSignupContext({ provider, emailToken })` 후 `/signup/sns`로 이동. 가입 폼이 `SnsEmailVerification` 블록을 렌더해 `line/email/{code,verify}`로 인증한다. 인증 전에는 제출 버튼만 잠기고, **인증한 이메일에 계정이 있는지로 분기하지 않는다** — 가입 가능 여부는 `line/signup` 응답(409 등)으로 판정한다. 자세한 내용은 SNS 레퍼런스 §3.8, §3.9, §7.
 
 > `login()` 호출 위치가 일관되지 않음에 주의: 분기 C(login)는 **호출부**에서, 분기 A/B(link·signup)는 **훅 내부**에서 호출한다. (정리 후보는 SNS 레퍼런스 §8 참조)
 
@@ -150,7 +150,7 @@ sequenceDiagram
         U->>Form: 이메일 입력 → 코드 발송/검증
         Form->>API: line/email/code, line/email/verify
         API-->>Form: PostSnsLoginResponse
-        Note over Form: 분기 A 또는 B 로 재분기
+        Note over Form: 인증 통과 → 제출 → signup 응답으로 판정
     else 매칭 실패
         SB->>U: toast "google_login_response_error"
     end
