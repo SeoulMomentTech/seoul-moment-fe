@@ -167,7 +167,36 @@ password flows.
   `user/auth/email/verify` swagger entry is published. The legacy
   `postEmailCode` (`auth/email/code`) function is kept as a fallback but
   no longer wired to signup.
-- **SNS auth (Google only).** Login/signup via `/user/auth/google/{login,link,signup}`
-  3-step flow. Shared signup UI (`/signup/sns`, `snsAuthStorage`, `SnsSignupForm`)
-  wraps a Google-only comms layer (`google*` hooks). Apple/Kakao/Naver not implemented.
-  See `.claude/references/sns-auth-flow.md`.
+- **SNS auth (Google + LINE).** Login/signup via `/user/auth/{google,line}/{login,link,signup}`
+  3-step flow. Both providers share the request/response shape, so `services/auth.ts`
+  defines `PostSns*` types with per-provider aliases; only the id_token layer differs
+  (`googleIdentity.ts` popup vs `lineIdentity.ts` redirect). Apple/Kakao/Naver not
+  implemented. See `.claude/references/sns-auth-flow.md`.
+  - **LINE is redirect-based, not popup.** `liff.login()` leaves the page, so
+    `SocialLoginButtons` resumes on mount — but only when it set the `sns:linePending`
+    flag itself. Judging by LIFF session alone would hijack `/login` for anyone with a
+    live LIFF session.
+  - **Never consume `sns:linePending` when reading it.** The resume is interrupted
+    twice: StrictMode double-invokes the effect, and LIFF reloads the page from the
+    primary redirect URL to the secondary one. Clearing the flag up front means the
+    holder is always the side that gets discarded, so nobody finishes the login — this
+    was a real bug. `readLineLoginPending()` only peeks (TTL 5min) and
+    `clearLineLoginPending()` runs at terminal outcomes only; the in-flight token
+    lookup is shared through a `useRef` so the second invocation joins it. On a load
+    where `isLineRedirectPending()` is true, a missing token is not a cancellation.
+    Regression test: `SocialLoginButtons.test.tsx`.
+  - **LINE id_token lives 1h, the LIFF session 12h.** `isLoggedIn()` stays true after
+    the token dies and LIFF has no renew API, so `getValidLineIdToken()` checks `exp`
+    up front and `startLineLogin()` calls `liff.logout()` before `liff.login()`.
+  - **LINE may not provide an email** (scope unapproved / user declined / no email on
+    the account). The server then returns `needsEmail`/`emailToken` instead of a
+    signupToken, and the user verifies an email inside the SNS signup form via
+    `line/email/{code,verify}`. Verification is allowed whether or not an account
+    already uses that email — **the form does not branch on it and never opens the link
+    dialog**; passing verification just unlocks submit, and `line/signup` decides (409
+    for an email already taken). `SnsSignupContext` is a union of "ready"
+    (`signupToken`) and "email pending" (`emailToken`) — narrow with `isSnsSignupReady()`.
+  - **The server answers 401 for both an expired token and a wrong code.** Callers must
+    pre-check `exp` with `isSnsTokenExpired()` (`login/lib/snsToken.ts`) so a remaining
+    401 can be read as a code mismatch.
+  - The LINE button renders only when `NEXT_PUBLIC_LINE_LIFF_ID` is set.
