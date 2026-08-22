@@ -84,16 +84,21 @@ export const requestGoogleIdToken = async (): Promise<string> => {
     pendingReject = reject;
 
     window.google!.accounts.id.prompt((notification) => {
-      if (
-        notification.isNotDisplayed() ||
-        notification.isSkippedMoment() ||
-        notification.isDismissedMoment()
-      ) {
-        const rejectFn = pendingReject;
-        pendingResolve = null;
-        pendingReject = null;
-        rejectFn?.(new GoogleSignInCancelledError());
-      }
+      // FedCM 에서는 display moment 알림이 오지 않으므로 isNotDisplayed 로는
+      // 아무것도 판단할 수 없다. dismissed 는 완전 지원, skipped 는 user_cancel
+      // 사유만 빠진 부분 지원이라 이 둘만 본다.
+      const isCancelled = notification.isDismissedMoment()
+        ? // credential_returned 는 성공 통보이고, flow_restarted 는 뒤이어 다른
+          // 알림이 오므로 둘 다 취소가 아니다.
+          notification.getDismissedReason() === "cancel_called"
+        : notification.isSkippedMoment();
+
+      if (!isCancelled) return;
+
+      const rejectFn = pendingReject;
+      pendingResolve = null;
+      pendingReject = null;
+      rejectFn?.(new GoogleSignInCancelledError());
     });
   });
 };
