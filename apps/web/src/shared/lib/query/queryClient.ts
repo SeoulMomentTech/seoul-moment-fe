@@ -1,7 +1,8 @@
 import { cache } from "react";
 
-import { isKyError } from "ky";
 import { toast } from "sonner";
+
+import { readErrorInfo } from "@shared/lib/utils/error";
 
 import * as Sentry from "@sentry/nextjs";
 import type { ExtendedHTTPError } from "@shared/services";
@@ -68,21 +69,11 @@ function makeQueryClient() {
         }
 
         if (mutation.meta?.showToast) {
-          if (isKyError(err)) {
-            const kyError = err as ExtendedHTTPError;
-            kyError.response
-              .clone()
-              .json()
-              .then((data) => {
-                const message = (data as { message?: string } | null)?.message;
-                toast.error(message ?? err.message);
-              })
-              .catch(() => {
-                toast.error(err.message);
-              });
-          } else {
-            toast.error(err.message);
-          }
+          // 서버가 준 message 가 ky 의 기본 문구보다 구체적이므로 본문까지 읽는다.
+          // 본문을 읽을 수 없거나 HTTP 에러가 아니면 err.message 로 떨어진다.
+          void readErrorInfo(err).then((info) => {
+            toast.error(info.message ?? err.message);
+          });
         }
       },
     }),

@@ -10,6 +10,8 @@ import { useLineEmailVerifyMutation } from "@features/login/api/useLineEmailVeri
 import { isSnsTokenExpired } from "@features/login/lib/snsToken";
 import type { PostSnsLoginResponse } from "@shared/services/auth";
 
+import { readErrorInfo } from "@/shared/lib/utils/error";
+
 import { Button, cn, Flex, HStack, Input, VStack } from "@seoul-moment/ui";
 
 import { RESEND_INITIAL_SECONDS } from "../model/schema";
@@ -86,9 +88,19 @@ export function SnsEmailVerification({
       onVerified(data, email);
     },
     // 만료는 요청 전에 걸러내므로 여기 401 은 코드 불일치로 본다.
-    onError: () => {
-      setIsVerified(false);
-      setVerifyError(t("code_not_match"));
+    onError: async (err) => {
+      try {
+        const { status, message = "" } = await readErrorInfo(err);
+
+        if (status === 409) {
+          setVerifyError(message);
+          return;
+        }
+
+        setVerifyError(t("code_not_match"));
+      } finally {
+        setIsVerified(false);
+      }
     },
   });
 
