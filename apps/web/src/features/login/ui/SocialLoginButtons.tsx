@@ -110,9 +110,6 @@ export function SocialLoginButtons() {
 
   const googleLoginMutation = useGoogleLoginMutation({
     onSuccess: (data) => handleSnsLoginSuccess("google", data),
-    onError: () => {
-      toast.error(t("google_login_failed"));
-    },
   });
 
   const lineLoginMutation = useLineLoginMutation({
@@ -122,7 +119,6 @@ export function SocialLoginButtons() {
       // 서버가 id_token 을 거절했다면 그 토큰으로는 다시 시도해도 같은 결과다.
       // 세션을 버려 다음 클릭이 새 토큰을 받도록 한다.
       if (error.response.status === 401) void clearLineSession();
-      toast.error(t("line_login_failed"));
     },
   });
   // 복귀 effect 가 안정적인 식별자에만 의존하도록 mutate 를 분리한다.

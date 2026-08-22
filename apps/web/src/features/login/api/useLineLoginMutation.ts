@@ -29,5 +29,6 @@ export function useLineLoginMutation({
       onSuccess?.(res.data);
     },
     onError,
+    toastOnError: true,
   });
 }

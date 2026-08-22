@@ -29,5 +29,6 @@ export function useGoogleLoginMutation({
       onSuccess?.(res.data);
     },
     onError,
+    toastOnError: true,
   });
 }
