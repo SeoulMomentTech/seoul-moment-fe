@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 import { useUserAuthStore } from "@shared/lib/hooks/useUserAuthStore";
+import { getErrorInfo } from "@shared/lib/utils/error";
 import type { PostSnsLoginResponse } from "@shared/services/auth";
 
 import { useRouter } from "@/i18n/navigation";
@@ -118,7 +119,8 @@ export function SocialLoginButtons() {
       setIsResumingLine(false);
       // 서버가 id_token 을 거절했다면 그 토큰으로는 다시 시도해도 같은 결과다.
       // 세션을 버려 다음 클릭이 새 토큰을 받도록 한다.
-      if (error.response.status === 401) void clearLineSession();
+      // 타임아웃·네트워크 오류에는 response 가 없으므로 직접 접근하지 않는다.
+      if (getErrorInfo(error).status === 401) void clearLineSession();
     },
   });
   // 복귀 effect 가 안정적인 식별자에만 의존하도록 mutate 를 분리한다.

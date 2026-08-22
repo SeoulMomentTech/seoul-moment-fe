@@ -10,7 +10,7 @@ import { useLineEmailVerifyMutation } from "@features/login/api/useLineEmailVeri
 import { isSnsTokenExpired } from "@features/login/lib/snsToken";
 import type { PostSnsLoginResponse } from "@shared/services/auth";
 
-import { readErrorInfo } from "@/shared/lib/utils/error";
+import { getErrorInfo } from "@/shared/lib/utils/error";
 
 import { Button, cn, Flex, HStack, Input, VStack } from "@seoul-moment/ui";
 
@@ -31,8 +31,11 @@ interface SnsEmailVerificationProps {
   /**
    * 인증 성공. 응답은 login 과 같은 shape 이라 호출부가 연결(2-A) /
    * 가입(2-B) 으로 다시 분기해야 한다.
+   *
+   * 반환값이 false 면 이 화면을 인증 완료로 표시하지 않는다. 연결 확인처럼
+   * 호출부가 다른 분기로 넘어간 경우, 완료 표시만 남으면 사용자가 되돌릴 수 없다.
    */
-  onVerified(data: PostSnsLoginResponse, email: string): void;
+  onVerified(data: PostSnsLoginResponse, email: string): boolean;
   /** emailToken 이 만료됐다. 처음부터 다시 인증해야 한다. */
   onExpired(): void;
 }
@@ -76,31 +79,26 @@ export function SnsEmailVerification({
       setResendSeconds(RESEND_INITIAL_SECONDS);
     },
     // 이 엔드포인트의 401 은 emailToken 만료·변조 뿐이다.
+    // 타임아웃·네트워크 오류에는 response 가 없으므로 직접 접근하지 않는다.
     onError: (error) => {
-      if (error.response.status === 401) onExpired();
+      if (getErrorInfo(error).status === 401) onExpired();
     },
   });
 
   const emailVerifyMutation = useLineEmailVerifyMutation({
     onSuccess: (data) => {
       setVerifyError(null);
-      setIsVerified(true);
-      onVerified(data, email);
+      // 인증 완료로 표시할지는 호출부가 결정한다. 연결 확인 분기로 넘어갔다면
+      // 이 화면은 완료 상태로 남지 않아야 한다.
+      setIsVerified(onVerified(data, email));
     },
-    // 만료는 요청 전에 걸러내므로 여기 401 은 코드 불일치로 본다.
-    onError: async (err) => {
-      try {
-        const { status, message = "" } = await readErrorInfo(err);
-
-        if (status === 409) {
-          setVerifyError(message);
-          return;
-        }
-
-        setVerifyError(t("code_not_match"));
-      } finally {
-        setIsVerified(false);
-      }
+    onError: (err) => {
+      // 만료는 guardExpiry 가 요청 전에 걸러내므로 401 은 코드 불일치로 본다.
+      // 500·네트워크 오류까지 코드 불일치로 표시하면 사용자가 올바른 코드를
+      // 계속 다시 입력하게 되므로 일반 실패 문구로 구분한다.
+      const { status } = getErrorInfo(err);
+      setVerifyError(status === 401 ? t("code_not_match") : t("verify_failed"));
+      setIsVerified(false);
     },
   });
 
