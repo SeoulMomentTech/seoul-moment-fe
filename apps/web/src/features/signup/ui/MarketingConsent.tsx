@@ -18,24 +18,13 @@ const CONSENT_ITEMS: { key: MarketingConsentKey; labelKey: string }[] = [
 ];
 
 interface MarketingConsentProps {
-  newProductAgreed: boolean;
-  adAgreed: boolean;
-  recommendAgreed: boolean;
+  /** 동의 항목의 현재 값. CONSENT_ITEMS 와 같은 키를 쓴다. */
+  values: Record<MarketingConsentKey, boolean>;
   onChange(key: MarketingConsentKey, next: boolean): void;
 }
 
-export function MarketingConsent({
-  newProductAgreed,
-  adAgreed,
-  recommendAgreed,
-  onChange,
-}: MarketingConsentProps) {
+export function MarketingConsent({ values, onChange }: MarketingConsentProps) {
   const t = useTranslations();
-  const values: Record<MarketingConsentKey, boolean> = {
-    newProductAgreed,
-    adAgreed,
-    recommendAgreed,
-  };
   const isAllAgreed = CONSENT_ITEMS.every(({ key }) => values[key]);
 
   const handleToggleAll = () => {

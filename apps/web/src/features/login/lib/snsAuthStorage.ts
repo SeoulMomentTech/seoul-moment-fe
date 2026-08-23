@@ -8,6 +8,7 @@ export type SnsProvider = "google" | "line";
 
 /** 이메일 확보가 끝나 닉네임·약관만 받으면 가입할 수 있는 상태 */
 interface SnsSignupReady {
+  status: "ready";
   provider: SnsProvider;
   signupToken: string;
   /**
@@ -22,6 +23,7 @@ interface SnsSignupReady {
  * signupToken 은 이메일 인증을 통과한 뒤에야 발급된다.
  */
 interface SnsSignupEmailPending {
+  status: "emailPending";
   provider: SnsProvider;
   /** 인증 코드 발송·검증 API 에 전달하는 단기 토큰 (10분) */
   emailToken: string;
@@ -29,10 +31,15 @@ interface SnsSignupEmailPending {
 
 export type SnsSignupContext = SnsSignupReady | SnsSignupEmailPending;
 
-/** 가입 진행 가능 상태인지(= signupToken 을 이미 받았는지) 좁힌다. */
+/**
+ * 가입 진행 가능 상태인지(= signupToken 을 이미 받았는지) 좁힌다.
+ *
+ * status 리터럴로 판정하므로 두 토큰을 동시에 가진 값은 타입 단계에서 막힌다.
+ * 키의 유무로 좁히면 `{ signupToken, emailToken }` 도 ready 로 통과했다.
+ */
 export const isSnsSignupReady = (
   context: SnsSignupContext,
-): context is SnsSignupReady => "signupToken" in context;
+): context is SnsSignupReady => context.status === "ready";
 
 const isSnsProvider = (value: string | null): value is SnsProvider =>
   value === "google" || value === "line";
@@ -73,11 +80,16 @@ export const readSnsSignupContext = (): SnsSignupContext | null => {
   const signupToken = sessionStorage.getItem(SIGNUP_TOKEN_KEY);
   if (signupToken) {
     const email = sessionStorage.getItem(SIGNUP_EMAIL_KEY);
-    return { provider, signupToken, email: email ?? undefined };
+    return {
+      status: "ready",
+      provider,
+      signupToken,
+      email: email ?? undefined,
+    };
   }
 
   const emailToken = sessionStorage.getItem(EMAIL_TOKEN_KEY);
-  if (emailToken) return { provider, emailToken };
+  if (emailToken) return { status: "emailPending", provider, emailToken };
 
   return null;
 };

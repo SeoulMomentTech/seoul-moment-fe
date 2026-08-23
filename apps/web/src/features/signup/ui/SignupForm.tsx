@@ -211,17 +211,18 @@ export function SignupForm() {
           )}
         </Flex>
         <Flex className="w-full" direction="column" gap={6}>
+          {/* 표시값과 폼 값이 같은 sanitize 된 값이도록 제어 입력으로 묶는다. */}
           <Input
             className="max-sm:h-12"
             maxLength={NICKNAME_MAX_LENGTH}
+            onChange={(event) =>
+              setValue("nickname", sanitizeNickname(event.target.value), {
+                shouldValidate: true,
+              })
+            }
             placeholder={t("allowed_input")}
             type="text"
-            {...register("nickname", {
-              onChange: (e) =>
-                setValue("nickname", sanitizeNickname(e.target.value), {
-                  shouldValidate: true,
-                }),
-            })}
+            value={nickname}
           />
           {nicknameMessage && (
             <span

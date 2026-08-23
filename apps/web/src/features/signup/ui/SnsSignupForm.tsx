@@ -9,11 +9,13 @@ import { toast } from "sonner";
 
 import { useGoogleSignupMutation } from "@features/login/api/useGoogleSignupMutation";
 import { useLineSignupMutation } from "@features/login/api/useLineSignupMutation";
+import { classifySnsAuthResponse } from "@features/login/lib/snsAuthOutcome";
 import {
   clearSnsSignupContext,
   isSnsSignupReady,
   readSnsSignupContext,
   saveSnsSignupContext,
+  type SnsProvider,
   type SnsSignupContext,
 } from "@features/login/lib/snsAuthStorage";
 import { SnsLinkConfirmDialog } from "@features/login/ui/SnsLinkConfirmDialog";
@@ -69,7 +71,6 @@ export function SnsSignupForm() {
   }, [handleSessionExpired]);
 
   const {
-    register,
     handleSubmit,
     watch,
     setValue,
@@ -86,9 +87,11 @@ export function SnsSignupForm() {
   });
 
   const nickname = watch("nickname");
-  const newProductAgreed = watch("newProductAgreed");
-  const adAgreed = watch("adAgreed");
-  const recommendAgreed = watch("recommendAgreed");
+  const consents = {
+    newProductAgreed: watch("newProductAgreed"),
+    adAgreed: watch("adAgreed"),
+    recommendAgreed: watch("recommendAgreed"),
+  };
 
   const { status: nicknameStatus, message: nicknameMessage } =
     useNicknameValidate({ nickname });
@@ -106,8 +109,12 @@ export function SnsSignupForm() {
   const lineSignupMutation = useLineSignupMutation({
     onSuccess: handleSignupSuccess,
   });
-  const signupMutation =
-    context?.provider === "line" ? lineSignupMutation : googleSignupMutation;
+  // provider 가 늘면 이 레코드에 빠진 항목을 컴파일러가 잡는다.
+  const signupMutations: Record<SnsProvider, typeof googleSignupMutation> = {
+    google: googleSignupMutation,
+    line: lineSignupMutation,
+  };
+  const signupMutation = signupMutations[context?.provider ?? "google"];
 
   const onSubmit: SubmitHandler<SnsSignupFormValues> = (values) => {
     // signupToken 이 없는 단계(이메일 인증 대기)에서는 제출할 수 없다. 빈 토큰을
@@ -128,48 +135,52 @@ export function SnsSignupForm() {
 
   /**
    * 이메일 인증 성공. verify 응답은 login 과 같은 shape 이라 여기서 다시
-   * 로그인 / 연결확인 / 신규가입으로 분기한다.
-   *
-   * 반환값은 "이 화면을 인증 완료 상태로 둘지" 다. 연결 확인처럼 다른 분기로
-   * 넘어간 경우 인증 완료로 표시하면, 다이얼로그를 취소한 사용자가 진행할 수
-   * 없는 완료 상태에 갇힌다.
+   * 로그인 / 연결확인 / 신규가입으로 분기한다. 어느 결과인지 판정은
+   * classifySnsAuthResponse 가 맡고, 여기서는 결과별 실행만 한다.
    */
   const handleEmailVerified = (
     data: PostSnsLoginResponse,
     verifiedEmail: string,
   ) => {
-    // 서버가 바로 로그인시킨 경우다. GuestOnly 가 홈으로 보낸다.
-    if (data.token && data.refreshToken) {
-      clearSnsSignupContext();
-      login({ accessToken: data.token, refreshToken: data.refreshToken });
-      return false;
-    }
+    const outcome = classifySnsAuthResponse(data, {
+      fallbackEmail: verifiedEmail,
+    });
 
-    // 인증한 이메일로 이미 가입된 계정이 있다. 신규 가입이 아니라 기존 계정에
-    // SNS 를 연결하는 경로이므로, login 응답과 동일하게 연결 확인을 받는다.
-    if (data.needsLinkConfirm && data.linkToken) {
-      setLinkPrompt({
-        email: data.email ?? verifiedEmail,
-        linkToken: data.linkToken,
-      });
-      return false;
-    }
+    switch (outcome.kind) {
+      // 서버가 바로 로그인시킨 경우다. GuestOnly 가 홈으로 보낸다.
+      case "loggedIn":
+        clearSnsSignupContext();
+        login({
+          accessToken: outcome.accessToken,
+          refreshToken: outcome.refreshToken,
+        });
+        return;
 
-    // 로그인도 연결도 가입도 아닌 응답은 진행할 수 있는 단계가 없다.
-    if (!data.signupToken) {
-      toast.error(t("verify_failed"));
-      return false;
-    }
+      // 인증한 이메일로 이미 가입된 계정이 있다. 신규 가입이 아니라 기존 계정에
+      // SNS 를 연결하는 경로이므로, login 응답과 동일하게 연결 확인을 받는다.
+      case "needsLink":
+        setLinkPrompt({ email: outcome.email, linkToken: outcome.linkToken });
+        return;
 
-    const next: SnsSignupContext = {
-      provider: context.provider,
-      signupToken: data.signupToken,
-      email: data.email ?? verifiedEmail,
-    };
-    // 새로고침으로 인증을 되돌리지 않도록 즉시 저장한다.
-    saveSnsSignupContext(next);
-    setContext(next);
-    return true;
+      case "readyToSignup": {
+        const next: SnsSignupContext = {
+          status: "ready",
+          provider: context.provider,
+          signupToken: outcome.signupToken,
+          email: outcome.email,
+        };
+        // 새로고침으로 인증을 되돌리지 않도록 즉시 저장한다.
+        saveSnsSignupContext(next);
+        setContext(next);
+        return;
+      }
+
+      // needsEmail 은 이메일 입력 단계인 이 화면에서 다시 나올 수 없는 응답이다.
+      case "needsEmail":
+      case "unusable":
+        toast.error(t("verify_failed"));
+        return;
+    }
   };
 
   // signupToken 을 확보한 상태(isReady)만 제출할 수 있다. 이메일 인증 통과를
@@ -211,17 +222,18 @@ export function SnsSignupForm() {
             <p className="text-body-3 leading-none text-black/60">
               {t("nickname")}
             </p>
+            {/* 표시값과 폼 값이 같은 sanitize 된 값이도록 제어 입력으로 묶는다. */}
             <Input
               className="max-sm:h-12"
               maxLength={NICKNAME_MAX_LENGTH}
+              onChange={(event) =>
+                setValue("nickname", sanitizeNickname(event.target.value), {
+                  shouldValidate: true,
+                })
+              }
               placeholder={t("allowed_input")}
               type="text"
-              {...register("nickname", {
-                onChange: (e) =>
-                  setValue("nickname", sanitizeNickname(e.target.value), {
-                    shouldValidate: true,
-                  }),
-              })}
+              value={nickname}
             />
             {nicknameMessage && (
               <span
@@ -237,12 +249,10 @@ export function SnsSignupForm() {
         </VStack>
 
         <MarketingConsent
-          adAgreed={adAgreed}
-          newProductAgreed={newProductAgreed}
           onChange={(key, next) =>
             setValue(key, next, { shouldValidate: true })
           }
-          recommendAgreed={recommendAgreed}
+          values={consents}
         />
 
         <div className="w-full pt-[30px]">
