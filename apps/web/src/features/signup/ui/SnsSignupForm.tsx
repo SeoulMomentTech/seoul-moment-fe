@@ -98,7 +98,7 @@ export function SnsSignupForm() {
 
   const handleSignupSuccess = () => {
     clearSnsSignupContext();
-    toast.success(t("registration_completed"), { position: "top-center" });
+    toast.success(t("registration_completed"));
     router.replace("/login");
   };
 
