@@ -17,12 +17,14 @@ beforeEach(() => {
 describe("saveSnsSignupContext / readSnsSignupContext", () => {
   it("provider와 이메일을 함께 저장하고 그대로 읽는다", () => {
     saveSnsSignupContext({
+      status: "ready",
       provider: "line",
       signupToken: "token",
       email: "test@test.com",
     });
 
     expect(readSnsSignupContext()).toEqual({
+      status: "ready",
       provider: "line",
       signupToken: "token",
       email: "test@test.com",
@@ -30,9 +32,14 @@ describe("saveSnsSignupContext / readSnsSignupContext", () => {
   });
 
   it("이메일이 없어도 컨텍스트를 반환한다", () => {
-    saveSnsSignupContext({ provider: "line", signupToken: "token" });
+    saveSnsSignupContext({
+      status: "ready",
+      provider: "line",
+      signupToken: "token",
+    });
 
     expect(readSnsSignupContext()).toEqual({
+      status: "ready",
       provider: "line",
       signupToken: "token",
       email: undefined,
@@ -41,13 +48,19 @@ describe("saveSnsSignupContext / readSnsSignupContext", () => {
 
   it("이메일을 생략하면 이전에 저장된 이메일이 남지 않는다", () => {
     saveSnsSignupContext({
+      status: "ready",
       provider: "google",
       signupToken: "token",
       email: "stale@test.com",
     });
-    saveSnsSignupContext({ provider: "line", signupToken: "token" });
+    saveSnsSignupContext({
+      status: "ready",
+      provider: "line",
+      signupToken: "token",
+    });
 
     expect(readSnsSignupContext()).toEqual({
+      status: "ready",
       provider: "line",
       signupToken: "token",
       email: undefined,
@@ -59,33 +72,52 @@ describe("saveSnsSignupContext / readSnsSignupContext", () => {
   });
 
   it("emailToken만 저장한 이메일 인증 대기 상태를 그대로 읽는다", () => {
-    saveSnsSignupContext({ provider: "line", emailToken: "email-token" });
+    saveSnsSignupContext({
+      status: "emailPending",
+      provider: "line",
+      emailToken: "email-token",
+    });
 
     const context = readSnsSignupContext();
 
-    expect(context).toEqual({ provider: "line", emailToken: "email-token" });
+    expect(context).toEqual({
+      status: "emailPending",
+      provider: "line",
+      emailToken: "email-token",
+    });
     expect(context && isSnsSignupReady(context)).toBe(false);
   });
 
   it("이메일 인증 대기 상태는 이전 단계의 signupToken·이메일을 남기지 않는다", () => {
     saveSnsSignupContext({
+      status: "ready",
       provider: "line",
       signupToken: "stale-token",
       email: "stale@test.com",
     });
 
-    saveSnsSignupContext({ provider: "line", emailToken: "email-token" });
+    saveSnsSignupContext({
+      status: "emailPending",
+      provider: "line",
+      emailToken: "email-token",
+    });
 
     expect(readSnsSignupContext()).toEqual({
+      status: "emailPending",
       provider: "line",
       emailToken: "email-token",
     });
   });
 
   it("인증을 마쳐 signupToken을 저장하면 emailToken이 남지 않는다", () => {
-    saveSnsSignupContext({ provider: "line", emailToken: "email-token" });
+    saveSnsSignupContext({
+      status: "emailPending",
+      provider: "line",
+      emailToken: "email-token",
+    });
 
     saveSnsSignupContext({
+      status: "ready",
       provider: "line",
       signupToken: "signup-token",
       email: "verified@test.com",
@@ -94,6 +126,7 @@ describe("saveSnsSignupContext / readSnsSignupContext", () => {
     const context = readSnsSignupContext();
 
     expect(context).toEqual({
+      status: "ready",
       provider: "line",
       signupToken: "signup-token",
       email: "verified@test.com",
@@ -120,6 +153,7 @@ describe("saveSnsSignupContext / readSnsSignupContext", () => {
 describe("clearSnsSignupContext", () => {
   it("provider·토큰·이메일을 모두 제거한다", () => {
     saveSnsSignupContext({
+      status: "ready",
       provider: "line",
       signupToken: "token",
       email: "test@test.com",
@@ -133,7 +167,11 @@ describe("clearSnsSignupContext", () => {
   });
 
   it("이메일 인증 대기 상태도 제거한다", () => {
-    saveSnsSignupContext({ provider: "line", emailToken: "email-token" });
+    saveSnsSignupContext({
+      status: "emailPending",
+      provider: "line",
+      emailToken: "email-token",
+    });
 
     clearSnsSignupContext();
 

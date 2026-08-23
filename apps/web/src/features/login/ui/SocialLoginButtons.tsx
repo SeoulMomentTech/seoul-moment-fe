@@ -28,6 +28,7 @@ import {
   isLineRedirectPending,
   startLineLogin,
 } from "../lib/lineIdentity";
+import { classifySnsAuthResponse } from "../lib/snsAuthOutcome";
 import {
   clearLineLoginPending,
   markLineLoginPending,
@@ -61,8 +62,8 @@ export function SocialLoginButtons() {
   const [isResumingLine, setIsResumingLine] = useState(false);
 
   /**
-   * login 응답의 분기는 provider 와 무관하게 동일하다. 토큰이 있으면 즉시
-   * 로그인, 없으면 needsEmail / needsLinkConfirm / needsSignup 으로 갈린다.
+   * login 응답의 분기는 provider 와 무관하게 동일하다. 어느 결과인지 판정은
+   * classifySnsAuthResponse 가 맡고, 여기서는 결과별 실행만 한다.
    */
   const handleSnsLoginSuccess = (
     provider: SnsProvider,
@@ -72,41 +73,55 @@ export function SocialLoginButtons() {
     // 로딩 화면에 가려지면 안 된다.
     setIsResumingLine(false);
 
-    if (data.token && data.refreshToken) {
-      login({ accessToken: data.token, refreshToken: data.refreshToken });
-      return;
+    const outcome = classifySnsAuthResponse(data);
+
+    switch (outcome.kind) {
+      case "loggedIn":
+        login({
+          accessToken: outcome.accessToken,
+          refreshToken: outcome.refreshToken,
+        });
+        return;
+
+      // provider 가 이메일을 주지 않은 경우다. 가입 화면에서 직접 입력받아
+      // 인증하고, 그 결과로 연결/가입 분기가 다시 정해진다.
+      case "needsEmail":
+        saveSnsSignupContext({
+          status: "emailPending",
+          provider,
+          emailToken: outcome.emailToken,
+        });
+        router.push("/signup/sns");
+        return;
+
+      case "needsLink":
+        setLinkPrompt({
+          provider,
+          email: outcome.email,
+          linkToken: outcome.linkToken,
+        });
+        return;
+
+      case "readyToSignup":
+        saveSnsSignupContext({
+          status: "ready",
+          provider,
+          signupToken: outcome.signupToken,
+          email: outcome.email,
+        });
+        router.push("/signup/sns");
+        return;
+
+      case "unusable":
+        toast.error(
+          t(
+            provider === "line"
+              ? "line_login_response_error"
+              : "google_login_response_error",
+          ),
+        );
+        return;
     }
-    // provider 가 이메일을 주지 않은 경우다. 가입 화면에서 직접 입력받아
-    // 인증하고, 그 결과로 연결/가입 분기가 다시 정해진다.
-    if (data.needsEmail && data.emailToken) {
-      saveSnsSignupContext({ provider, emailToken: data.emailToken });
-      router.push("/signup/sns");
-      return;
-    }
-    if (data.needsLinkConfirm && data.linkToken && data.email) {
-      setLinkPrompt({
-        provider,
-        email: data.email,
-        linkToken: data.linkToken,
-      });
-      return;
-    }
-    if (data.needsSignup && data.signupToken) {
-      saveSnsSignupContext({
-        provider,
-        signupToken: data.signupToken,
-        email: data.email,
-      });
-      router.push("/signup/sns");
-      return;
-    }
-    toast.error(
-      t(
-        provider === "line"
-          ? "line_login_response_error"
-          : "google_login_response_error",
-      ),
-    );
   };
 
   const googleLoginMutation = useGoogleLoginMutation({

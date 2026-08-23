@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { debounce } from "es-toolkit";
 import type { HTTPError } from "ky";
 
-import { NICKNAME_MAX_LENGTH, NICKNAME_MIN_LENGTH } from "@shared/lib/nickname";
+import { isValidNickname } from "@shared/lib/nickname";
 import { postNicknameValidate } from "@shared/services/auth";
 
 const DEFAULT_DEBOUNCE_MS = 400;
@@ -37,9 +37,6 @@ const MESSAGES: Record<NicknameValidateStatus, string | null> = {
   error: "닉네임 확인에 실패했습니다. 다시 시도해주세요.",
 };
 
-const isValidLength = (value: string) =>
-  value.length >= NICKNAME_MIN_LENGTH && value.length <= NICKNAME_MAX_LENGTH;
-
 export function useNicknameValidate({
   nickname,
   enabled = true,
@@ -68,7 +65,8 @@ export function useNicknameValidate({
   useEffect(() => {
     latestNicknameRef.current = nickname;
 
-    if (!enabled || !isValidLength(nickname)) {
+    // 닉네임 규칙을 통과하지 못한 값은 서버에 물어볼 필요가 없다.
+    if (!enabled || !isValidNickname(nickname)) {
       flushValidate.cancel();
       setStatus("idle");
       return;

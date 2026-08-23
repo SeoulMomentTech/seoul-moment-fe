@@ -9,7 +9,7 @@
 - **구현된 provider**: **Google**, **LINE**. Apple/Kakao/Naver 등은 미구현.
 - **백엔드 엔드포인트 prefix**: `/user/auth/{google,line}/*` — 1) `login` 2) `link` 3) `signup` 의 3-step. 두 provider의 요청·응답 shape이 **동일**하므로 `shared/services/auth.ts`가 `PostSns{Login,Link,Signup}*` 공통 타입을 정의하고 provider별 이름을 alias로 둔다.
 - **LINE 전용 추가 엔드포인트**: `line/email/{code,verify}` — provider가 이메일을 주지 않은 경우 서비스가 직접 입력받아 인증하는 1-B 단계다(§7).
-- **공통 vs provider별**: 응답 분기 처리, 가입 화면(`/signup/sns`), 임시 저장소(`snsAuthStorage`), 연결 확인 다이얼로그(`SnsLinkConfirmDialog`)는 provider 공통이다. **id_token을 획득하는 계층과 이메일 인증 단계만** provider별로 갈린다(`googleIdentity.ts` / `lineIdentity.ts`).
+- **공통 vs provider별**: 응답 판정(`snsAuthOutcome`), 가입 화면(`/signup/sns`), 임시 저장소(`snsAuthStorage`), 연결 확인 다이얼로그(`SnsLinkConfirmDialog`)는 provider 공통이다. **id_token을 획득하는 계층과 이메일 인증 단계만** provider별로 갈린다(`googleIdentity.ts` / `lineIdentity.ts`).
 
 ### Google과 LINE의 결정적 차이 — 팝업 vs 리다이렉트
 
@@ -134,15 +134,17 @@ sequenceDiagram
 
 ```ts
 type SnsSignupContext =
-  | { provider; signupToken: string; email? }  // 가입 가능 (Ready)
-  | { provider; emailToken: string };          // 이메일 인증 대기 (EmailPending)
+  | { status: "ready"; provider; signupToken: string; email? }  // 가입 가능
+  | { status: "emailPending"; provider; emailToken: string };   // 이메일 인증 대기
 ```
 
-- 좁히기는 `isSnsSignupReady(context)` 로 한다.
-- **두 토큰은 배타적으로 저장된다** — `save`가 반대쪽 키를 지운다. 남겨두면 만료된 이전 단계 토큰으로 요청하게 된다.
+- 좁히기는 `isSnsSignupReady(context)` 로 한다. 판정 기준은 `status` 리터럴이다 — 키의 유무(`"signupToken" in context`)로 좁히면 두 토큰을 동시에 가진 값도 Ready 로 통과했다.
+- **두 토큰은 배타적으로 저장된다** — `save`가 반대쪽 키를 지운다. 남겨두면 만료된 이전 단계 토큰으로 요청하게 된다. `status` 태그가 이 배타성을 타입 단계에서도 보장한다.
 - Ready 의 `email`은 여전히 옵셔널이다 — LINE 이 이메일을 준 적 없는 과거 세션이 남아 있을 수 있다.
 - **`sns:provider`가 없는 세션은 `"google"`로 폴백한다** — LINE 도입 전에 가입을 시작한 사용자가 배포 시점에 튕기지 않게 하기 위함.
 - 단위 테스트: `snsAuthStorage.test.ts`
+
+**`snsAuthOutcome.ts` — `classifySnsAuthResponse(data, { fallbackEmail? })`**: `login` / `email/verify` 응답이 어느 도메인 결과인지만 판정하는 순수 함수다. 결과는 `loggedIn | needsEmail | needsLink | readyToSignup | unusable` 유니온이고, 실행(로그인·다이얼로그·화면 이동)은 호출부가 한다. 두 응답의 shape·분기가 같아 `/login` 진입점(§3.6)과 가입 폼의 인증 후처리(§3.8)가 같은 함수를 쓴다. 판정 기준은 `needsSignup` 같은 보조 플래그가 아니라 **토큰의 유무**다 — 진행 가능한 단계를 결정하는 것이 토큰이기 때문. `fallbackEmail` 은 응답에 `email` 이 없을 때 호출부가 이미 아는 이메일(직접 인증한 이메일)로 대신 채우는 용도다.
 
 **`snsToken.ts` — `isSnsTokenExpired(token)`**: 단기 토큰(email/link/signup)의 `exp`를 요청 전에 검사한다. 서버가 "토큰 만료"와 "인증 코드 불일치"에 **모두 401**을 주고 본문으로 구분할 수 없기 때문에, 선검사로 만료를 걸러내야 남은 401을 코드 불일치로 해석할 수 있다. 단위 테스트: `snsToken.test.ts`
 
@@ -196,12 +198,12 @@ LIFF 로그인은 페이지를 떠났다가 돌아온다. `SocialLoginButtons`�
 
 `apps/web/src/features/login/ui/SocialLoginButtons.tsx`
 
-- `handleSnsLoginSuccess(provider, data)`: 응답 4분기를 provider 공통으로 처리한다.
-  - `token && refreshToken` → `login()`
-  - `needsEmail && emailToken` → `saveSnsSignupContext({ provider, emailToken })` + `router.push("/signup/sns")`. **`needsLinkConfirm` 검사보다 먼저** 온다 — 이메일이 없으면 연결·가입 판정 자체가 불가능하기 때문.
-  - `needsLinkConfirm && linkToken && email` → `setLinkPrompt({ provider, ... })` (다이얼로그 오픈)
-  - `needsSignup && signupToken` → `saveSnsSignupContext()` + `router.push("/signup/sns")`. **`email`을 요구하지 않는다** — LINE은 없을 수 있다.
-  - 그 외 → provider별 `*_login_response_error` 토스트
+- `handleSnsLoginSuccess(provider, data)`: `classifySnsAuthResponse(data)` 로 결과를 판정하고 결과별 실행만 한다(판정 로직은 §3.3).
+  - `loggedIn` → `login()`
+  - `needsEmail` → `saveSnsSignupContext({ status: "emailPending", ... })` + `router.push("/signup/sns")`. **`needsLink` 판정보다 먼저** 온다 — 이메일이 없으면 연결·가입 판정 자체가 불가능하기 때문.
+  - `needsLink` → `setLinkPrompt({ provider, ... })` (다이얼로그 오픈)
+  - `readyToSignup` → `saveSnsSignupContext({ status: "ready", ... })` + `router.push("/signup/sns")`. **`email`을 요구하지 않는다** — LINE은 없을 수 있다.
+  - `unusable` → provider별 `*_login_response_error` 토스트
 - `handleGoogleClick`: `requestGoogleIdToken()` → mutate. `GoogleSignInCancelledError`는 무음, 그 외는 toast.
 - `handleLineClick`: `getValidLineIdToken()`이 있으면 바로 mutate(리다이렉트 없음), 없으면 `markLineLoginPending()` + `startLineLogin()`.
 - LINE login이 **401**이면 `clearLineSession()`을 호출해 다음 클릭이 새 토큰으로 시작되게 한다. 자동 재시도는 하지 않는다.
@@ -226,23 +228,25 @@ LIFF 로그인은 페이지를 떠났다가 돌아온다. `SocialLoginButtons`�
 - 컨텍스트 상태에 따라 폼 상단이 갈린다.
   - **Ready** → `context.email`이 있으면 읽기 전용 "계정" 필드, 없으면 블록 자체를 렌더하지 않는다.
   - **EmailPending** → `SnsEmailVerification` 블록. 닉네임·약관은 그대로 보이고 **제출 버튼만 잠긴다.**
-- 인증 성공(`handleEmailVerified`) 처리는 **분기하지 않는다.**
-  - 인증을 통과하면 `isEmailVerified`로 제출 잠금을 푼다 — **인증한 이메일에 계정이 있는지 없는지로 여기서 막지 않는다.**
-  - `signupToken` 이 함께 오면 컨텍스트를 Ready 로 교체 저장한다(새로고침 내성).
-  - `token && refreshToken` 이면 방어적으로 즉시 로그인한다(`GuestOnly`가 홈으로 보낸다).
-- **가입 가능 여부는 제출 응답으로 판정한다.** 이미 가입된 이메일이면 `line/signup` 이 409를 주고, `useLineSignupMutation` 의 `toastOnError` 가 서버 message 를 띄운다. 인증은 됐지만 서버가 `signupToken` 을 주지 않은 경우(= 그 이메일에 계정이 있어 연결이 정상 경로인 경우)도 그대로 제출해 응답으로 판정한다.
-- **연결 확인 다이얼로그를 띄우지 않는다.** 인증 단계에서 계정 존재를 UI로 먼저 알리지 않는다는 결정이다. `/login` 진입점의 연결 플로우(§3.7)는 그대로 유지된다.
+- 인증 성공(`handleEmailVerified`)은 `classifySnsAuthResponse(data, { fallbackEmail: verifiedEmail })` 로 판정하고 결과별로 실행한다. verify 응답은 login 과 shape 이 같으므로 분기도 같다.
+  - `loggedIn` → 컨텍스트를 지우고 즉시 로그인(`GuestOnly`가 홈으로 보낸다).
+  - `needsLink` → `setLinkPrompt` 로 연결 확인 다이얼로그를 띄운다. 신규 가입이 아니라 **기존 계정에 SNS를 연결하는 경로**이므로 `/login` 진입점과 같은 처리다.
+  - `readyToSignup` → 컨텍스트를 Ready 로 교체 저장(새로고침 내성)하고 제출을 연다.
+  - `needsEmail` / `unusable` → `verify_failed` 토스트. 진행할 수 있는 단계가 없다.
+- **제출 가능 조건은 `isSnsSignupReady(context)` 하나다.** 인증 통과를 별도 플래그로 두면 signupToken 없이 제출이 열려 빈 토큰을 보내는 경로가 생긴다.
+- 그래도 **가입 가능 여부의 최종 판정은 제출 응답이다.** 이미 가입된 이메일이면 `line/signup` 이 409를 주고 `useLineSignupMutation` 의 `toastOnError` 가 서버 message 를 띄운다.
 
 ### 3.9 이메일 직접 입력 — `SnsEmailVerification`
 
 `apps/web/src/features/signup/ui/SnsEmailVerification.tsx`
 
-- props: `{ emailToken, onVerified(data, email), onExpired }` — 인증 결과의 후처리는 부모(`SnsSignupForm`)가 맡는다.
+- props: `{ emailToken, onVerified(data, email): void, onExpired }` — 인증 결과의 후처리는 부모(`SnsSignupForm`)가 맡는다. `onVerified` 는 값을 돌려주지 않는다: 인증이 가입 단계로 이어지면 부모가 컨텍스트를 Ready 로 바꿔 이 컴포넌트를 계정 필드로 교체하므로, 자식이 "인증 완료"를 따로 기록할 이유가 없다.
+- 화면 상태는 `{ phase: "editing" } | { phase: "awaitingCode" } | { phase: "rejected"; message }` 유니온 하나다. 발송 여부·오류 문구를 독립 플래그로 두면 "인증 성공인데 오류 문구도 있는" 조합이 타입 단계에서 허용되고, 그걸 막는 수동 리셋 절차가 onChange 마다 늘어난다. 재발송 카운트다운만 직교하는 축이라 별도 상태다.
 - 이메일 입력 / 코드 발송 / 재발송 카운트다운(`RESEND_INITIAL_SECONDS` 28초) / 코드 검증 / 인라인 메시지를 전부 소유한다. 스키마는 `model/snsEmailSchema.ts`.
 - 인증 통과 판정은 서버가 주는 signupToken 이 하므로 스키마에 `isVerified` 같은 플래그를 두지 않는다(일반 `SignupForm`과 다른 점).
 - 요청 전에 `isSnsTokenExpired(emailToken)`을 검사한다 → 만료면 `onExpired()`.
 - **401 해석**: `email/code`의 401은 emailToken 만료뿐이라 `onExpired()`. `email/verify`의 401은 만료를 이미 걸러냈으므로 **코드 불일치**로 보고 인라인 표시(`code_not_match`).
-- 이메일을 수정하면 발송·인증 상태를 초기화한다 — 이전 이메일로 받은 코드는 의미가 없다.
+- 이메일을 수정하면 `editing` 으로 되돌린다 — 이전 이메일로 받은 코드는 의미가 없다. 코드만 고치거나 재발송하면 실패 문구만 지운다(`awaitingCode`).
 - 새 i18n 키가 없다. 일반 `SignupForm`의 이메일 인증 키를 그대로 재사용한다.
 
 ---
@@ -296,8 +300,8 @@ PostLineEmailVerifyPayload  // { emailToken, email, code }
 | --- | --- | --- | --- |
 | `accessToken`, `refreshToken` | `useUserAuthStore` → localStorage (persist) | 로그아웃까지 | refresh 시 `updateAccessToken()`이 새 토큰의 `id/exp`도 재추출. |
 | `id`, `exp` (JWT claims) | `useUserAuthStore` (persist 대상) | accessToken과 동일 | mypage `useGet*Query` 의 queryKey 스코핑에 사용. |
-| `provider` + `signupToken` + `email?` | `snsAuthStorage` → sessionStorage | 탭 종료 / `clearSnsSignupContext()` | signupToken JWT는 10분 만료. |
-| `provider` + `emailToken` | `snsAuthStorage` → sessionStorage | 탭 종료 / 인증 성공 시 signupToken 으로 교체 | emailToken JWT도 10분 만료. signupToken과 배타적. |
+| `status: "ready"` + `provider` + `signupToken` + `email?` | `snsAuthStorage` → sessionStorage | 탭 종료 / `clearSnsSignupContext()` | signupToken JWT는 10분 만료. |
+| `status: "emailPending"` + `provider` + `emailToken` | `snsAuthStorage` → sessionStorage | 탭 종료 / 인증 성공 시 signupToken 으로 교체 | emailToken JWT도 10분 만료. signupToken과 배타적. |
 | `linkToken` + `email` | `SocialLoginButtons` 컴포넌트 state (`linkPrompt`) | 다이얼로그 닫힘 / 컴포넌트 unmount | sessionStorage에는 저장하지 않음. |
 | `sns:linePending` | sessionStorage | 복귀 시 즉시 소비 | LIFF 리다이렉트 왕복 식별용. |
 | LINE id_token | LIFF 내부 저장소 | **1시간** | 갱신 API 없음. 만료 시 logout → login. |

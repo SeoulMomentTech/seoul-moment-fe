@@ -191,11 +191,14 @@ password flows.
   - **LINE may not provide an email** (scope unapproved / user declined / no email on
     the account). The server then returns `needsEmail`/`emailToken` instead of a
     signupToken, and the user verifies an email inside the SNS signup form via
-    `line/email/{code,verify}`. Verification is allowed whether or not an account
-    already uses that email — **the form does not branch on it and never opens the link
-    dialog**; passing verification just unlocks submit, and `line/signup` decides (409
-    for an email already taken). `SnsSignupContext` is a union of "ready"
-    (`signupToken`) and "email pending" (`emailToken`) — narrow with `isSnsSignupReady()`.
+    `line/email/{code,verify}`. The verify response has the same shape as `login`, so the
+    form re-branches on it through the same classifier the login screen uses
+    (`classifySnsAuthResponse` in `login/lib/snsAuthOutcome.ts`) — an already-linked
+    account logs straight in, an existing account opens the link dialog, and only a
+    `signupToken` unlocks submit. `SnsSignupContext` is a `status`-tagged union of
+    `"ready"` (`signupToken`) and `"emailPending"` (`emailToken`) — narrow with
+    `isSnsSignupReady()`; the literal tag is what keeps the two tokens mutually
+    exclusive at the type level.
   - **The server answers 401 for both an expired token and a wrong code.** Callers must
     pre-check `exp` with `isSnsTokenExpired()` (`login/lib/snsToken.ts`) so a remaining
     401 can be read as a code mismatch.

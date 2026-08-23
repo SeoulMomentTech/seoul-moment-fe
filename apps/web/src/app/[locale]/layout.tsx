@@ -129,8 +129,8 @@ export default async function RootLayout({ children }: PropsWithChildren) {
               <main className="mx-auto min-h-[calc(100vh-200px)] bg-white">
                 {children}
                 {/* 우측 하단은 챗봇 플로팅 버튼 자리다. 기본값(bottom-right)이면
-                    토스트가 버튼을 덮어 클릭이 막히므로 하단 중앙으로 옮긴다. */}
-                <Toaster position="bottom-center" />
+                    토스트가 버튼을 덮어 클릭이 막히므로 상단 중앙으로 옮긴다. */}
+                <Toaster position="top-center" />
                 <GlobalQueryHandler />
               </main>
               <Footer />
