@@ -63,7 +63,11 @@ Both apps follow this import sequence:
 @import "@seoul-moment/ui/styles.css";
 ```
 
-Web adds: Pretendard font import, `tailwind-scrollbar-hide/v4`, custom scrollbar utilities.
+Web adds a Pretendard font import and custom scrollbar utilities: `scrollbar-hide`,
+`scrollbar-medium`, `scrollbar-small`, `scrollbar-color-transparent`, `scrollbar-color-neutral`.
+Keep the standard properties (`scrollbar-width` / `scrollbar-color`) inside
+`@supports not selector(::-webkit-scrollbar)` — Chromium drops every `::-webkit-scrollbar*`
+rule on an element as soon as one of them applies. See `apps/web/src/app/globals.css`.
 
 ## @seoul-moment/ui Component Library
 
