@@ -25,16 +25,44 @@ App-specific guides (commands, architecture, API layer, conventions):
 - **GitHub Actions** `ci.yml` runs `pnpm typecheck` + `pnpm lint` on PRs to `develop`
 - Package references use `workspace:*` protocol
 
+### Dependency versions (catalog)
+
+Anything used by **2+ workspaces** lives in the `stable` catalog in `pnpm-workspace.yaml`; each
+package.json references it as `"catalog:stable"`. Bump the version there, not in package.json.
+Single-app deps (`next`, `axios`, `swiper`, …) stay declared locally as normal ranges.
+
+Two rules that are easy to get wrong:
+
+- **peerDependencies are never catalogued.** Peer ranges are deliberately wide (`react: ^19.0.0`);
+  collapsing them onto the catalog's exact pin would over-constrain consumers of `@seoul-moment/ui`.
+- **`pnpm.overrides` still holds `postcss`.** It is a security pin (4 GHSAs) on a *transitive*
+  dependency of `@tailwindcss/postcss` and `vite`. Catalogs only reach direct dependencies, so this
+  one cannot move — see 0bc70ba. `packages/ui` is `private: false`, so if it is ever published it
+  must go out via `pnpm publish`, which rewrites `catalog:` to real versions; plain `npm publish`
+  would ship the unresolved protocol.
+
+The four `tailwindcss` / `@tailwindcss/*` entries are pinned exactly and must move together — they
+are one release train, and letting them drift installs multiple copies of the engine.
+
+For an experiment that spans several packages, add a `beta` catalog and point only the packages
+under test at `catalog:beta`. Catalogs do **not** compose (`catalog:beta` will not fall back to
+`stable`), and pnpm never warns about an unused catalog — so restore the references and delete the
+`beta` block in the same commit that ends the experiment.
+
 ## TypeScript 6/7 Dual Setup
 
 TypeScript 7 is the Go-native compiler. It ships **no compiler API** (stable API lands in 7.1),
 so anything that does `require("typescript")` — typescript-eslint, Next.js, tsconfck — cannot run
-on it. `apps/web`, `apps/admin`, and `packages/ui` therefore install both, via npm aliases:
+on it. `apps/web`, `apps/admin`, and `packages/ui` therefore install both, via npm aliases. Both
+aliases live in the `stable` catalog, so the pair is defined once in `pnpm-workspace.yaml`:
 
-```jsonc
-"@typescript/native": "npm:typescript@~7.0.2",          // real TS 7  -> `tsc`  binary
-"typescript": "npm:@typescript/typescript6@~6.0.2"      // TS 6 API   -> `tsc6` binary
+```yaml
+"@typescript/native": npm:typescript@~7.0.2          # real TS 7  -> `tsc`  binary
+typescript: npm:@typescript/typescript6@~6.0.2       # TS 6 API   -> `tsc6` binary
 ```
+
+The three packages just carry `"typescript": "catalog:stable"` and `"@typescript/native":
+"catalog:stable"`.
 
 | Runs on | What |
 | --- | --- |
@@ -49,8 +77,9 @@ is a *peerDependency*, so it always resolves from the importing package.
 defaults to spawning `typescript`'s `bin.tsc`, and the compat package only exposes `tsc6`, which
 would break `next build`. API mode costs ~8s extra on `next build` (10s → 18s).
 
-**When TS 7.1 ships a stable API**: drop the aliases back to a plain `"typescript": "~7.x"`, remove
-`useTypeScriptCli` from `next.config.ts`, and delete the `typecheck:ts6` scripts.
+**When TS 7.1 ships a stable API**: replace the two catalog entries with a plain
+`typescript: ~7.x` (one edit, all three packages follow), drop the `@typescript/native` references,
+remove `useTypeScriptCli` from `next.config.ts`, and delete the `typecheck:ts6` scripts.
 
 Each package has a `typecheck:ts6` script (`tsc6`) to cross-check TS 7 results against TS 6 when a
 diagnostic looks suspicious. Editors use VS Code's bundled TypeScript; the compat package ships no

@@ -3,17 +3,17 @@
   "version": "1.0.0",
   "description": "",
   "keywords": [],
+  "license": "ISC",
   "author": "",
   "type": "module",
-  "license": "ISC",
   "exports": {
     ".": "./shared-styles.css",
     "./postcss": "./postcss.config.js"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
+    "@tailwindcss/postcss": "catalog:stable",
     "postcss": "^8.5.26",
-    "tailwindcss": "^4",
-    "tailwindcss-animated": "^2.0.0"
+    "tailwindcss": "catalog:stable",
+    "tailwindcss-animated": "catalog:stable"
   }
 }

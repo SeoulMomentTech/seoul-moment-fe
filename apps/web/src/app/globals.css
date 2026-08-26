@@ -5,7 +5,6 @@
 @import "tailwindcss";
 @import "@seoul-moment/tailwind-config";
 @import "@seoul-moment/ui/styles.css";
-@import "tailwind-scrollbar-hide/v4";
 
 :root {
   --background: var(--neutral-0);
@@ -40,6 +39,18 @@
   --text-body-5: 12px;
 }
 
+/*
+ * 스크롤바 유틸리티.
+ *
+ * 주의: Chromium 은 표준 속성(`scrollbar-width` / `scrollbar-color`)이 하나라도
+ * 지정되면 `::-webkit-scrollbar*` 의사요소 스타일을 통째로 무시한다. 그래서 표준
+ * 속성은 반드시 `@supports not selector(::-webkit-scrollbar)` 안에서만 쓴다.
+ *
+ * 폭 지정 유틸을 `scrollbar-small` 로 부르는 것도 같은 이유다. Tailwind 4.3 이
+ * 추가한 동명의 내장 폭 유틸은 `scrollbar-width` 를 조건 없이 걸어버려서, 이름이
+ * 겹치면 아래 의사요소 규칙이 통째로 무시된다.
+ * (내장 유틸 이름을 여기 적으면 스캐너가 후보로 주워 실제로 생성되므로 적지 않는다)
+ */
 @utility scrollbar-hide {
   /* Firefox */
   scrollbar-width: none;
@@ -47,16 +58,6 @@
   /* Safari and Chrome */
   &::-webkit-scrollbar {
     display: none;
-  }
-}
-
-@utility scrollbar-default {
-  /* Firefox */
-  scrollbar-width: auto;
-
-  /* Safari and Chrome */
-  &::-webkit-scrollbar {
-    display: block;
   }
 }
 
@@ -90,11 +91,10 @@
   @supports not selector(::-webkit-scrollbar) {
     scrollbar-color: rgba(19, 20, 22, 0.1);
     scrollbar-width: thin;
-    scrollbar-height: thin;
   }
 }
 
-@utility scrollbar-thin {
+@utility scrollbar-small {
   @supports selector(::-webkit-scrollbar) {
     &::-webkit-scrollbar {
       width: 8px;
@@ -104,7 +104,6 @@
 
   @supports not selector(::-webkit-scrollbar) {
     scrollbar-width: thin;
-    scrollbar-height: thin;
   }
 }
 
@@ -120,17 +119,10 @@
   }
 }
 
-@utility scrollbar-transition {
-  transition: all 0.3s ease;
-
-  @supports selector(::-webkit-scrollbar-thumb) {
-    &::-webkit-scrollbar-thumb {
-      transition: all 0.3s ease;
-    }
-  }
-
+@utility scrollbar-color-neutral {
+  /* thumb 색은 webkit 쪽 유틸에서 지정하므로 여기서는 의사요소를 다루지 않는다. */
   @supports not selector(::-webkit-scrollbar) {
-    transition: all 0.3s ease;
+    scrollbar-color: var(--neutral-200) transparent;
   }
 }
 

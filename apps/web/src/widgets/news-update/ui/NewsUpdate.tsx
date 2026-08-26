@@ -18,7 +18,7 @@ export function NewsUpdate({ news }: NewsUpdateProps) {
       <div
         className={cn(
           "h-ful flex h-[428px] w-full flex-1 flex-col gap-[20px] overflow-auto overscroll-contain",
-          "scrollbar-thin scrollbar-color-transparent",
+          "scrollbar-small scrollbar-color-transparent",
         )}
       >
         {news.map((item) => (
