@@ -108,7 +108,6 @@ import { cn } from "@seoul-moment/ui";
   @import "tailwindcss";
   @import "@seoul-moment/tailwind-config";
   @import "@seoul-moment/ui/styles.css";
-  @import "tailwind-scrollbar-hide/v4";
   ```
 - **전역 규칙** (globals.css / shared-styles.css)
   - 모든 요소에 포커스 링 리셋: `* { @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-transparent focus-visible:ring-offset-0; }`
@@ -214,7 +213,9 @@ import { Button, Dialog, Input, Card, VStack, HStack, Flex, cn } from "@seoul-mo
 
 - **animate 토큰**: `animate-accordion-down` / `animate-accordion-up` (Radix accordion 높이), `animate-in` / `animate-out`(enter/exit)
 - **enter/exit 유틸**: `fade-in-0` / `fade-out-0`, `zoom-in-95` / `zoom-out-95`, `slide-in-from-{top,bottom,left,right}` / `slide-out-to-{top,bottom,left,right}`, 소형 변형 `slide-in-from-*-2`(0.5rem offset)
-- **스크롤바 유틸**([globals.css](./src/app/globals.css)): `scrollbar-hide`, `scrollbar-default`, `scrollbar-medium`, `scrollbar-thin`, `scrollbar-color-transparent`, `scrollbar-transition`
+- **스크롤바 유틸**([globals.css](./src/app/globals.css)): `scrollbar-hide`, `scrollbar-medium`(12px), `scrollbar-small`(8px), `scrollbar-color-transparent`, `scrollbar-color-neutral`
+  - Chromium 은 표준 속성(`scrollbar-width` / `scrollbar-color`)이 하나라도 걸리면 `::-webkit-scrollbar*` 스타일을 전부 무시합니다. 위 유틸은 표준 속성을 `@supports not selector(::-webkit-scrollbar)` 안에만 둬서 이를 피합니다.
+  - 같은 이유로 Tailwind 내장 스크롤바 폭 유틸은 쓰지 않습니다 — 무조건 `scrollbar-width` 를 걸어 커스텀 thumb 이 시스템 기본으로 되돌아갑니다.
 
 #### 로드 연출 유틸 (CSS 전용)
 
