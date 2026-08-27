@@ -3,6 +3,9 @@ name: code-review
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
+    # Release promotions (develop -> main) carry the whole release diff and blow past the
+    # OpenAI TPM ceiling. That tree was already reviewed on the release PR into develop.
+    branches-ignore: [main]
   issue_comment:
     types: [created]
   pull_request_review_comment:
