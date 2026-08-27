@@ -20,7 +20,7 @@ const styleMap = {
   },
   mobile: {
     section:
-      "max-sm:flex max-sm:flex-col max-sm:max-w-auto max-sm:min-w-auto max-sm:w-full max-sm:min-h-[686px] max-sm:h-auto",
+      "max-sm:flex max-sm:flex-col max-sm:min-w-auto max-sm:w-full max-sm:min-h-[686px] max-sm:h-auto",
     image: "max-sm:w-full max-sm:h-[400px]",
     titleBox: "max-sm:w-full max-sm:py-[40px] max-sm:px-[20px]",
     category: "",

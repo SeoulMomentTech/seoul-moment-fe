@@ -182,7 +182,7 @@ gh pr create --base develop --title "chore(release): web v0.2.0" --body "<body>"
 - The husky pre-commit hook blocks commits made directly on `develop` — which is exactly why Phase 2 works on a `chore/release-*` branch. `.lintstagedrc` matches only `apps/*/src/**/*.{js,ts,jsx,tsx}`, so `package.json` and `CHANGELOG.md` are **not** reformatted on commit; what you wrote is what lands.
 - Multi-app commit/title: `chore(release): web v0.2.0, admin v0.1.0`.
 - Body follows `.github/pull_request_template.md` (Summary / Details / Notes). Put the generated CHANGELOG section under **Details**.
-- No `--label`: per `github-pr-creator`, `chore` has no label mapping.
+- No `--label`: per `github-pr-creator`, `chore` has no label mapping. The `release` label belongs to the Phase 4 promotion PR only — this PR's title is `chore(release):`, not a bare `release:`, and it merges into `develop` rather than deploying anything.
 
 Wait for CI (`ci.yml` runs typecheck + lint on PRs to `develop`):
 
@@ -216,7 +216,17 @@ Confirm the release commit is on `develop`, then present the release summary:
 ```bash
 gh pr create --base main --head develop \
   --title "release: web v0.2.0" \
-  --body "<CHANGELOG + link to the Phase 2 PR>"
+  --body "<CHANGELOG + link to the Phase 2 PR>" \
+  --label release
+```
+
+`--label release` is mandatory here. Per `github-pr-creator`'s title-prefix rule, every PR
+titled `release:` carries the `release` label — it is what marks a production promotion in
+the PR list. Verify the label exists first (`gh label list --json name`) and create it if
+absent:
+
+```bash
+gh label create release --description "Production release: promotion PR into main" --color 0E8A16
 ```
 
 Two traps — read both before running anything:

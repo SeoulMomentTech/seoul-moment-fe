@@ -15,33 +15,64 @@ import {
 } from "@seoul-moment/ui";
 
 import { useGoogleLinkMutation } from "../api/useGoogleLinkMutation";
+import { useLineLinkMutation } from "../api/useLineLinkMutation";
+import type { SnsProvider } from "../lib/snsAuthStorage";
 
-interface GoogleLinkConfirmDialogProps {
+const TEXT_KEYS = {
+  google: {
+    title: "connect_google_to_existing_account",
+    description: "connect_account_to_google",
+    failed: "connect_google_failed",
+  },
+  line: {
+    title: "connect_line_to_existing_account",
+    description: "connect_account_to_line",
+    failed: "connect_line_failed",
+  },
+} as const satisfies Record<SnsProvider, Record<string, string>>;
+
+interface SnsLinkConfirmDialogProps {
   open: boolean;
+  provider: SnsProvider;
   email: string;
   linkToken: string;
   onOpenChange(open: boolean): void;
   onLinked?(): void;
 }
 
-export function GoogleLinkConfirmDialog({
+export function SnsLinkConfirmDialog({
   open,
+  provider,
   email,
   linkToken,
   onOpenChange,
   onLinked,
-}: GoogleLinkConfirmDialogProps) {
+}: SnsLinkConfirmDialogProps) {
   const t = useTranslations();
-  const linkMutation = useGoogleLinkMutation({
-    onSuccess: () => {
-      onOpenChange(false);
-      onLinked?.();
-    },
-    onError: () => {
-      toast.error(t("connect_google_failed"));
-      onOpenChange(false);
-    },
+  const textKeys = TEXT_KEYS[provider];
+
+  const handleSuccess = () => {
+    onOpenChange(false);
+    onLinked?.();
+  };
+
+  const handleError = () => {
+    toast.error(t(textKeys.failed));
+    onOpenChange(false);
+  };
+
+  // 훅은 조건부로 호출할 수 없으므로 둘 다 생성하고 provider 로 골라 쓴다.
+  // 실제로 요청을 보내는 쪽만 동작하므로 부작용은 없다.
+  const googleLinkMutation = useGoogleLinkMutation({
+    onSuccess: handleSuccess,
+    onError: handleError,
   });
+  const lineLinkMutation = useLineLinkMutation({
+    onSuccess: handleSuccess,
+    onError: handleError,
+  });
+  const linkMutation =
+    provider === "line" ? lineLinkMutation : googleLinkMutation;
 
   const handleConfirm = () => {
     if (linkMutation.isPending) return;
@@ -70,13 +101,13 @@ export function GoogleLinkConfirmDialog({
       >
         <VStack className="w-full" gap={12}>
           <DialogTitle className="text-title-4 text-foreground text-left font-semibold leading-tight">
-            {t("connect_google_to_existing_account")}
+            {t(textKeys.title)}
           </DialogTitle>
           <DialogDescription className="text-body-3 text-left leading-normal text-black/60">
             <strong className="font-semibold text-black/80">{email}</strong>{" "}
             {t("account_exists")}
             <br />
-            {t("connect_account_to_google")}
+            {t(textKeys.description)}
           </DialogDescription>
         </VStack>
 

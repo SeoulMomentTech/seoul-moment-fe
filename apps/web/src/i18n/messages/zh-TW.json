@@ -305,5 +305,11 @@
   "chatbot_suggestions_error": "無法載入建議問題，請直接輸入您的問題。",
   "chatbot_rate_limit_notice": "請稍後再試。（{seconds} 秒）",
   "chatbot_list_expand": "查看其餘 {count} 個",
-  "chatbot_list_collapse": "收合"
+  "chatbot_list_collapse": "收合",
+  "connect_line_to_existing_account": "將 LINE 帳號連結至既有帳號",
+  "connect_line_failed": "LINE 帳號連結失敗，請再試一次。",
+  "connect_account_to_line": "您是否要將此帳號連結 LINE 登入？",
+  "line_login_response_error": "無法處理 LINE 登入回應。",
+  "line_login_failed": "LINE 登入失敗，請再試一次。",
+  "line_login_start_error": "無法啟動 LINE 登入。"
 }

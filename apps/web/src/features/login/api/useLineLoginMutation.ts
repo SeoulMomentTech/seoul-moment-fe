@@ -1,30 +1,30 @@
 import type { HTTPError } from "ky";
 
 import {
-  postGoogleLogin,
-  type PostGoogleLoginPayload,
-  type PostGoogleLoginResponse,
+  postLineLogin,
+  type PostLineLoginPayload,
+  type PostLineLoginResponse,
 } from "@shared/services/auth";
 
 import useAppMutation from "@/shared/lib/hooks/query/useAppMutation";
 
 import type { CommonRes } from "@shared/services";
 
-interface UseGoogleLoginMutationOptions {
-  onSuccess?(data: PostGoogleLoginResponse): void;
+interface UseLineLoginMutationOptions {
+  onSuccess?(data: PostLineLoginResponse): void;
   onError?(error: HTTPError): void;
 }
 
-export function useGoogleLoginMutation({
+export function useLineLoginMutation({
   onSuccess,
   onError,
-}: UseGoogleLoginMutationOptions = {}) {
+}: UseLineLoginMutationOptions = {}) {
   return useAppMutation<
-    CommonRes<PostGoogleLoginResponse>,
+    CommonRes<PostLineLoginResponse>,
     HTTPError,
-    PostGoogleLoginPayload
+    PostLineLoginPayload
   >({
-    mutationFn: postGoogleLogin,
+    mutationFn: postLineLogin,
     onSuccess: (res) => {
       onSuccess?.(res.data);
     },

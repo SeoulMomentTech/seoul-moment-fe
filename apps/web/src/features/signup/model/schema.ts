@@ -2,13 +2,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import { PASSWORD_RULES } from "@shared/lib/hooks/usePasswordRules";
-import {
-  NICKNAME_MAX_LENGTH,
-  NICKNAME_MIN_LENGTH,
-  NICKNAME_PATTERN,
-} from "@shared/lib/nickname";
+import { isValidNickname, sanitizeNickname } from "@shared/lib/nickname";
 
 export const RESEND_INITIAL_SECONDS = 28;
+
+/**
+ * 닉네임 필드의 값 관계. 입력은 항상 sanitize 되고, 그 결과가 닉네임 규칙을
+ * 만족해야 유효하다. 입력 시점의 정리와 제출 시점의 검증이 같은 관계를 쓴다.
+ */
+export const nicknameSchema = z
+  .string()
+  .transform(sanitizeNickname)
+  .refine(isValidNickname);
 
 const passwordSchema = z
   .string()
@@ -23,11 +28,7 @@ export const signupSchema = z
     email: z.string().email(),
     verificationCode: z.string().min(1),
     isVerified: z.boolean().refine((value) => value === true),
-    nickname: z
-      .string()
-      .min(NICKNAME_MIN_LENGTH)
-      .max(NICKNAME_MAX_LENGTH)
-      .regex(NICKNAME_PATTERN),
+    nickname: nicknameSchema,
     password: passwordSchema,
     passwordConfirm: z.string(),
     termsOfService: z.boolean().refine((value) => value === true),

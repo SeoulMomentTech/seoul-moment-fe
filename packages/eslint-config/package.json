@@ -2,6 +2,9 @@
   "name": "@seoul-moment/eslint-config",
   "version": "1.0.0",
   "description": "",
+  "keywords": [],
+  "license": "ISC",
+  "author": "",
   "type": "module",
   "exports": {
     "./base": "./base.js",
@@ -12,7 +15,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
-    "eslint": "^9",
+    "eslint": "catalog:stable",
     "eslint-config-next": "16.3.0",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-react": "^7.37.5",
@@ -20,8 +23,5 @@
   },
   "peerDependencies": {
     "typescript": "^6"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  }
 }

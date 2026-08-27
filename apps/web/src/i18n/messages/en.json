@@ -305,5 +305,11 @@
   "chatbot_suggestions_error": "Couldn't load suggested questions. Type your question instead.",
   "chatbot_rate_limit_notice": "Please try again in a moment. ({seconds}s)",
   "chatbot_list_expand": "Show {count} more",
-  "chatbot_list_collapse": "Show less"
+  "chatbot_list_collapse": "Show less",
+  "connect_line_to_existing_account": "Connect LINE to Existing Account",
+  "connect_line_failed": "Failed to connect LINE account. Please try again.",
+  "connect_account_to_line": "Do you want to connect LINE login to this account?",
+  "line_login_response_error": "Unable to process the LINE login response.",
+  "line_login_failed": "LINE login failed. Please try again.",
+  "line_login_start_error": "Unable to start LINE login."
 }
