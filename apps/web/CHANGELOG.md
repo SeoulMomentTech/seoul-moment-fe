@@ -2,6 +2,12 @@
 
 All notable changes to `@seoul-moment/web` are documented here.
 
+## 1.1.1 — 2026-08-31
+
+### Fixes
+
+- Enable ISR on the home page to unfreeze build-time data (`095ef3e`)
+
 ## 1.1.0 — 2026-08-27
 
 ### Features
