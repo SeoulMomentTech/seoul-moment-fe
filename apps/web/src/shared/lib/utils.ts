@@ -11,8 +11,7 @@ export const formatDateTime = (
 export const replaceLineBreaks = (s: string) =>
   s.replace(/(\r\n|\r|\n)/g, "<br/>");
 
-export const splitLineBreaks = (s: string) =>
-  s.split(/(\r\n|\r|\n)/g).filter((w) => w !== "\n");
+export const splitLineBreaks = (s: string) => s.split(/\r\n|\r|\n/);
 
 export const createMarkup = (content?: string) => ({
   __html: replaceLineBreaks(content ?? ""),
