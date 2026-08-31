@@ -9,12 +9,30 @@ import type { getHome } from "@shared/services/home";
 import { BaseImage } from "@shared/ui/base-image";
 
 import { Link } from "@/i18n/navigation";
+import { splitLineBreaks } from "@/shared/lib/utils";
 
 import { Skeleton } from "@seoul-moment/ui";
 
 interface SeasonCollectionProps {
   promise: ReturnType<typeof getHome>;
 }
+
+interface DescriptionLine {
+  offset: number;
+  text: string;
+}
+
+/**
+ * 줄 단위로 자른 뒤 각 줄의 시작 문자 위치를 붙인다.
+ * 같은 문장이 반복돼도 offset 은 겹치지 않으므로 안정적인 key 로 쓸 수 있다.
+ */
+const toDescriptionLines = (description: string): DescriptionLine[] =>
+  splitLineBreaks(description).reduce<DescriptionLine[]>((lines, text) => {
+    const previous = lines.at(-1);
+    const offset = previous ? previous.offset + previous.text.length : 0;
+
+    return [...lines, { offset, text }];
+  }, []);
 
 export function SeasonCollection({ promise }: SeasonCollectionProps) {
   const id = useId();
@@ -44,9 +62,11 @@ export function SeasonCollection({ promise }: SeasonCollectionProps) {
           >
             {title}
           </h3>
-          <span className="max-sm:text-body-3 whitespace-break-spaces">
-            {description}
-          </span>
+          <div className="max-sm:text-body-3">
+            {toDescriptionLines(description).map(({ offset, text }) => (
+              <p key={offset}>{text}</p>
+            ))}
+          </div>
         </div>
         <Link
           className={cn("text-body-2 flex items-center", "max-sm:text-body-4")}
