@@ -2,6 +2,12 @@
 
 All notable changes to `@seoul-moment/web` are documented here.
 
+## 1.1.2 — 2026-08-31
+
+### Other
+
+- Use Tailwind spacing scale in PrimeSection (`1b53077`)
+
 ## 1.1.1 — 2026-08-31
 
 ### Fixes
