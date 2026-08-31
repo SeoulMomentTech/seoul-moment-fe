@@ -28,14 +28,14 @@ export function SeasonCollection({ promise }: SeasonCollectionProps) {
   return (
     <section
       className={cn(
-        "w-7xl mx-auto flex justify-between pt-[100px]",
-        "max-sm:w-auto max-sm:flex-col-reverse max-sm:gap-10 max-sm:px-5 max-sm:pt-[90px]",
+        "w-7xl pt-25 mx-auto flex justify-between",
+        "max-sm:pt-22.5 max-sm:w-auto max-sm:flex-col-reverse max-sm:gap-10 max-sm:px-5",
       )}
     >
       <div
         className={cn(
-          "flex flex-col justify-center gap-[90px]",
-          "max-sm:ml-0 max-sm:gap-[30px]",
+          "gap-22.5 flex flex-col justify-center",
+          "max-sm:gap-7.5 max-sm:ml-0",
         )}
       >
         <div className="flex flex-col gap-5">
@@ -44,7 +44,9 @@ export function SeasonCollection({ promise }: SeasonCollectionProps) {
           >
             {title}
           </h3>
-          <span className="max-sm:text-body-3">{description}</span>
+          <span className="max-sm:text-body-3 whitespace-break-spaces">
+            {description}
+          </span>
         </div>
         <Link
           className={cn("text-body-2 flex items-center", "max-sm:text-body-4")}
@@ -58,17 +60,11 @@ export function SeasonCollection({ promise }: SeasonCollectionProps) {
         </Link>
       </div>
       <div
-        className={cn(
-          "flex h-[590px] gap-[30px]",
-          "max-sm:h-[199px] max-sm:gap-4",
-        )}
+        className={cn("h-147.5 gap-7.5 flex", "max-sm:h-49.75 max-sm:gap-4")}
       >
         {imageUrl && (
           <figure
-            className={cn(
-              "w-[708px] bg-gray-300",
-              "max-sm:w-auto max-sm:flex-1",
-            )}
+            className={cn("w-177 bg-gray-300", "max-sm:w-auto max-sm:flex-1")}
           >
             <BaseImage
               alt=""
@@ -89,37 +85,30 @@ export function SeasonCollectionSkeleton() {
   return (
     <section
       className={cn(
-        "w-7xl mx-auto flex justify-between py-[140px]",
-        "max-sm:w-auto max-sm:flex-col-reverse max-sm:gap-10 max-sm:px-5 max-sm:py-[90px]",
+        "w-7xl py-35 mx-auto flex justify-between",
+        "max-sm:py-22.5 max-sm:w-auto max-sm:flex-col-reverse max-sm:gap-10 max-sm:px-5",
       )}
     >
       <div
         className={cn(
-          "flex flex-col justify-center gap-[90px]",
-          "max-sm:ml-0 max-sm:gap-[30px]",
+          "gap-22.5 flex flex-col justify-center",
+          "max-sm:gap-7.5 max-sm:ml-0",
         )}
       >
         <div className="flex flex-col gap-5">
-          <Skeleton
-            className={cn("h-8 w-[280px]", "max-sm:h-5 max-sm:w-[180px]")}
-          />
+          <Skeleton className={cn("w-70 h-8", "max-sm:w-45 max-sm:h-5")} />
           <div className="flex flex-col gap-3">
-            <Skeleton className="h-[18px] w-[360px] max-sm:w-full" />
-            <Skeleton className="h-[18px] w-[320px] max-sm:hidden" />
+            <Skeleton className="h-4.5 w-90 max-sm:w-full" />
+            <Skeleton className="h-4.5 w-[320px] max-sm:hidden" />
           </div>
         </div>
-        <Skeleton
-          className={cn("h-5 w-[150px]", "max-sm:h-[18px] max-sm:w-[140px]")}
-        />
+        <Skeleton className={cn("w-37.5 h-5", "max-sm:h-4.5 max-sm:w-35")} />
       </div>
       <div
-        className={cn(
-          "flex h-[590px] gap-[30px]",
-          "max-sm:h-[199px] max-sm:gap-4",
-        )}
+        className={cn("h-147.5 gap-7.5 flex", "max-sm:h-49.75 max-sm:gap-4")}
       >
         <Skeleton
-          className={cn("h-full w-[708px]", "max-sm:w-auto max-sm:flex-1")}
+          className={cn("w-177 h-full", "max-sm:w-auto max-sm:flex-1")}
         />
       </div>
     </section>
