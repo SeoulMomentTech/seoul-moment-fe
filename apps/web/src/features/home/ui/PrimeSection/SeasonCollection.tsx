@@ -9,6 +9,7 @@ import type { getHome } from "@shared/services/home";
 import { BaseImage } from "@shared/ui/base-image";
 
 import { Link } from "@/i18n/navigation";
+import { splitLineBreaks } from "@/shared/lib/utils";
 
 import { Skeleton } from "@seoul-moment/ui";
 
@@ -44,9 +45,11 @@ export function SeasonCollection({ promise }: SeasonCollectionProps) {
           >
             {title}
           </h3>
-          <span className="max-sm:text-body-3 whitespace-break-spaces">
-            {description}
-          </span>
+          <div className="max-sm:text-body-3">
+            {splitLineBreaks(description).map((w) => (
+              <p key={w}>{w}</p>
+            ))}
+          </div>
         </div>
         <Link
           className={cn("text-body-2 flex items-center", "max-sm:text-body-4")}
