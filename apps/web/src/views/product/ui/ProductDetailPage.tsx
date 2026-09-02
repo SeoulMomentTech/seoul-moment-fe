@@ -10,7 +10,7 @@ import { PRODUCT_DISPLAY_AD_SLOT } from "@shared/constants/ads";
 import { useAppQuery, useLanguage } from "@shared/lib/hooks";
 import { useUserAuthStore } from "@shared/lib/hooks/useUserAuthStore";
 import { cn } from "@shared/lib/style";
-import { setComma, toNTCurrency } from "@shared/lib/utils";
+import { setComma } from "@shared/lib/utils";
 import {
   getProductDetail,
   type GetProductDetailRes,
@@ -26,6 +26,7 @@ import {
   BrandProductList,
   ProductDetailInfo,
   ProductExternalGroup,
+  ProductPrice,
 } from "@features/product";
 import { Button } from "@seoul-moment/ui";
 import type { CommonRes } from "@shared/services";
@@ -135,41 +136,10 @@ export default function ProductDetailPage({
                 </span>
               </div>
               {/** 가격 영역*/}
-              <div className="flex flex-col gap-5">
-                {data.price > 0 && (
-                  <div className={cn("text-body-3 flex", "text-body-4")}>
-                    <span className="min-w-30">{t("price")}</span>
-                    <span
-                      className={cn(
-                        "text-black",
-                        data.discountPrice > 0 && "text-black/40 line-through",
-                      )}
-                    >
-                      {toNTCurrency(data.price)}
-                    </span>
-                  </div>
-                )}
-                {data.discountPrice > 0 && (
-                  <div className="flex items-center">
-                    <span
-                      className={cn(
-                        "text-body-3 min-w-30",
-                        "max-sm:text-body-4",
-                      )}
-                    >
-                      판매가
-                    </span>
-                    <span
-                      className={cn(
-                        "text-body-1 font-semibold",
-                        "max-sm:text-body-2",
-                      )}
-                    >
-                      {toNTCurrency(data.discountPrice)}
-                    </span>
-                  </div>
-                )}
-              </div>
+              <ProductPrice
+                discountPrice={data.discountPrice}
+                price={data.price}
+              />
             </div>
             {/** 원산지, 배송 정보 */}
             <ProductDetailInfo
