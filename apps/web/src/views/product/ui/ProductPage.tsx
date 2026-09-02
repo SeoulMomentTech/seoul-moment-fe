@@ -11,13 +11,10 @@ export default function ProductPage() {
   return (
     <div>
       <section
-        className={cn(
-          "mx-auto w-[1320px] pt-[106px]",
-          "max-sm:w-full max-sm:pt-[56px]",
-        )}
+        className={cn("w-330 pt-26.5 mx-auto", "max-sm:w-full max-sm:pt-14")}
       >
         <Banner />
-        <div className="px-[20px]">
+        <div className="px-5">
           <ProductList />
         </div>
       </section>
