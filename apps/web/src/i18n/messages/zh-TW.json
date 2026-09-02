@@ -311,5 +311,6 @@
   "connect_account_to_line": "您是否要將此帳號連結 LINE 登入？",
   "line_login_response_error": "無法處理 LINE 登入回應。",
   "line_login_failed": "LINE 登入失敗，請再試一次。",
-  "line_login_start_error": "無法啟動 LINE 登入。"
+  "line_login_start_error": "無法啟動 LINE 登入。",
+  "sale_price": "售價"
 }
