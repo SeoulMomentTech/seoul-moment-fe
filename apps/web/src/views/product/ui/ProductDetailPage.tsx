@@ -22,7 +22,11 @@ import { AvatarBadge } from "@widgets/avatar-badge/ui/AvatarBadge";
 import { Link } from "@/i18n/navigation";
 
 import { useProductLikeToggle, useTrackRecentProduct } from "@entities/product";
-import { BrandProductList, ProductExternalGroup } from "@features/product";
+import {
+  BrandProductList,
+  ProductDetailInfo,
+  ProductExternalGroup,
+} from "@features/product";
 import { Button } from "@seoul-moment/ui";
 import type { CommonRes } from "@shared/services";
 import { ProductDetailImage } from "@widgets/product-detail-image";
@@ -75,7 +79,7 @@ export default function ProductDetailPage({
         "max-sm:px-0 max-sm:pb-0 max-sm:pt-14",
       )}
     >
-      <section className={cn("mx-auto w-[1200px]", "max-sm:w-full")}>
+      <section className={cn("w-300 mx-auto", "max-sm:w-full")}>
         <div
           className={cn(
             "pb-12.5 flex gap-20 border-b border-b-black/10",
@@ -168,55 +172,18 @@ export default function ProductDetailPage({
               </div>
             </div>
             {/** 원산지, 배송 정보 */}
-            <div
-              className={cn(
-                "pb-12.5 flex flex-col gap-5 pt-5",
-                "max-sm:gap-4 max-sm:pb-4",
-              )}
-            >
-              {data.origin && (
-                <div className={cn("text-body-3 flex", "text-body-4")}>
-                  <span className="min-w-32.5">{t("place_of_origin")}</span>
-                  <span>{data.origin}</span>
-                </div>
-              )}
-              {data.shippingInfo > 0 && (
-                <div className={cn("text-body-3 flex", "text-body-4")}>
-                  <span className="min-w-32.5">
-                    {t("shipping_information")}
-                  </span>
-                  <span>{t("within_days", { n: data.shippingInfo })}</span>
-                </div>
-              )}
-              {data.shippingCost > 0 && (
-                <div className={cn("text-body-3 flex", "text-body-4")}>
-                  <span className="min-w-32.5">{t("shipping_fee")}</span>
-                  <span>{toNTCurrency(data.shippingCost)}</span>
-                </div>
-              )}
-              {/* 색상 정보 */}
-              {data.option?.COLOR?.length ? (
-                <div className={cn("text-body-3 flex", "text-body-4")}>
-                  <span className="min-w-32.5">{t("color")}</span>
-                  <span>{data.option.COLOR[0].value}</span>
-                </div>
-              ) : null}
-              {/* 사이즈 */}
-              {data.option?.SIZE?.length ? (
-                <div className={cn("text-body-3 flex", "text-body-4")}>
-                  <span className="min-w-32.5">{t("size")}</span>
-                  <span>
-                    {data.option.SIZE.map((item) => item.value).join("/")}
-                  </span>
-                </div>
-              ) : null}
-            </div>
+            <ProductDetailInfo
+              option={data.option}
+              origin={data.origin}
+              shippingCost={data.shippingCost}
+              shippingInfo={data.shippingInfo}
+            />
             <ProductExternalGroup items={data.external} />
           </div>
         </div>
         <BrandProductList data={data.relate} />
         <AdSense
-          className="my-[60px] max-sm:my-10 max-sm:px-5"
+          className="my-15 max-sm:my-10 max-sm:px-5"
           format="display"
           slot={PRODUCT_DISPLAY_AD_SLOT}
         />
