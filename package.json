@@ -16,6 +16,7 @@
     "lint:fix:admin": "turbo run lint:fix --filter=@seoul-moment/admin",
     "lint:fix:all": "turbo run lint:fix --filter=@seoul-moment/web --filter=@seoul-moment/admin",
     "lint:fix:web": "turbo run lint:fix --filter=@seoul-moment/web",
+    "option:sync": "turbo run option:sync --filter=@seoul-moment/web",
     "prepare": "husky",
     "start": "turbo run start --filter=@seoul-moment/web",
     "test:admin-e2e": "turbo run test:e2e --filter=@seoul-moment/admin",

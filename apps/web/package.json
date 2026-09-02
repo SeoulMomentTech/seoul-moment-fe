@@ -8,6 +8,7 @@
     "i18n:sync": "node scripts/syncLocaleFromSheet.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "option:sync": "node scripts/syncProductOptionTypes.js",
     "start": "next start",
     "test": "vitest",
     "test:e2e": "playwright test",
