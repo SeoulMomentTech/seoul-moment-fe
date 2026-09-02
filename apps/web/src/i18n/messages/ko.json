@@ -311,5 +311,6 @@
   "connect_account_to_line": "이 계정에 LINE 로그인을 연결하시겠습니까?",
   "line_login_response_error": "LINE 로그인 응답을 처리할 수 없습니다.",
   "line_login_failed": "LINE 로그인에 실패했습니다. 다시 시도해주세요.",
-  "line_login_start_error": "LINE 로그인을 시작할 수 없습니다."
+  "line_login_start_error": "LINE 로그인을 시작할 수 없습니다.",
+  "sale_price": "판매가"
 }
