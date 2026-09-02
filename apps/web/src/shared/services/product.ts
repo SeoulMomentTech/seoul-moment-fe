@@ -1,4 +1,5 @@
 import type { Category } from "./category";
+import type { OptionType } from "./generated/productOptionType";
 
 import type { CommonRes, PublicLanguageCode } from ".";
 import { api } from ".";
@@ -121,9 +122,8 @@ interface OptionValue {
   value: string;
 }
 
-type OptionType = "COLOR" | "SIZE" | "MATERIAL" | "FIT" | "STYLE";
-
-type DetailOption = Record<OptionType, OptionValue[]>;
+// 상세 응답은 해당 상품이 가진 옵션 키만 내려준다 (전체 OptionType 중 일부).
+type DetailOption = Partial<Record<OptionType, OptionValue[]>>;
 
 export interface GetProductDetailRes {
   id: number;

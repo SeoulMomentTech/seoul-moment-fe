@@ -195,21 +195,21 @@ export default function ProductDetailPage({
                 </div>
               )}
               {/* 색상 정보 */}
-              {data.option?.COLOR?.length > 0 && (
+              {data.option?.COLOR?.length ? (
                 <div className={cn("text-body-3 flex", "text-body-4")}>
                   <span className="min-w-32.5">{t("color")}</span>
                   <span>{data.option.COLOR[0].value}</span>
                 </div>
-              )}
+              ) : null}
               {/* 사이즈 */}
-              {data.option?.SIZE?.length > 0 && (
+              {data.option?.SIZE?.length ? (
                 <div className={cn("text-body-3 flex", "text-body-4")}>
                   <span className="min-w-32.5">{t("size")}</span>
                   <span>
                     {data.option.SIZE.map((item) => item.value).join("/")}
                   </span>
                 </div>
-              )}
+              ) : null}
             </div>
             <ProductExternalGroup items={data.external} />
           </div>

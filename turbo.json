@@ -35,6 +35,9 @@
     },
     "i18n:sync": {
       "cache": false
+    },
+    "option:sync": {
+      "cache": false
     }
   }
 }
