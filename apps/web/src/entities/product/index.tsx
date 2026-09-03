@@ -12,5 +12,7 @@ export {
   OPTION_AXIS_ORDER,
   formatOptionAxisValues,
   listProductOptionAxes,
+  splitProductOptionAxes,
   type ProductOptionAxis,
+  type ProductOptionAxisSplit,
 } from "./lib/optionAxes";

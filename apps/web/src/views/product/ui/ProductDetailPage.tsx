@@ -27,6 +27,7 @@ import {
   useProductLikeToggle,
   useTrackRecentProduct,
 } from "@entities/product";
+import { AddToCart } from "@features/cart";
 import { BrandProductList, ProductExternalGroup } from "@features/product";
 import { Button } from "@seoul-moment/ui";
 import type { CommonRes } from "@shared/services";
@@ -160,7 +161,7 @@ export default function ProductDetailPage({
                         "max-sm:text-body-4",
                       )}
                     >
-                      판매가
+                      {t("sale_price")}
                     </span>
                     <span
                       className={cn(
@@ -213,7 +214,18 @@ export default function ProductDetailPage({
                 </div>
               ))}
             </div>
-            <ProductExternalGroup items={data.external} />
+            <AddToCart
+              likeSlot={
+                <LikeCount
+                  active={liked}
+                  className="size-12 shrink-0 justify-center rounded-[4px] border border-black/20"
+                  iconSize={24}
+                  onClick={handleToggleLike}
+                />
+              }
+              product={data}
+            />
+            <ProductExternalGroup className="mt-5" items={data.external} />
           </div>
         </div>
         <BrandProductList data={data.relate} />
