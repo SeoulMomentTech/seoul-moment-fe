@@ -117,7 +117,7 @@ interface GetProductDetailReq extends PublicLanguageCode {
   id: number;
 }
 
-interface OptionValue {
+export interface OptionValue {
   id: number;
   value: string;
 }
@@ -216,11 +216,6 @@ export const getProductOptions = () =>
 
 interface GetProductOptionValueReq extends PublicLanguageCode {
   optionId: number;
-}
-
-interface OptionValue {
-  id: number;
-  value: string;
 }
 
 interface GetProductOptionValuRes {
