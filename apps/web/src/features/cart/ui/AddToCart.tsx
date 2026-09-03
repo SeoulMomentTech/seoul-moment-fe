@@ -76,7 +76,7 @@ export function AddToCart({ product, likeSlot }: AddToCartProps) {
     <div className="flex items-center gap-2">
       {likeSlot}
       <Button
-        className="h-auto flex-1 rounded-[4px] px-5 py-4 font-semibold"
+        className="h-12 flex-1 rounded-[4px] px-5 font-semibold"
         disabled={addDisabled}
         onClick={onAddToCart}
         type="button"
@@ -86,7 +86,7 @@ export function AddToCart({ product, likeSlot }: AddToCartProps) {
       </Button>
       <Button
         aria-describedby="add-to-cart-coming-soon"
-        className="h-auto flex-1 rounded-[4px] px-5 py-4 font-semibold"
+        className="h-12 flex-1 rounded-[4px] px-5 font-semibold"
         disabled
         type="button"
       >
