@@ -6,23 +6,24 @@
 
 ## 도메인 문서
 
-| 문서 | 도메인 | 핵심 내용 |
-| --- | --- | --- |
-| [product.md](./product.md) | 상품 | 목록·필터(nuqs)·무한 스크롤(IntersectionObserver)·상세(Server Promise) |
-| [auth.md](./auth.md) | 인증 | 로그인 · 회원가입(이메일 인증) · SNS Google 3-step · 토큰 갱신(401 refresh) |
-| [mypage.md](./mypage.md) | 마이페이지 | 프로필 · 찜(상품/브랜드) · 최근 조회 · 사이즈(fit) 정보 |
-| [promotion.md](./promotion.md) | 프로모션 | 중첩 동적 라우트 · 첫 브랜드 redirect · `use(promise)` + Suspense |
-| [content.md](./content.md) | 콘텐츠 | News/Article/Magazine 상세 · SSG/ISR · 공유 `@widgets/detail` · Schema.org JSON-LD |
+| 문서                           | 도메인     | 핵심 내용                                                                          |
+| ------------------------------ | ---------- | ---------------------------------------------------------------------------------- |
+| [product.md](./product.md)     | 상품       | 목록·필터(nuqs)·무한 스크롤(IntersectionObserver)·상세(Server Promise)             |
+| [cart.md](./cart.md)           | 장바구니   | 담아두기(로컬 persist) · 옵션 축 분기 · 브랜드 그룹 · 외부 몰 이동                 |
+| [auth.md](./auth.md)           | 인증       | 로그인 · 회원가입(이메일 인증) · SNS Google 3-step · 토큰 갱신(401 refresh)        |
+| [mypage.md](./mypage.md)       | 마이페이지 | 프로필 · 찜(상품/브랜드) · 최근 조회 · 사이즈(fit) 정보                            |
+| [promotion.md](./promotion.md) | 프로모션   | 중첩 동적 라우트 · 첫 브랜드 redirect · `use(promise)` + Suspense                  |
+| [content.md](./content.md)     | 콘텐츠     | News/Article/Magazine 상세 · SSG/ISR · 공유 `@widgets/detail` · Schema.org JSON-LD |
 
 ### 화면 단위 문서 (인증 UI)
 
 `auth.md`가 인증 전반 흐름을 다루며, 아래 화면 문서는 레이아웃·컴포넌트 합성 등 UI 디테일을 보완한다.
 
-| 문서 | 화면 |
-| --- | --- |
-| [login.md](./login.md) | 로그인 페이지 (`/login`) |
-| [signup.md](./signup.md) | 회원가입 페이지 (`/signup`) |
-| [find-password.md](./find-password.md) | 비밀번호 찾기 (`/find-password`) |
+| 문서                                             | 화면                                      |
+| ------------------------------------------------ | ----------------------------------------- |
+| [login.md](./login.md)                           | 로그인 페이지 (`/login`)                  |
+| [signup.md](./signup.md)                         | 회원가입 페이지 (`/signup`)               |
+| [find-password.md](./find-password.md)           | 비밀번호 찾기 (`/find-password`)          |
 | [profile-image-crop.md](./profile-image-crop.md) | 프로필 이미지 크롭 (마이페이지 세부 기능) |
 
 ## 도메인 관계 한눈에 보기
@@ -44,6 +45,7 @@ graph TD
 
     subgraph Private["인증 필요 영역"]
         Mypage["마이페이지<br/>mypage.md"]
+        Cart["장바구니<br/>cart.md"]
     end
 
     subgraph Shared["shared 계층"]
@@ -57,12 +59,14 @@ graph TD
     Home --> Promotion
     Home --> Content
     Product -->|상세·찜| Mypage
+    Product -->|담기| Cart
     Promotion -->|브랜드 상세| Product
 
     Login --> AuthStore
     Signup --> AuthStore
     FindPw --> Login
     AuthStore -->|isAuthenticated| Mypage
+    AuthStore -->|isAuthenticated| Cart
 
     Product --> Query
     Promotion --> Query
