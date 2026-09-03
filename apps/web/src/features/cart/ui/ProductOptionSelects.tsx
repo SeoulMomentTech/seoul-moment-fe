@@ -49,7 +49,7 @@ export function ProductOptionSelects({
           >
             <SelectTrigger
               aria-label={label}
-              className="text-body-3 h-auto rounded-[4px] px-3 py-4"
+              className="text-body-3 h-12 rounded-[4px] px-3"
             >
               {/* 값만 남기면 축이 3개 이상인 상품에서 무엇을 고른 건지 알 수 없다.
                   디자인은 색상·사이즈 2축 전제였고 실제 데이터는 소재·핏도 온다. */}
