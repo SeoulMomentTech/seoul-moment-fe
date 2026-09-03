@@ -116,14 +116,25 @@ interface GetProductDetailReq extends PublicLanguageCode {
   id: number;
 }
 
-interface OptionValue {
+export interface OptionValue {
   id: number;
   value: string;
 }
 
-type OptionType = "COLOR" | "SIZE" | "MATERIAL" | "FIT" | "STYLE";
+export type OptionType =
+  | "COLOR"
+  | "SIZE"
+  | "VOLUME"
+  | "TEXTURE"
+  | "MATERIAL"
+  | "FIT"
+  | "STYLE";
 
-type DetailOption = Record<OptionType, OptionValue[]>;
+/**
+ * 서버는 상품이 실제로 가진 축만 내려준다. `Record`로 두면 모든 축이 항상 존재한다고
+ * 타입이 보장해버려서 `Object.entries` 순회나 `option.COLOR[0]` 접근이 런타임에 터진다.
+ */
+export type DetailOption = Partial<Record<OptionType, OptionValue[]>>;
 
 export interface GetProductDetailRes {
   id: number;
@@ -216,11 +227,6 @@ export const getProductOptions = () =>
 
 interface GetProductOptionValueReq extends PublicLanguageCode {
   optionId: number;
-}
-
-interface OptionValue {
-  id: number;
-  value: string;
 }
 
 interface GetProductOptionValuRes {

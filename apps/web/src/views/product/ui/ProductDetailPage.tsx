@@ -21,7 +21,12 @@ import { AvatarBadge } from "@widgets/avatar-badge/ui/AvatarBadge";
 
 import { Link } from "@/i18n/navigation";
 
-import { useProductLikeToggle, useTrackRecentProduct } from "@entities/product";
+import {
+  formatOptionAxisValues,
+  listProductOptionAxes,
+  useProductLikeToggle,
+  useTrackRecentProduct,
+} from "@entities/product";
 import { BrandProductList, ProductExternalGroup } from "@features/product";
 import { Button } from "@seoul-moment/ui";
 import type { CommonRes } from "@shared/services";
@@ -61,6 +66,8 @@ export default function ProductDetailPage({
   });
 
   useTrackRecentProduct({ productId: id });
+
+  const optionAxes = listProductOptionAxes(data?.option);
 
   const handleToggleShowMore = (showMore: boolean) => {
     setShowMore(showMore);
@@ -194,22 +201,17 @@ export default function ProductDetailPage({
                   <span>{toNTCurrency(data.shippingCost)}</span>
                 </div>
               )}
-              {/* 색상 정보 */}
-              {data.option?.COLOR?.length > 0 && (
-                <div className={cn("text-body-3 flex", "text-body-4")}>
-                  <span className="min-w-32.5">{t("color")}</span>
-                  <span>{data.option.COLOR[0].value}</span>
+              {/* 옵션 축 - 상품이 실제로 가진 축만 OPTION_AXIS_ORDER 순서로 노출한다.
+                  의류는 색상/사이즈, 화장품은 용량/텍스처가 온다. */}
+              {optionAxes.map((axis) => (
+                <div
+                  className={cn("text-body-3 flex", "text-body-4")}
+                  key={axis.type}
+                >
+                  <span className="min-w-32.5">{t(axis.labelKey)}</span>
+                  <span>{formatOptionAxisValues(axis.values)}</span>
                 </div>
-              )}
-              {/* 사이즈 */}
-              {data.option?.SIZE?.length > 0 && (
-                <div className={cn("text-body-3 flex", "text-body-4")}>
-                  <span className="min-w-32.5">{t("size")}</span>
-                  <span>
-                    {data.option.SIZE.map((item) => item.value).join("/")}
-                  </span>
-                </div>
-              )}
+              ))}
             </div>
             <ProductExternalGroup items={data.external} />
           </div>

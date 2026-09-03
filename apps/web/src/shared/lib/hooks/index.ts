@@ -14,3 +14,4 @@ export { useNicknameValidate } from "./useNicknameValidate";
 export { default as useAppMutaion } from "./query/useAppMutation";
 export { default as useAppQuery } from "./query/useAppQuery";
 export { default as useAppInfiniteQuery } from "./query/useAppInfiniteQuery";
+export { useFloatingOffset } from "./useFloatingOffset";

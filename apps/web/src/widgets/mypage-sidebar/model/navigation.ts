@@ -11,7 +11,10 @@ export interface SidebarGroup {
 export const SIDEBAR_GROUPS: ReadonlyArray<SidebarGroup> = [
   {
     titleKey: "shopping_info",
-    items: [{ labelKey: "favorites", href: "/mypage/interest" }],
+    items: [
+      { labelKey: "cart", href: "/cart" },
+      { labelKey: "favorites", href: "/mypage/interest" },
+    ],
   },
   {
     titleKey: "my_profile",
