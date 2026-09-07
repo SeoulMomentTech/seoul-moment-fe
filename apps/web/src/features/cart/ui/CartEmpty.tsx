@@ -6,11 +6,14 @@ import { useTranslations } from "next-intl";
 
 import { toNTCurrency } from "@shared/lib/utils";
 import { BaseImage } from "@shared/ui/base-image";
+import CardSlider from "@shared/ui/card-slider";
 
 import { Link } from "@/i18n/navigation";
 
 import { useGetUserRecentListQuery } from "@entities/product";
 import { Button, Skeleton } from "@seoul-moment/ui";
+
+import "./cart-recent-slide.css";
 
 /**
  * 빈 장바구니. 아이콘 + 한 줄로 끝내지 않는다 — 활성화 지점이라 상품 목록으로 보내는 CTA 와
@@ -32,7 +35,7 @@ export function CartEmpty() {
           {t("cart_empty_description")}
         </p>
         <Button asChild className="h-12 rounded-[4px] px-6 max-sm:w-full">
-          <Link href="/product">{t("discover_products")}</Link>
+          <Link href="/product">{t("view_popular_products")}</Link>
         </Button>
       </div>
 
@@ -41,45 +44,47 @@ export function CartEmpty() {
           <h3 className="text-body-2 mb-4 font-semibold">
             {t("recently_viewed")}
           </h3>
-          <ul className="flex gap-4 overflow-x-auto pb-1">
-            {isLoading
-              ? Array.from({ length: 4 }).map((_, index) => (
-                  <li
-                    className="w-38 shrink-0 max-sm:w-32"
-                    key={`cart-recent-skeleton-${index + 1}`}
-                  >
-                    <Skeleton className="aspect-3/4 w-full" />
-                    <Skeleton className="mt-2 h-3 w-12" />
-                    <Skeleton className="mt-1.5 h-4 w-full" />
-                  </li>
-                ))
-              : recent.map((item) => (
-                  <li
-                    className="w-38 shrink-0 max-sm:w-32"
-                    key={item.productItemId}
-                  >
-                    <Link href={`/product/${item.productItemId}`}>
-                      <BaseImage
-                        alt={item.productName}
-                        className="aspect-3/4 w-full border border-black/[0.07] object-cover"
-                        height={400}
-                        src={item.imageUrl}
-                        unoptimized
-                        width={300}
-                      />
-                      <p className="text-body-5 mt-2 font-semibold">
-                        {item.brandName}
-                      </p>
-                      <p className="text-body-4 mt-0.5 truncate">
-                        {item.productName}
-                      </p>
-                      <p className="text-body-4 mt-1 font-semibold tabular-nums">
-                        {toNTCurrency(item.discountPrice || item.price)}
-                      </p>
-                    </Link>
-                  </li>
-                ))}
-          </ul>
+          {isLoading ? (
+            <ul className="flex gap-4 overflow-hidden">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <li
+                  className="w-38 shrink-0 max-sm:w-32"
+                  key={`cart-recent-skeleton-${index + 1}`}
+                >
+                  <Skeleton className="aspect-3/4 w-full" />
+                  <Skeleton className="mt-2 h-3 w-12" />
+                  <Skeleton className="mt-1.5 h-4 w-full" />
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <CardSlider
+              getKey={(item) => `cart-recent-${item.productItemId}`}
+              items={recent}
+              renderItem={(item) => (
+                <Link href={`/product/${item.productItemId}`}>
+                  <BaseImage
+                    alt={item.productName}
+                    className="aspect-3/4 w-full border border-black/[0.07] object-cover"
+                    height={400}
+                    src={item.imageUrl}
+                    unoptimized
+                    width={300}
+                  />
+                  <p className="text-body-5 mt-2 font-semibold">
+                    {item.brandName}
+                  </p>
+                  <p className="text-body-4 mt-0.5 truncate">
+                    {item.productName}
+                  </p>
+                  <p className="text-body-4 mt-1 font-semibold tabular-nums">
+                    {toNTCurrency(item.discountPrice || item.price)}
+                  </p>
+                </Link>
+              )}
+              swiperClassName="cart-recent-swiper"
+            />
+          )}
         </div>
       )}
     </div>
