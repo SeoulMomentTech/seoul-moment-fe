@@ -4,6 +4,7 @@ import type { ProductVariant } from "@shared/services/product";
 
 import {
   findProductVariant,
+  isProductSoldOut,
   listProductVariantChoices,
 } from "./productVariant";
 
@@ -107,5 +108,30 @@ describe("listProductVariantChoices", () => {
     });
 
     expect(choices.map((c) => c.isPurchasable)).toEqual([false, false]);
+  });
+});
+
+describe("isProductSoldOut", () => {
+  it("살 수 있는 조합이 하나라도 있으면 품절이 아니다", () => {
+    expect(
+      isProductSoldOut([
+        { ...variant(101, [1]), isSoldOut: true },
+        variant(102, [2]),
+      ]),
+    ).toBe(false);
+  });
+
+  it("모든 조합이 품절이거나 재고 0이면 품절이다", () => {
+    expect(
+      isProductSoldOut([
+        { ...variant(101, [1]), isSoldOut: true },
+        { ...variant(102, [2]), stockQuantity: 0 },
+      ]),
+    ).toBe(true);
+  });
+
+  // 재고를 모르는 것과 없는 것은 다르다. 막으면 축별 선택 상품이 통째로 구매 불가가 된다.
+  it("variants 를 못 받았으면 품절로 보지 않는다", () => {
+    expect(isProductSoldOut([])).toBe(false);
   });
 });

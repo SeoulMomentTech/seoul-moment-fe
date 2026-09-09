@@ -8,9 +8,12 @@ import { Checkbox } from "@shared/ui/checkbox";
 
 import {
   CartLineRow,
-  findLineStock,
+  findCartLineState,
   getMaxLineQuantity,
+  isCartLineLowStock,
+  isCartLineUnavailable,
   type CartBrandGroup as Group,
+  type CartLineServerState,
 } from "@entities/cart";
 
 import { CartLinePurchase } from "./CartLinePurchase";
@@ -22,8 +25,8 @@ interface CartBrandGroupProps {
   onToggleGroup(lineIds: ReadonlyArray<string>, selected: boolean): void;
   onQuantityChange(lineId: string, quantity: number): void;
   onRemove(lineId: string): void;
-  /** `cartItemId` → 재고. 서버 장바구니에서 온다 */
-  stock: ReadonlyMap<number, number>;
+  /** `cartItemId` → 재고·품절. 서버 장바구니에서 온다 */
+  lineStates: ReadonlyMap<number, CartLineServerState>;
 }
 
 /**
@@ -37,7 +40,7 @@ export function CartBrandGroupSection({
   onToggleGroup,
   onQuantityChange,
   onRemove,
-  stock,
+  lineStates,
 }: CartBrandGroupProps) {
   const titleId = useId();
   const lineIds = group.lines.map((line) => line.lineId);
@@ -74,22 +77,28 @@ export function CartBrandGroupSection({
         </span>
       </div>
 
-      {group.lines.map((line) => (
-        <CartLineRow
-          actionSlot={<CartLinePurchase external={line.external} />}
-          key={line.lineId}
-          line={line}
-          maxQuantity={getMaxLineQuantity(
-            findLineStock(stock, line.cartItemId),
-          )}
-          onQuantityChange={(quantity) =>
-            onQuantityChange(line.lineId, quantity)
-          }
-          onRemove={() => onRemove(line.lineId)}
-          onSelectedChange={(selected) => onToggleLine(line.lineId, selected)}
-          selected={isSelected(line.lineId)}
-        />
-      ))}
+      {group.lines.map((line) => {
+        const state = findCartLineState(lineStates, line.cartItemId);
+
+        return (
+          <CartLineRow
+            actionSlot={<CartLinePurchase external={line.external} />}
+            key={line.lineId}
+            line={line}
+            lowStock={
+              isCartLineLowStock(state) ? state?.stockQuantity : undefined
+            }
+            maxQuantity={getMaxLineQuantity(state?.stockQuantity)}
+            onQuantityChange={(quantity) =>
+              onQuantityChange(line.lineId, quantity)
+            }
+            onRemove={() => onRemove(line.lineId)}
+            onSelectedChange={(selected) => onToggleLine(line.lineId, selected)}
+            selected={isSelected(line.lineId)}
+            unavailable={isCartLineUnavailable(state)}
+          />
+        );
+      })}
     </section>
   );
 }

@@ -17,6 +17,16 @@ export const isVariantPurchasable = (variant: ProductVariant) =>
   !variant.isSoldOut && variant.stockQuantity > 0;
 
 /**
+ * 살 수 있는 조합이 하나도 없는 상품인지.
+ *
+ * `variants` 를 못 받은 상품은 **품절로 보지 않는다** — 재고를 모르는 것과 없는 것은 다르고,
+ * 모른다는 이유로 막으면 축별 선택으로 돌아간 상품이 통째로 구매 불가가 된다.
+ */
+export const isProductSoldOut = (
+  variants: readonly ProductVariant[],
+): boolean => variants.length > 0 && !variants.some(isVariantPurchasable);
+
+/**
  * 선택된 옵션값 조합에 해당하는 SKU(variant)를 찾는다. 없으면 `null`.
  *
  * 조합 드롭다운을 쓰면 선택 자체가 SKU 라 이 번역이 필요 없다. `variants` 가 비어

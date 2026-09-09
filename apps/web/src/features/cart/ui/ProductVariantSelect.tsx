@@ -10,11 +10,14 @@ import {
   SelectTrigger,
 } from "@shared/ui/select";
 
+import { LOW_STOCK_THRESHOLD } from "@entities/cart";
 import type { ProductVariantChoice } from "@entities/product";
 
 interface ProductVariantSelectProps {
   choices: ReadonlyArray<ProductVariantChoice>;
   onPick(variantId: number): void;
+  /** 살 수 있는 조합이 하나도 없을 때. 열어봐야 전부 회색이라 트리거째로 잠근다 */
+  soldOut?: boolean;
   className?: string;
 }
 
@@ -31,6 +34,7 @@ interface ProductVariantSelectProps {
 export function ProductVariantSelect({
   choices,
   onPick,
+  soldOut = false,
   className,
 }: ProductVariantSelectProps) {
   const t = useTranslations();
@@ -38,25 +42,44 @@ export function ProductVariantSelect({
   if (!choices.length) return null;
 
   return (
-    <Select onValueChange={(next) => onPick(Number(next))} value={undefined}>
+    <Select
+      disabled={soldOut}
+      onValueChange={(next) => onPick(Number(next))}
+      value={undefined}
+    >
       <SelectTrigger
-        aria-label={t("select")}
+        aria-label={soldOut ? t("sold_out") : t("select")}
         className={cn("text-body-3 h-12 rounded-[4px] px-3", className)}
       >
-        <span className="text-neutral">{t("select")}</span>
+        <span className={cn(soldOut ? "font-semibold" : "text-neutral")}>
+          {soldOut ? t("sold_out") : t("select")}
+        </span>
       </SelectTrigger>
       <SelectContent>
-        {choices.map((choice) => (
-          <SelectItem
-            disabled={!choice.isPurchasable}
-            key={choice.variantId}
-            value={String(choice.variantId)}
-          >
-            {choice.isPurchasable
-              ? choice.label
-              : `${choice.label} · ${t("sold_out")}`}
-          </SelectItem>
-        ))}
+        {choices.map((choice) => {
+          // 고르기 전에 보이는 게 유용하다 — 담고 나서 스테퍼가 안 올라가는 것보다 낫다.
+          const lowStock =
+            choice.isPurchasable &&
+            choice.stockQuantity > 0 &&
+            choice.stockQuantity < LOW_STOCK_THRESHOLD;
+
+          return (
+            <SelectItem
+              disabled={!choice.isPurchasable}
+              key={choice.variantId}
+              value={String(choice.variantId)}
+            >
+              {choice.isPurchasable
+                ? choice.label
+                : `${choice.label} · ${t("sold_out")}`}
+              {lowStock && (
+                <span className="text-brand ml-1.5 tabular-nums">
+                  {t("stock_left", { stock: choice.stockQuantity })}
+                </span>
+              )}
+            </SelectItem>
+          );
+        })}
       </SelectContent>
     </Select>
   );

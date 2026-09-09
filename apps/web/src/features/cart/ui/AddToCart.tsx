@@ -72,6 +72,7 @@ export function AddToCart({ product, likeSlot }: AddToCartProps) {
       <ProductVariantSelect
         choices={draft.variantChoices}
         onPick={draft.pickVariant}
+        soldOut={draft.isSoldOut}
       />
     ) : (
       <ProductOptionSelects
@@ -81,6 +82,12 @@ export function AddToCart({ product, likeSlot }: AddToCartProps) {
         unavailableOptionValueIds={draft.unavailableOptionValueIds}
       />
     );
+
+  const soldOutHint = draft.isSoldOut && (
+    <p className="text-body-4 text-center font-semibold" role="status">
+      {t("product_sold_out")}
+    </p>
+  );
 
   const comingSoonHint = (
     <p className="sr-only" id="add-to-cart-coming-soon">
@@ -97,12 +104,12 @@ export function AddToCart({ product, likeSlot }: AddToCartProps) {
       {likeSlot}
       <Button
         className="h-12 flex-1 rounded-[4px] px-5 font-semibold"
-        disabled={addDisabled}
+        disabled={addDisabled || draft.isSoldOut}
         onClick={onAddToCart}
         type="button"
         variant="outline"
       >
-        {t("add_to_cart")}
+        {draft.isSoldOut ? t("sold_out") : t("add_to_cart")}
       </Button>
       <Button
         aria-describedby="add-to-cart-coming-soon"
@@ -134,6 +141,7 @@ export function AddToCart({ product, likeSlot }: AddToCartProps) {
             <DrawerTitle className="sr-only">{t("select_options")}</DrawerTitle>
             <div className="grid gap-4 pt-2.5">
               {options}
+              {soldOutHint}
               <DraftLineList
                 compact
                 lines={draft.lines}
@@ -143,7 +151,7 @@ export function AddToCart({ product, likeSlot }: AddToCartProps) {
                 totalAmount={draft.totalAmount}
                 unitPrice={unitPrice}
               />
-              {!draft.canSubmit && (
+              {!draft.canSubmit && !draft.isSoldOut && (
                 <p className="text-body-4 text-neutral text-center">
                   {t("select_option_required")}
                 </p>
@@ -162,6 +170,7 @@ export function AddToCart({ product, likeSlot }: AddToCartProps) {
   return (
     <div className={cn("border-t border-black/10 pt-6")}>
       {options}
+      {soldOutHint && <div className="mt-4">{soldOutHint}</div>}
       <DraftLineList
         className="mt-5"
         lines={draft.lines}

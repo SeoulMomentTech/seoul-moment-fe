@@ -13,6 +13,7 @@ export {
 } from "./lib/optionAvailability";
 export {
   findProductVariant,
+  isProductSoldOut,
   isVariantPurchasable,
   listProductVariantChoices,
   type ProductVariantChoice,

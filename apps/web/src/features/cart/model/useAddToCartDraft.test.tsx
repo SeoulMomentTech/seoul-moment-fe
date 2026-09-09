@@ -410,6 +410,31 @@ describe("조합형 — variants 를 받은 상품", () => {
     ]);
   });
 
+  it("살 수 있는 조합이 하나라도 있으면 품절이 아니다", () => {
+    const { result } = setup(clothing, [
+      { ...variant(101, [1, 10, 20]), isSoldOut: true },
+      variant(102, [1, 11, 21]),
+    ]);
+
+    expect(result.current.isSoldOut).toBe(false);
+  });
+
+  it("모든 조합이 품절이면 상품 전체가 품절이다", () => {
+    const { result } = setup(clothing, [
+      { ...variant(101, [1, 10, 20]), isSoldOut: true },
+      { ...variant(102, [1, 11, 21]), stockQuantity: 0 },
+    ]);
+
+    expect(result.current.isSoldOut).toBe(true);
+  });
+
+  // 재고를 모르는 것과 없는 것은 다르다.
+  it("variants 를 못 받은 상품은 품절로 보지 않는다", () => {
+    const { result } = setup(clothing);
+
+    expect(result.current.isSoldOut).toBe(false);
+  });
+
   it("같은 조합을 재고보다 많이 고를 수 없다", () => {
     const { result } = setup(clothing, [
       { ...variant(101, [1, 10, 20]), stockQuantity: 2 },

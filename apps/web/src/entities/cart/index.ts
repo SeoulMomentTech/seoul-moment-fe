@@ -27,7 +27,14 @@ export type {
 } from "./model/types";
 export { useCart } from "./model/useCart";
 export { useCartBadgeCount } from "./model/useCartBadgeCount";
-export { findLineStock, useCartStock } from "./model/useCartStock";
+export {
+  findCartLineState,
+  isCartLineLowStock,
+  isCartLineUnavailable,
+  LOW_STOCK_THRESHOLD,
+  useCartLineStates,
+  type CartLineServerState,
+} from "./model/useCartLineStates";
 export { useCartOwnerGuard } from "./model/useCartOwnerGuard";
 export {
   getMaxLineQuantity,

@@ -8,7 +8,11 @@ import { cn } from "@shared/lib/style";
 import { toNTCurrency } from "@shared/lib/utils";
 import { QuantityStepper } from "@shared/ui/quantity-stepper";
 
-import { formatCartLineOptions, getMaxLineQuantity } from "@entities/cart";
+import {
+  formatCartLineOptions,
+  getMaxLineQuantity,
+  LOW_STOCK_THRESHOLD,
+} from "@entities/cart";
 
 import type { DraftLine } from "../model/useAddToCartDraft";
 
@@ -50,6 +54,13 @@ export function DraftLineList({
           const optionText = line.label ?? formatCartLineOptions(line.options);
           // 재고를 아는 조합은 거기까지만 올릴 수 있다.
           const maxQuantity = getMaxLineQuantity(line.stockQuantity);
+          // 상한에 왜 걸렸는지 보이게 남은 개수를 알린다. 넉넉하면 안 띄운다.
+          const lowStock =
+            line.stockQuantity != null &&
+            line.stockQuantity > 0 &&
+            line.stockQuantity < LOW_STOCK_THRESHOLD
+              ? line.stockQuantity
+              : undefined;
 
           return (
             <div
@@ -59,14 +70,21 @@ export function DraftLineList({
               )}
               key={line.key}
             >
-              <p
-                className={cn(
-                  "text-body-3 min-w-0 flex-1 leading-none text-black/80",
-                  compact && "text-body-4",
+              <div className="min-w-0 flex-1">
+                <p
+                  className={cn(
+                    "text-body-3 leading-none text-black/80",
+                    compact && "text-body-4",
+                  )}
+                >
+                  {optionText}
+                </p>
+                {lowStock != null && (
+                  <p className="text-body-5 text-brand mt-1.5 font-semibold tabular-nums">
+                    {t("stock_left", { stock: lowStock })}
+                  </p>
                 )}
-              >
-                {optionText}
-              </p>
+              </div>
 
               <div
                 className={cn("gap-7.5 flex items-center", compact && "gap-1")}

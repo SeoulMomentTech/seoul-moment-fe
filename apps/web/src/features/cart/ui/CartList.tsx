@@ -11,8 +11,9 @@ import FixedBox from "@shared/ui/fixed-box";
 import {
   groupCartLinesByBrand,
   sumCartAmount,
+  isCartLineUnavailable,
   useCart,
-  useCartStock,
+  useCartLineStates,
   type CartLine,
 } from "@entities/cart";
 
@@ -26,8 +27,26 @@ import { useCartSelection } from "../model/useCartSelection";
 export function CartList() {
   const t = useTranslations();
   const { lines, updateQuantity, removeLines, restoreLines } = useCart();
-  const selection = useCartSelection(lines);
-  const stock = useCartStock();
+  const lineStates = useCartLineStates();
+
+  // 품절·판매중지 라인은 고를 수 없다. 선택에서 빼야 합계와 개수가 서로 맞는다.
+  const unselectableLineIds = useMemo(
+    () =>
+      new Set(
+        lines
+          .filter((line) =>
+            isCartLineUnavailable(
+              line.cartItemId == null
+                ? undefined
+                : lineStates.get(line.cartItemId),
+            ),
+          )
+          .map((line) => line.lineId),
+      ),
+    [lines, lineStates],
+  );
+
+  const selection = useCartSelection(lines, unselectableLineIds);
 
   // 되돌리기용 스냅샷. 토스트 액션이 실행될 시점에는 스토어에서 이미 사라졌으므로 따로 들고 있는다.
   const removedRef = useRef<CartLine[]>([]);
@@ -72,7 +91,7 @@ export function CartList() {
         onToggleAll={selection.toggleAll}
         selectedCount={selection.selectedCount}
         someSelected={selection.someSelected}
-        totalCount={lines.length}
+        totalCount={selection.selectableCount}
       />
 
       <div
@@ -87,11 +106,11 @@ export function CartList() {
               group={group}
               isSelected={selection.isSelected}
               key={group.brandId}
+              lineStates={lineStates}
               onQuantityChange={updateQuantity}
               onRemove={(lineId) => handleRemove([lineId])}
               onToggleGroup={selection.toggleMany}
               onToggleLine={selection.toggle}
-              stock={stock}
             />
           ))}
         </div>

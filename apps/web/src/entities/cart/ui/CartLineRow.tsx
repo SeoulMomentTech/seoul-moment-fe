@@ -27,6 +27,10 @@ interface CartLineRowProps {
   onRemove(): void;
   /** 이 라인에서 고를 수 있는 최대 수량. 재고를 반영한 값을 넘긴다 */
   maxQuantity?: number;
+  /** 품절·판매중지. 수량과 선택을 잠그고 금액 합계에서 빠진다 */
+  unavailable?: boolean;
+  /** 재고가 얼마 안 남았을 때 그 개수. 넉넉하면 비워 둔다 */
+  lowStock?: number;
   /** 라인 하단 우측에 붙는 액션. 외부 몰 구매 버튼 등. */
   actionSlot?: ReactNode;
   className?: string;
@@ -43,6 +47,8 @@ export function CartLineRow({
   onQuantityChange,
   onRemove,
   maxQuantity = MAX_LINE_QUANTITY,
+  unavailable = false,
+  lowStock,
   actionSlot,
   className,
 }: CartLineRowProps) {
@@ -56,13 +62,15 @@ export function CartLineRow({
       className={cn(
         "grid grid-cols-[20px_120px_minmax(0,1fr)_32px] items-start gap-4 border-b border-black/[0.06] py-5",
         "max-sm:py-4.5 max-sm:grid-cols-[20px_100px_minmax(0,1fr)_28px] max-sm:gap-3",
-        !selected && "opacity-50",
+        (!selected || unavailable) && "opacity-50",
         className,
       )}
     >
       <Checkbox
         aria-label={line.productName}
         checked={selected}
+        // 살 수 없는 라인은 고를 수 없다 — 골라도 금액에 안 들어가 합계가 어긋나 보인다.
+        disabled={unavailable}
         onChange={(event) => onSelectedChange(event.target.checked)}
       />
 
@@ -100,6 +108,19 @@ export function CartLineRow({
           <p className="text-body-5 text-neutral mb-2.5">{optionText}</p>
         )}
 
+        {/* 품절이 우선이다. 둘 다 붙이면 "품절 · 2개 남음" 처럼 모순돼 보인다. */}
+        {unavailable ? (
+          <p className="text-body-5 mb-2.5 font-semibold text-black/70">
+            {t("sold_out")}
+          </p>
+        ) : (
+          lowStock != null && (
+            <p className="text-body-5 text-brand mb-2.5 font-semibold tabular-nums">
+              {t("stock_left", { stock: lowStock })}
+            </p>
+          )
+        )}
+
         <div className="mb-3 flex items-baseline gap-2 tabular-nums">
           {hasDiscount && (
             <span className="text-body-4 text-black/40 line-through">
@@ -118,6 +139,7 @@ export function CartLineRow({
 
         <div className="flex flex-wrap items-center gap-3">
           <QuantityStepper
+            disabled={unavailable}
             label={line.productName}
             max={maxQuantity}
             onChange={onQuantityChange}

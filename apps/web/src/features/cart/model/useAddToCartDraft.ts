@@ -19,6 +19,7 @@ import {
   findProductVariant,
   getUnavailableOptionValueIds,
   isOptionCombinationPurchasable,
+  isProductSoldOut,
   listProductVariantChoices,
   splitProductOptionAxes,
 } from "@entities/product";
@@ -89,6 +90,9 @@ export const useAddToCartDraft = ({ product }: UseAddToCartDraftArgs) => {
       }),
     [product.option, product.variants],
   );
+
+  /** 살 수 있는 조합이 하나도 없는 상품. 옵션 선택과 담기를 통째로 잠근다 */
+  const isSoldOut = isProductSoldOut(product.variants);
 
   /**
    * `"variant"` 면 조합 하나를 그대로 고른다. `variants` 를 못 받은 상품만 기존처럼
@@ -316,6 +320,7 @@ export const useAddToCartDraft = ({ product }: UseAddToCartDraftArgs) => {
     selectableAxes: selectable,
     fixedAxes: fixed,
     selectMode,
+    isSoldOut,
     picked,
     pickAxis,
     unavailableOptionValueIds,
