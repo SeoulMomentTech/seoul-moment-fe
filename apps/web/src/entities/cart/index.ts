@@ -26,8 +26,11 @@ export type {
   CartOptionSelection,
 } from "./model/types";
 export { useCart } from "./model/useCart";
+export { useCartBadgeCount } from "./model/useCartBadgeCount";
+export { findLineStock, useCartStock } from "./model/useCartStock";
 export { useCartOwnerGuard } from "./model/useCartOwnerGuard";
 export {
+  getMaxLineQuantity,
   MAX_CART_LINES,
   MAX_LINE_QUANTITY,
   useCartHydrated,

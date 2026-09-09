@@ -43,16 +43,28 @@ export function AddToCart({ product, likeSlot }: AddToCartProps) {
       ? product.discountPrice
       : product.price;
 
-  const handleSubmit = () => {
-    if (!draft.submit()) return;
+  // 서버 응답을 기다리는 동안 다시 눌리면 같은 조합이 두 번 담긴다.
+  const [isSubmitting, setSubmitting] = useState(false);
 
-    setSheetOpen(false);
-    toast.success(t("added_to_cart"), {
-      action: {
-        label: t("view_cart"),
-        onClick: () => router.push("/cart"),
-      },
-    });
+  const handleSubmit = async () => {
+    if (isSubmitting) return;
+    setSubmitting(true);
+
+    try {
+      // 서버가 받아준 뒤에만 성공을 알린다. 기다리지 않으면 재고 부족으로 거부된
+      // 담기에도 "담았습니다" 가 뜬다.
+      if (!(await draft.submit())) return;
+
+      setSheetOpen(false);
+      toast.success(t("added_to_cart"), {
+        action: {
+          label: t("view_cart"),
+          onClick: () => router.push("/cart"),
+        },
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const options =
@@ -136,7 +148,9 @@ export function AddToCart({ product, likeSlot }: AddToCartProps) {
                   {t("select_option_required")}
                 </p>
               )}
-              {actions(handleSubmit, { addDisabled: !draft.canSubmit })}
+              {actions(() => void handleSubmit(), {
+                addDisabled: !draft.canSubmit || isSubmitting,
+              })}
             </div>
           </DrawerContent>
         </Drawer>
@@ -158,7 +172,9 @@ export function AddToCart({ product, likeSlot }: AddToCartProps) {
         unitPrice={unitPrice}
       />
       <div className="mt-5">
-        {actions(handleSubmit, { addDisabled: !draft.canSubmit })}
+        {actions(() => void handleSubmit(), {
+          addDisabled: !draft.canSubmit || isSubmitting,
+        })}
       </div>
       {comingSoonHint}
     </div>

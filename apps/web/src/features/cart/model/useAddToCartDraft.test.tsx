@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import type * as Ky from "ky";
 import { NextIntlClientProvider } from "next-intl";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -30,13 +31,23 @@ vi.mock("@/i18n/navigation", () => ({
 
 vi.mock("next/image", () => ({ default: () => null }));
 
+// useCart 가 서버 정정을 위해 useLanguage(useParams) 를 탄다. 라우트 밖이라 null 이 온다.
+vi.mock("next/navigation", () => ({ useParams: () => ({ locale: "ko" }) }));
+
 vi.mock("@shared/lib/hooks/useUserAuthStore", () => ({
   useUserAuthStore: (
-    selector: (state: { isAuthenticated: boolean }) => unknown,
-  ) => selector({ isAuthenticated: true }),
+    selector: (state: { isAuthenticated: boolean; id: number }) => unknown,
+  ) => selector({ isAuthenticated: true, id: 1 }),
 }));
 
 vi.mock("sonner", () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
+
+// `getErrorInfo` 는 ky 의 isHTTPError 로 판별한다. name 이 "HTTPError" 면 통과시킨다.
+vi.mock("ky", async (importOriginal) => ({
+  ...(await importOriginal<typeof Ky>()),
+  isHTTPError: (error: unknown) =>
+    error instanceof Error && error.name === "HTTPError",
+}));
 
 const createUserCartItem = vi.fn((req: CreateUserCartItemReq) =>
   Promise.resolve({
@@ -48,7 +59,11 @@ const createUserCartItem = vi.fn((req: CreateUserCartItemReq) =>
 vi.mock("@shared/services/userCart", () => ({
   // useMutation 은 mutationFn 에 (variables, context) 를 넘기므로 첫 인자만 스파이로 흘린다.
   createUserCartItem: (req: CreateUserCartItemReq) => createUserCartItem(req),
-  getUserCart: vi.fn(),
+  getUserCart: () =>
+    Promise.resolve({
+      result: true,
+      data: { brandGroups: [], totalCount: 0 },
+    }),
   getUserCartCount: vi.fn(),
   updateUserCartItem: vi.fn(),
   deleteUserCartItem: vi.fn(),
@@ -211,7 +226,7 @@ describe("선택형 — variants 를 못 받은, 값이 2개 이상인 축이 �
     expect(result.current.canSubmit).toBe(false);
   });
 
-  it("담기 1회로 조합 전체가 장바구니에 들어간다", () => {
+  it("담기 1회로 조합 전체가 장바구니에 들어간다", async () => {
     const { result } = setup(clothing);
 
     act(() => result.current.pickAxis("SIZE", 10));
@@ -219,8 +234,8 @@ describe("선택형 — variants 를 못 받은, 값이 2개 이상인 축이 �
     act(() => result.current.pickAxis("SIZE", 11));
 
     let ok = false;
-    act(() => {
-      ok = result.current.submit();
+    await act(async () => {
+      ok = await result.current.submit();
     });
 
     expect(ok).toBe(true);
@@ -243,7 +258,7 @@ describe("선택형 — variants 를 못 받은, 값이 2개 이상인 축이 �
 
     // mutate 는 mutationFn 을 마이크로태스크에서 호출하므로 flush 가 필요하다.
     await act(async () => {
-      result.current.submit();
+      await result.current.submit();
     });
 
     expect(createUserCartItem.mock.calls.map(([req]) => req)).toEqual([
@@ -261,7 +276,7 @@ describe("선택형 — variants 를 못 받은, 값이 2개 이상인 축이 �
 
     let ok = false;
     await act(async () => {
-      ok = result.current.submit();
+      ok = await result.current.submit();
     });
 
     expect(ok).toBe(true);
@@ -386,13 +401,61 @@ describe("조합형 — variants 를 받은 상품", () => {
     act(() => result.current.pickVariant(102));
 
     await act(async () => {
-      result.current.submit();
+      await result.current.submit();
     });
 
     expect(createUserCartItem.mock.calls.map(([req]) => req)).toEqual([
       { productVariantId: 101, quantity: 1 },
       { productVariantId: 102, quantity: 1 },
     ]);
+  });
+
+  it("같은 조합을 재고보다 많이 고를 수 없다", () => {
+    const { result } = setup(clothing, [
+      { ...variant(101, [1, 10, 20]), stockQuantity: 2 },
+    ]);
+
+    act(() => result.current.pickVariant(101));
+    act(() => result.current.pickVariant(101));
+    act(() => result.current.pickVariant(101));
+
+    expect(result.current.lines[0].stockQuantity).toBe(2);
+    expect(result.current.lines[0].quantity).toBe(2);
+  });
+
+  it("수량을 직접 올려도 재고에서 멈춘다", () => {
+    const { result } = setup(clothing, [
+      { ...variant(101, [1, 10, 20]), stockQuantity: 2 },
+    ]);
+
+    act(() => result.current.pickVariant(101));
+    act(() => result.current.setQuantity(result.current.lines[0].key, 9));
+
+    expect(result.current.lines[0].quantity).toBe(2);
+  });
+
+  // 회귀 방지: 서버 응답을 기다리지 않으면 재고 부족으로 거부된 담기에도
+  // "장바구니에 담았습니다" 가 뜬다.
+  it("서버가 재고 부족으로 거부하면 담기를 성공으로 알리지 않는다", async () => {
+    createUserCartItem.mockImplementationOnce(() =>
+      Promise.reject(
+        Object.assign(new Error("Request failed with status code 409"), {
+          name: "HTTPError",
+          response: { status: 409, url: "https://api/user/cart" },
+        }),
+      ),
+    );
+
+    const { result } = setup(clothing, [variant(101, [1, 10, 20])]);
+
+    act(() => result.current.pickVariant(101));
+
+    let ok = true;
+    await act(async () => {
+      ok = await result.current.submit();
+    });
+
+    expect(ok).toBe(false);
   });
 
   // 고를 축이 없는 상품이라도 조합이 있으면 드롭다운으로 고른다. 미리 쌓아두면

@@ -10,9 +10,8 @@ import type { GetProductDetailRes, OptionType } from "@shared/services/product";
 
 import {
   createCartLineId,
-  MAX_LINE_QUANTITY,
+  getMaxLineQuantity,
   useCart,
-  useCreateUserCartItemMutation,
   type CartLineDraft,
   type CartOptionSelection,
 } from "@entities/cart";
@@ -36,6 +35,8 @@ export interface DraftLine {
    * 다시 만들면 `나일론 / 스판덱스` 가 되어 고른 것과 다르게 읽힌다.
    */
   label?: string;
+  /** 이 조합의 재고. 수량을 여기까지만 올릴 수 있다. 모르면(축별 선택) 비어 있다 */
+  stockQuantity?: number;
 }
 
 const toSelection = (
@@ -64,10 +65,6 @@ interface UseAddToCartDraftArgs {
 export const useAddToCartDraft = ({ product }: UseAddToCartDraftArgs) => {
   const t = useTranslations();
   const { addLines } = useCart();
-  // 전환기 이중 기록용. 화면은 로컬을 읽으므로 실패를 토스트로 알리지 않는다.
-  const { mutate: createServerCartItem } = useCreateUserCartItemMutation({
-    toastOnError: false,
-  });
   const isAuthenticated = useUserAuthStore((state) => state.isAuthenticated);
 
   const { selectable, fixed, mode } = useMemo(
@@ -135,19 +132,22 @@ export const useAddToCartDraft = ({ product }: UseAddToCartDraftArgs) => {
   const pushLine = useCallback(
     (
       options: CartOptionSelection[],
-      extra?: { variantId?: number; label?: string },
+      extra?: { variantId?: number; label?: string; stockQuantity?: number },
     ) => {
       const key = createCartLineId(product.id, options);
 
       setLines((prev) => {
         const index = prev.findIndex((line) => line.key === key);
-        // 이미 쌓아둔 조합을 다시 고르면 새 줄이 아니라 수량 +1
+        // 이미 쌓아둔 조합을 다시 고르면 새 줄이 아니라 수량 +1 (재고까지만)
         if (index >= 0) {
           return prev.map((line, i) =>
             i === index
               ? {
                   ...line,
-                  quantity: Math.min(line.quantity + 1, MAX_LINE_QUANTITY),
+                  quantity: Math.min(
+                    line.quantity + 1,
+                    getMaxLineQuantity(line.stockQuantity),
+                  ),
                 }
               : line,
           );
@@ -220,6 +220,7 @@ export const useAddToCartDraft = ({ product }: UseAddToCartDraftArgs) => {
       pushLine(choice.options, {
         variantId: choice.variantId,
         label: choice.label,
+        stockQuantity: choice.stockQuantity,
       });
     },
     [variantChoices, pushLine, t],
@@ -231,7 +232,10 @@ export const useAddToCartDraft = ({ product }: UseAddToCartDraftArgs) => {
         line.key === key
           ? {
               ...line,
-              quantity: Math.min(Math.max(quantity, 1), MAX_LINE_QUANTITY),
+              quantity: Math.min(
+                Math.max(quantity, 1),
+                getMaxLineQuantity(line.stockQuantity),
+              ),
             }
           : line,
       ),
@@ -261,7 +265,7 @@ export const useAddToCartDraft = ({ product }: UseAddToCartDraftArgs) => {
 
   const canSubmit = lines.length > 0;
 
-  const submit = useCallback(() => {
+  const submit = useCallback(async () => {
     if (!isAuthenticated) {
       toast.error(t("login_required"));
       return false;
@@ -271,6 +275,14 @@ export const useAddToCartDraft = ({ product }: UseAddToCartDraftArgs) => {
     const drafts: CartLineDraft[] = lines.map((line) => ({
       productId: product.id,
       quantity: line.quantity,
+      // 조합을 직접 고른 라인은 SKU 를 이미 들고 있다. 축별 선택이면 역으로 찾는다.
+      // 못 찾으면 서버에 담을 방법이 없고, 그 라인은 로컬에만 남는다.
+      productVariantId:
+        line.variantId ??
+        findProductVariant(
+          product.variants,
+          line.options.map((option) => option.optionValueId),
+        )?.id,
       productName: product.name,
       // 로컬 카트는 brandId 를 문자열로 저장해 왔고 그 값이 localStorage 에 남아 있다.
       // 상세 v1 이 number 로 내려주더라도 저장 포맷은 유지한다.
@@ -284,33 +296,20 @@ export const useAddToCartDraft = ({ product }: UseAddToCartDraftArgs) => {
       external: product.external,
     }));
 
-    const result = addLines(drafts);
+    // 서버 장바구니 반영은 `addLines`(useCart) 가 함께 처리한다 — 담기·수량·삭제가
+    // 한 곳에서 서버로 흘러야 헤더 배지가 읽는 카운트와 어긋나지 않는다.
+    const result = await addLines(drafts);
 
     if (result.status === "limit") {
       toast.error(t("cart_limit_reached", { max: result.max }));
       return false;
     }
 
-    // 서버 장바구니에도 같은 담기를 반영한다. 아직 화면(/cart · 헤더 배지)은 로컬을 읽으므로
-    // 이 호출은 best-effort 다 — 실패해도 담기 자체를 되돌리지 않는다.
-    // 서버는 productVariantId(SKU) 단위로 담으므로 선택 조합을 variant 로 번역해야 한다.
-    for (const line of lines) {
-      // 조합을 직접 고른 라인은 SKU 를 이미 들고 있다. 축별 선택이면 역으로 찾는다.
-      const productVariantId =
-        line.variantId ??
-        findProductVariant(
-          product.variants,
-          line.options.map((option) => option.optionValueId),
-        )?.id;
-
-      // SKU 를 못 찾으면 서버에 담을 방법이 없다. 로컬 담기는 유지한다.
-      if (!productVariantId) continue;
-
-      createServerCartItem({ productVariantId, quantity: line.quantity });
-    }
+    // 재고 부족은 `useCart` 가 라인을 정정하며 이미 알렸다. 여기서 또 띄우지 않는다.
+    if (result.status === "stock") return false;
 
     return true;
-  }, [isAuthenticated, lines, product, addLines, createServerCartItem, t]);
+  }, [isAuthenticated, lines, product, addLines, t]);
 
   return {
     mode,

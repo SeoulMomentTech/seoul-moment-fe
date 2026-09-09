@@ -6,7 +6,12 @@ import { toNTCurrency } from "@shared/lib/utils";
 import { BaseImage } from "@shared/ui/base-image";
 import { Checkbox } from "@shared/ui/checkbox";
 
-import { CartLineRow, type CartBrandGroup as Group } from "@entities/cart";
+import {
+  CartLineRow,
+  findLineStock,
+  getMaxLineQuantity,
+  type CartBrandGroup as Group,
+} from "@entities/cart";
 
 import { CartLinePurchase } from "./CartLinePurchase";
 
@@ -17,6 +22,8 @@ interface CartBrandGroupProps {
   onToggleGroup(lineIds: ReadonlyArray<string>, selected: boolean): void;
   onQuantityChange(lineId: string, quantity: number): void;
   onRemove(lineId: string): void;
+  /** `cartItemId` → 재고. 서버 장바구니에서 온다 */
+  stock: ReadonlyMap<number, number>;
 }
 
 /**
@@ -30,6 +37,7 @@ export function CartBrandGroupSection({
   onToggleGroup,
   onQuantityChange,
   onRemove,
+  stock,
 }: CartBrandGroupProps) {
   const titleId = useId();
   const lineIds = group.lines.map((line) => line.lineId);
@@ -71,6 +79,9 @@ export function CartBrandGroupSection({
           actionSlot={<CartLinePurchase external={line.external} />}
           key={line.lineId}
           line={line}
+          maxQuantity={getMaxLineQuantity(
+            findLineStock(stock, line.cartItemId),
+          )}
           onQuantityChange={(quantity) =>
             onQuantityChange(line.lineId, quantity)
           }

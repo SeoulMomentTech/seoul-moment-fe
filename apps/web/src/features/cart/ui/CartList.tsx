@@ -12,6 +12,7 @@ import {
   groupCartLinesByBrand,
   sumCartAmount,
   useCart,
+  useCartStock,
   type CartLine,
 } from "@entities/cart";
 
@@ -26,6 +27,7 @@ export function CartList() {
   const t = useTranslations();
   const { lines, updateQuantity, removeLines, restoreLines } = useCart();
   const selection = useCartSelection(lines);
+  const stock = useCartStock();
 
   // 되돌리기용 스냅샷. 토스트 액션이 실행될 시점에는 스토어에서 이미 사라졌으므로 따로 들고 있는다.
   const removedRef = useRef<CartLine[]>([]);
@@ -89,6 +91,7 @@ export function CartList() {
               onRemove={(lineId) => handleRemove([lineId])}
               onToggleGroup={selection.toggleMany}
               onToggleLine={selection.toggle}
+              stock={stock}
             />
           ))}
         </div>

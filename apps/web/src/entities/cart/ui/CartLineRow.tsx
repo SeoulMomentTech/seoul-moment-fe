@@ -25,6 +25,8 @@ interface CartLineRowProps {
   onSelectedChange(selected: boolean): void;
   onQuantityChange(quantity: number): void;
   onRemove(): void;
+  /** 이 라인에서 고를 수 있는 최대 수량. 재고를 반영한 값을 넘긴다 */
+  maxQuantity?: number;
   /** 라인 하단 우측에 붙는 액션. 외부 몰 구매 버튼 등. */
   actionSlot?: ReactNode;
   className?: string;
@@ -40,6 +42,7 @@ export function CartLineRow({
   onSelectedChange,
   onQuantityChange,
   onRemove,
+  maxQuantity = MAX_LINE_QUANTITY,
   actionSlot,
   className,
 }: CartLineRowProps) {
@@ -116,7 +119,7 @@ export function CartLineRow({
         <div className="flex flex-wrap items-center gap-3">
           <QuantityStepper
             label={line.productName}
-            max={MAX_LINE_QUANTITY}
+            max={maxQuantity}
             onChange={onQuantityChange}
             value={line.quantity}
           />

@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import type { CartLineDraft } from "./types";
 import {
+  getMaxLineQuantity,
   MAX_CART_LINES,
   MAX_LINE_QUANTITY,
   useCartStore,
@@ -178,5 +179,24 @@ describe("useCartStore 수량 / 삭제 / 되돌리기", () => {
     useCartStore.getState().clear();
 
     expect(useCartStore.getState().lines).toHaveLength(0);
+  });
+});
+
+describe("getMaxLineQuantity", () => {
+  it("재고를 모르면 정책 천장을 쓴다", () => {
+    expect(getMaxLineQuantity()).toBe(MAX_LINE_QUANTITY);
+  });
+
+  it("재고가 천장보다 적으면 재고가 상한이다", () => {
+    expect(getMaxLineQuantity(3)).toBe(3);
+  });
+
+  it("재고가 천장보다 많아도 천장을 넘지 않는다", () => {
+    expect(getMaxLineQuantity(MAX_LINE_QUANTITY + 50)).toBe(MAX_LINE_QUANTITY);
+  });
+
+  // 재고 0 은 품절이다. 스테퍼를 0 으로 만들면 값이 min 아래로 내려가 렌더가 깨진다.
+  it("재고가 0이어도 1 아래로는 내리지 않는다", () => {
+    expect(getMaxLineQuantity(0)).toBe(1);
   });
 });

@@ -8,7 +8,7 @@ import { cn } from "@shared/lib/style";
 import { toNTCurrency } from "@shared/lib/utils";
 import { QuantityStepper } from "@shared/ui/quantity-stepper";
 
-import { formatCartLineOptions, MAX_LINE_QUANTITY } from "@entities/cart";
+import { formatCartLineOptions, getMaxLineQuantity } from "@entities/cart";
 
 import type { DraftLine } from "../model/useAddToCartDraft";
 
@@ -48,6 +48,8 @@ export function DraftLineList({
         {lines.map((line, index) => {
           // 조합을 그대로 고른 라인은 드롭다운에 보인 문구를 그대로 쓴다.
           const optionText = line.label ?? formatCartLineOptions(line.options);
+          // 재고를 아는 조합은 거기까지만 올릴 수 있다.
+          const maxQuantity = getMaxLineQuantity(line.stockQuantity);
 
           return (
             <div
@@ -71,7 +73,7 @@ export function DraftLineList({
               >
                 <QuantityStepper
                   label={optionText}
-                  max={MAX_LINE_QUANTITY}
+                  max={maxQuantity}
                   onChange={(quantity) => onQuantityChange(line.key, quantity)}
                   value={line.quantity}
                 />

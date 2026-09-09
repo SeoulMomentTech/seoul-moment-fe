@@ -4,8 +4,19 @@ import { createJSONStorage, persist } from "zustand/middleware";
 import type { AddCartLinesResult, CartLine, CartLineDraft } from "./types";
 import { createCartLineId } from "../lib/cartLineId";
 
-/** 한 라인의 수량 상한. 서버에 재고/최대주문수량 필드가 없어 클라이언트 상수로만 둔다. */
+/** 한 라인의 수량 상한. 재고와 무관한 정책상 천장이다. */
 export const MAX_LINE_QUANTITY = 99;
+
+/**
+ * 이 라인에서 실제로 고를 수 있는 최대 수량 — 정책 천장과 재고 중 작은 쪽.
+ *
+ * 재고를 모르면(서버가 안 내려줬거나 로컬에만 있는 라인) 천장만 적용한다. 모른다는 이유로
+ * 1로 묶으면 살 수 있는 수량까지 막힌다.
+ */
+export const getMaxLineQuantity = (stockQuantity?: number): number =>
+  stockQuantity == null
+    ? MAX_LINE_QUANTITY
+    : Math.max(1, Math.min(MAX_LINE_QUANTITY, stockQuantity));
 /** localStorage 무한 증가 방지 */
 export const MAX_CART_LINES = 100;
 
@@ -20,6 +31,8 @@ interface CartState {
   hasHydrated: boolean;
 
   addLines(drafts: ReadonlyArray<CartLineDraft>): AddCartLinesResult;
+  /** 서버 담기 응답이 돌아오면 그 라인에 서버 id 를 붙인다 */
+  attachCartItemId(lineId: string, cartItemId: number): void;
   updateQuantity(lineId: string, quantity: number): void;
   removeLines(lineIds: ReadonlyArray<string>): void;
   restoreLines(lines: ReadonlyArray<CartLine>): void;
@@ -83,6 +96,13 @@ export const useCartStore = create<CartState>()(
 
         return { status: "added", count: drafts.length };
       },
+
+      attachCartItemId: (lineId, cartItemId) =>
+        set((state) => ({
+          lines: state.lines.map((line) =>
+            line.lineId === lineId ? { ...line, cartItemId } : line,
+          ),
+        })),
 
       updateQuantity: (lineId, quantity) =>
         set((state) => ({
