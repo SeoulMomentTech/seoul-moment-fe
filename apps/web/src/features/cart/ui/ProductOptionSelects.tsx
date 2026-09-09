@@ -17,6 +17,8 @@ interface ProductOptionSelectsProps {
   axes: ReadonlyArray<ProductOptionAxis>;
   picked: Partial<Record<OptionType, number>>;
   onPick(type: OptionType, optionValueId: number): void;
+  /** 지금 선택으로는 구매 가능한 조합이 없는 옵션값 ID. 비활성 + 품절 표기한다 */
+  unavailableOptionValueIds?: ReadonlySet<number>;
   className?: string;
 }
 
@@ -28,6 +30,7 @@ export function ProductOptionSelects({
   axes,
   picked,
   onPick,
+  unavailableOptionValueIds,
   className,
 }: ProductOptionSelectsProps) {
   const t = useTranslations();
@@ -58,11 +61,21 @@ export function ProductOptionSelects({
               </span>
             </SelectTrigger>
             <SelectContent>
-              {axis.values.map((option) => (
-                <SelectItem key={option.id} value={String(option.id)}>
-                  {option.value}
-                </SelectItem>
-              ))}
+              {axis.values.map((option) => {
+                const soldOut = unavailableOptionValueIds?.has(option.id);
+
+                return (
+                  <SelectItem
+                    disabled={soldOut}
+                    key={option.id}
+                    value={String(option.id)}
+                  >
+                    {soldOut
+                      ? `${option.value} · ${t("sold_out")}`
+                      : option.value}
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
         );

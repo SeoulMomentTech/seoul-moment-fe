@@ -12,16 +12,30 @@ import {
   createCartLineId,
   MAX_LINE_QUANTITY,
   useCart,
+  useCreateUserCartItemMutation,
   type CartLineDraft,
   type CartOptionSelection,
 } from "@entities/cart";
-import { splitProductOptionAxes } from "@entities/product";
+import {
+  findProductVariant,
+  getUnavailableOptionValueIds,
+  isOptionCombinationPurchasable,
+  listProductVariantChoices,
+  splitProductOptionAxes,
+} from "@entities/product";
 
 /** 담기 전 화면에 쌓여 있는 조합 한 줄 */
 export interface DraftLine {
   key: string;
   options: CartOptionSelection[];
   quantity: number;
+  /** 조합을 직접 고른 경우의 SKU. 축별 선택이면 담을 때 역으로 찾는다 */
+  variantId?: number;
+  /**
+   * 드롭다운에 보인 문구 그대로. 한 축에 값이 여러 개인 조합(혼방 소재)을 옵션 나열로
+   * 다시 만들면 `나일론 / 스판덱스` 가 되어 고른 것과 다르게 읽힌다.
+   */
+  label?: string;
 }
 
 const toSelection = (
@@ -40,12 +54,20 @@ interface UseAddToCartDraftArgs {
 /**
  * 상품상세 담기 상태.
  *
- * 선택형(값 2개 이상인 축이 있음)은 축을 전부 골라야 조합이 쌓이고, 고정형(화장품)은
- * 고를 게 없으므로 조합 1개가 처음부터 존재하고 수량만 조작한다.
+ * `variants` 를 받으면 조합(SKU) 하나를 select 한 개로 고른다 — 축을 하나씩 고르면
+ * 존재하지 않는 조합을 만들 수 있고, 고른 값을 다시 SKU 로 번역해야 한다.
+ *
+ * `variants` 가 비어 있을 때만 축별 선택으로 되돌아간다. 선택형(값 2개 이상인 축이
+ * 있음)은 축을 전부 골라야 조합이 쌓이고, 고정형(화장품)은 고를 게 없으므로 조합
+ * 1개가 처음부터 존재하고 수량만 조작한다.
  */
 export const useAddToCartDraft = ({ product }: UseAddToCartDraftArgs) => {
   const t = useTranslations();
   const { addLines } = useCart();
+  // 전환기 이중 기록용. 화면은 로컬을 읽으므로 실패를 토스트로 알리지 않는다.
+  const { mutate: createServerCartItem } = useCreateUserCartItemMutation({
+    toastOnError: false,
+  });
   const isAuthenticated = useUserAuthStore((state) => state.isAuthenticated);
 
   const { selectable, fixed, mode } = useMemo(
@@ -58,9 +80,31 @@ export const useAddToCartDraft = ({ product }: UseAddToCartDraftArgs) => {
     [fixed],
   );
 
-  // 고정형은 고를 게 없으므로 조합 1개로 시작한다.
+  /**
+   * 조합(SKU) 단위로 고르는 드롭다운 항목. `variants` 가 곧 살 수 있는 조합 목록이므로
+   * 축을 하나씩 고르게 하지 않고 이 목록을 그대로 한 개의 select 로 보여준다.
+   */
+  const variantChoices = useMemo(
+    () =>
+      listProductVariantChoices({
+        option: product.option,
+        variants: product.variants,
+      }),
+    [product.option, product.variants],
+  );
+
+  /**
+   * `"variant"` 면 조합 하나를 그대로 고른다. `variants` 를 못 받은 상품만 기존처럼
+   * 축별로 고른다(`"selectable"` / `"fixed"`).
+   */
+  const selectMode: "variant" | "selectable" | "fixed" = variantChoices.length
+    ? "variant"
+    : mode;
+
+  // 고정형은 고를 게 없으므로 조합 1개로 시작한다. 조합 드롭다운이 뜨는 상품은
+  // 항목이 하나여도 사용자가 고르게 둔다 — 미리 쌓아두면 같은 조합이 두 줄이 된다.
   const [lines, setLines] = useState<DraftLine[]>(() =>
-    mode === "fixed"
+    selectMode === "fixed"
       ? [
           {
             key: createCartLineId(product.id, fixedSelections),
@@ -74,9 +118,25 @@ export const useAddToCartDraft = ({ product }: UseAddToCartDraftArgs) => {
   /** 축별로 현재 고른 optionValueId */
   const [picked, setPicked] = useState<Partial<Record<OptionType, number>>>({});
 
-  const addLine = useCallback(
-    (selections: CartOptionSelection[]) => {
-      const options = [...fixedSelections, ...selections];
+  // 자동 확정 축도 조합에 들어가므로 재고 판정 제약에 함께 넘긴다.
+  const allAxes = useMemo(() => [...selectable, ...fixed], [selectable, fixed]);
+
+  /** 지금 선택으로는 구매 가능한 조합이 없는 옵션값들 — selectbox 에서 비활성화한다 */
+  const unavailableOptionValueIds = useMemo(
+    () =>
+      getUnavailableOptionValueIds({
+        variants: product.variants,
+        axes: allAxes,
+        picked,
+      }),
+    [product.variants, allAxes, picked],
+  );
+
+  const pushLine = useCallback(
+    (
+      options: CartOptionSelection[],
+      extra?: { variantId?: number; label?: string },
+    ) => {
       const key = createCartLineId(product.id, options);
 
       setLines((prev) => {
@@ -92,10 +152,16 @@ export const useAddToCartDraft = ({ product }: UseAddToCartDraftArgs) => {
               : line,
           );
         }
-        return [...prev, { key, options, quantity: 1 }];
+        return [...prev, { key, options, quantity: 1, ...extra }];
       });
     },
-    [fixedSelections, product.id],
+    [product.id],
+  );
+
+  const addLine = useCallback(
+    (selections: CartOptionSelection[]) =>
+      pushLine([...fixedSelections, ...selections]),
+    [fixedSelections, pushLine],
   );
 
   const pickAxis = useCallback(
@@ -112,13 +178,51 @@ export const useAddToCartDraft = ({ product }: UseAddToCartDraftArgs) => {
 
       if (selections.some((selection) => selection === null)) return;
 
+      const options = [
+        ...fixedSelections,
+        ...(selections as CartOptionSelection[]),
+      ];
+
+      // 값 단위 비활성화를 우회해 들어온 조합(재고가 방금 빠진 경우 등)을 여기서 막는다.
+      if (
+        !isOptionCombinationPurchasable(
+          product.variants,
+          options.map((option) => option.optionValueId),
+        )
+      ) {
+        toast.error(t("option_sold_out"));
+        return;
+      }
+
       addLine(selections as CartOptionSelection[]);
 
       // 선택을 리셋하지 않는다. 축 하나만 바꿔 다음 조합을 쌓는 게 실제 흐름이고
       // (색상 고정 + 사이즈만 변경 → 두 줄), 리셋하면 Radix Select 의 controlled
       // value 만 비워져 같은 값을 다시 골라도 onValueChange 가 오지 않는다.
     },
-    [picked, selectable, addLine],
+    [picked, selectable, addLine, fixedSelections, product.variants, t],
+  );
+
+  const pickVariant = useCallback(
+    (variantId: number) => {
+      const choice = variantChoices.find(
+        (item) => item.variantId === variantId,
+      );
+
+      if (!choice) return;
+
+      // 품절 조합은 드롭다운에서 이미 비활성이지만, 재고가 방금 빠진 경우를 여기서 막는다.
+      if (!choice.isPurchasable) {
+        toast.error(t("option_sold_out"));
+        return;
+      }
+
+      pushLine(choice.options, {
+        variantId: choice.variantId,
+        label: choice.label,
+      });
+    },
+    [variantChoices, pushLine, t],
   );
 
   const setQuantity = useCallback((key: string, quantity: number) => {
@@ -135,12 +239,14 @@ export const useAddToCartDraft = ({ product }: UseAddToCartDraftArgs) => {
   }, []);
 
   // 고정형은 조합이 항상 1개라 지울 수 없다 — 지우면 되살릴 선택 UI 가 없다.
+  const canRemoveLines = selectMode !== "fixed";
+
   const removeLine = useCallback(
     (key: string) => {
-      if (mode === "fixed") return;
+      if (!canRemoveLines) return;
       setLines((prev) => prev.filter((line) => line.key !== key));
     },
-    [mode],
+    [canRemoveLines],
   );
 
   const unitPrice =
@@ -185,18 +291,41 @@ export const useAddToCartDraft = ({ product }: UseAddToCartDraftArgs) => {
       return false;
     }
 
+    // 서버 장바구니에도 같은 담기를 반영한다. 아직 화면(/cart · 헤더 배지)은 로컬을 읽으므로
+    // 이 호출은 best-effort 다 — 실패해도 담기 자체를 되돌리지 않는다.
+    // 서버는 productVariantId(SKU) 단위로 담으므로 선택 조합을 variant 로 번역해야 한다.
+    for (const line of lines) {
+      // 조합을 직접 고른 라인은 SKU 를 이미 들고 있다. 축별 선택이면 역으로 찾는다.
+      const productVariantId =
+        line.variantId ??
+        findProductVariant(
+          product.variants,
+          line.options.map((option) => option.optionValueId),
+        )?.id;
+
+      // SKU 를 못 찾으면 서버에 담을 방법이 없다. 로컬 담기는 유지한다.
+      if (!productVariantId) continue;
+
+      createServerCartItem({ productVariantId, quantity: line.quantity });
+    }
+
     return true;
-  }, [isAuthenticated, lines, product, addLines, t]);
+  }, [isAuthenticated, lines, product, addLines, createServerCartItem, t]);
 
   return {
     mode,
     selectableAxes: selectable,
     fixedAxes: fixed,
+    selectMode,
     picked,
     pickAxis,
+    unavailableOptionValueIds,
+    variantChoices,
+    pickVariant,
     lines,
     setQuantity,
     removeLine,
+    canRemoveLines,
     totalAmount,
     canSubmit,
     submit,

@@ -16,6 +16,7 @@ import { Button, Drawer, DrawerContent, DrawerTitle } from "@seoul-moment/ui";
 
 import { DraftLineList } from "./DraftLineList";
 import { ProductOptionSelects } from "./ProductOptionSelects";
+import { ProductVariantSelect } from "./ProductVariantSelect";
 import { useAddToCartDraft } from "../model/useAddToCartDraft";
 
 interface AddToCartProps {
@@ -54,13 +55,20 @@ export function AddToCart({ product, likeSlot }: AddToCartProps) {
     });
   };
 
-  const options = (
-    <ProductOptionSelects
-      axes={draft.selectableAxes}
-      onPick={draft.pickAxis}
-      picked={draft.picked}
-    />
-  );
+  const options =
+    draft.selectMode === "variant" ? (
+      <ProductVariantSelect
+        choices={draft.variantChoices}
+        onPick={draft.pickVariant}
+      />
+    ) : (
+      <ProductOptionSelects
+        axes={draft.selectableAxes}
+        onPick={draft.pickAxis}
+        picked={draft.picked}
+        unavailableOptionValueIds={draft.unavailableOptionValueIds}
+      />
+    );
 
   const comingSoonHint = (
     <p className="sr-only" id="add-to-cart-coming-soon">
@@ -119,7 +127,7 @@ export function AddToCart({ product, likeSlot }: AddToCartProps) {
                 lines={draft.lines}
                 onQuantityChange={draft.setQuantity}
                 onRemove={draft.removeLine}
-                removable={draft.mode === "selectable"}
+                removable={draft.canRemoveLines}
                 totalAmount={draft.totalAmount}
                 unitPrice={unitPrice}
               />
@@ -145,7 +153,7 @@ export function AddToCart({ product, likeSlot }: AddToCartProps) {
         lines={draft.lines}
         onQuantityChange={draft.setQuantity}
         onRemove={draft.removeLine}
-        removable={draft.mode === "selectable"}
+        removable={draft.canRemoveLines}
         totalAmount={draft.totalAmount}
         unitPrice={unitPrice}
       />

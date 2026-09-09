@@ -10,9 +10,11 @@ import type {
   GetProductDetailRes,
   OptionValue,
 } from "@shared/services/product";
+import type { CreateUserCartItemReq } from "@shared/services/userCart";
 
 import messages from "@/i18n/messages/ko.json";
 
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook } from "@testing-library/react";
 
 import { useAddToCartDraft } from "./useAddToCartDraft";
@@ -36,9 +38,37 @@ vi.mock("@shared/lib/hooks/useUserAuthStore", () => ({
 
 vi.mock("sonner", () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 
+const createUserCartItem = vi.fn((req: CreateUserCartItemReq) =>
+  Promise.resolve({
+    result: true,
+    data: { cartItemId: req.productVariantId, totalCount: 1 },
+  }),
+);
+
+vi.mock("@shared/services/userCart", () => ({
+  // useMutation 은 mutationFn 에 (variables, context) 를 넘기므로 첫 인자만 스파이로 흘린다.
+  createUserCartItem: (req: CreateUserCartItemReq) => createUserCartItem(req),
+  getUserCart: vi.fn(),
+  getUserCartCount: vi.fn(),
+  updateUserCartItem: vi.fn(),
+  deleteUserCartItem: vi.fn(),
+  deleteUserCartItems: vi.fn(),
+}));
+
 const value = (id: number, v: string): OptionValue => ({ id, value: v });
 
-const product = (option: GetProductDetailRes["option"]): GetProductDetailRes =>
+const variant = (id: number, optionValueIds: number[]) => ({
+  id,
+  sku: `SKU-${id}`,
+  optionValueIds,
+  stockQuantity: 10,
+  isSoldOut: false,
+});
+
+const product = (
+  option: GetProductDetailRes["option"],
+  variants: GetProductDetailRes["variants"] = [],
+): GetProductDetailRes =>
   ({
     id: 132,
     name: "무브 쇼츠",
@@ -48,7 +78,7 @@ const product = (option: GetProductDetailRes["option"]): GetProductDetailRes =>
     origin: "중국",
     shippingInfo: 7,
     option,
-    variants: [],
+    variants,
     like: 0,
     review: 0,
     reviewAverage: 0,
@@ -60,21 +90,36 @@ const product = (option: GetProductDetailRes["option"]): GetProductDetailRes =>
   }) as GetProductDetailRes;
 
 const wrapper = ({ children }: { children: ReactNode }) => (
-  <NextIntlClientProvider locale="ko" messages={messages}>
-    {children}
-  </NextIntlClientProvider>
+  <QueryClientProvider
+    client={
+      new QueryClient({
+        defaultOptions: {
+          queries: { retry: false },
+          mutations: { retry: false },
+        },
+      })
+    }
+  >
+    <NextIntlClientProvider locale="ko" messages={messages}>
+      {children}
+    </NextIntlClientProvider>
+  </QueryClientProvider>
 );
 
-const setup = (option: GetProductDetailRes["option"]) =>
-  renderHook(() => useAddToCartDraft({ product: product(option) }), {
+const setup = (
+  option: GetProductDetailRes["option"],
+  variants?: GetProductDetailRes["variants"],
+) =>
+  renderHook(() => useAddToCartDraft({ product: product(option, variants) }), {
     wrapper,
   });
 
 beforeEach(() => {
   useCartStore.setState({ lines: [], ownerId: 0 });
+  createUserCartItem.mockClear();
 });
 
-describe("선택형 — 값이 2개 이상인 축이 있는 상품", () => {
+describe("선택형 — variants 를 못 받은, 값이 2개 이상인 축이 있는 상품", () => {
   const clothing: GetProductDetailRes["option"] = {
     COLOR: [value(1, "레드")],
     SIZE: [value(10, "S"), value(11, "M")],
@@ -183,6 +228,183 @@ describe("선택형 — 값이 2개 이상인 축이 있는 상품", () => {
     expect(useCartStore.getState().lines[0].imageUrl).toBe(
       "https://example.com/a.jpg",
     );
+  });
+
+  // 전환기에는 로컬과 서버 양쪽에 담는다. 서버는 SKU 단위라 조합을 variant 로 번역한다.
+  it("담기와 함께 조합별 SKU 로 서버에도 담는다", async () => {
+    const { result } = setup(clothing, [
+      variant(101, [1, 10, 20]),
+      variant(102, [1, 11, 20]),
+    ]);
+
+    act(() => result.current.pickAxis("SIZE", 10));
+    act(() => result.current.pickAxis("MATERIAL", 20));
+    act(() => result.current.pickAxis("SIZE", 11));
+
+    // mutate 는 mutationFn 을 마이크로태스크에서 호출하므로 flush 가 필요하다.
+    await act(async () => {
+      result.current.submit();
+    });
+
+    expect(createUserCartItem.mock.calls.map(([req]) => req)).toEqual([
+      { productVariantId: 101, quantity: 1 },
+      { productVariantId: 102, quantity: 1 },
+    ]);
+  });
+
+  // 재고 정보가 없으면 검증할 근거가 없다. 담기를 막지 않고 서버 호출만 건너뛴다.
+  it("variants 가 없으면 서버 호출을 건너뛰고 로컬만 담는다", async () => {
+    const { result } = setup(clothing);
+
+    act(() => result.current.pickAxis("SIZE", 10));
+    act(() => result.current.pickAxis("MATERIAL", 20));
+
+    let ok = false;
+    await act(async () => {
+      ok = result.current.submit();
+    });
+
+    expect(ok).toBe(true);
+    expect(useCartStore.getState().lines).toHaveLength(1);
+    expect(createUserCartItem).not.toHaveBeenCalled();
+  });
+
+  it("고를수록 남은 조합이 없는 옵션값이 비활성 대상이 된다", () => {
+    // 살아 있는 조합은 S+폴리에스터, M+스판덱스 뿐이다.
+    const { result } = setup(clothing, [
+      variant(101, [1, 10, 20]),
+      variant(102, [1, 11, 21]),
+    ]);
+
+    // 아직 아무것도 안 골랐으면 네 값 모두 도달 가능하다.
+    expect([...result.current.unavailableOptionValueIds]).toEqual([]);
+
+    // S 를 고르면 스판덱스(21)로 갈 방법이 없어진다.
+    act(() => result.current.pickAxis("SIZE", 10));
+    expect([...result.current.unavailableOptionValueIds]).toEqual([21]);
+  });
+
+  it("품절된 조합의 옵션값은 처음부터 비활성 대상이다", () => {
+    const { result } = setup(clothing, [
+      { ...variant(101, [1, 10, 20]), isSoldOut: true },
+      variant(102, [1, 11, 20]),
+    ]);
+
+    // S(10) 는 어떤 조합으로도 살 수 없다. 스판덱스(21)도 조합 자체가 없다.
+    expect([...result.current.unavailableOptionValueIds].sort()).toEqual([
+      10, 21,
+    ]);
+  });
+
+  it("구매 가능한 조합이 없으면 조합을 쌓지 않는다", () => {
+    const { result } = setup(clothing, [
+      { ...variant(101, [1, 10, 20]), stockQuantity: 0 },
+    ]);
+
+    act(() => result.current.pickAxis("SIZE", 10));
+    act(() => result.current.pickAxis("MATERIAL", 20));
+
+    expect(result.current.lines).toHaveLength(0);
+    expect(result.current.canSubmit).toBe(false);
+  });
+});
+
+describe("조합형 — variants 를 받은 상품", () => {
+  const clothing: GetProductDetailRes["option"] = {
+    COLOR: [value(1, "레드")],
+    SIZE: [value(10, "S"), value(11, "M")],
+    MATERIAL: [value(20, "폴리에스터"), value(21, "스판덱스")],
+  };
+
+  it("축별 selectbox 대신 조합 하나짜리 드롭다운을 쓴다", () => {
+    const { result } = setup(clothing, [
+      variant(101, [1, 10, 20]),
+      variant(102, [1, 11, 21]),
+    ]);
+
+    expect(result.current.selectMode).toBe("variant");
+    expect(result.current.variantChoices.map((c) => c.label)).toEqual([
+      "레드 / S / 폴리에스터",
+      "레드 / M / 스판덱스",
+    ]);
+  });
+
+  // 서버 현재 응답 형태: 상품당 조합 1개 + 한 축(소재)에 값 여러 개.
+  it("한 축에 값이 여러 개인 합집합 응답도 조합 드롭다운으로 보여준다", () => {
+    const { result } = setup(clothing, [variant(170, [1, 10, 20, 21])]);
+
+    expect(result.current.selectMode).toBe("variant");
+    expect(result.current.variantChoices.map((c) => c.label)).toEqual([
+      "레드 / S / 폴리에스터·스판덱스",
+    ]);
+  });
+
+  it("조합을 고르면 SKU 를 그대로 들고 라인이 쌓인다", () => {
+    const { result } = setup(clothing, [
+      variant(101, [1, 10, 20]),
+      variant(102, [1, 11, 21]),
+    ]);
+
+    act(() => result.current.pickVariant(102));
+
+    expect(result.current.lines).toHaveLength(1);
+    expect(result.current.lines[0].variantId).toBe(102);
+    expect(result.current.lines[0].label).toBe("레드 / M / 스판덱스");
+    expect(result.current.canSubmit).toBe(true);
+  });
+
+  it("같은 조합을 다시 고르면 새 줄이 아니라 수량 +1", () => {
+    const { result } = setup(clothing, [variant(101, [1, 10, 20])]);
+
+    act(() => result.current.pickVariant(101));
+    act(() => result.current.pickVariant(101));
+
+    expect(result.current.lines).toHaveLength(1);
+    expect(result.current.lines[0].quantity).toBe(2);
+  });
+
+  it("품절 조합은 라인을 만들지 않는다", () => {
+    const { result } = setup(clothing, [
+      { ...variant(101, [1, 10, 20]), isSoldOut: true },
+    ]);
+
+    expect(result.current.variantChoices[0].isPurchasable).toBe(false);
+
+    act(() => result.current.pickVariant(101));
+
+    expect(result.current.lines).toHaveLength(0);
+  });
+
+  // 고른 조합이 곧 SKU 라 담을 때 역으로 찾을 필요가 없다.
+  it("고른 SKU 로 서버에도 담는다", async () => {
+    const { result } = setup(clothing, [
+      variant(101, [1, 10, 20]),
+      variant(102, [1, 11, 21]),
+    ]);
+
+    act(() => result.current.pickVariant(101));
+    act(() => result.current.pickVariant(102));
+
+    await act(async () => {
+      result.current.submit();
+    });
+
+    expect(createUserCartItem.mock.calls.map(([req]) => req)).toEqual([
+      { productVariantId: 101, quantity: 1 },
+      { productVariantId: 102, quantity: 1 },
+    ]);
+  });
+
+  // 고를 축이 없는 상품이라도 조합이 있으면 드롭다운으로 고른다. 미리 쌓아두면
+  // 사용자가 고른 조합과 키가 달라 같은 SKU 가 두 줄이 된다.
+  it("값이 전부 1개인 상품도 조합을 받으면 미리 쌓아두지 않는다", () => {
+    const { result } = setup({ VOLUME: [value(30, "50ml")] }, [
+      variant(101, [30]),
+    ]);
+
+    expect(result.current.selectMode).toBe("variant");
+    expect(result.current.lines).toHaveLength(0);
+    expect(result.current.canRemoveLines).toBe(true);
   });
 });
 

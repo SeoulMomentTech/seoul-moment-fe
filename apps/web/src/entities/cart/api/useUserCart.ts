@@ -69,10 +69,20 @@ function useInvalidateUserCart() {
     queryClient.invalidateQueries({ queryKey: userCartQueryKeys.all });
 }
 
+interface CreateUserCartItemMutationArgs {
+  /**
+   * 실패를 사용자에게 토스트로 알릴지. 로컬 카트와 병행 기록하는 전환기에는
+   * 화면상 담기가 이미 성공했으므로 끄고 Sentry 로만 남긴다.
+   */
+  toastOnError?: boolean;
+}
+
 /**
  * @description 장바구니 담기
  */
-export function useCreateUserCartItemMutation() {
+export function useCreateUserCartItemMutation({
+  toastOnError = true,
+}: CreateUserCartItemMutationArgs = {}) {
   const invalidateUserCart = useInvalidateUserCart();
 
   return useAppMutation<
@@ -81,7 +91,8 @@ export function useCreateUserCartItemMutation() {
     CreateUserCartItemReq
   >({
     mutationFn: createUserCartItem,
-    toastOnError: true,
+    toastOnError,
+    logOnError: !toastOnError,
     onSuccess: invalidateUserCart,
   });
 }

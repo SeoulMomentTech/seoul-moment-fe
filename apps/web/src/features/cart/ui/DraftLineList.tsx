@@ -45,53 +45,58 @@ export function DraftLineList({
   return (
     <div className={className}>
       <div className="flex flex-col bg-black/5 px-4 py-3">
-        {lines.map((line, index) => (
-          <div
-            className={cn(
-              "flex items-center gap-4 pb-4 pt-3",
-              index === lines.length - 1 && "pb-3",
-            )}
-            key={line.key}
-          >
-            <p
-              className={cn(
-                "text-body-3 min-w-0 flex-1 leading-none text-black/80",
-                compact && "text-body-4",
-              )}
-            >
-              {formatCartLineOptions(line.options)}
-            </p>
+        {lines.map((line, index) => {
+          // 조합을 그대로 고른 라인은 드롭다운에 보인 문구를 그대로 쓴다.
+          const optionText = line.label ?? formatCartLineOptions(line.options);
 
+          return (
             <div
-              className={cn("gap-7.5 flex items-center", compact && "gap-1")}
+              className={cn(
+                "flex items-center gap-4 pb-4 pt-3",
+                index === lines.length - 1 && "pb-3",
+              )}
+              key={line.key}
             >
-              <QuantityStepper
-                label={formatCartLineOptions(line.options)}
-                max={MAX_LINE_QUANTITY}
-                onChange={(quantity) => onQuantityChange(line.key, quantity)}
-                value={line.quantity}
-              />
+              <p
+                className={cn(
+                  "text-body-3 min-w-0 flex-1 leading-none text-black/80",
+                  compact && "text-body-4",
+                )}
+              >
+                {optionText}
+              </p>
 
-              <div className="flex items-center justify-center gap-2">
-                {!compact && (
-                  <span className="text-body-3 font-semibold tabular-nums text-[#212529]">
-                    {toNTCurrency(unitPrice * line.quantity)}
-                  </span>
-                )}
-                {removable && (
-                  <button
-                    aria-label={t("remove_from_cart")}
-                    className="grid cursor-pointer place-items-center p-1"
-                    onClick={() => onRemove(line.key)}
-                    type="button"
-                  >
-                    <XIcon height={16} width={16} />
-                  </button>
-                )}
+              <div
+                className={cn("gap-7.5 flex items-center", compact && "gap-1")}
+              >
+                <QuantityStepper
+                  label={optionText}
+                  max={MAX_LINE_QUANTITY}
+                  onChange={(quantity) => onQuantityChange(line.key, quantity)}
+                  value={line.quantity}
+                />
+
+                <div className="flex items-center justify-center gap-2">
+                  {!compact && (
+                    <span className="text-body-3 font-semibold tabular-nums text-[#212529]">
+                      {toNTCurrency(unitPrice * line.quantity)}
+                    </span>
+                  )}
+                  {removable && (
+                    <button
+                      aria-label={t("remove_from_cart")}
+                      className="grid cursor-pointer place-items-center p-1"
+                      onClick={() => onRemove(line.key)}
+                      type="button"
+                    >
+                      <XIcon height={16} width={16} />
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div
