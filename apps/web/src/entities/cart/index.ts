@@ -1,4 +1,13 @@
 export {
+  useCreateUserCartItemMutation,
+  useDeleteUserCartItemMutation,
+  useDeleteUserCartItemsMutation,
+  useUpdateUserCartItemMutation,
+  useUserCartCountQuery,
+  useUserCartQuery,
+} from "./api/useUserCart";
+export { USER_CART_QUERY_KEY, userCartQueryKeys } from "./api/queryKey";
+export {
   createCartLineId,
   formatCartLineOptions,
   getProductIdFromCartLineId,
