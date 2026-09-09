@@ -166,7 +166,9 @@ export const useAddToCartDraft = ({ product }: UseAddToCartDraftArgs) => {
       productId: product.id,
       quantity: line.quantity,
       productName: product.name,
-      brandId: product.brand.id,
+      // 로컬 카트는 brandId 를 문자열로 저장해 왔고 그 값이 localStorage 에 남아 있다.
+      // 상세 v1 이 number 로 내려주더라도 저장 포맷은 유지한다.
+      brandId: String(product.brand.id),
       brandName: product.brand.name,
       brandProfileImg: product.brand.profileImg,
       imageUrl: product.subImage[0] ?? "",
