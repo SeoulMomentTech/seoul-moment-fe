@@ -12,7 +12,7 @@ import { cn } from "@shared/lib/style";
 
 import { Link } from "@/i18n/navigation";
 
-import { useCartBadgeCount, useCartOwnerGuard } from "@entities/cart";
+import { useCartBadgeCount } from "@entities/cart";
 
 interface CartButtonProps {
   iconSize?: number;
@@ -24,10 +24,7 @@ const MAX_BADGE_COUNT = 99;
 /**
  * 헤더 장바구니 진입점.
  *
- * 항상 마운트되어 있으므로 `useCartOwnerGuard` 를 여기서 호출한다 — 계정 전환 시 장바구니를
- * 비우는 판단을 한 곳에서만 하게 된다.
- *
- * 배지는 **라인 개수**다(수량 합이 아니다). 숫자의 근거(서버 카운트)와 hydration 방어는
+ * 배지는 **라인 개수**다(수량 합이 아니다). 숫자의 근거(서버 카운트)와 캐시 복원 대기는
  * `useCartBadgeCount` 가 쥐고 있다.
  */
 export function CartButton({ iconSize = 22, className }: CartButtonProps) {
@@ -35,8 +32,6 @@ export function CartButton({ iconSize = 22, className }: CartButtonProps) {
   const isAuthenticated = useUserAuthStore((state) => state.isAuthenticated);
   const hasAuthHydrated = useUserAuthHydrated();
   const { count, isReady } = useCartBadgeCount();
-
-  useCartOwnerGuard();
 
   if (!hasAuthHydrated || !isAuthenticated) return null;
 

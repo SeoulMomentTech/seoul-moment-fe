@@ -1,0 +1,1292 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>주문서 시안</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600;700&amp;family=Noto+Sans+KR:wght@400;500;700&amp;display=swap">
+<style>
+  :root { color-scheme: light; }
+  html { -webkit-text-size-adjust: 100%; }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+</style>
+<style>
+/* ============================================================
+   REVIEW CANVAS — 문서 크롬. 검토 대상(흰 프레임)과 섞이지 않게
+   웜 차콜 단일 월드로 고정. Seoul Moment 앱에 다크 모드가 없으므로
+   (DESIGN.md §10) 프레임은 항상 흰색이고 없는 테마를 지어내지 않는다.
+   ============================================================ */
+:root {
+  --canvas:        #1b1815;
+  --canvas-raised: #24201c;
+  --canvas-sunken: #141110;
+  --rule:          #38322c;
+  --rule-soft:     #2b2621;
+  --ink:           #ece6de;
+  --ink-dim:       #a1968a;
+  --ink-faint:     #8f8479;
+  --annot:         #7aa9bb;
+  --annot-dim:     #63899a;
+  --annot-on-light:#3f6472;
+  --figma:         #c39be0;
+  --figma-dim:     #6d4f85;
+
+  /* Seoul Moment 토큰 — DESIGN.md §2.1 */
+  --sm-bg:      #ffffff;
+  --sm-fg:      #171717;
+  --sm-brand:   #f37b2a;
+  --sm-neutral: #707070;
+  --sm-danger:  #ff383c;
+
+  /* Figma 실측 raw 값 — 디자인이 authority */
+  --sm-line:  rgba(0,0,0,0.2);   /* 컨트롤 보더 */
+  --sm-rule:  rgba(0,0,0,0.1);   /* 섹션 구분선 */
+  --sm-hair:  rgba(0,0,0,0.05);  /* 헤더 하단 / 조합 라인 박스 배경 */
+  --sm-ink80: rgba(0,0,0,0.8);
+  --sm-ink40: rgba(0,0,0,0.4);
+  --sm-price: #212529;
+
+  /* 타이포 스케일 — DESIGN.md §2.2 */
+  --t2: 32px; --t3: 24px; --t4: 20px;
+  --b1: 18px; --b2: 16px; --b3: 14px; --b4: 13px; --b5: 12px;
+
+  --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px; --s8: 72px;
+
+  --sans: "Inter", "Noto Sans KR", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0; background: var(--canvas); color: var(--ink);
+  font-family: var(--sans); font-size: 15px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+:focus-visible { outline: 2px solid var(--annot); outline-offset: 3px; }
+
+/* ---------- 상단 바 ---------- */
+.topbar { position: sticky; top: 0; z-index: 50; border-bottom: 1px solid var(--rule-soft); background: var(--canvas); }
+@supports (backdrop-filter: blur(1px)) {
+  .topbar { background: color-mix(in srgb, var(--canvas) 88%, transparent); backdrop-filter: blur(12px); }
+}
+.topbar-in { max-width: 1400px; margin: 0 auto; padding: 0 var(--s5); display: flex; align-items: center; gap: var(--s7); min-height: 54px; }
+.topbar-name { font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-dim); white-space: nowrap; }
+.jump { display: flex; gap: var(--s5); overflow-x: auto; scrollbar-width: none; margin-left: auto; }
+.jump::-webkit-scrollbar { display: none; }
+.jump a {
+  font-family: var(--mono); font-size: 12px; color: var(--ink-faint); text-decoration: none;
+  padding: 6px 0; border-bottom: 1.5px solid transparent; white-space: nowrap;
+  transition: color 160ms ease, border-color 160ms ease;
+}
+.jump a:hover { color: var(--ink); }
+.jump a[aria-current="true"] { color: var(--ink); border-bottom-color: var(--annot); }
+
+/* ---------- 페이지 골격 ---------- */
+main { max-width: 1400px; margin: 0 auto; padding: 0 var(--s5) var(--s8); }
+
+.intro {
+  padding: var(--s8) 0 var(--s7); border-bottom: 1px solid var(--rule-soft);
+  display: grid; grid-template-columns: minmax(0,1fr) minmax(0,380px); gap: var(--s8); align-items: end;
+}
+@media (max-width: 900px) { .intro { grid-template-columns: 1fr; gap: var(--s6); align-items: start; } }
+.intro h1 { margin: 0 0 var(--s4); font-size: clamp(30px, 4.4vw, 46px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; text-wrap: balance; }
+.intro p { margin: 0; max-width: 62ch; color: var(--ink-dim); font-size: 15px; }
+.intro p + p { margin-top: var(--s3); }
+.intro strong { color: var(--ink); font-weight: 600; }
+
+.scope { display: grid; gap: 1px; background: var(--rule-soft); border: 1px solid var(--rule-soft); }
+.scope > div { display: grid; grid-template-columns: 76px 1fr; gap: var(--s4); background: var(--canvas-raised); padding: 10px var(--s4); }
+.scope .k { font-family: var(--mono); font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-faint); padding-top: 3px; }
+.scope .v { font-size: 13.5px; color: var(--ink); }
+code { font-family: var(--mono); font-size: 0.88em; color: var(--annot); }
+
+/* ---------- 섹션 ---------- */
+section.group { padding: var(--s8) 0 0; }
+.group-head { display: flex; align-items: baseline; gap: var(--s4); flex-wrap: wrap; margin-bottom: var(--s5); }
+.group-num { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; color: var(--annot-dim); padding-top: 4px; }
+.group-head h2 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.02em; }
+.group-head .sub { color: var(--ink-faint); font-size: 13.5px; }
+
+.src {
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.09em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 2px; white-space: nowrap; align-self: center;
+}
+.src.figma { background: var(--figma-dim); color: #f0e4fa; }
+.src.new { background: var(--rule); color: var(--ink-dim); }
+
+/* 주석 */
+.notes { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s5); margin-bottom: var(--s4); }
+.note { font-family: var(--mono); font-size: 11.5px; line-height: 1.55; color: var(--annot); display: flex; gap: 7px; align-items: baseline; }
+.note::before { content: "—"; color: var(--annot-dim); flex: none; }
+.note b { color: var(--ink-dim); font-weight: 500; }
+.note em { font-style: normal; color: var(--ink); }
+
+.rail { display: grid; gap: var(--s4); align-content: start; padding-top: var(--s2); }
+.rail .note { display: block; color: var(--ink-dim); font-family: var(--sans); font-size: 13px; line-height: 1.55; }
+.rail .note::before { content: none; }
+.rail .note strong {
+  display: block; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--annot); margin-bottom: 4px; font-weight: 500;
+}
+.rail .note em { font-style: normal; color: var(--ink); font-weight: 500; }
+
+/* ---------- 프레임 ---------- */
+.frame { background: var(--sm-bg); border: 1px solid var(--rule); overflow: hidden; }
+.frame-bar { display: flex; align-items: center; gap: var(--s3); background: var(--canvas-sunken); border-bottom: 1px solid var(--rule); padding: 7px var(--s3); }
+.frame-bar .url { font-family: var(--mono); font-size: 11px; color: var(--ink-dim); background: var(--canvas); border: 1px solid var(--rule-soft); padding: 2px 10px; border-radius: 3px; }
+.frame-bar .dim { font-family: var(--mono); font-size: 11px; color: var(--annot-dim); margin-left: auto; }
+.frame-bar .node { font-family: var(--mono); font-size: 10.5px; color: var(--figma); }
+.frame-body { background: var(--sm-bg); color: var(--sm-fg); }
+.frame.mo360 { width: 360px; max-width: 100%; flex: none; }
+.frame.w560 { flex: 1 1 330px; max-width: 560px; min-width: 0; }
+.frame.mo390 { width: 390px; max-width: 100%; flex: none; }
+
+.pair { display: flex; gap: var(--s6); align-items: flex-start; flex-wrap: wrap; }
+.pair > .rail { flex: 1 1 250px; min-width: 230px; }
+.gap { height: var(--s5); }
+
+.is-new { position: relative; outline: 1px dashed var(--annot-dim); outline-offset: 4px; }
+.new-tag {
+  position: absolute; top: -9px; left: 0; font-family: var(--mono); font-size: 9.5px;
+  letter-spacing: 0.08em; text-transform: uppercase; background: var(--canvas); color: var(--annot); padding: 1px 6px;
+}
+.legend { display: inline-flex; align-items: center; gap: var(--s2); font-family: var(--mono); font-size: 11px; color: var(--ink-faint); margin-top: var(--s4); }
+.legend i { width: 22px; border-top: 1px dashed var(--annot-dim); display: block; }
+
+/* ============================================================
+   SEOUL MOMENT UI — 프레임 내부. 정적 표현이므로 모든 컨트롤은
+   비-포커스 span (무동작 탭 스톱과 거짓 ARIA 방지). 구현 시 접근성은 §07.
+   ============================================================ */
+.sm { font-family: var(--sans); color: var(--sm-fg); background: var(--sm-bg); }
+.sm *, .sm *::before, .sm *::after { box-sizing: border-box; }
+.sm svg { display: block; }
+.sm .num { font-variant-numeric: tabular-nums; }
+.sm p, .sm h1, .sm h2, .sm h3 { margin: 0; }
+
+/* 전역 헤더 (코드의 Header.tsx) */
+.sm-header { height: 56px; border-bottom: 1px solid var(--sm-hair); display: flex; align-items: center; padding: 0 20px; }
+.sm-header-in { width: 100%; max-width: 1280px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 40px; }
+.sm-header-in.m { max-width: none; gap: 10px; }
+.sm-wordmark { font-size: 15px; font-weight: 700; letter-spacing: 0.14em; white-space: nowrap; }
+.sm-wordmark.s { font-size: 12.5px; }
+.sm-nav { display: flex; align-items: center; gap: 40px; list-style: none; margin: 0; padding: 0; }
+.sm-lnk { font-size: var(--b3); }
+.sm-lnk.on { font-weight: 600; }
+.sm-lang { font-size: var(--b3); display: flex; align-items: center; gap: 4px; }
+.sm-cluster { display: flex; align-items: center; gap: 40px; }
+.sm-cluster.tight { gap: 18px; }
+.sm-cluster.m { gap: 10px; }
+
+/* 상품상세 전용 GNB (Figma MO/GNB) */
+.sm-gnb { height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; }
+.sm-gnb .r { display: flex; align-items: center; gap: 16px; }
+
+.sm-cart-btn { position: relative; display: block; }
+.sm-cart-btn > svg { width: 22px; height: 22px; }
+.sm-cart-btn.s > svg { width: 20px; height: 20px; }
+.sm-cart-btn.f > svg { width: 24px; height: 24px; }
+.sm-badge {
+  position: absolute; top: -5px; right: -7px; min-width: 17px; height: 17px; padding: 0 4px;
+  background: var(--sm-brand); color: #fff; border-radius: 999px;
+  font-size: 10.5px; font-weight: 600; line-height: 17px; text-align: center; font-variant-numeric: tabular-nums;
+}
+.sm-ico20 { width: 20px; height: 20px; }
+.sm-ico22 { width: 22px; height: 22px; }
+.sm-ico24 { width: 24px; height: 24px; }
+
+/* ---- 공통 컨트롤 (Figma 실측) ---- */
+.sm-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+  padding: 16px 20px; border-radius: 4px; background: var(--sm-fg); color: #fff;
+  font-size: var(--b2); font-weight: 600; line-height: 1;
+}
+.sm-btn.out { background: #fff; color: var(--sm-fg); border: 1px solid var(--sm-line); }
+.sm-btn.block { width: 100%; }
+.sm-btn.sq48 { width: 48px; height: 48px; padding: 12px 20px; flex: none; }
+.sm-btn.off { background: rgba(0,0,0,.1); color: var(--sm-ink40); }
+.sm-btn.grow { flex: 1 1 0; min-width: 0; }
+
+.sm-cta { display: flex; gap: 8px; align-items: center; }
+
+/* selectbox */
+.sm-select {
+  background: #fff; border: 1px solid var(--sm-line); border-radius: 4px;
+  padding: 16px 12px; display: flex; align-items: center; gap: 8px; font-size: var(--b3); line-height: 1;
+}
+.sm-select > span { flex: 1 1 0; min-width: 0; }
+.sm-select svg { width: 16px; height: 16px; flex: none; }
+.sm-selects { display: grid; gap: 10px; }
+
+/* 수량 스테퍼 — Figma w-86 박스 */
+.sm-step {
+  width: 86px; flex: none; background: #fff; border: 1px solid var(--sm-line); border-radius: 4px;
+  padding: 8px; display: flex; align-items: center; gap: 8px;
+}
+.sm-step .b { padding: 2px; display: grid; place-items: center; }
+.sm-step .b svg { width: 12px; height: 12px; color: var(--sm-neutral); }
+.sm-step .b.off svg { color: rgba(0,0,0,.18); }
+.sm-step .q { flex: 1 1 0; min-width: 0; text-align: center; font-size: var(--b5); font-weight: 600; line-height: 1; font-variant-numeric: tabular-nums; }
+
+/* 조합 라인 박스 (Figma 상세정보) */
+.sm-draft { background: var(--sm-hair); padding: 12px 16px; display: flex; flex-direction: column; }
+.sm-draft .line { display: flex; align-items: center; gap: 16px; padding: 12px 0 16px; }
+.sm-draft .line .lbl { flex: 1 1 0; min-width: 0; font-size: var(--b3); color: var(--sm-ink80); line-height: 1; }
+.sm-draft .line .rt { display: flex; align-items: center; gap: 30px; }
+.sm-draft .line .money { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.sm-draft .line .money .p { font-size: var(--b3); font-weight: 600; color: var(--sm-price); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sm-draft .line .x { padding: 4px; display: grid; place-items: center; }
+.sm-draft .line .x svg { width: 16px; height: 16px; }
+.sm-draft.m .line .lbl { font-size: var(--b4); }
+.sm-draft.m .line .rt { gap: 4px; }
+
+/* 총 상품 금액 */
+.sm-total { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+.sm-total .k { font-size: var(--b5); }
+.sm-total .v { font-size: var(--b1); font-weight: 600; font-variant-numeric: tabular-nums; }
+.sm-total.m { justify-content: space-between; padding-bottom: 10px; }
+.sm-total.m .k { font-size: var(--b2); font-weight: 600; }
+.sm-total.m .v { font-size: var(--t4); font-weight: 600; }
+
+/* ---- 상품상세 ---- */
+.sm-detail { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 80px; max-width: 1200px; margin: 0 auto; padding: 50px 20px 60px; }
+@media (max-width: 1040px) { .sm-detail { grid-template-columns: 1fr; gap: var(--s6); } }
+.sm-gallery { aspect-ratio: 1; display: grid; place-items: center; position: relative; }
+.sm-gallery span { font-family: var(--mono); font-size: 11px; color: rgba(0,0,0,.5); }
+.sm-thumbs { display: flex; gap: 8px; margin-top: 8px; }
+.sm-thumbs i { width: 64px; height: 64px; display: block; border: 1px solid var(--sm-hair); }
+.sm-thumbs i.on { border-color: #000; }
+.sm-thumbs.m i { width: 56px; height: 56px; }
+
+.sm-ptitle { display: flex; gap: 16px; align-items: flex-start; padding-bottom: 20px; }
+.sm-ptitle h2 { flex: 1 1 0; min-width: 0; font-size: var(--t4); font-weight: 700; line-height: 1.35; letter-spacing: -0.02em; }
+.sm-brandrow { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; }
+.sm-brandrow .ab { display: flex; align-items: center; gap: 4px; font-size: var(--b3); }
+.sm-brandrow .lk { display: flex; align-items: center; gap: 4px; font-size: var(--b4); color: var(--sm-ink40); }
+.sm-brandrow .lk svg { width: 20px; height: 20px; color: var(--sm-neutral); }
+.sm-avatar { width: 32px; height: 32px; border-radius: 999px; flex: none; border: 1px solid var(--sm-hair); }
+.sm-avatar.s { width: 24px; height: 24px; }
+.sm-avatar.xs { width: 28px; height: 28px; }
+
+.sm-meta { border-bottom: 1px solid var(--sm-rule); padding: 10px 0 20px; display: grid; gap: 30px; }
+.sm-meta.m { gap: 20px; }
+.sm-rate { display: flex; align-items: center; gap: 4px; font-size: var(--b3); color: var(--sm-ink80); }
+.sm-stars { display: flex; }
+.sm-stars svg { width: 16px; height: 16px; color: var(--sm-brand); }
+.sm-meta.m .sm-stars svg { width: 14px; height: 14px; }
+.sm-meta.m .sm-rate { font-size: var(--b4); }
+.sm-prices { display: grid; gap: 20px; }
+.sm-meta.m .sm-prices { gap: 16px; }
+.sm-prices .r { display: flex; align-items: center; font-size: var(--b3); }
+.sm-meta.m .sm-prices .r { font-size: var(--b4); }
+.sm-prices .r .k { width: 120px; flex: none; color: var(--sm-ink80); }
+.sm-prices .was { color: var(--sm-ink40); text-decoration: line-through; font-variant-numeric: tabular-nums; }
+.sm-prices .now { display: flex; align-items: center; gap: 8px; }
+.sm-prices .now b { font-size: var(--b1); font-weight: 700; font-variant-numeric: tabular-nums; }
+.sm-meta.m .sm-prices .now b { font-size: var(--b2); }
+.sm-prices .now .off { color: var(--sm-brand); font-size: var(--b5); font-weight: 700; }
+
+.sm-info { display: grid; gap: 20px; padding: 20px 0 0; font-size: var(--b3); color: var(--sm-ink80); }
+.sm-info.m { gap: 16px; font-size: var(--b4); }
+.sm-info .r { display: flex; }
+.sm-info .r .k { width: 120px; flex: none; }
+
+/* ---- 모바일 하단 고정 바 / 시트 ---- */
+.sm-barfix { background: #fff; padding: 16px 20px; filter: drop-shadow(0 -4px 5px rgba(0,0,0,0.08)); }
+.sm-scrim { position: relative; background: #fff; overflow: hidden; }
+.sm-scrim .dimlayer { position: absolute; inset: 0; background: rgba(0,0,0,0.5); }
+.sm-sheet {
+  position: relative; background: #fff; border-top-left-radius: 16px; border-top-right-radius: 16px;
+  box-shadow: 0 -8px 10px rgba(0,0,0,0.08); padding: 10px 20px 16px;
+}
+.sm-handle { width: 50px; height: 4px; border-radius: 999px; background: rgba(0,0,0,.2); margin: 0 auto 20px; }
+
+/* ---- /cart ---- */
+.sm-page { max-width: 1280px; margin: 0 auto; padding: 40px 20px 60px; }
+.sm-page.m { padding: 24px 20px 0; max-width: none; }
+
+.sm-h1 { display: flex; align-items: baseline; gap: 10px; margin-bottom: 20px; }
+.sm-h1 h1 { font-size: var(--t3); font-weight: 700; letter-spacing: -0.02em; }
+.sm-h1 .c { font-size: var(--t4); font-weight: 700; color: var(--sm-brand); font-variant-numeric: tabular-nums; }
+.sm-page.m .sm-h1 h1 { font-size: var(--t4); }
+.sm-page.m .sm-h1 .c { font-size: var(--b1); }
+
+.sm-selbar {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s4);
+  border-top: 1px solid var(--sm-rule); border-bottom: 1px solid var(--sm-rule); padding: 13px 0;
+}
+.sm-selbar .l { display: flex; align-items: center; gap: 10px; font-size: var(--b3); }
+.sm-selbar .l .n { color: var(--sm-neutral); font-variant-numeric: tabular-nums; }
+.sm-selbar .r { display: flex; align-items: center; gap: 12px; font-size: var(--b3); color: var(--sm-neutral); }
+.sm-selbar .r .sep { width: 1px; height: 11px; background: var(--sm-line); }
+
+/* 체크박스 — black (디자인 언어: #f37b2a는 할인율·별점 전용) */
+.sm-cb { width: 20px; height: 20px; flex: none; border: 1.5px solid var(--sm-line); border-radius: 3px; background: #fff; display: grid; place-items: center; }
+.sm-cb > svg { width: 13px; height: 13px; color: #fff; }
+.sm-cb.on, .sm-cb.mixed { background: var(--sm-fg); border-color: var(--sm-fg); }
+.sm-cb.mixed::after { content: ""; width: 9px; height: 1.5px; background: #fff; border-radius: 1px; }
+
+.sm-cols { display: grid; grid-template-columns: minmax(0,1fr) 360px; gap: 40px; align-items: start; padding-top: 4px; }
+@media (max-width: 1120px) { .sm-cols { grid-template-columns: 1fr; gap: var(--s6); } }
+
+.sm-group { padding-top: 28px; }
+.sm-group-head { display: flex; align-items: center; gap: 10px; padding-bottom: 12px; border-bottom: 1px solid var(--sm-rule); }
+.sm-group-head .bn { font-size: var(--b2); font-weight: 600; letter-spacing: -0.01em; }
+.sm-group-head .bk { font-size: var(--b4); color: var(--sm-neutral); }
+.sm-group-head .st { margin-left: auto; font-size: var(--b3); font-weight: 600; font-variant-numeric: tabular-nums; }
+.sm-page.m .sm-group-head .bn { font-size: var(--b3); }
+
+.sm-line { display: grid; grid-template-columns: 20px 120px minmax(0,1fr) 32px; gap: 16px; padding: 20px 0; border-bottom: 1px solid rgba(0,0,0,.06); align-items: start; }
+.sm-page.m .sm-line, .sm-line.compact { grid-template-columns: 20px 100px minmax(0,1fr) 28px; gap: 12px; padding: 18px 0; }
+.sm-line.off { opacity: .5; }
+.sm-thumb { aspect-ratio: 1; width: 100%; border: 1px solid var(--sm-hair); }
+.sm-line .name { font-size: var(--b2); line-height: 1.45; margin-bottom: 8px; letter-spacing: -0.01em; }
+.sm-page.m .sm-line .name, .sm-line.compact .name { font-size: var(--b3); }
+.sm-line .opt { font-size: var(--b5); color: var(--sm-neutral); margin-bottom: 10px; }
+.sm-line .price { display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px; font-variant-numeric: tabular-nums; }
+.sm-line .price .was { font-size: var(--b4); color: var(--sm-ink40); text-decoration: line-through; }
+.sm-line .price .now { font-size: var(--b1); font-weight: 600; letter-spacing: -0.01em; }
+.sm-page.m .sm-line .price .now, .sm-line.compact .price .now { font-size: var(--b2); }
+.sm-line-foot { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+.sm-buy { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--sm-line); border-radius: 4px; padding: 8px 12px; font-size: var(--b4); }
+.sm-buy svg { width: 13px; height: 13px; color: var(--sm-neutral); }
+.sm-del { width: 32px; height: 32px; display: grid; place-items: center; color: var(--sm-neutral); margin: -4px -6px 0 0; }
+.sm-del svg { width: 17px; height: 17px; }
+
+.sm-summary { border: 1px solid var(--sm-line); padding: 24px; margin-top: 28px; display: grid; gap: 0; }
+.sm-summary .sel { font-size: var(--b3); color: var(--sm-neutral); font-variant-numeric: tabular-nums; }
+.sm-summary .lab { font-size: var(--b3); margin-top: 14px; }
+.sm-summary .tot { font-size: var(--t2); font-weight: 700; letter-spacing: -0.03em; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.sm-summary hr { border: 0; border-top: 1px solid var(--sm-rule); margin: 20px 0 16px; width: 100%; }
+.sm-summary .row { display: flex; justify-content: space-between; gap: var(--s4); font-size: var(--b3); }
+.sm-summary .row .v { color: var(--sm-neutral); }
+.sm-summary .cta { margin-top: 20px; }
+.sm-summary .foot { font-size: var(--b5); color: var(--sm-neutral); margin-top: 14px; line-height: 1.5; }
+.sticky-tag { font-family: var(--mono); font-size: 10.5px; color: var(--annot-on-light); margin-top: 8px; }
+.impl-tag { font-family: var(--mono); font-size: 10.5px; color: rgba(0,0,0,.55); }
+
+.sm-cartbar { border-top: 1px solid var(--sm-rule); background: #fff; padding: 16px 20px; display: grid; gap: 12px; }
+.sm-cartbar .row { display: flex; align-items: baseline; justify-content: space-between; }
+.sm-cartbar .row .k { font-size: var(--b3); color: var(--sm-neutral); }
+.sm-cartbar .row .v { font-size: var(--b1); font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+
+/* 빈 상태 */
+.sm-empty { display: grid; justify-items: center; gap: 16px; padding: 72px 20px; text-align: center; }
+.sm-page.m .sm-empty { padding: 48px 0; }
+.sm-empty .ico { color: rgba(0,0,0,.2); }
+.sm-empty .ico svg { width: 40px; height: 40px; }
+.sm-empty h2 { font-size: var(--b1); font-weight: 600; letter-spacing: -0.01em; }
+.sm-empty p { margin-top: -6px; font-size: var(--b3); color: var(--sm-neutral); max-width: 34ch; }
+
+.sm-recent { border-top: 1px solid var(--sm-rule); padding: 28px 0 40px; }
+.sm-recent h3 { margin-bottom: 16px; font-size: var(--b2); font-weight: 600; }
+.sm-recent .row { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 4px; }
+.sm-recent .card { width: 152px; flex: none; }
+.sm-page.m .sm-recent .card { width: 128px; }
+.sm-recent .card .t { aspect-ratio: 3/4; border: 1px solid var(--sm-hair); margin-bottom: 8px; }
+.sm-recent .card .b { font-size: var(--b5); font-weight: 600; }
+.sm-recent .card .n { font-size: var(--b4); line-height: 1.4; margin: 2px 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sm-recent .card .p { font-size: var(--b4); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* 토스트 */
+.sm-toastwrap { background: #f6f6f6; padding: 24px 20px; display: grid; gap: 12px; justify-items: center; }
+.sm-toast { width: 100%; max-width: 356px; background: #fff; border: 1px solid rgba(0,0,0,.08); border-radius: 8px; box-shadow: 0 4px 14px rgba(0,0,0,.10); padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+.sm-toast .ic { width: 18px; height: 18px; flex: none; }
+.sm-toast .ic.ok { color: #16803c; }
+.sm-toast .ic.mut { color: var(--sm-neutral); }
+.sm-toast .ic.bad { color: var(--sm-danger); }
+.sm-toast .tx { font-size: var(--b3); flex: 1; }
+.sm-toast .act { font-size: var(--b3); font-weight: 600; color: var(--sm-brand); white-space: nowrap; }
+.sm-toast .act.mut { color: var(--sm-fg); }
+
+/* 기존 좋아요 라인 */
+.sm-likerow { display: flex; align-items: center; gap: 10px; padding: 16px 20px; border-bottom: 1px solid var(--sm-rule); }
+.sm-likerow .t { width: 80px; height: 80px; flex: none; border: 1px solid var(--sm-hair); }
+.sm-likerow .m { flex: 1; min-width: 0; display: grid; gap: 16px; }
+.sm-likerow .top { display: grid; gap: 10px; }
+.sm-likerow .b { font-size: var(--b5); font-weight: 600; }
+.sm-likerow .n { font-size: var(--b3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sm-likerow .p { font-size: var(--b3); font-weight: 600; font-variant-numeric: tabular-nums; }
+.sm-likerow .h { color: #dc2626; }
+.sm-likerow .h svg { width: 24px; height: 24px; }
+
+/* ---------- 대비 / 표 ---------- */
+.compare { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: var(--s6); align-items: start; }
+.compare .col { display: grid; gap: var(--s3); align-content: start; }
+.compare .cap { font-family: var(--mono); font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-faint); }
+.compare .cap b { color: var(--annot); font-weight: 500; }
+
+.tablewrap { overflow-x: auto; }
+.difftable { width: 100%; border-collapse: collapse; margin-top: var(--s6); font-size: 13.5px; }
+.difftable th, .difftable td { text-align: left; padding: 10px var(--s4) 10px 0; border-bottom: 1px solid var(--rule-soft); vertical-align: top; }
+.difftable thead th { font-family: var(--mono); font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-faint); font-weight: 500; }
+.difftable td:first-child, .difftable th:first-child { color: var(--ink-faint); white-space: nowrap; padding-right: var(--s5); }
+.difftable td:nth-child(2) { color: var(--ink-dim); }
+.difftable td:last-child { color: var(--ink); }
+.difftable td b { font-weight: 600; }
+.difftable code { font-size: 11.5px; }
+
+/* ---------- 토큰 ---------- */
+.tokgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1px; background: var(--rule-soft); border: 1px solid var(--rule-soft); }
+.tok { background: var(--canvas-raised); padding: var(--s4); display: grid; gap: 9px; }
+.tok .sw { height: 46px; border: 1px solid var(--rule); }
+.tok .nm { font-family: var(--mono); font-size: 11.5px; color: var(--ink); }
+.tok .hx { font-family: var(--mono); font-size: 10.5px; color: var(--ink-faint); line-height: 1.5; }
+
+.scaletable { width: 100%; border-collapse: collapse; margin-top: var(--s6); }
+.scaletable td { padding: 7px var(--s5) 7px 0; border-bottom: 1px solid var(--rule-soft); vertical-align: baseline; }
+.scaletable td:first-child { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); white-space: nowrap; width: 1%; }
+.scaletable td:nth-child(2) { font-family: var(--mono); font-size: 11px; color: var(--annot-dim); white-space: nowrap; width: 1%; }
+.scaletable td:last-child { color: var(--ink); letter-spacing: -0.02em; }
+
+.caveat { border-left: 2px solid var(--annot-dim); padding: 2px 0 2px var(--s4); margin-top: var(--s7); display: grid; gap: var(--s3); }
+.caveat.figma { border-left-color: var(--figma-dim); }
+.caveat h3 { margin: 0; font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--annot); font-weight: 500; }
+.caveat.figma h3 { color: var(--figma); }
+.caveat ul { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
+.caveat li { color: var(--ink-dim); font-size: 13.5px; line-height: 1.6; }
+.caveat li b { color: var(--ink); font-weight: 600; }
+
+footer {
+  margin-top: var(--s8); padding-top: var(--s5); border-top: 1px solid var(--rule-soft);
+  font-family: var(--mono); font-size: 11px; color: var(--ink-faint);
+  display: flex; justify-content: space-between; gap: var(--s4); flex-wrap: wrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
+
+  /* Artifact 호스트가 주입하는 리셋과 동등 */
+  :root { color-scheme: light; }
+  html { -webkit-text-size-adjust: 100%; }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+
+/* ============================================================
+   주문/결제 전용 — 장바구니 어휘 상속
+   ============================================================ */
+.flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: var(--s3); margin-bottom: var(--s5); }
+.flow .step {
+  flex: 1 1 150px; min-width: 0; background: var(--canvas-raised);
+  border: 1px solid var(--rule-soft); padding: var(--s4); display: grid; gap: 6px; align-content: start;
+}
+.flow .step .n { font-family: var(--mono); font-size: 10px; letter-spacing: .08em; color: var(--annot-dim); }
+.flow .step .t { font-size: 14px; font-weight: 600; letter-spacing: -.01em; }
+.flow .step .d { font-size: 12.5px; color: var(--ink-faint); line-height: 1.5; }
+.flow .step.here { border-color: var(--annot-dim); background: #221f22; }
+.flow .step.here .t { color: var(--annot); }
+.flow .arrow { align-self: center; color: var(--rule); font-family: var(--mono); font-size: 14px; }
+@media (max-width: 780px) { .flow .arrow { display: none; } }
+
+/* 주문서 골격 */
+.sm-order { max-width: 1280px; margin: 0 auto; padding: 40px 20px 60px; }
+.sm-order.m { padding: 24px 20px 0; max-width: none; }
+.sm-order-cols { display: grid; grid-template-columns: minmax(0,1fr) 360px; gap: 40px; align-items: start; }
+@media (max-width: 1120px) { .sm-order-cols { grid-template-columns: 1fr; gap: var(--s6); } }
+
+.sm-sec { border-top: 1px solid var(--sm-fg); padding: 20px 0 32px; }
+.sm-sec:first-child { border-top-color: var(--sm-fg); }
+.sm-sec > h2 { font-size: var(--b1); font-weight: 700; letter-spacing: -.02em; margin-bottom: 16px; }
+.sm-order.m .sm-sec > h2 { font-size: var(--b2); }
+.sm-sec .hint { font-size: var(--b5); color: var(--sm-neutral); margin-top: 8px; line-height: 1.5; }
+
+/* 주문 상품 — 읽기 전용이라 /cart 라인보다 조용하다 */
+.sm-obrand { border-bottom: 1px solid var(--sm-rule); padding-bottom: 16px; }
+.sm-obrand + .sm-obrand { margin-top: 24px; }
+.sm-obrand-head { display: flex; align-items: center; gap: 8px; padding-bottom: 12px; }
+.sm-obrand-head .bn { font-size: var(--b3); font-weight: 600; }
+.sm-obrand-head .bk { font-size: var(--b5); color: var(--sm-neutral); }
+.sm-oline { display: grid; grid-template-columns: 80px minmax(0,1fr) auto; gap: 12px; align-items: start; padding: 12px 0; }
+.sm-oline .t { width: 80px; height: 80px; border: 1px solid var(--sm-hair); }
+.sm-oline .nm { font-size: var(--b3); line-height: 1.45; }
+.sm-oline .op { font-size: var(--b5); color: var(--sm-neutral); margin-top: 6px; }
+.sm-oline .qt { font-size: var(--b5); color: var(--sm-neutral); margin-top: 6px; font-variant-numeric: tabular-nums; }
+.sm-oline .am { font-size: var(--b3); font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right; }
+.sm-ship { display: flex; justify-content: space-between; align-items: baseline; padding-top: 12px; border-top: 1px dashed var(--sm-rule); font-size: var(--b5); }
+.sm-ship .k { color: var(--sm-neutral); }
+.sm-ship .v { font-variant-numeric: tabular-nums; }
+
+/* 폼 */
+.sm-fields { display: grid; gap: 16px; }
+.sm-field { display: grid; gap: 8px; }
+.sm-field > .lb { font-size: var(--b4); color: var(--sm-ink80); }
+.sm-field > .lb .req { color: var(--sm-danger); margin-left: 2px; }
+.sm-input {
+  background: #fff; border: 1px solid var(--sm-line); border-radius: 4px;
+  padding: 16px 12px; font-size: var(--b3); line-height: 1; display: block; width: 100%;
+}
+.sm-input.ph { color: var(--sm-neutral); }
+.sm-input.bad { border-color: var(--sm-danger); }
+.sm-err { font-size: var(--b5); color: var(--sm-danger); }
+.sm-two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.sm-addr { display: grid; grid-template-columns: 96px 1fr 1fr; gap: 8px; }
+@media (max-width: 560px) { .sm-addr { grid-template-columns: 1fr; } }
+.sm-check-row { display: flex; align-items: center; gap: 8px; font-size: var(--b3); }
+
+/* 결제 수단 */
+.sm-pays { display: grid; gap: 8px; }
+.sm-pay {
+  display: flex; align-items: center; gap: 12px; border: 1px solid var(--sm-line);
+  border-radius: 4px; padding: 16px; background: #fff;
+}
+.sm-pay.on { border-color: var(--sm-fg); border-width: 1.5px; padding: 15.5px; }
+.sm-pay .dot { width: 18px; height: 18px; flex: none; border-radius: 999px; border: 1.5px solid var(--sm-line); display: grid; place-items: center; }
+.sm-pay.on .dot { border-color: var(--sm-fg); }
+.sm-pay.on .dot::after { content: ""; width: 9px; height: 9px; border-radius: 999px; background: var(--sm-fg); }
+.sm-pay .mark { height: 20px; padding: 0 8px; border-radius: 3px; display: grid; place-items: center; font-size: 10.5px; font-weight: 700; letter-spacing: .02em; flex: none; }
+.sm-pay .nm { font-size: var(--b3); font-weight: 500; }
+.sm-pay .sub { font-size: var(--b5); color: var(--sm-neutral); margin-left: auto; text-align: right; }
+
+/* 동의 */
+.sm-agree { border: 1px solid var(--sm-line); border-radius: 4px; padding: 16px; display: grid; gap: 12px; }
+.sm-agree .top { display: flex; align-items: flex-start; gap: 8px; font-size: var(--b3); line-height: 1.5; }
+.sm-agree .terms { display: grid; gap: 8px; padding-left: 28px; }
+.sm-agree .terms span { font-size: var(--b5); color: var(--sm-neutral); display: flex; justify-content: space-between; }
+
+/* 결제 금액 패널 */
+.sm-paysum { border: 1px solid var(--sm-line); padding: 24px; }
+.sm-paysum h3 { font-size: var(--b2); font-weight: 700; margin-bottom: 18px; }
+.sm-paysum .row { display: flex; justify-content: space-between; gap: var(--s4); font-size: var(--b3); padding: 6px 0; }
+.sm-paysum .row .v { font-variant-numeric: tabular-nums; }
+.sm-paysum .row.sub { font-size: var(--b5); color: var(--sm-neutral); padding: 2px 0 2px 10px; }
+.sm-paysum hr { border: 0; border-top: 1px solid var(--sm-rule); margin: 16px 0; }
+.sm-paysum .final { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s4); }
+.sm-paysum .final .k { font-size: var(--b3); font-weight: 600; }
+.sm-paysum .final .v { font-size: var(--t3); font-weight: 700; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.sm-paysum .cta { margin-top: 20px; }
+.sm-paysum .foot { font-size: var(--b5); color: var(--sm-neutral); margin-top: 14px; line-height: 1.5; }
+
+.sm-paybar { border-top: 1px solid var(--sm-rule); background: #fff; padding: 16px 20px; display: grid; gap: 12px; }
+.sm-paybar .row { display: flex; align-items: baseline; justify-content: space-between; }
+.sm-paybar .row .k { font-size: var(--b3); color: var(--sm-neutral); }
+.sm-paybar .row .v { font-size: var(--b1); font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+
+/* 주문 완료 */
+.sm-done { display: grid; justify-items: center; gap: 14px; padding: 64px 20px 40px; text-align: center; }
+.sm-done .ic { color: #16803c; }
+.sm-done .ic svg { width: 44px; height: 44px; }
+.sm-done h2 { font-size: var(--t4); font-weight: 700; letter-spacing: -.02em; }
+.sm-done p { font-size: var(--b3); color: var(--sm-neutral); }
+.sm-done .no { font-family: var(--mono); font-size: var(--b3); background: var(--sm-hair); padding: 8px 14px; border-radius: 4px; margin-top: 4px; }
+.sm-donesum { border-top: 1px solid var(--sm-rule); border-bottom: 1px solid var(--sm-rule); padding: 20px 0; display: grid; gap: 14px; max-width: 480px; margin: 8px auto 0; width: 100%; }
+.sm-donesum .r { display: flex; gap: 16px; font-size: var(--b3); }
+.sm-donesum .r .k { width: 88px; flex: none; color: var(--sm-neutral); }
+.sm-donesum .r .v { min-width: 0; }
+.sm-donecta { display: flex; gap: 8px; max-width: 480px; margin: 24px auto 0; width: 100%; }
+.sm-donecta .sm-btn { flex: 1 1 0; min-width: 0; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="ic-cart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/>
+    <path d="M2.5 3h2.2l2.6 11.1a1.8 1.8 0 0 0 1.75 1.4h8.6a1.8 1.8 0 0 0 1.76-1.42L21 6.6H5.6"/>
+  </symbol>
+  <symbol id="ic-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="ic-minus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"/></symbol>
+  <symbol id="ic-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+  <symbol id="ic-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="ic-ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+  </symbol>
+  <symbol id="ic-heart" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4">
+    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+  </symbol>
+  <symbol id="ic-heart-o" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+  </symbol>
+  <symbol id="ic-star" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9Z"/></symbol>
+  <symbol id="ic-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></symbol>
+  <symbol id="ic-login" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="m10 17 5-5-5-5"/><path d="M15 12H3"/>
+  </symbol>
+  <symbol id="ic-logout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>
+  </symbol>
+  <symbol id="ic-chev-d" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="ic-chev-l" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="ic-share" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/>
+    <path d="M8.4 13.4 15.6 17.7"/><path d="M15.6 6.3 8.4 10.6"/>
+  </symbol>
+  <symbol id="ic-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+  </symbol>
+  <symbol id="ic-ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></symbol>
+  <symbol id="ic-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4.5"/><path d="M12 16h.01"/></symbol>
+</svg>
+<header class="topbar">
+  <div class="topbar-in">
+    <span class="topbar-name">Order · 시안 v1</span>
+    <nav class="jump" aria-label="섹션 이동">
+      <a href="#f-flow">흐름</a>
+      <a href="#f-order">주문서</a>
+      <a href="#f-mobile">모바일</a>
+      <a href="#f-ship">배송지</a>
+      <a href="#f-pay">결제 수단</a>
+      <a href="#f-done">완료</a>
+      <a href="#f-open">결정 필요</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <div class="intro">
+    <div>
+      <h1>주문서 시안</h1>
+      <p>장바구니에서 <code>주문하기</code>를 누른 뒤의 화면입니다. 결제는 <strong>LINE Pay</strong>와 <strong>ECPay</strong> 두 갈래이고 둘 다 외부 결제창으로 넘어가므로, 이 페이지의 역할은 <strong>주문 내용 확정과 배송지 입력</strong>까지입니다. 카드번호 같은 결제 정보는 우리 화면에서 받지 않습니다.</p>
+      <p>배송비는 <strong>브랜드별로 분리</strong>됩니다 — 장바구니를 브랜드 단위로 묶어둔 것과 같은 구조입니다. 그래서 주문서의 상품 목록도 브랜드 그룹을 유지하고 그룹마다 배송비가 붙습니다.</p>
+    </div>
+    <div class="scope">
+      <div><span class="k">라우트</span><span class="v"><code>/order</code> → 결제창 → <code>/order/complete</code></span></div>
+      <div><span class="k">접근</span><span class="v">로그인 필수 · <code>AuthOnly</code></span></div>
+      <div><span class="k">결제</span><span class="v">LINE Pay · ECPay (둘 다 리다이렉트)</span></div>
+      <div><span class="k">배송</span><span class="v">주소 배송만 · 배송비 브랜드별</span></div>
+    </div>
+  </div>
+
+  <!-- ==================== 01 흐름 ==================== -->
+  <section class="group" id="f-flow">
+    <div class="group-head">
+      <span class="group-num">01</span>
+      <h2>흐름</h2>
+      <span class="src new">신규 설계</span>
+    </div>
+
+    <div class="flow">
+      <div class="step">
+        <span class="n">01</span><span class="t">/cart</span>
+        <span class="d">담아둔 것 중 <b>선택한 라인만</b> 주문으로 넘긴다</span>
+      </div>
+      <span class="arrow">→</span>
+      <div class="step here">
+        <span class="n">02</span><span class="t">/order</span>
+        <span class="d">주문 상품 확인 · 배송지 · 결제 수단 · 동의 → <b>결제하기</b></span>
+      </div>
+      <span class="arrow">→</span>
+      <div class="step">
+        <span class="n">03</span><span class="t">외부 결제창</span>
+        <span class="d">LINE Pay 또는 ECPay 호스팅 페이지. <b>우리 화면을 떠난다</b></span>
+      </div>
+      <span class="arrow">→</span>
+      <div class="step">
+        <span class="n">04</span><span class="t">/order/complete</span>
+        <span class="d">주문번호 · 결제 수단 · 배송지 요약</span>
+      </div>
+    </div>
+
+    <div class="notes">
+      <span class="note"><b>주문 상품은 읽기 전용</b> 수량 변경·삭제는 <code>/cart</code>에서만. 주문서에서 고치게 하면 금액 재계산과 재고 검증이 얽힙니다</span>
+      <span class="note"><b>이탈 복구</b> 결제창에서 돌아오면 주문서 입력값이 남아 있어야 합니다 — 리다이렉트 기반이라 상태를 어디에 둘지가 설계 포인트입니다</span>
+      <span class="note"><b>장바구니는 결제 성공 후에 비운다</b> 결제창으로 넘어가는 시점에 비우면 이탈 시 담아둔 것이 사라집니다</span>
+    </div>
+  </section>
+
+  <!-- ==================== 02 주문서 데스크톱 ==================== -->
+  <section class="group" id="f-order">
+    <div class="group-head">
+      <span class="group-num">02</span>
+      <h2>/order — 주문서</h2>
+      <span class="src new">신규 설계</span>
+      <span class="sub">장바구니에서 2건 선택해 넘어온 상태</span>
+    </div>
+
+    <div class="notes">
+      <span class="note"><b>상속</b> 보더 <code>rgba(0,0,0,.2)</code> · radius 4px · 섹션 구분선 <code>rgba(0,0,0,.1)</code> · 브랜드 그룹</span>
+      <span class="note"><b>섹션 제목</b> 위쪽 보더를 검정 1px로 — 주문서는 서류 성격이라 구분이 장바구니보다 강해야 합니다</span>
+      <span class="note"><b>썸네일 80px</b> 장바구니의 120px보다 작게 — 여기서는 이미지가 주인공이 아니라 확인용입니다</span>
+    </div>
+
+    <div class="frame">
+      <div class="frame-bar"><span class="url">/ko/order</span><span class="dim">데스크톱 · 콘텐츠 max-w 1280</span></div>
+      <div class="frame-body sm">
+        <div class="sm-header">
+          <div class="sm-header-in">
+            <div class="sm-cluster">
+              <span class="sm-wordmark">SEOUL MOMENT</span>
+              <ul class="sm-nav"><li><span class="sm-lnk">Product</span></li><li><span class="sm-lnk">News</span></li></ul>
+            </div>
+            <ul class="sm-nav">
+              <li><span class="sm-lnk">About</span></li><li><span class="sm-lnk">Contact</span></li><li><span class="sm-lnk">MyPage</span></li>
+              <li><span class="sm-cart-btn"><svg><use href="#ic-cart"/></svg><span class="sm-badge num">3</span></span></li>
+              <li><span class="sm-lang">한국어 <svg style="width:14px;height:14px"><use href="#ic-chev-d"/></svg></span></li>
+              <li><span class="sm-lnk">Logout</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="sm-order">
+          <div class="sm-h1"><h1>주문서</h1></div>
+
+          <div class="sm-order-cols">
+            <div>
+              <!-- 주문 상품 -->
+              <section class="sm-sec">
+                <h2>주문 상품 <span class="num" style="color:var(--sm-brand)">2</span></h2>
+
+                <div class="sm-obrand">
+                  <div class="sm-obrand-head">
+                    <span class="sm-avatar xs" style="background:#e8ded2"></span>
+                    <span class="bn">온도</span><span class="bk">ONDO</span>
+                  </div>
+                  <div class="sm-oline">
+                    <span class="t" style="background:#efe9df"></span>
+                    <div>
+                      <p class="nm">코튼 트윌 오버셔츠 릴랙스 핏</p>
+                      <p class="op">IVORY / M</p>
+                      <p class="qt">수량 2</p>
+                    </div>
+                    <span class="am">NT$2,560</span>
+                  </div>
+                  <div class="sm-ship"><span class="k">배송비</span><span class="v num">NT$60</span></div>
+                </div>
+
+                <div class="sm-obrand">
+                  <div class="sm-obrand-head">
+                    <span class="sm-avatar xs" style="background:#cfd8dc"></span>
+                    <span class="bn">MOONREST</span>
+                  </div>
+                  <div class="sm-oline">
+                    <span class="t" style="background:#d9cfbb"></span>
+                    <div>
+                      <p class="nm">리넨 블렌드 버킷햇</p>
+                      <p class="op">FREE</p>
+                      <p class="qt">수량 1</p>
+                    </div>
+                    <span class="am">NT$1,340</span>
+                  </div>
+                  <div class="sm-ship"><span class="k">배송비</span><span class="v num">NT$80</span></div>
+                </div>
+
+                <p class="hint">브랜드별로 따로 발송되어 배송비가 각각 청구됩니다.</p>
+              </section>
+
+              <!-- 배송지 -->
+              <section class="sm-sec">
+                <h2>배송지</h2>
+                <div class="sm-check-row" style="margin-bottom:16px">
+                  <span class="sm-cb on"><svg><use href="#ic-check"/></svg></span> 기본 배송지 사용
+                </div>
+                <div class="sm-fields">
+                  <div class="sm-two">
+                    <div class="sm-field">
+                      <span class="lb">받는 분<span class="req">*</span></span>
+                      <span class="sm-input">李佳蓉</span>
+                    </div>
+                    <div class="sm-field">
+                      <span class="lb">연락처<span class="req">*</span></span>
+                      <span class="sm-input">+886 912 345 678</span>
+                    </div>
+                  </div>
+                  <div class="sm-field">
+                    <span class="lb">주소<span class="req">*</span></span>
+                    <div class="sm-addr">
+                      <span class="sm-input num">110</span>
+                      <span class="sm-select"><span>臺北市</span><svg><use href="#ic-chev-d"/></svg></span>
+                      <span class="sm-select"><span>信義區</span><svg><use href="#ic-chev-d"/></svg></span>
+                    </div>
+                    <span class="sm-input">松高路 11號 5樓</span>
+                  </div>
+                  <div class="sm-field">
+                    <span class="lb">배송 요청사항</span>
+                    <span class="sm-select"><span>부재 시 경비실에 맡겨주세요</span><svg><use href="#ic-chev-d"/></svg></span>
+                  </div>
+                </div>
+                <p class="hint">우편번호는 縣市·區를 고르면 자동으로 채워집니다 — <code>cityCountryData.json</code>에 ZipCode가 있습니다.</p>
+              </section>
+
+              <!-- 결제 수단 -->
+              <section class="sm-sec">
+                <h2>결제 수단</h2>
+                <div class="sm-pays">
+                  <span class="sm-pay on">
+                    <span class="dot"></span>
+                    <span class="mark" style="background:#06c755;color:#fff">LINE Pay</span>
+                    <span class="nm">LINE Pay</span>
+                    <span class="sub">LINE 앱으로 이동</span>
+                  </span>
+                  <span class="sm-pay">
+                    <span class="dot"></span>
+                    <span class="mark" style="background:#0b1f3a;color:#fff">ECPay</span>
+                    <span class="nm">신용카드 · ATM · 편의점</span>
+                    <span class="sub">ECPay 결제창으로 이동</span>
+                  </span>
+                </div>
+                <p class="hint">카드번호는 우리 화면에서 받지 않습니다. 두 수단 모두 외부 결제창으로 이동합니다.</p>
+              </section>
+
+              <!-- 동의 -->
+              <section class="sm-sec">
+                <h2>주문 동의</h2>
+                <div class="sm-agree">
+                  <span class="top">
+                    <span class="sm-cb on"><svg><use href="#ic-check"/></svg></span>
+                    <span>주문 내용을 확인했으며 결제에 동의합니다<span style="color:var(--sm-danger)">*</span></span>
+                  </span>
+                  <div class="terms">
+                    <span><span>구매조건 및 결제대행 서비스 약관 동의</span><span style="text-decoration:underline">보기</span></span>
+                    <span><span>개인정보 제3자 제공 동의 (배송)</span><span style="text-decoration:underline">보기</span></span>
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            <!-- 결제 금액 -->
+            <div>
+              <div class="sm-paysum">
+                <h3>결제 금액</h3>
+                <div class="row"><span>상품 금액</span><span class="v num">NT$3,900</span></div>
+                <div class="row"><span>배송비</span><span class="v num">NT$140</span></div>
+                <div class="row sub"><span>온도</span><span class="num">NT$60</span></div>
+                <div class="row sub"><span>MOONREST</span><span class="num">NT$80</span></div>
+                <hr>
+                <div class="final"><span class="k">최종 결제 금액</span><span class="v num">NT$4,040</span></div>
+                <div class="cta"><span class="sm-btn block">결제하기</span></div>
+                <p class="foot">결제하기를 누르면 LINE Pay로 이동합니다.</p>
+              </div>
+              <p class="sticky-tag">position: sticky · top 76px</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 03 모바일 ==================== -->
+  <section class="group" id="f-mobile">
+    <div class="group-head">
+      <span class="group-num">03</span>
+      <h2>모바일</h2>
+      <span class="src new">신규 설계</span>
+      <span class="sub">1컬럼 · 하단 고정 결제 바</span>
+    </div>
+
+    <div class="pair">
+      <div class="frame mo390">
+        <div class="frame-bar"><span class="url">/ko/order</span><span class="dim">390</span></div>
+        <div class="frame-body sm">
+          <div class="sm-header">
+            <div class="sm-header-in m">
+              <div class="sm-cluster m"><svg class="sm-ico22"><use href="#ic-menu"/></svg><span class="sm-wordmark s">SEOUL MOMENT</span></div>
+              <div class="sm-cluster tight">
+                <span class="sm-cart-btn s"><svg><use href="#ic-cart"/></svg><span class="sm-badge num">3</span></span>
+                <svg class="sm-ico20"><use href="#ic-logout"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="sm-order m">
+            <div class="sm-h1"><h1>주문서</h1></div>
+
+            <section class="sm-sec">
+              <h2>주문 상품 <span class="num" style="color:var(--sm-brand)">2</span></h2>
+              <div class="sm-obrand">
+                <div class="sm-obrand-head">
+                  <span class="sm-avatar s" style="background:#e8ded2"></span>
+                  <span class="bn">온도</span><span class="bk">ONDO</span>
+                </div>
+                <div class="sm-oline">
+                  <span class="t" style="background:#efe9df"></span>
+                  <div>
+                    <p class="nm">코튼 트윌 오버셔츠 릴랙스 핏</p>
+                    <p class="op">IVORY / M</p>
+                    <p class="qt">수량 2</p>
+                  </div>
+                  <span class="am">NT$2,560</span>
+                </div>
+                <div class="sm-ship"><span class="k">배송비</span><span class="v num">NT$60</span></div>
+              </div>
+              <div class="sm-obrand">
+                <div class="sm-obrand-head">
+                  <span class="sm-avatar s" style="background:#cfd8dc"></span>
+                  <span class="bn">MOONREST</span>
+                </div>
+                <div class="sm-oline">
+                  <span class="t" style="background:#d9cfbb"></span>
+                  <div>
+                    <p class="nm">리넨 블렌드 버킷햇</p>
+                    <p class="op">FREE</p>
+                    <p class="qt">수량 1</p>
+                  </div>
+                  <span class="am">NT$1,340</span>
+                </div>
+                <div class="sm-ship"><span class="k">배송비</span><span class="v num">NT$80</span></div>
+              </div>
+            </section>
+
+            <section class="sm-sec">
+              <h2>배송지</h2>
+              <div class="sm-check-row" style="margin-bottom:16px">
+                <span class="sm-cb on"><svg><use href="#ic-check"/></svg></span> 기본 배송지 사용
+              </div>
+              <div class="sm-fields">
+                <div class="sm-field"><span class="lb">받는 분<span class="req">*</span></span><span class="sm-input">李佳蓉</span></div>
+                <div class="sm-field"><span class="lb">연락처<span class="req">*</span></span><span class="sm-input">+886 912 345 678</span></div>
+                <div class="sm-field">
+                  <span class="lb">주소<span class="req">*</span></span>
+                  <div class="sm-addr" style="grid-template-columns:1fr">
+                    <span class="sm-input num">110</span>
+                    <span class="sm-select"><span>臺北市</span><svg><use href="#ic-chev-d"/></svg></span>
+                    <span class="sm-select"><span>信義區</span><svg><use href="#ic-chev-d"/></svg></span>
+                  </div>
+                  <span class="sm-input">松高路 11號 5樓</span>
+                </div>
+              </div>
+            </section>
+
+            <section class="sm-sec">
+              <h2>결제 수단</h2>
+              <div class="sm-pays">
+                <span class="sm-pay on">
+                  <span class="dot"></span>
+                  <span class="mark" style="background:#06c755;color:#fff">LINE Pay</span>
+                  <span class="nm">LINE Pay</span>
+                </span>
+                <span class="sm-pay">
+                  <span class="dot"></span>
+                  <span class="mark" style="background:#0b1f3a;color:#fff">ECPay</span>
+                  <span class="nm">신용카드 · ATM</span>
+                </span>
+              </div>
+            </section>
+
+            <section class="sm-sec" style="padding-bottom:20px">
+              <h2>결제 금액</h2>
+              <div class="sm-paysum" style="border:0;padding:0">
+                <div class="row"><span>상품 금액</span><span class="v num">NT$3,900</span></div>
+                <div class="row"><span>배송비</span><span class="v num">NT$140</span></div>
+                <hr>
+                <div class="final"><span class="k">최종 결제 금액</span><span class="v num">NT$4,040</span></div>
+              </div>
+            </section>
+          </div>
+
+          <div class="sm-paybar is-new">
+            <span class="new-tag">신규</span>
+            <div class="row"><span class="k">최종 결제 금액</span><span class="v num">NT$4,040</span></div>
+            <span class="sm-btn block">결제하기</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="rail">
+        <span class="note"><strong>동의는 결제 바 위</strong>모바일에서는 동의 체크가 하단 바 바로 위 섹션에 옵니다. 스크롤 끝에 두면 결제 버튼과 붙어 실수 체크가 늘어납니다.</span>
+        <span class="note"><strong>결제 금액 두 번</strong>본문 섹션과 하단 바에 같은 금액이 나옵니다. 중복이지만 하단 바만으로는 배송비 내역을 볼 수 없어 본문 섹션을 남겼습니다.</span>
+        <span class="note"><strong>주소 3단</strong>모바일에서는 우편번호·縣市·區를 1컬럼으로 쌓습니다. 데스크톱은 <code>96px 1fr 1fr</code> 3단입니다.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 04 배송지 상태 ==================== -->
+  <section class="group" id="f-ship">
+    <div class="group-head">
+      <span class="group-num">04</span>
+      <h2>배송지 상태</h2>
+      <span class="src new">신규 설계</span>
+      <span class="sub">기본 배송지 · 직접 입력 · 검증 실패</span>
+    </div>
+
+    <div class="notes">
+      <span class="note"><b>재사용</b> <code>UserProfile</code>의 <code>postalCode·city·district·detailAddress</code>와 mypage 프로필 폼 구조를 그대로 씁니다</span>
+      <span class="note"><b>연락처</b> <code>UserInfo.phone</code>이 비어 있으면 mypage의 전화번호 인증 플로우로 보냅니다</span>
+    </div>
+
+    <div class="pair">
+      <div class="frame w560">
+        <div class="frame-bar"><span class="url">기본 배송지 사용</span><span class="dim">읽기 전용</span></div>
+        <div class="frame-body sm" style="padding:24px 20px">
+          <div class="sm-check-row" style="margin-bottom:16px">
+            <span class="sm-cb on"><svg><use href="#ic-check"/></svg></span> 기본 배송지 사용
+          </div>
+          <div style="background:var(--sm-hair);padding:16px;border-radius:4px;display:grid;gap:8px">
+            <p style="font-size:var(--b3);font-weight:600">李佳蓉</p>
+            <p style="font-size:var(--b3);color:var(--sm-ink80)">+886 912 345 678</p>
+            <p style="font-size:var(--b3);color:var(--sm-ink80);line-height:1.5">110 臺北市 信義區<br>松高路 11號 5樓</p>
+          </div>
+          <p class="impl-tag" style="margin-top:12px">체크를 풀면 입력 폼으로 바뀝니다</p>
+        </div>
+      </div>
+
+      <div class="frame w560">
+        <div class="frame-bar"><span class="url">직접 입력 · 빈 상태</span><span class="dim">결제하기 비활성</span></div>
+        <div class="frame-body sm" style="padding:24px 20px">
+          <div class="sm-check-row" style="margin-bottom:16px">
+            <span class="sm-cb"></span> 기본 배송지 사용
+          </div>
+          <div class="sm-fields">
+            <div class="sm-field"><span class="lb">받는 분<span class="req">*</span></span><span class="sm-input ph">받는 분 이름</span></div>
+            <div class="sm-field"><span class="lb">연락처<span class="req">*</span></span><span class="sm-input ph">+886</span></div>
+            <div class="sm-field">
+              <span class="lb">주소<span class="req">*</span></span>
+              <div class="sm-addr">
+                <span class="sm-input ph">우편번호</span>
+                <span class="sm-select" style="color:var(--sm-neutral)"><span>縣市</span><svg><use href="#ic-chev-d"/></svg></span>
+                <span class="sm-select" style="color:var(--sm-neutral)"><span>區</span><svg><use href="#ic-chev-d"/></svg></span>
+              </div>
+              <span class="sm-input ph">상세 주소</span>
+            </div>
+          </div>
+          <span class="sm-btn off block" style="margin-top:20px">결제하기</span>
+          <p class="impl-tag" style="margin-top:12px">필수 항목이 비면 결제하기가 비활성입니다</p>
+        </div>
+      </div>
+
+      <div class="frame w560">
+        <div class="frame-bar"><span class="url">검증 실패</span><span class="dim">에러 표시</span></div>
+        <div class="frame-body sm" style="padding:24px 20px">
+          <div class="sm-fields">
+            <div class="sm-field">
+              <span class="lb">받는 분<span class="req">*</span></span>
+              <span class="sm-input">李佳蓉</span>
+            </div>
+            <div class="sm-field">
+              <span class="lb">연락처<span class="req">*</span></span>
+              <span class="sm-input bad">+886 912</span>
+              <span class="sm-err">연락처 형식이 올바르지 않습니다. +886 뒤 9자리를 입력해주세요.</span>
+            </div>
+            <div class="sm-field">
+              <span class="lb">주소<span class="req">*</span></span>
+              <div class="sm-addr">
+                <span class="sm-input num">110</span>
+                <span class="sm-select"><span>臺北市</span><svg><use href="#ic-chev-d"/></svg></span>
+                <span class="sm-select"><span>信義區</span><svg><use href="#ic-chev-d"/></svg></span>
+              </div>
+              <span class="sm-input bad ph">상세 주소</span>
+              <span class="sm-err">상세 주소를 입력해주세요.</span>
+            </div>
+          </div>
+          <p class="impl-tag" style="margin-top:12px">에러는 필드 바로 아래. 상단 요약 배너는 두지 않습니다</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 05 결제 수단 ==================== -->
+  <section class="group" id="f-pay">
+    <div class="group-head">
+      <span class="group-num">05</span>
+      <h2>결제 수단</h2>
+      <span class="src new">신규 설계</span>
+      <span class="sub">둘 다 리다이렉트 — 카드 정보는 받지 않습니다</span>
+    </div>
+
+    <div class="pair">
+      <div class="frame w560">
+        <div class="frame-bar"><span class="url">미선택</span><span class="dim">결제하기 비활성</span></div>
+        <div class="frame-body sm" style="padding:24px 20px">
+          <div class="sm-pays">
+            <span class="sm-pay"><span class="dot"></span><span class="mark" style="background:#06c755;color:#fff">LINE Pay</span><span class="nm">LINE Pay</span></span>
+            <span class="sm-pay"><span class="dot"></span><span class="mark" style="background:#0b1f3a;color:#fff">ECPay</span><span class="nm">신용카드 · ATM · 편의점</span></span>
+          </div>
+          <span class="sm-btn off block" style="margin-top:20px">결제하기</span>
+        </div>
+      </div>
+
+      <div class="frame w560">
+        <div class="frame-bar"><span class="url">LINE Pay 선택</span></div>
+        <div class="frame-body sm" style="padding:24px 20px">
+          <div class="sm-pays">
+            <span class="sm-pay on"><span class="dot"></span><span class="mark" style="background:#06c755;color:#fff">LINE Pay</span><span class="nm">LINE Pay</span><span class="sub">LINE 앱으로 이동</span></span>
+            <span class="sm-pay"><span class="dot"></span><span class="mark" style="background:#0b1f3a;color:#fff">ECPay</span><span class="nm">신용카드 · ATM · 편의점</span></span>
+          </div>
+          <span class="sm-btn block" style="margin-top:20px">결제하기</span>
+          <p class="impl-tag" style="margin-top:12px">이미 LINE 로그인을 쓰고 있어 LIFF 세션과 겹칩니다</p>
+        </div>
+      </div>
+
+      <div class="frame w560">
+        <div class="frame-bar"><span class="url">ECPay 선택</span></div>
+        <div class="frame-body sm" style="padding:24px 20px">
+          <div class="sm-pays">
+            <span class="sm-pay"><span class="dot"></span><span class="mark" style="background:#06c755;color:#fff">LINE Pay</span><span class="nm">LINE Pay</span></span>
+            <span class="sm-pay on"><span class="dot"></span><span class="mark" style="background:#0b1f3a;color:#fff">ECPay</span><span class="nm">신용카드 · ATM · 편의점</span><span class="sub">ECPay 결제창으로 이동</span></span>
+          </div>
+          <span class="sm-btn block" style="margin-top:20px">결제하기</span>
+          <p class="impl-tag" style="margin-top:12px">세부 수단(카드/ATM/편의점)은 ECPay 화면에서 고릅니다</p>
+        </div>
+      </div>
+
+      <div class="rail">
+        <span class="note"><strong>세부 수단을 우리가 안 나누는 이유</strong>ECPay 결제창이 카드·ATM·편의점을 자체적으로 제공합니다. 우리 화면에서 또 나누면 같은 선택을 두 번 하게 됩니다.</span>
+        <span class="note"><strong>LINE Pay 주의</strong>이 서비스는 이미 LINE 로그인(LIFF)을 씁니다. 결제 리다이렉트와 로그인 리다이렉트가 겹치므로 <code>sns:linePending</code> 같은 플래그와 충돌하지 않게 별도 키를 써야 합니다.</span>
+        <span class="note"><strong>ATM·편의점을 고르면</strong>결제가 즉시 끝나지 않고 <em>입금 대기</em> 상태가 생깁니다. 주문 완료 화면에 가상계좌·코드와 기한을 반드시 노출해야 합니다 — 06번 참고.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 06 주문 완료 ==================== -->
+  <section class="group" id="f-done">
+    <div class="group-head">
+      <span class="group-num">06</span>
+      <h2>주문 완료</h2>
+      <span class="src new">신규 설계</span>
+      <span class="sub">결제 완료 / 입금 대기 / 실패</span>
+    </div>
+
+    <div class="pair">
+      <div class="frame w560">
+        <div class="frame-bar"><span class="url">/ko/order/complete</span><span class="dim">결제 완료</span></div>
+        <div class="frame-body sm">
+          <div class="sm-done">
+            <span class="ic"><svg><use href="#ic-ok"/></svg></span>
+            <h2>주문이 완료되었습니다</h2>
+            <p>주문 내역은 마이페이지에서 확인할 수 있습니다.</p>
+            <span class="no">SM-20260903-000481</span>
+          </div>
+          <div style="padding:0 20px 32px">
+            <div class="sm-donesum">
+              <div class="r"><span class="k">결제 수단</span><span class="v">LINE Pay</span></div>
+              <div class="r"><span class="k">결제 금액</span><span class="v num">NT$4,040</span></div>
+              <div class="r"><span class="k">배송지</span><span class="v">李佳蓉<br>110 臺北市 信義區 松高路 11號 5樓</span></div>
+            </div>
+            <div class="sm-donecta">
+              <span class="sm-btn out">주문 상세 보기</span>
+              <span class="sm-btn">쇼핑 계속하기</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="frame w560">
+        <div class="frame-bar"><span class="url">입금 대기</span><span class="dim">ECPay ATM</span></div>
+        <div class="frame-body sm">
+          <div class="sm-done">
+            <span class="ic" style="color:#0088ff"><svg><use href="#ic-alert"/></svg></span>
+            <h2>입금을 기다리고 있습니다</h2>
+            <p>기한 내에 입금하지 않으면 주문이 자동 취소됩니다.</p>
+            <span class="no">SM-20260903-000482</span>
+          </div>
+          <div style="padding:0 20px 32px">
+            <div class="sm-donesum">
+              <div class="r"><span class="k">입금 계좌</span><span class="v num">808 · 1234 5678 9012</span></div>
+              <div class="r"><span class="k">입금 금액</span><span class="v num">NT$4,040</span></div>
+              <div class="r"><span class="k">입금 기한</span><span class="v">2026.09.06 23:59</span></div>
+            </div>
+            <div class="sm-donecta">
+              <span class="sm-btn out">계좌 복사</span>
+              <span class="sm-btn">주문 상세 보기</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="frame w560">
+        <div class="frame-bar"><span class="url">결제 실패 / 취소</span></div>
+        <div class="frame-body sm">
+          <div class="sm-done">
+            <span class="ic" style="color:var(--sm-danger)"><svg><use href="#ic-alert"/></svg></span>
+            <h2>결제가 완료되지 않았습니다</h2>
+            <p>결제창에서 취소되었거나 승인이 거절되었습니다.<br>담아둔 상품은 그대로 있습니다.</p>
+          </div>
+          <div style="padding:0 20px 32px">
+            <div class="sm-donecta">
+              <span class="sm-btn out">장바구니로</span>
+              <span class="sm-btn">다시 결제하기</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rail">
+        <span class="note"><strong>입금 대기가 별도 상태</strong>ATM·편의점을 고르면 결제가 끝나지 않은 상태로 주문이 생성됩니다. "완료" 화면을 그대로 쓰면 사용자가 결제가 끝났다고 착각합니다.</span>
+        <span class="note"><strong>실패 화면의 문구</strong>"담아둔 상품은 그대로 있습니다"를 명시합니다 — 장바구니는 결제 성공 후에만 비우므로 사실이고, 다시 시도할 때 가장 궁금한 부분입니다.</span>
+        <span class="note"><strong>주문번호 없는 실패</strong>결제창에서 취소되면 주문번호를 노출하지 않습니다. 서버에 주문이 남았는지는 백엔드 설계에 따라 갈립니다.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 07 결정 필요 ==================== -->
+  <section class="group" id="f-open">
+    <div class="group-head">
+      <span class="group-num">07</span>
+      <h2>결정이 필요한 것</h2>
+    </div>
+
+    <div class="caveat">
+      <h3>설계에 영향이 큰 것</h3>
+      <ul>
+        <li><b>브랜드 내 배송비 산정</b> — <code>shippingCost</code>는 <b>상품 단위</b> 값입니다. 한 브랜드에서 상품 3개를 담으면 배송비를 합산할지, 최대값 하나만 받을지 정해야 합니다. 시안은 <b>브랜드 내 최대값</b>으로 그렸습니다(함께 발송되므로 중복 청구하지 않음).</li>
+        <li><b>무료배송 기준</b> — 브랜드별 금액 기준 무료배송이 있는지. 있으면 그룹 헤더에 "NT$X 더 담으면 무료배송" 같은 유도 문구 자리가 필요합니다.</li>
+        <li><b>이탈 복구</b> — 결제창은 리다이렉트라 우리 페이지를 떠납니다. 돌아왔을 때 주문서 입력값을 살릴지, 매번 새로 받을지 정해야 합니다. 살린다면 어디에 둘지(sessionStorage / 서버 주문 초안).</li>
+        <li><b>주문 초안 시점</b> — <code>결제하기</code>를 누를 때 서버에 주문을 먼저 만들고 결제창으로 보내는지(권장), 아니면 결제 성공 후에 만드는지. 전자면 실패 주문이 남고 후자면 금액 위조 검증이 어렵습니다.</li>
+        <li><b>쿠폰·포인트</b> — 시안에 없습니다. 있으면 결제 금액 패널에 할인 행이 추가되고 최종 금액 계산이 바뀝니다.</li>
+        <li><b>재고 검증</b> — 상품 API에 <code>stock</code>이 없습니다. 주문 시점에 품절을 어떻게 알릴지 정해야 합니다.</li>
+      </ul>
+    </div>
+
+    <div class="caveat">
+      <h3>UI 판단 (되돌릴 수 있음)</h3>
+      <ul>
+        <li><b>주문 상품은 읽기 전용</b> — 수량 변경·삭제를 주문서에서 못 합니다. 장바구니로 돌아가야 합니다. 주문서에서 고치게 하면 금액 재계산과 재고 검증이 얽힙니다.</li>
+        <li><b>썸네일 80px</b> — 장바구니의 120px보다 작게 했습니다. 주문서에서는 이미지가 주인공이 아니라 확인용입니다.</li>
+        <li><b>섹션 상단 보더를 검정 1px로</b> — 장바구니는 <code>rgba(0,0,0,.1)</code> 구분선인데, 주문서는 서류 성격이라 섹션 구분을 더 강하게 했습니다.</li>
+        <li><b>세부 결제수단을 나누지 않음</b> — ECPay 결제창이 카드·ATM·편의점을 자체 제공하므로 우리 화면에서 또 나누지 않았습니다.</li>
+        <li><b>동의는 단일 체크</b> — 약관 2건을 개별 체크로 나누지 않고 하나로 묶었습니다. 법무 검토가 필요하면 개별 체크로 쪼갭니다.</li>
+      </ul>
+    </div>
+
+    <div class="caveat figma">
+      <h3>재사용할 기존 코드</h3>
+      <ul>
+        <li><code>UserProfile</code> (<code>shared/services/user.ts</code>) — <code>name·postalCode·city·district·detailAddress</code>가 기본 배송지 그대로입니다.</li>
+        <li><code>UserInfo.phone</code> — 연락처 기본값. 비어 있으면 mypage의 <code>PhoneVerificationFlow</code>로 보냅니다.</li>
+        <li><code>features/mypage/lib/regions.ts</code> + <code>cityCountryData.json</code> — 대만 24개 縣市 · 區 · ZipCode. locale에 따라 중문/영문 라벨을 고릅니다.</li>
+        <li><code>features/mypage/ui/ProfileSection.tsx</code> — 주소 3단 select 폼이 이미 이 구조입니다.</li>
+        <li><code>entities/cart</code> — <code>groupCartLinesByBrand</code>, <code>getCartLineAmount</code>, <code>sumCartAmount</code>를 주문서 금액 계산에 그대로 씁니다.</li>
+        <li><code>shared/ui/checkbox.tsx</code>, <code>shared/ui/fixed-box.tsx</code>, <code>shared/ui/select.tsx</code></li>
+      </ul>
+    </div>
+
+    <div class="caveat">
+      <h3>시안에서 대체한 것</h3>
+      <ul>
+        <li><b>폰트</b> — 실제는 <b>Pretendard</b>입니다. Artifact CSP가 jsDelivr 스타일시트를 막아 <code>Inter</code> + <code>Noto Sans KR</code>로 대체했습니다.</li>
+        <li><b>이미지</b> — 색 블록입니다. 실제로는 <code>BaseImage</code>.</li>
+        <li><b>정적입니다</b> — 라디오·체크박스·select는 상태를 보여주기 위해 고정된 모습입니다. 무동작 탭 스톱과 거짓 ARIA를 만들지 않으려고 실제 컨트롤이 아닌 <code>span</code>으로 그렸습니다.</li>
+        <li><b>데이터</b> — 상품·브랜드·주소·주문번호·계좌 전부 예시입니다. 금액은 계산이 맞습니다 — 상품 NT$2,560 + NT$1,340 = NT$3,900, 배송비 NT$60 + NT$80 = NT$140, 합계 NT$4,040.</li>
+        <li><b>LINE Pay / ECPay 마크</b> — 실제 로고가 아니라 색 배지에 이름만 넣은 대체 표기입니다. 구현 시 각 사의 브랜드 가이드를 따라야 합니다.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <span>apps/web · 주문서 시안 v1</span>
+    <span>장바구니 시안 — docs/cart-mockup.html</span>
+  </footer>
+
+</main>
+
+<script>
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll('.jump a'));
+  var map = {};
+  var targets = links.map(function (a) {
+    var el = document.querySelector(a.getAttribute('href'));
+    if (el) map[el.id] = a;
+    return el;
+  }).filter(Boolean);
+  if (!('IntersectionObserver' in window) || !targets.length) return;
+  var visible = Object.create(null);
+  function paint() {
+    var current = null;
+    for (var i = 0; i < targets.length; i++) if (visible[targets[i].id]) { current = targets[i].id; break; }
+    links.forEach(function (a) { a.removeAttribute('aria-current'); });
+    if (current && map[current]) map[current].setAttribute('aria-current', 'true');
+  }
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) visible[e.target.id] = true; else delete visible[e.target.id];
+    });
+    paint();
+  }, { rootMargin: '-56px 0px -70% 0px' });
+  targets.forEach(function (t) { io.observe(t); });
+})();
+</script>
+</body>
+</html>

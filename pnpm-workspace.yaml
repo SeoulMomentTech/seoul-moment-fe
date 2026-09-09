@@ -54,7 +54,7 @@ catalogs:
     # --- Runtime ---
     react-hook-form: ^7.69.0
     "@hookform/resolvers": ^5.2.2
-    "@tanstack/react-query": ^5.90.6
+    "@tanstack/react-query": ^5.102.8
     zod: 4.0.5
     zustand: ^5.0.8
     es-toolkit: ^1.41.0

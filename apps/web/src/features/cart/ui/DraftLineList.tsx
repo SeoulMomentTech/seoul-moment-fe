@@ -8,12 +8,9 @@ import { cn } from "@shared/lib/style";
 import { toNTCurrency } from "@shared/lib/utils";
 import { QuantityStepper } from "@shared/ui/quantity-stepper";
 
-import {
-  formatCartLineOptions,
-  getMaxLineQuantity,
-  LOW_STOCK_THRESHOLD,
-} from "@entities/cart";
+import { getMaxLineQuantity, LOW_STOCK_THRESHOLD } from "@entities/cart";
 
+import { formatDraftLineOptions } from "../lib/draftLine";
 import type { DraftLine } from "../model/useAddToCartDraft";
 
 interface DraftLineListProps {
@@ -51,7 +48,7 @@ export function DraftLineList({
       <div className="flex flex-col bg-black/5 px-4 py-3">
         {lines.map((line, index) => {
           // 조합을 그대로 고른 라인은 드롭다운에 보인 문구를 그대로 쓴다.
-          const optionText = line.label ?? formatCartLineOptions(line.options);
+          const optionText = line.label ?? formatDraftLineOptions(line.options);
           // 재고를 아는 조합은 거기까지만 올릴 수 있다.
           const maxQuantity = getMaxLineQuantity(line.stockQuantity);
           // 상한에 왜 걸렸는지 보이게 남은 개수를 알린다. 넉넉하면 안 띄운다.

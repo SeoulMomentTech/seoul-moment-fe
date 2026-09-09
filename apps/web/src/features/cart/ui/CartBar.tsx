@@ -9,13 +9,16 @@ import { toNTCurrency } from "@shared/lib/utils";
 
 import { Button } from "@seoul-moment/ui";
 
-interface CartBarProps {
-  selectedCount: number;
-  amount: number;
-}
+import type { CartSummaryValues } from "./CartSummary";
 
-/** 모바일 하단 고정 요약. 전역 결제 CTA 는 비활성 자리이고 실제 구매는 라인의 외부 몰 링크다. */
-export function CartBar({ selectedCount, amount }: CartBarProps) {
+type CartBarProps = CartSummaryValues;
+
+/** 모바일 하단 고정 요약. 전역 결제 CTA 는 아직 비활성 자리다. */
+export function CartBar({
+  selectedCount,
+  shippingFee,
+  totalAmount,
+}: CartBarProps) {
   const t = useTranslations();
   const ref = useRef<HTMLDivElement>(null);
 
@@ -29,13 +32,17 @@ export function CartBar({ selectedCount, amount }: CartBarProps) {
     >
       <div className="flex items-baseline justify-between">
         <span className="text-body-3 text-neutral tabular-nums">
-          {t("total_product_amount")} (
+          {t("estimated_total_amount")} (
           {t("cart_selected_count", { count: selectedCount })})
         </span>
         <span className="text-body-1 font-bold tabular-nums tracking-[-0.02em]">
-          {toNTCurrency(amount)}
+          {toNTCurrency(totalAmount)}
         </span>
       </div>
+      <p className="text-body-5 text-neutral -mt-1.5 tabular-nums">
+        {t("shipping_fee")}{" "}
+        {shippingFee > 0 ? toNTCurrency(shippingFee) : t("free_shipping")}
+      </p>
       <Button
         aria-describedby="cart-bar-hint"
         className="h-12 w-full rounded-[4px]"

@@ -33,7 +33,7 @@ function CartSkeleton() {
 
 export function CartPage() {
   const t = useTranslations();
-  const { lineCount, isHydrated } = useCart();
+  const { totalCount, isPending } = useCart();
 
   return (
     <AuthOnly>
@@ -48,16 +48,16 @@ export function CartPage() {
           <h1 className="text-title-3 max-sm:text-title-4 font-bold tracking-[-0.02em]">
             {t("cart")}
           </h1>
-          {isHydrated && lineCount > 0 && (
+          {!isPending && totalCount > 0 && (
             <span className="text-title-4 text-brand max-sm:text-body-1 font-bold tabular-nums">
-              {lineCount}
+              {totalCount}
             </span>
           )}
         </div>
 
-        {/* persist rehydrate 전에는 담긴 것을 알 수 없다. 빈 화면을 먼저 보여주면
-            새로고침마다 "비어 있습니다"가 깜박인다. */}
-        {isHydrated ? <CartList /> : <CartSkeleton />}
+        {/* 서버 응답(또는 복원된 캐시) 전에는 담긴 것을 알 수 없다. 빈 화면을 먼저
+            보여주면 새로고침마다 "비어 있습니다"가 깜박인다. */}
+        {isPending ? <CartSkeleton /> : <CartList />}
       </div>
     </AuthOnly>
   );

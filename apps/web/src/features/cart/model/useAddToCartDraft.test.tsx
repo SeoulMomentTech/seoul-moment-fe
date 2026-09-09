@@ -4,9 +4,6 @@ import type * as Ky from "ky";
 import { NextIntlClientProvider } from "next-intl";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-// 배럴은 `useCartStore` 를 노출하지 않는다(UI 가 스토어를 직접 못 쓰게 하는 경계).
-// 테스트는 UI 가 아니므로 깊은 경로로 가져와 경계를 그대로 둔다.
-import { useCartStore } from "@entities/cart/model/useCartStore";
 import type {
   GetProductDetailRes,
   OptionValue,
@@ -34,10 +31,13 @@ vi.mock("next/image", () => ({ default: () => null }));
 // useCart 가 서버 정정을 위해 useLanguage(useParams) 를 탄다. 라우트 밖이라 null 이 온다.
 vi.mock("next/navigation", () => ({ useParams: () => ({ locale: "ko" }) }));
 
+const authState = { isAuthenticated: true, id: 1 };
+
 vi.mock("@shared/lib/hooks/useUserAuthStore", () => ({
-  useUserAuthStore: (
-    selector: (state: { isAuthenticated: boolean; id: number }) => unknown,
-  ) => selector({ isAuthenticated: true, id: 1 }),
+  // `useUserCartQuery` 는 셀렉터 없이 부른다. 두 호출 방식을 모두 받아야 한다.
+  useUserAuthStore: (selector?: (state: typeof authState) => unknown) =>
+    selector ? selector(authState) : authState,
+  useUserAuthHydrated: () => true,
 }));
 
 vi.mock("sonner", () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
@@ -130,7 +130,6 @@ const setup = (
   });
 
 beforeEach(() => {
-  useCartStore.setState({ lines: [], ownerId: 0 });
   createUserCartItem.mockClear();
 });
 
@@ -226,27 +225,8 @@ describe("선택형 — variants 를 못 받은, 값이 2개 이상인 축이 �
     expect(result.current.canSubmit).toBe(false);
   });
 
-  it("담기 1회로 조합 전체가 장바구니에 들어간다", async () => {
-    const { result } = setup(clothing);
-
-    act(() => result.current.pickAxis("SIZE", 10));
-    act(() => result.current.pickAxis("MATERIAL", 20));
-    act(() => result.current.pickAxis("SIZE", 11));
-
-    let ok = false;
-    await act(async () => {
-      ok = await result.current.submit();
-    });
-
-    expect(ok).toBe(true);
-    expect(useCartStore.getState().lines).toHaveLength(2);
-    expect(useCartStore.getState().lines[0].imageUrl).toBe(
-      "https://example.com/a.jpg",
-    );
-  });
-
-  // 전환기에는 로컬과 서버 양쪽에 담는다. 서버는 SKU 단위라 조합을 variant 로 번역한다.
-  it("담기와 함께 조합별 SKU 로 서버에도 담는다", async () => {
+  // 서버 장바구니는 SKU 단위라 고른 조합을 variant 로 번역해 보낸다.
+  it("담기 1회로 조합마다 한 번씩 서버에 담는다", async () => {
     const { result } = setup(clothing, [
       variant(101, [1, 10, 20]),
       variant(102, [1, 11, 20]),
@@ -256,31 +236,33 @@ describe("선택형 — variants 를 못 받은, 값이 2개 이상인 축이 �
     act(() => result.current.pickAxis("MATERIAL", 20));
     act(() => result.current.pickAxis("SIZE", 11));
 
+    let ok = false;
     // mutate 는 mutationFn 을 마이크로태스크에서 호출하므로 flush 가 필요하다.
     await act(async () => {
-      await result.current.submit();
+      ok = await result.current.submit();
     });
 
+    expect(ok).toBe(true);
     expect(createUserCartItem.mock.calls.map(([req]) => req)).toEqual([
       { productVariantId: 101, quantity: 1 },
       { productVariantId: 102, quantity: 1 },
     ]);
   });
 
-  // 재고 정보가 없으면 검증할 근거가 없다. 담기를 막지 않고 서버 호출만 건너뛴다.
-  it("variants 가 없으면 서버 호출을 건너뛰고 로컬만 담는다", async () => {
+  // 서버 장바구니가 유일한 저장소라 SKU 를 못 정하면 담을 방법이 없다.
+  // 예전에는 로컬에만 남겼지만 이제는 실패로 끝낸다.
+  it("variants 가 없으면 아무것도 담지 않고 실패로 끝낸다", async () => {
     const { result } = setup(clothing);
 
     act(() => result.current.pickAxis("SIZE", 10));
     act(() => result.current.pickAxis("MATERIAL", 20));
 
-    let ok = false;
+    let ok = true;
     await act(async () => {
       ok = await result.current.submit();
     });
 
-    expect(ok).toBe(true);
-    expect(useCartStore.getState().lines).toHaveLength(1);
+    expect(ok).toBe(false);
     expect(createUserCartItem).not.toHaveBeenCalled();
   });
 

@@ -9,11 +9,9 @@ import { useUserAuthStore } from "@shared/lib/hooks/useUserAuthStore";
 import type { GetProductDetailRes, OptionType } from "@shared/services/product";
 
 import {
-  createCartLineId,
   getMaxLineQuantity,
   useCart,
-  type CartLineDraft,
-  type CartOptionSelection,
+  type CartItemDraft,
 } from "@entities/cart";
 import {
   findProductVariant,
@@ -24,10 +22,15 @@ import {
   splitProductOptionAxes,
 } from "@entities/product";
 
+import {
+  createDraftLineKey,
+  type DraftOptionSelection,
+} from "../lib/draftLine";
+
 /** 담기 전 화면에 쌓여 있는 조합 한 줄 */
 export interface DraftLine {
   key: string;
-  options: CartOptionSelection[];
+  options: DraftOptionSelection[];
   quantity: number;
   /** 조합을 직접 고른 경우의 SKU. 축별 선택이면 담을 때 역으로 찾는다 */
   variantId?: number;
@@ -43,7 +46,7 @@ export interface DraftLine {
 const toSelection = (
   type: OptionType,
   value: { id: number; value: string },
-): CartOptionSelection => ({
+): DraftOptionSelection => ({
   type,
   optionValueId: value.id,
   value: value.value,
@@ -65,7 +68,7 @@ interface UseAddToCartDraftArgs {
  */
 export const useAddToCartDraft = ({ product }: UseAddToCartDraftArgs) => {
   const t = useTranslations();
-  const { addLines } = useCart();
+  const { addItems } = useCart();
   const isAuthenticated = useUserAuthStore((state) => state.isAuthenticated);
 
   const { selectable, fixed, mode } = useMemo(
@@ -108,7 +111,7 @@ export const useAddToCartDraft = ({ product }: UseAddToCartDraftArgs) => {
     selectMode === "fixed"
       ? [
           {
-            key: createCartLineId(product.id, fixedSelections),
+            key: createDraftLineKey(product.id, fixedSelections),
             options: fixedSelections,
             quantity: 1,
           },
@@ -135,10 +138,10 @@ export const useAddToCartDraft = ({ product }: UseAddToCartDraftArgs) => {
 
   const pushLine = useCallback(
     (
-      options: CartOptionSelection[],
+      options: DraftOptionSelection[],
       extra?: { variantId?: number; label?: string; stockQuantity?: number },
     ) => {
-      const key = createCartLineId(product.id, options);
+      const key = createDraftLineKey(product.id, options);
 
       setLines((prev) => {
         const index = prev.findIndex((line) => line.key === key);
@@ -163,7 +166,7 @@ export const useAddToCartDraft = ({ product }: UseAddToCartDraftArgs) => {
   );
 
   const addLine = useCallback(
-    (selections: CartOptionSelection[]) =>
+    (selections: DraftOptionSelection[]) =>
       pushLine([...fixedSelections, ...selections]),
     [fixedSelections, pushLine],
   );
@@ -184,7 +187,7 @@ export const useAddToCartDraft = ({ product }: UseAddToCartDraftArgs) => {
 
       const options = [
         ...fixedSelections,
-        ...(selections as CartOptionSelection[]),
+        ...(selections as DraftOptionSelection[]),
       ];
 
       // 값 단위 비활성화를 우회해 들어온 조합(재고가 방금 빠진 경우 등)을 여기서 막는다.
@@ -198,7 +201,7 @@ export const useAddToCartDraft = ({ product }: UseAddToCartDraftArgs) => {
         return;
       }
 
-      addLine(selections as CartOptionSelection[]);
+      addLine(selections as DraftOptionSelection[]);
 
       // 선택을 리셋하지 않는다. 축 하나만 바꿔 다음 조합을 쌓는 게 실제 흐름이고
       // (색상 고정 + 사이즈만 변경 → 두 줄), 리셋하면 Radix Select 의 controlled
@@ -276,44 +279,32 @@ export const useAddToCartDraft = ({ product }: UseAddToCartDraftArgs) => {
     }
     if (!lines.length) return false;
 
-    const drafts: CartLineDraft[] = lines.map((line) => ({
-      productId: product.id,
+    // 서버 장바구니는 SKU 단위다. 조합을 직접 고른 라인은 SKU 를 이미 들고 있고,
+    // 축별 선택이면 역으로 찾는다.
+    const drafts: CartItemDraft[] = lines.map((line) => ({
       quantity: line.quantity,
-      // 조합을 직접 고른 라인은 SKU 를 이미 들고 있다. 축별 선택이면 역으로 찾는다.
-      // 못 찾으면 서버에 담을 방법이 없고, 그 라인은 로컬에만 남는다.
       productVariantId:
         line.variantId ??
         findProductVariant(
           product.variants,
           line.options.map((option) => option.optionValueId),
         )?.id,
-      productName: product.name,
-      // 로컬 카트는 brandId 를 문자열로 저장해 왔고 그 값이 localStorage 에 남아 있다.
-      // 상세 v1 이 number 로 내려주더라도 저장 포맷은 유지한다.
-      brandId: String(product.brand.id),
-      brandName: product.brand.name,
-      brandProfileImg: product.brand.profileImg,
-      imageUrl: product.subImage[0] ?? "",
-      price: product.price,
-      discountPrice: product.discountPrice,
-      options: line.options,
-      external: product.external,
     }));
 
-    // 서버 장바구니 반영은 `addLines`(useCart) 가 함께 처리한다 — 담기·수량·삭제가
-    // 한 곳에서 서버로 흘러야 헤더 배지가 읽는 카운트와 어긋나지 않는다.
-    const result = await addLines(drafts);
+    const result = await addItems(drafts);
 
-    if (result.status === "limit") {
-      toast.error(t("cart_limit_reached", { max: result.max }));
+    // SKU 를 못 정한 조합은 담을 방법이 없다. 예전에는 로컬에만 남겨 두었지만 이제는
+    // 아무 일도 일어나지 않으므로 그 사실을 알린다.
+    if (result.status === "invalid") {
+      toast.error(t("cart_add_unavailable"));
       return false;
     }
 
-    // 재고 부족은 `useCart` 가 라인을 정정하며 이미 알렸다. 여기서 또 띄우지 않는다.
-    if (result.status === "stock") return false;
+    // 재고 부족과 그 밖의 실패는 `useCart` 가 이미 알렸다. 여기서 또 띄우지 않는다.
+    if (result.status !== "added") return false;
 
     return true;
-  }, [isAuthenticated, lines, product, addLines, t]);
+  }, [isAuthenticated, lines, product, addItems, t]);
 
   return {
     mode,

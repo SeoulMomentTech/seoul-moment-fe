@@ -1,29 +1,24 @@
 "use client";
 
-import { useCartStore } from "./useCartStore";
+import { useIsRestoring } from "@tanstack/react-query";
+
 import { useUserCartCountQuery } from "../api/useUserCart";
 
 /**
  * 헤더 배지에 찍을 라인 수.
  *
- * 값의 근거는 서버(`GET user/cart/count`)다 — 다른 기기에서 담은 것까지 세어야 하고,
- * 로컬은 이 브라우저가 본 것만 안다.
+ * 값의 근거는 서버(`GET user/cart/count`)다 — 다른 기기에서 담은 것까지 세어야 한다.
  *
- * 다만 **응답 전과 실패 시에는 로컬 라인 수로 버틴다**. 그 사이 0 을 그리면 새로고침마다
- * 배지가 사라졌다 나타난다. 로컬 쓰기는 `useCart` 가 서버에도 흘리므로 두 값은 곧 만난다.
+ * 응답 전에도 깜박이지 않는 이유는 이 쿼리 캐시가 localStorage 에 남아 복원되기 때문이다.
+ * 복원이 끝나기 전에는 아직 아무것도 모르므로 `isReady` 가 false 다 — 그 값은 서버와
+ * 클라이언트 첫 렌더가 같아서 hydration 불일치가 나지 않는다.
  */
 export const useCartBadgeCount = () => {
-  const localCount = useCartStore((state) => state.lines.length);
-  const hasCartHydrated = useCartStore((state) => state.hasHydrated);
-
-  const { data, isSuccess } = useUserCartCountQuery();
+  const isRestoring = useIsRestoring();
+  const { data } = useUserCartCountQuery();
 
   return {
-    count: isSuccess ? data.count : localCount,
-    /**
-     * 서버가 답하기 전에는 로컬을 쓰므로 rehydrate 를 기다려야 한다. SSR 은 항상 0 으로
-     * 그리기 때문에 그대로 두면 hydration 불일치가 난다.
-     */
-    isReady: hasCartHydrated || isSuccess,
+    count: data?.count ?? 0,
+    isReady: !isRestoring && data != null,
   };
 };

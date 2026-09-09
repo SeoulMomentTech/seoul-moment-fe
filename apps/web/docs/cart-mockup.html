@@ -1,0 +1,1565 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>장바구니 셀렉션 시안</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500;600;700&amp;family=Noto+Sans+KR:wght@400;500;700&amp;display=swap">
+<style>
+  /* Artifact 호스트가 주입하는 리셋과 동등 */
+  :root { color-scheme: light; }
+  html { -webkit-text-size-adjust: 100%; }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<style>
+/* ============================================================
+   REVIEW CANVAS — 문서 크롬. 검토 대상(흰 프레임)과 섞이지 않게
+   웜 차콜 단일 월드로 고정. Seoul Moment 앱에 다크 모드가 없으므로
+   (DESIGN.md §10) 프레임은 항상 흰색이고 없는 테마를 지어내지 않는다.
+   ============================================================ */
+:root {
+  --canvas:        #1b1815;
+  --canvas-raised: #24201c;
+  --canvas-sunken: #141110;
+  --rule:          #38322c;
+  --rule-soft:     #2b2621;
+  --ink:           #ece6de;
+  --ink-dim:       #a1968a;
+  --ink-faint:     #8f8479;
+  --annot:         #7aa9bb;
+  --annot-dim:     #63899a;
+  --annot-on-light:#3f6472;
+  --figma:         #c39be0;
+  --figma-dim:     #6d4f85;
+
+  /* Seoul Moment 토큰 — DESIGN.md §2.1 */
+  --sm-bg:      #ffffff;
+  --sm-fg:      #171717;
+  --sm-brand:   #f37b2a;
+  --sm-neutral: #707070;
+  --sm-danger:  #ff383c;
+
+  /* Figma 실측 raw 값 — 디자인이 authority */
+  --sm-line:  rgba(0,0,0,0.2);   /* 컨트롤 보더 */
+  --sm-rule:  rgba(0,0,0,0.1);   /* 섹션 구분선 */
+  --sm-hair:  rgba(0,0,0,0.05);  /* 헤더 하단 / 조합 라인 박스 배경 */
+  --sm-ink80: rgba(0,0,0,0.8);
+  --sm-ink40: rgba(0,0,0,0.4);
+  --sm-price: #212529;
+
+  /* 타이포 스케일 — DESIGN.md §2.2 */
+  --t2: 32px; --t3: 24px; --t4: 20px;
+  --b1: 18px; --b2: 16px; --b3: 14px; --b4: 13px; --b5: 12px;
+
+  --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px; --s8: 72px;
+
+  --sans: "Inter", "Noto Sans KR", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0; background: var(--canvas); color: var(--ink);
+  font-family: var(--sans); font-size: 15px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+:focus-visible { outline: 2px solid var(--annot); outline-offset: 3px; }
+
+/* ---------- 상단 바 ---------- */
+.topbar { position: sticky; top: 0; z-index: 50; border-bottom: 1px solid var(--rule-soft); background: var(--canvas); }
+@supports (backdrop-filter: blur(1px)) {
+  .topbar { background: color-mix(in srgb, var(--canvas) 88%, transparent); backdrop-filter: blur(12px); }
+}
+.topbar-in { max-width: 1400px; margin: 0 auto; padding: 0 var(--s5); display: flex; align-items: center; gap: var(--s7); min-height: 54px; }
+.topbar-name { font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-dim); white-space: nowrap; }
+.jump { display: flex; gap: var(--s5); overflow-x: auto; scrollbar-width: none; margin-left: auto; }
+.jump::-webkit-scrollbar { display: none; }
+.jump a {
+  font-family: var(--mono); font-size: 12px; color: var(--ink-faint); text-decoration: none;
+  padding: 6px 0; border-bottom: 1.5px solid transparent; white-space: nowrap;
+  transition: color 160ms ease, border-color 160ms ease;
+}
+.jump a:hover { color: var(--ink); }
+.jump a[aria-current="true"] { color: var(--ink); border-bottom-color: var(--annot); }
+
+/* ---------- 페이지 골격 ---------- */
+main { max-width: 1400px; margin: 0 auto; padding: 0 var(--s5) var(--s8); }
+
+.intro {
+  padding: var(--s8) 0 var(--s7); border-bottom: 1px solid var(--rule-soft);
+  display: grid; grid-template-columns: minmax(0,1fr) minmax(0,380px); gap: var(--s8); align-items: end;
+}
+@media (max-width: 900px) { .intro { grid-template-columns: 1fr; gap: var(--s6); align-items: start; } }
+.intro h1 { margin: 0 0 var(--s4); font-size: clamp(30px, 4.4vw, 46px); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; text-wrap: balance; }
+.intro p { margin: 0; max-width: 62ch; color: var(--ink-dim); font-size: 15px; }
+.intro p + p { margin-top: var(--s3); }
+.intro strong { color: var(--ink); font-weight: 600; }
+
+.scope { display: grid; gap: 1px; background: var(--rule-soft); border: 1px solid var(--rule-soft); }
+.scope > div { display: grid; grid-template-columns: 76px 1fr; gap: var(--s4); background: var(--canvas-raised); padding: 10px var(--s4); }
+.scope .k { font-family: var(--mono); font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-faint); padding-top: 3px; }
+.scope .v { font-size: 13.5px; color: var(--ink); }
+code { font-family: var(--mono); font-size: 0.88em; color: var(--annot); }
+
+/* ---------- 섹션 ---------- */
+section.group { padding: var(--s8) 0 0; }
+.group-head { display: flex; align-items: baseline; gap: var(--s4); flex-wrap: wrap; margin-bottom: var(--s5); }
+.group-num { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; color: var(--annot-dim); padding-top: 4px; }
+.group-head h2 { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.02em; }
+.group-head .sub { color: var(--ink-faint); font-size: 13.5px; }
+
+.src {
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.09em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 2px; white-space: nowrap; align-self: center;
+}
+.src.figma { background: var(--figma-dim); color: #f0e4fa; }
+.src.new { background: var(--rule); color: var(--ink-dim); }
+
+/* 주석 */
+.notes { display: flex; flex-wrap: wrap; gap: var(--s2) var(--s5); margin-bottom: var(--s4); }
+.note { font-family: var(--mono); font-size: 11.5px; line-height: 1.55; color: var(--annot); display: flex; gap: 7px; align-items: baseline; }
+.note::before { content: "—"; color: var(--annot-dim); flex: none; }
+.note b { color: var(--ink-dim); font-weight: 500; }
+.note em { font-style: normal; color: var(--ink); }
+
+.rail { display: grid; gap: var(--s4); align-content: start; padding-top: var(--s2); }
+.rail .note { display: block; color: var(--ink-dim); font-family: var(--sans); font-size: 13px; line-height: 1.55; }
+.rail .note::before { content: none; }
+.rail .note strong {
+  display: block; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--annot); margin-bottom: 4px; font-weight: 500;
+}
+.rail .note em { font-style: normal; color: var(--ink); font-weight: 500; }
+
+/* ---------- 프레임 ---------- */
+.frame { background: var(--sm-bg); border: 1px solid var(--rule); overflow: hidden; }
+.frame-bar { display: flex; align-items: center; gap: var(--s3); background: var(--canvas-sunken); border-bottom: 1px solid var(--rule); padding: 7px var(--s3); }
+.frame-bar .url { font-family: var(--mono); font-size: 11px; color: var(--ink-dim); background: var(--canvas); border: 1px solid var(--rule-soft); padding: 2px 10px; border-radius: 3px; }
+.frame-bar .dim { font-family: var(--mono); font-size: 11px; color: var(--annot-dim); margin-left: auto; }
+.frame-bar .node { font-family: var(--mono); font-size: 10.5px; color: var(--figma); }
+.frame-body { background: var(--sm-bg); color: var(--sm-fg); }
+.frame.mo360 { width: 360px; max-width: 100%; flex: none; }
+.frame.w560 { flex: 1 1 330px; max-width: 560px; min-width: 0; }
+.frame.mo390 { width: 390px; max-width: 100%; flex: none; }
+
+.pair { display: flex; gap: var(--s6); align-items: flex-start; flex-wrap: wrap; }
+.pair > .rail { flex: 1 1 250px; min-width: 230px; }
+.gap { height: var(--s5); }
+
+.is-new { position: relative; outline: 1px dashed var(--annot-dim); outline-offset: 4px; }
+.new-tag {
+  position: absolute; top: -9px; left: 0; font-family: var(--mono); font-size: 9.5px;
+  letter-spacing: 0.08em; text-transform: uppercase; background: var(--canvas); color: var(--annot); padding: 1px 6px;
+}
+.legend { display: inline-flex; align-items: center; gap: var(--s2); font-family: var(--mono); font-size: 11px; color: var(--ink-faint); margin-top: var(--s4); }
+.legend i { width: 22px; border-top: 1px dashed var(--annot-dim); display: block; }
+
+/* ============================================================
+   SEOUL MOMENT UI — 프레임 내부. 정적 표현이므로 모든 컨트롤은
+   비-포커스 span (무동작 탭 스톱과 거짓 ARIA 방지). 구현 시 접근성은 §07.
+   ============================================================ */
+.sm { font-family: var(--sans); color: var(--sm-fg); background: var(--sm-bg); }
+.sm *, .sm *::before, .sm *::after { box-sizing: border-box; }
+.sm svg { display: block; }
+.sm .num { font-variant-numeric: tabular-nums; }
+.sm p, .sm h1, .sm h2, .sm h3 { margin: 0; }
+
+/* 전역 헤더 (코드의 Header.tsx) */
+.sm-header { height: 56px; border-bottom: 1px solid var(--sm-hair); display: flex; align-items: center; padding: 0 20px; }
+.sm-header-in { width: 100%; max-width: 1280px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 40px; }
+.sm-header-in.m { max-width: none; gap: 10px; }
+.sm-wordmark { font-size: 15px; font-weight: 700; letter-spacing: 0.14em; white-space: nowrap; }
+.sm-wordmark.s { font-size: 12.5px; }
+.sm-nav { display: flex; align-items: center; gap: 40px; list-style: none; margin: 0; padding: 0; }
+.sm-lnk { font-size: var(--b3); }
+.sm-lnk.on { font-weight: 600; }
+.sm-lang { font-size: var(--b3); display: flex; align-items: center; gap: 4px; }
+.sm-cluster { display: flex; align-items: center; gap: 40px; }
+.sm-cluster.tight { gap: 18px; }
+.sm-cluster.m { gap: 10px; }
+
+/* 상품상세 전용 GNB (Figma MO/GNB) */
+.sm-gnb { height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; }
+.sm-gnb .r { display: flex; align-items: center; gap: 16px; }
+
+.sm-cart-btn { position: relative; display: block; }
+.sm-cart-btn > svg { width: 22px; height: 22px; }
+.sm-cart-btn.s > svg { width: 20px; height: 20px; }
+.sm-cart-btn.f > svg { width: 24px; height: 24px; }
+.sm-badge {
+  position: absolute; top: -5px; right: -7px; min-width: 17px; height: 17px; padding: 0 4px;
+  background: var(--sm-brand); color: #fff; border-radius: 999px;
+  font-size: 10.5px; font-weight: 600; line-height: 17px; text-align: center; font-variant-numeric: tabular-nums;
+}
+.sm-ico20 { width: 20px; height: 20px; }
+.sm-ico22 { width: 22px; height: 22px; }
+.sm-ico24 { width: 24px; height: 24px; }
+
+/* ---- 공통 컨트롤 (Figma 실측) ---- */
+.sm-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+  padding: 16px 20px; border-radius: 4px; background: var(--sm-fg); color: #fff;
+  font-size: var(--b2); font-weight: 600; line-height: 1;
+}
+.sm-btn.out { background: #fff; color: var(--sm-fg); border: 1px solid var(--sm-line); }
+.sm-btn.block { width: 100%; }
+.sm-btn.sq48 { width: 48px; height: 48px; padding: 12px 20px; flex: none; }
+.sm-btn.off { background: rgba(0,0,0,.1); color: var(--sm-ink40); }
+.sm-btn.grow { flex: 1 1 0; min-width: 0; }
+
+.sm-cta { display: flex; gap: 8px; align-items: center; }
+
+/* selectbox */
+.sm-select {
+  background: #fff; border: 1px solid var(--sm-line); border-radius: 4px;
+  padding: 16px 12px; display: flex; align-items: center; gap: 8px; font-size: var(--b3); line-height: 1;
+}
+.sm-select > span { flex: 1 1 0; min-width: 0; }
+.sm-select svg { width: 16px; height: 16px; flex: none; }
+.sm-selects { display: grid; gap: 10px; }
+
+/* 수량 스테퍼 — Figma w-86 박스 */
+.sm-step {
+  width: 86px; flex: none; background: #fff; border: 1px solid var(--sm-line); border-radius: 4px;
+  padding: 8px; display: flex; align-items: center; gap: 8px;
+}
+.sm-step .b { padding: 2px; display: grid; place-items: center; }
+.sm-step .b svg { width: 12px; height: 12px; color: var(--sm-neutral); }
+.sm-step .b.off svg { color: rgba(0,0,0,.18); }
+.sm-step .q { flex: 1 1 0; min-width: 0; text-align: center; font-size: var(--b5); font-weight: 600; line-height: 1; font-variant-numeric: tabular-nums; }
+
+/* 조합 라인 박스 (Figma 상세정보) */
+.sm-draft { background: var(--sm-hair); padding: 12px 16px; display: flex; flex-direction: column; }
+.sm-draft .line { display: flex; align-items: center; gap: 16px; padding: 12px 0 16px; }
+.sm-draft .line .lbl { flex: 1 1 0; min-width: 0; font-size: var(--b3); color: var(--sm-ink80); line-height: 1; }
+.sm-draft .line .rt { display: flex; align-items: center; gap: 30px; }
+.sm-draft .line .money { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.sm-draft .line .money .p { font-size: var(--b3); font-weight: 600; color: var(--sm-price); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sm-draft .line .x { padding: 4px; display: grid; place-items: center; }
+.sm-draft .line .x svg { width: 16px; height: 16px; }
+.sm-draft.m .line .lbl { font-size: var(--b4); }
+.sm-draft.m .line .rt { gap: 4px; }
+
+/* 총 상품 금액 */
+.sm-total { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+.sm-total .k { font-size: var(--b5); }
+.sm-total .v { font-size: var(--b1); font-weight: 600; font-variant-numeric: tabular-nums; }
+.sm-total.m { justify-content: space-between; padding-bottom: 10px; }
+.sm-total.m .k { font-size: var(--b2); font-weight: 600; }
+.sm-total.m .v { font-size: var(--t4); font-weight: 600; }
+
+/* ---- 상품상세 ---- */
+.sm-detail { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 80px; max-width: 1200px; margin: 0 auto; padding: 50px 20px 60px; }
+@media (max-width: 1040px) { .sm-detail { grid-template-columns: 1fr; gap: var(--s6); } }
+.sm-gallery { aspect-ratio: 1; display: grid; place-items: center; position: relative; }
+.sm-gallery span { font-family: var(--mono); font-size: 11px; color: rgba(0,0,0,.5); }
+.sm-thumbs { display: flex; gap: 8px; margin-top: 8px; }
+.sm-thumbs i { width: 64px; height: 64px; display: block; border: 1px solid var(--sm-hair); }
+.sm-thumbs i.on { border-color: #000; }
+.sm-thumbs.m i { width: 56px; height: 56px; }
+
+.sm-ptitle { display: flex; gap: 16px; align-items: flex-start; padding-bottom: 20px; }
+.sm-ptitle h2 { flex: 1 1 0; min-width: 0; font-size: var(--t4); font-weight: 700; line-height: 1.35; letter-spacing: -0.02em; }
+.sm-brandrow { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; }
+.sm-brandrow .ab { display: flex; align-items: center; gap: 4px; font-size: var(--b3); }
+.sm-brandrow .lk { display: flex; align-items: center; gap: 4px; font-size: var(--b4); color: var(--sm-ink40); }
+.sm-brandrow .lk svg { width: 20px; height: 20px; color: var(--sm-neutral); }
+.sm-avatar { width: 32px; height: 32px; border-radius: 999px; flex: none; border: 1px solid var(--sm-hair); }
+.sm-avatar.s { width: 24px; height: 24px; }
+.sm-avatar.xs { width: 28px; height: 28px; }
+
+.sm-meta { border-bottom: 1px solid var(--sm-rule); padding: 10px 0 20px; display: grid; gap: 30px; }
+.sm-meta.m { gap: 20px; }
+.sm-rate { display: flex; align-items: center; gap: 4px; font-size: var(--b3); color: var(--sm-ink80); }
+.sm-stars { display: flex; }
+.sm-stars svg { width: 16px; height: 16px; color: var(--sm-brand); }
+.sm-meta.m .sm-stars svg { width: 14px; height: 14px; }
+.sm-meta.m .sm-rate { font-size: var(--b4); }
+.sm-prices { display: grid; gap: 20px; }
+.sm-meta.m .sm-prices { gap: 16px; }
+.sm-prices .r { display: flex; align-items: center; font-size: var(--b3); }
+.sm-meta.m .sm-prices .r { font-size: var(--b4); }
+.sm-prices .r .k { width: 120px; flex: none; color: var(--sm-ink80); }
+.sm-prices .was { color: var(--sm-ink40); text-decoration: line-through; font-variant-numeric: tabular-nums; }
+.sm-prices .now { display: flex; align-items: center; gap: 8px; }
+.sm-prices .now b { font-size: var(--b1); font-weight: 700; font-variant-numeric: tabular-nums; }
+.sm-meta.m .sm-prices .now b { font-size: var(--b2); }
+.sm-prices .now .off { color: var(--sm-brand); font-size: var(--b5); font-weight: 700; }
+
+.sm-info { display: grid; gap: 20px; padding: 20px 0 0; font-size: var(--b3); color: var(--sm-ink80); }
+.sm-info.m { gap: 16px; font-size: var(--b4); }
+.sm-info .r { display: flex; }
+.sm-info .r .k { width: 120px; flex: none; }
+
+/* ---- 모바일 하단 고정 바 / 시트 ---- */
+.sm-barfix { background: #fff; padding: 16px 20px; filter: drop-shadow(0 -4px 5px rgba(0,0,0,0.08)); }
+.sm-scrim { position: relative; background: #fff; overflow: hidden; }
+.sm-scrim .dimlayer { position: absolute; inset: 0; background: rgba(0,0,0,0.5); }
+.sm-sheet {
+  position: relative; background: #fff; border-top-left-radius: 16px; border-top-right-radius: 16px;
+  box-shadow: 0 -8px 10px rgba(0,0,0,0.08); padding: 10px 20px 16px;
+}
+.sm-handle { width: 50px; height: 4px; border-radius: 999px; background: rgba(0,0,0,.2); margin: 0 auto 20px; }
+
+/* ---- /cart ---- */
+.sm-page { max-width: 1280px; margin: 0 auto; padding: 40px 20px 60px; }
+.sm-page.m { padding: 24px 20px 0; max-width: none; }
+
+.sm-h1 { display: flex; align-items: baseline; gap: 10px; margin-bottom: 20px; }
+.sm-h1 h1 { font-size: var(--t3); font-weight: 700; letter-spacing: -0.02em; }
+.sm-h1 .c { font-size: var(--t4); font-weight: 700; color: var(--sm-brand); font-variant-numeric: tabular-nums; }
+.sm-page.m .sm-h1 h1 { font-size: var(--t4); }
+.sm-page.m .sm-h1 .c { font-size: var(--b1); }
+
+.sm-selbar {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s4);
+  border-top: 1px solid var(--sm-rule); border-bottom: 1px solid var(--sm-rule); padding: 13px 0;
+}
+.sm-selbar .l { display: flex; align-items: center; gap: 10px; font-size: var(--b3); }
+.sm-selbar .l .n { color: var(--sm-neutral); font-variant-numeric: tabular-nums; }
+.sm-selbar .r { display: flex; align-items: center; gap: 12px; font-size: var(--b3); color: var(--sm-neutral); }
+.sm-selbar .r .sep { width: 1px; height: 11px; background: var(--sm-line); }
+
+/* 체크박스 — black (디자인 언어: #f37b2a는 할인율·별점 전용) */
+.sm-cb { width: 20px; height: 20px; flex: none; border: 1.5px solid var(--sm-line); border-radius: 3px; background: #fff; display: grid; place-items: center; }
+.sm-cb > svg { width: 13px; height: 13px; color: #fff; }
+.sm-cb.on, .sm-cb.mixed { background: var(--sm-fg); border-color: var(--sm-fg); }
+.sm-cb.mixed::after { content: ""; width: 9px; height: 1.5px; background: #fff; border-radius: 1px; }
+
+.sm-cols { display: grid; grid-template-columns: minmax(0,1fr) 360px; gap: 40px; align-items: start; padding-top: 4px; }
+@media (max-width: 1120px) { .sm-cols { grid-template-columns: 1fr; gap: var(--s6); } }
+
+.sm-group { padding-top: 28px; }
+.sm-group-head { display: flex; align-items: center; gap: 10px; padding-bottom: 12px; border-bottom: 1px solid var(--sm-rule); }
+.sm-group-head .bn { font-size: var(--b2); font-weight: 600; letter-spacing: -0.01em; }
+.sm-group-head .bk { font-size: var(--b4); color: var(--sm-neutral); }
+.sm-group-head .st { margin-left: auto; font-size: var(--b3); font-weight: 600; font-variant-numeric: tabular-nums; }
+.sm-page.m .sm-group-head .bn { font-size: var(--b3); }
+
+.sm-line { display: grid; grid-template-columns: 20px 120px minmax(0,1fr) 32px; gap: 16px; padding: 20px 0; border-bottom: 1px solid rgba(0,0,0,.06); align-items: start; }
+.sm-page.m .sm-line, .sm-line.compact { grid-template-columns: 20px 100px minmax(0,1fr) 28px; gap: 12px; padding: 18px 0; }
+.sm-line.off { opacity: .5; }
+.sm-thumb { aspect-ratio: 1; width: 100%; border: 1px solid var(--sm-hair); }
+.sm-line .name { font-size: var(--b2); line-height: 1.45; margin-bottom: 8px; letter-spacing: -0.01em; }
+.sm-page.m .sm-line .name, .sm-line.compact .name { font-size: var(--b3); }
+.sm-line .opt { font-size: var(--b5); color: var(--sm-neutral); margin-bottom: 10px; }
+.sm-line .price { display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px; font-variant-numeric: tabular-nums; }
+.sm-line .price .was { font-size: var(--b4); color: var(--sm-ink40); text-decoration: line-through; }
+.sm-line .price .now { font-size: var(--b1); font-weight: 600; letter-spacing: -0.01em; }
+.sm-page.m .sm-line .price .now, .sm-line.compact .price .now { font-size: var(--b2); }
+.sm-line-foot { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+.sm-buy { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--sm-line); border-radius: 4px; padding: 8px 12px; font-size: var(--b4); }
+.sm-buy svg { width: 13px; height: 13px; color: var(--sm-neutral); }
+.sm-del { width: 32px; height: 32px; display: grid; place-items: center; color: var(--sm-neutral); margin: -4px -6px 0 0; }
+.sm-del svg { width: 17px; height: 17px; }
+
+.sm-summary { border: 1px solid var(--sm-line); padding: 24px; margin-top: 28px; display: grid; gap: 0; }
+.sm-summary .sel { font-size: var(--b3); color: var(--sm-neutral); font-variant-numeric: tabular-nums; }
+.sm-summary .lab { font-size: var(--b3); margin-top: 14px; }
+.sm-summary .tot { font-size: var(--t2); font-weight: 700; letter-spacing: -0.03em; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.sm-summary hr { border: 0; border-top: 1px solid var(--sm-rule); margin: 20px 0 16px; width: 100%; }
+.sm-summary .row { display: flex; justify-content: space-between; gap: var(--s4); font-size: var(--b3); }
+.sm-summary .row .v { color: var(--sm-neutral); }
+.sm-summary .cta { margin-top: 20px; }
+.sm-summary .foot { font-size: var(--b5); color: var(--sm-neutral); margin-top: 14px; line-height: 1.5; }
+.sticky-tag { font-family: var(--mono); font-size: 10.5px; color: var(--annot-on-light); margin-top: 8px; }
+.impl-tag { font-family: var(--mono); font-size: 10.5px; color: rgba(0,0,0,.55); }
+
+.sm-cartbar { border-top: 1px solid var(--sm-rule); background: #fff; padding: 16px 20px; display: grid; gap: 12px; }
+.sm-cartbar .row { display: flex; align-items: baseline; justify-content: space-between; }
+.sm-cartbar .row .k { font-size: var(--b3); color: var(--sm-neutral); }
+.sm-cartbar .row .v { font-size: var(--b1); font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+
+/* 빈 상태 */
+.sm-empty { display: grid; justify-items: center; gap: 16px; padding: 72px 20px; text-align: center; }
+.sm-page.m .sm-empty { padding: 48px 0; }
+.sm-empty .ico { color: rgba(0,0,0,.2); }
+.sm-empty .ico svg { width: 40px; height: 40px; }
+.sm-empty h2 { font-size: var(--b1); font-weight: 600; letter-spacing: -0.01em; }
+.sm-empty p { margin-top: -6px; font-size: var(--b3); color: var(--sm-neutral); max-width: 34ch; }
+
+.sm-recent { border-top: 1px solid var(--sm-rule); padding: 28px 0 40px; }
+.sm-recent h3 { margin-bottom: 16px; font-size: var(--b2); font-weight: 600; }
+.sm-recent .row { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 4px; }
+.sm-recent .card { width: 152px; flex: none; }
+.sm-page.m .sm-recent .card { width: 128px; }
+.sm-recent .card .t { aspect-ratio: 3/4; border: 1px solid var(--sm-hair); margin-bottom: 8px; }
+.sm-recent .card .b { font-size: var(--b5); font-weight: 600; }
+.sm-recent .card .n { font-size: var(--b4); line-height: 1.4; margin: 2px 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sm-recent .card .p { font-size: var(--b4); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* 토스트 */
+.sm-toastwrap { background: #f6f6f6; padding: 24px 20px; display: grid; gap: 12px; justify-items: center; }
+.sm-toast { width: 100%; max-width: 356px; background: #fff; border: 1px solid rgba(0,0,0,.08); border-radius: 8px; box-shadow: 0 4px 14px rgba(0,0,0,.10); padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+.sm-toast .ic { width: 18px; height: 18px; flex: none; }
+.sm-toast .ic.ok { color: #16803c; }
+.sm-toast .ic.mut { color: var(--sm-neutral); }
+.sm-toast .ic.bad { color: var(--sm-danger); }
+.sm-toast .tx { font-size: var(--b3); flex: 1; }
+.sm-toast .act { font-size: var(--b3); font-weight: 600; color: var(--sm-brand); white-space: nowrap; }
+.sm-toast .act.mut { color: var(--sm-fg); }
+
+/* 기존 좋아요 라인 */
+.sm-likerow { display: flex; align-items: center; gap: 10px; padding: 16px 20px; border-bottom: 1px solid var(--sm-rule); }
+.sm-likerow .t { width: 80px; height: 80px; flex: none; border: 1px solid var(--sm-hair); }
+.sm-likerow .m { flex: 1; min-width: 0; display: grid; gap: 16px; }
+.sm-likerow .top { display: grid; gap: 10px; }
+.sm-likerow .b { font-size: var(--b5); font-weight: 600; }
+.sm-likerow .n { font-size: var(--b3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sm-likerow .p { font-size: var(--b3); font-weight: 600; font-variant-numeric: tabular-nums; }
+.sm-likerow .h { color: #dc2626; }
+.sm-likerow .h svg { width: 24px; height: 24px; }
+
+/* ---------- 대비 / 표 ---------- */
+.compare { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: var(--s6); align-items: start; }
+.compare .col { display: grid; gap: var(--s3); align-content: start; }
+.compare .cap { font-family: var(--mono); font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-faint); }
+.compare .cap b { color: var(--annot); font-weight: 500; }
+
+.tablewrap { overflow-x: auto; }
+.difftable { width: 100%; border-collapse: collapse; margin-top: var(--s6); font-size: 13.5px; }
+.difftable th, .difftable td { text-align: left; padding: 10px var(--s4) 10px 0; border-bottom: 1px solid var(--rule-soft); vertical-align: top; }
+.difftable thead th { font-family: var(--mono); font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-faint); font-weight: 500; }
+.difftable td:first-child, .difftable th:first-child { color: var(--ink-faint); white-space: nowrap; padding-right: var(--s5); }
+.difftable td:nth-child(2) { color: var(--ink-dim); }
+.difftable td:last-child { color: var(--ink); }
+.difftable td b { font-weight: 600; }
+.difftable code { font-size: 11.5px; }
+
+/* ---------- 토큰 ---------- */
+.tokgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1px; background: var(--rule-soft); border: 1px solid var(--rule-soft); }
+.tok { background: var(--canvas-raised); padding: var(--s4); display: grid; gap: 9px; }
+.tok .sw { height: 46px; border: 1px solid var(--rule); }
+.tok .nm { font-family: var(--mono); font-size: 11.5px; color: var(--ink); }
+.tok .hx { font-family: var(--mono); font-size: 10.5px; color: var(--ink-faint); line-height: 1.5; }
+
+.scaletable { width: 100%; border-collapse: collapse; margin-top: var(--s6); }
+.scaletable td { padding: 7px var(--s5) 7px 0; border-bottom: 1px solid var(--rule-soft); vertical-align: baseline; }
+.scaletable td:first-child { font-family: var(--mono); font-size: 11px; color: var(--ink-faint); white-space: nowrap; width: 1%; }
+.scaletable td:nth-child(2) { font-family: var(--mono); font-size: 11px; color: var(--annot-dim); white-space: nowrap; width: 1%; }
+.scaletable td:last-child { color: var(--ink); letter-spacing: -0.02em; }
+
+.caveat { border-left: 2px solid var(--annot-dim); padding: 2px 0 2px var(--s4); margin-top: var(--s7); display: grid; gap: var(--s3); }
+.caveat.figma { border-left-color: var(--figma-dim); }
+.caveat h3 { margin: 0; font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--annot); font-weight: 500; }
+.caveat.figma h3 { color: var(--figma); }
+.caveat ul { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
+.caveat li { color: var(--ink-dim); font-size: 13.5px; line-height: 1.6; }
+.caveat li b { color: var(--ink); font-weight: 600; }
+
+footer {
+  margin-top: var(--s8); padding-top: var(--s5); border-top: 1px solid var(--rule-soft);
+  font-family: var(--mono); font-size: 11px; color: var(--ink-faint);
+  display: flex; justify-content: space-between; gap: var(--s4); flex-wrap: wrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="ic-cart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/>
+    <path d="M2.5 3h2.2l2.6 11.1a1.8 1.8 0 0 0 1.75 1.4h8.6a1.8 1.8 0 0 0 1.76-1.42L21 6.6H5.6"/>
+  </symbol>
+  <symbol id="ic-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="ic-minus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"/></symbol>
+  <symbol id="ic-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+  <symbol id="ic-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="ic-ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+  </symbol>
+  <symbol id="ic-heart" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.4">
+    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+  </symbol>
+  <symbol id="ic-heart-o" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+  </symbol>
+  <symbol id="ic-star" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9Z"/></symbol>
+  <symbol id="ic-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></symbol>
+  <symbol id="ic-login" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="m10 17 5-5-5-5"/><path d="M15 12H3"/>
+  </symbol>
+  <symbol id="ic-logout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>
+  </symbol>
+  <symbol id="ic-chev-d" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="ic-chev-l" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="ic-share" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/>
+    <path d="M8.4 13.4 15.6 17.7"/><path d="M15.6 6.3 8.4 10.6"/>
+  </symbol>
+  <symbol id="ic-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+  </symbol>
+  <symbol id="ic-ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></symbol>
+  <symbol id="ic-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4.5"/><path d="M12 16h.01"/></symbol>
+</svg>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <span class="topbar-name">Cart · 시안 v2</span>
+    <nav class="jump" aria-label="섹션 이동">
+      <a href="#f-detail">담기 (Figma)</a>
+      <a href="#f-axes">축 규칙</a>
+      <a href="#f-cart">장바구니</a>
+      <a href="#f-empty">빈 상태</a>
+      <a href="#f-header">헤더</a>
+      <a href="#f-feedback">피드백</a>
+      <a href="#f-contrast">대비</a>
+      <a href="#f-tokens">토큰</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <div class="intro">
+    <div>
+      <h1>장바구니 셀렉션 시안</h1>
+      <p><strong>담아두기</strong> 성격의 장바구니입니다. 자체 결제는 만들지 않고 수량 조절·선택 삭제·총 상품 금액까지만 다룹니다. 실제 구매는 지금처럼 브랜드의 외부 몰에서 일어나고, <code>구매하기</code>·<code>주문하기</code>는 <strong>비활성 자리</strong>로 예약해 둡니다.</p>
+      <p>상품상세 담기는 <strong>Figma 디자인을 1:1로</strong> 재현했습니다 — 옵션은 드롭다운 2개, 고른 조합이 회색 박스에 쌓이고, 그 아래 총 상품 금액과 3버튼. <code>/cart</code> 페이지는 디자인이 없어 그 어휘를 상속해 새로 설계했습니다. 어느 쪽인지 섹션마다 라벨로 표시했습니다.</p>
+      <p>02번은 <strong>옵션 축이 상품마다 다를 때</strong>의 분기입니다 — 의류는 색상·사이즈를 다 골라야 하고, 화장품처럼 용량·텍스처가 하나로 고정된 상품은 옵션 노출 없이 수량만 조절합니다.</p>
+    </div>
+    <div class="scope">
+      <div><span class="k">접근</span><span class="v">로그인 필수 · <code>AuthOnly</code></span></div>
+      <div><span class="k">저장</span><span class="v">서버 <code>user/cart</code> · 쿼리 캐시를 localStorage 에 영속화</span></div>
+      <div><span class="k">구매</span><span class="v">상품 상세의 외부 몰 링크 · 자체 결제는 disabled 자리</span></div>
+      <div><span class="k">옵션 축</span><span class="v"><code>COLOR SIZE VOLUME TEXTURE MATERIAL FIT STYLE</code></span></div>
+      <div><span class="k">통화</span><span class="v"><code>NT$</code> — 디자인은 <code>원</code>이지만 코드가 authority</span></div>
+    </div>
+  </div>
+
+  <!-- ==================== 01 상품상세 담기 (FIGMA) ==================== -->
+  <section class="group" id="f-detail">
+    <div class="group-head">
+      <span class="group-num">01</span>
+      <h2>상품상세 — 담기</h2>
+      <span class="src figma">Figma 1:1</span>
+      <span class="sub">옵션 드롭다운 → 조합 라인 → 총 상품 금액 → 3버튼</span>
+    </div>
+
+    <div class="notes">
+      <span class="note"><b>옵션</b> 버튼 그리드가 아니라 <em>selectbox</em> 2개 (색상 / 사이즈) — <em>선택형</em> 상품</span>
+      <span class="note"><b>조합</b> 고른 조합이 <em>회색 박스에 쌓인다</em> — NAVY/M, NAVY/S 동시. 담기 1회 = 라인 N개</span>
+      <span class="note"><b>스테퍼</b> 86px 박스 하나 · −/+ 12px · 수량 12px semibold</span>
+      <span class="note"><b>구매하기</b> disabled(준비중) — 마크업을 지금 만들어 결제 붙일 때 재작업 없게</span>
+    </div>
+
+    <div class="frame">
+      <div class="frame-bar">
+        <span class="url">/ko/product/1042</span>
+        <span class="node">1536:9910</span>
+        <span class="dim">데스크톱 · 콘텐츠 1200 (560 + 80 + 560)</span>
+      </div>
+      <div class="frame-body sm">
+        <div class="sm-header">
+          <div class="sm-header-in">
+            <div class="sm-cluster">
+              <span class="sm-wordmark">SEOUL MOMENT</span>
+              <ul class="sm-nav"><li><span class="sm-lnk on">Product</span></li><li><span class="sm-lnk">News</span></li></ul>
+            </div>
+            <ul class="sm-nav">
+              <li><span class="sm-lnk">About</span></li><li><span class="sm-lnk">Contact</span></li><li><span class="sm-lnk">MyPage</span></li>
+              <li class="is-new" style="outline-offset:9px"><span class="new-tag" style="top:-22px;left:-6px">신규</span><span class="sm-cart-btn"><svg><use href="#ic-cart"/></svg><span class="sm-badge num">2</span></span></li>
+              <li><span class="sm-lang">한국어 <svg style="width:14px;height:14px"><use href="#ic-chev-d"/></svg></span></li>
+              <li><span class="sm-lnk">Logout</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="sm-detail">
+          <div>
+            <div class="sm-gallery" style="background:#39445c"><span style="color:rgba(255,255,255,.65)">ProductGallery — 변경 없음</span></div>
+            <div class="sm-thumbs">
+              <i class="on" style="background:#39445c"></i><i style="background:#4a5570"></i><i style="background:#2c3547"></i>
+            </div>
+          </div>
+
+          <div>
+            <div class="sm-ptitle">
+              <h2>코튼 트윌 오버셔츠 릴랙스 핏</h2>
+              <svg style="width:20px;height:20px;flex:none;color:#171717"><use href="#ic-share"/></svg>
+            </div>
+            <div class="sm-brandrow">
+              <span class="ab"><span class="sm-avatar" style="background:#e8ded2"></span> 온도 ONDO</span>
+              <span class="lk"><svg><use href="#ic-heart-o"/></svg> <span class="num">999+</span></span>
+            </div>
+            <div class="sm-meta">
+              <span class="sm-rate">
+                <span class="sm-stars">
+                  <svg><use href="#ic-star"/></svg><svg><use href="#ic-star"/></svg><svg><use href="#ic-star"/></svg><svg><use href="#ic-star"/></svg><svg><use href="#ic-star"/></svg>
+                </span>
+                리뷰 <span class="num">422</span>
+              </span>
+              <div class="sm-prices">
+                <div class="r"><span class="k">정상가</span><span class="was">NT$1,600</span></div>
+                <div class="r"><span class="k">판매가</span><span class="now"><b>NT$1,280</b><span class="off num">20%</span></span></div>
+              </div>
+            </div>
+            <div class="sm-info">
+              <div class="r"><span class="k">원산지</span><span>대한민국</span></div>
+              <div class="r"><span class="k">배송정보</span><span>3일 이내 출고</span></div>
+              <div class="r"><span class="k">배송비</span><span class="num">NT$60</span></div>
+            </div>
+
+            <div class="is-new" style="margin-top:24px">
+              <span class="new-tag">신규 · AddToCartPanel</span>
+              <div class="sm-selects">
+                <span class="sm-select"><span>색상</span><svg><use href="#ic-chev-d"/></svg></span>
+                <span class="sm-select"><span>사이즈</span><svg><use href="#ic-chev-d"/></svg></span>
+              </div>
+
+              <div class="sm-draft" style="margin-top:20px">
+                <div class="line">
+                  <span class="lbl">NAVY/M</span>
+                  <span class="rt">
+                    <span class="sm-step"><span class="b"><svg><use href="#ic-minus"/></svg></span><span class="q num">1</span><span class="b"><svg><use href="#ic-plus"/></svg></span></span>
+                    <span class="money"><span class="p">NT$1,280</span><span class="x"><svg><use href="#ic-x"/></svg></span></span>
+                  </span>
+                </div>
+                <div class="line" style="padding-bottom:12px">
+                  <span class="lbl">NAVY/S</span>
+                  <span class="rt">
+                    <span class="sm-step"><span class="b"><svg><use href="#ic-minus"/></svg></span><span class="q num">1</span><span class="b"><svg><use href="#ic-plus"/></svg></span></span>
+                    <span class="money"><span class="p">NT$1,280</span><span class="x"><svg><use href="#ic-x"/></svg></span></span>
+                  </span>
+                </div>
+              </div>
+
+              <div class="sm-total" style="padding:20px 0"><span class="k">총 상품 금액</span><span class="v num">NT$2,560</span></div>
+
+              <div class="sm-cta">
+                <span class="sm-btn out sq48" style="color:#dc2626"><svg class="sm-ico24"><use href="#ic-heart"/></svg></span>
+                <span class="sm-btn out grow">장바구니 담기</span>
+                <span class="sm-btn off grow" title="준비중">구매하기</span>
+              </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding-top:20px">
+              <span class="sm-btn out impl-tag">외부 몰 A</span>
+              <span class="sm-btn out impl-tag">외부 몰 B</span>
+            </div>
+            <p class="impl-tag" style="margin-top:8px">ProductExternalGroup — 변경 없음. 실제 구매 동선</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="gap"></div>
+
+    <div class="pair">
+      <div class="frame mo360">
+        <div class="frame-bar"><span class="url">기본</span><span class="node">1536:10065</span><span class="dim">360</span></div>
+        <div class="frame-body sm">
+          <div class="sm-gnb">
+            <svg class="sm-ico24"><use href="#ic-chev-l"/></svg>
+            <span class="r">
+              <span class="sm-cart-btn f"><svg><use href="#ic-cart"/></svg><span class="sm-badge num">2</span></span>
+              <svg class="sm-ico24"><use href="#ic-share"/></svg>
+            </span>
+          </div>
+          <div class="sm-gallery" style="background:#39445c"></div>
+          <div style="padding:16px 20px 0">
+            <div class="sm-thumbs m"><i class="on" style="background:#39445c"></i><i style="background:#4a5570"></i><i style="background:#2c3547"></i></div>
+            <div class="sm-brandrow" style="padding-top:20px">
+              <span class="ab"><span class="sm-avatar s" style="background:#e8ded2"></span> 온도 ONDO</span>
+              <svg class="sm-ico20" style="color:#707070"><use href="#ic-heart-o"/></svg>
+            </div>
+            <p style="font-size:var(--b2);font-weight:700;line-height:1.4;padding:10px 0 10px">코튼 트윌 오버셔츠 릴랙스 핏</p>
+            <div class="sm-meta m">
+              <span class="sm-rate"><span class="sm-stars"><svg><use href="#ic-star"/></svg><svg><use href="#ic-star"/></svg><svg><use href="#ic-star"/></svg><svg><use href="#ic-star"/></svg><svg><use href="#ic-star"/></svg></span> 리뷰 <span class="num">422</span></span>
+              <div class="sm-prices">
+                <div class="r"><span class="k">정상가</span><span class="was">NT$1,600</span></div>
+                <div class="r"><span class="k">판매가</span><span class="now"><b>NT$1,280</b><span class="off num">20%</span></span></div>
+              </div>
+            </div>
+            <div class="sm-info m" style="padding-bottom:24px">
+              <div class="r"><span class="k">원산지</span><span>대한민국</span></div>
+              <div class="r"><span class="k">배송정보</span><span>3일 이내 출고</span></div>
+              <div class="r"><span class="k">배송비</span><span class="num">NT$60</span></div>
+            </div>
+          </div>
+          <div class="sm-barfix is-new">
+            <span class="new-tag">신규 · AddToCartBar</span>
+            <div class="sm-cta">
+              <span class="sm-btn out sq48" style="color:#707070"><svg class="sm-ico24"><use href="#ic-heart-o"/></svg></span>
+              <span class="sm-btn out grow">장바구니 담기</span>
+              <span class="sm-btn off grow" title="준비중">구매하기</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="frame mo360">
+        <div class="frame-bar"><span class="url">시트 열림 · 선택 전</span><span class="node">1536:10170</span><span class="dim">360</span></div>
+        <div class="frame-body sm sm-scrim">
+          <div>
+            <div class="sm-gnb">
+              <svg class="sm-ico24"><use href="#ic-chev-l"/></svg>
+              <span class="r"><span class="sm-cart-btn f"><svg><use href="#ic-cart"/></svg><span class="sm-badge num">2</span></span><svg class="sm-ico24"><use href="#ic-share"/></svg></span>
+            </div>
+            <div class="sm-gallery" style="background:#39445c"></div>
+            <div style="padding:16px 20px 24px">
+              <div class="sm-thumbs m"><i class="on" style="background:#39445c"></i><i style="background:#4a5570"></i><i style="background:#2c3547"></i></div>
+              <p style="font-size:var(--b2);font-weight:700;line-height:1.4;padding-top:20px">코튼 트윌 오버셔츠 릴랙스 핏</p>
+            </div>
+          </div>
+          <div class="dimlayer"></div>
+          <div class="sm-sheet is-new">
+            <span class="new-tag" style="left:20px">신규 · AddToCartSheet</span>
+            <div class="sm-handle"></div>
+            <div class="sm-selects">
+              <span class="sm-select"><span>색상</span><svg><use href="#ic-chev-d"/></svg></span>
+              <span class="sm-select"><span>사이즈</span><svg><use href="#ic-chev-d"/></svg></span>
+            </div>
+          </div>
+          <div class="sm-barfix" style="position:relative">
+            <div class="sm-cta">
+              <span class="sm-btn out sq48" style="color:#707070"><svg class="sm-ico24"><use href="#ic-heart-o"/></svg></span>
+              <span class="sm-btn out grow">장바구니 담기</span>
+              <span class="sm-btn off grow" title="준비중">구매하기</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="frame mo360">
+        <div class="frame-bar"><span class="url">시트 확장 · 선택 후</span><span class="node">1536:10279</span><span class="dim">360</span></div>
+        <div class="frame-body sm sm-scrim">
+          <div>
+            <div class="sm-gnb">
+              <svg class="sm-ico24"><use href="#ic-chev-l"/></svg>
+              <span class="r"><span class="sm-cart-btn f"><svg><use href="#ic-cart"/></svg><span class="sm-badge num">2</span></span><svg class="sm-ico24"><use href="#ic-share"/></svg></span>
+            </div>
+            <div class="sm-gallery" style="background:#39445c"></div>
+            <div style="padding:16px 20px 24px">
+              <div class="sm-thumbs m"><i class="on" style="background:#39445c"></i><i style="background:#4a5570"></i><i style="background:#2c3547"></i></div>
+              <p style="font-size:var(--b2);font-weight:700;line-height:1.4;padding-top:20px">코튼 트윌 오버셔츠 릴랙스 핏</p>
+            </div>
+          </div>
+          <div class="dimlayer"></div>
+          <div class="sm-sheet">
+            <div class="sm-handle"></div>
+            <div class="sm-selects">
+              <span class="sm-select"><span>색상</span><svg><use href="#ic-chev-d"/></svg></span>
+              <span class="sm-select"><span>사이즈</span><svg><use href="#ic-chev-d"/></svg></span>
+            </div>
+            <div class="sm-draft m" style="margin-top:20px">
+              <div class="line">
+                <span class="lbl">NAVY/M</span>
+                <span class="rt">
+                  <span class="sm-step"><span class="b"><svg><use href="#ic-minus"/></svg></span><span class="q num">1</span><span class="b"><svg><use href="#ic-plus"/></svg></span></span>
+                  <span class="x"><svg><use href="#ic-x"/></svg></span>
+                </span>
+              </div>
+              <div class="line" style="padding-bottom:12px">
+                <span class="lbl">NAVY/S</span>
+                <span class="rt">
+                  <span class="sm-step"><span class="b"><svg><use href="#ic-minus"/></svg></span><span class="q num">1</span><span class="b"><svg><use href="#ic-plus"/></svg></span></span>
+                  <span class="x"><svg><use href="#ic-x"/></svg></span>
+                </span>
+              </div>
+            </div>
+            <div class="sm-total m" style="padding-top:20px"><span class="k">총 상품 금액</span><span class="v num">NT$2,560</span></div>
+          </div>
+          <div class="sm-barfix" style="position:relative">
+            <div class="sm-cta">
+              <span class="sm-btn out sq48" style="color:#dc2626"><svg class="sm-ico24"><use href="#ic-heart"/></svg></span>
+              <span class="sm-btn out grow">장바구니 담기</span>
+              <span class="sm-btn off grow" title="준비중">구매하기</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rail">
+        <span class="note"><strong>코드와 다른 점</strong>Figma의 상품상세 전용 GNB(뒤로가기 + 카트 + 공유)는 코드에 없습니다 — 코드는 전역 <code>Header</code>를 씁니다. 카트 아이콘은 전역 헤더에 넣고, 이 프레임은 디자인 기준으로 그렸습니다.</span>
+        <span class="note"><strong>범위 밖</strong>디자인에 있지만 장바구니 작업이 아닌 것 — <em>할인율 20%</em>(brand orange), <em>공유 아이콘</em>, <em>별 5개 리뷰 표시</em>. 현재 코드에 없습니다. 같이 넣을지는 별도 결정입니다.</span>
+        <span class="note"><strong>축 개수</strong>디자인은 색상·사이즈 2개 고정이지만 API는 <code>MATERIAL</code>/<code>FIT</code>/<code>STYLE</code>도 주고, 화장품은 용량·텍스처가 옵니다. selectbox 개수와 노출 여부는 <em>데이터 기반</em> — <a href="#f-axes" style="color:var(--annot)">02번 축 규칙</a>에 분기를 정리했습니다.</span>
+        <span class="note"><strong>담기 = 라인 N개</strong>조합 2개를 만들고 담기를 누르면 장바구니에 <em>2줄</em>이 들어갑니다. 같은 조합을 다시 고르면 새 줄이 아니라 수량 +1.</span>
+        <span class="note"><strong>비활성 조건</strong>조합 라인이 0개면 <code>장바구니 담기</code>도 비활성입니다. 눌러본 뒤 토스트로 야단치지 않습니다.</span>
+      </div>
+    </div>
+    <span class="legend"><i></i> 점선은 신규 요소 표시 — UI가 아닙니다</span>
+  </section>
+
+  <!-- ==================== 02 옵션 축 규칙 ==================== -->
+  <section class="group" id="f-axes">
+    <div class="group-head">
+      <span class="group-num">02</span>
+      <h2>옵션 축 규칙</h2>
+      <span class="src new">파생 설계</span>
+      <span class="sub">01의 어휘로 상품 유형을 분기합니다</span>
+    </div>
+
+    <div class="notes">
+      <span class="note"><b>판별은 축 이름이 아니라 값 개수</b> — 축이 늘어도 UI가 자동 대응합니다</span>
+      <span class="note"><b>적용됨</b> <code>OptionType</code>에 <code>VOLUME</code>·<code>TEXTURE</code> 추가 · <code>DetailOption</code>을 <code>Partial</code>로 · 상세 정보 블록을 축 순회로 교체</span>
+      <span class="note"><b>선택필요</b> 값 2개 이상 · <b>자동확정</b> 값 1개</span>
+    </div>
+
+    <div class="tablewrap">
+      <table class="difftable">
+        <thead><tr><th>모드</th><th>조건</th><th>동작</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b>선택형</b><br>의류</td>
+            <td>선택필요 축 &ge; 1<br><code>COLOR</code> 3개 + <code>SIZE</code> 3개</td>
+            <td>축마다 selectbox 노출 · <b>전부 골라야</b> 조합 라인 생성 · 라인 &#10005; 로 제거 · <b>라인 0개면 담기 비활성</b></td>
+          </tr>
+          <tr>
+            <td><b>고정형</b><br>화장품</td>
+            <td>선택필요 축 = 0<br><code>VOLUME</code> 1개 + <code>TEXTURE</code> 1개</td>
+            <td><b>selectbox 영역 없음</b> · 라인 1개가 처음부터 존재 · <b>&#10005; 미렌더</b>(지우면 되살릴 UI가 없으므로) · 수량만 조작 · 담기 항상 활성</td>
+          </tr>
+          <tr>
+            <td>립스틱 케이스</td>
+            <td><code>COLOR</code> 12개 + <code>SIZE</code> 없음</td>
+            <td><b>선택형</b> — 색을 골라야 합니다. "SIZE가 있으면 선택형"으로 판별하면 이 상품이 깨집니다</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="gap"></div>
+
+    <div class="pair">
+      <div class="frame w560">
+        <div class="frame-bar"><span class="url">선택형 · 선택 전</span><span class="dim">담기 비활성</span></div>
+        <div class="frame-body sm" style="padding:24px 20px">
+          <div class="sm-selects">
+            <span class="sm-select" style="color:var(--sm-neutral)"><span>색상 선택</span><svg><use href="#ic-chev-d"/></svg></span>
+            <span class="sm-select" style="color:var(--sm-neutral)"><span>사이즈 선택</span><svg><use href="#ic-chev-d"/></svg></span>
+          </div>
+          <div class="sm-cta" style="margin-top:20px">
+            <span class="sm-btn out sq48" style="color:#707070"><svg class="sm-ico24"><use href="#ic-heart-o"/></svg></span>
+            <span class="sm-btn off grow">장바구니 담기</span>
+            <span class="sm-btn off grow" title="준비중">구매하기</span>
+          </div>
+          <p class="impl-tag" style="margin-top:12px">라인 0개 &rarr; 회색 박스와 총 상품 금액을 렌더하지 않습니다</p>
+        </div>
+      </div>
+
+      <div class="frame w560">
+        <div class="frame-bar"><span class="url">선택형 · 선택 후</span><span class="node">1536:9910</span><span class="dim">라인 2</span></div>
+        <div class="frame-body sm" style="padding:24px 20px">
+          <div class="sm-selects">
+            <span class="sm-select"><span>NAVY</span><svg><use href="#ic-chev-d"/></svg></span>
+            <span class="sm-select" style="color:var(--sm-neutral)"><span>사이즈 선택</span><svg><use href="#ic-chev-d"/></svg></span>
+          </div>
+          <div class="sm-draft" style="margin-top:20px">
+            <div class="line">
+              <span class="lbl">NAVY/M</span>
+              <span class="rt">
+                <span class="sm-step"><span class="b"><svg><use href="#ic-minus"/></svg></span><span class="q num">1</span><span class="b"><svg><use href="#ic-plus"/></svg></span></span>
+                <span class="money"><span class="p">NT$1,280</span><span class="x"><svg><use href="#ic-x"/></svg></span></span>
+              </span>
+            </div>
+            <div class="line" style="padding-bottom:12px">
+              <span class="lbl">NAVY/S</span>
+              <span class="rt">
+                <span class="sm-step"><span class="b"><svg><use href="#ic-minus"/></svg></span><span class="q num">1</span><span class="b"><svg><use href="#ic-plus"/></svg></span></span>
+                <span class="money"><span class="p">NT$1,280</span><span class="x"><svg><use href="#ic-x"/></svg></span></span>
+              </span>
+            </div>
+          </div>
+          <div class="sm-total" style="padding:20px 0"><span class="k">총 상품 금액</span><span class="v num">NT$2,560</span></div>
+          <div class="sm-cta">
+            <span class="sm-btn out sq48" style="color:#dc2626"><svg class="sm-ico24"><use href="#ic-heart"/></svg></span>
+            <span class="sm-btn out grow">장바구니 담기</span>
+            <span class="sm-btn off grow" title="준비중">구매하기</span>
+          </div>
+          <p class="impl-tag" style="margin-top:12px">색상은 고른 값이 남고, 사이즈를 바꿔가며 조합을 쌓습니다</p>
+        </div>
+      </div>
+
+      <div class="frame w560">
+        <div class="frame-bar"><span class="url">고정형 · 화장품</span><span class="dim">selectbox 없음</span></div>
+        <div class="frame-body sm" style="padding:24px 20px">
+          <div class="sm-draft is-new">
+            <span class="new-tag">고정형</span>
+            <div class="line" style="padding-bottom:12px">
+              <span class="lbl">50ml/젤 크림</span>
+              <span class="rt">
+                <span class="sm-step"><span class="b"><svg><use href="#ic-minus"/></svg></span><span class="q num">2</span><span class="b"><svg><use href="#ic-plus"/></svg></span></span>
+                <span class="money"><span class="p">NT$980</span></span>
+              </span>
+            </div>
+          </div>
+          <div class="sm-total" style="padding:20px 0"><span class="k">총 상품 금액</span><span class="v num">NT$1,960</span></div>
+          <div class="sm-cta">
+            <span class="sm-btn out sq48" style="color:#707070"><svg class="sm-ico24"><use href="#ic-heart-o"/></svg></span>
+            <span class="sm-btn out grow">장바구니 담기</span>
+            <span class="sm-btn off grow" title="준비중">구매하기</span>
+          </div>
+          <p class="impl-tag" style="margin-top:12px">&#10005; 가 없습니다 — 라인이 항상 1개고, 지우면 되살릴 선택 UI가 없습니다</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="gap"></div>
+
+    <div class="pair">
+      <div class="frame mo360">
+        <div class="frame-bar"><span class="url">고정형 · 모바일 시트</span><span class="dim">360</span></div>
+        <div class="frame-body sm sm-scrim">
+          <div>
+            <div class="sm-gnb">
+              <svg class="sm-ico24"><use href="#ic-chev-l"/></svg>
+              <span class="r"><span class="sm-cart-btn f"><svg><use href="#ic-cart"/></svg><span class="sm-badge num">2</span></span><svg class="sm-ico24"><use href="#ic-share"/></svg></span>
+            </div>
+            <div class="sm-gallery" style="background:#e9e3da"></div>
+            <div style="padding:16px 20px 24px">
+              <div class="sm-thumbs m"><i class="on" style="background:#e9e3da"></i><i style="background:#f2ede6"></i><i style="background:#ddd5ca"></i></div>
+              <p style="font-size:var(--b2);font-weight:700;line-height:1.4;padding-top:20px">세라마이드 배리어 크림</p>
+            </div>
+          </div>
+          <div class="dimlayer"></div>
+          <div class="sm-sheet">
+            <div class="sm-handle"></div>
+            <div class="sm-draft m">
+              <div class="line" style="padding-bottom:12px">
+                <span class="lbl">50ml/젤 크림</span>
+                <span class="rt">
+                  <span class="sm-step"><span class="b"><svg><use href="#ic-minus"/></svg></span><span class="q num">2</span><span class="b"><svg><use href="#ic-plus"/></svg></span></span>
+                </span>
+              </div>
+            </div>
+            <div class="sm-total m" style="padding-top:20px"><span class="k">총 상품 금액</span><span class="v num">NT$1,960</span></div>
+          </div>
+          <div class="sm-barfix" style="position:relative">
+            <div class="sm-cta">
+              <span class="sm-btn out sq48" style="color:#707070"><svg class="sm-ico24"><use href="#ic-heart-o"/></svg></span>
+              <span class="sm-btn out grow">장바구니 담기</span>
+              <span class="sm-btn off grow" title="준비중">구매하기</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rail">
+        <span class="note"><strong>왜 시트를 여나</strong>고를 게 없어도 <em>수량은 정해야</em> 합니다. 하단 바에서 바로 담으면 수량 1로 고정되니, 시트를 열어 수량 조절 기회를 줍니다. selectbox만 빠진 짧은 시트입니다.</span>
+        <span class="note"><strong>라벨</strong>자동확정된 축 값을 <code>AXIS_ORDER</code> 순으로 <code>/</code>로 이어 <em>50ml/젤 크림</em>. 축이 아예 없는 상품이면 라벨 없이 수량·가격만 남습니다.</span>
+        <span class="note"><strong>축 라벨 i18n</strong><code>volume</code>·<code>texture</code>·<code>material</code>·<code>fit</code>·<code>style</code> 5개 키를 로컬 JSON에 넣어 동작하게 했습니다. <b>Google Sheet에도 넣어야 합니다</b> — <code>pnpm i18n:sync</code>가 JSON을 전체 덮어쓰므로 dev 서버 재시작만으로 사라집니다. 매핑에 없는 축은 렌더하지 않습니다.</span>
+        <span class="note"><strong>타입 버그 (해결)</strong><code>DetailOption</code>이 <code>Record</code>라 5개 축이 전부 필수라고 주장했습니다(<code>option?.COLOR?.length</code> 옵셔널 체이닝이 증거). <code>Partial</code>로 바꾸고, 중복 선언되어 있던 <code>OptionValue</code> 인터페이스도 하나로 합쳤습니다.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 03 /cart ==================== -->
+  <section class="group" id="f-cart">
+    <div class="group-head">
+      <span class="group-num">03</span>
+      <h2>/cart — 브랜드별 셀렉션</h2>
+      <span class="src new">신규 설계</span>
+      <span class="sub">디자인 없음 → 01의 어휘 상속</span>
+    </div>
+
+    <div class="notes">
+      <span class="note"><b>상속</b> 스테퍼 86px · 보더 <code>rgba(0,0,0,.2)</code> · radius 4px · 라벨 <em>총 상품 금액</em></span>
+      <span class="note"><b>그룹</b> 브랜드 단위 section + 그룹 체크박스 + 그 브랜드의 <em>선택된</em> 라인 소계</span>
+      <span class="note"><b>체크박스는 black</b> — 실측상 <code>#f37b2a</code>는 할인율·별점 전용, 선택·액션은 전부 black</span>
+      <span class="note"><b>옵션은 슬래시 텍스트</b> chip이 아니라 <code>IVORY / M</code> — 디자인의 <code>NAVY/M</code> 표기</span>
+    </div>
+
+    <div class="frame">
+      <div class="frame-bar"><span class="url">/ko/cart</span><span class="dim">데스크톱 · 콘텐츠 max-w 1280</span></div>
+      <div class="frame-body sm">
+        <div class="sm-header">
+          <div class="sm-header-in">
+            <div class="sm-cluster">
+              <span class="sm-wordmark">SEOUL MOMENT</span>
+              <ul class="sm-nav"><li><span class="sm-lnk">Product</span></li><li><span class="sm-lnk">News</span></li></ul>
+            </div>
+            <ul class="sm-nav">
+              <li><span class="sm-lnk">About</span></li><li><span class="sm-lnk">Contact</span></li><li><span class="sm-lnk">MyPage</span></li>
+              <li><span class="sm-cart-btn"><svg><use href="#ic-cart"/></svg><span class="sm-badge num">3</span></span></li>
+              <li><span class="sm-lang">한국어 <svg style="width:14px;height:14px"><use href="#ic-chev-d"/></svg></span></li>
+              <li><span class="sm-lnk">Logout</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="sm-page">
+          <div class="sm-h1"><h1>장바구니</h1><span class="c num">3</span></div>
+
+          <div class="sm-selbar">
+            <span class="l"><span class="sm-cb mixed"></span> 전체 선택 <span class="n">(2/3)</span></span>
+            <span class="r">선택 삭제 <span class="sep"></span> 전체 삭제</span>
+          </div>
+
+          <div class="sm-cols">
+            <div>
+              <section class="sm-group">
+                <div class="sm-group-head">
+                  <span class="sm-cb mixed"></span>
+                  <span class="sm-avatar xs" style="background:#e8ded2"></span>
+                  <span class="bn">온도</span><span class="bk">ONDO</span>
+                  <span class="st num">NT$2,560</span>
+                </div>
+
+                <div class="sm-line">
+                  <span class="sm-cb on"><svg><use href="#ic-check"/></svg></span>
+                  <span class="sm-thumb" style="background:#efe9df"></span>
+                  <div>
+                    <p class="name">코튼 트윌 오버셔츠 릴랙스 핏</p>
+                    <p class="opt">IVORY / M</p>
+                    <div class="price"><span class="was">NT$1,600</span><span class="now">NT$1,280</span></div>
+                    <div class="sm-line-foot">
+                      <span class="sm-step"><span class="b"><svg><use href="#ic-minus"/></svg></span><span class="q num">2</span><span class="b"><svg><use href="#ic-plus"/></svg></span></span>
+                    </div>
+                  </div>
+                  <span class="sm-del"><svg><use href="#ic-x"/></svg></span>
+                </div>
+
+                <div class="sm-line off">
+                  <span class="sm-cb"></span>
+                  <span class="sm-thumb" style="background:#39445c"></span>
+                  <div>
+                    <p class="name">워시드 데님 와이드 팬츠</p>
+                    <p class="opt">INDIGO / 28</p>
+                    <div class="price"><span class="now">NT$2,200</span></div>
+                    <div class="sm-line-foot">
+                      <span class="sm-step"><span class="b off"><svg><use href="#ic-minus"/></svg></span><span class="q num">1</span><span class="b"><svg><use href="#ic-plus"/></svg></span></span>
+                    </div>
+                  </div>
+                  <span class="sm-del"><svg><use href="#ic-x"/></svg></span>
+                </div>
+              </section>
+
+              <section class="sm-group">
+                <div class="sm-group-head">
+                  <span class="sm-cb on"><svg><use href="#ic-check"/></svg></span>
+                  <span class="sm-avatar xs" style="background:#cfd8dc"></span>
+                  <span class="bn">MOONREST</span>
+                  <span class="st num">NT$1,340</span>
+                </div>
+
+                <div class="sm-line">
+                  <span class="sm-cb on"><svg><use href="#ic-check"/></svg></span>
+                  <span class="sm-thumb" style="background:#d9cfbb"></span>
+                  <div>
+                    <p class="name">리넨 블렌드 버킷햇</p>
+                    <p class="opt">FREE</p>
+                    <div class="price"><span class="now">NT$1,340</span></div>
+                    <div class="sm-line-foot">
+                      <span class="sm-step"><span class="b off"><svg><use href="#ic-minus"/></svg></span><span class="q num">1</span><span class="b"><svg><use href="#ic-plus"/></svg></span></span>
+                    </div>
+                  </div>
+                  <span class="sm-del"><svg><use href="#ic-x"/></svg></span>
+                </div>
+              </section>
+            </div>
+
+            <div>
+              <div class="sm-summary is-new">
+                <span class="new-tag">신규</span>
+                <p class="sel num">선택 2개</p>
+                <p class="lab">총 상품 금액</p>
+                <p class="tot num">NT$3,900</p>
+                <div class="row" style="margin-top:16px"><span>배송비</span><span class="num">NT$60</span></div>
+                <p class="foot" style="margin-top:6px;color:var(--sm-brand)">NT$100 더 담으면 무료배송</p>
+                <hr>
+                <div class="row"><span>예상 결제 금액</span><span class="num" style="font-size:var(--t4);font-weight:700">NT$3,960</span></div>
+                <div class="cta"><span class="sm-btn off block" title="준비중">주문하기</span></div>
+                <p class="foot">배송비는 주문서에서 배송지에 따라 확정됩니다. 외섬은 NT$140입니다.</p>
+              </div>
+              <p class="sticky-tag">position: sticky · top 76px (헤더 56 + 20)</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="gap"></div>
+
+    <div class="pair">
+      <div class="frame mo390">
+        <div class="frame-bar"><span class="url">/ko/cart</span><span class="dim">390</span></div>
+        <div class="frame-body sm">
+          <div class="sm-header">
+            <div class="sm-header-in m">
+              <div class="sm-cluster m">
+                <svg class="sm-ico22"><use href="#ic-menu"/></svg>
+                <span class="sm-wordmark s">SEOUL MOMENT</span>
+              </div>
+              <div class="sm-cluster tight">
+                <span class="sm-cart-btn s"><svg><use href="#ic-cart"/></svg><span class="sm-badge num">3</span></span>
+                <svg class="sm-ico20"><use href="#ic-logout"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="sm-page m">
+            <div class="sm-h1"><h1>장바구니</h1><span class="c num">3</span></div>
+            <div class="sm-selbar">
+              <span class="l"><span class="sm-cb mixed"></span> 전체 <span class="n">(2/3)</span></span>
+              <span class="r">선택 삭제</span>
+            </div>
+
+            <section class="sm-group">
+              <div class="sm-group-head">
+                <span class="sm-cb mixed"></span>
+                <span class="sm-avatar s" style="background:#e8ded2"></span>
+                <span class="bn">온도</span><span class="bk">ONDO</span>
+                <span class="st num">NT$2,560</span>
+              </div>
+              <div class="sm-line">
+                <span class="sm-cb on"><svg><use href="#ic-check"/></svg></span>
+                <span class="sm-thumb" style="background:#efe9df"></span>
+                <div>
+                  <p class="name">코튼 트윌 오버셔츠 릴랙스 핏</p>
+                  <p class="opt">IVORY / M</p>
+                  <div class="price"><span class="was">NT$1,600</span><span class="now">NT$1,280</span></div>
+                  <div class="sm-line-foot">
+                    <span class="sm-step"><span class="b"><svg><use href="#ic-minus"/></svg></span><span class="q num">2</span><span class="b"><svg><use href="#ic-plus"/></svg></span></span>
+                  </div>
+                </div>
+                <span class="sm-del"><svg><use href="#ic-x"/></svg></span>
+              </div>
+              <div class="sm-line off">
+                <span class="sm-cb"></span>
+                <span class="sm-thumb" style="background:#39445c"></span>
+                <div>
+                  <p class="name">워시드 데님 와이드 팬츠</p>
+                  <p class="opt">INDIGO / 28</p>
+                  <div class="price"><span class="now">NT$2,200</span></div>
+                  <div class="sm-line-foot">
+                    <span class="sm-step"><span class="b off"><svg><use href="#ic-minus"/></svg></span><span class="q num">1</span><span class="b"><svg><use href="#ic-plus"/></svg></span></span>
+                  </div>
+                </div>
+                <span class="sm-del"><svg><use href="#ic-x"/></svg></span>
+              </div>
+            </section>
+
+            <section class="sm-group" style="padding-bottom:24px">
+              <div class="sm-group-head">
+                <span class="sm-cb on"><svg><use href="#ic-check"/></svg></span>
+                <span class="sm-avatar s" style="background:#cfd8dc"></span>
+                <span class="bn">MOONREST</span>
+                <span class="st num">NT$1,340</span>
+              </div>
+              <div class="sm-line" style="border-bottom:0">
+                <span class="sm-cb on"><svg><use href="#ic-check"/></svg></span>
+                <span class="sm-thumb" style="background:#d9cfbb"></span>
+                <div>
+                  <p class="name">리넨 블렌드 버킷햇</p>
+                  <p class="opt">FREE</p>
+                  <div class="price"><span class="now">NT$1,340</span></div>
+                  <div class="sm-line-foot">
+                    <span class="sm-step"><span class="b off"><svg><use href="#ic-minus"/></svg></span><span class="q num">1</span><span class="b"><svg><use href="#ic-plus"/></svg></span></span>
+                  </div>
+                </div>
+                <span class="sm-del"><svg><use href="#ic-x"/></svg></span>
+              </div>
+            </section>
+          </div>
+
+          <div class="sm-cartbar is-new">
+            <span class="new-tag">신규</span>
+            <div class="row"><span class="k">총 상품 금액 <span class="num">(선택 2개)</span></span><span class="v num">NT$3,900</span></div>
+            <span class="sm-btn off block" title="준비중">주문하기</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="rail">
+        <span class="note"><strong>주문하기는 비활성</strong>상세의 <code>구매하기</code>와 짝을 맞춘 자리 예약입니다. 실제 구매는 라인의 <em>구매 ↗</em>가 담당합니다 — 상세에도 자체 결제(비활성) + 외부 몰(동작)이 나란히 있으니 같은 구조입니다.</span>
+        <span class="note"><strong>미선택 라인</strong>흐리게 처리하고 체크박스만 비웁니다. 숨기지 않는 이유 — 담아둔 것을 다시 보러 오는 화면이라 목록에서 사라지면 안 됩니다.</span>
+        <span class="note"><strong>배송비 제외</strong><code>shippingCost</code>는 상품 단위 값이라 브랜드로 합산하면 부정확합니다. 합계에서 빼고 "브랜드별 별도"로 정직하게 씁니다.</span>
+        <span class="note"><strong>− 버튼</strong>수량 1에서 비활성. 0으로 내려가 암묵적으로 삭제되는 동작은 만들지 않습니다.</span>
+        <span class="note"><strong>구매처</strong>라인에는 구매 버튼이 없습니다 — 서버 장바구니 응답에 <code>external</code>이 없어, 상품명을 눌러 상세에서 외부 몰로 갑니다.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 04 빈 상태 ==================== -->
+  <section class="group" id="f-empty">
+    <div class="group-head">
+      <span class="group-num">04</span>
+      <h2>빈 상태</h2>
+      <span class="src new">신규 설계</span>
+      <span class="sub">활성화 지점이라 아이콘 + 한 줄로 끝내지 않습니다</span>
+    </div>
+
+    <div class="notes">
+      <span class="note"><b>재사용</b> 최근 본 상품은 useGetUserRecentListQuery — 로그인 필수라 조건 분기가 필요 없습니다</span>
+      <span class="note"><b>CTA</b> 기존 i18n 키 discover_products 재사용</span>
+    </div>
+
+    <div class="pair">
+      <div class="frame" style="flex:1 1 560px;min-width:320px">
+        <div class="frame-bar"><span class="url">/ko/cart · 비어 있음</span><span class="dim">데스크톱</span></div>
+        <div class="frame-body sm">
+          <div class="sm-page" style="padding:24px 20px 0">
+            <div class="sm-h1"><h1>장바구니</h1></div>
+            <div class="sm-empty">
+              <span class="ico"><svg><use href="#ic-cart"/></svg></span>
+              <h2>장바구니가 비어 있습니다</h2>
+              <p>마음에 드는 상품을 담아두고 한 번에 살펴보세요.</p>
+              <span class="sm-btn">상품 보러가기</span>
+            </div>
+            <div class="sm-recent">
+              <h3>최근 본 상품</h3>
+              <div class="row">
+                <div class="card"><div class="t" style="background:#e3ddd3"></div><div class="b">온도</div><div class="n">코튼 트윌 오버셔츠</div><div class="p num">NT$1,280</div></div>
+                <div class="card"><div class="t" style="background:#39445c"></div><div class="b">온도</div><div class="n">워시드 데님 와이드 팬츠</div><div class="p num">NT$2,200</div></div>
+                <div class="card"><div class="t" style="background:#d9cfbb"></div><div class="b">MOONREST</div><div class="n">리넨 블렌드 버킷햇</div><div class="p num">NT$1,340</div></div>
+                <div class="card"><div class="t" style="background:#b9c6bd"></div><div class="b">재이</div><div class="n">가먼트 다이드 스웻셔츠</div><div class="p num">NT$1,780</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="frame mo390">
+        <div class="frame-bar"><span class="url">/ko/cart · 비어 있음</span><span class="dim">390</span></div>
+        <div class="frame-body sm">
+          <div class="sm-page m">
+            <div class="sm-h1"><h1>장바구니</h1></div>
+            <div class="sm-empty">
+              <span class="ico"><svg><use href="#ic-cart"/></svg></span>
+              <h2>장바구니가 비어 있습니다</h2>
+              <p>마음에 드는 상품을 담아두고 한 번에 살펴보세요.</p>
+              <span class="sm-btn block">상품 보러가기</span>
+            </div>
+            <div class="sm-recent">
+              <h3>최근 본 상품</h3>
+              <div class="row">
+                <div class="card"><div class="t" style="background:#e3ddd3"></div><div class="b">온도</div><div class="n">코튼 트윌 오버셔츠</div><div class="p num">NT$1,280</div></div>
+                <div class="card"><div class="t" style="background:#39445c"></div><div class="b">온도</div><div class="n">워시드 데님 와이드 팬츠</div><div class="p num">NT$2,200</div></div>
+                <div class="card"><div class="t" style="background:#d9cfbb"></div><div class="b">MOONREST</div><div class="n">리넨 블렌드 버킷햇</div><div class="p num">NT$1,340</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 05 헤더 ==================== -->
+  <section class="group" id="f-header">
+    <div class="group-head">
+      <span class="group-num">05</span>
+      <h2>헤더 진입점</h2>
+      <span class="src new">일부 신규</span>
+      <span class="sub">모바일 GNB의 <code>ico/cart</code>는 디자인에 있고, 배지와 데스크톱 아이콘은 신규</span>
+    </div>
+
+    <div class="notes">
+      <span class="note"><b>데스크톱</b> 디자인 GNB에는 없습니다 — 없으면 URL 직입력밖에 없어 <em>추가</em>합니다. 언어 선택 왼쪽</span>
+      <span class="note"><b>배지</b> 라인 개수 (수량 합이 아님) · 0이면 배지를 렌더하지 않습니다. 디자인에는 배지가 없습니다</span>
+      <span class="note"><b>가드</b> hasHydrated &amp;&amp; isAuthenticated — 하나라도 아니면 아이콘 없음</span>
+    </div>
+
+    <div class="pair">
+      <div class="frame mo390">
+        <div class="frame-bar"><span class="url">전역 헤더 · 로그인</span><span class="dim">390</span></div>
+        <div class="frame-body sm">
+          <div class="sm-header">
+            <div class="sm-header-in m">
+              <div class="sm-cluster m"><svg class="sm-ico22"><use href="#ic-menu"/></svg><span class="sm-wordmark s">SEOUL MOMENT</span></div>
+              <div class="sm-cluster tight">
+                <span class="sm-cart-btn s"><svg><use href="#ic-cart"/></svg><span class="sm-badge num">3</span></span>
+                <svg class="sm-ico20"><use href="#ic-logout"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="frame mo390">
+        <div class="frame-bar"><span class="url">전역 헤더 · 비로그인</span><span class="dim">390</span></div>
+        <div class="frame-body sm">
+          <div class="sm-header">
+            <div class="sm-header-in m">
+              <div class="sm-cluster m"><svg class="sm-ico22"><use href="#ic-menu"/></svg><span class="sm-wordmark s">SEOUL MOMENT</span></div>
+              <svg class="sm-ico20"><use href="#ic-login"/></svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rail">
+        <span class="note"><strong>배지 자리수</strong>고정폭 없이 <em>min-width 17px</em> + 좌우 4px 패딩. ko/en/zh-TW 길이 차 때문에 고정폭은 쓰지 않습니다.</span>
+        <div style="display:flex;align-items:center;gap:24px;padding:12px 16px;background:#fff;border:1px solid var(--rule);color:#171717">
+          <span class="sm-cart-btn"><svg><use href="#ic-cart"/></svg></span>
+          <span class="sm-cart-btn"><svg><use href="#ic-cart"/></svg><span class="sm-badge num">3</span></span>
+          <span class="sm-cart-btn"><svg><use href="#ic-cart"/></svg><span class="sm-badge num">12</span></span>
+          <span class="sm-cart-btn"><svg><use href="#ic-cart"/></svg><span class="sm-badge num">99+</span></span>
+        </div>
+        <span class="note" style="font-family:var(--mono);font-size:10.5px;color:var(--ink-faint)">0 &nbsp; 3 &nbsp; 12 &nbsp; 99+</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 06 피드백 ==================== -->
+  <section class="group" id="f-feedback">
+    <div class="group-head">
+      <span class="group-num">06</span>
+      <h2>피드백</h2>
+      <span class="src new">신규 설계</span>
+      <span class="sub">sonner 액션 토스트 · 이미 top-center로 붙어 있습니다</span>
+    </div>
+
+    <div class="notes">
+      <span class="note"><b>미니 드로어는 쓰지 않습니다</b> 옵션 시트가 닫히자마자 또 시트가 열려 겹칩니다</span>
+      <span class="note"><b>삭제</b> collapse 애니메이션 대신 되돌리기 — 로컬 상태라 공짜로 되고, 실수 복구가 모션보다 가치 있습니다</span>
+    </div>
+
+    <div class="pair">
+      <div class="frame" style="flex:1 1 400px;min-width:300px">
+        <div class="frame-bar"><span class="url">토스트</span><span class="dim">position top-center</span></div>
+        <div class="frame-body sm">
+          <div class="sm-toastwrap">
+            <div class="sm-toast">
+              <span class="ic ok"><svg><use href="#ic-ok"/></svg></span>
+              <span class="tx">장바구니에 2개 담았습니다</span>
+              <span class="act">장바구니 보기</span>
+            </div>
+            <div class="sm-toast">
+              <span class="ic mut"><svg><use href="#ic-trash"/></svg></span>
+              <span class="tx">삭제했습니다</span>
+              <span class="act mut">되돌리기</span>
+            </div>
+            <div class="sm-toast">
+              <span class="ic bad"><svg><use href="#ic-alert"/></svg></span>
+              <span class="tx">로그인이 필요합니다</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rail">
+        <span class="note"><strong>담기 성공</strong>조합 2개를 담으면 <em>"2개 담았습니다"</em>로 개수를 알려줍니다 — 한 번 눌렀는데 두 줄이 생기니 말해줘야 합니다. 액션 라벨은 brand orange. 자동 이동은 하지 않습니다.</span>
+        <span class="note"><strong>삭제 + 되돌리기</strong>되돌리기 액션은 검정입니다. 파괴적 동작의 복구라 강조색을 쓰지 않습니다.</span>
+        <span class="note"><strong>로그인 필요</strong>액션 없이 알림만. 좋아요 버튼이 이미 이렇게 동작하고 있어 같은 형태를 씁니다.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 07 대비 ==================== -->
+  <section class="group" id="f-contrast">
+    <div class="group-head">
+      <span class="group-num">07</span>
+      <h2>좋아요 목록과의 대비</h2>
+      <span class="sub">같은 상품, 두 화면</span>
+    </div>
+
+    <div class="compare">
+      <div class="col">
+        <span class="cap">/mypage/interest — 기존</span>
+        <div class="frame">
+          <div class="frame-body sm">
+            <div class="sm-likerow">
+              <span class="t" style="background:#efe9df"></span>
+              <span class="m">
+                <span class="top"><span class="b">온도</span><span class="n">코튼 트윌 오버셔츠 릴랙스 핏</span></span>
+                <span class="p num">NT$1,280</span>
+              </span>
+              <span class="h"><svg><use href="#ic-heart"/></svg></span>
+            </div>
+            <div class="sm-likerow" style="border-bottom:0">
+              <span class="t" style="background:#39445c"></span>
+              <span class="m">
+                <span class="top"><span class="b">온도</span><span class="n">워시드 데님 와이드 팬츠</span></span>
+                <span class="p num">NT$2,200</span>
+              </span>
+              <span class="h"><svg><use href="#ic-heart"/></svg></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <span class="cap">/cart — <b>신규</b></span>
+        <div class="frame">
+          <div class="frame-body sm">
+            <div style="padding:0 20px 8px">
+              <section class="sm-group" style="padding-top:16px">
+                <div class="sm-group-head">
+                  <span class="sm-cb mixed"></span>
+                  <span class="sm-avatar s" style="background:#e8ded2"></span>
+                  <span class="bn" style="font-size:var(--b3)">온도</span><span class="bk">ONDO</span>
+                  <span class="st num">NT$2,560</span>
+                </div>
+                <div class="sm-line compact" style="border-bottom:0">
+                  <span class="sm-cb on"><svg><use href="#ic-check"/></svg></span>
+                  <span class="sm-thumb" style="background:#efe9df"></span>
+                  <div>
+                    <p class="name">코튼 트윌 오버셔츠 릴랙스 핏</p>
+                    <p class="opt">IVORY / M</p>
+                    <div class="price"><span class="was">NT$1,600</span><span class="now">NT$1,280</span></div>
+                    <div class="sm-line-foot">
+                      <span class="sm-step"><span class="b"><svg><use href="#ic-minus"/></svg></span><span class="q num">2</span><span class="b"><svg><use href="#ic-plus"/></svg></span></span>
+                    </div>
+                  </div>
+                  <span class="sm-del"><svg><use href="#ic-x"/></svg></span>
+                </div>
+              </section>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tablewrap">
+      <table class="difftable">
+        <thead><tr><th>축</th><th>/mypage/interest</th><th>/cart</th></tr></thead>
+        <tbody>
+          <tr><td>썸네일</td><td>80px</td><td><b>120px</b> — 이미지가 주인공</td></tr>
+          <tr><td>구조</td><td>플랫 목록 + 구분선</td><td><b>브랜드별 section + 소계</b></td></tr>
+          <tr><td>라인 정보</td><td>브랜드 / 이름 / 가격</td><td>+ <b>옵션</b> <code>IVORY / M</code>, <b>수량 스테퍼 86px</b></td></tr>
+          <tr><td>선택</td><td>없음 (개별 하트만)</td><td><b>체크박스</b> — 라인 / 브랜드 / 전체 3단</td></tr>
+          <tr><td>우측 액션</td><td>하트 1개</td><td>구매 ↗ / 삭제 ✕</td></tr>
+          <tr><td>요약</td><td>없음</td><td><b>sticky 총 상품 금액 패널</b></td></tr>
+          <tr><td>브랜드 표기</td><td>라인마다 반복</td><td>그룹 헤더에 한 번 — 라인이 그만큼 조용해집니다</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ==================== 08 토큰 ==================== -->
+  <section class="group" id="f-tokens">
+    <div class="group-head">
+      <span class="group-num">08</span>
+      <h2>토큰과 실측값</h2>
+      <span class="sub">새 색·새 사이즈를 만들지 않았습니다</span>
+    </div>
+
+    <div class="tokgrid">
+      <div class="tok"><span class="sw" style="background:#f37b2a"></span><span class="nm">brand</span><span class="hx">#f37b2a<br>할인율 · 별점 · 배지 · 토스트 액션</span></div>
+      <div class="tok"><span class="sw" style="background:#171717"></span><span class="nm">foreground</span><span class="hx">#171717<br>본문 · 체크박스 · 구매하기</span></div>
+      <div class="tok"><span class="sw" style="background:#707070"></span><span class="nm">neutral</span><span class="hx">#707070<br>보조 텍스트 · 아이콘</span></div>
+      <div class="tok"><span class="sw" style="background:#212529"></span><span class="nm">#212529</span><span class="hx">조합 라인 가격<br>디자인의 raw 예외값</span></div>
+      <div class="tok"><span class="sw" style="background:#fff;border-color:rgba(255,255,255,.35);box-shadow:inset 0 0 0 1px rgba(0,0,0,.2)"></span><span class="nm">rgba(0,0,0,.2)</span><span class="hx">컨트롤 보더<br>neutral-subtle(#ddd) 아님</span></div>
+      <div class="tok"><span class="sw" style="background:rgba(0,0,0,.05);border-color:var(--rule)"></span><span class="nm">rgba(0,0,0,.05)</span><span class="hx">조합 라인 박스 배경<br>헤더 하단 보더</span></div>
+    </div>
+
+    <table class="scaletable">
+      <tbody>
+        <tr><td>text-title-2</td><td>32px</td><td style="font-size:32px;font-weight:700">NT$3,900</td></tr>
+        <tr><td>text-title-3</td><td>24px</td><td style="font-size:24px;font-weight:700">장바구니</td></tr>
+        <tr><td>text-title-4</td><td>20px</td><td style="font-size:20px;font-weight:700">코튼 트윌 오버셔츠</td></tr>
+        <tr><td>text-body-1</td><td>18px</td><td style="font-size:18px;font-weight:600">NT$1,280</td></tr>
+        <tr><td>text-body-2</td><td>16px</td><td style="font-size:16px;font-weight:600">장바구니 담기</td></tr>
+        <tr><td>text-body-3</td><td>14px</td><td style="font-size:14px">색상 · 사이즈 · NAVY/M</td></tr>
+        <tr><td>text-body-4</td><td>13px</td><td style="font-size:13px;color:var(--ink-dim)">정상가 NT$1,600</td></tr>
+        <tr><td>text-body-5</td><td>12px</td><td style="font-size:12px;color:var(--ink-dim)">총 상품 금액 · 수량 1</td></tr>
+      </tbody>
+    </table>
+
+    <div class="caveat figma">
+      <h3>Figma와 코드가 이미 다른 것 (장바구니 범위 밖)</h3>
+      <ul>
+        <li><b>할인율 <code>20%</code></b> — 디자인은 판매가 옆에 brand orange로 할인율을 표시합니다. 현재 코드에 없고 API에도 필드가 없습니다.</li>
+        <li><b>공유 아이콘</b> — 디자인은 제목 우측(데스크톱) / GNB(모바일)에 있습니다. <code>widgets/share-modal</code>은 이미 있으니 배선만 남았습니다.</li>
+        <li><b>별 5개 리뷰 표시</b> — 코드는 별 1개 + 평점 숫자입니다.</li>
+        <li><b>상품상세 전용 GNB</b> — 디자인에는 뒤로가기 + 카트 + 공유의 전용 헤더가 있지만 코드는 전역 <code>Header</code>를 씁니다.</li>
+        <li><b>GNB 메뉴</b> — 디자인은 Product / Brand / Magazine + 검색, 코드는 Product / News입니다.</li>
+      </ul>
+      <p style="margin:0;color:var(--ink-faint);font-size:13px">이번 작업에서는 <b>건드리지 않습니다.</b> 같이 정리할지는 별도 결정입니다.</p>
+    </div>
+
+    <div class="caveat" style="border-left-color:#4d7a5a">
+      <h3 style="color:#7fbb92">코드에 이미 적용한 것</h3>
+      <ul>
+        <li><code>shared/services/product.ts</code> — <code>OptionType</code>에 <b><code>VOLUME</code>·<code>TEXTURE</code></b> 추가. <code>OptionValue</code>·<code>OptionType</code>·<code>DetailOption</code>을 <b>export</b>로 열었습니다(장바구니 feature가 씁니다).</li>
+        <li><code>DetailOption</code>을 <code>Record</code> → <b><code>Partial&lt;Record&gt;</code></b>로. 서버는 상품이 가진 축만 내려주는데 <code>Record</code>는 7개 축이 항상 존재한다고 타입이 보장해버려서 <code>option.COLOR[0]</code> 같은 접근이 런타임에 터집니다.</li>
+        <li><b>중복 선언 제거</b> — <code>interface OptionValue</code>가 같은 파일에 <b>두 번</b> 선언되어 있었습니다. 멤버가 같아서 declaration merging으로 조용히 컴파일되고 있었습니다.</li>
+        <li><code>entities/product/lib/optionAxes.ts</code> <b>신설</b> — <code>OPTION_AXIS_ORDER</code>(서버 JSON 키 순서에 의존하지 않기 위한 명시적 순서), <code>OPTION_AXIS_LABEL_KEY</code>, <code>listProductOptionAxes()</code>, <code>formatOptionAxisValues()</code>. <code>views/product</code>와 <code>features/cart</code>가 함께 쓰므로 FSD상 entities에 두었습니다.</li>
+        <li><code>ProductDetailPage.tsx</code> — 하드코딩된 색상/사이즈 블록 2개를 <b>축 순회</b>로 교체. 색상은 <code>COLOR[0].value</code>만 쓰고 있어서 값이 여러 개면 나머지가 사라지던 문제도 함께 없어졌습니다.</li>
+        <li><code>i18n/messages/{ko,en,zh-TW}.json</code> — <code>volume texture material fit style</code> 5개 키 추가. <b>Google Sheet에 넣지 않으면 다음 <code>pnpm i18n:sync</code>에 사라집니다.</b></li>
+      </ul>
+      <p style="margin:0;color:var(--ink-faint);font-size:13px"><code>pnpm typecheck:web</code> · <code>pnpm lint:fix:web</code> 통과.</p>
+    </div>
+
+    <div class="caveat">
+      <h3>결정이 필요한 것</h3>
+      <ul>
+        <li><b>라인 단위 구매 ↗</b> — 시안에는 있었으나 구현에서 뺐습니다. <code>GET user/cart</code> 응답에 <code>external</code>이 없고, 라인마다 상세를 치면 N+1입니다. 응답에 추가되면 되살릴 수 있습니다.</li>
+        <li><b>/cart의 <code>주문하기</code></b> — 상세의 <code>구매하기</code>와 짝을 맞춰 비활성 자리로 뒀습니다. 아예 없애도 됩니다.</li>
+        <li><b>상세의 하트 버튼</b> — 디자인상 브랜드 줄 오른쪽과 CTA 옆에 <b>둘 다</b> 있습니다. 하나로 줄일지 정해야 합니다.</li>
+        <li><b>축 판별 기준</b> — "SIZE가 있으면 선택형" 대신 <b>값이 2개 이상인 축이 있으면 선택형</b>으로 잡았습니다. 의류·화장품 두 케이스를 모두 만족하면서 립스틱(COLOR 여러 개 + SIZE 없음)이 깨지지 않습니다. SIZE 기준으로 고정하길 원하시면 알려주세요.</li>
+        <li><b>배지 숫자</b> — 라인 개수로 뒀습니다. 수량 합이 아닙니다.</li>
+        <li><b>비활성 버튼 문구</b> — 지금은 <code>구매하기</code>/<code>주문하기</code> 그대로 비활성입니다. "준비중"을 라벨에 넣을지, <code>title</code>로만 둘지 결정이 필요합니다.</li>
+      </ul>
+    </div>
+
+    <div class="caveat">
+      <h3>구현 시 접근성 요구사항</h3>
+      <ul>
+        <li>이 시안의 컨트롤은 <b>정적 표현</b>입니다 — 무동작 탭 스톱과 거짓 ARIA를 만들지 않으려고 실제 <code>button</code>이 아닌 <code>span</code>으로 그렸습니다.</li>
+        <li><b>selectbox</b> — 네이티브 <code>select</code> 또는 <code>shared/ui/select.tsx</code>. 축 이름이 라벨이 되어야 합니다(플레이스홀더만으로 두지 않기).</li>
+        <li><b>고정형</b> — selectbox가 없으므로 사용자는 무엇이 담기는지 라인 라벨(<code>50ml/젤 크림</code>)로만 압니다. 라벨을 장식이 아니라 <b>읽히는 텍스트</b>로 두고, 수량 스테퍼에 상품 맥락을 담은 <code>aria-label</code>을 붙입니다.</li>
+        <li><b>체크박스</b> — 네이티브 <code>input type="checkbox"</code>. 전체선택은 부분 선택 시 <code>indeterminate</code>.</li>
+        <li><b>수량</b> — <code>role="group"</code> + <code>aria-label</code>, 숫자에 <code>aria-live="polite"</code>, 1에서 − 비활성. 스테퍼 내부 버튼이 12px 아이콘이라 <b>터치 타겟이 부족합니다</b> — 아이콘은 12px로 두고 히트 영역을 44px로 넓혀야 합니다.</li>
+        <li><b>비활성 버튼</b> — <code>disabled</code>만 두면 이유를 알 수 없습니다. <code>aria-describedby</code>로 "준비중"을 연결합니다.</li>
+        <li><b>Drawer</b> — <code>DrawerTitle</code>을 반드시 렌더합니다(필요하면 <code>sr-only</code>). Radix 요구사항입니다.</li>
+      </ul>
+    </div>
+
+    <div class="caveat">
+      <h3>시안에서 대체한 것</h3>
+      <ul>
+        <li><b>폰트</b> — 실제 서비스와 디자인 모두 <b>Pretendard</b>입니다. Artifact CSP가 jsDelivr 스타일시트를 막아서 이 시안은 <code>Inter</code>(라틴) + <code>Noto Sans KR</code>(한글)로 대체했습니다. 자폭과 자간이 미세하게 다릅니다.</li>
+        <li><b>이미지</b> — 상품 사진 대신 색 블록입니다. 카트 라인은 선택된 컬러 옵션 색을 칩니다. 실제로는 <code>BaseImage</code>.</li>
+        <li><b>로고</b> — <code>/logo.png</code> 대신 워드마크 텍스트.</li>
+        <li><b>프레임 폭</b> — 상품상세/장바구니 데스크톱은 유동적으로 그렸고 콘텐츠 컨테이너만 실제와 같습니다(1200 / 1280). 상품상세 모바일은 Figma 캔버스와 같은 <b>360px</b>, <code>/cart</code> 모바일은 실제 기기 폭 <b>390px</b>입니다.</li>
+        <li><b>데이터</b> — 상품·브랜드·가격 전부 예시이고 실제 브랜드가 아닙니다. 디자인의 예시 상품(실제 스포츠 브랜드)은 그대로 쓰지 않았습니다. 금액은 계산이 맞습니다 — 상세 NT$1,280 × 2줄 = NT$2,560 / 카트 선택 2건 NT$2,560 + NT$1,340 = NT$3,900.</li>
+        <li><b>통화</b> — 디자인은 <code>원</code>이지만 코드가 <code>toNTCurrency</code>(NT$)이고 대만 서비스라 <code>NT$</code>로 그렸습니다.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <span>apps/web · 장바구니 시안 v2 · Figma G1QY7B17G2KWHa9nLLLCaL</span>
+    <span>다음 단계 — 시안 확정 후 shared/ui 프리미티브부터 구현</span>
+  </footer>
+
+</main>
+
+<script>
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll('.jump a'));
+  var map = {};
+  var targets = links.map(function (a) {
+    var el = document.querySelector(a.getAttribute('href'));
+    if (el) map[el.id] = a;
+    return el;
+  }).filter(Boolean);
+
+  if (!('IntersectionObserver' in window) || !targets.length) return;
+
+  var visible = Object.create(null);
+  function paint() {
+    var current = null;
+    for (var i = 0; i < targets.length; i++) {
+      if (visible[targets[i].id]) { current = targets[i].id; break; }
+    }
+    links.forEach(function (a) { a.removeAttribute('aria-current'); });
+    if (current && map[current]) map[current].setAttribute('aria-current', 'true');
+  }
+
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) visible[e.target.id] = true;
+      else delete visible[e.target.id];
+    });
+    paint();
+  }, { rootMargin: '-56px 0px -70% 0px' });
+
+  targets.forEach(function (t) { io.observe(t); });
+})();
+</script>
+</body>
+</html>

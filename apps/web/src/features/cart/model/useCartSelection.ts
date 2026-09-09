@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 
-import type { CartLine } from "@entities/cart";
+import type { UserCartItem } from "@entities/cart";
 
 /**
  * 장바구니 선택 상태. URL 로 올리지 않는다 — 새로고침·공유로 보존할 가치가 없고
@@ -11,49 +11,49 @@ import type { CartLine } from "@entities/cart";
  * 기본값은 **전체 선택**이다. 담아둔 것을 다시 보러 오는 화면이라 아무것도 선택 안 된 상태로
  * 시작하면 합계가 0으로 보이고 매번 전체 선택을 눌러야 한다.
  *
- * `unselectableLineIds`(품절·판매중지)는 선택 자체에서 빠진다. 고를 수 있게 두면 합계에는
+ * `unselectableIds`(품절·판매중지)는 선택 자체에서 빠진다. 고를 수 있게 두면 합계에는
  * 안 들어가는데 개수에만 잡혀 "3개 선택"과 금액이 어긋나 보이고, 전체 선택이 영원히
  * 완료되지 않는다.
  */
 export const useCartSelection = (
-  lines: ReadonlyArray<CartLine>,
-  unselectableLineIds?: ReadonlySet<string>,
+  items: ReadonlyArray<UserCartItem>,
+  unselectableIds?: ReadonlySet<number>,
 ) => {
-  const [excluded, setExcluded] = useState<ReadonlySet<string>>(new Set());
+  const [excluded, setExcluded] = useState<ReadonlySet<number>>(new Set());
 
-  const selectableLines = useMemo(
-    () => lines.filter((line) => !unselectableLineIds?.has(line.lineId)),
-    [lines, unselectableLineIds],
+  const selectableItems = useMemo(
+    () => items.filter((item) => !unselectableIds?.has(item.cartItemId)),
+    [items, unselectableIds],
   );
 
   // 선택 해제된 id 만 들고 있는다. 새로 담긴 라인이 자동으로 선택 상태가 되고,
-  // 삭제된 라인의 id 는 lines 에서 사라지므로 따로 정리할 필요가 없다.
-  const selectedLineIds = useMemo(
+  // 삭제된 라인의 id 는 items 에서 사라지므로 따로 정리할 필요가 없다.
+  const selectedCartItemIds = useMemo(
     () =>
       new Set(
-        selectableLines
-          .filter((line) => !excluded.has(line.lineId))
-          .map((line) => line.lineId),
+        selectableItems
+          .filter((item) => !excluded.has(item.cartItemId))
+          .map((item) => item.cartItemId),
       ),
-    [selectableLines, excluded],
+    [selectableItems, excluded],
   );
 
-  const toggle = useCallback((lineId: string, selected: boolean) => {
+  const toggle = useCallback((cartItemId: number, selected: boolean) => {
     setExcluded((prev) => {
       const next = new Set(prev);
-      if (selected) next.delete(lineId);
-      else next.add(lineId);
+      if (selected) next.delete(cartItemId);
+      else next.add(cartItemId);
       return next;
     });
   }, []);
 
   const toggleMany = useCallback(
-    (lineIds: ReadonlyArray<string>, selected: boolean) => {
+    (cartItemIds: ReadonlyArray<number>, selected: boolean) => {
       setExcluded((prev) => {
         const next = new Set(prev);
-        for (const lineId of lineIds) {
-          if (selected) next.delete(lineId);
-          else next.add(lineId);
+        for (const cartItemId of cartItemIds) {
+          if (selected) next.delete(cartItemId);
+          else next.add(cartItemId);
         }
         return next;
       });
@@ -61,31 +61,31 @@ export const useCartSelection = (
     [],
   );
 
-  const selectedCount = selectedLineIds.size;
+  const selectedCount = selectedCartItemIds.size;
   const allSelected =
-    selectableLines.length > 0 && selectedCount === selectableLines.length;
+    selectableItems.length > 0 && selectedCount === selectableItems.length;
   const someSelected = selectedCount > 0 && !allSelected;
 
   return {
-    selectedLineIds,
+    selectedCartItemIds,
     selectedCount,
     /** 전체 선택 기준이 되는 개수 — 품절 라인은 빠진다 */
-    selectableCount: selectableLines.length,
+    selectableCount: selectableItems.length,
     allSelected,
     someSelected,
     isSelected: useCallback(
-      (lineId: string) => selectedLineIds.has(lineId),
-      [selectedLineIds],
+      (cartItemId: number) => selectedCartItemIds.has(cartItemId),
+      [selectedCartItemIds],
     ),
     toggle,
     toggleMany,
     toggleAll: useCallback(
       (selected: boolean) =>
         toggleMany(
-          selectableLines.map((line) => line.lineId),
+          selectableItems.map((item) => item.cartItemId),
           selected,
         ),
-      [selectableLines, toggleMany],
+      [selectableItems, toggleMany],
     ),
   };
 };

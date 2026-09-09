@@ -1,6 +1,6 @@
 "use client";
 
-import { useId } from "react";
+import { useId, useMemo } from "react";
 
 import { toNTCurrency } from "@shared/lib/utils";
 import { BaseImage } from "@shared/ui/base-image";
@@ -8,44 +8,44 @@ import { Checkbox } from "@shared/ui/checkbox";
 
 import {
   CartLineRow,
-  findCartLineState,
-  getMaxLineQuantity,
-  isCartLineLowStock,
-  isCartLineUnavailable,
-  type CartBrandGroup as Group,
-  type CartLineServerState,
+  sumSelectedAmount,
+  type UserCartBrandGroup,
 } from "@entities/cart";
 
-import { CartLinePurchase } from "./CartLinePurchase";
-
 interface CartBrandGroupProps {
-  group: Group;
-  isSelected(lineId: string): boolean;
-  onToggleLine(lineId: string, selected: boolean): void;
-  onToggleGroup(lineIds: ReadonlyArray<string>, selected: boolean): void;
-  onQuantityChange(lineId: string, quantity: number): void;
-  onRemove(lineId: string): void;
-  /** `cartItemId` → 재고·품절. 서버 장바구니에서 온다 */
-  lineStates: ReadonlyMap<number, CartLineServerState>;
+  group: UserCartBrandGroup;
+  selectedCartItemIds: ReadonlySet<number>;
+  onToggleLine(cartItemId: number, selected: boolean): void;
+  onToggleGroup(cartItemIds: ReadonlyArray<number>, selected: boolean): void;
+  onQuantityChange(cartItemId: number, quantity: number): void;
+  onRemove(cartItemId: number): void;
 }
 
 /**
  * 브랜드 단위 그룹. 좋아요 목록이 플랫 리스트인 것과 달리 장바구니는 브랜드로 묶인다 —
- * 실제 구매도 브랜드/외부 몰 단위로 갈리고, 브랜드명을 라인마다 반복하지 않아 라인이 조용해진다.
+ * 브랜드명을 라인마다 반복하지 않아 라인이 조용해지고, 묶음과 순서는 서버가 정해 준다.
+ *
+ * 소계는 서버의 `productAmount`(전체 기준)가 아니라 **선택된 라인만** 더한 값이다.
  */
 export function CartBrandGroupSection({
   group,
-  isSelected,
+  selectedCartItemIds,
   onToggleLine,
   onToggleGroup,
   onQuantityChange,
   onRemove,
-  lineStates,
 }: CartBrandGroupProps) {
   const titleId = useId();
-  const lineIds = group.lines.map((line) => line.lineId);
-  const selectedInGroup = lineIds.filter(isSelected).length;
-  const allSelected = selectedInGroup === lineIds.length;
+  const cartItemIds = group.items.map((item) => item.cartItemId);
+  const selectedInGroup = cartItemIds.filter((id) =>
+    selectedCartItemIds.has(id),
+  ).length;
+  const allSelected = selectedInGroup === cartItemIds.length;
+
+  const selectedAmount = useMemo(
+    () => sumSelectedAmount(group.items, selectedCartItemIds),
+    [group.items, selectedCartItemIds],
+  );
 
   return (
     <section aria-labelledby={titleId} className="pt-7">
@@ -54,14 +54,14 @@ export function CartBrandGroupSection({
           aria-label={group.brandName}
           checked={allSelected}
           indeterminate={selectedInGroup > 0 && !allSelected}
-          onChange={(event) => onToggleGroup(lineIds, event.target.checked)}
+          onChange={(event) => onToggleGroup(cartItemIds, event.target.checked)}
         />
-        {group.brandProfileImg && (
+        {group.brandProfileImage && (
           <BaseImage
             alt=""
             className="size-7 shrink-0 rounded-full border border-black/[0.08] object-cover"
             height={56}
-            src={group.brandProfileImg}
+            src={group.brandProfileImage}
             unoptimized
             width={56}
           />
@@ -73,32 +73,24 @@ export function CartBrandGroupSection({
           {group.brandName}
         </span>
         <span className="text-body-3 ml-auto font-semibold tabular-nums">
-          {toNTCurrency(group.selectedAmount)}
+          {toNTCurrency(selectedAmount)}
         </span>
       </div>
 
-      {group.lines.map((line) => {
-        const state = findCartLineState(lineStates, line.cartItemId);
-
-        return (
-          <CartLineRow
-            actionSlot={<CartLinePurchase external={line.external} />}
-            key={line.lineId}
-            line={line}
-            lowStock={
-              isCartLineLowStock(state) ? state?.stockQuantity : undefined
-            }
-            maxQuantity={getMaxLineQuantity(state?.stockQuantity)}
-            onQuantityChange={(quantity) =>
-              onQuantityChange(line.lineId, quantity)
-            }
-            onRemove={() => onRemove(line.lineId)}
-            onSelectedChange={(selected) => onToggleLine(line.lineId, selected)}
-            selected={isSelected(line.lineId)}
-            unavailable={isCartLineUnavailable(state)}
-          />
-        );
-      })}
+      {group.items.map((item) => (
+        <CartLineRow
+          item={item}
+          key={item.cartItemId}
+          onQuantityChange={(quantity) =>
+            onQuantityChange(item.cartItemId, quantity)
+          }
+          onRemove={() => onRemove(item.cartItemId)}
+          onSelectedChange={(selected) =>
+            onToggleLine(item.cartItemId, selected)
+          }
+          selected={selectedCartItemIds.has(item.cartItemId)}
+        />
+      ))}
     </section>
   );
 }

@@ -7,6 +7,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import type {
   CreateUserCartItemReq,
   UpdateUserCartItemReq,
+  UserCartItem,
 } from "@shared/services/userCart";
 
 import messages from "@/i18n/messages/ko.json";
@@ -14,55 +15,89 @@ import messages from "@/i18n/messages/ko.json";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook, waitFor } from "@testing-library/react";
 
-import type { CartLineDraft } from "./types";
 import { useCart } from "./useCart";
-import { useCartStore } from "./useCartStore";
 
-// 담기 응답의 cartItemId 를 라인마다 다르게 주려고 순번을 센다.
+/** 서버 장바구니. 테스트마다 갈아끼우고, mutation mock 이 실제로 고친다. */
+let serverCart: UserCartItem[] = [];
 let nextCartItemId = 0;
 
+const cartItem = (
+  productVariantId: number,
+  quantity = 1,
+  overrides: Partial<UserCartItem> = {},
+): UserCartItem => {
+  nextCartItemId += 1;
+
+  return {
+    cartItemId: nextCartItemId,
+    productItemId: 1,
+    productVariantId,
+    productName: `상품 ${productVariantId}`,
+    optionText: "IVORY / M",
+    imageUrl: "",
+    price: 1000,
+    discountPrice: 0,
+    quantity,
+    totalPrice: 1000 * quantity,
+    stockQuantity: 50,
+    isSoldOut: false,
+    isAvailable: true,
+    ...overrides,
+  };
+};
+
 const createUserCartItem = vi.fn<(req: CreateUserCartItemReq) => unknown>(
-  () => {
-    nextCartItemId += 1;
+  (req) => {
+    const item = cartItem(req.productVariantId, req.quantity);
+    serverCart = [...serverCart, item];
 
     return Promise.resolve({
       result: true,
-      data: { cartItemId: nextCartItemId, totalCount: nextCartItemId },
+      data: { cartItemId: item.cartItemId, totalCount: serverCart.length },
     });
   },
 );
-const updateUserCartItem = vi.fn<(req: UpdateUserCartItemReq) => unknown>(() =>
-  Promise.resolve({ result: true, data: null }),
-);
-const deleteUserCartItems = vi.fn<(ids?: number[]) => unknown>(() =>
-  Promise.resolve(),
+
+const updateUserCartItem = vi.fn<(req: UpdateUserCartItemReq) => unknown>(
+  ({ cartItemId, quantity }) => {
+    serverCart = serverCart.map((item) =>
+      item.cartItemId === cartItemId
+        ? { ...item, quantity, totalPrice: item.price * quantity }
+        : item,
+    );
+
+    return Promise.resolve({ result: true, data: null });
+  },
 );
 
-/** 정정이 읽어갈 서버 장바구니. 테스트마다 갈아끼운다. */
-let serverCart: Array<{
-  cartItemId: number;
-  quantity: number;
-  stockQuantity: number;
-}> = [];
+const deleteUserCartItems = vi.fn<(ids?: number[]) => unknown>((ids) => {
+  serverCart = ids
+    ? serverCart.filter((item) => !ids.includes(item.cartItemId))
+    : [];
+
+  return Promise.resolve();
+});
 
 const getUserCart = vi.fn(() =>
   Promise.resolve({
     result: true,
     data: {
-      brandGroups: [
-        {
-          brandId: 1,
-          brandName: "OSSMOVE",
-          brandProfileImage: "",
-          items: serverCart,
-          productAmount: 0,
-        },
-      ],
-      totalProductAmount: 0,
-      estimatedShippingFee: 0,
-      remoteIslandFee: 0,
-      freeShippingThreshold: 0,
-      amountToFreeShipping: 0,
+      brandGroups: serverCart.length
+        ? [
+            {
+              brandId: 1,
+              brandName: "OSSMOVE",
+              brandProfileImage: "",
+              items: serverCart,
+              productAmount: serverCart.reduce((n, i) => n + i.totalPrice, 0),
+            },
+          ]
+        : [],
+      totalProductAmount: serverCart.reduce((n, i) => n + i.totalPrice, 0),
+      estimatedShippingFee: 60,
+      remoteIslandFee: 140,
+      freeShippingThreshold: 3000,
+      amountToFreeShipping: 3000,
       estimatedTotalAmount: 0,
       totalCount: serverCart.length,
     },
@@ -107,288 +142,187 @@ vi.mock("sonner", () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
 // `useLanguage` 가 useParams 로 locale 을 읽는다. 라우트 밖이라 null 이 온다.
 vi.mock("next/navigation", () => ({ useParams: () => ({ locale: "ko" }) }));
 
-const draft = (
-  productId: number,
-  optionValueId: number,
-  productVariantId?: number,
-): CartLineDraft => ({
-  productId,
-  productVariantId,
-  quantity: 1,
-  productName: `상품 ${productId}`,
-  brandId: "1",
-  brandName: "OSSMOVE",
-  brandProfileImg: "",
-  imageUrl: "",
-  price: 1000,
-  discountPrice: 0,
-  options: [{ type: "SIZE", optionValueId, value: "M" }],
-  external: [],
-});
+const authState = { isAuthenticated: true, id: 1 };
 
-const wrapper = ({ children }: { children: ReactNode }) => (
-  <QueryClientProvider
-    client={
-      new QueryClient({
-        defaultOptions: {
-          queries: { retry: false },
-          mutations: { retry: false },
-        },
-      })
-    }
-  >
-    <NextIntlClientProvider locale="ko" messages={messages}>
-      {children}
-    </NextIntlClientProvider>
-  </QueryClientProvider>
-);
+vi.mock("@shared/lib/hooks/useUserAuthStore", () => ({
+  useUserAuthStore: (selector?: (state: typeof authState) => unknown) =>
+    selector ? selector(authState) : authState,
+  useUserAuthHydrated: () => true,
+}));
 
-const setup = () => renderHook(() => useCart(), { wrapper });
+const setup = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false, gcTime: 0 },
+      mutations: { retry: false },
+    },
+  });
+
+  const wrapper = ({ children }: { children: ReactNode }) => (
+    <QueryClientProvider client={queryClient}>
+      <NextIntlClientProvider locale="ko" messages={messages}>
+        {children}
+      </NextIntlClientProvider>
+    </QueryClientProvider>
+  );
+
+  return renderHook(() => useCart(), { wrapper });
+};
+
+/** 첫 조회가 끝나 화면이 서버 값을 들고 있는 상태까지 기다린다 */
+const setupLoaded = async () => {
+  const rendered = setup();
+  await waitFor(() => expect(rendered.result.current.isPending).toBe(false));
+
+  return rendered;
+};
+
+const items = (result: { current: ReturnType<typeof useCart> }) =>
+  result.current.brandGroups.flatMap((group) => group.items);
 
 beforeEach(() => {
   nextCartItemId = 0;
   serverCart = [];
   getUserCart.mockClear();
-  useCartStore.setState({ lines: [], ownerId: 0 });
   createUserCartItem.mockClear();
   updateUserCartItem.mockClear();
   deleteUserCartItems.mockClear();
 });
 
 describe("담기", () => {
-  it("서버에도 담고 돌아온 cartItemId 를 라인에 붙인다", async () => {
-    const { result } = setup();
+  it("고른 SKU 와 수량만 서버로 보낸다", async () => {
+    const { result } = await setupLoaded();
 
-    act(() => {
-      result.current.addLines([draft(1, 10, 501)]);
+    await act(async () => {
+      await expect(
+        result.current.addItems([{ productVariantId: 501, quantity: 2 }]),
+      ).resolves.toEqual({ status: "added" });
     });
 
-    await waitFor(() =>
-      expect(result.current.lines[0].cartItemId).toBe(nextCartItemId),
-    );
     expect(createUserCartItem).toHaveBeenCalledWith({
       productVariantId: 501,
-      quantity: 1,
+      quantity: 2,
     });
   });
 
-  // SKU 를 모르면 서버에 담을 방법이 없다. 로컬 담기는 그대로 둔다.
-  it("productVariantId 가 없는 라인은 서버에 보내지 않는다", async () => {
-    const { result } = setup();
+  // SKU 를 모르면 서버 장바구니에 담을 방법이 없다. 예전처럼 로컬에 남겨두지 않는다.
+  it("productVariantId 가 없으면 아무것도 담지 않는다", async () => {
+    const { result } = await setupLoaded();
 
-    act(() => {
-      result.current.addLines([draft(1, 10)]);
+    await act(async () => {
+      await expect(
+        result.current.addItems([
+          { productVariantId: 501, quantity: 1 },
+          { quantity: 1 },
+        ]),
+      ).resolves.toEqual({ status: "invalid" });
     });
 
-    expect(result.current.lines).toHaveLength(1);
     expect(createUserCartItem).not.toHaveBeenCalled();
   });
-});
 
-describe("삭제", () => {
-  it("서버 id 를 가진 라인만 모아 한 번에 지운다", async () => {
-    const { result } = setup();
+  it("재고 부족(409)이면 서버를 다시 읽고 stock 을 돌려준다", async () => {
+    const { result } = await setupLoaded();
+    const readsBefore = getUserCart.mock.calls.length;
 
-    act(() => {
-      result.current.addLines([draft(1, 10, 501), draft(2, 20, 502)]);
-    });
-    await waitFor(() =>
-      expect(result.current.lines.every((line) => line.cartItemId)).toBe(true),
-    );
-
-    const [first, second] = result.current.lines;
-
-    // mutate 는 mutationFn 을 마이크로태스크에서 호출하므로 flush 가 필요하다.
-    await act(async () => {
-      result.current.removeLines([first.lineId, second.lineId]);
-    });
-
-    expect(result.current.lines).toHaveLength(0);
-    expect(deleteUserCartItems).toHaveBeenCalledWith([
-      first.cartItemId,
-      second.cartItemId,
-    ]);
-  });
-
-  // 회귀 방지: `deleteUserCartItems()` 를 빈 인자로 부르면 장바구니 전체가 날아간다.
-  it("지울 서버 라인이 없으면 아예 호출하지 않는다", async () => {
-    const { result } = setup();
-
-    act(() => {
-      result.current.addLines([draft(1, 10)]);
-    });
-    await act(async () => {
-      result.current.removeLines([result.current.lines[0].lineId]);
-    });
-
-    expect(result.current.lines).toHaveLength(0);
-    expect(deleteUserCartItems).not.toHaveBeenCalled();
-  });
-
-  it("되돌리기는 서버에 다시 담고 새 cartItemId 를 받는다", async () => {
-    const { result } = setup();
-
-    act(() => {
-      result.current.addLines([draft(1, 10, 501)]);
-    });
-    await waitFor(() => expect(result.current.lines[0].cartItemId).toBe(1));
-
-    const removed = result.current.lines;
+    createUserCartItem.mockImplementationOnce(conflict);
 
     await act(async () => {
-      result.current.removeLines([removed[0].lineId]);
-    });
-    act(() => {
-      result.current.restoreLines(removed);
-    });
-
-    await waitFor(() => expect(result.current.lines[0].cartItemId).toBe(2));
-    expect(createUserCartItem).toHaveBeenCalledTimes(2);
-  });
-
-  // 스토어가 이미 있는 라인은 건너뛴다. 그대로 서버에 보내면 수량이 두 번 더해진다.
-  it("이미 살아 있는 라인은 되돌려도 다시 담지 않는다", async () => {
-    const { result } = setup();
-
-    act(() => {
-      result.current.addLines([draft(1, 10, 501)]);
-    });
-    await waitFor(() => expect(result.current.lines[0].cartItemId).toBe(1));
-
-    act(() => {
-      result.current.restoreLines(result.current.lines);
+      await expect(
+        result.current.addItems([{ productVariantId: 501, quantity: 99 }]),
+      ).resolves.toEqual({ status: "stock" });
     });
 
-    expect(createUserCartItem).toHaveBeenCalledTimes(1);
+    expect(getUserCart.mock.calls.length).toBeGreaterThan(readsBefore);
   });
 });
 
 describe("수량 변경", () => {
-  beforeEach(() => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
-  });
-
-  it("연달아 눌러도 라인당 마지막 수량 한 번만 PATCH 한다", async () => {
-    const { result } = setup();
+  it("화면은 즉시 바뀌고 전송은 모아서 한 번만 한다", async () => {
+    serverCart = [cartItem(501, 1)];
+    const { result } = await setupLoaded();
+    const [line] = items(result);
 
     act(() => {
-      result.current.addLines([draft(1, 10, 501)]);
-    });
-    await waitFor(() => expect(result.current.lines[0].cartItemId).toBe(1));
-
-    const { lineId } = result.current.lines[0];
-
-    act(() => {
-      result.current.updateQuantity(lineId, 2);
-      result.current.updateQuantity(lineId, 3);
-      result.current.updateQuantity(lineId, 4);
+      result.current.updateQuantity(line.cartItemId, 2);
+      result.current.updateQuantity(line.cartItemId, 3);
     });
 
-    await act(async () => {
-      vi.advanceTimersByTime(500);
-    });
-
-    expect(updateUserCartItem.mock.calls.map(([req]) => req)).toEqual([
-      { cartItemId: 1, quantity: 4 },
-    ]);
-    vi.useRealTimers();
-  });
-
-  it("서버 id 가 없는 라인은 로컬 수량만 바꾼다", async () => {
-    const { result } = setup();
-
-    act(() => {
-      result.current.addLines([draft(1, 10)]);
-    });
-
-    act(() => {
-      result.current.updateQuantity(result.current.lines[0].lineId, 5);
-    });
-    await act(async () => {
-      vi.advanceTimersByTime(500);
-    });
-
-    expect(result.current.lines[0].quantity).toBe(5);
+    // 전송 전에 이미 화면이 움직여 있어야 스테퍼가 굳어 보이지 않는다.
+    await waitFor(() => expect(items(result)[0].quantity).toBe(3));
+    expect(items(result)[0].totalPrice).toBe(3000);
     expect(updateUserCartItem).not.toHaveBeenCalled();
-    vi.useRealTimers();
+
+    await waitFor(() => expect(updateUserCartItem).toHaveBeenCalledTimes(1));
+    expect(updateUserCartItem).toHaveBeenCalledWith({
+      cartItemId: line.cartItemId,
+      quantity: 3,
+    });
+  });
+
+  it("재고 부족(409)이면 서버를 다시 읽어 정정한다", async () => {
+    serverCart = [cartItem(501, 1)];
+    const { result } = await setupLoaded();
+    const [line] = items(result);
+
+    updateUserCartItem.mockImplementationOnce(conflict);
+
+    act(() => {
+      result.current.updateQuantity(line.cartItemId, 9);
+    });
+
+    await waitFor(() => expect(updateUserCartItem).toHaveBeenCalledTimes(1));
+    // 서버는 1 을 그대로 들고 있다. 재조회가 화면을 그 값으로 되돌린다.
+    await waitFor(() => expect(items(result)[0].quantity).toBe(1));
   });
 });
 
-describe("재고 부족(409)", () => {
-  // 409 는 "그 수량은 존재할 수 없다"는 확정 답변이다. 로컬에 남기면 영구히 어긋난다.
-  it("담기가 거부되면 로컬 라인도 되돌린다", async () => {
-    createUserCartItem.mockImplementationOnce(conflict);
+describe("삭제", () => {
+  it("고른 라인만 즉시 사라지고 한 번에 지운다", async () => {
+    serverCart = [cartItem(501), cartItem(502)];
+    const { result } = await setupLoaded();
+    const [first] = items(result);
 
-    const { result } = setup();
+    act(() => {
+      result.current.removeItems([first.cartItemId]);
+    });
+
+    // 서버 응답을 기다리지 않고 먼저 사라진다.
+    await waitFor(() => expect(items(result)).toHaveLength(1));
+    expect(deleteUserCartItems).toHaveBeenCalledWith([first.cartItemId]);
+  });
+
+  // 회귀 방지: 빈 인자로 부르면 서버가 장바구니를 통째로 비운다.
+  it("지울 것이 없으면 호출하지 않는다", async () => {
+    serverCart = [cartItem(501)];
+    const { result } = await setupLoaded();
+
+    act(() => {
+      result.current.removeItems([]);
+    });
+
+    expect(deleteUserCartItems).not.toHaveBeenCalled();
+  });
+});
+
+describe("되돌리기", () => {
+  it("지웠던 SKU 를 같은 수량으로 다시 담는다", async () => {
+    serverCart = [cartItem(501, 3)];
+    const { result } = await setupLoaded();
+    const [line] = items(result);
+
+    act(() => {
+      result.current.removeItems([line.cartItemId]);
+    });
+    await waitFor(() => expect(deleteUserCartItems).toHaveBeenCalled());
 
     await act(async () => {
-      result.current.addLines([draft(1, 10, 501)]);
+      await result.current.restoreItems([line]);
     });
 
-    await waitFor(() => expect(result.current.lines).toHaveLength(0));
-    expect(getUserCart).toHaveBeenCalled();
-  });
-
-  it("수량 변경이 거부되면 서버 수량으로 정정한다", async () => {
-    const { result } = setup();
-
-    act(() => {
-      result.current.addLines([draft(1, 10, 501)]);
+    expect(createUserCartItem).toHaveBeenCalledWith({
+      productVariantId: 501,
+      quantity: 3,
     });
-    await waitFor(() => expect(result.current.lines[0].cartItemId).toBe(1));
-
-    // 서버는 1개만 남았다고 답한다.
-    serverCart = [{ cartItemId: 1, quantity: 1, stockQuantity: 1 }];
-    updateUserCartItem.mockImplementationOnce(conflict);
-
-    const { lineId } = result.current.lines[0];
-
-    act(() => {
-      result.current.updateQuantity(lineId, 5);
-    });
-
-    // 로컬은 일단 낙관적으로 5가 된다.
-    expect(result.current.lines[0].quantity).toBe(5);
-
-    await waitFor(() => expect(result.current.lines[0].quantity).toBe(1));
-  });
-
-  // 서버를 못 읽으면 무엇이 옳은지 모른다. 멋대로 지우면 멀쩡한 라인이 날아간다.
-  it("정정용 재조회가 실패하면 로컬을 건드리지 않는다", async () => {
-    const { result } = setup();
-
-    act(() => {
-      result.current.addLines([draft(1, 10, 501)]);
-    });
-    await waitFor(() => expect(result.current.lines[0].cartItemId).toBe(1));
-
-    updateUserCartItem.mockImplementationOnce(conflict);
-    getUserCart.mockImplementationOnce(() => Promise.reject(new Error("down")));
-
-    const { lineId } = result.current.lines[0];
-
-    act(() => {
-      result.current.updateQuantity(lineId, 5);
-    });
-
-    await waitFor(() => expect(getUserCart).toHaveBeenCalled());
-    expect(result.current.lines).toHaveLength(1);
-    expect(result.current.lines[0].quantity).toBe(5);
-  });
-
-  // 409 가 아닌 실패는 best-effort 라 로컬을 유지한다.
-  it("네트워크 실패는 로컬을 되돌리지 않는다", async () => {
-    createUserCartItem.mockImplementationOnce(() =>
-      Promise.reject(new Error("network")),
-    );
-
-    const { result } = setup();
-
-    await act(async () => {
-      result.current.addLines([draft(1, 10, 501)]);
-    });
-
-    expect(result.current.lines).toHaveLength(1);
-    expect(getUserCart).not.toHaveBeenCalled();
   });
 });
