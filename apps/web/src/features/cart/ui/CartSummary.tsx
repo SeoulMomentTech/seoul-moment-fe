@@ -55,7 +55,9 @@ export function CartSummary({
       </p>
 
       <div className="text-body-3 mt-4 flex justify-between gap-4">
-        <span>{t("shipping_fee")}</span>
+        {/* 배송지가 아직 없어 본섬 기준으로 계산한 값이다. 금액 옆에서 바로 알 수 있어야
+            사용자가 이 숫자를 확정 배송비로 읽지 않는다 — 확정은 주문서에서 한다. */}
+        <span>{t("cart_shipping_fee_estimate")}</span>
         <span className="tabular-nums">
           {shippingFee > 0 ? toNTCurrency(shippingFee) : t("free_shipping")}
         </span>

@@ -40,7 +40,7 @@ export function CartBar({
         </span>
       </div>
       <p className="text-body-5 text-neutral -mt-1.5 tabular-nums">
-        {t("shipping_fee")}{" "}
+        {t("cart_shipping_fee_estimate")}{" "}
         {shippingFee > 0 ? toNTCurrency(shippingFee) : t("free_shipping")}
       </p>
       <Button
