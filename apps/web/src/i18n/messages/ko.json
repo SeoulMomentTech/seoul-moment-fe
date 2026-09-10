@@ -358,5 +358,6 @@
   "free_shipping": "무료",
   "estimated_total_amount": "예상 결제 금액",
   "cart_shipping_estimate_note": "배송비는 주문서에서 배송지에 따라 확정됩니다. 외섬은 {amount}입니다.",
-  "cart_add_unavailable": "담을 수 없는 옵션입니다"
+  "cart_add_unavailable": "담을 수 없는 옵션입니다",
+  "cart_shipping_fee_estimate": "배송비 (본섬 기준 예상)"
 }

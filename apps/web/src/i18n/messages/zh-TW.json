@@ -358,5 +358,6 @@
   "free_shipping": "免運",
   "estimated_total_amount": "預估結帳金額",
   "cart_shipping_estimate_note": "運費將於結帳時依配送地址確認。離島為 {amount}。",
-  "cart_add_unavailable": "此選項無法加入購物車"
+  "cart_add_unavailable": "此選項無法加入購物車",
+  "cart_shipping_fee_estimate": "配送費用（本島預估）"
 }
