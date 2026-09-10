@@ -8,6 +8,7 @@ import { Checkbox } from "@shared/ui/checkbox";
 
 import {
   CartLineRow,
+  isCartItemUnavailable,
   sumSelectedAmount,
   type UserCartBrandGroup,
 } from "@entities/cart";
@@ -36,11 +37,17 @@ export function CartBrandGroupSection({
   onRemove,
 }: CartBrandGroupProps) {
   const titleId = useId();
-  const cartItemIds = group.items.map((item) => item.cartItemId);
-  const selectedInGroup = cartItemIds.filter((id) =>
+
+  // 품절·판매중지 라인은 애초에 고를 수 없다(`useCartSelection`). 세는 쪽에서 함께 빼지
+  // 않으면 그 라인이 낀 브랜드는 전체 선택이 영원히 완료되지 않아 체크박스가 중간 상태로 굳는다.
+  const selectableIds = group.items
+    .filter((item) => !isCartItemUnavailable(item))
+    .map((item) => item.cartItemId);
+  const selectedInGroup = selectableIds.filter((id) =>
     selectedCartItemIds.has(id),
   ).length;
-  const allSelected = selectedInGroup === cartItemIds.length;
+  const allSelected =
+    selectableIds.length > 0 && selectedInGroup === selectableIds.length;
 
   const selectedAmount = useMemo(
     () => sumSelectedAmount(group.items, selectedCartItemIds),
@@ -53,8 +60,12 @@ export function CartBrandGroupSection({
         <Checkbox
           aria-label={group.brandName}
           checked={allSelected}
+          // 전부 품절인 브랜드는 누를 대상이 없다. 켜지지도 않는 체크박스를 살려두지 않는다.
+          disabled={selectableIds.length === 0}
           indeterminate={selectedInGroup > 0 && !allSelected}
-          onChange={(event) => onToggleGroup(cartItemIds, event.target.checked)}
+          onChange={(event) =>
+            onToggleGroup(selectableIds, event.target.checked)
+          }
         />
         {group.brandProfileImage && (
           <BaseImage
