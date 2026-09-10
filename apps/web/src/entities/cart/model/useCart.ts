@@ -16,7 +16,7 @@ import type {
   UserCartItem,
 } from "./types";
 import {
-  useCreateUserCartItemMutation,
+  useCreateUserCartItemsMutation,
   useDeleteUserCartItemsMutation,
   useFetchUserCart,
   useSetCartItemQuantity,
@@ -56,9 +56,9 @@ export const useCart = () => {
   const setItemQuantity = useSetCartItemQuantity();
   const fetchUserCart = useFetchUserCart();
 
-  // 라인마다 결과를 따로 처리해야 하므로 promise 로 받는다 — `mutate` 의 호출별 콜백은
+  // 결과를 호출한 자리에서 처리해야 하므로 promise 로 받는다 — `mutate` 의 호출별 콜백은
   // 관찰자 하나를 공유해 나중 호출이 앞 호출의 콜백을 덮어쓴다.
-  const { mutateAsync: createItem } = useCreateUserCartItemMutation({
+  const { mutateAsync: createItems } = useCreateUserCartItemsMutation({
     toastOnError: false,
   });
   const { mutateAsync: updateItem } = useUpdateUserCartItemMutation({
@@ -117,6 +117,9 @@ export const useCart = () => {
    *
    * SKU 를 못 정한 라인이 하나라도 있으면 아무것도 담지 않는다 — 일부만 담기면 사용자는
    * 무엇이 빠졌는지 알 수 없고, 남은 라인을 다시 고르는 것 말고는 할 일이 없다.
+   *
+   * 서버도 같은 규칙이라 여러 조합을 한 번의 요청으로 보낸다. 하나라도 담을 수 없으면
+   * 서버가 전부 되돌리므로, 라인별로 나눠 보내던 때처럼 반쯤 담긴 상태가 남지 않는다.
    */
   const addItems = useCallback(
     async (
@@ -131,35 +134,28 @@ export const useCart = () => {
 
       if (targets.length !== drafts.length) return { status: "invalid" };
 
-      const outcomes = await Promise.all(
-        targets.map(async (draft) => {
-          try {
-            await createItem({
-              productVariantId: draft.productVariantId,
-              quantity: draft.quantity,
-            });
-            return "ok" as const;
-          } catch (error) {
-            if (isNotEnoughStockError(error)) return "stock" as const;
+      try {
+        await createItems({
+          items: targets.map((draft) => ({
+            productVariantId: draft.productVariantId,
+            quantity: draft.quantity,
+          })),
+        });
 
-            notifyFailure(error);
-            return "error" as const;
-          }
-        }),
-      );
+        return { status: "added" };
+      } catch (error) {
+        // 담기의 409 는 어떤 라인이 막혔는지 서버 id 로 짚을 수 없다(아직 id 가 없다).
+        // 목록을 다시 읽어 화면을 맞추는 것으로 충분하다.
+        if (isNotEnoughStockError(error)) {
+          await reconcileAfterStockConflict();
+          return { status: "stock" };
+        }
 
-      // 담기의 409 는 어떤 라인이 막혔는지 서버 id 로 짚을 수 없다(아직 id 가 없다).
-      // 목록을 다시 읽어 화면을 맞추는 것으로 충분하다.
-      if (outcomes.includes("stock")) {
-        await reconcileAfterStockConflict();
-        return { status: "stock" };
+        notifyFailure(error);
+        return { status: "error" };
       }
-
-      if (outcomes.includes("error")) return { status: "error" };
-
-      return { status: "added" };
     },
-    [createItem, notifyFailure, reconcileAfterStockConflict],
+    [createItems, notifyFailure, reconcileAfterStockConflict],
   );
 
   // 라인별 최신 수량만 남겼다가 한 번에 흘린다. 타이머 하나로 여러 라인을 함께 보낸다 —

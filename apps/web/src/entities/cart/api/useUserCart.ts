@@ -7,12 +7,12 @@ import useAppMutation from "@shared/lib/hooks/query/useAppMutation";
 import useAppQuery from "@shared/lib/hooks/query/useAppQuery";
 import { useUserAuthStore } from "@shared/lib/hooks/useUserAuthStore";
 import {
-  createUserCartItem,
+  createUserCartItems,
   deleteUserCartItems,
   getUserCart,
   getUserCartCount,
   updateUserCartItem,
-  type CreateUserCartItemReq,
+  type CreateUserCartItemsReq,
   type GetUserCartCountRes,
   type GetUserCartRes,
   type UpdateUserCartItemReq,
@@ -194,24 +194,24 @@ interface UserCartMutationArgs {
 }
 
 /**
- * @description 장바구니 담기
+ * @description 장바구니 담기 (단건 · 다건)
  *
  * 담기는 낙관적으로 반영하지 않는다 — 서버가 매기는 `cartItemId` 를 알 수 없어 가짜 라인을
  * 넣으면 그 라인의 수량 변경·삭제가 곧바로 깨진다. 대신 응답이 함께 주는 `totalCount` 로
  * 헤더 뱃지만 즉시 맞춘다.
  */
-export function useCreateUserCartItemMutation({
+export function useCreateUserCartItemsMutation({
   toastOnError = true,
 }: UserCartMutationArgs = {}) {
   const queryClient = useQueryClient();
   const keys = useUserCartKeys();
 
   return useAppMutation<
-    Awaited<ReturnType<typeof createUserCartItem>>,
+    Awaited<ReturnType<typeof createUserCartItems>>,
     HTTPError,
-    CreateUserCartItemReq
+    CreateUserCartItemsReq
   >({
-    mutationFn: createUserCartItem,
+    mutationFn: createUserCartItems,
     toastOnError,
     logOnError: !toastOnError,
     onSuccess: (res) => {

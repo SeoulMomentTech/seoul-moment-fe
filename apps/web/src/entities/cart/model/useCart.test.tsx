@@ -5,7 +5,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type {
-  CreateUserCartItemReq,
+  CreateUserCartItemsReq,
   UpdateUserCartItemReq,
   UserCartItem,
 } from "@shared/services/userCart";
@@ -46,14 +46,23 @@ const cartItem = (
   };
 };
 
-const createUserCartItem = vi.fn<(req: CreateUserCartItemReq) => unknown>(
+const createUserCartItems = vi.fn<(req: CreateUserCartItemsReq) => unknown>(
   (req) => {
-    const item = cartItem(req.productVariantId, req.quantity);
-    serverCart = [...serverCart, item];
+    const added = req.items.map((line) =>
+      cartItem(line.productVariantId, line.quantity),
+    );
+    serverCart = [...serverCart, ...added];
 
     return Promise.resolve({
       result: true,
-      data: { cartItemId: item.cartItemId, totalCount: serverCart.length },
+      data: {
+        items: added.map((item) => ({
+          productVariantId: item.productVariantId,
+          cartItemId: item.cartItemId,
+          quantity: item.quantity,
+        })),
+        totalCount: serverCart.length,
+      },
     });
   },
 );
@@ -118,7 +127,8 @@ const conflict = () =>
   );
 
 vi.mock("@shared/services/userCart", () => ({
-  createUserCartItem: (req: CreateUserCartItemReq) => createUserCartItem(req),
+  createUserCartItems: (req: CreateUserCartItemsReq) =>
+    createUserCartItems(req),
   updateUserCartItem: (req: UpdateUserCartItemReq) => updateUserCartItem(req),
   deleteUserCartItems: (ids?: number[]) => deleteUserCartItems(ids),
   deleteUserCartItem: vi.fn(),
@@ -184,7 +194,7 @@ beforeEach(() => {
   nextCartItemId = 0;
   serverCart = [];
   getUserCart.mockClear();
-  createUserCartItem.mockClear();
+  createUserCartItems.mockClear();
   updateUserCartItem.mockClear();
   deleteUserCartItems.mockClear();
 });
@@ -199,9 +209,8 @@ describe("담기", () => {
       ).resolves.toEqual({ status: "added" });
     });
 
-    expect(createUserCartItem).toHaveBeenCalledWith({
-      productVariantId: 501,
-      quantity: 2,
+    expect(createUserCartItems).toHaveBeenCalledWith({
+      items: [{ productVariantId: 501, quantity: 2 }],
     });
   });
 
@@ -218,14 +227,14 @@ describe("담기", () => {
       ).resolves.toEqual({ status: "invalid" });
     });
 
-    expect(createUserCartItem).not.toHaveBeenCalled();
+    expect(createUserCartItems).not.toHaveBeenCalled();
   });
 
   it("재고 부족(409)이면 서버를 다시 읽고 stock 을 돌려준다", async () => {
     const { result } = await setupLoaded();
     const readsBefore = getUserCart.mock.calls.length;
 
-    createUserCartItem.mockImplementationOnce(conflict);
+    createUserCartItems.mockImplementationOnce(conflict);
 
     await act(async () => {
       await expect(
@@ -320,9 +329,8 @@ describe("되돌리기", () => {
       await result.current.restoreItems([line]);
     });
 
-    expect(createUserCartItem).toHaveBeenCalledWith({
-      productVariantId: 501,
-      quantity: 3,
+    expect(createUserCartItems).toHaveBeenCalledWith({
+      items: [{ productVariantId: 501, quantity: 3 }],
     });
   });
 });

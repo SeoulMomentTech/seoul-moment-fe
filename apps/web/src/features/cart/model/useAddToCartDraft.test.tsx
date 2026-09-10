@@ -8,7 +8,7 @@ import type {
   GetProductDetailRes,
   OptionValue,
 } from "@shared/services/product";
-import type { CreateUserCartItemReq } from "@shared/services/userCart";
+import type { CreateUserCartItemsReq } from "@shared/services/userCart";
 
 import messages from "@/i18n/messages/ko.json";
 
@@ -49,16 +49,24 @@ vi.mock("ky", async (importOriginal) => ({
     error instanceof Error && error.name === "HTTPError",
 }));
 
-const createUserCartItem = vi.fn((req: CreateUserCartItemReq) =>
+const createUserCartItems = vi.fn((req: CreateUserCartItemsReq) =>
   Promise.resolve({
     result: true,
-    data: { cartItemId: req.productVariantId, totalCount: 1 },
+    data: {
+      items: req.items.map((line) => ({
+        productVariantId: line.productVariantId,
+        cartItemId: line.productVariantId,
+        quantity: line.quantity,
+      })),
+      totalCount: req.items.length,
+    },
   }),
 );
 
 vi.mock("@shared/services/userCart", () => ({
   // useMutation 은 mutationFn 에 (variables, context) 를 넘기므로 첫 인자만 스파이로 흘린다.
-  createUserCartItem: (req: CreateUserCartItemReq) => createUserCartItem(req),
+  createUserCartItems: (req: CreateUserCartItemsReq) =>
+    createUserCartItems(req),
   getUserCart: () =>
     Promise.resolve({
       result: true,
@@ -130,7 +138,7 @@ const setup = (
   });
 
 beforeEach(() => {
-  createUserCartItem.mockClear();
+  createUserCartItems.mockClear();
 });
 
 describe("선택형 — variants 를 못 받은, 값이 2개 이상인 축이 있는 상품", () => {
@@ -226,7 +234,7 @@ describe("선택형 — variants 를 못 받은, 값이 2개 이상인 축이 �
   });
 
   // 서버 장바구니는 SKU 단위라 고른 조합을 variant 로 번역해 보낸다.
-  it("담기 1회로 조합마다 한 번씩 서버에 담는다", async () => {
+  it("고른 조합을 한 번의 요청으로 함께 담는다", async () => {
     const { result } = setup(clothing, [
       variant(101, [1, 10, 20]),
       variant(102, [1, 11, 20]),
@@ -243,9 +251,13 @@ describe("선택형 — variants 를 못 받은, 값이 2개 이상인 축이 �
     });
 
     expect(ok).toBe(true);
-    expect(createUserCartItem.mock.calls.map(([req]) => req)).toEqual([
-      { productVariantId: 101, quantity: 1 },
-      { productVariantId: 102, quantity: 1 },
+    expect(createUserCartItems.mock.calls.map(([req]) => req)).toEqual([
+      {
+        items: [
+          { productVariantId: 101, quantity: 1 },
+          { productVariantId: 102, quantity: 1 },
+        ],
+      },
     ]);
   });
 
@@ -263,7 +275,7 @@ describe("선택형 — variants 를 못 받은, 값이 2개 이상인 축이 �
     });
 
     expect(ok).toBe(false);
-    expect(createUserCartItem).not.toHaveBeenCalled();
+    expect(createUserCartItems).not.toHaveBeenCalled();
   });
 
   it("고를수록 남은 조합이 없는 옵션값이 비활성 대상이 된다", () => {
@@ -386,9 +398,13 @@ describe("조합형 — variants 를 받은 상품", () => {
       await result.current.submit();
     });
 
-    expect(createUserCartItem.mock.calls.map(([req]) => req)).toEqual([
-      { productVariantId: 101, quantity: 1 },
-      { productVariantId: 102, quantity: 1 },
+    expect(createUserCartItems.mock.calls.map(([req]) => req)).toEqual([
+      {
+        items: [
+          { productVariantId: 101, quantity: 1 },
+          { productVariantId: 102, quantity: 1 },
+        ],
+      },
     ]);
   });
 
@@ -444,7 +460,7 @@ describe("조합형 — variants 를 받은 상품", () => {
   // 회귀 방지: 서버 응답을 기다리지 않으면 재고 부족으로 거부된 담기에도
   // "장바구니에 담았습니다" 가 뜬다.
   it("서버가 재고 부족으로 거부하면 담기를 성공으로 알리지 않는다", async () => {
-    createUserCartItem.mockImplementationOnce(() =>
+    createUserCartItems.mockImplementationOnce(() =>
       Promise.reject(
         Object.assign(new Error("Request failed with status code 409"), {
           name: "HTTPError",

@@ -1,27 +1,44 @@
 import type { CommonRes, PublicLanguageCode } from "./";
 import { api } from "./";
 
-export interface CreateUserCartItemReq {
+export interface CreateUserCartItem {
   /** 상품 변형(SKU) ID. 상품 상세 v1 응답의 variants[].id */
   productVariantId: number;
   quantity: number;
 }
 
-export interface CreateUserCartItemRes {
+export interface CreateUserCartItemsReq {
+  /**
+   * 담을 SKU 목록. 한 개만 담을 때도 길이 1 배열로 보낸다.
+   * 같은 SKU 가 두 번 들어오면 서버가 수량을 합쳐서 처리한다.
+   */
+  items: CreateUserCartItem[];
+}
+
+export interface CreatedUserCartItem {
+  productVariantId: number;
   cartItemId: number;
+  /** 합산된 뒤의 라인 수량. 이미 담겨 있던 수량이 더해진 값이다 */
+  quantity: number;
+}
+
+export interface CreateUserCartItemsRes {
+  /** 담긴 라인. 요청한 순서를 그대로 지킨다 */
+  items: CreatedUserCartItem[];
   /** 담긴 뒤의 장바구니 라인 수. 헤더 뱃지를 바로 갱신하라고 함께 준다 */
   totalCount: number;
 }
 
 /**
- * @description 장바구니 담기. 이미 담긴 SKU 면 라인을 늘리지 않고 수량을 더한다.
+ * @description 장바구니 담기 (단건 · 다건). 이미 담긴 SKU 면 라인을 늘리지 않고 수량을
+ * 더한다. 하나라도 담을 수 없으면 전부 담지 않는다 — 재고가 모자라면 409 가 온다.
  */
-export const createUserCartItem = (data: CreateUserCartItemReq) =>
+export const createUserCartItems = (data: CreateUserCartItemsReq) =>
   api
     .post("user/cart", {
       json: data,
     })
-    .json<CommonRes<CreateUserCartItemRes>>();
+    .json<CommonRes<CreateUserCartItemsRes>>();
 
 export interface UserCartItem {
   cartItemId: number;
