@@ -358,5 +358,6 @@
   "free_shipping": "Free",
   "estimated_total_amount": "Estimated total",
   "cart_shipping_estimate_note": "Shipping is finalized at checkout based on your address. Outlying islands: {amount}.",
-  "cart_add_unavailable": "This option can't be added to your cart"
+  "cart_add_unavailable": "This option can't be added to your cart",
+  "cart_shipping_fee_estimate": "Shipping fee (main island est.)"
 }
