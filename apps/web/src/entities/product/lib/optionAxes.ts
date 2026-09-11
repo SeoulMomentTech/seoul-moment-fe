@@ -17,7 +17,6 @@ export const OPTION_AXIS_ORDER: ReadonlyArray<OptionType> = [
   "TEXTURE",
   "MATERIAL",
   "FIT",
-  "STYLE",
 ];
 
 /**
@@ -25,14 +24,13 @@ export const OPTION_AXIS_ORDER: ReadonlyArray<OptionType> = [
  *
  * 매핑에 없는 축은 렌더하지 않는다 - raw 키(`MATERIAL`)가 그대로 화면에 뜨는 것을 막는다.
  */
-export const OPTION_AXIS_LABEL_KEY: Record<OptionType, string> = {
+export const OPTION_AXIS_LABEL_KEY: Partial<Record<OptionType, string>> = {
   COLOR: "color",
   SIZE: "size",
   VOLUME: "volume",
   TEXTURE: "texture",
   MATERIAL: "material",
   FIT: "fit",
-  STYLE: "style",
 };
 
 export interface ProductOptionAxis {

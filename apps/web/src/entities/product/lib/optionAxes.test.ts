@@ -30,7 +30,7 @@ describe("listProductOptionAxes", () => {
 
   it("서버 키 순서와 무관하게 OPTION_AXIS_ORDER 순서로 돌려준다", () => {
     const option: DetailOption = {
-      STYLE: [value(9, "CASUAL")],
+      MATERIAL: [value(9, "COTTON")],
       SIZE: [value(2, "M")],
       COLOR: [value(1, "NAVY")],
     };
@@ -38,7 +38,7 @@ describe("listProductOptionAxes", () => {
     expect(listProductOptionAxes(option).map((axis) => axis.type)).toEqual([
       "COLOR",
       "SIZE",
-      "STYLE",
+      "MATERIAL",
     ]);
   });
 

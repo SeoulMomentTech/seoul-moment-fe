@@ -122,8 +122,12 @@ export interface OptionValue {
   value: string;
 }
 
+// 옵션 축 타입의 원본은 생성 파일이지만, 이 축을 쓰는 쪽은 응답 타입(`DetailOption`)과
+// 늘 같이 필요하다. 상위 레이어가 두 곳을 import하지 않도록 서비스 모듈에서 함께 공개한다.
+export type { OptionType };
+
 // 상세 응답은 해당 상품이 가진 옵션 키만 내려준다 (전체 OptionType 중 일부).
-type DetailOption = Partial<Record<OptionType, OptionValue[]>>;
+export type DetailOption = Partial<Record<OptionType, OptionValue[]>>;
 
 export interface ProductDetailBrand {
   id: number;
