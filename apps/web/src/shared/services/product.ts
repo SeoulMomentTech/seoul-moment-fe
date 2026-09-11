@@ -117,24 +117,47 @@ interface GetProductDetailReq extends PublicLanguageCode {
   id: number;
 }
 
-interface OptionValue {
+export interface OptionValue {
   id: number;
   value: string;
 }
 
+// 옵션 축 타입의 원본은 생성 파일이지만, 이 축을 쓰는 쪽은 응답 타입(`DetailOption`)과
+// 늘 같이 필요하다. 상위 레이어가 두 곳을 import하지 않도록 서비스 모듈에서 함께 공개한다.
+export type { OptionType };
+
 // 상세 응답은 해당 상품이 가진 옵션 키만 내려준다 (전체 OptionType 중 일부).
-type DetailOption = Partial<Record<OptionType, OptionValue[]>>;
+export type DetailOption = Partial<Record<OptionType, OptionValue[]>>;
+
+export interface ProductDetailBrand {
+  id: number;
+  name: string;
+  profileImg: string;
+}
+
+/** 옵션 조합 단위의 실판매 단위(SKU). 장바구니는 이 `id` 로 담는다. */
+export interface ProductVariant {
+  id: number;
+  sku: string;
+  /** 이 조합을 이루는 옵션값 ID 목록. `DetailOption` 의 `OptionValue.id` 와 맞물린다 */
+  optionValueIds: number[];
+  stockQuantity: number;
+  /** 재고가 없거나 판매 중지된 조합이면 true */
+  isSoldOut: boolean;
+}
 
 export interface GetProductDetailRes {
   id: number;
   name: string;
-  brand: Record<"name" | "profileImg" | "id", string>;
+  brand: ProductDetailBrand;
   price: number;
   discountPrice: number;
   origin: string;
+  /** 출고까지 걸리는 일수 */
   shippingInfo: number;
-  shippingCost: number;
+  /** 옵션 축별 값. 실제 구매 가능한 조합은 `variants` 를 봐야 한다 */
   option: DetailOption;
+  variants: ProductVariant[];
   like: number;
   review: number;
   reviewAverage: number;
@@ -145,9 +168,15 @@ export interface GetProductDetailRes {
   isLiked: boolean;
 }
 
+/**
+ * @description 상품 상세 조회 (v1)
+ *
+ * v0(`product/{id}`) 대비 `variants`(옵션 조합 SKU·재고)가 추가되고 `shippingCost` 가 빠졌다.
+ * 배송비는 상품이 아니라 배송지로 정해지므로 `GET shipping-policy` 를 쓴다.
+ */
 export const getProductDetail = ({ id, languageCode }: GetProductDetailReq) =>
   api
-    .get(`product/${id}`, {
+    .get(`product/v1/${id}`, {
       searchParams: {
         languageCode,
       },
@@ -216,11 +245,6 @@ export const getProductOptions = () =>
 
 interface GetProductOptionValueReq extends PublicLanguageCode {
   optionId: number;
-}
-
-interface OptionValue {
-  id: number;
-  value: string;
 }
 
 interface GetProductOptionValuRes {

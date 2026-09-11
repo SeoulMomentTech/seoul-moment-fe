@@ -5,11 +5,11 @@ import { cn } from "@shared/lib/style";
 
 import { Link } from "@/i18n/navigation";
 
+import { useGetUserRecentListQuery } from "@entities/product";
 import { Skeleton } from "@seoul-moment/ui";
 
 import { EmptyRecent } from "./EmptyRecent";
 import { SimilarToRecentSection } from "./SimilarToRecentSection";
-import { useGetUserRecentListQuery } from "../api/useGetUserRecentListQuery";
 import { toProductItem } from "../lib/adapters";
 
 interface InterestRecentTabProps {

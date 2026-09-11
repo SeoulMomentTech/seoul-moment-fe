@@ -29,6 +29,7 @@ import { localeLabels, type LanguageType } from "@/i18n/const";
 import { Link, usePathname } from "@/i18n/navigation";
 
 import { BrandMenuModal } from "./BrandMenuModal";
+import { CartButton } from "./CartButton";
 import LoginStatus from "./LoginStatus";
 
 const ShareModal = lazy(() =>
@@ -53,7 +54,7 @@ function Desktop() {
   const t = useTranslations();
   const isAuthenticated = useUserAuthStore((s) => s.isAuthenticated);
   const hasHydrated = useUserAuthHydrated();
-  const showMypage = hasHydrated && isAuthenticated;
+  const isSignedIn = hasHydrated && isAuthenticated;
 
   return (
     <div
@@ -128,7 +129,7 @@ function Desktop() {
               {t("contact")}
             </Link>
           </li>
-          {showMypage && (
+          {isSignedIn && (
             <li>
               <Link
                 className={cn(
@@ -140,6 +141,11 @@ function Desktop() {
               >
                 MyPage
               </Link>
+            </li>
+          )}
+          {isSignedIn && (
+            <li className="flex items-center">
+              <CartButton />
             </li>
           )}
           <li className="text-body-3 h-full py-[20px]">
@@ -162,7 +168,7 @@ function Mobile() {
   const isAuthenticated = useUserAuthStore((s) => s.isAuthenticated);
   const logout = useUserAuthStore((s) => s.logout);
   const hasHydrated = useUserAuthHydrated();
-  const showMypage = hasHydrated && isAuthenticated;
+  const isSignedIn = hasHydrated && isAuthenticated;
 
   const handleLogout = () => {
     logout();
@@ -261,7 +267,7 @@ function Mobile() {
                       <ChevronRightIcon height={16} width={16} />
                     </Link>
                   </li>
-                  {showMypage && (
+                  {isSignedIn && (
                     <li>
                       <Link
                         className={styleMap.mobile.menu}
@@ -299,26 +305,29 @@ function Mobile() {
           <Image alt="" height={16} preload src="/logo.png" width={133} />
         </Link>
       </div>
-      {hasHydrated &&
-        (isAuthenticated ? (
-          <button
-            aria-label="Logout"
-            className="flex cursor-pointer items-center"
-            onClick={handleLogout}
-            type="button"
-          >
-            <LogOut className="size-5" />
-          </button>
-        ) : (
-          <Link
-            aria-label="Login"
-            className="flex items-center"
-            href="/login"
-            prefetch={ENABLE_HEADER_PREFETCH}
-          >
-            <LogIn className="size-5" />
-          </Link>
-        ))}
+      <div className="flex items-center gap-[18px]">
+        <CartButton iconSize={20} />
+        {hasHydrated &&
+          (isAuthenticated ? (
+            <button
+              aria-label="Logout"
+              className="flex cursor-pointer items-center"
+              onClick={handleLogout}
+              type="button"
+            >
+              <LogOut className="size-5" />
+            </button>
+          ) : (
+            <Link
+              aria-label="Login"
+              className="flex items-center"
+              href="/login"
+              prefetch={ENABLE_HEADER_PREFETCH}
+            >
+              <LogIn className="size-5" />
+            </Link>
+          ))}
+      </div>
       <BrandMenuModal
         isOpen={isBrandModalOpen}
         onOpenChange={setIsBrandModalOpen}

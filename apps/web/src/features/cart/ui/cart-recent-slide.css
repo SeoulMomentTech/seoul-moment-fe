@@ -1,0 +1,11 @@
+/* CardSlider 가 slidesPerView="auto" + spaceBetween=16 을 쓰므로 폭만 정의한다.
+   기존 최근 본 상품 카드 폭(w-38 / max-sm:w-32)을 그대로 옮긴 값이다. */
+.cart-recent-swiper .swiper-slide {
+  width: 152px;
+}
+
+@media (max-width: 640px) {
+  .cart-recent-swiper .swiper-slide {
+    width: 128px;
+  }
+}

@@ -30,7 +30,9 @@ export default function ChatbotLauncher() {
     <>
       <Floating
         className={cn(
-          "bottom-6 right-6 z-40 max-sm:bottom-4 max-sm:right-4",
+          // --floating-offset 은 하단 고정 바가 있는 화면에서만 0 이 아니다 (globals.css 참고)
+          "bottom-[calc(1.5rem+var(--floating-offset))] right-6 z-40",
+          "max-sm:bottom-[calc(1rem+var(--floating-offset))] max-sm:right-4",
           // 모바일에서 패널이 전체화면이므로 버튼을 숨긴다. 닫기는 패널 헤더에서.
           isOpen && "max-sm:pointer-events-none max-sm:opacity-0",
         )}

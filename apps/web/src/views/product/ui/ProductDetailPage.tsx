@@ -10,7 +10,7 @@ import { PRODUCT_DISPLAY_AD_SLOT } from "@shared/constants/ads";
 import { useAppQuery, useLanguage } from "@shared/lib/hooks";
 import { useUserAuthStore } from "@shared/lib/hooks/useUserAuthStore";
 import { cn } from "@shared/lib/style";
-import { setComma } from "@shared/lib/utils";
+import { setComma, toNTCurrency } from "@shared/lib/utils";
 import {
   getProductDetail,
   type GetProductDetailRes,
@@ -21,13 +21,16 @@ import { AvatarBadge } from "@widgets/avatar-badge/ui/AvatarBadge";
 
 import { Link } from "@/i18n/navigation";
 
-import { useProductLikeToggle, useTrackRecentProduct } from "@entities/product";
 import {
-  BrandProductList,
-  ProductDetailInfo,
-  ProductExternalGroup,
-  ProductPrice,
-} from "@features/product";
+  formatOptionAxisValues,
+  isProductSoldOut,
+  listProductOptionAxes,
+  useProductLikeToggle,
+  useTrackRecentProduct,
+} from "@entities/product";
+import { useShippingPolicyQuery } from "@entities/shipping";
+import { AddToCart } from "@features/cart";
+import { BrandProductList, ProductExternalGroup } from "@features/product";
 import { Button } from "@seoul-moment/ui";
 import type { CommonRes } from "@shared/services";
 import { ProductDetailImage } from "@widgets/product-detail-image";
@@ -67,11 +70,33 @@ export default function ProductDetailPage({
 
   useTrackRecentProduct({ productId: id });
 
+  const { data: shippingPolicy } = useShippingPolicyQuery();
+
+  const optionAxes = listProductOptionAxes(data?.option);
+
   const handleToggleShowMore = (showMore: boolean) => {
     setShowMore(showMore);
   };
 
+  // 배송비는 상품이 아니라 배송지로 정해져서 상세 v1 응답에 없다. 요율표로 안내만 한다.
+  // 외섬 프로모션 중이면 외섬도 baseFee 라 괄호 안내를 붙이지 않는다.
+  const shippingFeeText = shippingPolicy
+    ? [
+        shippingPolicy.remoteIslandPromotion
+          ? toNTCurrency(shippingPolicy.baseFee)
+          : `${toNTCurrency(shippingPolicy.baseFee)} (${t("remote_island")} ${toNTCurrency(shippingPolicy.remoteIslandFee)})`,
+        shippingPolicy.freeShippingThreshold > 0 &&
+          t("free_shipping_over", {
+            amount: toNTCurrency(shippingPolicy.freeShippingThreshold),
+          }),
+      ]
+        .filter(Boolean)
+        .join(" / ")
+    : null;
+
   if (!data) return null;
+
+  const isSoldOut = isProductSoldOut(data.variants);
 
   return (
     <div
@@ -80,7 +105,7 @@ export default function ProductDetailPage({
         "max-sm:px-0 max-sm:pb-0 max-sm:pt-14",
       )}
     >
-      <section className={cn("w-300 mx-auto", "max-sm:w-full")}>
+      <section className={cn("mx-auto w-[1200px]", "max-sm:w-full")}>
         <div
           className={cn(
             "pb-12.5 flex gap-20 border-b border-b-black/10",
@@ -96,6 +121,12 @@ export default function ProductDetailPage({
               )}
             >
               {data.name}
+              {/* 담기 영역까지 내려가야 알 수 있으면 늦다. 이름 옆에서 바로 보인다. */}
+              {isSoldOut && (
+                <span className="text-body-4 ml-2 rounded-[2px] bg-black/70 px-2 py-1 align-middle font-semibold text-white">
+                  {t("sold_out")}
+                </span>
+              )}
             </h2>
             <div className="flex items-center justify-between py-2.5">
               <Link href={`/product?brandId=${data.brand.id}`}>
@@ -136,24 +167,98 @@ export default function ProductDetailPage({
                 </span>
               </div>
               {/** 가격 영역*/}
-              <ProductPrice
-                discountPrice={data.discountPrice}
-                price={data.price}
-              />
+              <div className="flex flex-col gap-5">
+                {data.price > 0 && (
+                  <div className={cn("text-body-3 flex", "text-body-4")}>
+                    <span className="min-w-30">{t("price")}</span>
+                    <span
+                      className={cn(
+                        "text-black",
+                        data.discountPrice > 0 && "text-black/40 line-through",
+                      )}
+                    >
+                      {toNTCurrency(data.price)}
+                    </span>
+                  </div>
+                )}
+                {data.discountPrice > 0 && (
+                  <div className="flex items-center">
+                    <span
+                      className={cn(
+                        "text-body-3 min-w-30",
+                        "max-sm:text-body-4",
+                      )}
+                    >
+                      {t("sale_price")}
+                    </span>
+                    <span
+                      className={cn(
+                        "text-body-1 font-semibold",
+                        "max-sm:text-body-2",
+                      )}
+                    >
+                      {toNTCurrency(data.discountPrice)}
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
             {/** 원산지, 배송 정보 */}
-            <ProductDetailInfo
-              option={data.option}
-              origin={data.origin}
-              shippingCost={data.shippingCost}
-              shippingInfo={data.shippingInfo}
+            <div
+              className={cn(
+                "pb-12.5 flex flex-col gap-5 pt-5",
+                "max-sm:gap-4 max-sm:pb-4",
+              )}
+            >
+              {data.origin && (
+                <div className={cn("text-body-3 flex", "text-body-4")}>
+                  <span className="min-w-32.5">{t("place_of_origin")}</span>
+                  <span>{data.origin}</span>
+                </div>
+              )}
+              {data.shippingInfo > 0 && (
+                <div className={cn("text-body-3 flex", "text-body-4")}>
+                  <span className="min-w-32.5">
+                    {t("shipping_information")}
+                  </span>
+                  <span>{t("within_days", { n: data.shippingInfo })}</span>
+                </div>
+              )}
+              {shippingFeeText && (
+                <div className={cn("text-body-3 flex", "text-body-4")}>
+                  <span className="min-w-32.5">{t("shipping_fee")}</span>
+                  <span>{shippingFeeText}</span>
+                </div>
+              )}
+              {/* 옵션 축 - 상품이 실제로 가진 축만 OPTION_AXIS_ORDER 순서로 노출한다.
+                  의류는 색상/사이즈, 화장품은 용량/텍스처가 온다. */}
+              {optionAxes.map((axis) => (
+                <div
+                  className={cn("text-body-3 flex", "text-body-4")}
+                  key={axis.type}
+                >
+                  <span className="min-w-32.5">{t(axis.labelKey)}</span>
+                  <span>{formatOptionAxisValues(axis.values)}</span>
+                </div>
+              ))}
+            </div>
+            <AddToCart
+              likeSlot={
+                <LikeCount
+                  active={liked}
+                  className="size-12 shrink-0 justify-center rounded-[4px] border border-black/20"
+                  iconSize={24}
+                  onClick={handleToggleLike}
+                />
+              }
+              product={data}
             />
-            <ProductExternalGroup items={data.external} />
+            <ProductExternalGroup className="mt-5" items={data.external} />
           </div>
         </div>
         <BrandProductList data={data.relate} />
         <AdSense
-          className="my-15 max-sm:my-10 max-sm:px-5"
+          className="my-[60px] max-sm:my-10 max-sm:px-5"
           format="display"
           slot={PRODUCT_DISPLAY_AD_SLOT}
         />
