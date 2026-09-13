@@ -6,21 +6,74 @@ import {
   isValidTaiwanMobile,
   orderShippingSchema,
   toPhoneDigits,
+  toPhoneInput,
+  toTaiwanMobileE164,
 } from "./schema";
 
+/** 같은 번호를 쓰는 서로 다른 입력들. 어느 쪽으로 넣어도 결과가 같아야 한다 */
+const SAME_NUMBER = [
+  "+886 912 345 678",
+  "+886912345678",
+  "886912345678",
+  "886-9-1234-5678",
+  "0912345678",
+  "0912-345-678",
+  "912345678",
+  // 국제전화 접두를 그대로 쓴 경우
+  "00886912345678",
+  // 저장해 둔 `0912...` 를 `+886` placeholder 뒤에 붙여넣은 흔한 오입력
+  "+886 0912 345 678",
+];
+
 describe("isValidTaiwanMobile", () => {
-  it("국가번호·국내 접두·구분기호를 모두 같은 번호로 본다", () => {
-    expect(isValidTaiwanMobile("+886 912 345 678")).toBe(true);
-    expect(isValidTaiwanMobile("886912345678")).toBe(true);
-    expect(isValidTaiwanMobile("0912-345-678")).toBe(true);
-    expect(isValidTaiwanMobile("912345678")).toBe(true);
+  it.each(SAME_NUMBER)("%s 를 같은 번호로 본다", (input) => {
+    expect(isValidTaiwanMobile(input)).toBe(true);
   });
 
   it("9 로 시작하지 않거나 자리수가 어긋나면 거부한다", () => {
     expect(isValidTaiwanMobile("+886 912")).toBe(false);
     expect(isValidTaiwanMobile("0212345678")).toBe(false);
     expect(isValidTaiwanMobile("09123456789")).toBe(false);
+    expect(isValidTaiwanMobile("0800092000")).toBe(false);
     expect(isValidTaiwanMobile("")).toBe(false);
+  });
+});
+
+describe("toTaiwanMobileE164", () => {
+  it.each(SAME_NUMBER)("%s 를 +886912345678 하나로 맞춘다", (input) => {
+    expect(toTaiwanMobileE164(input)).toBe("+886912345678");
+  });
+
+  // 절반만 정규화된 값에 `+886` 을 붙여 보내면 서버가 없는 번호를 받는다.
+  it("유효하지 않으면 빈 문자열이다", () => {
+    expect(toTaiwanMobileE164("0212345678")).toBe("");
+    expect(toTaiwanMobileE164("")).toBe("");
+  });
+});
+
+describe("toPhoneInput", () => {
+  it("한 자씩 쳐 나가는 동안 입력이 사라지지 않는다", () => {
+    // `886` 세 자리째에서 국가번호로 오인해 지워버리면 더 칠 수가 없다.
+    let box = "";
+    for (const ch of "886912345678") box = toPhoneInput(box + ch);
+
+    expect(box).toBe("912345678");
+  });
+
+  it("국가번호가 붙은 채로 한 번에 들어오면 떼어낸다", () => {
+    expect(toPhoneInput("+886912345678")).toBe("912345678");
+    expect(toPhoneInput("00886912345678")).toBe("912345678");
+  });
+
+  it("숫자가 아닌 것은 남기지 않는다", () => {
+    expect(toPhoneInput("0912-345-678")).toBe("0912345678");
+    expect(toPhoneInput("+886 912 345 678 (집)")).toBe("912345678");
+  });
+
+  // 잘라내면 너무 긴 번호가 조용히 맞는 번호로 둔갑한다.
+  it("너무 긴 입력을 자르지 않는다", () => {
+    expect(toPhoneInput("09123456789012")).toBe("09123456789012");
+    expect(isValidTaiwanMobile(toPhoneInput("09123456789012"))).toBe(false);
   });
 });
 

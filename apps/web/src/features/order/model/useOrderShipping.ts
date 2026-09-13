@@ -11,7 +11,8 @@ import type { UserOrderShipping } from "@shared/services/userOrder";
 import {
   orderShippingResolver,
   orderShippingSchema,
-  toPhoneDigits,
+  toLocalMobile,
+  toTaiwanMobileE164,
   type OrderShippingValues,
 } from "./schema";
 
@@ -44,7 +45,8 @@ const toFormValues = (
 ): OrderShippingValues => ({
   ...EMPTY_VALUES,
   recipientName: profile?.name ?? "",
-  phone: phone ?? "",
+  // 입력 칸은 `+886` 뒤 자리만 들고 있다. 프로필에는 어떤 형식으로든 저장돼 있다.
+  phone: toLocalMobile(phone ?? ""),
   postalCode:
     profile?.postalCode ?? findZipCode(profile?.city, profile?.district) ?? "",
   city: profile?.city ?? "",
@@ -125,7 +127,7 @@ export const useOrderShipping = ({
   const shipping = useMemo<UserOrderShipping>(
     () => ({
       recipientName: values.recipientName.trim(),
-      phone: toPhoneDigits(values.phone),
+      phone: toTaiwanMobileE164(values.phone),
       postalCode: values.postalCode,
       city: values.city,
       district: values.district,

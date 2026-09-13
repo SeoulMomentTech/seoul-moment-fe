@@ -22,6 +22,8 @@ import { Input, Label } from "@seoul-moment/ui";
 import {
   SHIPPING_ERROR_KEY,
   SHIPPING_REQUEST_KEYS,
+  toPhoneInput,
+  toTaiwanMobileE164,
   type OrderShippingValues,
 } from "../model/schema";
 
@@ -80,6 +82,8 @@ export function OrderShippingSection({
   const errorFor = (field: keyof OrderShippingValues) =>
     errors[field] ? t(SHIPPING_ERROR_KEY[field]) : undefined;
 
+  const phoneField = register("phone");
+
   return (
     <>
       {/* 프로필에 주소나 연락처가 없으면 기본 배송지라는 선택지 자체가 없다 */}
@@ -103,7 +107,7 @@ export function OrderShippingSection({
               label={t("recipient_phone")}
               valueClassName="tabular-nums"
             >
-              {values.phone}
+              {toTaiwanMobileE164(values.phone) || values.phone}
             </ReadOnlyField>
           </div>
 
@@ -147,20 +151,35 @@ export function OrderShippingSection({
               <FieldLabel htmlFor="order-phone">
                 {t("recipient_phone")}
               </FieldLabel>
-              <Input
-                aria-describedby="order-phone-error"
-                aria-invalid={!!errors.phone}
-                autoComplete="tel"
-                className={cn(
-                  INPUT_CLASS,
-                  "tabular-nums",
-                  errors.phone && "border-danger",
-                )}
-                id="order-phone"
-                placeholder="+886"
-                type="tel"
-                {...register("phone")}
-              />
+              {/* 국가번호는 칸에 박아 둔다 — 사용자가 넣고 빼는 자리가 아니다 */}
+              <div className="relative">
+                <span
+                  className="text-body-3 pointer-events-none absolute inset-y-0 left-3 flex items-center text-black/60"
+                  id="order-phone-prefix"
+                >
+                  +886
+                </span>
+                <Input
+                  aria-describedby="order-phone-prefix order-phone-error"
+                  aria-invalid={!!errors.phone}
+                  autoComplete="tel"
+                  className={cn(
+                    INPUT_CLASS,
+                    "pl-14 tabular-nums",
+                    errors.phone && "border-danger",
+                  )}
+                  id="order-phone"
+                  inputMode="numeric"
+                  placeholder="912345678"
+                  {...phoneField}
+                  onChange={(event) => {
+                    // 이벤트를 넘기기 전에 칸을 고친다 — 숫자 아닌 입력은 화면에도 남지 않는다.
+                    event.target.value = toPhoneInput(event.target.value);
+
+                    return phoneField.onChange(event);
+                  }}
+                />
+              </div>
               <FieldError id="order-phone-error">
                 {errorFor("phone")}
               </FieldError>
