@@ -119,9 +119,16 @@ export function CartList() {
 
   if (!items.length) return <CartEmpty />;
 
+  // 주문서는 고른 라인만 다룬다. id 를 URL 로 넘기므로 새로고침·뒤로가기에도 대상이 남는다.
+  // 고른 것이 없으면 링크 자체를 만들지 않는다 — 빈 주문서로 보내지 않는다.
+  const orderHref = selection.selectedCount
+    ? `/order?items=${[...selection.selectedCartItemIds].join(",")}`
+    : null;
+
   const summary = {
     amount: selectedAmount,
     amountToFreeShipping: shipping.amountToFreeShipping,
+    orderHref,
     remoteIslandFee,
     selectedCount: selection.selectedCount,
     shippingFee: shipping.fee,

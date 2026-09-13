@@ -5,6 +5,8 @@ import { useTranslations } from "next-intl";
 import { cn } from "@shared/lib/style";
 import { toNTCurrency } from "@shared/lib/utils";
 
+import { Link } from "@/i18n/navigation";
+
 import { Button } from "@seoul-moment/ui";
 
 export interface CartSummaryValues {
@@ -21,6 +23,8 @@ export interface CartSummaryValues {
 }
 
 interface CartSummaryProps extends CartSummaryValues {
+  /** 주문서로 갈 링크. 고른 라인이 없으면 `null` 이고 버튼은 비활성이다 */
+  orderHref: string | null;
   className?: string;
 }
 
@@ -30,8 +34,8 @@ interface CartSummaryProps extends CartSummaryValues {
  * 배송비는 서버가 준 본섬 기준 예상값이고, 무료배송 여부는 **선택 합계**에 다시 적용한다 —
  * 서버 값은 장바구니 전체 기준이라 일부만 고르면 화면 금액과 어긋난다. 확정은 주문서에서 한다.
  *
- * `주문하기` 는 비활성이다. 상품상세의 `구매하기` 와 같은 처리 — 마크업을 지금 만들어 두고
- * 결제가 붙을 때 UI 재작업이 없게 한다.
+ * `주문하기` 는 고른 라인을 주문서로 넘긴다. 비활성으로 남는 것은 주문서 마지막의
+ * `결제하기` 뿐이다 — 결제(LINE Pay·ECPay)는 아직 붙지 않았다.
  */
 export function CartSummary({
   selectedCount,
@@ -40,6 +44,7 @@ export function CartSummary({
   amountToFreeShipping,
   remoteIslandFee,
   totalAmount,
+  orderHref,
   className,
 }: CartSummaryProps) {
   const t = useTranslations();
@@ -80,17 +85,25 @@ export function CartSummary({
         </span>
       </div>
 
-      <Button
-        aria-describedby="cart-order-hint"
-        className="mt-5 h-12 w-full rounded-[4px]"
-        disabled
-        type="button"
-      >
-        {t("place_order")}
-      </Button>
-      <p className="text-body-5 text-neutral mt-2" id="cart-order-hint">
-        {t("coming_soon")}
-      </p>
+      {orderHref ? (
+        <Button asChild className="mt-5 h-12 w-full rounded-[4px]">
+          <Link href={orderHref}>{t("place_order")}</Link>
+        </Button>
+      ) : (
+        <>
+          <Button
+            aria-describedby="cart-order-hint"
+            className="mt-5 h-12 w-full rounded-[4px]"
+            disabled
+            type="button"
+          >
+            {t("place_order")}
+          </Button>
+          <p className="text-body-5 text-neutral mt-2" id="cart-order-hint">
+            {t("select_items_to_order")}
+          </p>
+        </>
+      )}
 
       <p className="text-body-5 text-neutral mt-3.5 leading-relaxed">
         {t("cart_shipping_estimate_note", {
