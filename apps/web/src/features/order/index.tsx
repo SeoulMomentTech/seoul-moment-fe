@@ -1,4 +1,3 @@
-export { OrderAgreementSection } from "./ui/OrderAgreementSection";
 export { OrderAmountRows, type OrderAmountValues } from "./ui/OrderAmountRows";
 export { OrderBar } from "./ui/OrderBar";
 export { OrderItemList } from "./ui/OrderItemList";

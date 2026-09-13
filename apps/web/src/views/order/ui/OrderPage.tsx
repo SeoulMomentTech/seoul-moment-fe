@@ -17,7 +17,6 @@ import { Link } from "@/i18n/navigation";
 import { useOrderPreviewQuery } from "@entities/order";
 import { useGetUserInfoQuery, useGetUserProfileQuery } from "@entities/user";
 import {
-  OrderAgreementSection,
   OrderAmountRows,
   OrderBar,
   OrderItemList,
@@ -89,7 +88,6 @@ export function OrderPage() {
 
   const [paymentMethod, setPaymentMethod] =
     useState<UserOrderPaymentMethod>("LINE_PAY");
-  const [agreed, setAgreed] = useState(false);
 
   // 배송비는 배송지가 정해진 뒤에만 확정된다. 주소 없이 부르지 않는 규칙은 쿼리가 들고 있다.
   const { data: preview } = useOrderPreviewQuery({
@@ -176,14 +174,6 @@ export function OrderPage() {
                   title={t("payment_amount")}
                 >
                   <OrderAmountRows {...amounts} />
-                </OrderSection>
-
-                {/* 동의는 결제 바 바로 위에 둔다. 스크롤 끝에 두면 CTA 와 붙어 실수 체크가 늘어난다 */}
-                <OrderSection title={t("order_agreement")}>
-                  <OrderAgreementSection
-                    agreed={agreed}
-                    onAgreedChange={setAgreed}
-                  />
                 </OrderSection>
               </div>
 
