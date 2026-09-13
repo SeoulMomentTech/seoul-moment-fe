@@ -28,6 +28,13 @@ import {
 const FIELD_LABEL_CLASS = "text-body-3 text-black";
 const INPUT_CLASS = "h-12 py-0";
 
+/** 읽기 전용 모드와 편집 폼이 같은 자리를 쓰도록 두 격자를 공유한다 */
+const TWO_COLUMN_CLASS = cn("grid grid-cols-2 gap-3", "max-sm:grid-cols-1");
+const ADDRESS_COLUMN_CLASS = cn(
+  "grid grid-cols-[96px_1fr_1fr] gap-2",
+  "max-sm:grid-cols-1",
+);
+
 interface OrderShippingSectionProps {
   form: UseFormReturn<OrderShippingValues>;
   canUseDefault: boolean;
@@ -41,7 +48,8 @@ interface OrderShippingSectionProps {
  * 배송지 입력. 기본 배송지를 쓰는 동안에는 값을 보여주기만 하고, 체크를 풀면 폼이 열린다.
  *
  * 읽기 전용 요약도 같은 폼 값을 그린다 — 표시용 사본을 따로 만들면 미리보기가 쓰는 주소와
- * 화면에 보이는 주소가 달라질 수 있다.
+ * 화면에 보이는 주소가 달라질 수 있다. 라벨과 격자도 편집 폼과 맞춰 둔다. 체크를 켜고 끌 때
+ * 값이 자리를 옮기면 같은 주소를 다시 읽어야 한다.
  */
 export function OrderShippingSection({
   form,
@@ -86,29 +94,46 @@ export function OrderShippingSection({
       )}
 
       {useDefaultShipping ? (
-        <div className="grid gap-2 rounded-[4px] bg-black/[0.03] p-4">
-          <p className="text-body-3 font-semibold">{values.recipientName}</p>
-          <p className="text-body-3 tabular-nums text-black/80">
-            {values.phone}
-          </p>
-          <p className="text-body-3 leading-relaxed text-black/80">
-            {values.postalCode} {values.city} {values.district}
-            <br />
-            {values.detailAddress}
-          </p>
+        <div className="grid gap-4">
+          <div className={TWO_COLUMN_CLASS}>
+            <ReadOnlyField label={t("recipient_name")}>
+              {values.recipientName}
+            </ReadOnlyField>
+            <ReadOnlyField
+              label={t("recipient_phone")}
+              valueClassName="tabular-nums"
+            >
+              {values.phone}
+            </ReadOnlyField>
+          </div>
+
+          <div className="grid gap-2">
+            <FieldLabel>{t("order_address")}</FieldLabel>
+            <div className={ADDRESS_COLUMN_CLASS}>
+              <ReadOnlyValue className="tabular-nums">
+                {values.postalCode}
+              </ReadOnlyValue>
+              <ReadOnlyValue>{values.city}</ReadOnlyValue>
+              <ReadOnlyValue>{values.district}</ReadOnlyValue>
+            </div>
+            <ReadOnlyValue>{values.detailAddress}</ReadOnlyValue>
+          </div>
         </div>
       ) : (
         <div className="grid gap-4">
-          <div className={cn("grid grid-cols-2 gap-3", "max-sm:grid-cols-1")}>
+          <div className={TWO_COLUMN_CLASS}>
             <div className="grid gap-2">
-              <Label className={FIELD_LABEL_CLASS} htmlFor="order-recipient">
+              <FieldLabel htmlFor="order-recipient">
                 {t("recipient_name")}
-                <span className="text-danger ml-0.5">*</span>
-              </Label>
+              </FieldLabel>
               <Input
                 aria-describedby="order-recipient-error"
                 aria-invalid={!!errors.recipientName}
-                className={INPUT_CLASS}
+                autoComplete="name"
+                className={cn(
+                  INPUT_CLASS,
+                  errors.recipientName && "border-danger",
+                )}
                 id="order-recipient"
                 placeholder={t("recipient_name")}
                 {...register("recipientName")}
@@ -119,17 +144,21 @@ export function OrderShippingSection({
             </div>
 
             <div className="grid gap-2">
-              <Label className={FIELD_LABEL_CLASS} htmlFor="order-phone">
+              <FieldLabel htmlFor="order-phone">
                 {t("recipient_phone")}
-                <span className="text-danger ml-0.5">*</span>
-              </Label>
+              </FieldLabel>
               <Input
                 aria-describedby="order-phone-error"
                 aria-invalid={!!errors.phone}
-                className={INPUT_CLASS}
+                autoComplete="tel"
+                className={cn(
+                  INPUT_CLASS,
+                  "tabular-nums",
+                  errors.phone && "border-danger",
+                )}
                 id="order-phone"
-                inputMode="tel"
                 placeholder="+886"
+                type="tel"
                 {...register("phone")}
               />
               <FieldError id="order-phone-error">
@@ -139,16 +168,8 @@ export function OrderShippingSection({
           </div>
 
           <div className="grid gap-2">
-            <Label className={FIELD_LABEL_CLASS} htmlFor="order-postal">
-              {t("order_address")}
-              <span className="text-danger ml-0.5">*</span>
-            </Label>
-            <div
-              className={cn(
-                "grid grid-cols-[96px_1fr_1fr] gap-2",
-                "max-sm:grid-cols-1",
-              )}
-            >
+            <FieldLabel htmlFor="order-postal">{t("order_address")}</FieldLabel>
+            <div className={ADDRESS_COLUMN_CLASS}>
               {/* 縣市·區 를 고르면 자동으로 채워진다. 직접 고칠 이유가 없어 읽기 전용이다. */}
               <Input
                 className={cn(INPUT_CLASS, "tabular-nums")}
@@ -191,7 +212,10 @@ export function OrderShippingSection({
             <Input
               aria-describedby="order-address-error"
               aria-invalid={!!errors.detailAddress}
-              className={INPUT_CLASS}
+              className={cn(
+                INPUT_CLASS,
+                errors.detailAddress && "border-danger",
+              )}
               placeholder={t("detail_address")}
               {...register("detailAddress")}
             />
@@ -199,41 +223,114 @@ export function OrderShippingSection({
               {errorFor("detailAddress") ?? errorFor("city")}
             </FieldError>
           </div>
-
-          <div className="grid gap-2">
-            <Label className={FIELD_LABEL_CLASS}>{t("shipping_request")}</Label>
-            <Select
-              onValueChange={(next) =>
-                setValue(
-                  "requestMessage",
-                  next as OrderShippingValues["requestMessage"],
-                )
-              }
-              value={values.requestMessage}
-            >
-              <SelectTrigger className="h-12">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {SHIPPING_REQUEST_KEYS.map((key) => (
-                  <SelectItem key={key} value={key}>
-                    {t(key)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
         </div>
       )}
+
+      {/* 저장된 주소의 일부가 아니라 주문마다 고르는 값이다 — 기본 배송지를 써도 보인다 */}
+      <div className="mt-4 grid gap-2">
+        <Label className={FIELD_LABEL_CLASS}>{t("shipping_request")}</Label>
+        <Select
+          onValueChange={(next) =>
+            setValue(
+              "requestMessage",
+              next as OrderShippingValues["requestMessage"],
+            )
+          }
+          value={values.requestMessage}
+        >
+          <SelectTrigger className="h-12">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {SHIPPING_REQUEST_KEYS.map((key) => (
+              <SelectItem key={key} value={key}>
+                {t(key)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
     </>
   );
 }
 
-function FieldError({ id, children }: { id: string; children?: string }) {
-  if (!children) return null;
+/**
+ * 필수 필드 라벨. `htmlFor` 가 없으면 읽기 전용 값이라 가리킬 폼 요소가 없다 — `label` 대신
+ * `span` 으로 낸다.
+ */
+function FieldLabel({
+  htmlFor,
+  children,
+}: {
+  htmlFor?: string;
+  children: string;
+}) {
+  const content = (
+    <>
+      {children}
+      <span className="text-danger ml-0.5">*</span>
+    </>
+  );
+
+  if (!htmlFor) {
+    return <span className={FIELD_LABEL_CLASS}>{content}</span>;
+  }
 
   return (
-    <p className="text-body-5 text-danger" id={id} role="alert">
+    <Label className={FIELD_LABEL_CLASS} htmlFor={htmlFor}>
+      {content}
+    </Label>
+  );
+}
+
+/** 편집 폼의 `Input` 과 같은 크기의 읽기 전용 칸. 채움색으로 못 고치는 값임을 알린다. */
+function ReadOnlyValue({
+  className,
+  children,
+}: {
+  className?: string;
+  children?: string;
+}) {
+  return (
+    <p
+      className={cn(
+        "text-body-3 flex h-12 items-center rounded-[4px] border border-black/20 bg-black/5 px-3",
+        className,
+      )}
+    >
+      {children}
+    </p>
+  );
+}
+
+function ReadOnlyField({
+  label,
+  valueClassName,
+  children,
+}: {
+  label: string;
+  valueClassName?: string;
+  children?: string;
+}) {
+  return (
+    <div className="grid gap-2">
+      <FieldLabel>{label}</FieldLabel>
+      <ReadOnlyValue className={valueClassName}>{children}</ReadOnlyValue>
+    </div>
+  );
+}
+
+/**
+ * 에러 자리는 문구가 없어도 비워 둔다 — 검증이 `onBlur` 라, 포커스를 뗄 때마다 아래 필드가
+ * 밀렸다 돌아오면 입력하던 자리를 놓친다. `aria-describedby` 가 가리킬 대상도 늘 있어야 한다.
+ */
+function FieldError({ id, children }: { id: string; children?: string }) {
+  return (
+    <p
+      className="text-body-5 text-danger min-h-4 leading-4"
+      id={id}
+      role="alert"
+    >
       {children}
     </p>
   );
