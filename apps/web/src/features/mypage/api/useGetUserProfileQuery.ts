@@ -1,20 +1,3 @@
-import { getUserProfile, type UserProfile } from "@shared/services/user";
-
-import useAppQuery from "@/shared/lib/hooks/query/useAppQuery";
-import { useUserAuthStore } from "@/shared/lib/hooks/useUserAuthStore";
-
-export function useGetUserProfileQuery() {
-  const { id } = useUserAuthStore();
-
-  return useAppQuery<
-    Awaited<ReturnType<typeof getUserProfile>>,
-    Error,
-    UserProfile
-  >({
-    queryKey: ["user", "profile", id],
-    queryFn: getUserProfile,
-    select: (res) => res.data,
-    staleTime: 5 * 60 * 1000,
-    enabled: !!id,
-  });
-}
+// 주문서(`features/order`)도 기본 배송지로 같은 프로필을 읽는다. 쿼리 키가 갈라지면
+// 같은 응답을 두 번 받게 되므로 `entities/user` 로 올리고 여기서는 재수출만 한다.
+export { useGetUserProfileQuery } from "@entities/user";

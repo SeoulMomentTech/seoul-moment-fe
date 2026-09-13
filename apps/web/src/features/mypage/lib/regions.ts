@@ -1,47 +1,8 @@
-import cityCountryData from "@shared/constants/json/cityCountryData.json";
-
-import type { LanguageType } from "@/i18n/const";
-
-interface RawArea {
-  ZipCode: string;
-  AreaName: string;
-  AreaEngName: string;
-}
-
-interface RawCity {
-  CityName: string;
-  CityEngName: string;
-  AreaList: RawArea[];
-}
-
-export interface RegionOption {
-  value: string;
-  label: string;
-}
-
-const cities = cityCountryData as RawCity[];
-
-const pickCityLabel = (city: RawCity, locale: LanguageType) =>
-  locale === "en" ? city.CityEngName : city.CityName;
-
-const pickAreaLabel = (area: RawArea, locale: LanguageType) =>
-  locale === "en" ? area.AreaEngName : area.AreaName;
-
-export const getCityOptions = (locale: LanguageType): RegionOption[] =>
-  cities.map((city) => ({
-    value: city.CityName,
-    label: pickCityLabel(city, locale),
-  }));
-
-export const getDistrictOptions = (
-  cityValue: string | undefined,
-  locale: LanguageType,
-): RegionOption[] => {
-  if (!cityValue) return [];
-  const city = cities.find((c) => c.CityName === cityValue);
-  if (!city) return [];
-  return city.AreaList.map((area) => ({
-    value: area.AreaName,
-    label: pickAreaLabel(area, locale),
-  }));
-};
+// 주문서(`features/order`)도 같은 지역 데이터를 쓰므로 `shared/lib/regions.ts` 로 올렸다.
+// feature 끼리 임포트하지 않기 위한 재수출 — 기존 import 경로는 그대로 둔다.
+export {
+  findZipCode,
+  getCityOptions,
+  getDistrictOptions,
+  type RegionOption,
+} from "@shared/lib/regions";
