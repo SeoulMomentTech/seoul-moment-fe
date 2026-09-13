@@ -179,6 +179,7 @@ export function OrderPage() {
 
               <OrderSummary
                 {...amounts}
+                canSubmit={shipping.isValid}
                 className="top-19 sticky max-sm:hidden"
               />
             </div>
@@ -187,7 +188,10 @@ export function OrderPage() {
               className="left-0 z-10 hidden max-sm:block"
               direction="bottom"
             >
-              <OrderBar totalAmount={amounts.totalAmount} />
+              <OrderBar
+                canSubmit={shipping.isValid}
+                totalAmount={amounts.totalAmount}
+              />
             </FixedBox>
           </>
         )}

@@ -9,16 +9,22 @@ import { Button } from "@seoul-moment/ui";
 import { OrderAmountRows, type OrderAmountValues } from "./OrderAmountRows";
 
 interface OrderSummaryProps extends OrderAmountValues {
+  /** 배송지 필수 항목이 다 찼는지. 비면 `결제하기` 가 눌리지 않는다 */
+  canSubmit: boolean;
   className?: string;
 }
 
 /**
  * 데스크톱 결제 금액 패널.
  *
- * `결제하기` 는 비활성이다 — 장바구니 `주문하기`·상품상세 `구매하기` 와 같은 처리로,
- * 결제(LINE Pay·ECPay)가 붙을 때 UI 재작업이 없도록 마크업을 먼저 만들어 둔다.
+ * `결제하기` 는 배송지가 다 차야 눌린다. 누른 뒤의 결제(LINE Pay·ECPay)는 아직 붙지
+ * 않았으므로 안내 문구는 그대로 둔다 — 외부 결제창 URL 을 받는 API 가 아직 없다.
  */
-export function OrderSummary({ className, ...amounts }: OrderSummaryProps) {
+export function OrderSummary({
+  canSubmit,
+  className,
+  ...amounts
+}: OrderSummaryProps) {
   const t = useTranslations();
 
   return (
@@ -30,7 +36,7 @@ export function OrderSummary({ className, ...amounts }: OrderSummaryProps) {
       <Button
         aria-describedby="order-submit-hint"
         className="mt-5 h-12 w-full rounded-[4px]"
-        disabled
+        disabled={!canSubmit}
         type="button"
       >
         {t("pay_now")}

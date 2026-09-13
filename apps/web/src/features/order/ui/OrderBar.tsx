@@ -11,12 +11,14 @@ import { Button } from "@seoul-moment/ui";
 
 interface OrderBarProps {
   totalAmount: number;
+  /** 배송지 필수 항목이 다 찼는지. 비면 `결제하기` 가 눌리지 않는다 */
+  canSubmit: boolean;
 }
 
 /**
  * 모바일 하단 고정 결제 바. 금액 내역은 본문 섹션에 있고 여기는 합계와 CTA 만 둔다.
  */
-export function OrderBar({ totalAmount }: OrderBarProps) {
+export function OrderBar({ totalAmount, canSubmit }: OrderBarProps) {
   const t = useTranslations();
   const ref = useRef<HTMLDivElement>(null);
 
@@ -39,7 +41,7 @@ export function OrderBar({ totalAmount }: OrderBarProps) {
       <Button
         aria-describedby="order-bar-hint"
         className="h-12 w-full rounded-[4px]"
-        disabled
+        disabled={!canSubmit}
         type="button"
       >
         {t("pay_now")}

@@ -10,6 +10,7 @@ import type { UserOrderShipping } from "@shared/services/userOrder";
 
 import {
   orderShippingResolver,
+  orderShippingSchema,
   toPhoneDigits,
   type OrderShippingValues,
 } from "./schema";
@@ -109,6 +110,15 @@ export const useOrderShipping = ({
   const values = watch();
 
   /**
+   * 필수 항목이 다 찼는지 — `결제하기` 활성 여부가 이 값 하나로 정해진다.
+   *
+   * 리졸버가 쓰는 스키마로 직접 판정한다. `formState.isValid` 는 기본 배송지를 `reset` 으로
+   * 심었을 때 갱신되지 않아 다 채워진 주소에도 false 로 남는다 — `trigger()` 로 깨울 수는
+   * 있지만 그러면 손대지도 않은 필드에 에러 문구가 뜬다.
+   */
+  const isValid = orderShippingSchema.safeParse(values).success;
+
+  /**
    * 서버로 보낼 배송지. 기본 배송지를 쓰면 `shipping` 을 보내지 않는 것이 스웨거 규칙이고,
    * 그 규칙은 `CreateUserOrderReq` 의 유니온 타입이 이미 강제한다.
    */
@@ -136,5 +146,6 @@ export const useOrderShipping = ({
     city,
     district,
     shipping,
+    isValid,
   };
 };
