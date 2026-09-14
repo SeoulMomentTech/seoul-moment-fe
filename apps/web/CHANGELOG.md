@@ -2,6 +2,42 @@
 
 All notable changes to `@seoul-moment/web` are documented here.
 
+## 1.2.0 — 2026-09-14
+
+### Features
+
+- Add the cart and order API services (`6cf582e`)
+- Add the user cart query and mutation hooks (`f580934`)
+- Drive the cart from the server cart API (`613bd56`)
+- Add cart lines in one batched request (`a490168`)
+- Drive the cart badge from the server count (`dc133b2`)
+- Add a save-for-later cart (`589be37`)
+- Slide the cart's recently-viewed row with prev/next on PC (`3986e7b`)
+- Surface sold-out and low stock across the cart flow (`5256868`)
+- Label the cart shipping fee as a main-island estimate (`196321e`)
+- Add options and quantity to the product page, and wire it to the cart (`2f16e20`)
+- Pick a cart SKU from one combination select (`283a4f6`)
+- Generate OptionType from the product option API (`5c5c557`)
+- Cc the verified address on contact inquiries (`91a55b9`)
+
+### Fixes
+
+- Repair the product build broken by the option type migration (`9e6ba01`)
+- Count only selectable lines in the brand checkbox (`a1ccd92`)
+- Pin the product page control height so the CTA row lines up (`e6687ed`)
+- Render season collection description line breaks as paragraphs (`b9ce021`)
+- Handle CRLF and CR in splitLineBreaks (`d34aafa`)
+- Drop empty lines and use stable keys in SeasonCollection (`ea065c4`)
+- Align PromotionDetailLoading with the real render (`b063c72`)
+
+### Other
+
+- Extract ProductDetailInfo from the product detail page (`9a51d02`)
+- Extract ProductPrice from the product detail page (`877549d`)
+- Use spacing scale instead of arbitrary values on ProductPage (`b0164c5`)
+- Document the cart domain (`ea2970d`)
+- Sync locales from sheet (`ac89a5b`, `a6e5c67`, `e690549`, `45e93d4`)
+
 ## 1.1.2 — 2026-08-31
 
 ### Other
