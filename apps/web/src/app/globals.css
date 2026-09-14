@@ -9,6 +9,12 @@
 :root {
   --background: var(--neutral-0);
   --foreground: var(--neutral-900);
+
+  /**
+   * 하단 고정 바가 있는 화면에서 플로팅 요소(챗봇 런처)를 그만큼 위로 올린다.
+   * 기본 0 이므로 바가 없는 화면의 동작은 그대로다. `useFloatingOffset` 가 세팅한다.
+   */
+  --floating-offset: 0px;
 }
 
 @theme inline {

@@ -41,6 +41,10 @@ export default function CardSlider<T>({
 }: CardSliderProps<T>) {
   const { isBeginning, isEnd, onEdge } = useSwiperEdges();
 
+  // watchOverflow 덕에 넘칠 것이 없으면 Swiper 가 시작·끝을 동시에 참으로 둔다.
+  // 그때 버튼을 숨긴다 — 영구히 비활성인 버튼 두 개는 결함처럼 보인다.
+  const hasOverflow = !(isBeginning && isEnd);
+
   return (
     <div className={cn("relative", className)}>
       <Swiper
@@ -56,7 +60,7 @@ export default function CardSlider<T>({
         watchOverflow
       >
         <SlideButton
-          className={buttonClassName}
+          className={cn(!hasOverflow && "hidden", buttonClassName)}
           disabled={isBeginning}
           type="prev"
         />
@@ -65,7 +69,11 @@ export default function CardSlider<T>({
             {renderItem(item)}
           </SwiperSlide>
         ))}
-        <SlideButton className={buttonClassName} disabled={isEnd} type="next" />
+        <SlideButton
+          className={cn(!hasOverflow && "hidden", buttonClassName)}
+          disabled={isEnd}
+          type="next"
+        />
       </Swiper>
     </div>
   );

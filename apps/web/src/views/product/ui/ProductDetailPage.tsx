@@ -21,7 +21,15 @@ import { AvatarBadge } from "@widgets/avatar-badge/ui/AvatarBadge";
 
 import { Link } from "@/i18n/navigation";
 
-import { useProductLikeToggle, useTrackRecentProduct } from "@entities/product";
+import {
+  formatOptionAxisValues,
+  isProductSoldOut,
+  listProductOptionAxes,
+  useProductLikeToggle,
+  useTrackRecentProduct,
+} from "@entities/product";
+import { useShippingPolicyQuery } from "@entities/shipping";
+import { AddToCart } from "@features/cart";
 import { BrandProductList, ProductExternalGroup } from "@features/product";
 import { Button } from "@seoul-moment/ui";
 import type { CommonRes } from "@shared/services";
@@ -62,11 +70,33 @@ export default function ProductDetailPage({
 
   useTrackRecentProduct({ productId: id });
 
+  const { data: shippingPolicy } = useShippingPolicyQuery();
+
+  const optionAxes = listProductOptionAxes(data?.option);
+
   const handleToggleShowMore = (showMore: boolean) => {
     setShowMore(showMore);
   };
 
+  // 배송비는 상품이 아니라 배송지로 정해져서 상세 v1 응답에 없다. 요율표로 안내만 한다.
+  // 외섬 프로모션 중이면 외섬도 baseFee 라 괄호 안내를 붙이지 않는다.
+  const shippingFeeText = shippingPolicy
+    ? [
+        shippingPolicy.remoteIslandPromotion
+          ? toNTCurrency(shippingPolicy.baseFee)
+          : `${toNTCurrency(shippingPolicy.baseFee)} (${t("remote_island")} ${toNTCurrency(shippingPolicy.remoteIslandFee)})`,
+        shippingPolicy.freeShippingThreshold > 0 &&
+          t("free_shipping_over", {
+            amount: toNTCurrency(shippingPolicy.freeShippingThreshold),
+          }),
+      ]
+        .filter(Boolean)
+        .join(" / ")
+    : null;
+
   if (!data) return null;
+
+  const isSoldOut = isProductSoldOut(data.variants);
 
   return (
     <div
@@ -91,6 +121,12 @@ export default function ProductDetailPage({
               )}
             >
               {data.name}
+              {/* 담기 영역까지 내려가야 알 수 있으면 늦다. 이름 옆에서 바로 보인다. */}
+              {isSoldOut && (
+                <span className="text-body-4 ml-2 rounded-[2px] bg-black/70 px-2 py-1 align-middle font-semibold text-white">
+                  {t("sold_out")}
+                </span>
+              )}
             </h2>
             <div className="flex items-center justify-between py-2.5">
               <Link href={`/product?brandId=${data.brand.id}`}>
@@ -153,7 +189,7 @@ export default function ProductDetailPage({
                         "max-sm:text-body-4",
                       )}
                     >
-                      판매가
+                      {t("sale_price")}
                     </span>
                     <span
                       className={cn(
@@ -188,30 +224,36 @@ export default function ProductDetailPage({
                   <span>{t("within_days", { n: data.shippingInfo })}</span>
                 </div>
               )}
-              {data.shippingCost > 0 && (
+              {shippingFeeText && (
                 <div className={cn("text-body-3 flex", "text-body-4")}>
                   <span className="min-w-32.5">{t("shipping_fee")}</span>
-                  <span>{toNTCurrency(data.shippingCost)}</span>
+                  <span>{shippingFeeText}</span>
                 </div>
               )}
-              {/* 색상 정보 */}
-              {data.option?.COLOR?.length > 0 && (
-                <div className={cn("text-body-3 flex", "text-body-4")}>
-                  <span className="min-w-32.5">{t("color")}</span>
-                  <span>{data.option.COLOR[0].value}</span>
+              {/* 옵션 축 - 상품이 실제로 가진 축만 OPTION_AXIS_ORDER 순서로 노출한다.
+                  의류는 색상/사이즈, 화장품은 용량/텍스처가 온다. */}
+              {optionAxes.map((axis) => (
+                <div
+                  className={cn("text-body-3 flex", "text-body-4")}
+                  key={axis.type}
+                >
+                  <span className="min-w-32.5">{t(axis.labelKey)}</span>
+                  <span>{formatOptionAxisValues(axis.values)}</span>
                 </div>
-              )}
-              {/* 사이즈 */}
-              {data.option?.SIZE?.length > 0 && (
-                <div className={cn("text-body-3 flex", "text-body-4")}>
-                  <span className="min-w-32.5">{t("size")}</span>
-                  <span>
-                    {data.option.SIZE.map((item) => item.value).join("/")}
-                  </span>
-                </div>
-              )}
+              ))}
             </div>
-            <ProductExternalGroup items={data.external} />
+            <AddToCart
+              likeSlot={
+                <LikeCount
+                  active={liked}
+                  className="size-12 shrink-0 justify-center rounded-[4px] border border-black/20"
+                  iconSize={24}
+                  onClick={handleToggleLike}
+                />
+              }
+              product={data}
+            />
+            <ProductExternalGroup className="mt-5" items={data.external} />
           </div>
         </div>
         <BrandProductList data={data.relate} />

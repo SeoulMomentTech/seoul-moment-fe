@@ -2,7 +2,7 @@ import { cache } from "react";
 
 import { toast } from "sonner";
 
-import { readErrorInfo } from "@shared/lib/utils/error";
+import { getErrorInfo, readErrorInfo } from "@shared/lib/utils/error";
 
 import * as Sentry from "@sentry/nextjs";
 import type { ExtendedHTTPError } from "@shared/services";
@@ -52,7 +52,12 @@ function makeQueryClient() {
     }),
     mutationCache: new MutationCache({
       onError: (err, _var, _ctx, mutation) => {
-        if (mutation.meta?.logError) {
+        // 409 는 서버가 규칙대로 거부한 정상 응답이다(재고 부족 등). 결함이 아니므로
+        // Sentry 로 올리지 않는다 — 올려두면 트래픽이 붙는 만큼 노이즈가 된다.
+        // 화면 처리는 이 응답을 기대하는 호출부가 직접 한다.
+        const isConflict = getErrorInfo(err).status === 409;
+
+        if (mutation.meta?.logError && !isConflict) {
           // track error
           console.error(err.message);
 

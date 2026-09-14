@@ -124,7 +124,7 @@ export default function InquiryForm() {
     }
 
     try {
-      const { message, name, subject } = data;
+      const { message, name, subject, email, isVerified } = data;
 
       await verifyRecaptcha(recaptchaToken);
 
@@ -133,6 +133,8 @@ export default function InquiryForm() {
         html: message,
         name,
         subject: emailSubject === ETC_SUBJECT ? subject : emailSubject,
+        // 인증을 마친 문의자 이메일을 참조로 넣어 본인도 사본을 받게 한다.
+        cc: isVerified ? [email] : undefined,
       });
       setModalOpen({
         type: "success",
