@@ -2,6 +2,29 @@
 
 All notable changes to `@seoul-moment/web` are documented here.
 
+## 1.3.0 — 2026-09-16
+
+### Features
+
+- Add the order form page (`057b362`)
+- Link the cart order button to the order form (`3e76282`)
+- Enable the order pay button once the address is complete (`12df609`)
+
+### Fixes
+
+- Repair the order shipping fields flagged in the UI review (`1456823`)
+- Normalise the order phone number to one +886 form (`da62c84`)
+- Let the cart order CTA fill its whole button (`9ef239c`)
+- Put the order page behind a suspense boundary (`7de03ee`)
+
+### Other
+
+- Lift the shared user queries and region data out of mypage (`efb2508`)
+- Drop the order agreement section (`04fc3e5`)
+- Drop the disabled buy-now button from product detail (`dd7c222`)
+- Correct the order mockup shipping fee and add the agreement section (`78f6276`)
+- Sync locales from sheet (`ed79faf`)
+
 ## 1.2.0 — 2026-09-14
 
 ### Features
