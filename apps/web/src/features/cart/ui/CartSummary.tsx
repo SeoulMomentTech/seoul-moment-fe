@@ -86,8 +86,13 @@ export function CartSummary({
       </div>
 
       {orderHref ? (
-        <Button asChild className="mt-5 h-12 w-full rounded-[4px]">
-          <Link href={orderHref}>{t("place_order")}</Link>
+        <Button asChild className="mt-5 h-12 w-full rounded-[4px] px-0">
+          <Link
+            className="flex h-full w-full items-center justify-center"
+            href={orderHref}
+          >
+            {t("place_order")}
+          </Link>
         </Button>
       ) : (
         <>
