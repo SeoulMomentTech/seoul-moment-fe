@@ -89,13 +89,13 @@ export function AddToCart({ product, likeSlot }: AddToCartProps) {
     </p>
   );
 
-  const comingSoonHint = (
-    <p className="sr-only" id="add-to-cart-coming-soon">
-      {t("coming_soon")}
-    </p>
-  );
-
-  /** 하트 · 장바구니 담기 · 구매하기(비활성) 3버튼 행 */
+  /**
+   * 하트 · 장바구니 담기 버튼 행.
+   *
+   * 구매하기(바로구매)는 아직 없다. 주문 API 가 `cartItemIds` 로만 주문을 받아
+   * 장바구니를 거치지 않는 경로가 서버에 존재하지 않는다 — 백엔드에 직접 주문
+   * 엔드포인트가 생기면 여기에 되살린다.
+   */
   const actions = (
     onAddToCart: () => void,
     { addDisabled = false }: { addDisabled?: boolean } = {},
@@ -111,20 +111,12 @@ export function AddToCart({ product, likeSlot }: AddToCartProps) {
       >
         {draft.isSoldOut ? t("sold_out") : t("add_to_cart")}
       </Button>
-      <Button
-        aria-describedby="add-to-cart-coming-soon"
-        className="h-12 flex-1 rounded-[4px] px-5 font-semibold"
-        disabled
-        type="button"
-      >
-        {t("buy_now")}
-      </Button>
     </div>
   );
 
   // ---- 모바일: 하단 고정 바가 시트를 열고, 담기는 시트 안에서 확정한다.
   //      vaul Drawer 가 bottom-0 을 덮어 시트가 열린 동안에는 바를 누를 수 없으므로
-  //      3버튼 행을 시트 안에도 둔다 (디자인의 "시트 아래 버튼 바" 구조와 같은 모습).
+  //      버튼 행을 시트 안에도 둔다 (디자인의 "시트 아래 버튼 바" 구조와 같은 모습).
   if (isMobile) {
     return (
       <>
@@ -133,7 +125,6 @@ export function AddToCart({ product, likeSlot }: AddToCartProps) {
           direction="bottom"
         >
           {actions(() => setSheetOpen(true))}
-          {comingSoonHint}
         </FixedBox>
 
         <Drawer onOpenChange={setSheetOpen} open={isSheetOpen}>
@@ -185,7 +176,6 @@ export function AddToCart({ product, likeSlot }: AddToCartProps) {
           addDisabled: !draft.canSubmit || isSubmitting,
         })}
       </div>
-      {comingSoonHint}
     </div>
   );
 }

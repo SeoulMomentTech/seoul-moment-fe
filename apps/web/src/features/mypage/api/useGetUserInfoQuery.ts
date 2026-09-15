@@ -1,16 +1,2 @@
-import { getUserInfo, type UserInfo } from "@shared/services/user";
-
-import useAppQuery from "@/shared/lib/hooks/query/useAppQuery";
-import { useUserAuthStore } from "@/shared/lib/hooks/useUserAuthStore";
-
-export function useGetUserInfoQuery() {
-  const { id } = useUserAuthStore();
-
-  return useAppQuery<Awaited<ReturnType<typeof getUserInfo>>, Error, UserInfo>({
-    queryKey: ["user", "info", id],
-    queryFn: getUserInfo,
-    select: (res) => res.data,
-    staleTime: 5 * 60 * 1000,
-    enabled: !!id,
-  });
-}
+// 연락처 기본값을 주문서와 공유한다 — 자세한 배경은 useGetUserProfileQuery.ts 참고.
+export { useGetUserInfoQuery } from "@entities/user";
