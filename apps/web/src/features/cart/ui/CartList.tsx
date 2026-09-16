@@ -19,6 +19,7 @@ import {
   useCart,
   type UserCartItem,
 } from "@entities/cart";
+import { toOrderHref } from "@entities/order";
 import { Button } from "@seoul-moment/ui";
 
 import { CartBar } from "./CartBar";
@@ -122,7 +123,10 @@ export function CartList() {
   // 주문서는 고른 라인만 다룬다. id 를 URL 로 넘기므로 새로고침·뒤로가기에도 대상이 남는다.
   // 고른 것이 없으면 링크 자체를 만들지 않는다 — 빈 주문서로 보내지 않는다.
   const orderHref = selection.selectedCount
-    ? `/order?cart=${[...selection.selectedCartItemIds].join(",")}`
+    ? toOrderHref({
+        type: "cart",
+        cartItemIds: [...selection.selectedCartItemIds],
+      })
     : null;
 
   const summary = {

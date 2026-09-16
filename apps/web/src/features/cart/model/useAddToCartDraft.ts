@@ -7,6 +7,7 @@ import { toast } from "sonner";
 
 import { useUserAuthStore } from "@shared/lib/hooks/useUserAuthStore";
 import type { GetProductDetailRes, OptionType } from "@shared/services/product";
+import type { UserOrderDirectItem } from "@shared/services/userOrder";
 
 import {
   getMaxLineQuantity,
@@ -272,6 +273,51 @@ export const useAddToCartDraft = ({ product }: UseAddToCartDraftArgs) => {
 
   const canSubmit = lines.length > 0;
 
+  /**
+   * 쌓아둔 조합을 SKU 단위로 옮긴다. 조합을 직접 고른 라인은 SKU 를 이미 들고 있고,
+   * 축별 선택이면 역으로 찾는다. 담기와 구매하기가 같은 번역을 쓴다.
+   */
+  const toVariantDrafts = useCallback(
+    (): CartItemDraft[] =>
+      lines.map((line) => ({
+        quantity: line.quantity,
+        productVariantId:
+          line.variantId ??
+          findProductVariant(
+            product.variants,
+            line.options.map((option) => option.optionValueId),
+          )?.id,
+      })),
+    [lines, product.variants],
+  );
+
+  /**
+   * "구매하기" — 장바구니를 거치지 않고 주문서로 넘길 SKU 목록.
+   *
+   * 넘길 수 없으면 이유를 알리고 `null` 을 준다. 담기와 같은 판정을 쓰되 서버를 부르지
+   * 않는다 — 주문서가 미리보기에서 재고와 판매 여부를 다시 확인한다.
+   */
+  const toDirectItems = useCallback((): UserOrderDirectItem[] | null => {
+    if (!isAuthenticated) {
+      toast.error(t("login_required"));
+      return null;
+    }
+    if (!lines.length) return null;
+
+    const drafts = toVariantDrafts();
+
+    // SKU 를 못 정한 조합은 주문서로 넘길 방법이 없다. 조용히 빼면 고른 것보다 적게 주문된다.
+    if (drafts.some((draft) => draft.productVariantId == null)) {
+      toast.error(t("cart_add_unavailable"));
+      return null;
+    }
+
+    return drafts.map(({ productVariantId, quantity }) => ({
+      productVariantId: productVariantId as number,
+      quantity,
+    }));
+  }, [isAuthenticated, lines, toVariantDrafts, t]);
+
   const submit = useCallback(async () => {
     if (!isAuthenticated) {
       toast.error(t("login_required"));
@@ -279,19 +325,7 @@ export const useAddToCartDraft = ({ product }: UseAddToCartDraftArgs) => {
     }
     if (!lines.length) return false;
 
-    // 서버 장바구니는 SKU 단위다. 조합을 직접 고른 라인은 SKU 를 이미 들고 있고,
-    // 축별 선택이면 역으로 찾는다.
-    const drafts: CartItemDraft[] = lines.map((line) => ({
-      quantity: line.quantity,
-      productVariantId:
-        line.variantId ??
-        findProductVariant(
-          product.variants,
-          line.options.map((option) => option.optionValueId),
-        )?.id,
-    }));
-
-    const result = await addItems(drafts);
+    const result = await addItems(toVariantDrafts());
 
     // SKU 를 못 정한 조합은 담을 방법이 없다. 예전에는 로컬에만 남겨 두었지만 이제는
     // 아무 일도 일어나지 않으므로 그 사실을 알린다.
@@ -304,7 +338,7 @@ export const useAddToCartDraft = ({ product }: UseAddToCartDraftArgs) => {
     if (result.status !== "added") return false;
 
     return true;
-  }, [isAuthenticated, lines, product, addItems, t]);
+  }, [isAuthenticated, lines, toVariantDrafts, addItems, t]);
 
   return {
     mode,
@@ -324,5 +358,6 @@ export const useAddToCartDraft = ({ product }: UseAddToCartDraftArgs) => {
     totalAmount,
     canSubmit,
     submit,
+    toDirectItems,
   };
 };

@@ -5,7 +5,12 @@ import { describe, expect, it } from "vitest";
 
 import { renderHook } from "@testing-library/react";
 
-import { toOrderSourceBody, useOrderSource } from "./orderSource";
+import {
+  toOrderHref,
+  toOrderSourceBody,
+  useOrderSource,
+  type OrderSource,
+} from "./orderSource";
 
 const readSource = (searchParams: string) =>
   renderHook(() => useOrderSource(), {
@@ -80,5 +85,40 @@ describe("toOrderSourceBody", () => {
     const items = [{ productVariantId: 101, quantity: 1 }];
 
     expect(toOrderSourceBody({ type: "direct", items })).toEqual({ items });
+  });
+});
+
+describe("toOrderHref", () => {
+  it("장바구니 주문은 ?cart= 로 넘긴다", () => {
+    expect(toOrderHref({ type: "cart", cartItemIds: [1, 2, 3] })).toBe(
+      "/order?cart=1,2,3",
+    );
+  });
+
+  it('"구매하기" 는 ?buy= 로 넘긴다', () => {
+    expect(
+      toOrderHref({
+        type: "direct",
+        items: [
+          { productVariantId: 101, quantity: 2 },
+          { productVariantId: 102, quantity: 1 },
+        ],
+      }),
+    ).toBe("/order?buy=101:2,102:1");
+  });
+
+  // 만드는 쪽과 읽는 쪽이 갈라지면 빈 주문서로만 드러난다. 한 바퀴를 묶어 둔다.
+  const roundTrips: Array<[string, OrderSource]> = [
+    ["장바구니", { type: "cart", cartItemIds: [1, 2] }],
+    [
+      "구매하기",
+      { type: "direct", items: [{ productVariantId: 101, quantity: 3 }] },
+    ],
+  ];
+
+  it.each(roundTrips)("%s 링크는 그대로 다시 읽힌다", (_, source) => {
+    const href = toOrderHref(source);
+
+    expect(readSource(href.slice(href.indexOf("?")))).toEqual(source);
   });
 });

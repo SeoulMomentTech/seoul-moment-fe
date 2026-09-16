@@ -12,6 +12,7 @@ import FixedBox from "@shared/ui/fixed-box";
 
 import { useRouter } from "@/i18n/navigation";
 
+import { toOrderHref } from "@entities/order";
 import { Button, Drawer, DrawerContent, DrawerTitle } from "@seoul-moment/ui";
 
 import { DraftLineList } from "./DraftLineList";
@@ -45,6 +46,19 @@ export function AddToCart({ product, likeSlot }: AddToCartProps) {
 
   // 서버 응답을 기다리는 동안 다시 눌리면 같은 조합이 두 번 담긴다.
   const [isSubmitting, setSubmitting] = useState(false);
+
+  /**
+   * 구매하기. 장바구니를 거치지 않고 고른 조합을 그대로 주문서로 넘긴다 — 담은 수량과
+   * 합산되지 않으므로 "지금 고른 것만" 주문된다.
+   */
+  const handleBuyNow = () => {
+    const items = draft.toDirectItems();
+
+    // 넘길 수 없는 이유는 draft 가 이미 알렸다.
+    if (!items) return;
+
+    router.push(toOrderHref({ type: "direct", items }));
+  };
 
   const handleSubmit = async () => {
     if (isSubmitting) return;
@@ -89,32 +103,34 @@ export function AddToCart({ product, likeSlot }: AddToCartProps) {
     </p>
   );
 
-  /**
-   * 하트 · 장바구니 담기 버튼 행.
-   *
-   * 구매하기(바로구매)는 아직 없다. 주문 API 가 `cartItemIds` 로만 주문을 받아
-   * 장바구니를 거치지 않는 경로가 서버에 존재하지 않는다 — 백엔드에 직접 주문
-   * 엔드포인트가 생기면 여기에 되살린다.
-   */
+  /** 하트 · 장바구니 담기 · 구매하기 3버튼 행 */
   const actions = (
-    onAddToCart: () => void,
-    { addDisabled = false }: { addDisabled?: boolean } = {},
+    handlers: { onAddToCart(): void; onBuyNow(): void },
+    { disabled = false }: { disabled?: boolean } = {},
   ) => (
     <div className="flex items-center gap-2">
       {likeSlot}
       <Button
         className="h-12 flex-1 rounded-[4px] px-5 font-semibold"
-        disabled={addDisabled || draft.isSoldOut}
-        onClick={onAddToCart}
+        disabled={disabled || draft.isSoldOut}
+        onClick={handlers.onAddToCart}
         type="button"
         variant="outline"
       >
         {draft.isSoldOut ? t("sold_out") : t("add_to_cart")}
       </Button>
+      <Button
+        className="h-12 flex-1 rounded-[4px] px-5 font-semibold"
+        disabled={disabled || draft.isSoldOut}
+        onClick={handlers.onBuyNow}
+        type="button"
+      >
+        {t("buy_now")}
+      </Button>
     </div>
   );
 
-  // ---- 모바일: 하단 고정 바가 시트를 열고, 담기는 시트 안에서 확정한다.
+  // ---- 모바일: 하단 고정 바가 시트를 열고, 담기·구매하기는 시트 안에서 확정한다.
   //      vaul Drawer 가 bottom-0 을 덮어 시트가 열린 동안에는 바를 누를 수 없으므로
   //      버튼 행을 시트 안에도 둔다 (디자인의 "시트 아래 버튼 바" 구조와 같은 모습).
   if (isMobile) {
@@ -124,7 +140,10 @@ export function AddToCart({ product, likeSlot }: AddToCartProps) {
           className="left-0 z-10 px-5 py-4 drop-shadow-[0_-4px_5px_rgba(0,0,0,0.08)]"
           direction="bottom"
         >
-          {actions(() => setSheetOpen(true))}
+          {actions({
+            onAddToCart: () => setSheetOpen(true),
+            onBuyNow: () => setSheetOpen(true),
+          })}
         </FixedBox>
 
         <Drawer onOpenChange={setSheetOpen} open={isSheetOpen}>
@@ -147,9 +166,13 @@ export function AddToCart({ product, likeSlot }: AddToCartProps) {
                   {t("select_option_required")}
                 </p>
               )}
-              {actions(() => void handleSubmit(), {
-                addDisabled: !draft.canSubmit || isSubmitting,
-              })}
+              {actions(
+                {
+                  onAddToCart: () => void handleSubmit(),
+                  onBuyNow: handleBuyNow,
+                },
+                { disabled: !draft.canSubmit || isSubmitting },
+              )}
             </div>
           </DrawerContent>
         </Drawer>
@@ -172,9 +195,10 @@ export function AddToCart({ product, likeSlot }: AddToCartProps) {
         unitPrice={unitPrice}
       />
       <div className="mt-5">
-        {actions(() => void handleSubmit(), {
-          addDisabled: !draft.canSubmit || isSubmitting,
-        })}
+        {actions(
+          { onAddToCart: () => void handleSubmit(), onBuyNow: handleBuyNow },
+          { disabled: !draft.canSubmit || isSubmitting },
+        )}
       </div>
     </div>
   );

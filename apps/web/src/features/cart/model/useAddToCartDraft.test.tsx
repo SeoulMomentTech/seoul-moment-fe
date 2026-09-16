@@ -542,3 +542,70 @@ describe("옵션이 아예 없는 상품", () => {
     expect(result.current.canSubmit).toBe(true);
   });
 });
+
+describe('"구매하기" 로 주문서에 넘길 SKU', () => {
+  const clothing: GetProductDetailRes["option"] = {
+    COLOR: [value(1, "레드")],
+    SIZE: [value(10, "S"), value(11, "M")],
+    MATERIAL: [value(20, "폴리에스터"), value(21, "스판덱스")],
+  };
+
+  it("고른 조합을 SKU·수량 그대로 넘긴다", () => {
+    const { result } = setup(clothing, [
+      variant(101, [1, 10, 20]),
+      variant(102, [1, 11, 21]),
+    ]);
+
+    act(() => result.current.pickVariant(101));
+    act(() => result.current.pickVariant(101));
+    act(() => result.current.pickVariant(102));
+
+    expect(result.current.toDirectItems()).toEqual([
+      { productVariantId: 101, quantity: 2 },
+      { productVariantId: 102, quantity: 1 },
+    ]);
+  });
+
+  // 장바구니를 거치지 않는 게 "구매하기" 의 전부다. 담기면 이미 담긴 수량과 합산된다.
+  it("장바구니에는 담지 않는다", () => {
+    const { result } = setup(clothing, [variant(101, [1, 10, 20])]);
+
+    act(() => result.current.pickVariant(101));
+    result.current.toDirectItems();
+
+    expect(createUserCartItems).not.toHaveBeenCalled();
+  });
+
+  it("고른 조합이 없으면 넘기지 않는다", () => {
+    const { result } = setup(clothing, [variant(101, [1, 10, 20])]);
+
+    expect(result.current.toDirectItems()).toBeNull();
+  });
+
+  // 담기와 같은 판정이다 — SKU 를 못 정한 조합은 주문서로 보낼 방법이 없다.
+  it("variants 가 없어 SKU 를 못 정하면 넘기지 않는다", () => {
+    const { result } = setup(clothing);
+
+    act(() => result.current.pickAxis("SIZE", 10));
+    act(() => result.current.pickAxis("MATERIAL", 20));
+
+    expect(result.current.lines).toHaveLength(1);
+    expect(result.current.toDirectItems()).toBeNull();
+  });
+
+  it("비로그인이면 넘기지 않는다", () => {
+    // 렌더 시점의 인증 상태를 가져가므로 훅을 만들기 전에 바꾼다.
+    authState.isAuthenticated = false;
+
+    try {
+      const { result } = setup(clothing, [variant(101, [1, 10, 20])]);
+
+      act(() => result.current.pickVariant(101));
+
+      expect(result.current.lines).toHaveLength(1);
+      expect(result.current.toDirectItems()).toBeNull();
+    } finally {
+      authState.isAuthenticated = true;
+    }
+  });
+});

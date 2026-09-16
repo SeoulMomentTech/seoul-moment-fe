@@ -32,6 +32,11 @@ export const toOrderSourceBody = (source: OrderSource): UserOrderSourceBody =>
 
 const isPositiveInt = (value: number) => Number.isInteger(value) && value > 0;
 
+const serializeDirectItems = (items: ReadonlyArray<UserOrderDirectItem>) =>
+  items
+    .map(({ productVariantId, quantity }) => `${productVariantId}:${quantity}`)
+    .join(",");
+
 /**
  * `?buy=` 파서. `productVariantId:quantity` 쌍을 쉼표로 이은 값이다 (예: `101:1,102:2`).
  *
@@ -55,13 +60,19 @@ const parseAsDirectItems = createParser<UserOrderDirectItem[]>({
       ? items
       : null;
   },
-  serialize: (items) =>
-    items
-      .map(
-        ({ productVariantId, quantity }) => `${productVariantId}:${quantity}`,
-      )
-      .join(","),
+  serialize: serializeDirectItems,
 });
+
+/**
+ * 주문서 링크. 장바구니와 상품상세가 이 함수로만 주문서에 들어간다.
+ *
+ * 읽는 쪽(`useOrderSource`)과 같은 파일에서 만든다 — 링크를 손으로 짜면 파라미터
+ * 이름이나 구분자가 갈라져도 컴파일은 통과하고, 런타임에 빈 주문서로만 드러난다.
+ */
+export const toOrderHref = (source: OrderSource): string =>
+  source.type === "cart"
+    ? `/order?cart=${source.cartItemIds.join(",")}`
+    : `/order?buy=${serializeDirectItems(source.items)}`;
 
 const parseAsCartItemIds = parseAsArrayOf(parseAsInteger).withDefault([]);
 
