@@ -21,6 +21,9 @@ interface ProductVariantSelectProps {
   className?: string;
 }
 
+/** 어떤 `variantId` 와도 겹치지 않는 값. 항목이 선택된 상태로 남지 않게 한다 */
+const NOTHING_PICKED = "__none__";
+
 /**
  * 조합(SKU) 드롭다운. 축을 하나씩 고르는 대신 완성된 조합을 한 번에 고른다.
  *
@@ -28,8 +31,14 @@ interface ProductVariantSelectProps {
  * `productVariantId` 라 담을 때 번역이 필요 없다.
  *
  * 값을 유지하지 않는다 — 조합을 고르면 아래 라인 목록에 쌓이고, 같은 조합을 다시
- * 고르면 수량이 올라간다. controlled value 를 두면 같은 값 재선택에
- * `onValueChange` 가 오지 않아 두 번째 담기가 막힌다(축별 선택과 같은 이유).
+ * 고르면 수량이 올라간다. 이 드롭다운은 "지금 고른 값" 을 들고 있는 컨트롤이 아니라
+ * "이 조합을 담아라" 라는 명령이다.
+ *
+ * 그래서 어떤 항목과도 같지 않은 값으로 고정해 둔다. Radix 는 값이 **바뀔 때만**
+ * `onValueChange` 를 내므로(controlled 는 `next !== prop`, uncontrolled 는 내부
+ * state 비교), 값을 비워 두면 Radix 가 직전 선택을 그대로 들고 있어 같은 조합을
+ * 다시 고를 때 이벤트가 오지 않는다 — 라인을 지우고 같은 조합을 다시 골라도 아무
+ * 일도 일어나지 않던 버그다.
  */
 export function ProductVariantSelect({
   choices,
@@ -45,7 +54,7 @@ export function ProductVariantSelect({
     <Select
       disabled={soldOut}
       onValueChange={(next) => onPick(Number(next))}
-      value={undefined}
+      value={NOTHING_PICKED}
     >
       <SelectTrigger
         aria-label={soldOut ? t("sold_out") : t("select")}

@@ -25,6 +25,16 @@ interface ProductOptionSelectsProps {
 /**
  * 축별 selectbox. 디자인은 색상·사이즈 2개 고정이지만 개수는 데이터가 정한다.
  * 고정형(고를 축이 없는 화장품 등)이면 축 배열이 비어 아무것도 렌더하지 않는다.
+ *
+ * 서버가 `variants` 를 주면 `ProductVariantSelect` 가 대신 뜬다. 여기는 그걸 못 받은
+ * 상품만 타는 폴백이다.
+ *
+ * **알려진 제약** — 쌓인 라인을 지운 뒤 같은 값을 다시 골라도 라인이 되살아나지 않는다.
+ * `value` 가 `picked` 로 controlled 라 같은 값을 다시 고르면 Radix 가 변경으로 보지
+ * 않아 `onValueChange` 를 내지 않는다(`ProductVariantSelect` 가 값을 고정해 둔 것과
+ * 같은 이유). 고치려면 라인을 지울 때 `picked` 도 비워야 하는데, 라인이 여럿일 때 어느
+ * 축을 비울지 규칙을 정해야 한다. 폴백 경로라 실제로 밟히지 않아 그대로 둔다 —
+ * `variants` 없는 상품이 실제로 생기면 그때 정한다.
  */
 export function ProductOptionSelects({
   axes,
