@@ -7,6 +7,7 @@ import Sidebar from "./sidebar";
 
 export type MenuItem =
   | "dashboard"
+  | "members"
   | "users"
   | "user-roles"
   | "user-groups"
