@@ -395,5 +395,6 @@
   "order_items_unavailable": "None of these items can be ordered",
   "go_to_cart": "Go to cart",
   "seo_order_title": "Order | Seoul Moment",
-  "seo_order_description": "Confirm your shipping address and payment method to complete the order."
+  "seo_order_description": "Confirm your shipping address and payment method to complete the order.",
+  "product_sold_out": "This product is sold out."
 }
