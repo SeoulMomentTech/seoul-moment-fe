@@ -2,6 +2,18 @@
 
 All notable changes to `@seoul-moment/web` are documented here.
 
+## 1.4.0 — 2026-09-16
+
+### Features
+
+- Drive the order sheet from a single order source (`40af9df`)
+- Add a buy-now entry point to product detail (`386b184`)
+
+### Fixes
+
+- Let a variant be picked again after its line is removed (`e6dcbf2`)
+- Keep the order sheet rendered while a new address is priced (`cd6a469`)
+
 ## 1.3.0 — 2026-09-16
 
 ### Features
