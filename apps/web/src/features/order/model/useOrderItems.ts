@@ -24,6 +24,7 @@ export const useOrderItems = ({ city, district }: UseOrderItemsParams) => {
     data: preview,
     isPending,
     isError,
+    isPlaceholderData,
     refetch,
   } = useOrderPreviewQuery({ source, city, district });
 
@@ -37,6 +38,8 @@ export const useOrderItems = ({ city, district }: UseOrderItemsParams) => {
     isPending,
     isError,
     refetch,
+    /** 주소를 바꿔 금액을 다시 묻는 중. 지금 보이는 배송비는 직전 주소 기준이다 */
+    isRecalculating: isPlaceholderData,
     /** URL 에 주문 대상이 없거나, cart 와 buy 를 같이 보내 무효인 경우 */
     hasNoSelection: source === null,
   };

@@ -10,6 +10,8 @@ import {
 
 import type { LanguageType } from "@/i18n/const";
 
+import { keepPreviousData } from "@tanstack/react-query";
+
 import { toOrderSourceBody, type OrderSource } from "../model/orderSource";
 
 interface UseOrderPreviewQueryParams {
@@ -67,6 +69,10 @@ export const useOrderPreviewQuery = ({
     },
     select: (res) => res.data,
     enabled: request !== null,
+    // 주소를 고치면 키가 바뀐다. 비워 두면 라인 목록까지 사라져 화면 전체가 스켈레톤으로
+    // 돌아간다 — 주소를 고르는 동안 주문 상품이 없어졌다 나타난다. 직전 결과를 들고
+    // 있다가 새 금액이 오면 갈아끼운다. 그동안은 `isPlaceholderData` 로 알린다.
+    placeholderData: keepPreviousData,
     // 금액은 확정값이라 오래 들고 있을 이유가 없다. 주문서를 다시 열면 다시 묻는다.
     staleTime: 0,
   });
