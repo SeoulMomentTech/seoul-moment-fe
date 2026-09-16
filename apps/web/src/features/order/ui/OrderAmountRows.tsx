@@ -13,6 +13,11 @@ export interface OrderAmountValues {
   regionLabel: string | null;
   /** 배송비가 미확정이면 상품 금액과 같다 */
   totalAmount: number;
+  /**
+   * 주소를 바꿔 금액을 다시 묻는 중. 지금 보이는 배송비·합계는 직전 주소 기준이라
+   * 확정된 값처럼 읽히면 안 된다.
+   */
+  isRecalculating?: boolean;
 }
 
 /**
@@ -26,6 +31,7 @@ export function OrderAmountRows({
   shippingFee,
   regionLabel,
   totalAmount,
+  isRecalculating = false,
 }: OrderAmountValues) {
   const t = useTranslations();
 
@@ -39,7 +45,12 @@ export function OrderAmountRows({
       <div className="text-body-3 flex justify-between gap-4 py-1.5">
         <span>{t("shipping_fee")}</span>
         <span
-          className={cn("tabular-nums", shippingFee == null && "text-neutral")}
+          aria-busy={isRecalculating}
+          className={cn(
+            "tabular-nums transition-opacity",
+            shippingFee == null && "text-neutral",
+            isRecalculating && "opacity-40",
+          )}
         >
           {shippingFee == null
             ? t("shipping_fee_pending")
@@ -50,7 +61,14 @@ export function OrderAmountRows({
       </div>
 
       {regionLabel && (
-        <p className="text-body-5 text-neutral py-0.5 pl-2.5">{regionLabel}</p>
+        <p
+          className={cn(
+            "text-body-5 text-neutral py-0.5 pl-2.5 transition-opacity",
+            isRecalculating && "opacity-40",
+          )}
+        >
+          {regionLabel}
+        </p>
       )}
 
       <hr className="my-4 border-0 border-t border-black/10" />
@@ -59,7 +77,13 @@ export function OrderAmountRows({
         <span className="text-body-3 font-semibold">
           {t("final_payment_amount")}
         </span>
-        <span className="text-title-3 max-sm:text-title-4 font-bold tabular-nums tracking-[-0.03em]">
+        <span
+          aria-busy={isRecalculating}
+          className={cn(
+            "text-title-3 max-sm:text-title-4 font-bold tabular-nums tracking-[-0.03em] transition-opacity",
+            isRecalculating && "opacity-40",
+          )}
+        >
           {toNTCurrency(totalAmount)}
         </span>
       </div>

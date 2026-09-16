@@ -4,17 +4,17 @@ import { useTranslations } from "next-intl";
 
 import { cn } from "@shared/lib/style";
 import { toNTCurrency } from "@shared/lib/utils";
+import type {
+  UserOrderPreviewBrandGroup,
+  UserOrderPreviewItem,
+} from "@shared/services/userOrder";
 import { BaseImage } from "@shared/ui/base-image";
 
 import { Link } from "@/i18n/navigation";
 
-import {
-  isCartItemUnavailable,
-  type UserCartBrandGroup,
-  type UserCartItem,
-} from "@entities/cart";
+import { isCartItemUnavailable } from "@entities/cart";
 
-function OrderLine({ item }: { item: UserCartItem }) {
+function OrderLine({ item }: { item: UserOrderPreviewItem }) {
   const t = useTranslations();
 
   return (
@@ -64,7 +64,7 @@ function OrderLine({ item }: { item: UserCartItem }) {
 }
 
 interface OrderItemListProps {
-  groups: ReadonlyArray<UserCartBrandGroup>;
+  groups: ReadonlyArray<UserOrderPreviewBrandGroup>;
 }
 
 /**
@@ -101,7 +101,7 @@ export function OrderItemList({ groups }: OrderItemListProps) {
           </div>
 
           {group.items.map((item) => (
-            <OrderLine item={item} key={item.cartItemId} />
+            <OrderLine item={item} key={item.productVariantId} />
           ))}
         </div>
       ))}

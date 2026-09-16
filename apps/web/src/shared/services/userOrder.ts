@@ -1,6 +1,6 @@
 import { languageMap, type LanguageType } from "@/i18n/const";
 
-import type { UserCartBrandGroup } from "./userCart";
+import type { UserCartBrandGroup, UserCartItem } from "./userCart";
 
 import type { CommonRes, PublicLanguageCode } from "./";
 import { api } from "./";
@@ -11,27 +11,57 @@ const acceptLanguageHeaders = (languageCode: LanguageType) => ({
   "Accept-language": languageMap[languageCode] ?? "ko",
 });
 
-export interface PostUserOrderPreviewReq extends PublicLanguageCode {
-  cartItemIds: number[];
-  /** 배송지 縣市. 배송비가 지역으로 정해지므로 필수다 */
-  city: string;
-  /** 배송지 區/鄉. 綠島鄉·蘭嶼鄉 은 臺東縣이지만 외섬이다 */
-  district: string;
+export interface UserOrderDirectItem {
+  /** 상품 변형(SKU) ID. 상품상세 v1 응답의 variants[].id */
+  productVariantId: number;
+  quantity: number;
+}
+
+/**
+ * 주문 대상. 장바구니에서 주문하면 cartItemIds, 상품상세 "구매하기" 면 items 를 보낸다.
+ * 스웨거의 "둘 중 정확히 하나" 규칙을 타입으로 강제한다. 미리보기와 주문 생성이 같은 규칙이라
+ * 한 타입을 둘이 나눠 쓴다.
+ */
+export type UserOrderSourceBody =
+  | { cartItemIds: number[]; items?: never }
+  | { cartItemIds?: never; items: UserOrderDirectItem[] };
+
+/** 배송비가 지역으로 정해진다. 생략하면 본섬 기준 예상값이라 둘 다 없거나 둘 다 있다 */
+type UserOrderPreviewAddress =
+  | { city: string; district: string }
+  | { city?: never; district?: never };
+
+export type PostUserOrderPreviewReq = PublicLanguageCode &
+  UserOrderSourceBody &
+  UserOrderPreviewAddress;
+
+/** 미리보기 라인. items("구매하기")로 부르면 장바구니 라인이 아니라 cartItemId 가 null 이다 */
+export interface UserOrderPreviewItem extends Omit<UserCartItem, "cartItemId"> {
+  cartItemId: number | null;
+}
+
+export interface UserOrderPreviewBrandGroup
+  extends Omit<UserCartBrandGroup, "items"> {
+  items: UserOrderPreviewItem[];
 }
 
 export interface PostUserOrderPreviewRes {
-  brandGroups: UserCartBrandGroup[];
+  /** 브랜드별 묶음 (표시용) */
+  brandGroups: UserOrderPreviewBrandGroup[];
   totalProductAmount: number;
-  /** 확정 배송비. 배송지 지역과 무료배송 판정이 모두 반영된 값 */
+  /** 배송비. isShippingEstimated 가 true 면 본섬 기준 예상값이다 */
   shippingFee: number;
   isRemoteIsland: boolean;
+  /** city·district 를 생략하면 true 이고 본섬 기준으로 계산된다 */
+  isShippingEstimated: boolean;
   freeShippingThreshold: number;
   amountToFreeShipping: number;
   totalAmount: number;
 }
 
 /**
- * @description 주문서 금액 미리보기. DB 를 변경하지 않으며, 주소를 바꾸면 다시 호출해야 한다.
+ * @description 주문서 금액 미리보기 (장바구니 주문 · 상품상세 구매하기).
+ * DB 를 변경하지 않으며, 주소를 바꾸면 다시 호출해야 한다.
  */
 export const postUserOrderPreview = ({
   languageCode,
@@ -67,8 +97,8 @@ type UserOrderShippingOption =
   | { useDefaultShipping: false; shipping: UserOrderShipping };
 
 export type CreateUserOrderReq = PublicLanguageCode &
+  UserOrderSourceBody &
   UserOrderShippingOption & {
-    cartItemIds: number[];
     paymentMethod: UserOrderPaymentMethod;
   };
 

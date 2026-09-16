@@ -14,7 +14,6 @@ import FixedBox from "@shared/ui/fixed-box";
 
 import { Link } from "@/i18n/navigation";
 
-import { useOrderPreviewQuery } from "@entities/order";
 import { useGetUserInfoQuery, useGetUserProfileQuery } from "@entities/user";
 import {
   OrderAmountRows,
@@ -72,15 +71,6 @@ function OrderEmpty({ description }: { description: string }) {
 export function OrderPage() {
   const t = useTranslations();
 
-  const {
-    cartItemIds,
-    groups,
-    productAmount,
-    isPending,
-    isError,
-    hasNoSelection,
-  } = useOrderItems();
-
   const { data: profile } = useGetUserProfileQuery();
   const { data: userInfo } = useGetUserInfoQuery();
 
@@ -89,22 +79,32 @@ export function OrderPage() {
   const [paymentMethod, setPaymentMethod] =
     useState<UserOrderPaymentMethod>("LINE_PAY");
 
-  // 배송비는 배송지가 정해진 뒤에만 확정된다. 주소 없이 부르지 않는 규칙은 쿼리가 들고 있다.
-  const { data: preview } = useOrderPreviewQuery({
-    cartItemIds,
-    city: shipping.city,
-    district: shipping.district,
-  });
+  // 라인도 금액도 미리보기 응답에서 읽는다. 주문 대상은 URL 이 들고 있다.
+  const {
+    groups,
+    itemCount,
+    preview,
+    isPending,
+    isError,
+    isRecalculating,
+    hasNoSelection,
+  } = useOrderItems({ city: shipping.city, district: shipping.district });
+
+  // 주소가 없으면 서버가 본섬 기준 예상 배송비를 주지만 주문서는 확정값만 그린다 —
+  // 예상값을 그대로 쓰면 주소를 넣기 전인데 확정 금액처럼 읽힌다.
+  const productAmount = preview?.totalProductAmount ?? 0;
+  const isShippingFixed = preview != null && !preview.isShippingEstimated;
 
   const amounts = {
-    productAmount: preview?.totalProductAmount ?? productAmount,
-    shippingFee: preview?.shippingFee ?? null,
-    regionLabel: preview
+    productAmount,
+    shippingFee: isShippingFixed ? preview.shippingFee : null,
+    regionLabel: isShippingFixed
       ? `${shipping.city} ${shipping.district} · ${t(
           preview.isRemoteIsland ? "remote_island" : "main_island",
         )}`
       : null,
-    totalAmount: preview?.totalAmount ?? productAmount,
+    totalAmount: isShippingFixed ? preview.totalAmount : productAmount,
+    isRecalculating,
   };
 
   return (
@@ -124,16 +124,14 @@ export function OrderPage() {
           {t("order_sheet")}
         </h1>
 
-        {isPending ? (
+        {hasNoSelection ? (
+          <OrderEmpty description={t("order_no_selection")} />
+        ) : isPending ? (
           <OrderSkeleton />
         ) : isError ? (
           <OrderEmpty description={t("please_try_again")} />
         ) : !groups.length ? (
-          <OrderEmpty
-            description={t(
-              hasNoSelection ? "order_no_selection" : "order_items_unavailable",
-            )}
-          />
+          <OrderEmpty description={t("order_items_unavailable")} />
         ) : (
           <>
             <div
@@ -144,7 +142,7 @@ export function OrderPage() {
             >
               <div>
                 <OrderSection
-                  badge={String(groups.reduce((n, g) => n + g.items.length, 0))}
+                  badge={String(itemCount)}
                   title={t("order_items")}
                 >
                   <OrderItemList groups={groups} />

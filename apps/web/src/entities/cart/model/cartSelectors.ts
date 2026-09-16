@@ -9,8 +9,9 @@ export const listCartItems = (
 /**
  * 살 수 없는 라인인지. 서버가 금액 합계에서 빼는 라인은 품절 외의 사유(판매중지 등)도 포함한다.
  */
-export const isCartItemUnavailable = (item: UserCartItem): boolean =>
-  item.isSoldOut || !item.isAvailable;
+export const isCartItemUnavailable = (
+  item: Pick<UserCartItem, "isAvailable" | "isSoldOut">,
+): boolean => item.isSoldOut || !item.isAvailable;
 
 /** 남은 개수를 알릴 만큼 재고가 적은지. 품절은 별도 표기라 제외한다 */
 export const isCartItemLowStock = (item: UserCartItem): boolean =>
