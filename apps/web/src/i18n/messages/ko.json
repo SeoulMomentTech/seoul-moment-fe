@@ -395,5 +395,6 @@
   "order_items_unavailable": "주문할 수 있는 상품이 없습니다",
   "go_to_cart": "장바구니로 가기",
   "seo_order_title": "주문서 | Seoul Moment",
-  "seo_order_description": "배송지와 결제 수단을 확인하고 주문을 마무리하는 페이지입니다."
+  "seo_order_description": "배송지와 결제 수단을 확인하고 주문을 마무리하는 페이지입니다.",
+  "product_sold_out": "품절된 상품입니다."
 }
