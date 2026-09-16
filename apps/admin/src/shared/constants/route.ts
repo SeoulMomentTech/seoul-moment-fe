@@ -42,6 +42,10 @@ export const PATH = {
   BRAND_PROMOTION_ADD: "/brand/promotion/add",
   BRAND_PROMOTION_EDIT: "/brand/promotion/edit/:id",
 
+  // Member (서비스 회원 — /users 는 관리자 계정이라 다른 도메인이다)
+  MEMBERS: "/members",
+  MEMBER_DETAIL: "/members/:memberId",
+
   // User
   USERS: "/users",
 
