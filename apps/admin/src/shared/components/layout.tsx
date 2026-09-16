@@ -47,7 +47,9 @@ export function Layout({ children }: PropsWithChildren) {
           isMobileMenuOpen={isMobileMenuOpen}
           onMobileMenuClose={() => setIsMobileMenuOpen(false)}
         />
-        <main className="ml-56 flex-1 max-lg:ml-0">{children}</main>
+        {/* min-w-0: flex 아이템 기본값(min-width:auto)이면 넓은 테이블이 main 을
+            늘려 페이지 전체가 가로로 넘친다. 스크롤은 테이블이 스스로 가진다. */}
+        <main className="ml-56 min-w-0 flex-1 max-lg:ml-0">{children}</main>
       </Flex>
     </div>
   );
