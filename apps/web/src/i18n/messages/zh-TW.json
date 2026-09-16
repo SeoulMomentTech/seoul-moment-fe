@@ -395,5 +395,6 @@
   "order_items_unavailable": "沒有可訂購的商品",
   "go_to_cart": "前往購物車",
   "seo_order_title": "訂單 | Seoul Moment",
-  "seo_order_description": "確認配送地址與付款方式以完成訂單。"
+  "seo_order_description": "確認配送地址與付款方式以完成訂單。",
+  "product_sold_out": "此商品已售完。"
 }
