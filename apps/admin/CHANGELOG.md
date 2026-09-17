@@ -2,6 +2,12 @@
 
 All notable changes to `@seoul-moment/admin` are documented here.
 
+## 0.3.0 — 2026-09-17
+
+### Features
+
+- Build dashboard home as a hub of management cards (`794ee23c`)
+
 ## 0.2.0 — 2026-09-16
 
 ### Features
