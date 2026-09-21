@@ -23,8 +23,13 @@ export {
 } from "./model/cartPolicy";
 export type {
   AddCartItemsOutcome,
+  CartApi,
+  CartBrandGroup,
   CartItemDraft,
+  CartLine,
+  GetCartRes,
   GetUserCartRes,
+  ResolvedCartItemDraft,
   UserCartBrandGroup,
   UserCartItem,
 } from "./model/types";
