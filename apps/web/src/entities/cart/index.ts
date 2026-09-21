@@ -26,6 +26,8 @@ export {
   useGuestCartIdHydrated,
   useGuestCartIdStore,
 } from "./model/guestId";
+export { useCartSource } from "./api/useCartSource";
+export { resolveCartSource, type CartSource } from "./model/cartSource";
 export type {
   AddCartItemsOutcome,
   CartApi,
