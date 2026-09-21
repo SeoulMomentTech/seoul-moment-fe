@@ -46,26 +46,30 @@ export function CartList() {
   const items = useMemo(() => listCartItems(brandGroups), [brandGroups]);
 
   // 품절·판매중지 라인은 고를 수 없다. 선택에서 빼야 합계와 개수가 서로 맞는다.
-  const unselectableIds = useMemo(
+  const unselectableVariantIds = useMemo(
     () =>
       new Set(
-        items.filter(isCartItemUnavailable).map((item) => item.cartItemId),
+        items
+          .filter(isCartItemUnavailable)
+          .map((item) => item.productVariantId),
       ),
     [items],
   );
 
-  const selection = useCartSelection(items, unselectableIds);
+  const selection = useCartSelection(items, unselectableVariantIds);
 
   // 되돌리기용 스냅샷. 토스트 액션이 실행될 시점에는 목록에서 이미 사라졌으므로 따로 들고 있는다.
   const removedRef = useRef<UserCartItem[]>([]);
 
   const handleRemove = useCallback(
-    (cartItemIds: ReadonlyArray<number>) => {
-      if (!cartItemIds.length) return;
+    (productVariantIds: ReadonlyArray<number>) => {
+      if (!productVariantIds.length) return;
 
-      const ids = new Set(cartItemIds);
-      removedRef.current = items.filter((item) => ids.has(item.cartItemId));
-      removeItems(cartItemIds);
+      const ids = new Set(productVariantIds);
+      const targets = items.filter((item) => ids.has(item.productVariantId));
+      removedRef.current = targets;
+      // `removeItems` 는 아직 회원 전용 API 라 `cartItemId` 를 받는다 — SKU 에서 되찾아 넘긴다.
+      removeItems(targets.map((item) => item.cartItemId));
 
       const snapshot = removedRef.current;
       toast(t("removed_from_cart"), {
@@ -78,9 +82,22 @@ export function CartList() {
     [items, removeItems, restoreItems, t],
   );
 
+  // `updateQuantity` 도 아직 회원 전용 API 라 `cartItemId` 를 받는다 — SKU 에서 되찾아 넘긴다.
+  const handleQuantityChange = useCallback(
+    (productVariantId: number, quantity: number) => {
+      const target = items.find(
+        (item) => item.productVariantId === productVariantId,
+      );
+      if (!target) return;
+
+      updateQuantity(target.cartItemId, quantity);
+    },
+    [items, updateQuantity],
+  );
+
   const selectedAmount = useMemo(
-    () => sumSelectedAmount(items, selection.selectedCartItemIds),
-    [items, selection.selectedCartItemIds],
+    () => sumSelectedAmount(items, selection.selectedVariantIds),
+    [items, selection.selectedVariantIds],
   );
 
   const shipping = useMemo(
@@ -125,7 +142,11 @@ export function CartList() {
   const orderHref = selection.selectedCount
     ? toOrderHref({
         type: "cart",
-        cartItemIds: [...selection.selectedCartItemIds],
+        cartItemIds: items
+          .filter((item) =>
+            selection.selectedVariantIds.has(item.productVariantId),
+          )
+          .map((item) => item.cartItemId),
       })
     : null;
 
@@ -143,10 +164,10 @@ export function CartList() {
     <>
       <CartSelectionBar
         allSelected={selection.allSelected}
-        onDeleteAll={() => handleRemove(items.map((item) => item.cartItemId))}
-        onDeleteSelected={() =>
-          handleRemove([...selection.selectedCartItemIds])
+        onDeleteAll={() =>
+          handleRemove(items.map((item) => item.productVariantId))
         }
+        onDeleteSelected={() => handleRemove([...selection.selectedVariantIds])}
         onToggleAll={selection.toggleAll}
         selectedCount={selection.selectedCount}
         someSelected={selection.someSelected}
@@ -164,11 +185,11 @@ export function CartList() {
             <CartBrandGroupSection
               group={group}
               key={group.brandId}
-              onQuantityChange={updateQuantity}
-              onRemove={(cartItemId) => handleRemove([cartItemId])}
+              onQuantityChange={handleQuantityChange}
+              onRemove={(productVariantId) => handleRemove([productVariantId])}
               onToggleGroup={selection.toggleMany}
               onToggleLine={selection.toggle}
-              selectedCartItemIds={selection.selectedCartItemIds}
+              selectedVariantIds={selection.selectedVariantIds}
             />
           ))}
         </div>

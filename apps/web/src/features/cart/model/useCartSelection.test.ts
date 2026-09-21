@@ -5,11 +5,11 @@ import { act, renderHook } from "@testing-library/react";
 
 import { useCartSelection } from "./useCartSelection";
 
-const item = (cartItemId: number): UserCartItem => ({
-  cartItemId,
+const line = (overrides: Partial<UserCartItem>): UserCartItem => ({
+  cartItemId: 1,
   productItemId: 1,
-  productVariantId: cartItemId,
-  productName: `item-${cartItemId}`,
+  productVariantId: 101,
+  productName: "상품",
   optionText: "IVORY / M",
   imageUrl: "",
   price: 1000,
@@ -19,9 +19,14 @@ const item = (cartItemId: number): UserCartItem => ({
   stockQuantity: 50,
   isSoldOut: false,
   isAvailable: true,
+  ...overrides,
 });
 
-const items = [item(1), item(2), item(3)];
+const items = [
+  line({ cartItemId: 1, productVariantId: 1 }),
+  line({ cartItemId: 2, productVariantId: 2 }),
+  line({ cartItemId: 3, productVariantId: 3 }),
+];
 
 describe("useCartSelection", () => {
   it("기본값은 전체 선택이다", () => {
@@ -85,5 +90,25 @@ describe("useCartSelection", () => {
       expect(result.current.allSelected).toBe(false);
       expect(result.current.someSelected).toBe(false);
     });
+  });
+
+  it("라인이 새 cartItemId 로 다시 담겨도 선택 상태가 유지된다", () => {
+    // 삭제 되돌리기는 곧 재담기라 서버가 새 cartItemId 를 매긴다. 라인 키가 SKU 이므로
+    // 같은 라인으로 인식되어야 한다.
+    const before = [line({ cartItemId: 1, productVariantId: 101 })];
+    const after = [line({ cartItemId: 99, productVariantId: 101 })];
+
+    const { result, rerender } = renderHook(
+      ({ items }) => useCartSelection(items),
+      {
+        initialProps: { items: before },
+      },
+    );
+
+    act(() => result.current.toggle(101, false));
+    expect(result.current.selectedCount).toBe(0);
+
+    rerender({ items: after });
+    expect(result.current.selectedCount).toBe(0);
   });
 });
