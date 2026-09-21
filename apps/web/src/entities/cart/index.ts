@@ -21,6 +21,11 @@ export {
   LOW_STOCK_THRESHOLD,
   MAX_LINE_QUANTITY,
 } from "./model/cartPolicy";
+export {
+  useGuestCartId,
+  useGuestCartIdHydrated,
+  useGuestCartIdStore,
+} from "./model/guestId";
 export type {
   AddCartItemsOutcome,
   CartApi,
