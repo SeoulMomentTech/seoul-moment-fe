@@ -939,7 +939,9 @@ export const useCart = () => {
 
 `EMPTY_BRAND_GROUPS` 의 타입은 `CartBrandGroup[]` 으로 바꾼다.
 
-- [ ] **Step 4: `CartList` 의 전체 삭제를 `removeAll` 로 바꾼다**
+- [ ] **Step 4: `CartList` 의 임시 변환을 걷어내고 전체 삭제를 `removeAll` 로 바꾼다**
+
+Task 1 은 `useCart().removeItems`·`updateQuantity` 가 아직 `cartItemId` 를 받는 중간 상태였기 때문에, `CartList.tsx` 안에서 `productVariantId` → `cartItemId` 를 인라인으로 되찾아 넘기고 있다. 이 작업에서 두 함수가 SKU 를 받게 되었으므로 **그 변환과 래퍼(`handleQuantityChange`)를 지우고 SKU 를 그대로 넘긴다.** 남겨두면 한 번 더 번역되어 어긋난다.
 
 `apps/web/src/features/cart/ui/CartList.tsx`:
 
