@@ -25,7 +25,9 @@ const cartItem = (overrides: Partial<UserCartItem> = {}): UserCartItem => {
   return {
     cartItemId: nextCartItemId,
     productItemId: 1,
-    productVariantId: nextCartItemId,
+    // cartItemId 와 값을 다르게 둬야 한다 — 같으면 라인 키가 productVariantId 인지
+    // cartItemId 인지 이 테스트로는 구분할 수 없다.
+    productVariantId: nextCartItemId + 1000,
     productName: `상품 ${nextCartItemId}`,
     optionText: "IVORY / M",
     imageUrl: "",
