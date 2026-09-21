@@ -17,7 +17,7 @@ import {
   listCartItems,
   sumSelectedAmount,
   useCart,
-  type UserCartItem,
+  type CartLine,
 } from "@entities/cart";
 import { toOrderHref } from "@entities/order";
 import { Button } from "@seoul-moment/ui";
@@ -40,6 +40,7 @@ export function CartList() {
     remoteIslandFee,
     updateQuantity,
     removeItems,
+    removeAll,
     restoreItems,
   } = useCart();
 
@@ -59,17 +60,17 @@ export function CartList() {
   const selection = useCartSelection(items, unselectableVariantIds);
 
   // 되돌리기용 스냅샷. 토스트 액션이 실행될 시점에는 목록에서 이미 사라졌으므로 따로 들고 있는다.
-  const removedRef = useRef<UserCartItem[]>([]);
+  const removedRef = useRef<CartLine[]>([]);
 
   const handleRemove = useCallback(
     (productVariantIds: ReadonlyArray<number>) => {
       if (!productVariantIds.length) return;
 
       const ids = new Set(productVariantIds);
-      const targets = items.filter((item) => ids.has(item.productVariantId));
-      removedRef.current = targets;
-      // `removeItems` 는 아직 회원 전용 API 라 `cartItemId` 를 받는다 — SKU 에서 되찾아 넘긴다.
-      removeItems(targets.map((item) => item.cartItemId));
+      removedRef.current = items.filter((item) =>
+        ids.has(item.productVariantId),
+      );
+      removeItems(productVariantIds);
 
       const snapshot = removedRef.current;
       toast(t("removed_from_cart"), {
@@ -82,18 +83,17 @@ export function CartList() {
     [items, removeItems, restoreItems, t],
   );
 
-  // `updateQuantity` 도 아직 회원 전용 API 라 `cartItemId` 를 받는다 — SKU 에서 되찾아 넘긴다.
-  const handleQuantityChange = useCallback(
-    (productVariantId: number, quantity: number) => {
-      const target = items.find(
-        (item) => item.productVariantId === productVariantId,
-      );
-      if (!target) return;
+  const handleRemoveAll = useCallback(() => {
+    if (!items.length) return;
 
-      updateQuantity(target.cartItemId, quantity);
-    },
-    [items, updateQuantity],
-  );
+    removedRef.current = [...items];
+    removeAll();
+
+    const snapshot = removedRef.current;
+    toast(t("removed_from_cart"), {
+      action: { label: t("undo"), onClick: () => void restoreItems(snapshot) },
+    });
+  }, [items, removeAll, restoreItems, t]);
 
   const selectedAmount = useMemo(
     () => sumSelectedAmount(items, selection.selectedVariantIds),
@@ -142,11 +142,14 @@ export function CartList() {
   const orderHref = selection.selectedCount
     ? toOrderHref({
         type: "cart",
+        // 게스트 라인엔 `cartItemId` 가 없다. 지금 화면은 회원 전용이라 실제로 비지
+        // 않지만, 타입상 있을 수 있는 null 은 걸러야 서버가 받는 목록이 어긋나지 않는다.
         cartItemIds: items
           .filter((item) =>
             selection.selectedVariantIds.has(item.productVariantId),
           )
-          .map((item) => item.cartItemId),
+          .map((item) => item.cartItemId)
+          .filter((id): id is number => id != null),
       })
     : null;
 
@@ -164,9 +167,7 @@ export function CartList() {
     <>
       <CartSelectionBar
         allSelected={selection.allSelected}
-        onDeleteAll={() =>
-          handleRemove(items.map((item) => item.productVariantId))
-        }
+        onDeleteAll={handleRemoveAll}
         onDeleteSelected={() => handleRemove([...selection.selectedVariantIds])}
         onToggleAll={selection.toggleAll}
         selectedCount={selection.selectedCount}
@@ -185,7 +186,7 @@ export function CartList() {
             <CartBrandGroupSection
               group={group}
               key={group.brandId}
-              onQuantityChange={handleQuantityChange}
+              onQuantityChange={updateQuantity}
               onRemove={(productVariantId) => handleRemove([productVariantId])}
               onToggleGroup={selection.toggleMany}
               onToggleLine={selection.toggle}

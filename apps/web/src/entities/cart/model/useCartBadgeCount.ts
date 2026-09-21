@@ -2,7 +2,7 @@
 
 import { useIsRestoring } from "@tanstack/react-query";
 
-import { useUserCartCountQuery } from "../api/useUserCart";
+import { useUserCartCountQuery } from "../api/useMemberCart";
 
 /**
  * 헤더 배지에 찍을 라인 수.

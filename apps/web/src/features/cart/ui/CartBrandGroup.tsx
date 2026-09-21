@@ -10,11 +10,11 @@ import {
   CartLineRow,
   isCartItemUnavailable,
   sumSelectedAmount,
-  type UserCartBrandGroup,
+  type CartBrandGroup,
 } from "@entities/cart";
 
 interface CartBrandGroupProps {
-  group: UserCartBrandGroup;
+  group: CartBrandGroup;
   selectedVariantIds: ReadonlySet<number>;
   onToggleLine(productVariantId: number, selected: boolean): void;
   onToggleGroup(

@@ -253,8 +253,8 @@ describe("수량 변경", () => {
     const [line] = items(result);
 
     act(() => {
-      result.current.updateQuantity(line.cartItemId, 2);
-      result.current.updateQuantity(line.cartItemId, 3);
+      result.current.updateQuantity(line.productVariantId, 2);
+      result.current.updateQuantity(line.productVariantId, 3);
     });
 
     // 전송 전에 이미 화면이 움직여 있어야 스테퍼가 굳어 보이지 않는다.
@@ -277,7 +277,7 @@ describe("수량 변경", () => {
     updateUserCartItem.mockImplementationOnce(conflict);
 
     act(() => {
-      result.current.updateQuantity(line.cartItemId, 9);
+      result.current.updateQuantity(line.productVariantId, 9);
     });
 
     await waitFor(() => expect(updateUserCartItem).toHaveBeenCalledTimes(1));
@@ -293,7 +293,7 @@ describe("삭제", () => {
     const [first] = items(result);
 
     act(() => {
-      result.current.removeItems([first.cartItemId]);
+      result.current.removeItems([first.productVariantId]);
     });
 
     // 서버 응답을 기다리지 않고 먼저 사라진다.
@@ -321,7 +321,7 @@ describe("되돌리기", () => {
     const [line] = items(result);
 
     act(() => {
-      result.current.removeItems([line.cartItemId]);
+      result.current.removeItems([line.productVariantId]);
     });
     await waitFor(() => expect(deleteUserCartItems).toHaveBeenCalled());
 

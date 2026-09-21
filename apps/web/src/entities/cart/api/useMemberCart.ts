@@ -24,6 +24,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import { userCartQueryKeys } from "./queryKey";
 import { getCartItemUnitPrice } from "../model/cartSelectors";
+import type { CartApi } from "../model/types";
 
 type CartListCache = CommonRes<GetUserCartRes>;
 type CartCountCache = CommonRes<GetUserCartCountRes>;
@@ -142,7 +143,7 @@ export function useFetchUserCart() {
  * 두면 스테퍼가 그 시간만큼 굳어 보인다. 그래서 화면 반영과 전송을 떼어 놓았다.
  * 실패 시 되돌리기는 스냅샷 대신 서버 재조회로 한다 — 옳은 값을 아는 쪽은 서버다.
  */
-export function useSetCartItemQuantity() {
+function useSetCartItemQuantity() {
   const queryClient = useQueryClient();
   const keys = useUserCartKeys();
 
@@ -305,4 +306,92 @@ export function useDeleteUserCartItemsMutation({
     },
     onSettled: invalidateUserCart,
   });
+}
+
+/**
+ * 회원 장바구니 어댑터.
+ *
+ * 화면은 라인을 `productVariantId` 로 가리키지만 서버는 `cartItemId` 를 요구한다.
+ * 그 번역이 이 훅 안에서 끝나고, 밖으로는 새어 나가지 않는다.
+ */
+export function useMemberCart(): CartApi {
+  const queryClient = useQueryClient();
+  const keys = useUserCartKeys();
+
+  const { data, isPending, isError, refetch } = useUserCartQuery();
+  const fetchUserCart = useFetchUserCart();
+  const setItemQuantity = useSetCartItemQuantity();
+
+  const { mutateAsync: createItems } = useCreateUserCartItemsMutation({
+    toastOnError: false,
+  });
+  const { mutateAsync: updateItem } = useUpdateUserCartItemMutation({
+    toastOnError: false,
+  });
+  const { mutate: deleteItems } = useDeleteUserCartItemsMutation();
+
+  // 캐시에서 직접 찾는다. 렌더 시점의 값을 닫아두면 디바운스된 전송이 낡은 id 를 쓴다.
+  const toCartItemId = useCallback(
+    (productVariantId: number) =>
+      queryClient
+        .getQueryData<CartListCache>(keys.list)
+        ?.data.brandGroups.flatMap((group) => group.items)
+        .find((item) => item.productVariantId === productVariantId)
+        ?.cartItemId ?? null,
+    [queryClient, keys.list],
+  );
+
+  return {
+    data,
+    isPending,
+    isError,
+    refetch: useCallback(() => void refetch(), [refetch]),
+    fetchCart: useCallback(
+      () =>
+        fetchUserCart()
+          .then((res) => res.data)
+          .catch(() => null),
+      [fetchUserCart],
+    ),
+    addItems: useCallback(
+      async (items) => {
+        await createItems({ items: [...items] });
+      },
+      [createItems],
+    ),
+    setLineQuantity: useCallback(
+      (productVariantId, quantity) => {
+        const cartItemId = toCartItemId(productVariantId);
+        if (cartItemId == null) return;
+
+        setItemQuantity(cartItemId, quantity);
+      },
+      [setItemQuantity, toCartItemId],
+    ),
+    commitQuantity: useCallback(
+      async (productVariantId, quantity) => {
+        const cartItemId = toCartItemId(productVariantId);
+        // 라인이 이미 사라졌다. 보낼 곳이 없으므로 조용히 끝낸다.
+        if (cartItemId == null) return;
+
+        await updateItem({ cartItemId, quantity });
+      },
+      [toCartItemId, updateItem],
+    ),
+    removeItems: useCallback(
+      (productVariantIds) => {
+        const ids = productVariantIds
+          .map(toCartItemId)
+          .filter((id): id is number => id != null);
+
+        // `deleteUserCartItems()` 를 빈 인자로 부르면 전체 비우기다. 지울 것이 없으면
+        // 호출 자체를 하지 않는다.
+        if (!ids.length) return;
+
+        deleteItems(ids);
+      },
+      [deleteItems, toCartItemId],
+    ),
+    removeAll: useCallback(() => deleteItems(undefined), [deleteItems]),
+  };
 }

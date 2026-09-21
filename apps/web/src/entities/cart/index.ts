@@ -1,10 +1,11 @@
 export {
   useCreateUserCartItemsMutation,
   useDeleteUserCartItemsMutation,
+  useMemberCart,
   useUpdateUserCartItemMutation,
   useUserCartCountQuery,
   useUserCartQuery,
-} from "./api/useUserCart";
+} from "./api/useMemberCart";
 export { USER_CART_QUERY_KEY, userCartQueryKeys } from "./api/queryKey";
 export {
   estimateShipping,

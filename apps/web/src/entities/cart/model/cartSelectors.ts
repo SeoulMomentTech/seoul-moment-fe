@@ -1,26 +1,26 @@
 import { LOW_STOCK_THRESHOLD } from "./cartPolicy";
-import type { UserCartBrandGroup, UserCartItem } from "./types";
+import type { CartBrandGroup, CartLine } from "./types";
 
 /** 브랜드 묶음을 풀어 라인 하나하나로 본다. 선택·전체삭제처럼 브랜드가 무의미한 계산에 쓴다 */
 export const listCartItems = (
-  brandGroups: ReadonlyArray<UserCartBrandGroup>,
-): UserCartItem[] => brandGroups.flatMap((group) => group.items);
+  brandGroups: ReadonlyArray<CartBrandGroup>,
+): CartLine[] => brandGroups.flatMap((group) => group.items);
 
 /**
  * 살 수 없는 라인인지. 서버가 금액 합계에서 빼는 라인은 품절 외의 사유(판매중지 등)도 포함한다.
  */
 export const isCartItemUnavailable = (
-  item: Pick<UserCartItem, "isAvailable" | "isSoldOut">,
+  item: Pick<CartLine, "isAvailable" | "isSoldOut">,
 ): boolean => item.isSoldOut || !item.isAvailable;
 
 /** 남은 개수를 알릴 만큼 재고가 적은지. 품절은 별도 표기라 제외한다 */
-export const isCartItemLowStock = (item: UserCartItem): boolean =>
+export const isCartItemLowStock = (item: CartLine): boolean =>
   !isCartItemUnavailable(item) &&
   item.stockQuantity > 0 &&
   item.stockQuantity < LOW_STOCK_THRESHOLD;
 
 /** 할인가가 유효하면 할인가, 아니면 정상가 */
-export const getCartItemUnitPrice = (item: UserCartItem): number =>
+export const getCartItemUnitPrice = (item: CartLine): number =>
   item.discountPrice != null &&
   item.discountPrice > 0 &&
   item.discountPrice < item.price
@@ -38,7 +38,7 @@ export const getCartItemUnitPrice = (item: UserCartItem): number =>
  * 게스트 라인에는 `cartItemId` 가 없다.
  */
 export const sumSelectedAmount = (
-  items: ReadonlyArray<Pick<UserCartItem, "productVariantId" | "totalPrice">>,
+  items: ReadonlyArray<Pick<CartLine, "productVariantId" | "totalPrice">>,
   selectedVariantIds: ReadonlySet<number>,
 ): number =>
   items.reduce(
