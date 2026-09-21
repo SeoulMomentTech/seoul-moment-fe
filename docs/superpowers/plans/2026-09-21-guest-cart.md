@@ -698,7 +698,7 @@ export const resolveCartSource = ({
 - [ ] **Step 4: 통과를 확인한다**
 
 Run: `pnpm --filter @seoul-moment/web exec vitest run src/entities/cart/model/cartSource.test.ts`
-Expected: PASS (4개)
+Expected: PASS (5개)
 
 - [ ] **Step 5: store 를 읽는 훅을 만든다**
 
@@ -1751,6 +1751,20 @@ describe("toCartOrderHref", () => {
     expect(href).not.toContain("11");
   });
 
+  it("고른 라인 중 하나라도 서버 id 가 없으면 링크를 만들지 않는다", () => {
+    // 일부만 주문되면 사용자는 무엇이 빠졌는지 알 수 없다.
+    expect(
+      toCartOrderHref({
+        source: { kind: "member" },
+        lines: [
+          line({ cartItemId: 11, productVariantId: 101 }),
+          line({ cartItemId: null, productVariantId: 102 }),
+        ],
+        selectedVariantIds: new Set([101, 102]),
+      }),
+    ).toBeNull();
+  });
+
   it("게스트는 로그인으로 보낸다", () => {
     // 주문·결제는 회원 전용이다. 빈 주문서로 보내는 것보다 로그인이 정직하다.
     expect(
@@ -1813,12 +1827,19 @@ export const toCartOrderHref = ({
 
   if (source.kind === "guest") return "/login";
 
-  const cartItemIds = lines
-    .filter((line) => selectedVariantIds.has(line.productVariantId))
+  const selected = lines.filter((line) =>
+    selectedVariantIds.has(line.productVariantId),
+  );
+
+  const cartItemIds = selected
     .map((line) => line.cartItemId)
     .filter((cartItemId): cartItemId is number => cartItemId != null);
 
-  return cartItemIds.length ? toOrderHref({ type: "cart", cartItemIds }) : null;
+  // 고른 라인 중 하나라도 서버 id 가 없으면 링크를 만들지 않는다. 일부만 주문서로 넘기면
+  // 사용자는 무엇이 빠졌는지 알 수 없다 — 담기의 all-or-nothing 과 같은 규칙이다.
+  return cartItemIds.length && cartItemIds.length === selected.length
+    ? toOrderHref({ type: "cart", cartItemIds })
+    : null;
 };
 ```
 
@@ -1827,7 +1848,7 @@ export const toCartOrderHref = ({
 - [ ] **Step 4: 통과를 확인한다**
 
 Run: `pnpm --filter @seoul-moment/web exec vitest run src/entities/cart/model/cartOrderHref.test.ts`
-Expected: PASS (4개)
+Expected: PASS (5개)
 
 - [ ] **Step 5: 비로그인 담기가 되는 테스트를 고친다**
 
