@@ -36,6 +36,7 @@ export {
 } from "./model/guestId";
 export { useCartSource } from "./api/useCartSource";
 export { resolveCartSource, type CartSource } from "./model/cartSource";
+export { toCartOrderHref } from "./model/cartOrderHref";
 export type {
   AddCartItemsOutcome,
   CartApi,

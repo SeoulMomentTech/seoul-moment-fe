@@ -78,6 +78,27 @@ vi.mock("@shared/services/userCart", () => ({
   deleteUserCartItems: vi.fn(),
 }));
 
+// 비로그인 담기는 게스트 어댑터(`useGuestCart`)를 탄다 — 회원 mock 과 같은 모양으로 응답한다.
+const createGuestCartItems = vi.fn(() =>
+  Promise.resolve({
+    result: true,
+    data: { guestId: "g-test", items: [], totalCount: 1 },
+  }),
+);
+
+vi.mock("@shared/services/guestCart", () => ({
+  createGuestCartItems: () => createGuestCartItems(),
+  getGuestCart: () =>
+    Promise.resolve({
+      result: true,
+      data: { brandGroups: [], totalCount: 0 },
+    }),
+  getGuestCartCount: vi.fn(),
+  updateGuestCartItem: vi.fn(),
+  deleteGuestCartItem: vi.fn(),
+  deleteGuestCart: vi.fn(),
+}));
+
 const value = (id: number, v: string): OptionValue => ({ id, value: v });
 
 const variant = (id: number, optionValueIds: number[]) => ({
@@ -593,8 +614,7 @@ describe('"구매하기" 로 주문서에 넘길 SKU', () => {
     expect(result.current.toDirectItems()).toBeNull();
   });
 
-  it("비로그인이면 넘기지 않는다", () => {
-    // 렌더 시점의 인증 상태를 가져가므로 훅을 만들기 전에 바꾼다.
+  it("비로그인이어도 담기는 된다", async () => {
     authState.isAuthenticated = false;
 
     try {
@@ -602,7 +622,27 @@ describe('"구매하기" 로 주문서에 넘길 SKU', () => {
 
       act(() => result.current.pickVariant(101));
 
-      expect(result.current.lines).toHaveLength(1);
+      await act(async () => {
+        expect(await result.current.submit()).toBe(true);
+      });
+
+      // 비로그인이라 회원이 아니라 게스트 어댑터로 담긴다.
+      expect(createGuestCartItems).toHaveBeenCalled();
+      expect(createUserCartItems).not.toHaveBeenCalled();
+    } finally {
+      authState.isAuthenticated = true;
+    }
+  });
+
+  it("비로그인이면 구매하기는 막는다", () => {
+    // 주문·결제는 회원 전용이다.
+    authState.isAuthenticated = false;
+
+    try {
+      const { result } = setup(clothing, [variant(101, [1, 10, 20])]);
+
+      act(() => result.current.pickVariant(101));
+
       expect(result.current.toDirectItems()).toBeNull();
     } finally {
       authState.isAuthenticated = true;

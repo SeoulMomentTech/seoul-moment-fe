@@ -319,10 +319,6 @@ export const useAddToCartDraft = ({ product }: UseAddToCartDraftArgs) => {
   }, [isAuthenticated, lines, toVariantDrafts, t]);
 
   const submit = useCallback(async () => {
-    if (!isAuthenticated) {
-      toast.error(t("login_required"));
-      return false;
-    }
     if (!lines.length) return false;
 
     const result = await addItems(toVariantDrafts());
@@ -338,7 +334,7 @@ export const useAddToCartDraft = ({ product }: UseAddToCartDraftArgs) => {
     if (result.status !== "added") return false;
 
     return true;
-  }, [isAuthenticated, lines, toVariantDrafts, addItems, t]);
+  }, [lines, toVariantDrafts, addItems, t]);
 
   return {
     mode,

@@ -16,10 +16,11 @@ import {
   isCartItemUnavailable,
   listCartItems,
   sumSelectedAmount,
+  toCartOrderHref,
   useCart,
+  useCartSource,
   type CartLine,
 } from "@entities/cart";
-import { toOrderHref } from "@entities/order";
 import { Button } from "@seoul-moment/ui";
 
 import { CartBar } from "./CartBar";
@@ -43,6 +44,7 @@ export function CartList() {
     removeAll,
     restoreItems,
   } = useCart();
+  const source = useCartSource();
 
   const items = useMemo(() => listCartItems(brandGroups), [brandGroups]);
 
@@ -137,25 +139,13 @@ export function CartList() {
 
   if (!items.length) return <CartEmpty />;
 
-  // 주문서는 고른 라인만 다룬다. id 를 URL 로 넘기므로 새로고침·뒤로가기에도 대상이 남는다.
-  // 고른 것이 없으면 링크 자체를 만들지 않는다 — 빈 주문서로 보내지 않는다.
-  const selectedLines = items.filter((item) =>
-    selection.selectedVariantIds.has(item.productVariantId),
-  );
-  const selectedCartItemIds = selectedLines
-    .map((item) => item.cartItemId)
-    .filter((id): id is number => id != null);
-
-  // 전부 아니면 없음. 게스트 라인엔 `cartItemId` 가 없다 — 고른 라인 중 하나라도 서버
-  // id 가 없으면 나머지만으로 주문서를 채우지 않는다. `useCart.addItems` 가 SKU 를 못
-  // 정한 라인 앞에서 아무것도 담지 않는 것과 같은 규칙이다 — 그래야 사용자가 무엇이
-  // 빠졌는지 모른 채 절반만 주문하게 되는 일이 없다. `null` 이면 버튼이 비활성화되는
-  // 기존 경로를 그대로 탄다.
-  const orderHref =
-    selection.selectedCount &&
-    selectedCartItemIds.length === selectedLines.length
-      ? toOrderHref({ type: "cart", cartItemIds: selectedCartItemIds })
-      : null;
+  // 주문서는 고른 라인만 다룬다. 게스트는 `cartItemId` 가 없어 주문서를 만들 수 없으므로
+  // 로그인으로 보내고, 아직 어느 카트인지 모르면(복원 전) 링크를 만들지 않는다.
+  const orderHref = toCartOrderHref({
+    source,
+    lines: items,
+    selectedVariantIds: selection.selectedVariantIds,
+  });
 
   const summary = {
     amount: selectedAmount,
