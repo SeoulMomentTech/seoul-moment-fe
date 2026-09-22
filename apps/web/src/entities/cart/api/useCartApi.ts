@@ -46,10 +46,19 @@ const UNRESOLVED: CartApi = {
 /**
  * 회원·게스트 중 지금 유효한 장바구니.
  *
- * **게스트 분기는 이 파일에만 있다.** 심사가 끝나 게스트 모듈을 걷어낼 때 고칠 곳도
- * 여기다 — 장바구니 조작(`useCartApi`)과 뱃지 수(`useCartCount`), 이 두 훅이 유일한 seam
- * 이다. 훅 규칙상 둘 다 호출하되, 자기 차례가 아닌 쪽은 쿼리의 `enabled` 가 꺼져
- * 아무것도 하지 않는다.
+ * **회원/게스트 중 어느 어댑터를 쓸지 고르는 분기는 이 파일에만 있다** — 장바구니
+ * 조작(`useCartApi`)과 뱃지 수(`useCartCount`), 이 두 훅이 그 분기의 seam 이다. 훅
+ * 규칙상 둘 다 호출하되, 자기 차례가 아닌 쪽은 쿼리의 `enabled` 가 꺼져 아무것도 하지
+ * 않는다.
+ *
+ * 다만 게스트 흔적이 남는 곳은 이 파일 하나가 아니다 — 심사 후 제거할 때는 최소
+ * 아래 두 곳도 함께 봐야 한다.
+ * - `entities/cart/model/cartOrderHref.ts` — `source.kind === "guest"` 면 무조건
+ *   `/login` 으로 보내는 분기.
+ * - `features/cart/ui/CartList.tsx` — 주문 링크를 만들려고 `useCartSource()` 를 한 번
+ *   더 불러 같은 분기를 다시 읽는다.
+ *
+ * (전체 목록은 `apps/web/docs/cart.md` 와 설계 문서의 "심사 후 제거 절차" 참고.)
  */
 export function useCartApi(): CartApi {
   const source = useCartSource();

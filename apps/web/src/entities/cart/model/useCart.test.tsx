@@ -452,14 +452,23 @@ describe.each([
     }
   };
 
-  /** 전체 비우기 검증. 회원은 ids 없이, 게스트는 guestId 로 한 번만 부른다 */
-  const expectRemoveAllCalledOnce = () => {
+  /**
+   * 전체 비우기 검증. 게스트는 선택 삭제가 없어 `guestId` 로 통짜 호출 한 번뿐이다.
+   * 회원은 서버 API 자체는 ids 생략도 지원하지만(전체 비우기), 화면에 지금 보이는
+   * 라인의 `cartItemId` 를 명시해서 보내야 한다 — 다른 기기·다른 탭에서 담겨 이 화면에
+   * 아직 안 보이는 라인까지 함께 지우면 안 된다(회귀 방지).
+   */
+  const expectRemoveAllCalledOnce = (
+    lines: ReadonlyArray<{ cartItemId: number | null }>,
+  ) => {
     if (isGuest) {
       expect(deleteGuestCart).toHaveBeenCalledTimes(1);
       expect(deleteGuestCart).toHaveBeenCalledWith("g-1");
     } else {
       expect(deleteUserCartItems).toHaveBeenCalledTimes(1);
-      expect(deleteUserCartItems).toHaveBeenCalledWith(undefined);
+      expect(deleteUserCartItems).toHaveBeenCalledWith(
+        lines.map((line) => line.cartItemId),
+      );
     }
   };
 
@@ -629,12 +638,14 @@ describe.each([
       expect(removeSpy()).not.toHaveBeenCalled();
     });
 
-    // `removeAll` 은 화면의 id 목록을 모으지 않고 ids 없이 한 번만 호출한다 — 서버
-    // 장바구니 전체를 비우는 요청이라, 선택 삭제와는 다른 서버 호출 모양이다.
-    it("전체 비우기는 ids 없이 한 번만 호출하고 목록을 낙관적으로 비운다", async () => {
+    // 회귀 방지: 회원은 화면에 보이는 라인의 id 를 명시해서 보낸다 — ids 를 생략하면
+    // 서버가 이 화면에 안 보이는 라인(다른 기기·다른 탭에서 담긴 것)까지 통째로
+    // 지운다. 게스트는 선택 삭제가 없어 통짜 호출 하나뿐이다.
+    it("전체 비우기는 화면에 보이는 라인만 명시해서 한 번 호출하고 목록을 낙관적으로 비운다", async () => {
       serverCart = [cartItem(501), cartItem(502)];
       const { result } = await setupLoaded();
-      expect(items(result)).toHaveLength(2);
+      const visible = items(result);
+      expect(visible).toHaveLength(2);
 
       act(() => {
         result.current.removeAll();
@@ -642,7 +653,7 @@ describe.each([
 
       // 서버 응답을 기다리지 않고 먼저 비워진다.
       await waitFor(() => expect(items(result)).toHaveLength(0));
-      expectRemoveAllCalledOnce();
+      expectRemoveAllCalledOnce(visible);
     });
   });
 

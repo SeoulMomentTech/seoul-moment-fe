@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 
-import type { UserCartItem } from "@entities/cart";
+import type { CartLine } from "@entities/cart";
 
 /**
  * 장바구니 선택 상태. URL 로 올리지 않는다 — 새로고침·공유로 보존할 가치가 없고
@@ -16,7 +16,7 @@ import type { UserCartItem } from "@entities/cart";
  * 완료되지 않는다.
  */
 export const useCartSelection = (
-  items: ReadonlyArray<Pick<UserCartItem, "productVariantId">>,
+  items: ReadonlyArray<Pick<CartLine, "productVariantId">>,
   unselectableVariantIds?: ReadonlySet<number>,
 ) => {
   const [excluded, setExcluded] = useState<ReadonlySet<number>>(new Set());

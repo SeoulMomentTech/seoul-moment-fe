@@ -219,15 +219,56 @@ flowchart TD
 
 ## 심사 후 제거 절차
 
-게스트 흔적이 회원 카트 코드에 남지 않도록 제거 경로를 설계에 포함한다.
+게스트 흔적이 회원 카트 코드에 남지 않도록 제거 경로를 설계에 포함한다. 아래는 구현이
+끝난 뒤 실제 `grep -rn '게스트\|Guest\|guestId\|guest/cart\|x-guest-id' apps/web/src` 로
+다시 뽑은 전체 목록이다 — 설계 시점의 계획(파일 3개)보다 훨씬 넓다. `GuestOnly`
+(`shared/lib/components/GuestOnly.tsx`, 로그인·회원가입 화면을 비로그인 전용으로 가두는
+기존 컴포넌트)는 이름이 같은 "게스트"를 쓸 뿐 이 모듈과 무관하므로 대상이 아니다.
 
-1. `shared/services/guestCart.ts` 삭제
-2. `entities/cart/api/useGuestCart.ts`, `entities/cart/model/guestId.ts`,
-   `entities/cart/ui/GuestCartReset.tsx` 삭제
-3. `useCartSource` 를 `member` 고정으로 되돌리고 `useCartApi` 의 분기 제거
-4. `CartPage` 의 `AuthOnly` 와 `CartButton` 의 비로그인 숨김 복구,
-   `useAddToCartDraft` 의 담기 게이트 복구
-5. 계약 스위트의 `describe.each` 를 회원 한 줄로 되돌린다
+**1. 파일째 삭제한다.**
+
+- `shared/services/guestCart.ts`
+- `entities/cart/api/useGuestCart.ts` (+ `useGuestCart.test.tsx`)
+- `entities/cart/model/guestId.ts` (+ `guestId.test.ts`)
+- `entities/cart/ui/GuestCartReset.tsx` (+ `GuestCartReset.test.tsx`)
+- `entities/cart/model/cartSource.ts` (+ `cartSource.test.ts`) — `useCartSource` 를
+  `member` 고정으로 되돌리면 이 판정 함수 자체가 필요 없어진다
+- `views/cart/ui/CartSessionGuard.tsx` (+ `CartSessionGuard.test.tsx`) — `CartPage` 에
+  `AuthOnly` 를 되돌리면 세션 만료를 따로 잡아줄 이유가 없어진다(아래 4번)
+
+**2. 분기를 걷어낸다.**
+
+- `entities/cart/api/useCartApi.ts` — `useGuestCart`/`useGuestCartCountQuery` 호출과
+  `source.kind` 분기 제거, 회원 어댑터만 반환
+- `entities/cart/api/useCartSource.ts` — `guestId` store 참조를 지우고 `member` 고정으로
+- `entities/cart/model/cartOrderHref.ts` — `source.kind === "guest"` 면 `/login` 으로
+  보내는 분기 제거
+- `features/cart/ui/CartList.tsx` — 주문 링크를 만들려고 `useCartSource()` 를 다시 부르는
+  자리 제거
+- `entities/cart/lib/cartError.ts` — `isGuestCartGoneError` 제거
+- `entities/cart/api/queryKey.ts` — `GUEST_CART_QUERY_KEY`, `guestCartQueryKeys` 제거
+- `entities/cart/index.ts` — 배럴에 게스트 관련 export 가 없는 상태(이미 최소화돼 있다)를
+  유지·확인
+- `widgets/header/ui/CartButton.tsx` — 비로그인 숨김 복구("게스트도 장바구니를 쓴다" 주석이
+  가리키는 그 분기)
+- `widgets/header/ui/Header.tsx:146-150` — 데스크톱 카트 아이콘을 다시 회원 전용으로
+  가린다. **Task 8 에서 Critical 로 지적됐던 바로 그 자리** — 게스트 모듈을 걷어낼 때도
+  똑같이 놓치기 쉬우므로 명시해 둔다
+- `views/cart/ui/CartPage.tsx` — `CartSessionGuard` 를 떼고 `AuthOnly` 를 되돌린다
+- `app/[locale]/layout.tsx` — `GuestCartReset` import 와 마운트 제거
+- `features/cart/model/useAddToCartDraft.ts` — 담기 게이트(로그인 필수) 복구
+
+**3. 주석만 정리한다** (동작은 그대로, "회원·게스트" 서술만 회원 전용으로) —
+`entities/cart/model/cartSelectors.ts`, `entities/cart/model/types.ts`,
+`entities/cart/model/useCartBadgeCount.ts`, `entities/cart/model/useCart.ts`,
+`features/cart/ui/CartEmpty.tsx`.
+
+**4. 테스트.**
+
+- `entities/cart/model/useCart.test.tsx` — 계약 스위트의 `describe.each` 를 회원 한 줄로
+- `entities/cart/model/cartOrderHref.test.ts` — 게스트 케이스 제거
+- `widgets/header/ui/Header.test.tsx` — `guestId` 관련 `setState` 제거
+- `features/cart/model/useAddToCartDraft.test.tsx` — 게스트 담기 케이스 제거
 
 라인 키(`productVariantId`) 통일은 **되돌리지 않는다.** 회원 카트만 있어도 옳은 선택이고,
 이중 키(`lineId` ↔ `cartItemId`)를 없앴던 흐름과 같은 방향이다.

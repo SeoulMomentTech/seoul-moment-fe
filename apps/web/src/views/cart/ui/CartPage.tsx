@@ -8,6 +8,8 @@ import { useCart } from "@entities/cart";
 import { CartList } from "@features/cart";
 import { Skeleton } from "@seoul-moment/ui";
 
+import { CartSessionGuard } from "./CartSessionGuard";
+
 function CartSkeleton() {
   return (
     <div className="pt-4">
@@ -42,6 +44,7 @@ export function CartPage() {
         "max-sm:pb-30 max-sm:pt-19",
       )}
     >
+      <CartSessionGuard />
       <div className="mb-5 flex items-baseline gap-2.5">
         <h1 className="text-title-3 max-sm:text-title-4 font-bold tracking-[-0.02em]">
           {t("cart")}

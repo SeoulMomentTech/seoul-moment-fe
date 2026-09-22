@@ -42,7 +42,6 @@ function useGuestCartKeys(guestId: string | null, languageCode: LanguageType) {
   return useMemo(
     () => ({
       list: guestCartQueryKeys.list(guestId, languageCode),
-      count: guestCartQueryKeys.count(guestId),
     }),
     [guestId, languageCode],
   );
@@ -145,18 +144,20 @@ export function useGuestCart(guestId: string | null): CartApi {
       const res = await request.catch(handleError);
 
       setGuestId(res.data.guestId);
-      // 방금 응답이 준(새로 발급됐을 수 있는) ID 로 뱃지를 채운다. 렌더 시점의
-      // `keys.count` 는 첫 담기라면 아직 guestId 가 없던 때의 키라, 그 자리에 쓰면
-      // 아무도 읽지 않는 캐시가 된다.
+      // 방금 응답이 준(새로 발급됐을 수 있는) ID 로 뱃지와 목록을 함께 채운다. 렌더
+      // 시점의 `keys.list` 는 첫 담기라면 아직 guestId 가 없던 때의 키라, 그 자리를 그대로
+      // 쓰면 무효화가 아무도 구독하지 않는 캐시를 건드리고 만다.
       queryClient.setQueryData<CommonRes<GetGuestCartCountRes>>(
         guestCartQueryKeys.count(res.data.guestId),
         { result: true, data: { count: res.data.totalCount } },
       );
       // 회원 쪽과 같은 이유로 list 만 무효화한다(`useCreateUserCartItemsMutation` 참고).
       // 전체(`invalidate()`)를 쓰면 방금 위에서 쓴 count 캐시를 스스로 지운다.
-      void queryClient.invalidateQueries({ queryKey: keys.list });
+      void queryClient.invalidateQueries({
+        queryKey: guestCartQueryKeys.list(res.data.guestId, languageCode),
+      });
     },
-    [guestId, handleError, keys.list, queryClient, setGuestId],
+    [guestId, handleError, languageCode, queryClient, setGuestId],
   );
 
   const setLineQuantity = useCallback<CartApi["setLineQuantity"]>(

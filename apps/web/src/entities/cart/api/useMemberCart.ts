@@ -408,10 +408,15 @@ export function useMemberCart(): CartApi {
       },
       [deleteItems, toCartItemId],
     ),
-    // 의도한 동작 변화: 화면에 보이는 id 목록이 아니라 서버 장바구니 전체를 비운다.
-    // 다른 기기에서 담아 아직 이 화면에 안 보이는 라인도 함께 지워진다는 뜻이고,
-    // 되돌리기(undo)는 이 화면이 스냅샷으로 들고 있던 라인만 다시 담으므로 그 라인은
-    // 되돌아오지 않는다.
-    removeAll: useCallback(() => deleteItems(undefined), [deleteItems]),
+    // 화면에 지금 보이는 라인의 id 만 명시해서 보낸다. `deleteItems(undefined)` 는
+    // 서버 장바구니 전체를 비우라는 뜻이라, 다른 기기에서 담아 아직 이 화면에 안 보이는
+    // 라인이나 이 탭의 5분 staleTime 창이 열린 뒤 다른 곳에서 담긴 라인까지 함께
+    // 지워진다 — 되돌리기(undo)는 이 화면이 스냅샷으로 들고 있던 라인만 다시 담으므로
+    // 그 라인들은 영영 돌아오지 않는다. 캐시가 아직 없으면(비정상 경로) 지킬 라인도
+    // 없으므로 그때만 전체 비우기로 떨어진다.
+    removeAll: useCallback(() => {
+      const cache = queryClient.getQueryData<CartListCache>(keys.list);
+      deleteItems(cache ? [...listCacheItemIds(cache)] : undefined);
+    }, [deleteItems, queryClient, keys.list]),
   };
 }

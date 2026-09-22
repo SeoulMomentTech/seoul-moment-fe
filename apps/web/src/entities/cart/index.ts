@@ -6,14 +6,8 @@ export {
   useUserCartCountQuery,
   useUserCartQuery,
 } from "./api/useMemberCart";
-export {
-  GUEST_CART_QUERY_KEY,
-  guestCartQueryKeys,
-  USER_CART_QUERY_KEY,
-  userCartQueryKeys,
-} from "./api/queryKey";
-export { useGuestCart } from "./api/useGuestCart";
-export { isGuestCartGoneError, isNotEnoughStockError } from "./lib/cartError";
+export { USER_CART_QUERY_KEY, userCartQueryKeys } from "./api/queryKey";
+export { isNotEnoughStockError } from "./lib/cartError";
 export {
   estimateShipping,
   getCartItemUnitPrice,
@@ -29,13 +23,7 @@ export {
   LOW_STOCK_THRESHOLD,
   MAX_LINE_QUANTITY,
 } from "./model/cartPolicy";
-export {
-  useGuestCartId,
-  useGuestCartIdHydrated,
-  useGuestCartIdStore,
-} from "./model/guestId";
 export { useCartSource } from "./api/useCartSource";
-export { resolveCartSource, type CartSource } from "./model/cartSource";
 export { toCartOrderHref } from "./model/cartOrderHref";
 export type {
   AddCartItemsOutcome,
