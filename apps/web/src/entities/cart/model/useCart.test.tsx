@@ -190,6 +190,9 @@ const setupLoaded = async () => {
 const items = (result: { current: ReturnType<typeof useCart> }) =>
   result.current.brandGroups.flatMap((group) => group.items);
 
+/** 실제 400ms 디바운스를 넘어서는 타이밍을 재현하려면 진짜 시간이 흘러야 한다. */
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 beforeEach(() => {
   nextCartItemId = 0;
   serverCart = [];
@@ -249,11 +252,17 @@ describe("담기", () => {
 describe("수량 변경", () => {
   it("화면은 즉시 바뀌고 전송은 모아서 한 번만 한다", async () => {
     serverCart = [cartItem(501, 1)];
-    const { result } = await setupLoaded();
+    const { result, rerender } = await setupLoaded();
     const [line] = items(result);
 
+    // 두 클릭 사이에 실제로 렌더가 한 번 끼어들어야 한다 — 어댑터가 매 렌더 새
+    // 객체이므로, 렌더 없이 한 act 안에서 두 번 부르면 디바운스 인스턴스가 안정적인지
+    // 확인할 수 없다(회귀를 놓친다).
     act(() => {
       result.current.updateQuantity(line.productVariantId, 2);
+    });
+    rerender();
+    act(() => {
       result.current.updateQuantity(line.productVariantId, 3);
     });
 
@@ -284,6 +293,49 @@ describe("수량 변경", () => {
     // 서버는 1 을 그대로 들고 있다. 재조회가 화면을 그 값으로 되돌린다.
     await waitFor(() => expect(items(result)[0].quantity).toBe(1));
   });
+
+  // 회귀 방지: 어댑터(`useMemberCart`)는 매 렌더 새 객체를 돌려준다. `flushQuantities`
+  // 가 그 객체 자체(`cart`)에 의존하면 렌더마다 새 디바운스 인스턴스가 생겨 각자 독립된
+  // 타이머를 갖는다 — 클릭이 400ms 를 넘겨 이어지면(스테퍼를 계속 누르는 상황) 예전
+  // 인스턴스의 타이머가 중간에 먼저 끝나 중간 수량을 서버로 흘리고, 마지막 클릭도 한
+  // 박자 뒤에 따로 한 번 더 보낸다. 안정된 디바운스라면 매 클릭이 같은 타이머를 리셋해
+  // 마지막 클릭 뒤 400ms 에 딱 한 번만 보낸다.
+  it("400ms 를 넘겨 계속 클릭해도 마지막 값만 한 번 보낸다", async () => {
+    serverCart = [cartItem(501, 1)];
+    const { result, rerender } = await setupLoaded();
+    const [line] = items(result);
+
+    const click = (quantity: number) => {
+      act(() => {
+        result.current.updateQuantity(line.productVariantId, quantity);
+      });
+      // `useMemberCart` 를 다시 부르게 해 렌더 사이 디바운스 인스턴스가 바뀌는 조건을
+      // 실제로 만든다.
+      rerender();
+    };
+
+    // 150ms 간격 4클릭 = 총 450ms. 각 간격은 400ms 디바운스보다 짧아 계속 리셋돼야
+    // 하지만, 첫 클릭부터 마지막 클릭까지의 전체 구간은 400ms 를 넘는다 — 렌더마다
+    // 새 타이머가 생기는 회귀라면 이 지점에서 드러난다.
+    click(2);
+    await sleep(150);
+    click(3);
+    await sleep(150);
+    click(4);
+    await sleep(150);
+    click(5);
+
+    // 마지막 클릭 뒤 400ms 가 되기 전에는 아직 아무것도 보내지 않아야 한다 — 이전
+    // 클릭의 타이머가 먼저 끝나 버리면 여기서 이미 호출이 잡힌다.
+    await sleep(200);
+    expect(updateUserCartItem).not.toHaveBeenCalled();
+
+    await waitFor(() => expect(updateUserCartItem).toHaveBeenCalledTimes(1));
+    expect(updateUserCartItem).toHaveBeenCalledWith({
+      cartItemId: line.cartItemId,
+      quantity: 5,
+    });
+  });
 });
 
 describe("삭제", () => {
@@ -311,6 +363,23 @@ describe("삭제", () => {
     });
 
     expect(deleteUserCartItems).not.toHaveBeenCalled();
+  });
+
+  // `removeAll` 은 화면의 id 목록을 모으지 않고 ids 없이 한 번만 호출한다 — 서버
+  // 장바구니 전체를 비우는 요청이라, 선택 삭제와는 다른 서버 호출 모양이다.
+  it("전체 비우기는 ids 없이 한 번만 호출하고 목록을 낙관적으로 비운다", async () => {
+    serverCart = [cartItem(501), cartItem(502)];
+    const { result } = await setupLoaded();
+    expect(items(result)).toHaveLength(2);
+
+    act(() => {
+      result.current.removeAll();
+    });
+
+    // 서버 응답을 기다리지 않고 먼저 비워진다.
+    await waitFor(() => expect(items(result)).toHaveLength(0));
+    expect(deleteUserCartItems).toHaveBeenCalledTimes(1);
+    expect(deleteUserCartItems).toHaveBeenCalledWith(undefined);
   });
 });
 

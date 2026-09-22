@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 import type { HTTPError } from "ky";
 
@@ -29,15 +29,24 @@ import type { CartApi } from "../model/types";
 type CartListCache = CommonRes<GetUserCartRes>;
 type CartCountCache = CommonRes<GetUserCartCountRes>;
 
-/** 이 사용자·언어의 장바구니 캐시 키. 낙관적 업데이트가 매번 필요로 한다 */
+/**
+ * 이 사용자·언어의 장바구니 캐시 키. 낙관적 업데이트가 매번 필요로 한다.
+ *
+ * `userCartQueryKeys.list(...)` 는 매번 새 배열을 만든다. 여기서 `useMemo` 로 고정하지
+ * 않으면 이 값을 의존성으로 쓰는 콜백(`toCartItemId` 등)이 렌더마다 다시 만들어지고,
+ * 그 콜백들에 의존하는 디바운스(`useCart`)도 렌더마다 새 타이머를 갖게 된다.
+ */
 function useUserCartKeys() {
   const languageCode = useLanguage();
   const id = useUserAuthStore((state) => state.id);
 
-  return {
-    list: userCartQueryKeys.list(id, languageCode),
-    count: userCartQueryKeys.count(id),
-  };
+  return useMemo(
+    () => ({
+      list: userCartQueryKeys.list(id, languageCode),
+      count: userCartQueryKeys.count(id),
+    }),
+    [id, languageCode],
+  );
 }
 
 /** 라인을 걷어내고 빈 브랜드 묶음까지 정리한다. 상품 없는 브랜드 헤더만 남으면 안 된다 */
@@ -322,6 +331,8 @@ export function useMemberCart(): CartApi {
   const fetchUserCart = useFetchUserCart();
   const setItemQuantity = useSetCartItemQuantity();
 
+  // 결과를 호출한 자리에서 처리해야 하므로 promise 로 받는다 — `mutate` 의 호출별 콜백은
+  // 관찰자 하나를 공유해 나중 호출이 앞 호출의 콜백을 덮어쓴다.
   const { mutateAsync: createItems } = useCreateUserCartItemsMutation({
     toastOnError: false,
   });
@@ -371,7 +382,10 @@ export function useMemberCart(): CartApi {
     commitQuantity: useCallback(
       async (productVariantId, quantity) => {
         const cartItemId = toCartItemId(productVariantId);
-        // 라인이 이미 사라졌다. 보낼 곳이 없으므로 조용히 끝낸다.
+        // 라인이 이미 사라졌다. 보낼 곳이 없으므로 조용히 끝낸다. (의도한 동작 변화:
+        // 예전에는 `cartItemId` 를 직접 들고 있어 사라진 라인에도 PATCH 를 보내 서버가
+        // 404 로 답했다. 지금은 디바운스가 흘러 보내기 전에 캐시로 다시 확인하므로,
+        // 그 사이 삭제됐다면 애초에 보내지 않는다.)
         if (cartItemId == null) return;
 
         await updateItem({ cartItemId, quantity });
@@ -392,6 +406,10 @@ export function useMemberCart(): CartApi {
       },
       [deleteItems, toCartItemId],
     ),
+    // 의도한 동작 변화: 화면에 보이는 id 목록이 아니라 서버 장바구니 전체를 비운다.
+    // 다른 기기에서 담아 아직 이 화면에 안 보이는 라인도 함께 지워진다는 뜻이고,
+    // 되돌리기(undo)는 이 화면이 스냅샷으로 들고 있던 라인만 다시 담으므로 그 라인은
+    // 되돌아오지 않는다.
     removeAll: useCallback(() => deleteItems(undefined), [deleteItems]),
   };
 }

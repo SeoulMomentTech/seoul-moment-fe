@@ -49,6 +49,23 @@ export const useCart = () => {
 
   const cart = useMemberCart();
 
+  // 아래 메모들의 의존성은 `cart` 자체가 아니라 이렇게 뽑아낸 개별 함수여야 한다.
+  // `useMemberCart` 는 매 렌더 새 객체 리터럴을 돌려주므로, `cart` 를 의존성에 넣으면
+  // `flushQuantities` 가 렌더마다 다시 만들어지고 — 그 안의 디바운스도 렌더마다 새
+  // 타이머를 갖는다. 스테퍼를 계속 눌러 400ms 를 넘기면 예전 타이머가 먼저 끝나 중간
+  // 수량이 서버로 새어 나간다. 개별 함수는 각자의 의존성(`useMemberCart` 안에서 이미
+  // `useMemo`/`useCallback` 로 고정된 쿼리 키 등)이 바뀌지 않는 한 참조가 그대로다.
+  const {
+    data,
+    isPending,
+    isError,
+    refetch,
+    fetchCart,
+    setLineQuantity,
+    commitQuantity,
+    addItems: addCartItems,
+  } = cart;
+
   /**
    * 재고 부족이 아닌 실패를 알린다.
    *
@@ -73,12 +90,12 @@ export const useCart = () => {
    */
   const reconcileAfterStockConflict = useCallback(
     async (productVariantId?: number) => {
-      const data = await cart.fetchCart();
+      const res = await fetchCart();
 
       const serverItem =
         productVariantId == null
           ? undefined
-          : data?.brandGroups
+          : res?.brandGroups
               .flatMap((group) => group.items)
               .find((item) => item.productVariantId === productVariantId);
 
@@ -92,7 +109,7 @@ export const useCart = () => {
         id: STOCK_TOAST_ID,
       });
     },
-    [cart, t],
+    [fetchCart, t],
   );
 
   /**
@@ -118,7 +135,7 @@ export const useCart = () => {
       if (targets.length !== drafts.length) return { status: "invalid" };
 
       try {
-        await cart.addItems(
+        await addCartItems(
           targets.map((draft) => ({
             productVariantId: draft.productVariantId,
             quantity: draft.quantity,
@@ -138,7 +155,7 @@ export const useCart = () => {
         return { status: "error" };
       }
     },
-    [cart, notifyFailure, reconcileAfterStockConflict],
+    [addCartItems, notifyFailure, reconcileAfterStockConflict],
   );
 
   // 라인별 최신 수량만 남겼다가 한 번에 흘린다. 타이머 하나로 여러 라인을 함께 보낸다 —
@@ -152,19 +169,17 @@ export const useCart = () => {
         pendingQuantities.current.clear();
 
         pending.forEach(([productVariantId, quantity]) => {
-          cart
-            .commitQuantity(productVariantId, quantity)
-            .catch((error: unknown) => {
-              if (isNotEnoughStockError(error)) {
-                void reconcileAfterStockConflict(productVariantId);
-                return;
-              }
+          commitQuantity(productVariantId, quantity).catch((error: unknown) => {
+            if (isNotEnoughStockError(error)) {
+              void reconcileAfterStockConflict(productVariantId);
+              return;
+            }
 
-              notifyFailure(error);
-            });
+            notifyFailure(error);
+          });
         });
       }, QUANTITY_SYNC_DELAY),
-    [cart, reconcileAfterStockConflict, notifyFailure],
+    [commitQuantity, reconcileAfterStockConflict, notifyFailure],
   );
 
   const updateQuantity = useCallback(
@@ -172,18 +187,11 @@ export const useCart = () => {
       const next = clampLineQuantity(quantity);
 
       // 화면은 지금 바꾸고 전송만 모은다. 스테퍼가 굳어 보이면 안 된다.
-      cart.setLineQuantity(productVariantId, next);
+      setLineQuantity(productVariantId, next);
       pendingQuantities.current.set(productVariantId, next);
       flushQuantities();
     },
-    [cart, flushQuantities],
-  );
-
-  const removeItems = useCallback(
-    (productVariantIds: ReadonlyArray<number>) => {
-      cart.removeItems(productVariantIds);
-    },
-    [cart],
+    [setLineQuantity, flushQuantities],
   );
 
   /**
@@ -202,22 +210,24 @@ export const useCart = () => {
   );
 
   return {
-    brandGroups: cart.data?.brandGroups ?? EMPTY_BRAND_GROUPS,
+    brandGroups: data?.brandGroups ?? EMPTY_BRAND_GROUPS,
     /** 구매 가능 라인의 상품 금액 합. 선택과 무관한 **장바구니 전체** 기준이다 */
-    totalProductAmount: cart.data?.totalProductAmount ?? 0,
+    totalProductAmount: data?.totalProductAmount ?? 0,
     /** 배송지가 아직 없으므로 본섬 기준 예상값. 확정은 주문서에서 한다 */
-    estimatedShippingFee: cart.data?.estimatedShippingFee ?? 0,
-    remoteIslandFee: cart.data?.remoteIslandFee ?? 0,
-    freeShippingThreshold: cart.data?.freeShippingThreshold ?? 0,
+    estimatedShippingFee: data?.estimatedShippingFee ?? 0,
+    remoteIslandFee: data?.remoteIslandFee ?? 0,
+    freeShippingThreshold: data?.freeShippingThreshold ?? 0,
     /** 라인 개수(수량 합이 아니다) */
-    totalCount: cart.data?.totalCount ?? 0,
-    isPending: cart.isPending,
-    isError: cart.isError,
+    totalCount: data?.totalCount ?? 0,
+    isPending,
+    isError,
     /** 첫 조회가 실패했을 때 화면이 다시 시도할 수단 */
-    refetch: cart.refetch,
+    refetch,
     addItems,
     updateQuantity,
-    removeItems,
+    // 순수 위임이라 콜백으로 한 번 더 감싸지 않는다 — `cart.removeItems` 자체가 이미
+    // 안정된 참조다.
+    removeItems: cart.removeItems,
     removeAll: cart.removeAll,
     restoreItems,
   };

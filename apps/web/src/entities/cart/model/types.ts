@@ -65,8 +65,11 @@ export interface ResolvedCartItemDraft {
 /**
  * 회원·게스트 어댑터가 공통으로 만족하는 계약.
  *
- * `useCart` 는 이 인터페이스만 보고, 어느 카트인지 모른다. 실패는 전부 **throw** 로
- * 알린다 — 재고 부족(409) 뒤 정정과 실패 토스트는 `useCart` 한 곳에서 처리한다.
+ * `useCart` 는 이 인터페이스만 보고, 어느 카트인지 모른다. `addItems`·`commitQuantity`
+ * 는 실패를 **throw** 로 알린다 — 재고 부족(409) 뒤 정정과 실패 토스트는 `useCart` 한
+ * 곳에서 처리한다. `removeItems`·`removeAll`·`setLineQuantity`·`refetch` 는 반환값이
+ * `void` 다 — 실패해도 던지지 않고, 각자 필요한 방식으로 토스트·롤백을 어댑터 안에서
+ * 끝낸다(`useDeleteUserCartItemsMutation` 의 캐시 롤백 참고).
  */
 export interface CartApi {
   data?: GetCartRes;
