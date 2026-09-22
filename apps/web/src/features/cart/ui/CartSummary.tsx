@@ -7,6 +7,7 @@ import { toNTCurrency } from "@shared/lib/utils";
 
 import { Link } from "@/i18n/navigation";
 
+import type { CartOrderCta } from "@entities/cart";
 import { Button } from "@seoul-moment/ui";
 
 export interface CartSummaryValues {
@@ -23,8 +24,10 @@ export interface CartSummaryValues {
 }
 
 interface CartSummaryProps extends CartSummaryValues {
-  /** 주문서로 갈 링크. 고른 라인이 없으면 `null` 이고 버튼은 비활성이다 */
-  orderHref: string | null;
+  /** `주문하기` 버튼이 무엇을 해야 하는지. 이 컴포넌트는 렌더만 하고 판정은 위에서 받는다 */
+  orderCta: CartOrderCta;
+  /** `orderCta.type === "guest"` 일 때 버튼을 누르면 호출된다. 토스트는 호출부(`CartList`)가 띄운다 */
+  onGuestOrderAttempt(): void;
   className?: string;
 }
 
@@ -34,8 +37,10 @@ interface CartSummaryProps extends CartSummaryValues {
  * 배송비는 서버가 준 본섬 기준 예상값이고, 무료배송 여부는 **선택 합계**에 다시 적용한다 —
  * 서버 값은 장바구니 전체 기준이라 일부만 고르면 화면 금액과 어긋난다. 확정은 주문서에서 한다.
  *
- * `주문하기` 는 고른 라인을 주문서로 넘긴다. 비활성으로 남는 것은 주문서 마지막의
- * `결제하기` 뿐이다 — 결제(LINE Pay·ECPay)는 아직 붙지 않았다.
+ * `주문하기` 는 고른 라인을 주문서로 넘긴다. 게스트는 버튼이 활성이어도 로그인이 필요하다는
+ * 토스트만 뜨고 이동하지 않는다(`orderCta.type === "guest"`) — 요청하지 않은 로그인 화면으로
+ * 보내는 것은 그 거절에 비해 과한 인터럽트다. 비활성으로 남는 것은 고른 것이 없을 때와,
+ * 주문서 마지막의 `결제하기` 뿐이다 — 결제(LINE Pay·ECPay)는 아직 붙지 않았다.
  */
 export function CartSummary({
   selectedCount,
@@ -44,7 +49,8 @@ export function CartSummary({
   amountToFreeShipping,
   remoteIslandFee,
   totalAmount,
-  orderHref,
+  orderCta,
+  onGuestOrderAttempt,
   className,
 }: CartSummaryProps) {
   const t = useTranslations();
@@ -85,14 +91,22 @@ export function CartSummary({
         </span>
       </div>
 
-      {orderHref ? (
+      {orderCta.type === "link" ? (
         <Button asChild className="mt-5 h-12 w-full rounded-[4px] px-0">
           <Link
             className="flex h-full w-full items-center justify-center"
-            href={orderHref}
+            href={orderCta.href}
           >
             {t("place_order")}
           </Link>
+        </Button>
+      ) : orderCta.type === "guest" ? (
+        <Button
+          className="mt-5 h-12 w-full rounded-[4px]"
+          onClick={onGuestOrderAttempt}
+          type="button"
+        >
+          {t("place_order")}
         </Button>
       ) : (
         <>

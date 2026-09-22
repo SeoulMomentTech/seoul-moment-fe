@@ -1,11 +1,13 @@
 export {
   useCreateUserCartItemsMutation,
   useDeleteUserCartItemsMutation,
+  useMemberCart,
   useUpdateUserCartItemMutation,
   useUserCartCountQuery,
   useUserCartQuery,
-} from "./api/useUserCart";
+} from "./api/useMemberCart";
 export { USER_CART_QUERY_KEY, userCartQueryKeys } from "./api/queryKey";
+export { isNotEnoughStockError } from "./lib/cartError";
 export {
   estimateShipping,
   getCartItemUnitPrice,
@@ -21,13 +23,22 @@ export {
   LOW_STOCK_THRESHOLD,
   MAX_LINE_QUANTITY,
 } from "./model/cartPolicy";
+export { useCartSource } from "./api/useCartSource";
+export { toCartOrderCta } from "./model/cartOrderHref";
+export type { CartOrderCta } from "./model/cartOrderHref";
 export type {
   AddCartItemsOutcome,
+  CartApi,
+  CartBrandGroup,
   CartItemDraft,
+  CartLine,
+  GetCartRes,
   GetUserCartRes,
+  ResolvedCartItemDraft,
   UserCartBrandGroup,
   UserCartItem,
 } from "./model/types";
 export { useCart } from "./model/useCart";
 export { useCartBadgeCount } from "./model/useCartBadgeCount";
 export { CartLineRow } from "./ui/CartLineRow";
+export { GuestCartReset } from "./ui/GuestCartReset";

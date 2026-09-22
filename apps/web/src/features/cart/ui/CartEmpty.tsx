@@ -17,7 +17,8 @@ import "./cart-recent-slide.css";
 
 /**
  * 빈 장바구니. 아이콘 + 한 줄로 끝내지 않는다 — 활성화 지점이라 상품 목록으로 보내는 CTA 와
- * 최근 본 상품을 함께 둔다. `/cart` 는 로그인 필수라 최근 본 상품에 조건 분기가 필요 없다.
+ * 최근 본 상품을 함께 둔다. 게스트도 `/cart` 에 온다 — `useGetUserRecentListQuery` 가 자체
+ * `enabled: !!id` 로 걸러 회원이 아니면 요청 자체를 안 하므로, 여기서 따로 분기하지 않는다.
  */
 export function CartEmpty() {
   const t = useTranslations();

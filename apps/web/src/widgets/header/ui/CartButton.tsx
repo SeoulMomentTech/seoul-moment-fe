@@ -4,10 +4,7 @@ import { ShoppingCartIcon } from "lucide-react";
 
 import { useTranslations } from "next-intl";
 
-import {
-  useUserAuthHydrated,
-  useUserAuthStore,
-} from "@shared/lib/hooks/useUserAuthStore";
+import { useUserAuthHydrated } from "@shared/lib/hooks/useUserAuthStore";
 import { cn } from "@shared/lib/style";
 
 import { Link } from "@/i18n/navigation";
@@ -29,11 +26,12 @@ const MAX_BADGE_COUNT = 99;
  */
 export function CartButton({ iconSize = 22, className }: CartButtonProps) {
   const t = useTranslations();
-  const isAuthenticated = useUserAuthStore((state) => state.isAuthenticated);
   const hasAuthHydrated = useUserAuthHydrated();
   const { count, isReady } = useCartBadgeCount();
 
-  if (!hasAuthHydrated || !isAuthenticated) return null;
+  // 게스트도 장바구니를 쓴다. 복원 전에는 회원인지 게스트인지조차 몰라 아이콘 자체를
+  // 감춘다 — 서버·클라이언트 첫 렌더가 갈리는 hydration mismatch 를 피하기 위해서다.
+  if (!hasAuthHydrated) return null;
 
   const showBadge = isReady && count > 0;
 
