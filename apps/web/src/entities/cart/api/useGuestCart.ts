@@ -1,8 +1,10 @@
 "use client";
 
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useMemo } from "react";
 
 import type { HTTPError } from "ky";
+import { useTranslations } from "next-intl";
+import { toast } from "sonner";
 
 import { useLanguage } from "@shared/lib/hooks";
 import useAppQuery from "@shared/lib/hooks/query/useAppQuery";
@@ -16,11 +18,14 @@ import {
   type GetGuestCartRes,
 } from "@shared/services/guestCart";
 
+import type { LanguageType } from "@/i18n/const";
+
 import type { CommonRes } from "@shared/services";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { guestCartQueryKeys } from "./queryKey";
 import { isGuestCartGoneError } from "../lib/cartError";
+import { getCartItemUnitPrice } from "../model/cartSelectors";
 import { useGuestCartIdStore } from "../model/guestId";
 import type { CartApi } from "../model/types";
 
@@ -32,9 +37,7 @@ import type { CartApi } from "../model/types";
  * 의존성으로 쓰는 콜백(`addItems`·`setLineQuantity` 등)이 렌더마다 다시 만들어지고,
  * 그 콜백들에 의존하는 `useCart` 의 디바운스도 렌더마다 새 타이머를 갖게 된다.
  */
-function useGuestCartKeys(guestId: string | null) {
-  const languageCode = useLanguage();
-
+function useGuestCartKeys(guestId: string | null, languageCode: LanguageType) {
   return useMemo(
     () => ({
       list: guestCartQueryKeys.list(guestId, languageCode),
@@ -45,6 +48,16 @@ function useGuestCartKeys(guestId: string | null) {
 }
 
 /**
+ * 첫 담기로 발급 중인 게스트 ID.
+ *
+ * **모듈 스코프**여야 한다 — `useRef` 로 두면 훅 인스턴스마다(예: 헤더 뱃지와 상품 상세의
+ * 담기 버튼이 동시에 `useGuestCart` 를 부르는 경우) 서로 다른 "진행 중" 상태를 갖게 되어,
+ * 두 인스턴스가 동시에 헤더 없는 첫 담기를 보낼 수 있다 — 이 가드가 막으려는 바로 그
+ * 카트 분할이 그대로 재현된다.
+ */
+let issuingGuestId: Promise<string> | null = null;
+
+/**
  * 게스트 장바구니 어댑터.
  *
  * 회원 어댑터와 다른 점은 셋뿐이다 — 주인이 헤더의 `guestId` 이고, 그 ID 가 첫 담기
@@ -52,33 +65,24 @@ function useGuestCartKeys(guestId: string | null) {
  * 실패 토스트)는 `useCart` 가 회원과 똑같이 처리한다.
  */
 export function useGuestCart(guestId: string | null): CartApi {
+  const t = useTranslations();
   const queryClient = useQueryClient();
   const languageCode = useLanguage();
   const setGuestId = useGuestCartIdStore((s) => s.setGuestId);
   const clearGuestId = useGuestCartIdStore((s) => s.clearGuestId);
 
-  const keys = useGuestCartKeys(guestId);
-
-  // `query` 객체 자체가 아니라 필요한 값만 뽑아 쓴다. tanstack query 가 렌더마다 새
-  // 결과 객체를 돌려주므로, `query` 를 통째로 의존성에 넣으면 `refetch` 콜백이 렌더마다
-  // 다시 만들어진다 — `refetch` 함수 자체는 안정적이니 그것만 닫아 두면 된다.
-  const { data, isPending, isError, refetch } = useAppQuery<
-    Awaited<ReturnType<typeof getGuestCart>>,
-    HTTPError,
-    GetGuestCartRes
-  >({
-    queryKey: keys.list,
-    queryFn: () => getGuestCart({ guestId: guestId as string, languageCode }),
-    select: (res) => res.data,
-    enabled: !!guestId,
-    persist: true,
-  });
+  const keys = useGuestCartKeys(guestId, languageCode);
 
   const invalidate = useCallback(() => {
     void queryClient.invalidateQueries({ queryKey: guestCartQueryKeys.all });
   }, [queryClient]);
 
-  /** 404 는 "이 게스트 카트는 더 이상 없다" 는 뜻이다. ID 를 버리고 빈 카트로 돌아간다 */
+  /**
+   * 404 는 "이 게스트 카트는 더 이상 없다" 는 뜻이다. ID 를 버리고 빈 카트로 돌아간다.
+   *
+   * 항상 다시 던진다 — 호출부마다 필요한 모양(쿼리 에러로 흘리기, 결과값으로 죽이기,
+   * `allSettled` 로 모으기)이 다르므로, 여기서는 부수효과만 하고 판단은 호출부에 맡긴다.
+   */
   const handleError = useCallback(
     (error: unknown) => {
       if (isGuestCartGoneError(error)) {
@@ -91,14 +95,33 @@ export function useGuestCart(guestId: string | null): CartApi {
     [clearGuestId, invalidate],
   );
 
-  // ID 가 없을 때의 첫 담기. 진행 중인 요청이 있으면 그것이 발급한 ID 를 기다렸다가 쓴다 —
-  // 헤더 없는 요청을 둘 보내면 서버가 카트를 둘 만든다.
-  const issuing = useRef<Promise<string> | null>(null);
+  /** 실패를 사용자에게 알린다. 어떤 라인이 막혔는지 짚을 수 없는 집계 실패용 범용 문구 */
+  const notifyFailure = useCallback(() => {
+    toast.error(t("please_try_again"));
+  }, [t]);
+
+  const { data, isPending, isError, refetch } = useAppQuery<
+    Awaited<ReturnType<typeof getGuestCart>>,
+    HTTPError,
+    GetGuestCartRes
+  >({
+    queryKey: keys.list,
+    // 조회 자체의 404 도 카트가 사라졌다는 신호다. 여기서 놓치면 ID 가 localStorage 에
+    // 영영 남아 다음 방문마다 같은 404 를 반복한다 — 여기서 걸러 빈 카트로 돌아간다.
+    queryFn: () =>
+      getGuestCart({ guestId: guestId as string, languageCode }).catch(
+        handleError,
+      ),
+    select: (res) => res.data,
+    enabled: !!guestId,
+    persist: true,
+  });
 
   const addItems = useCallback<CartApi["addItems"]>(
     async (items) => {
-      const pendingId = guestId ? null : issuing.current;
-      const id = pendingId ? await pendingId : guestId;
+      const pendingId = guestId ? null : issuingGuestId;
+      // 앞선 담기가 실패했으면 그 실패를 물려받지 않는다 — 이 호출은 자기 것을 새로 낸다.
+      const id = pendingId ? await pendingId.catch(() => null) : guestId;
 
       const request = createGuestCartItems({
         guestId: id ?? undefined,
@@ -106,23 +129,33 @@ export function useGuestCart(guestId: string | null): CartApi {
       });
 
       if (!id) {
-        issuing.current = request
-          .then((res) => res.data.guestId)
+        const issued = request.then((res) => res.data.guestId);
+        issuingGuestId = issued;
+        // 대기자가 없어도(단독 첫 담기가 실패하는 경우) unhandled rejection 이 나지
+        // 않도록 별도로 처리한다. 대기자가 있다면 위의 `.catch(() => null)` 이 따로 또
+        // 붙으므로 서로 방해하지 않는다.
+        void issued
+          .catch(() => null)
           .finally(() => {
-            issuing.current = null;
+            if (issuingGuestId === issued) issuingGuestId = null;
           });
       }
 
       const res = await request.catch(handleError);
 
       setGuestId(res.data.guestId);
-      queryClient.setQueryData<CommonRes<GetGuestCartCountRes>>(keys.count, {
-        result: true,
-        data: { count: res.data.totalCount },
-      });
-      invalidate();
+      // 방금 응답이 준(새로 발급됐을 수 있는) ID 로 뱃지를 채운다. 렌더 시점의
+      // `keys.count` 는 첫 담기라면 아직 guestId 가 없던 때의 키라, 그 자리에 쓰면
+      // 아무도 읽지 않는 캐시가 된다.
+      queryClient.setQueryData<CommonRes<GetGuestCartCountRes>>(
+        guestCartQueryKeys.count(res.data.guestId),
+        { result: true, data: { count: res.data.totalCount } },
+      );
+      // 회원 쪽과 같은 이유로 list 만 무효화한다(`useCreateUserCartItemsMutation` 참고).
+      // 전체(`invalidate()`)를 쓰면 방금 위에서 쓴 count 캐시를 스스로 지운다.
+      void queryClient.invalidateQueries({ queryKey: keys.list });
     },
-    [guestId, handleError, invalidate, keys.count, queryClient, setGuestId],
+    [guestId, handleError, keys.list, queryClient, setGuestId],
   );
 
   const setLineQuantity = useCallback<CartApi["setLineQuantity"]>(
@@ -142,10 +175,7 @@ export function useGuestCart(guestId: string | null): CartApi {
                         ? {
                             ...item,
                             quantity,
-                            totalPrice:
-                              (item.discountPrice && item.discountPrice > 0
-                                ? item.discountPrice
-                                : item.price) * quantity,
+                            totalPrice: getCartItemUnitPrice(item) * quantity,
                           }
                         : item,
                     ),
@@ -175,8 +205,9 @@ export function useGuestCart(guestId: string | null): CartApi {
           meta: { logError: false, persist: true },
         })
         .then((res) => res.data)
+        .catch(handleError)
         .catch(() => null);
-    }, [guestId, languageCode, keys.list, queryClient]),
+    }, [guestId, handleError, languageCode, keys.list, queryClient]),
     addItems,
     setLineQuantity,
     commitQuantity: useCallback(
@@ -193,22 +224,33 @@ export function useGuestCart(guestId: string | null): CartApi {
       (productVariantIds) => {
         if (!guestId || !productVariantIds.length) return;
 
-        // 게스트 API 에는 선택 삭제가 없다. 라인마다 부르고, 하나라도 실패하면 재조회로
-        // 화면을 서버에 맞춘다.
+        // 게스트 API 에는 선택 삭제가 없다. 라인마다 부른다 — 404 를 만난 라인은
+        // `handleError` 가 ID 를 버리고, 그 외의 실패도 여기서는 던져 `allSettled` 로
+        // 모은다. 하나라도 실패하면 재조회로 화면을 서버에 맞추고, 조용히 사라진
+        // 것처럼 보이지 않도록 사용자에게도 알린다.
         void Promise.allSettled(
           productVariantIds.map((productVariantId) =>
-            deleteGuestCartItem({ guestId, productVariantId }),
+            deleteGuestCartItem({ guestId, productVariantId }).catch(
+              handleError,
+            ),
           ),
-        ).then(invalidate);
+        ).then((results) => {
+          invalidate();
+
+          if (results.some((result) => result.status === "rejected")) {
+            notifyFailure();
+          }
+        });
       },
-      [guestId, invalidate],
+      [guestId, handleError, invalidate, notifyFailure],
     ),
     removeAll: useCallback(() => {
       if (!guestId) return;
 
       void deleteGuestCart(guestId)
+        .catch(handleError)
         .catch(() => null)
         .finally(invalidate);
-    }, [guestId, invalidate]),
+    }, [guestId, handleError, invalidate]),
   };
 }

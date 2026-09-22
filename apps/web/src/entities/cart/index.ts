@@ -6,7 +6,14 @@ export {
   useUserCartCountQuery,
   useUserCartQuery,
 } from "./api/useMemberCart";
-export { USER_CART_QUERY_KEY, userCartQueryKeys } from "./api/queryKey";
+export {
+  GUEST_CART_QUERY_KEY,
+  guestCartQueryKeys,
+  USER_CART_QUERY_KEY,
+  userCartQueryKeys,
+} from "./api/queryKey";
+export { useGuestCart } from "./api/useGuestCart";
+export { isGuestCartGoneError, isNotEnoughStockError } from "./lib/cartError";
 export {
   estimateShipping,
   getCartItemUnitPrice,
