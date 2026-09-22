@@ -15,7 +15,7 @@ import type {
   CartItemDraft,
   CartLine,
 } from "./types";
-import { useMemberCart } from "../api/useMemberCart";
+import { useCartApi } from "../api/useCartApi";
 import { isNotEnoughStockError } from "../lib/cartError";
 
 /**
@@ -47,14 +47,15 @@ const EMPTY_BRAND_GROUPS: CartBrandGroup[] = [];
 export const useCart = () => {
   const t = useTranslations();
 
-  const cart = useMemberCart();
+  const cart = useCartApi();
 
   // 아래 메모들의 의존성은 `cart` 자체가 아니라 이렇게 뽑아낸 개별 함수여야 한다.
-  // `useMemberCart` 는 매 렌더 새 객체 리터럴을 돌려주므로, `cart` 를 의존성에 넣으면
-  // `flushQuantities` 가 렌더마다 다시 만들어지고 — 그 안의 디바운스도 렌더마다 새
-  // 타이머를 갖는다. 스테퍼를 계속 눌러 400ms 를 넘기면 예전 타이머가 먼저 끝나 중간
-  // 수량이 서버로 새어 나간다. 개별 함수는 각자의 의존성(`useMemberCart` 안에서 이미
-  // `useMemo`/`useCallback` 로 고정된 쿼리 키 등)이 바뀌지 않는 한 참조가 그대로다.
+  // `useCartApi` 가 위임하는 두 어댑터(`useMemberCart`, `useGuestCart`) 모두 매 렌더
+  // 새 객체 리터럴을 돌려주므로, `cart` 를 의존성에 넣으면 `flushQuantities` 가 렌더마다
+  // 다시 만들어지고 — 그 안의 디바운스도 렌더마다 새 타이머를 갖는다. 스테퍼를 계속
+  // 눌러 400ms 를 넘기면 예전 타이머가 먼저 끝나 중간 수량이 서버로 새어 나간다. 개별
+  // 함수는 각자의 의존성(어댑터 안에서 이미 `useMemo`/`useCallback` 로 고정된 쿼리 키
+  // 등)이 바뀌지 않는 한 참조가 그대로다.
   const {
     data,
     isPending,

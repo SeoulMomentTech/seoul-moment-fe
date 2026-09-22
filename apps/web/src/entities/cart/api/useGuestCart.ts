@@ -13,6 +13,7 @@ import {
   deleteGuestCart,
   deleteGuestCartItem,
   getGuestCart,
+  getGuestCartCount,
   updateGuestCartItem,
   type GetGuestCartCountRes,
   type GetGuestCartRes,
@@ -253,4 +254,21 @@ export function useGuestCart(guestId: string | null): CartApi {
         .finally(invalidate);
     }, [guestId, handleError, invalidate]),
   };
+}
+
+/**
+ * @description 게스트 장바구니 라인 수. ID 가 없으면 요청하지 않고 0 이다
+ */
+export function useGuestCartCountQuery(guestId: string | null) {
+  return useAppQuery<
+    Awaited<ReturnType<typeof getGuestCartCount>>,
+    HTTPError,
+    GetGuestCartCountRes
+  >({
+    queryKey: guestCartQueryKeys.count(guestId),
+    queryFn: () => getGuestCartCount(guestId as string),
+    select: (res) => res.data,
+    enabled: !!guestId,
+    persist: true,
+  });
 }
