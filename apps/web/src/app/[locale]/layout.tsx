@@ -17,6 +17,7 @@ import ScrollRestoration from "@shared/ui/scroll-restoration";
 
 import { routing } from "@/i18n/routing";
 
+import { GuestCartReset } from "@entities/cart";
 import { ChatbotLauncher } from "@widgets/chatbot";
 import { Footer } from "@widgets/footer";
 import { Header } from "@widgets/header";
@@ -99,7 +100,7 @@ export default async function RootLayout({ children }: PropsWithChildren) {
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
-              gtag('config', 'G-N4PST9C2ZV');  
+              gtag('config', 'G-N4PST9C2ZV');
             `,
               }}
               id="gtag-init"
@@ -132,6 +133,7 @@ export default async function RootLayout({ children }: PropsWithChildren) {
                     토스트가 버튼을 덮어 클릭이 막히므로 상단 중앙으로 옮긴다. */}
                 <Toaster position="top-center" />
                 <GlobalQueryHandler />
+                <GuestCartReset />
               </main>
               <Footer />
               {/* <main> 형제로 마운트해야 라우트 이동 시 언마운트되지 않는다.

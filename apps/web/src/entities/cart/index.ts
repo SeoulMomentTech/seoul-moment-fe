@@ -52,3 +52,4 @@ export type {
 export { useCart } from "./model/useCart";
 export { useCartBadgeCount } from "./model/useCartBadgeCount";
 export { CartLineRow } from "./ui/CartLineRow";
+export { GuestCartReset } from "./ui/GuestCartReset";
