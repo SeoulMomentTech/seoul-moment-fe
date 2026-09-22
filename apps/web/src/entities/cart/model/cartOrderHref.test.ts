@@ -31,6 +31,19 @@ describe("toCartOrderHref", () => {
     ).toBeNull();
   });
 
+  it("게스트도 고른 것이 없으면 로그인이 아니라 링크를 만들지 않는다", () => {
+    // 회원은 이 케이스에서 어차피 cartItemIds 가 비어 null 이 나오므로, 위 테스트만으로는
+    // `selectedVariantIds.size === 0` 가드가 실제로 하는 일을 확인할 수 없다 — 게스트는
+    // 그 가드가 없으면 선택과 무관하게 곧장 "/login" 이 나오므로 여기서만 그 가드가 드러난다.
+    expect(
+      toCartOrderHref({
+        source: { kind: "guest", guestId: "g-1" },
+        lines: [line({ cartItemId: null })],
+        selectedVariantIds: new Set(),
+      }),
+    ).toBeNull();
+  });
+
   it("회원은 고른 라인의 cartItemId 로 주문서에 간다", () => {
     const href = toCartOrderHref({
       source: { kind: "member" },

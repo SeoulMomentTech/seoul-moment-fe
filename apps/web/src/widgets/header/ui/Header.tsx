@@ -143,11 +143,11 @@ function Desktop() {
               </Link>
             </li>
           )}
-          {isSignedIn && (
-            <li className="flex items-center">
-              <CartButton />
-            </li>
-          )}
+          {/* 게스트도 장바구니를 쓴다 — 여기서 더 가리지 않는다. 복원 대기·배지 유무는
+              CartButton 이 스스로 처리한다. */}
+          <li className="flex items-center">
+            <CartButton />
+          </li>
           <li className="text-body-3 h-full py-[20px]">
             <LanguageSupport />
           </li>

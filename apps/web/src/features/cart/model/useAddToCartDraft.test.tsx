@@ -2,8 +2,10 @@ import type { ReactNode } from "react";
 
 import type * as Ky from "ky";
 import { NextIntlClientProvider } from "next-intl";
+import { toast } from "sonner";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { CreateGuestCartItemsReq } from "@shared/services/guestCart";
 import type {
   GetProductDetailRes,
   OptionValue,
@@ -79,15 +81,25 @@ vi.mock("@shared/services/userCart", () => ({
 }));
 
 // 비로그인 담기는 게스트 어댑터(`useGuestCart`)를 탄다 — 회원 mock 과 같은 모양으로 응답한다.
-const createGuestCartItems = vi.fn(() =>
+const createGuestCartItems = vi.fn((req: CreateGuestCartItemsReq) =>
   Promise.resolve({
     result: true,
-    data: { guestId: "g-test", items: [], totalCount: 1 },
+    data: {
+      guestId: "g-test",
+      items: req.items.map((line) => ({
+        productVariantId: line.productVariantId,
+        quantity: line.quantity,
+      })),
+      totalCount: req.items.length,
+    },
   }),
 );
 
 vi.mock("@shared/services/guestCart", () => ({
-  createGuestCartItems: () => createGuestCartItems(),
+  // 회원 mock(위 66행)과 같은 이유로 요청을 그대로 스파이에 흘린다 — 그래야 페이로드를
+  // 검증할 수 있다.
+  createGuestCartItems: (req: CreateGuestCartItemsReq) =>
+    createGuestCartItems(req),
   getGuestCart: () =>
     Promise.resolve({
       result: true,
@@ -160,6 +172,7 @@ const setup = (
 
 beforeEach(() => {
   createUserCartItems.mockClear();
+  createGuestCartItems.mockClear();
 });
 
 describe("선택형 — variants 를 못 받은, 값이 2개 이상인 축이 있는 상품", () => {
@@ -502,6 +515,28 @@ describe("조합형 — variants 를 받은 상품", () => {
     expect(ok).toBe(false);
   });
 
+  it("비로그인이어도 담기는 된다", async () => {
+    authState.isAuthenticated = false;
+
+    try {
+      const { result } = setup(clothing, [variant(101, [1, 10, 20])]);
+
+      act(() => result.current.pickVariant(101));
+
+      await act(async () => {
+        expect(await result.current.submit()).toBe(true);
+      });
+
+      // 비로그인이라 회원이 아니라 게스트 어댑터로, 고른 SKU·수량 그대로 담긴다.
+      expect(createGuestCartItems.mock.calls.map(([req]) => req)).toEqual([
+        { items: [{ productVariantId: 101, quantity: 1 }] },
+      ]);
+      expect(createUserCartItems).not.toHaveBeenCalled();
+    } finally {
+      authState.isAuthenticated = true;
+    }
+  });
+
   // 고를 축이 없는 상품이라도 조합이 있으면 드롭다운으로 고른다. 미리 쌓아두면
   // 사용자가 고른 조합과 키가 달라 같은 SKU 가 두 줄이 된다.
   it("값이 전부 1개인 상품도 조합을 받으면 미리 쌓아두지 않는다", () => {
@@ -614,36 +649,21 @@ describe('"구매하기" 로 주문서에 넘길 SKU', () => {
     expect(result.current.toDirectItems()).toBeNull();
   });
 
-  it("비로그인이어도 담기는 된다", async () => {
-    authState.isAuthenticated = false;
-
-    try {
-      const { result } = setup(clothing, [variant(101, [1, 10, 20])]);
-
-      act(() => result.current.pickVariant(101));
-
-      await act(async () => {
-        expect(await result.current.submit()).toBe(true);
-      });
-
-      // 비로그인이라 회원이 아니라 게스트 어댑터로 담긴다.
-      expect(createGuestCartItems).toHaveBeenCalled();
-      expect(createUserCartItems).not.toHaveBeenCalled();
-    } finally {
-      authState.isAuthenticated = true;
-    }
-  });
-
   it("비로그인이면 구매하기는 막는다", () => {
-    // 주문·결제는 회원 전용이다.
+    // 주문·결제는 회원 전용이다. `isAuthenticated` 체크가 `toDirectItems` 의 첫 줄이라,
+    // `lines` 가 비어 있어도(예: pickVariant 가 조용히 no-op 하는 회귀) 이 guard 를 거치지
+    // 않고 `null` 이 나올 수 있다 — 그래서 `lines` 를 먼저 확인하고, 어떤 guard 가 막았는지
+    // 도 `login_required` 토스트로 짚는다.
     authState.isAuthenticated = false;
 
     try {
       const { result } = setup(clothing, [variant(101, [1, 10, 20])]);
 
       act(() => result.current.pickVariant(101));
+      expect(result.current.lines).toHaveLength(1);
 
       expect(result.current.toDirectItems()).toBeNull();
+      expect(toast.error).toHaveBeenCalledWith(messages.login_required);
     } finally {
       authState.isAuthenticated = true;
     }

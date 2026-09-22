@@ -29,7 +29,8 @@ export function CartButton({ iconSize = 22, className }: CartButtonProps) {
   const hasAuthHydrated = useUserAuthHydrated();
   const { count, isReady } = useCartBadgeCount();
 
-  // 게스트도 장바구니를 쓴다. 복원 전에는 숫자를 모르므로 배지만 감춘다.
+  // 게스트도 장바구니를 쓴다. 복원 전에는 회원인지 게스트인지조차 몰라 아이콘 자체를
+  // 감춘다 — 서버·클라이언트 첫 렌더가 갈리는 hydration mismatch 를 피하기 위해서다.
   if (!hasAuthHydrated) return null;
 
   const showBadge = isReady && count > 0;
