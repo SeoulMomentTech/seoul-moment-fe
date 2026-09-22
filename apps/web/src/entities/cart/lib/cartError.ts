@@ -12,3 +12,12 @@ import { getErrorInfo } from "@shared/lib/utils/error";
  */
 export const isNotEnoughStockError = (error: unknown): boolean =>
   getErrorInfo(error).status === 409;
+
+/**
+ * 게스트 장바구니가 사라졌는지.
+ *
+ * 서버 보관은 7일이라 헤더의 ID 가 살아 있어도 카트가 없을 수 있다. 그 상태로 계속
+ * 요청하면 모든 조작이 조용히 실패하므로, 404 를 만나면 ID 를 버리고 빈 카트로 돌아간다.
+ */
+export const isGuestCartGoneError = (error: unknown): boolean =>
+  getErrorInfo(error).status === 404;

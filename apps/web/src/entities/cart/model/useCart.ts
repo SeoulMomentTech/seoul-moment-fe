@@ -11,18 +11,11 @@ import { readErrorInfo } from "@shared/lib/utils/error";
 import { clampLineQuantity } from "./cartPolicy";
 import type {
   AddCartItemsOutcome,
+  CartBrandGroup,
   CartItemDraft,
-  UserCartBrandGroup,
-  UserCartItem,
+  CartLine,
 } from "./types";
-import {
-  useCreateUserCartItemsMutation,
-  useDeleteUserCartItemsMutation,
-  useFetchUserCart,
-  useSetCartItemQuantity,
-  useUpdateUserCartItemMutation,
-  useUserCartQuery,
-} from "../api/useUserCart";
+import { useCartApi } from "../api/useCartApi";
 import { isNotEnoughStockError } from "../lib/cartError";
 
 /**
@@ -37,34 +30,42 @@ const QUANTITY_SYNC_DELAY = 400;
 const STOCK_TOAST_ID = "cart-stock";
 
 /** 캐시가 비었을 때 매번 새 배열을 만들지 않도록 고정 참조를 쓴다 */
-const EMPTY_BRAND_GROUPS: UserCartBrandGroup[] = [];
+const EMPTY_BRAND_GROUPS: CartBrandGroup[] = [];
 
 /**
  * 장바구니에 접근하는 **유일한 경계**.
  *
- * 읽기도 쓰기도 서버(`user/cart`)다. 화면이 그리는 값은 쿼리 캐시이고, 낙관적 반영은
- * 그 캐시를 직접 고쳐서 한다 — 로컬 사본을 따로 두면 두 세계를 동기화해야 하고 결국
- * 어느 쪽이 옳은지 알 수 없어진다.
+ * 읽기도 쓰기도 서버다 — 회원은 `user/cart`, 비로그인 게스트는 `guest/cart`. 화면이
+ * 그리는 값은 쿼리 캐시이고, 낙관적 반영은 그 캐시를 직접 고쳐서 한다 — 로컬 사본을
+ * 따로 두면 두 세계를 동기화해야 하고 결국 어느 쪽이 옳은지 알 수 없어진다.
  *
  * 실패했을 때 되돌릴 값도 서버에서 다시 읽는다. 옳은 수량과 남은 재고를 아는 쪽은 서버다.
+ *
+ * 어댑터(`CartApi`) 하나만 보고, 회원인지 게스트인지는 모른다 — `cartItemId` 로의 번역은
+ * 어댑터 안에서 끝난다.
  */
 export const useCart = () => {
   const t = useTranslations();
 
-  const { data, isPending, isError, refetch } = useUserCartQuery();
+  const cart = useCartApi();
 
-  const setItemQuantity = useSetCartItemQuantity();
-  const fetchUserCart = useFetchUserCart();
-
-  // 결과를 호출한 자리에서 처리해야 하므로 promise 로 받는다 — `mutate` 의 호출별 콜백은
-  // 관찰자 하나를 공유해 나중 호출이 앞 호출의 콜백을 덮어쓴다.
-  const { mutateAsync: createItems } = useCreateUserCartItemsMutation({
-    toastOnError: false,
-  });
-  const { mutateAsync: updateItem } = useUpdateUserCartItemMutation({
-    toastOnError: false,
-  });
-  const { mutate: deleteItems } = useDeleteUserCartItemsMutation();
+  // 아래 메모들의 의존성은 `cart` 자체가 아니라 이렇게 뽑아낸 개별 함수여야 한다.
+  // `useCartApi` 가 위임하는 두 어댑터(`useMemberCart`, `useGuestCart`) 모두 매 렌더
+  // 새 객체 리터럴을 돌려주므로, `cart` 를 의존성에 넣으면 `flushQuantities` 가 렌더마다
+  // 다시 만들어지고 — 그 안의 디바운스도 렌더마다 새 타이머를 갖는다. 스테퍼를 계속
+  // 눌러 400ms 를 넘기면 예전 타이머가 먼저 끝나 중간 수량이 서버로 새어 나간다. 개별
+  // 함수는 각자의 의존성(어댑터 안에서 이미 `useMemo`/`useCallback` 로 고정된 쿼리 키
+  // 등)이 바뀌지 않는 한 참조가 그대로다.
+  const {
+    data,
+    isPending,
+    isError,
+    refetch,
+    fetchCart,
+    setLineQuantity,
+    commitQuantity,
+    addItems: addCartItems,
+  } = cart;
 
   /**
    * 재고 부족이 아닌 실패를 알린다.
@@ -89,15 +90,15 @@ export const useCart = () => {
    * 스테퍼 상한이 맞으므로 한 번의 재조회로 둘 다 해결한다.
    */
   const reconcileAfterStockConflict = useCallback(
-    async (cartItemId?: number) => {
-      const res = await fetchUserCart().catch(() => null);
+    async (productVariantId?: number) => {
+      const res = await fetchCart();
 
       const serverItem =
-        cartItemId == null
+        productVariantId == null
           ? undefined
-          : res?.data.brandGroups
+          : res?.brandGroups
               .flatMap((group) => group.items)
-              .find((item) => item.cartItemId === cartItemId);
+              .find((item) => item.productVariantId === productVariantId);
 
       // 서버를 못 읽었거나 그 라인이 사라졌으면 남은 재고를 말할 수 없다.
       if (!serverItem) {
@@ -109,7 +110,7 @@ export const useCart = () => {
         id: STOCK_TOAST_ID,
       });
     },
-    [fetchUserCart, t],
+    [fetchCart, t],
   );
 
   /**
@@ -135,12 +136,12 @@ export const useCart = () => {
       if (targets.length !== drafts.length) return { status: "invalid" };
 
       try {
-        await createItems({
-          items: targets.map((draft) => ({
+        await addCartItems(
+          targets.map((draft) => ({
             productVariantId: draft.productVariantId,
             quantity: draft.quantity,
           })),
-        });
+        );
 
         return { status: "added" };
       } catch (error) {
@@ -155,7 +156,7 @@ export const useCart = () => {
         return { status: "error" };
       }
     },
-    [createItems, notifyFailure, reconcileAfterStockConflict],
+    [addCartItems, notifyFailure, reconcileAfterStockConflict],
   );
 
   // 라인별 최신 수량만 남겼다가 한 번에 흘린다. 타이머 하나로 여러 라인을 함께 보낸다 —
@@ -168,10 +169,10 @@ export const useCart = () => {
         const pending = [...pendingQuantities.current.entries()];
         pendingQuantities.current.clear();
 
-        pending.forEach(([cartItemId, quantity]) => {
-          updateItem({ cartItemId, quantity }).catch((error: unknown) => {
+        pending.forEach(([productVariantId, quantity]) => {
+          commitQuantity(productVariantId, quantity).catch((error: unknown) => {
             if (isNotEnoughStockError(error)) {
-              void reconcileAfterStockConflict(cartItemId);
+              void reconcileAfterStockConflict(productVariantId);
               return;
             }
 
@@ -179,30 +180,19 @@ export const useCart = () => {
           });
         });
       }, QUANTITY_SYNC_DELAY),
-    [updateItem, reconcileAfterStockConflict, notifyFailure],
+    [commitQuantity, reconcileAfterStockConflict, notifyFailure],
   );
 
   const updateQuantity = useCallback(
-    (cartItemId: number, quantity: number) => {
+    (productVariantId: number, quantity: number) => {
       const next = clampLineQuantity(quantity);
 
       // 화면은 지금 바꾸고 전송만 모은다. 스테퍼가 굳어 보이면 안 된다.
-      setItemQuantity(cartItemId, next);
-      pendingQuantities.current.set(cartItemId, next);
+      setLineQuantity(productVariantId, next);
+      pendingQuantities.current.set(productVariantId, next);
       flushQuantities();
     },
-    [setItemQuantity, flushQuantities],
-  );
-
-  const removeItems = useCallback(
-    (cartItemIds: ReadonlyArray<number>) => {
-      // `deleteUserCartItems()` 를 빈 인자로 부르면 **전체 비우기**다. 지울 것이 없으면
-      // 호출 자체를 하지 않는다.
-      if (!cartItemIds.length) return;
-
-      deleteItems([...cartItemIds]);
-    },
-    [deleteItems],
+    [setLineQuantity, flushQuantities],
   );
 
   /**
@@ -210,7 +200,7 @@ export const useCart = () => {
    * 를 받는다. 같은 SKU 를 서버가 수량 합산하므로 이중 담기를 따로 막지 않아도 된다.
    */
   const restoreItems = useCallback(
-    (items: ReadonlyArray<UserCartItem>) =>
+    (items: ReadonlyArray<CartLine>) =>
       addItems(
         items.map((item) => ({
           productVariantId: item.productVariantId,
@@ -236,7 +226,10 @@ export const useCart = () => {
     refetch,
     addItems,
     updateQuantity,
-    removeItems,
+    // 순수 위임이라 콜백으로 한 번 더 감싸지 않는다 — `cart.removeItems` 자체가 이미
+    // 안정된 참조다.
+    removeItems: cart.removeItems,
+    removeAll: cart.removeAll,
     restoreItems,
   };
 };

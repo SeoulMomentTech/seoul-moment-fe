@@ -16,10 +16,11 @@ import {
   isCartItemUnavailable,
   listCartItems,
   sumSelectedAmount,
+  toCartOrderCta,
   useCart,
-  type UserCartItem,
+  useCartSource,
+  type CartLine,
 } from "@entities/cart";
-import { toOrderHref } from "@entities/order";
 import { Button } from "@seoul-moment/ui";
 
 import { CartBar } from "./CartBar";
@@ -40,32 +41,38 @@ export function CartList() {
     remoteIslandFee,
     updateQuantity,
     removeItems,
+    removeAll,
     restoreItems,
   } = useCart();
+  const source = useCartSource();
 
   const items = useMemo(() => listCartItems(brandGroups), [brandGroups]);
 
   // 품절·판매중지 라인은 고를 수 없다. 선택에서 빼야 합계와 개수가 서로 맞는다.
-  const unselectableIds = useMemo(
+  const unselectableVariantIds = useMemo(
     () =>
       new Set(
-        items.filter(isCartItemUnavailable).map((item) => item.cartItemId),
+        items
+          .filter(isCartItemUnavailable)
+          .map((item) => item.productVariantId),
       ),
     [items],
   );
 
-  const selection = useCartSelection(items, unselectableIds);
+  const selection = useCartSelection(items, unselectableVariantIds);
 
   // 되돌리기용 스냅샷. 토스트 액션이 실행될 시점에는 목록에서 이미 사라졌으므로 따로 들고 있는다.
-  const removedRef = useRef<UserCartItem[]>([]);
+  const removedRef = useRef<CartLine[]>([]);
 
   const handleRemove = useCallback(
-    (cartItemIds: ReadonlyArray<number>) => {
-      if (!cartItemIds.length) return;
+    (productVariantIds: ReadonlyArray<number>) => {
+      if (!productVariantIds.length) return;
 
-      const ids = new Set(cartItemIds);
-      removedRef.current = items.filter((item) => ids.has(item.cartItemId));
-      removeItems(cartItemIds);
+      const ids = new Set(productVariantIds);
+      removedRef.current = items.filter((item) =>
+        ids.has(item.productVariantId),
+      );
+      removeItems(productVariantIds);
 
       const snapshot = removedRef.current;
       toast(t("removed_from_cart"), {
@@ -78,9 +85,28 @@ export function CartList() {
     [items, removeItems, restoreItems, t],
   );
 
+  const handleRemoveAll = useCallback(() => {
+    if (!items.length) return;
+
+    removedRef.current = [...items];
+    removeAll();
+
+    const snapshot = removedRef.current;
+    toast(t("removed_from_cart"), {
+      action: { label: t("undo"), onClick: () => void restoreItems(snapshot) },
+    });
+  }, [items, removeAll, restoreItems, t]);
+
+  // 게스트가 `주문하기` 를 눌렀을 때. 로그인 화면으로 보내지 않는다 — 요청하지 않은 화면
+  // 전환은 이 거절에 비해 과한 인터럽트다. `login_required` 는 "구매하기"(buy-now)와
+  // 같은 거절이 쓰는 문구라 재사용한다 — 둘이 하나의 목소리로 말해야 한다.
+  const handleGuestOrderAttempt = useCallback(() => {
+    toast.error(t("login_required"));
+  }, [t]);
+
   const selectedAmount = useMemo(
-    () => sumSelectedAmount(items, selection.selectedCartItemIds),
-    [items, selection.selectedCartItemIds],
+    () => sumSelectedAmount(items, selection.selectedVariantIds),
+    [items, selection.selectedVariantIds],
   );
 
   const shipping = useMemo(
@@ -120,19 +146,19 @@ export function CartList() {
 
   if (!items.length) return <CartEmpty />;
 
-  // 주문서는 고른 라인만 다룬다. id 를 URL 로 넘기므로 새로고침·뒤로가기에도 대상이 남는다.
-  // 고른 것이 없으면 링크 자체를 만들지 않는다 — 빈 주문서로 보내지 않는다.
-  const orderHref = selection.selectedCount
-    ? toOrderHref({
-        type: "cart",
-        cartItemIds: [...selection.selectedCartItemIds],
-      })
-    : null;
+  // 주문서는 고른 라인만 다룬다. 게스트는 `cartItemId` 가 없어 주문서를 만들 수 없으므로
+  // 버튼은 활성으로 두고 누르면 토스트만 띄우며, 아직 어느 카트인지 모르면(복원 전) 비활성이다.
+  const orderCta = toCartOrderCta({
+    source,
+    lines: items,
+    selectedVariantIds: selection.selectedVariantIds,
+  });
 
   const summary = {
     amount: selectedAmount,
     amountToFreeShipping: shipping.amountToFreeShipping,
-    orderHref,
+    onGuestOrderAttempt: handleGuestOrderAttempt,
+    orderCta,
     remoteIslandFee,
     selectedCount: selection.selectedCount,
     shippingFee: shipping.fee,
@@ -143,10 +169,8 @@ export function CartList() {
     <>
       <CartSelectionBar
         allSelected={selection.allSelected}
-        onDeleteAll={() => handleRemove(items.map((item) => item.cartItemId))}
-        onDeleteSelected={() =>
-          handleRemove([...selection.selectedCartItemIds])
-        }
+        onDeleteAll={handleRemoveAll}
+        onDeleteSelected={() => handleRemove([...selection.selectedVariantIds])}
         onToggleAll={selection.toggleAll}
         selectedCount={selection.selectedCount}
         someSelected={selection.someSelected}
@@ -165,10 +189,10 @@ export function CartList() {
               group={group}
               key={group.brandId}
               onQuantityChange={updateQuantity}
-              onRemove={(cartItemId) => handleRemove([cartItemId])}
+              onRemove={(productVariantId) => handleRemove([productVariantId])}
               onToggleGroup={selection.toggleMany}
               onToggleLine={selection.toggle}
-              selectedCartItemIds={selection.selectedCartItemIds}
+              selectedVariantIds={selection.selectedVariantIds}
             />
           ))}
         </div>
