@@ -90,8 +90,43 @@ const toCartResponse = (cart: readonly FakeCartLine[]) => ({
   },
 });
 
-const createUserCartItems = vi.fn<(req: CreateUserCartItemsReq) => unknown>(
-  (req) => {
+/** `useCart` 의 재고 부족 토스트 문구를 그대로 계산한다 — 문자열을 하드코딩하는 대신
+ * 실제 메시지 리소스를 보간해서, 문구가 바뀌어도 이 헬퍼가 따라간다. */
+const stockLeftOnlyMessage = (stock: number) =>
+  messages.stock_left_only.replace("{stock}", String(stock));
+
+/** 이 스위트가 쓰는 mock 은 전부 `vi.fn()` 로 비워 두고(제너릭·초기 구현 없이) 기본
+ * 동작은 `installDefaultServerBehavior` 가 매 테스트 다시 심는다. 이유는 `vi.fn(impl)`
+ * 처럼 구현을 생성자에 직접 넘기면 그 시점의 시그니처로 타입이 굳어 `deleteGuestCart`
+ * 처럼 실제 호출 인자 수와 mock 구현의 인자 수가 다를 때 어긋나고, `mockReset()` 도
+ * "생성자에 준 impl 로 되돌아간다"는 규칙이라 conflict 용 `mockImplementationOnce` 를
+ * 비운 뒤 기본 동작이 사라진다 — 빈 `vi.fn()` 은 `Mock<(...args: any[]) => any>` 로
+ * 느슨하게 잡혀 두 문제 모두 피해 간다. */
+const createUserCartItems = vi.fn();
+const updateUserCartItem = vi.fn();
+const deleteUserCartItems = vi.fn();
+const getUserCart = vi.fn();
+
+/** 게스트 서비스도 회원과 같은 가짜 서버 카트를 보게 해서 같은 시나리오를 돌린다 */
+const createGuestCartItems = vi.fn();
+const getGuestCart = vi.fn();
+const updateGuestCartItem = vi.fn();
+const deleteGuestCartItem = vi.fn();
+const deleteGuestCart = vi.fn();
+
+/** `useCart` 가 실패를 알리는 토스트. 재고 부족 정정(`reconcileAfterStockConflict`)이
+ * 실제로 돌았는지는 화면 값이 되돌아온 것만으로 알 수 없다 — 무효화(`invalidate`/
+ * `onSettled`)만으로도 같은 결과가 나오기 때문이다. 이 토스트가 뜬 것까지 봐야 정정
+ * 로직 자체를 검증한 것이 된다. */
+const toastError = vi.fn();
+const toastSuccess = vi.fn();
+
+/**
+ * 가짜 서버 로직을 심는다. `beforeEach` 에서 `mockReset()` 직후 다시 불러 conflict 용
+ * `mockImplementationOnce` 잔여물이 다음 테스트·다음 소스로 새지 않게 한다.
+ */
+const installDefaultServerBehavior = () => {
+  createUserCartItems.mockImplementation((req: CreateUserCartItemsReq) => {
     const added = req.items.map((line) =>
       cartItem(line.productVariantId, line.quantity),
     );
@@ -108,79 +143,81 @@ const createUserCartItems = vi.fn<(req: CreateUserCartItemsReq) => unknown>(
         totalCount: serverCart.length,
       },
     });
-  },
-);
-
-const updateUserCartItem = vi.fn<(req: UpdateUserCartItemReq) => unknown>(
-  ({ cartItemId, quantity }) => {
-    serverCart = serverCart.map((item) =>
-      item.cartItemId === cartItemId
-        ? { ...item, quantity, totalPrice: item.price * quantity }
-        : item,
-    );
-
-    return Promise.resolve({ result: true, data: null });
-  },
-);
-
-const deleteUserCartItems = vi.fn<(ids?: number[]) => unknown>((ids) => {
-  serverCart = ids
-    ? serverCart.filter((item) => !ids.includes(item.cartItemId))
-    : [];
-
-  return Promise.resolve();
-});
-
-const getUserCart = vi.fn(() => Promise.resolve(toCartResponse(serverCart)));
-
-/** 게스트 서비스도 회원과 같은 가짜 서버 카트를 보게 해서 같은 시나리오를 돌린다 */
-const createGuestCartItems = vi.fn((req: CreateGuestCartItemsReq) => {
-  const added = req.items.map((line) =>
-    cartItem(line.productVariantId, line.quantity),
-  );
-  serverCart = [...serverCart, ...added];
-
-  return Promise.resolve({
-    result: true,
-    data: { guestId: "g-1", items: req.items, totalCount: serverCart.length },
   });
-});
 
-const getGuestCart = vi.fn(() =>
-  Promise.resolve(
-    toCartResponse(serverCart.map((item) => ({ ...item, cartItemId: null }))),
-  ),
-);
+  updateUserCartItem.mockImplementation(
+    ({ cartItemId, quantity }: UpdateUserCartItemReq) => {
+      serverCart = serverCart.map((item) =>
+        item.cartItemId === cartItemId
+          ? { ...item, quantity, totalPrice: item.price * quantity }
+          : item,
+      );
 
-const updateGuestCartItem = vi.fn(
-  ({ productVariantId, quantity }: UpdateGuestCartItemReq) => {
-    const line = serverCart.find(
-      (item) => item.productVariantId === productVariantId,
+      return Promise.resolve({ result: true, data: null });
+    },
+  );
+
+  deleteUserCartItems.mockImplementation((ids?: number[]) => {
+    serverCart = ids
+      ? serverCart.filter((item) => !ids.includes(item.cartItemId))
+      : [];
+
+    return Promise.resolve();
+  });
+
+  getUserCart.mockImplementation(() =>
+    Promise.resolve(toCartResponse(serverCart)),
+  );
+
+  createGuestCartItems.mockImplementation((req: CreateGuestCartItemsReq) => {
+    const added = req.items.map((line) =>
+      cartItem(line.productVariantId, line.quantity),
     );
-    if (line) line.quantity = quantity;
+    serverCart = [...serverCart, ...added];
 
-    return Promise.resolve({ result: true, data: null });
-  },
-);
+    return Promise.resolve({
+      result: true,
+      data: {
+        guestId: "g-1",
+        items: req.items,
+        totalCount: serverCart.length,
+      },
+    });
+  });
 
-const deleteGuestCartItem = vi.fn(
-  ({ productVariantId }: DeleteGuestCartItemReq) => {
-    serverCart = serverCart.filter(
-      (item) => item.productVariantId !== productVariantId,
-    );
+  getGuestCart.mockImplementation(() =>
+    Promise.resolve(
+      toCartResponse(serverCart.map((item) => ({ ...item, cartItemId: null }))),
+    ),
+  );
+
+  updateGuestCartItem.mockImplementation(
+    ({ productVariantId, quantity }: UpdateGuestCartItemReq) => {
+      const line = serverCart.find(
+        (item) => item.productVariantId === productVariantId,
+      );
+      if (line) line.quantity = quantity;
+
+      return Promise.resolve({ result: true, data: null });
+    },
+  );
+
+  deleteGuestCartItem.mockImplementation(
+    ({ productVariantId }: DeleteGuestCartItemReq) => {
+      serverCart = serverCart.filter(
+        (item) => item.productVariantId !== productVariantId,
+      );
+
+      return Promise.resolve(undefined);
+    },
+  );
+
+  deleteGuestCart.mockImplementation(() => {
+    serverCart = [];
 
     return Promise.resolve(undefined);
-  },
-);
-
-const deleteGuestCart = vi.fn((guestId: string) => {
-  // 호출 인자(guestId) 자체는 이 mock 에서 검증하지 않는다 — 누가 불렀는지는
-  // `expectRemoveAllCalledOnce` 가 `toHaveBeenCalledWith` 로 따로 짚는다.
-  void guestId;
-  serverCart = [];
-
-  return Promise.resolve(undefined);
-});
+  });
+};
 
 /** ky 의 HTTPError 와 같은 모양 — `getErrorInfo` 는 response.status 만 본다. */
 class FakeHTTPError extends Error {
@@ -193,6 +230,12 @@ class FakeHTTPError extends Error {
 const conflict = () =>
   Promise.reject(new FakeHTTPError({ status: 409, url: "https://api/cart" }));
 
+// 회원 mutation 은 `useAppMutation`(react-query) 을 거쳐 나간다 — 그 내부가
+// `mutationFn(변수, {client, meta, ...})` 처럼 두 번째 인자를 몰래 얹어 부르므로,
+// 여기서 딱 하나만 이름 붙여 받아 그 인자만 넘긴다. `(...args) => fn(...args)` 로
+// 전부 넘기면 그 숨은 두 번째 인자까지 spy 에 찍혀 `toHaveBeenCalledWith` 단언이
+// 깨진다 — 실제로 그렇게 바꿔봤다가 회원 쪽 담기·수량 변경·삭제 단언이 전부 깨지는
+// 것으로 확인했다.
 vi.mock("@shared/services/userCart", () => ({
   createUserCartItems: (req: CreateUserCartItemsReq) =>
     createUserCartItems(req),
@@ -213,6 +256,11 @@ vi.mock("@shared/services/guestCart", () => ({
     updateGuestCartItem(req),
   deleteGuestCartItem: (req: DeleteGuestCartItemReq) =>
     deleteGuestCartItem(req),
+  // 게스트 쪽은 `useAppMutation` 을 거치지 않고 직접 호출되므로 숨은 인자가 없다 —
+  // `deleteGuestCart(guestId)` 하나뿐이라 이름 붙여 그대로 넘긴다. 예전에는 이 mock 의
+  // 구현을 `vi.fn(() => {...})` 처럼 인자 없이 생성자에 직접 줘서, 여기서 인자를 하나
+  // 받아 넘기면 타입이 어긋났다 — 지금은 `installDefaultServerBehavior` 가 빈
+  // `vi.fn()` 에 나중에 구현을 심으므로(느슨한 `Mock<Procedure>` 타입) 그 문제가 없다.
   deleteGuestCart: (guestId: string) => deleteGuestCart(guestId),
 }));
 
@@ -227,7 +275,12 @@ vi.mock("ky", async (importOriginal) => {
   };
 });
 
-vi.mock("sonner", () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
+vi.mock("sonner", () => ({
+  toast: {
+    error: (...args: unknown[]) => toastError(...args),
+    success: (...args: unknown[]) => toastSuccess(...args),
+  },
+}));
 
 // `useLanguage` 가 useParams 로 locale 을 읽는다. 라우트 밖이라 null 이 온다.
 vi.mock("next/navigation", () => ({ useParams: () => ({ locale: "ko" }) }));
@@ -268,15 +321,25 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 beforeEach(() => {
   nextCartItemId = 0;
   serverCart = [];
-  getUserCart.mockClear();
-  createUserCartItems.mockClear();
-  updateUserCartItem.mockClear();
-  deleteUserCartItems.mockClear();
-  getGuestCart.mockClear();
-  createGuestCartItems.mockClear();
-  updateGuestCartItem.mockClear();
-  deleteGuestCartItem.mockClear();
-  deleteGuestCart.mockClear();
+
+  // `mockClear()` 는 호출 기록만 지우고 `mockImplementationOnce` 대기열은 남긴다 —
+  // 어떤 테스트가 conflict 를 등록해 두고 그 호출까지 가지 않은 채(이른 return 등으로)
+  // 끝나면, 그 once 가 다음 테스트·다음 소스(회원→게스트)로 새어 들어가 엉뚱한 곳에서
+  // 409 를 만든다. `mockReset()` 은 대기열까지 비우므로 매 테스트가 완전한 새 상태에서
+  // 시작한다 — 대신 구현 자체도 지워지므로 바로 아래서 기본 동작을 다시 심는다.
+  createUserCartItems.mockReset();
+  updateUserCartItem.mockReset();
+  deleteUserCartItems.mockReset();
+  getUserCart.mockReset();
+  createGuestCartItems.mockReset();
+  getGuestCart.mockReset();
+  updateGuestCartItem.mockReset();
+  deleteGuestCartItem.mockReset();
+  deleteGuestCart.mockReset();
+  installDefaultServerBehavior();
+
+  toastError.mockClear();
+  toastSuccess.mockClear();
 });
 
 describe.each([
@@ -364,7 +427,8 @@ describe.each([
   /**
    * 선택 삭제 요청 검증. 회원은 `cartItemId` 배열로 한 번에, 게스트는 SKU 별로 각각
    * 부른다 — 서버 API 모양 자체가 다르므로(회원: 벌크, 게스트: 라인당 호출) 호출 형태도
-   * 함께 갈라 짚는다.
+   * 함께 갈라 짚는다. 횟수까지 확인해야 라인을 두 번 지우거나 엉뚱한 라인을 하나 더
+   * 지워도 이 단언이 잡아낸다.
    */
   const expectRemoveCalledWithLines = (
     lines: ReadonlyArray<{
@@ -373,6 +437,7 @@ describe.each([
     }>,
   ) => {
     if (isGuest) {
+      expect(deleteGuestCartItem).toHaveBeenCalledTimes(lines.length);
       lines.forEach((line) =>
         expect(deleteGuestCartItem).toHaveBeenCalledWith({
           guestId: "g-1",
@@ -380,6 +445,7 @@ describe.each([
         }),
       );
     } else {
+      expect(deleteUserCartItems).toHaveBeenCalledTimes(1);
       expect(deleteUserCartItems).toHaveBeenCalledWith(
         lines.map((line) => line.cartItemId),
       );
@@ -469,7 +535,7 @@ describe.each([
     });
 
     it("재고 부족(409)이면 서버를 다시 읽어 정정한다", async () => {
-      serverCart = [cartItem(501, 1)];
+      serverCart = [cartItem(501, 1, { stockQuantity: 7 })];
       const { result } = await setupLoaded();
       const [line] = items(result);
 
@@ -482,6 +548,16 @@ describe.each([
       await waitFor(() => expect(updateSpy()).toHaveBeenCalledTimes(1));
       // 서버는 1 을 그대로 들고 있다. 재조회가 화면을 그 값으로 되돌린다.
       await waitFor(() => expect(items(result)[0].quantity).toBe(1));
+
+      // 화면이 1로 돌아오는 것만으로는 `reconcileAfterStockConflict` 가 실제로 돈
+      // 것인지 알 수 없다 — 무효화(회원은 `onSettled`, 게스트는 `.finally(invalidate)`)
+      // 만으로도 같은 결과가 나온다. 재조회가 읽어 온 "남은 재고" 수치가 토스트로
+      // 뜬 것까지 봐야 정정 로직 자체가 돈 것이 확인된다.
+      await waitFor(() =>
+        expect(toastError).toHaveBeenCalledWith(stockLeftOnlyMessage(7), {
+          id: "cart-stock",
+        }),
+      );
     });
 
     // 회귀 방지: 어댑터(`useMemberCart`/`useGuestCart`)는 매 렌더 새 객체를 돌려준다.
