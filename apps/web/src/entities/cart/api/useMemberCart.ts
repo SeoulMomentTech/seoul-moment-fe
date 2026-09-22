@@ -416,7 +416,23 @@ export function useMemberCart(): CartApi {
     // 없으므로 그때만 전체 비우기로 떨어진다.
     removeAll: useCallback(() => {
       const cache = queryClient.getQueryData<CartListCache>(keys.list);
-      deleteItems(cache ? [...listCacheItemIds(cache)] : undefined);
+
+      if (!cache) {
+        deleteItems(undefined);
+        return;
+      }
+
+      const ids = [...listCacheItemIds(cache)];
+
+      // 캐시가 있는데 ids 가 비어 있으면(이미 빈 장바구니) 절대 그대로 보내지 않는다.
+      // `deleteUserCartItems([])` 는 검색 파라미터 없는 요청으로 직렬화되고, 서버는 그
+      // 모양을 "ids 생략 = 전체 비우기"로 읽는다 — 바로 위에서 명시적 ids 를 쓰기로 한
+      // 이유였던 그 데이터 유실 사고(다른 기기에서 담긴 라인까지 삭제)가 빈 배열을 타고
+      // 다시 일어난다. 오늘은 `CartList.tsx` 가 `if (!items.length) return;` 로 한 겹
+      // 막아 주지만, 그 가드는 엔티티 계약이 아니라 화면 쪽 우연이다.
+      if (!ids.length) return;
+
+      deleteItems(ids);
     }, [deleteItems, queryClient, keys.list]),
   };
 }

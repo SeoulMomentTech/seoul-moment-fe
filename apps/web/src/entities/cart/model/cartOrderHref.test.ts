@@ -72,15 +72,16 @@ describe("toCartOrderHref", () => {
     ).toBeNull();
   });
 
-  it("게스트는 로그인으로 보낸다", () => {
-    // 주문·결제는 회원 전용이다. 빈 주문서로 보내는 것보다 로그인이 정직하다.
+  it("게스트는 돌아올 곳(/cart)을 실어 로그인으로 보낸다", () => {
+    // 주문·결제는 회원 전용이다. 빈 주문서로 보내는 것보다 로그인이 정직하다 — 다만
+    // 로그인만 시키고 어디로 왔는지 잊으면 안 되므로 `redirect` 로 장바구니를 되돌려준다.
     expect(
       toCartOrderHref({
         source: { kind: "guest", guestId: "g-1" },
         lines: [line({ cartItemId: null })],
         selectedVariantIds: new Set([101]),
       }),
-    ).toBe("/login");
+    ).toBe("/login?redirect=%2Fcart");
   });
 
   it("아직 어느 카트인지 모르면 링크를 만들지 않는다", () => {

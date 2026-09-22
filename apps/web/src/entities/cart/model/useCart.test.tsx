@@ -657,6 +657,39 @@ describe.each([
     });
   });
 
+  // 게스트 어댑터(`useGuestCart`)의 `removeAll` 은 ids 없이 언제나 `deleteGuestCart(guestId)`
+  // 하나만 부르므로 이 가드가 해당하지 않는다 — 회원 어댑터에만 있는 경로다.
+  if (!isGuest) {
+    describe("전체 비우기 · 빈 캐시 가드", () => {
+      // 회귀 방지: 캐시가 있고 그 안이 이미 비어 있으면(예: 방금 전체 비우기가 끝난 뒤)
+      // `listCacheItemIds` 가 빈 배열을 낸다. `deleteUserCartItems([])` 는 검색
+      // 파라미터 없는 요청으로 직렬화돼 서버가 "ids 생략 = 전체 비우기"로 읽는다 —
+      // 다른 기기에서 방금 담은 라인까지 지우는, ids 를 명시하기로 한 이유 그 자체의
+      // 사고가 빈 배열을 타고 재발한다. 캐시가 있고 비어 있으면 서버를 부르지 않아야
+      // 한다.
+      it("캐시가 있고 비어 있으면 다시 호출하지 않는다", async () => {
+        serverCart = [cartItem(501)];
+        const { result } = await setupLoaded();
+
+        act(() => {
+          result.current.removeAll();
+        });
+        await waitFor(() => expect(items(result)).toHaveLength(0));
+        expect(deleteUserCartItems).toHaveBeenCalledTimes(1);
+
+        deleteUserCartItems.mockClear();
+
+        act(() => {
+          result.current.removeAll();
+        });
+
+        // 비동기 경로가 있다면 걸릴 시간을 준다 — 가드가 없다면 이 사이에 호출된다.
+        await sleep(50);
+        expect(deleteUserCartItems).not.toHaveBeenCalled();
+      });
+    });
+  }
+
   describe("되돌리기", () => {
     it("지웠던 SKU 를 같은 수량으로 다시 담는다", async () => {
       serverCart = [cartItem(501, 3)];

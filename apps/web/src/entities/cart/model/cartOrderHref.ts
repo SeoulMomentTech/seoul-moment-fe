@@ -20,7 +20,9 @@ interface ToCartOrderHrefArgs {
  *
  * 주문·결제는 회원 전용이다(서버가 게스트 주문을 지원하지 않는다). 게스트는 같은 자리에서
  * 로그인으로 보낸다 — 빈 주문서로 보내는 것보다 정직하고, 게스트 라인은 `cartItemId` 가
- * 없어 주문서가 받을 수도 없다.
+ * 없어 주문서가 받을 수도 없다. `redirect` 로 돌아올 곳(`/cart`)을 함께 실어 보낸다 —
+ * 없으면 로그인 뒤 홈으로 떨어져, 왜 로그인했는지 기억하지 못하는 화면이 된다. 읽는 쪽은
+ * `resolveRedirectPath`(`shared/lib/utils/redirectPath.ts`) 가 내부 경로인지 다시 검증한다.
  *
  * 고른 것이 없으면 `null` 이고 버튼은 비활성이다.
  */
@@ -31,7 +33,8 @@ export const toCartOrderHref = ({
 }: ToCartOrderHrefArgs): string | null => {
   if (!source || selectedVariantIds.size === 0) return null;
 
-  if (source.kind === "guest") return "/login";
+  if (source.kind === "guest")
+    return `/login?redirect=${encodeURIComponent("/cart")}`;
 
   const selected = lines.filter((line) =>
     selectedVariantIds.has(line.productVariantId),
