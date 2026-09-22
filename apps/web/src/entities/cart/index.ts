@@ -24,7 +24,8 @@ export {
   MAX_LINE_QUANTITY,
 } from "./model/cartPolicy";
 export { useCartSource } from "./api/useCartSource";
-export { toCartOrderHref } from "./model/cartOrderHref";
+export { toCartOrderCta } from "./model/cartOrderHref";
+export type { CartOrderCta } from "./model/cartOrderHref";
 export type {
   AddCartItemsOutcome,
   CartApi,

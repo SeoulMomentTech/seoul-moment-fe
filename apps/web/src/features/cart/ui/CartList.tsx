@@ -16,7 +16,7 @@ import {
   isCartItemUnavailable,
   listCartItems,
   sumSelectedAmount,
-  toCartOrderHref,
+  toCartOrderCta,
   useCart,
   useCartSource,
   type CartLine,
@@ -97,6 +97,13 @@ export function CartList() {
     });
   }, [items, removeAll, restoreItems, t]);
 
+  // 게스트가 `주문하기` 를 눌렀을 때. 로그인 화면으로 보내지 않는다 — 요청하지 않은 화면
+  // 전환은 이 거절에 비해 과한 인터럽트다. `login_required` 는 "구매하기"(buy-now)와
+  // 같은 거절이 쓰는 문구라 재사용한다 — 둘이 하나의 목소리로 말해야 한다.
+  const handleGuestOrderAttempt = useCallback(() => {
+    toast.error(t("login_required"));
+  }, [t]);
+
   const selectedAmount = useMemo(
     () => sumSelectedAmount(items, selection.selectedVariantIds),
     [items, selection.selectedVariantIds],
@@ -140,8 +147,8 @@ export function CartList() {
   if (!items.length) return <CartEmpty />;
 
   // 주문서는 고른 라인만 다룬다. 게스트는 `cartItemId` 가 없어 주문서를 만들 수 없으므로
-  // 로그인으로 보내고, 아직 어느 카트인지 모르면(복원 전) 링크를 만들지 않는다.
-  const orderHref = toCartOrderHref({
+  // 버튼은 활성으로 두고 누르면 토스트만 띄우며, 아직 어느 카트인지 모르면(복원 전) 비활성이다.
+  const orderCta = toCartOrderCta({
     source,
     lines: items,
     selectedVariantIds: selection.selectedVariantIds,
@@ -150,7 +157,8 @@ export function CartList() {
   const summary = {
     amount: selectedAmount,
     amountToFreeShipping: shipping.amountToFreeShipping,
-    orderHref,
+    onGuestOrderAttempt: handleGuestOrderAttempt,
+    orderCta,
     remoteIslandFee,
     selectedCount: selection.selectedCount,
     shippingFee: shipping.fee,

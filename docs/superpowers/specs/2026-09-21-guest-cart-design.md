@@ -150,8 +150,10 @@ flowchart TD
 
 주문·결제가 회원 전용이라는 서버 정책을 그대로 따른다.
 
-- 장바구니 `주문하기` — 회원은 지금 그대로 주문서로 간다. 게스트는 같은 자리에서 `/login` 으로
-  보낸다. 게스트 라인은 `cartItemId` 가 `null` 이라 타입 차원에서도 주문서로 갈 수 없다.
+- 장바구니 `주문하기` — 회원은 지금 그대로 주문서로 간다. 게스트는 버튼이 활성이어도 누르면
+  `login_required` 토스트만 뜨고 이동하지 않는다 — 요청하지 않은 로그인 화면으로 보내는 것은
+  그 거절에 비해 과한 인터럽트다. 게스트 라인은 `cartItemId` 가 `null` 이라 타입 차원에서도
+  주문서로 갈 수 없다.
 - 상품상세 `구매하기` — 지금의 `login_required` 토스트를 유지한다
   (`useAddToCartDraft.ts:301`). 푸는 것은 `장바구니 담기` 게이트뿐이다 (같은 파일 322행).
 - `views/cart/ui/CartPage.tsx:44` 의 `AuthOnly` 를 제거한다.
@@ -214,7 +216,7 @@ flowchart TD
 | **로그인 시 게스트 카트 폐기 (병합 없음)**    | 프론트가 `POST user/cart` 로 병합     | 심사용 일회성 모듈이다. 병합은 40줄이지만 재고 부족·부분 실패 정책을 새로 정해야 하고, 그 정책이 검증될 무렵이면 모듈이 사라진다               | 게스트 카트가 상시 기능이 되면 |
 | **`DELETE guest/cart` 를 부르지 않고 로컬 ID 만 폐기** | 로그인 시 서버 카트도 비우기 | 서버 TTL 7일이 정리한다. 로그인 직후 실패할 수 있는 요청을 하나 더 만들 이유가 없다                                                            | —                              |
 | **게스트 선택 삭제는 N 건 병렬 호출**         | 게스트에서 선택 삭제 UI 숨김          | 화면을 회원과 다르게 만들면 "동등 실드" 가 깨지고 `CartSelectionBar` 가 두 벌이 된다. 선택 삭제는 한 번에 몇 건 수준이다                       | 삭제 건수가 커지면             |
-| **주문·구매하기는 회원 전용 유지**            | 게스트 주문서 진입 후 로그인 요구     | 서버가 게스트 주문을 지원하지 않는다. 빈 주문서로 보내는 것보다 `/login` 이 정직하다                                                          | 비회원 주문이 생기면           |
+| **주문·구매하기는 회원 전용 유지**            | 게스트 주문서 진입 후 로그인 요구     | 서버가 게스트 주문을 지원하지 않는다. 요청하지 않은 로그인 화면으로 보내는 것은 과한 인터럽트라, 버튼은 활성으로 두고 `login_required` 토스트만 띄운다                     | 비회원 주문이 생기면           |
 | **E2E 없음**                                  | 게스트 해피패스 1개 추가              | 곧 삭제할 임시 모듈이고 카트 E2E 하네스 자체가 아직 없다                                                                                       | 게스트 카트가 상시 기능이 되면 |
 
 ## 심사 후 제거 절차
@@ -241,8 +243,8 @@ flowchart TD
 - `entities/cart/api/useCartApi.ts` — `useGuestCart`/`useGuestCartCountQuery` 호출과
   `source.kind` 분기 제거, 회원 어댑터만 반환
 - `entities/cart/api/useCartSource.ts` — `guestId` store 참조를 지우고 `member` 고정으로
-- `entities/cart/model/cartOrderHref.ts` — `source.kind === "guest"` 면 `/login` 으로
-  보내는 분기 제거
+- `entities/cart/model/cartOrderHref.ts` — `source.kind === "guest"` 면 `{ type: "guest" }`
+  (로그인 토스트)를 내는 분기 제거
 - `features/cart/ui/CartList.tsx` — 주문 링크를 만들려고 `useCartSource()` 를 다시 부르는
   자리 제거
 - `entities/cart/lib/cartError.ts` — `isGuestCartGoneError` 제거

@@ -3,17 +3,17 @@
 `apps/web`의 장바구니 구현 문서. 수량 조절·선택 삭제·금액 요약에 더해 주문서 진입까지
 다룬다. `주문하기`(장바구니)·`구매하기`(상품상세)는 더 이상 `disabled` 로만 렌더하는 자리가
 아니다 — 고른 라인이 있으면 실제로 주문서(`/order`) 로 이동한다. 회원 전용이라 게스트는
-같은 자리에서 `/login` 으로 보낸다 — `?redirect=/cart` 를 함께 실어 보내, 로그인을 마치면
-장바구니로 되돌아온다(`LoginPage` 가 `GuestOnly` 의 `redirectTo` 로 그 값을 넘긴다).
-아직 없는 것은 주문서 화면 자체가 아니라 그 안의
+버튼이 활성이어도 누르면 로그인이 필요하다는 토스트만 뜨고 이동하지 않는다 — 요청하지
+않은 로그인 화면으로 보내는 것은 그 거절에 비해 과한 인터럽트다. 아직 없는 것은
+주문서 화면 자체가 아니라 그 안의
 **주문 생성(결제 확정)** 호출이다 — `shared/services/userOrder.ts` 의 `createUserOrder` 는
 정의돼 있지만 호출부가 없다(아래 "알려진 제약" 참고).
 
 읽기도 쓰기도 서버다 — 회원은 **`user/cart`**, 비로그인 게스트는 **`guest/cart`** 다. 지금
 어느 카트가 유효한지는 `useCartSource` 가 정하고, **어댑터를 고르는** 분기는 `useCartApi`
 한 곳에 있다. 다만 게스트 흔적이 남는 곳은 그 한 곳만이 아니다 — `cartOrderHref.ts` 의
-"게스트면 `/login`" 분기와, 그 분기를 먹이려고 `CartList.tsx` 가 `useCartSource()` 를 한
-번 더 부르는 자리까지 합쳐 세 곳이다(심사 후 제거 절차 참고). 화면이 그리는 값은
+"게스트면 로그인 토스트" 분기와, 그 분기를 먹이려고 `CartList.tsx` 가 `useCartSource()` 를
+한 번 더 부르는 자리까지 합쳐 세 곳이다(심사 후 제거 절차 참고). 화면이 그리는 값은
 TanStack Query 캐시이고, 낙관적 반영은 그 캐시를 직접 고쳐서 한다. UI는 `useCart` 경계만
 쓴다 — 회원인지 게스트인지는 이 경계 아래에 숨는다.
 
@@ -62,7 +62,7 @@ apps/web/src/
 │   │   ├── cartSelectors.ts            # 선택 합계 · 배송비 예상 · 품절/저재고 판정
 │   │   ├── cartSource.ts               # CartSource 타입 + 순수 판정 함수(resolveCartSource)
 │   │   ├── guestId.ts                  # 게스트 ID persist(zustand). 첫 담기 응답으로만 발급
-│   │   ├── cartOrderHref.ts            # `주문하기` 링크 산정. 게스트는 무조건 `/login`
+│   │   ├── cartOrderHref.ts            # `주문하기` CTA 판정(link/guest/disabled). 게스트는 토스트
 │   │   ├── useCart.ts                  # UI 가 쓰는 유일한 경계
 │   │   └── useCartBadgeCount.ts        # 헤더 배지 수
 │   └── ui/
@@ -194,7 +194,7 @@ localStorage 에 남겨 첫 페인트를 메운다(`shared/lib/query/persister.t
 | Hook                          | 위치                  | 역할                                                                                                                     |
 | ----------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------ |
 | `useCart`                     | `entities/cart/model` | **UI가 쓰는 유일한 경계 — 회원·게스트 어느 카트가 지금 유효한지 가리지 않는다.** 서버 금액·`brandGroups`·`isPending` + `addItems`/`updateQuantity`/`removeItems`/`restoreItems`. 400ms 수량 디바운스·409 재조회 정정·실패 토스트·`restoreItems` 를 여기 한 곳에서만 다룬다 |
-| `useCartApi`                  | `entities/cart/api`   | `useCartSource` 결과로 `useMemberCart`/`useGuestCart` 중 하나를 고른다. **어댑터를 고르는 분기는 이 파일에 있다** — 헤더 배지용 `useCartCount` 도 같은 파일에 있다. 다만 게스트 분기 자체는 여기 하나로 끝나지 않는다: `cartOrderHref.ts` 의 "게스트면 `/login`" 과, 그걸 먹이려고 `CartList.tsx` 가 `useCartSource()` 를 한 번 더 부르는 자리까지 총 세 곳이 심사 후 제거 대상이다 |
+| `useCartApi`                  | `entities/cart/api`   | `useCartSource` 결과로 `useMemberCart`/`useGuestCart` 중 하나를 고른다. **어댑터를 고르는 분기는 이 파일에 있다** — 헤더 배지용 `useCartCount` 도 같은 파일에 있다. 다만 게스트 분기 자체는 여기 하나로 끝나지 않는다: `cartOrderHref.ts` 의 "게스트면 로그인 토스트" 와, 그걸 먹이려고 `CartList.tsx` 가 `useCartSource()` 를 한 번 더 부르는 자리까지 총 세 곳이 심사 후 제거 대상이다 |
 | `useCartSource`               | `entities/cart/api`   | 인증 store 와 게스트 ID store 를 읽어 `{ kind: "member" }` / `{ kind: "guest", guestId }` / `null`(두 store 모두 복원 전)을 만든다 |
 | `useMemberCart`                | `entities/cart/api`   | 회원 어댑터(구 `useUserCart.ts`). 화면이 쓰는 `productVariantId` 를 서버가 요구하는 `cartItemId` 로 번역 — 그 번역은 이 훅 밖으로 새지 않는다. `useUserCartQuery`·`useUserCartCountQuery`·`useSetCartItemQuantity`·`useFetchUserCart` 도 이 파일에 있다 |
 | `useGuestCart`                | `entities/cart/api`   | 게스트 어댑터. 첫 담기 응답으로만 `guestId` 를 발급받아 이후 요청에 `x-guest-id` 헤더로 싣는다(동시 첫 담기는 모듈 스코프 promise 로 직렬화). 선택 삭제가 서버에 없어 라인마다 병렬 호출 + `Promise.allSettled`. 404 면 `guestId` 를 버리고 빈 카트로 정정한다 |
@@ -316,7 +316,7 @@ export interface UserCartItem {
 | **로그인 시 게스트 카트 폐기 (병합 없음)**                          | 프론트가 `POST user/cart` 로 병합 | 심사용 일회성 모듈이다. 병합은 얼마 안 되는 코드지만 재고 부족·부분 실패 정책을 새로 정해야 하고, 그 정책이 검증될 무렵이면 모듈이 사라진다                                          | 게스트 카트가 상시 기능이 되면            |
 | **`DELETE guest/cart` 를 부르지 않고 로컬 ID 만 폐기**              | 로그인 시 서버 카트도 비우기    | 서버 TTL 7일이 정리한다. 로그인 직후 실패할 수 있는 요청을 하나 더 만들 이유가 없다                                                                                                   | —                                         |
 | **게스트 선택 삭제는 N 건 병렬 호출**                               | 게스트에서 선택 삭제 UI 숨김    | 화면을 회원과 다르게 만들면 "동등 실드"가 깨지고 `CartSelectionBar`가 두 벌이 된다. 선택 삭제는 한 번에 몇 건 수준이다                                                                | 삭제 건수가 커지면                        |
-| **주문·구매하기는 회원 전용 유지**                                  | 게스트 주문서 진입 후 로그인 요구 | 서버가 게스트 주문을 지원하지 않는다. 빈 주문서로 보내는 것보다 `?redirect=/cart`로 돌아올 곳을 실은 `/login`이 정직하다                                                              | 비회원 주문이 생기면                      |
+| **주문·구매하기는 회원 전용 유지**                                  | 게스트 주문서 진입 후 로그인 요구 | 서버가 게스트 주문을 지원하지 않는다. 다만 요청하지 않은 로그인 화면으로 보내는 것은 과한 인터럽트라, 버튼은 활성으로 두고 누르면 `login_required` 토스트만 띄운다(`/order` 이동 없음) | 비회원 주문이 생기면                      |
 | **게스트 카트 E2E 없음**                                            | 게스트 해피패스 1개 추가        | 곧 삭제할 임시 모듈이고 카트 E2E 하네스 자체가 아직 없다. 비로그인 담기 경로는 계약 스위트(`useCart.test.tsx`, `describe.each`)가 덮는다                                             | 게스트 카트가 상시 기능이 되면            |
 
 ## 알려진 제약 / TODO
@@ -326,7 +326,8 @@ export interface UserCartItem {
 - **로그인하면 게스트가 담아둔 것은 병합 없이 사라진다.** 서버가 게스트→회원 이관 엔드포인트를
   제공하지 않고, 프론트도 대신 병합하지 않는다 — 의도된 동작이다(위 ADR 참고).
 - **게스트는 주문·결제로 이어지지 않는다.** 게스트 라인은 `cartItemId` 가 없어 주문서로 넘길
-  방법이 없고, `주문하기`는 게스트를 항상 `/login` 으로 보낸다.
+  방법이 없다. `주문하기` 버튼은 활성이지만 누르면 `login_required` 토스트만 뜨고 이동하지
+  않는다 — 요청하지 않은 로그인 화면으로 보내는 것은 이 거절에 비해 과한 인터럽트다.
 - **게스트 모듈은 심사가 끝나면 통째로 제거될 임시 코드다.** 제거 절차는 설계 문서의
   ["심사 후 제거 절차"](../../../docs/superpowers/specs/2026-09-21-guest-cart-design.md#심사-후-제거-절차)
   를 따른다 — 실제 `grep -rn 'uest' apps/web/src` 기준의 전체 체크리스트가 거기 있다.
