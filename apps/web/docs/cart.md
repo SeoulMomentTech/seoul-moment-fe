@@ -4,8 +4,10 @@
 수량 조절·선택 삭제·금액 요약까지만 다룬다. `주문하기`·`구매하기`는 결제가 붙을 때 UI 재작업이
 없도록 **비활성 자리**로만 렌더한다.
 
-읽기도 쓰기도 **서버(`user/cart`)** 다. 화면이 그리는 값은 TanStack Query 캐시이고, 낙관적
-반영은 그 캐시를 직접 고쳐서 한다. UI는 `useCart` 경계만 쓴다.
+읽기도 쓰기도 서버다 — 회원은 **`user/cart`**, 비로그인 게스트는 **`guest/cart`** 다. 지금
+어느 카트가 유효한지는 `useCartSource` 가 정하고, 회원/게스트 분기는 `useCartApi` 한 곳에만
+있다. 화면이 그리는 값은 TanStack Query 캐시이고, 낙관적 반영은 그 캐시를 직접 고쳐서 한다.
+UI는 `useCart` 경계만 쓴다 — 회원인지 게스트인지는 이 경계 아래에 숨는다.
 
 - 장바구니 라우트: `apps/web/src/app/[locale]/cart/page.tsx` → `/[locale]/cart` (예: `/ko/cart`)
 - 담기 진입점: 상품상세(`/product/[id]`) 우측 정보 컬럼(데스크톱) / 하단 고정 바 + 시트(모바일)
@@ -17,12 +19,12 @@ apps/web/src/
 ├── app/[locale]/cart/
 │   └── page.tsx                        # 라우트 진입점 + generateMetadata (robots noindex)
 ├── views/cart/
-│   └── ui/CartPage.tsx                 # "use client", AuthOnly + 첫 조회 스켈레톤
+│   └── ui/CartPage.tsx                 # "use client", 첫 조회 스켈레톤 (로그인 게이트 없음)
 ├── features/cart/
 │   ├── index.tsx                       # barrel (CartList, AddToCart, useCartSelection)
 │   ├── lib/draftLine.ts                # 담기 전 조합의 키 생성 · 옵션 슬래시 표기
 │   ├── model/
-│   │   ├── useCartSelection.ts         # 선택 상태 (해제된 cartItemId 만 보관)
+│   │   ├── useCartSelection.ts         # 선택 상태 (해제된 productVariantId 만 보관)
 │   │   └── useAddToCartDraft.ts        # 축·조합 선택 → SKU 로 번역 → 담기
 │   └── ui/
 │       ├── CartList.tsx                # 리스트 조립 + 삭제/되돌리기 토스트
@@ -38,16 +40,24 @@ apps/web/src/
 ├── entities/cart/
 │   ├── index.ts                        # barrel
 │   ├── api/
-│   │   ├── queryKey.ts                 # userCartQueryKeys (userId·languageCode 포함)
-│   │   └── useUserCart.ts              # 조회/담기/수량/삭제 + 낙관적 캐시 갱신
-│   ├── lib/cartError.ts                # 409(재고 부족) 판정
+│   │   ├── queryKey.ts                 # userCartQueryKeys · guestCartQueryKeys
+│   │   ├── useCartSource.ts            # auth·guestId 두 store 를 읽어 CartSource 산정
+│   │   ├── useCartApi.ts               # 회원/게스트 어댑터 선택(분기는 여기 한 곳) + useCartCount
+│   │   ├── useMemberCart.ts            # 회원 어댑터. 조회/담기/수량/삭제 + 낙관적 캐시 갱신
+│   │   └── useGuestCart.ts             # 게스트 어댑터. 같은 계약을 productVariantId 로 구현
+│   ├── lib/cartError.ts                # 409(재고 부족) · 404(게스트 카트 소멸) 판정
 │   ├── model/
-│   │   ├── types.ts                    # 서버 DTO 재노출 + CartItemDraft · AddCartItemsOutcome
+│   │   ├── types.ts                    # CartApi · CartLine · CartBrandGroup · GetCartRes · CartItemDraft 등
 │   │   ├── cartPolicy.ts               # MAX_LINE_QUANTITY · LOW_STOCK_THRESHOLD · 수량 clamp
 │   │   ├── cartSelectors.ts            # 선택 합계 · 배송비 예상 · 품절/저재고 판정
+│   │   ├── cartSource.ts               # CartSource 타입 + 순수 판정 함수(resolveCartSource)
+│   │   ├── guestId.ts                  # 게스트 ID persist(zustand). 첫 담기 응답으로만 발급
+│   │   ├── cartOrderHref.ts            # `주문하기` 링크 산정. 게스트는 무조건 `/login`
 │   │   ├── useCart.ts                  # UI 가 쓰는 유일한 경계
 │   │   └── useCartBadgeCount.ts        # 헤더 배지 수
-│   └── ui/CartLineRow.tsx              # 라인 프레젠테이션 (썸네일 120 / 100px)
+│   └── ui/
+│       ├── CartLineRow.tsx             # 라인 프레젠테이션 (썸네일 120 / 100px)
+│       └── GuestCartReset.tsx          # 로그인 전환 시 guestId 폐기 (헤드리스)
 ├── entities/product/lib/               # optionAxes · productVariant · optionAvailability
 ├── widgets/header/ui/CartButton.tsx    # 헤더 아이콘 + 배지
 └── shared/
@@ -85,19 +95,27 @@ flowchart TD
 ```mermaid
 flowchart TD
   A["app/[locale]/cart/page.tsx"] --> B["views/cart · CartPage"]
-  B --> C{"AuthOnly"}
-  C -->|"비로그인"| D["/login 리다이렉트"]
-  C -->|"로그인"| E["useCart → useUserCartQuery<br/>GET user/cart"]
-  E -->|"isPending<br/>(캐시 복원·첫 조회 전)"| F["스켈레톤"]
-  E -->|"응답 또는 복원된 캐시"| G["features/cart · CartList"]
-  G --> H{"라인 개수"}
-  H -->|"0"| I["CartEmpty<br/>+ 최근 본 상품"]
-  H -->|"1개 이상"| J["CartSelectionBar"]
-  J --> K["brandGroups (서버가 묶고 정렬)"]
-  K --> L["CartBrandGroup → CartLineRow"]
-  K --> M["sumSelectedAmount<br/>estimateShipping"]
-  M --> N["CartSummary (sticky)<br/>/ CartBar (모바일)"]
+  B --> C["useCart → useCartApi"]
+  C --> D{"useCartSource"}
+  D -->|"미정<br/>(auth·guestId store 복원 전)"| E["스켈레톤"]
+  D -->|"회원"| F["useMemberCart<br/>GET user/cart"]
+  D -->|"게스트 · guestId 있음"| G["useGuestCart<br/>GET guest/cart"]
+  D -->|"게스트 · guestId 없음<br/>(담은 적 없음)"| H["빈 카트<br/>요청 없음 · isPending=false"]
+  F --> I["features/cart · CartList"]
+  G --> I
+  H --> I
+  I --> J{"라인 개수"}
+  J -->|"0"| K["CartEmpty<br/>+ 최근 본 상품"]
+  J -->|"1개 이상"| L["CartSelectionBar"]
+  L --> M["brandGroups (서버가 묶고 정렬)"]
+  M --> N["CartBrandGroup → CartLineRow"]
+  M --> O["sumSelectedAmount<br/>estimateShipping"]
+  O --> P["CartSummary (sticky)<br/>/ CartBar (모바일)"]
 ```
+
+`CartPage` 자체에는 더 이상 로그인 게이트가 없다 — `AuthOnly` 는 지웠다. 비로그인이어도
+`/cart` 는 들어오고, 담은 적 있는 게스트라면 그 내용을 그린다. 회원 전용으로 남은 것은
+"주문하기" 하나뿐이다(아래 참고).
 
 ### 낙관적 반영과 되돌리기
 
@@ -153,14 +171,14 @@ localStorage 에 남겨 첫 페인트를 메운다(`shared/lib/query/persister.t
 
 | Hook                          | 위치                  | 역할                                                                                                                     |
 | ----------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `useCart`                     | `entities/cart/model` | **UI가 쓰는 유일한 경계.** 서버 금액·`brandGroups`·`isPending` + `addItems`/`updateQuantity`/`removeItems`/`restoreItems` |
-| `useUserCartQuery`            | `entities/cart/api`   | `GET user/cart`. `persist: true` 로 캐시를 localStorage 에 남긴다                                                        |
-| `useUserCartCountQuery`       | `entities/cart/api`   | `GET user/cart/count` (헤더 배지)                                                                                        |
-| `useSetCartItemQuantity`      | `entities/cart/api`   | 수량을 캐시에만 먼저 반영. 전송은 `useCart` 가 모아서 한다                                                               |
-| `useFetchUserCart`            | `entities/cart/api`   | 409 뒤 즉시 재조회. 상품상세에는 목록 구독자가 없어 무효화만으로는 아무도 다시 읽지 않는다                               |
-| `useCartBadgeCount`           | `entities/cart/model` | 배지 수 + 캐시 복원 대기(`useIsRestoring`)                                                                               |
-| `useCartSelection`            | `features/cart/model` | 선택 상태. **해제된 `cartItemId` 만** 보관해 새 라인이 자동 선택되고 삭제된 id가 남지 않는다                             |
-| `useAddToCartDraft`           | `features/cart/model` | 조합 선택 → SKU 번역 → `addItems`. 로그인 게이트 포함                                                                    |
+| `useCart`                     | `entities/cart/model` | **UI가 쓰는 유일한 경계 — 회원·게스트 어느 카트가 지금 유효한지 가리지 않는다.** 서버 금액·`brandGroups`·`isPending` + `addItems`/`updateQuantity`/`removeItems`/`restoreItems`. 400ms 수량 디바운스·409 재조회 정정·실패 토스트·`restoreItems` 를 여기 한 곳에서만 다룬다 |
+| `useCartApi`                  | `entities/cart/api`   | `useCartSource` 결과로 `useMemberCart`/`useGuestCart` 중 하나를 고른다. **회원·게스트 분기는 이 파일에만 있다** — 심사 후 게스트를 걷어낼 때 고칠 곳도 여기다. 헤더 배지용 `useCartCount` 도 같은 파일에 있다 |
+| `useCartSource`               | `entities/cart/api`   | 인증 store 와 게스트 ID store 를 읽어 `{ kind: "member" }` / `{ kind: "guest", guestId }` / `null`(두 store 모두 복원 전)을 만든다 |
+| `useMemberCart`                | `entities/cart/api`   | 회원 어댑터(구 `useUserCart.ts`). 화면이 쓰는 `productVariantId` 를 서버가 요구하는 `cartItemId` 로 번역 — 그 번역은 이 훅 밖으로 새지 않는다. `useUserCartQuery`·`useUserCartCountQuery`·`useSetCartItemQuantity`·`useFetchUserCart` 도 이 파일에 있다 |
+| `useGuestCart`                | `entities/cart/api`   | 게스트 어댑터. 첫 담기 응답으로만 `guestId` 를 발급받아 이후 요청에 `x-guest-id` 헤더로 싣는다(동시 첫 담기는 모듈 스코프 promise 로 직렬화). 선택 삭제가 서버에 없어 라인마다 병렬 호출 + `Promise.allSettled`. 404 면 `guestId` 를 버리고 빈 카트로 정정한다 |
+| `useCartBadgeCount`           | `entities/cart/model` | 배지 수 + 캐시 복원 대기(`useIsRestoring`). 회원/게스트 중 무엇을 볼지는 `useCartApi.ts` 의 `useCartCount` 가 정한다               |
+| `useCartSelection`            | `features/cart/model` | 선택 상태. **해제된 `productVariantId` 만** 보관해 새 라인이 자동 선택되고 삭제된 id가 남지 않는다                       |
+| `useAddToCartDraft`           | `features/cart/model` | 조합 선택 → SKU 번역 → `addItems`. **담기 자체에는 더 이상 로그인 게이트가 없다** — 로그인 없이도 `useCart.addItems` 가 게스트 카트로 담는다. 로그인 게이트가 남은 것은 `toDirectItems`(상품상세 "구매하기")뿐이다 |
 | `useFloatingOffset`           | `shared/lib/hooks`    | 하단 고정 바 높이를 `--floating-offset`으로 노출                                                                         |
 
 ### Service — `shared/services/userCart.ts`
@@ -176,6 +194,25 @@ localStorage 에 남겨 첫 페인트를 메운다(`shared/lib/query/persister.t
 쿼리 키는 `["user","cart","list",userId,languageCode]` / `["user","cart","count",userId]`.
 `userId` 를 키에 넣어 계정 전환 시 이전 사용자 캐시가 노출되지 않게 한다.
 
+### Service — `shared/services/guestCart.ts`
+
+| 함수                   | 엔드포인트                             | 비고                                                |
+| ---------------------- | -------------------------------------- | --------------------------------------------------- |
+| `createGuestCartItems` | `POST guest/cart`                      | `guestId` 없이 보내면 서버가 새로 발급해 응답에 담는다 |
+| `getGuestCart`         | `GET guest/cart`                       | 회원 조회와 **같은 응답 모양**                       |
+| `getGuestCartCount`    | `GET guest/cart/count`                 | `guestId` 가 없거나 담은 적 없으면 404 대신 `0`      |
+| `updateGuestCartItem`  | `PATCH guest/cart/{productVariantId}`  | 경로가 라인 ID 가 아니라 SKU ID. 재고 초과면 409     |
+| `deleteGuestCartItem`  | `DELETE guest/cart/{productVariantId}` |                                                       |
+| `deleteGuestCart`      | `DELETE guest/cart`                    | **선택 삭제가 없어** 언제나 전체 비우기. 담은 적 없어도 204 |
+
+주인은 `x-guest-id` 헤더다 — 회원 카트의 `Authorization` 자리를 대신한다. 값은 **첫 담기
+응답으로만 발급**되므로 클라이언트가 보관했다가(`entities/cart/model/guestId.ts`, zustand
+persist) 이후 요청마다 실어 보낸다. 다른 발급 경로는 없다.
+
+쿼리 키는 `["guest","cart","list",guestId,languageCode]` / `["guest","cart","count",guestId]`.
+회원 키의 `userId` 자리를 `guestId` 가 대신한다 — ID 가 바뀌면(첫 발급·404 폐기) 이전 카트의
+캐시가 그대로 보이면 안 되기 때문이다.
+
 ### 상수
 
 | 상수                  | 값                | 위치                                 |
@@ -189,13 +226,30 @@ localStorage 에 남겨 첫 페인트를 메운다(`shared/lib/query/persister.t
 
 ## 데이터 모델
 
-화면이 읽는 값은 서버 응답 그대로다(`shared/services/userCart.ts`).
+화면이 실제로 읽는 라인 타입은 `CartLine`이다(`entities/cart/model/types.ts`) — 서버
+`UserCartItem` 을 그대로 감싸되 `cartItemId` 만 `number | null` 로 넓힌다. 게스트 라인은
+서버 스펙상 라인 ID 가 없어 항상 `null` 이다.
+
+```ts
+export interface CartLine extends Omit<UserCartItem, "cartItemId"> {
+  cartItemId: number | null; // 게스트 라인은 항상 null
+}
+```
+
+**라인을 가리키는 값은 `productVariantId` 다.** 화면(선택·수량 변경·삭제·되돌리기)이 쓰는
+식별자는 이것 하나뿐이고, 회원·게스트 어느 쪽도 라인당 SKU 가 유일해 안전하다. `cartItemId`
+는 회원 어댑터(`useMemberCart`) 안에만 남아 — 캐시에서 `productVariantId` 로 라인을 다시
+찾아 서버가 요구하는 `PATCH`/`DELETE user/cart/{id}` 호출에만 쓰인다. 그 번역은 어댑터 밖으로
+새지 않는다. 게스트는 애초에 라인 ID 가 없으므로 `PATCH`/`DELETE guest/cart/{productVariantId}`
+를 곧장 부른다.
+
+서버 DTO 원본은 이렇다(`shared/services/userCart.ts`).
 
 ```ts
 export interface UserCartItem {
-  cartItemId: number;        // 라인 식별자. 수량 변경·삭제가 이 값을 쓴다
+  cartItemId: number;
   productItemId: number;     // 상품 상세 링크
-  productVariantId: number;  // 되돌리기(재담기)가 이 값을 쓴다
+  productVariantId: number;
   productName: string;
   optionText: string;        // "IVORY / M"
   imageUrl: string;
@@ -211,9 +265,9 @@ export interface UserCartItem {
 
 **선택 합계는 프론트가 계산한다.** 서버의 `totalProductAmount`·`estimatedShippingFee`·
 `amountToFreeShipping` 은 장바구니 **전체** 기준이라 일부만 고르면 화면 금액과 어긋난다.
-라인 금액은 서버 `totalPrice` 를 그대로 더하고(`sumSelectedAmount`), 배송비는 규칙
-(본섬 기준 · 기준액 이상 무료)을 선택 합계에 다시 적용한다(`estimateShipping`). 확정은
-주문서에서 한다.
+라인 금액은 서버 `totalPrice` 를 그대로 더하고(`sumSelectedAmount`, `productVariantId` 기준
+선택 판정), 배송비는 규칙(본섬 기준 · 기준액 이상 무료)을 선택 합계에 다시 적용한다
+(`estimateShipping`). 확정은 주문서에서 한다.
 
 ## 설계 결정 (ADR)
 
@@ -235,15 +289,33 @@ export interface UserCartItem {
 | **삭제는 collapse 모션 대신 되돌리기**                             | 애니메이션                      | Operate 화면에서는 실수 복구가 모션보다 가치 있다                                                                                                                                     | —                                        |
 | **선택 상태는 해제된 id만 보관**                                   | 선택된 id 보관 / URL(nuqs)      | 새로 담긴 라인이 자동 선택되고, 삭제된 라인 id를 따로 정리할 필요가 없다. URL에 두면 유령 id가 남는다                                                                                 | —                                        |
 | **`unoptimized` 이미지**                                           | `next/image` 최적화             | 코드베이스 관행이고, 브랜드가 올린 외부 호스트 이미지라 호스트가 바뀌면 `next/image`가 던지며 페이지를 죽인다                                                                         | 이미지 호스트가 `next.config`에 고정되면 |
+| **게스트는 어댑터로 분리 (`cartSource`)**                          | 기존 훅마다 게스트 분기 추가    | 쿼리 키·낙관적 캐시·409 정정이 6개 훅에서 두 갈래가 되면 같은 분기가 흩어지고, 심사 후 제거할 때 6곳을 헤집어야 한다                                                                  | —                                         |
+| **라인 키를 `productVariantId` 로 통일**                           | 합성 키 도입 / 게스트 전용 화면 | 두 카트 모두 라인당 SKU 가 유일하다. 합성 키는 개념이 하나 더 늘 뿐이고, 화면을 갈라놓으면 곧 어긋난다                                                                                | —                                         |
+| **로그인 시 게스트 카트 폐기 (병합 없음)**                          | 프론트가 `POST user/cart` 로 병합 | 심사용 일회성 모듈이다. 병합은 얼마 안 되는 코드지만 재고 부족·부분 실패 정책을 새로 정해야 하고, 그 정책이 검증될 무렵이면 모듈이 사라진다                                          | 게스트 카트가 상시 기능이 되면            |
+| **`DELETE guest/cart` 를 부르지 않고 로컬 ID 만 폐기**              | 로그인 시 서버 카트도 비우기    | 서버 TTL 7일이 정리한다. 로그인 직후 실패할 수 있는 요청을 하나 더 만들 이유가 없다                                                                                                   | —                                         |
+| **게스트 선택 삭제는 N 건 병렬 호출**                               | 게스트에서 선택 삭제 UI 숨김    | 화면을 회원과 다르게 만들면 "동등 실드"가 깨지고 `CartSelectionBar`가 두 벌이 된다. 선택 삭제는 한 번에 몇 건 수준이다                                                                | 삭제 건수가 커지면                        |
+| **주문·구매하기는 회원 전용 유지**                                  | 게스트 주문서 진입 후 로그인 요구 | 서버가 게스트 주문을 지원하지 않는다. 빈 주문서로 보내는 것보다 `/login`이 정직하다                                                                                                    | 비회원 주문이 생기면                      |
+| **게스트 카트 E2E 없음**                                            | 게스트 해피패스 1개 추가        | 곧 삭제할 임시 모듈이고 카트 E2E 하네스 자체가 아직 없다. 비로그인 담기 경로는 계약 스위트(`useCart.test.tsx`, `describe.each`)가 덮는다                                             | 게스트 카트가 상시 기능이 되면            |
 
 ## 알려진 제약 / TODO
 
-- **비로그인 담기 불가.** 담기 자체가 로그인 필수라 로컬 임시 장바구니가 없다. 비로그인 담기를
-  허용하려면 로컬 보관과 로그인 시 서버 병합을 함께 설계해야 한다.
+- **게스트 카트는 서버에 7일만 남는다.** Redis TTL 만료 후 첫 조작은 404 를 받고, 클라이언트는
+  로컬 `guestId` 를 버린 뒤 빈 카트로 돌아간다.
+- **로그인하면 게스트가 담아둔 것은 병합 없이 사라진다.** 서버가 게스트→회원 이관 엔드포인트를
+  제공하지 않고, 프론트도 대신 병합하지 않는다 — 의도된 동작이다(위 ADR 참고).
+- **게스트는 주문·결제로 이어지지 않는다.** 게스트 라인은 `cartItemId` 가 없어 주문서로 넘길
+  방법이 없고, `주문하기`는 게스트를 항상 `/login` 으로 보낸다.
+- **게스트 모듈은 심사가 끝나면 통째로 제거될 임시 코드다.** 제거 절차는 설계 문서의
+  ["심사 후 제거 절차"](../../../docs/superpowers/specs/2026-09-21-guest-cart-design.md#심사-후-제거-절차)
+  를 따른다 — `shared/services/guestCart.ts`·`useGuestCart.ts`·`guestId.ts`·`GuestCartReset.tsx`
+  삭제, `useCartSource`/`useCartApi`의 분기 되돌리기, `CartPage`의 `AuthOnly`와
+  `CartButton`의 비로그인 숨김·`useAddToCartDraft`의 담기 게이트 복구, 계약 스위트의
+  `describe.each`를 회원 한 줄로 되돌리는 것까지가 대상이다. 라인 키를 `productVariantId`로
+  통일한 것은 되돌리지 않는다.
 - **주문/결제 미구현.** `주문하기`·`구매하기`가 비활성이다. `shared/services/userOrder.ts` 는
   이미 있으나 호출부가 없다. 시안은 [`order-mockup.html`](./order-mockup.html).
 - **배송비는 예상값.** 배송지가 없으므로 본섬 기준이고, 외섬 여부는 주문서에서 확정된다.
-- **E2E 미작성.** 유닛 테스트는 `entities/cart`(19개)와 `features/cart`(35개)에 있다.
+- **E2E 미작성.** 유닛 테스트는 `entities/cart`(54개)와 `features/cart`(49개)에 있다.
 - **i18n 키는 시트가 SSOT.** `pnpm dev:web`이 매 시작마다 `i18n:sync`를 돌려 JSON을 전체
   덮어쓴다. **새 키를 추가할 때는 시트에 먼저 넣어야 한다.**
 

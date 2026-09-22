@@ -1,3 +1,9 @@
+"use client";
+
+// 이 파일 자체에는 훅이 없지만 "use client" 가 필요하다 — `@entities/order` 를 거쳐
+// 클라이언트 전용 코드(`useOrderPreviewQuery` 등)를 끌어오므로, 이 모듈이 서버 컴포넌트
+// 그래프(entities/cart 배럴 → app/[locale]/layout.tsx)에서 계속 닿을 수 있다. 지우지 말 것.
+
 import { toOrderHref } from "@entities/order";
 
 import type { CartSource } from "./cartSource";
