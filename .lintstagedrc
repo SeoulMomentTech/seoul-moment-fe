@@ -5,5 +5,9 @@
   ],
   "apps/admin/src/**/*.{js,ts,jsx,tsx}": [
     "pnpm --filter @seoul-moment/admin exec eslint --config eslint.config.mjs --cache --max-warnings=0"
+  ],
+  "apps/mobile/src/**/*.{js,ts,jsx,tsx}": [
+    "pnpm exec prettier --write",
+    "pnpm --filter @seoul-moment/mobile exec eslint --config eslint.config.mjs --cache --max-warnings=0"
   ]
 }
