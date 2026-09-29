@@ -91,6 +91,7 @@ web(`apps/web/src/shared/services`)과 같은 인터페이스를 따릅니다.
 
 - `className`으로 Tailwind 유틸리티를 사용합니다(NativeWind).
 - 조건부·병합 클래스는 `cn()`(`@seoul-moment/ui/utils`, clsx + tailwind-merge)으로 조합합니다. 충돌하는 유틸리티는 뒤에 온 값이 남습니다.
+- 색상·타이포 토큰(`text-brand`, `bg-danger`, `text-body-3` 등)은 web과 같은 `@seoul-moment/tailwind-config/tokens`를 씁니다. gluestack 컴포넌트용 시맨틱 색상(`bg-primary`, `border-border` 등)은 `src/global.css`에서 이 토큰에 연결합니다(라이트 전용).
 - NativeWind v5는 RC 버전입니다. `nativewind` / `react-native-css`는 정확한 버전으로 고정되어 있으며, 정식 출시 시 함께 올립니다.
 - `lightningcss`는 NativeWind가 요구하는 1.30.1을 mobile에만 devDependency로 고정했습니다(web/admin은 영향 없음).
 - `nativewind-env.d.ts`는 자동 생성 파일이므로 수정하지 않습니다.
