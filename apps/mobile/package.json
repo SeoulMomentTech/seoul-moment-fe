@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@expo/ui": "~57.0.20",
+    "@seoul-moment/ui": "workspace:*",
     "@tanstack/react-query": "catalog:stable",
     "expo": "~57.0.25",
     "expo-constants": "~57.0.19",
