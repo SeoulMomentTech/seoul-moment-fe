@@ -14,7 +14,8 @@
     "lint": "turbo run lint",
     "lint-staged": "lint-staged",
     "lint:fix:admin": "turbo run lint:fix --filter=@seoul-moment/admin",
-    "lint:fix:all": "turbo run lint:fix --filter=@seoul-moment/web --filter=@seoul-moment/admin",
+    "lint:fix:all": "turbo run lint:fix --filter=@seoul-moment/web --filter=@seoul-moment/admin --filter=@seoul-moment/mobile",
+    "lint:fix:mobile": "turbo run lint:fix --filter=@seoul-moment/mobile",
     "lint:fix:web": "turbo run lint:fix --filter=@seoul-moment/web",
     "option:sync": "turbo run option:sync --filter=@seoul-moment/web",
     "prepare": "husky",
@@ -26,6 +27,7 @@
     "test:web-e2e:ui": "turbo run test:e2e:ui --filter=@seoul-moment/web",
     "typecheck": "turbo run typecheck",
     "typecheck:admin": "turbo run typecheck --filter=@seoul-moment/admin",
+    "typecheck:mobile": "turbo run typecheck --filter=@seoul-moment/mobile",
     "typecheck:web": "turbo run typecheck --filter=@seoul-moment/web"
   },
   "devDependencies": {
