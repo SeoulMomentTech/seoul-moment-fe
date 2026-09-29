@@ -1,12 +1,7 @@
-import { AppState, Platform } from "react-native";
-
 import type { ExtendedHTTPError } from "@shared/services";
-import {
-  focusManager,
-  MutationCache,
-  QueryCache,
-  QueryClient,
-} from "@tanstack/react-query";
+import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
+
+import { setupQueryAppLifecycle } from "./appLifecycle";
 
 const logError = (type: "query" | "mutation", err: Error, key: unknown) => {
   if ((err as ExtendedHTTPError).isReported) return;
@@ -35,17 +30,4 @@ export const queryClient = new QueryClient({
   }),
 });
 
-/**
- * RN 에는 window focus 이벤트가 없다. 앱이 foreground 로 돌아올 때를 focus 로 알려
- * refetchOnWindowFocus 가 web 의 탭 복귀처럼 동작하게 한다. web 타깃은 기본 동작을 쓴다.
- * 반환한 함수로 구독을 해제한다.
- */
-export const subscribeAppFocus = () => {
-  if (Platform.OS === "web") return () => {};
-
-  const subscription = AppState.addEventListener("change", (status) => {
-    focusManager.setFocused(status === "active");
-  });
-
-  return () => subscription.remove();
-};
+setupQueryAppLifecycle();
