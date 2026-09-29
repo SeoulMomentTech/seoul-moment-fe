@@ -3,6 +3,7 @@
 @import "tailwindcss/utilities.css";
 
 @import "nativewind/theme";
+@import "@seoul-moment/tailwind-config/tokens";
 
 :root {
   --font-display:
@@ -15,4 +16,26 @@
     "SF Pro Rounded", "Hiragino Maru Gothic ProN", Meiryo, "MS PGothic",
     sans-serif;
   --font-serif: Georgia, "Times New Roman", serif;
+}
+
+/*
+ * gluestack-ui 컴포넌트가 쓰는 시맨틱 색상(bg-primary, border-border 등)을
+ * Seoul Moment 토큰에 연결한다. web 에 다크 테마가 없으므로 라이트 값만 둔다.
+ */
+@theme inline {
+  --color-primary: var(--neutral-900);
+  --color-primary-foreground: var(--neutral-0);
+  --color-secondary: var(--color-neutral-100);
+  --color-secondary-foreground: var(--neutral-900);
+  --color-accent: var(--color-neutral-100);
+  --color-accent-foreground: var(--neutral-900);
+  --color-muted: var(--color-neutral-100);
+  --color-muted-foreground: var(--neutral-600);
+  --color-destructive: var(--danger-500);
+  --color-card: var(--neutral-0);
+  --color-popover: var(--neutral-0);
+  --color-popover-foreground: var(--neutral-900);
+  --color-border: var(--neutral-200);
+  --color-input: var(--neutral-200);
+  --color-ring: var(--neutral-200);
 }
