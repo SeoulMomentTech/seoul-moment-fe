@@ -1,8 +1,7 @@
 import { create } from "zustand";
 
-import { decodeJWT } from "../utils/decodeJWT";
-
 import { tokenStorage } from "./tokenStorage";
+import { decodeJWT } from "../utils/decodeJWT";
 
 export interface UserAuthUser {
   id: number;
