@@ -1,0 +1,66 @@
+{
+  "name": "@seoul-moment/mobile",
+  "version": "1.0.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "scripts": {
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "lint": "expo lint",
+    "reset-project": "node ./scripts/reset-project.js",
+    "start": "expo start",
+    "typecheck": "tsc --noEmit",
+    "typecheck:ts6": "tsc6 --noEmit",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "@expo/ui": "~57.0.20",
+    "expo": "~57.0.25",
+    "expo-constants": "~57.0.19",
+    "expo-device": "~57.0.2",
+    "expo-font": "~57.0.4",
+    "expo-glass-effect": "~57.0.4",
+    "expo-image": "~57.0.5",
+    "expo-linking": "~57.0.11",
+    "expo-localization": "~57.0.2",
+    "expo-router": "~57.0.23",
+    "expo-secure-store": "~57.0.4",
+    "expo-splash-screen": "~57.0.9",
+    "expo-status-bar": "~57.0.1",
+    "expo-symbols": "~57.0.3",
+    "expo-system-ui": "~57.0.4",
+    "expo-web-browser": "~57.0.3",
+    "nativewind": "5.0.0-rc.0",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-css": "3.1.0-rc.0",
+    "react-native-gesture-handler": "~2.32.0",
+    "react-native-reanimated": "4.5.1",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-screens": "~4.26.0",
+    "react-native-web": "~0.21.0",
+    "react-native-worklets": "0.10.1",
+    "ky": "catalog:stable",
+    "@tanstack/react-query": "catalog:stable",
+    "zustand": "catalog:stable"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "catalog:stable",
+    "@types/react": "~19.2.2",
+    "@typescript/native": "catalog:stable",
+    "eslint": "catalog:stable",
+    "eslint-config-expo": "~57.0.2",
+    "lightningcss": "1.30.1",
+    "postcss": "^8.5.26",
+    "tailwindcss": "catalog:stable",
+    "typescript": "catalog:stable"
+  },
+  "expo": {
+    "install": {
+      "exclude": [
+        "typescript"
+      ]
+    }
+  }
+}
