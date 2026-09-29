@@ -8,6 +8,7 @@
   "type": "module",
   "exports": {
     ".": "./shared-styles.css",
+    "./tokens": "./tokens.css",
     "./postcss": "./postcss.config.js"
   },
   "devDependencies": {
