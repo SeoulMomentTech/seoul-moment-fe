@@ -16,6 +16,8 @@
   },
   "dependencies": {
     "@expo/ui": "~57.0.20",
+    "@gluestack-ui/core": "^5.0.15",
+    "@gluestack-ui/utils": "^5.0.6",
     "@seoul-moment/ui": "workspace:*",
     "@tanstack/react-query": "catalog:stable",
     "expo": "~57.0.25",
@@ -44,12 +46,14 @@
     "react-native-reanimated": "4.5.1",
     "react-native-safe-area-context": "~5.7.0",
     "react-native-screens": "~4.26.0",
+    "react-native-svg": "15.15.4",
     "react-native-web": "~0.21.0",
     "react-native-worklets": "0.10.1",
     "zustand": "catalog:stable"
   },
   "devDependencies": {
     "@seoul-moment/eslint-config": "workspace:*",
+    "@seoul-moment/tailwind-config": "workspace:*",
     "@tailwindcss/postcss": "catalog:stable",
     "@types/react": "~19.2.2",
     "@typescript/native": "catalog:stable",
