@@ -14,7 +14,7 @@ import { cn } from "@seoul-moment/ui";
 
 ## Design Tokens
 
-Defined in `packages/tailwind-config/shared-styles.css` and mapped to Tailwind theme:
+Defined in `packages/tailwind-config/tokens.css` (imported by `shared-styles.css`; non-web consumers such as NativeWind import `@seoul-moment/tailwind-config/tokens` directly) and mapped to Tailwind theme:
 
 ### Colors (use as `text-brand`, `bg-danger`, etc.)
 
