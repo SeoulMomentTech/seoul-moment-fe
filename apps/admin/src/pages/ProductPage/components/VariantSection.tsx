@@ -1,4 +1,4 @@
-import { Plus, Trash2 } from "lucide-react";
+import { Copy, Plus, Trash2 } from "lucide-react";
 
 import { Button, Input, Label } from "@seoul-moment/ui";
 
@@ -10,6 +10,7 @@ interface VariantSectionProps {
   error?: string;
   isPending: boolean;
   onAddVariant(): void;
+  onDuplicateVariant(index: number): void;
   onOpenOptionModal(index: number): void;
   onRemoveVariant(index: number): void;
   onUpdateVariant(index: number, nextVariant: VariantForm): void;
@@ -25,6 +26,7 @@ export function VariantSection({
   error,
   isPending,
   onAddVariant,
+  onDuplicateVariant,
   onOpenOptionModal,
   onRemoveVariant,
   onUpdateVariant,
@@ -63,18 +65,30 @@ export function VariantSection({
               <p className="text-sm font-semibold text-gray-800">
                 변형 #{index + 1}
               </p>
-              {variants.length > 1 && (
+              <div className="flex items-center gap-1">
                 <Button
-                  className="text-red-500 hover:text-red-600"
-                  onClick={() => onRemoveVariant(index)}
+                  disabled={isPending}
+                  onClick={() => onDuplicateVariant(index)}
                   size="sm"
                   type="button"
                   variant="ghost"
                 >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  삭제
+                  <Copy className="mr-2 h-4 w-4" />
+                  복사
                 </Button>
-              )}
+                {variants.length > 1 && (
+                  <Button
+                    className="text-red-500 hover:text-red-600"
+                    onClick={() => onRemoveVariant(index)}
+                    size="sm"
+                    type="button"
+                    variant="ghost"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    삭제
+                  </Button>
+                )}
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">

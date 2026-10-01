@@ -12,6 +12,14 @@ export const createEmptyVariant = (): VariantForm => ({
   optionValueBadgeList: [],
 });
 
+/**
+ * 기존 변형을 SKU·재고·옵션 조합까지 그대로 복사한다.
+ */
+export const duplicateVariant = (variant: VariantForm): VariantForm => ({
+  ...variant,
+  optionValueBadgeList: [...(variant.optionValueBadgeList ?? [])],
+});
+
 export const createInitialValues = (): ProductFormValues => ({
   productId: "",
   price: "",
@@ -23,6 +31,45 @@ export const createInitialValues = (): ProductFormValues => ({
   imageUrlList: [],
   variants: [createEmptyVariant()],
 });
+
+/**
+ * getKey가 같은 값을 돌려주는 첫 번째 변형 묶음의 번호(1부터)를 찾는다.
+ * getKey가 null이면 비교에서 제외한다(빈 값은 필수값 검증에서 따로 잡는다).
+ */
+const findDuplicateNumbers = (
+  variants: VariantForm[],
+  getKey: (variant: VariantForm) => string | null,
+) => {
+  const numbersByKey = new Map<string, number[]>();
+
+  variants.forEach((variant, index) => {
+    const key = getKey(variant);
+    if (key === null) {
+      return;
+    }
+
+    numbersByKey.set(key, [...(numbersByKey.get(key) ?? []), index + 1]);
+  });
+
+  return [...numbersByKey.values()].find((numbers) => numbers.length > 1);
+};
+
+/**
+ * SKU가 같은 변형들의 번호를 찾는다. 앞뒤 공백은 무시한다.
+ */
+export const findDuplicateSkuNumbers = (variants: VariantForm[]) =>
+  findDuplicateNumbers(variants, (variant) => variant.sku.trim() || null);
+
+/**
+ * 옵션 값 조합이 같은 변형들의 번호를 찾는다. 옵션 값 순서는 무시한다.
+ */
+export const findDuplicateOptionNumbers = (variants: VariantForm[]) =>
+  findDuplicateNumbers(variants, (variant) => {
+    const ids = parseOptionValueIds(variant.optionValueIds);
+    return ids.length > 0
+      ? [...new Set(ids)].sort((a, b) => a - b).join(",")
+      : null;
+  });
 
 /**
  * Parse a comma-separated string of option value IDs into an array of positive integers.
@@ -52,6 +99,9 @@ export const getOptionValueLabel = (nameDto?: AdminProductOptionValueName[]) =>
   nameDto?.find((name) => name.languageCode === "ko")?.value ??
   nameDto?.[0]?.value ??
   "-";
+
+const formatVariantNumbers = (numbers: number[]) =>
+  numbers.map((number) => `변형 #${number}`).join(", ");
 
 export const validateProductForm = (values: ProductFormValues) => {
   const errors: Record<string, string> = {};
@@ -87,8 +137,15 @@ export const validateProductForm = (values: ProductFormValues) => {
         parseOptionValueIds(variant.optionValueIds).length === 0,
     );
 
+    const duplicateSkuNumbers = findDuplicateSkuNumbers(values.variants);
+    const duplicateOptionNumbers = findDuplicateOptionNumbers(values.variants);
+
     if (invalidVariantIndex !== -1) {
       errors.variants = "옵션(재고) 정보를 모두 입력해주세요.";
+    } else if (duplicateSkuNumbers) {
+      errors.variants = `SKU가 같은 변형이 있습니다. (${formatVariantNumbers(duplicateSkuNumbers)})`;
+    } else if (duplicateOptionNumbers) {
+      errors.variants = `옵션 값 조합이 같은 변형이 있습니다. (${formatVariantNumbers(duplicateOptionNumbers)})`;
     }
   }
 
