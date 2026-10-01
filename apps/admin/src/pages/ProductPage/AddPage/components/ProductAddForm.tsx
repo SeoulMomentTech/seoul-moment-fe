@@ -1,4 +1,4 @@
-import { useEffect, type ChangeEvent } from "react";
+import { useEffect, type ChangeEvent, type FormEvent } from "react";
 
 import { useNavigate } from "react-router";
 
@@ -8,6 +8,7 @@ import { PATH } from "@shared/constants/route";
 import type { CreateAdminProductItemRequest } from "@shared/services/products";
 import { stripImageDomain, uploadImageFile } from "@shared/utils/image";
 import { useFormik } from "formik";
+import { toast } from "sonner";
 
 import { Button } from "@seoul-moment/ui";
 
@@ -24,6 +25,7 @@ import type { ProductFormValues, VariantForm } from "../../types";
 import {
   createEmptyVariant,
   createInitialValues,
+  duplicateVariant,
   parseOptionValueIds,
   validateProductForm,
 } from "../../utils";
@@ -114,6 +116,15 @@ export default function ProductAddForm() {
       createEmptyVariant(),
     ]);
 
+  const handleDuplicateVariant = (index: number) => {
+    const { variants } = formik.values;
+    formik.setFieldValue("variants", [
+      ...variants.slice(0, index + 1),
+      duplicateVariant(variants[index]),
+      ...variants.slice(index + 1),
+    ]);
+  };
+
   const handleRemoveVariant = (index: number) =>
     formik.setFieldValue(
       "variants",
@@ -142,6 +153,16 @@ export default function ProductAddForm() {
     );
   };
 
+  // 변형 에러 문구는 섹션 상단에 있어 저장 버튼을 누를 때 화면 밖일 수 있으므로 토스트로도 알린다.
+  const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const errors = await formik.validateForm();
+    if (errors.variants) {
+      toast.error(errors.variants as string);
+    }
+    await formik.submitForm();
+  };
+
   const handleMainImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) {
@@ -166,7 +187,7 @@ export default function ProductAddForm() {
 
   return (
     <>
-      <form className="space-y-6" onSubmit={formik.handleSubmit}>
+      <form className="space-y-6" onSubmit={handleFormSubmit}>
         <ProductBasicInfoSection formik={formik} isPending={isPending} />
         <ShippingInfoSection formik={formik} isPending={isPending} />
         <div className="space-y-1">
@@ -189,6 +210,7 @@ export default function ProductAddForm() {
           error={formik.errors.variants as string | undefined}
           isPending={isPending}
           onAddVariant={handleAddVariant}
+          onDuplicateVariant={handleDuplicateVariant}
           onOpenOptionModal={handleOpenOptionModal}
           onRemoveVariant={handleRemoveVariant}
           onUpdateVariant={handleVariantUpdate}
