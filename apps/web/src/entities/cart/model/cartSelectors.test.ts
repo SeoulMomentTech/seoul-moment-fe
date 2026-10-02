@@ -89,12 +89,7 @@ describe("sumSelectedAmount", () => {
       item(3, { totalPrice: 400 }),
     ];
 
-    expect(
-      sumSelectedAmount(
-        items,
-        new Set([items[0].productVariantId, items[2].productVariantId]),
-      ),
-    ).toBe(1400);
+    expect(sumSelectedAmount(items, new Set([1, 3]))).toBe(1400);
     expect(sumSelectedAmount(items, new Set())).toBe(0);
   });
 });
