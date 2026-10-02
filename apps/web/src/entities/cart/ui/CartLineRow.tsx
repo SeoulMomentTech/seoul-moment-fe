@@ -18,10 +18,10 @@ import {
   isCartItemLowStock,
   isCartItemUnavailable,
 } from "../model/cartSelectors";
-import type { CartLine } from "../model/types";
+import type { UserCartItem } from "../model/types";
 
 interface CartLineRowProps {
-  item: CartLine;
+  item: UserCartItem;
   selected: boolean;
   onSelectedChange(selected: boolean): void;
   onQuantityChange(quantity: number): void;

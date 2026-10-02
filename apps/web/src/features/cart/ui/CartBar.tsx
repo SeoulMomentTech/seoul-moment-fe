@@ -9,16 +9,13 @@ import { toNTCurrency } from "@shared/lib/utils";
 
 import { Link } from "@/i18n/navigation";
 
-import type { CartOrderCta } from "@entities/cart";
 import { Button } from "@seoul-moment/ui";
 
 import type { CartSummaryValues } from "./CartSummary";
 
 interface CartBarProps extends CartSummaryValues {
-  /** `주문하기` 버튼이 무엇을 해야 하는지. `CartSummary` 와 같은 판정을 공유한다 */
-  orderCta: CartOrderCta;
-  /** `orderCta.type === "guest"` 일 때 버튼을 누르면 호출된다. 토스트는 호출부(`CartList`)가 띄운다 */
-  onGuestOrderAttempt(): void;
+  /** 주문서로 갈 링크. 고른 라인이 없으면 `null` 이고 버튼은 비활성이다 */
+  orderHref: string | null;
 }
 
 /** 모바일 하단 고정 요약. 데스크톱 패널과 같은 값을 쓰고 CTA 만 압축해 보여준다. */
@@ -26,8 +23,7 @@ export function CartBar({
   selectedCount,
   shippingFee,
   totalAmount,
-  orderCta,
-  onGuestOrderAttempt,
+  orderHref,
 }: CartBarProps) {
   const t = useTranslations();
   const ref = useRef<HTMLDivElement>(null);
@@ -53,22 +49,14 @@ export function CartBar({
         {t("cart_shipping_fee_estimate")}{" "}
         {shippingFee > 0 ? toNTCurrency(shippingFee) : t("free_shipping")}
       </p>
-      {orderCta.type === "link" ? (
+      {orderHref ? (
         <Button asChild className="h-12 w-full rounded-[4px]">
           <Link
             className="flex h-full w-full items-center justify-center"
-            href={orderCta.href}
+            href={orderHref}
           >
             {t("place_order")}
           </Link>
-        </Button>
-      ) : orderCta.type === "guest" ? (
-        <Button
-          className="h-12 w-full rounded-[4px]"
-          onClick={onGuestOrderAttempt}
-          type="button"
-        >
-          {t("place_order")}
         </Button>
       ) : (
         <>

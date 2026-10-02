@@ -25,9 +25,7 @@ const cartItem = (overrides: Partial<UserCartItem> = {}): UserCartItem => {
   return {
     cartItemId: nextCartItemId,
     productItemId: 1,
-    // cartItemId 와 값을 다르게 둬야 한다 — 같으면 라인 키가 productVariantId 인지
-    // cartItemId 인지 이 테스트로는 구분할 수 없다.
-    productVariantId: nextCartItemId + 1000,
+    productVariantId: nextCartItemId,
     productName: `상품 ${nextCartItemId}`,
     optionText: "IVORY / M",
     imageUrl: "",
@@ -54,7 +52,7 @@ const brandGroup = (items: UserCartItem[]): UserCartBrandGroup => ({
 
 const renderGroup = (
   items: UserCartItem[],
-  selectedVariantIds: ReadonlySet<number>,
+  selectedCartItemIds: ReadonlySet<number>,
   onToggleGroup = vi.fn(),
 ) => {
   render(
@@ -65,7 +63,7 @@ const renderGroup = (
         onRemove={vi.fn()}
         onToggleGroup={onToggleGroup}
         onToggleLine={vi.fn()}
-        selectedVariantIds={selectedVariantIds}
+        selectedCartItemIds={selectedCartItemIds}
       />
     </NextIntlClientProvider>,
   );
@@ -84,7 +82,7 @@ beforeEach(() => {
 
 describe("브랜드 체크박스", () => {
   /**
-   * 회귀 방지: 품절 라인은 `useCartSelection` 이 선택 대상에서 빼므로 `selectedVariantIds`
+   * 회귀 방지: 품절 라인은 `useCartSelection` 이 선택 대상에서 빼므로 `selectedCartItemIds`
    * 에 절대 들어오지 않는다. 그룹이 전체 라인으로 세면 이 브랜드는 전체 선택이 영원히
    * 완료되지 않아 체크박스가 중간 상태로 굳는다.
    */
@@ -94,7 +92,7 @@ describe("브랜드 체크박스", () => {
 
     const { brandCheckbox } = renderGroup(
       [available, soldOut],
-      new Set([available.productVariantId]),
+      new Set([available.cartItemId]),
     );
 
     expect(brandCheckbox.checked).toBe(true);
@@ -108,7 +106,7 @@ describe("브랜드 체크박스", () => {
 
     const { brandCheckbox } = renderGroup(
       [first, second, soldOut],
-      new Set([first.productVariantId]),
+      new Set([first.cartItemId]),
     );
 
     expect(brandCheckbox.checked).toBe(false);
@@ -122,7 +120,7 @@ describe("브랜드 체크박스", () => {
 
     const { brandCheckbox } = renderGroup(
       [available, unavailable],
-      new Set([available.productVariantId]),
+      new Set([available.cartItemId]),
     );
 
     expect(brandCheckbox.checked).toBe(true);
@@ -150,9 +148,6 @@ describe("브랜드 체크박스", () => {
 
     fireEvent.click(brandCheckbox);
 
-    expect(onToggleGroup).toHaveBeenCalledWith(
-      [available.productVariantId],
-      true,
-    );
+    expect(onToggleGroup).toHaveBeenCalledWith([available.cartItemId], true);
   });
 });
