@@ -12,7 +12,23 @@ const CARD_WIDTH = Math.round(Dimensions.get("window").width * 0.72);
 const CARD_HEIGHT = 160;
 
 export function PromotionSection() {
-  const { data: promotions, isPending, isError, refetch } = useHomePromotion();
+  const {
+    data: promotions,
+    isPending,
+    isError,
+    fetchStatus,
+    refetch,
+  } = useHomePromotion();
+
+  // 오프라인이면 요청이 paused 되어 isPending 이 유지된다. 스켈레톤을 영원히
+  // 돌리지 말고 재시도 줄을 보여준다.
+  if (isPending && fetchStatus === "paused") {
+    return (
+      <Section title="Season Collection">
+        <SectionError onRetry={() => void refetch()} />
+      </Section>
+    );
+  }
 
   if (isPending) {
     return (
