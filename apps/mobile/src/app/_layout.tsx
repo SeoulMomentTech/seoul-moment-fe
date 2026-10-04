@@ -1,26 +1,27 @@
 import "@/global.css";
 
-import { DarkTheme, DefaultTheme, ThemeProvider } from "expo-router";
+import { DefaultTheme, Stack, ThemeProvider } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useColorScheme } from "react-native";
 
 import { hydrateUserAuth } from "@shared/lib/auth/useUserAuthStore";
 import { QueryProvider } from "@shared/lib/query/QueryProvider";
 
 import { AnimatedSplashOverlay } from "@/components/animated-icon";
-import AppTabs from "@/components/app-tabs";
 
 SplashScreen.preventAutoHideAsync();
 // 첫 화면이 그려지는 동안 SecureStore 에서 토큰을 미리 복원해 둔다.
 void hydrateUserAuth();
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+export default function RootLayout() {
   return (
     <QueryProvider>
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+      {/* 브랜드 토큰에 다크 값이 없어 라이트로 고정한다. app.json 의
+          userInterfaceStyle 도 "light" 다. */}
+      <ThemeProvider value={DefaultTheme}>
         <AnimatedSplashOverlay />
-        <AppTabs />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(tabs)" />
+        </Stack>
       </ThemeProvider>
     </QueryProvider>
   );

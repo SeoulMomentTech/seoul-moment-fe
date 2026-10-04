@@ -62,3 +62,6 @@ test-results
 # claude code local settings
 .claude/settings.local.json
 .playwright-mcp
+
+# superpowers brainstorming mockups
+.superpowers/
