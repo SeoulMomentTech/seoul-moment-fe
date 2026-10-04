@@ -9,7 +9,6 @@ export interface News {
   createDate: string;
   image: string;
   homeImage: string;
-  newsCategoryName: string;
 }
 
 export interface GetNewsListRes {
