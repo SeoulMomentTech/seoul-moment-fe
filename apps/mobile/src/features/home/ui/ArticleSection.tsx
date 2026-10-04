@@ -9,7 +9,23 @@ import { useHomeArticle } from "../model/useHomeLists";
 const LIST_HEIGHT = 290;
 
 export function ArticleSection() {
-  const { data: articles, isPending, isError, refetch } = useHomeArticle();
+  const {
+    data: articles,
+    isPending,
+    isError,
+    fetchStatus,
+    refetch,
+  } = useHomeArticle();
+
+  // 오프라인이면 요청이 paused 되어 isPending 이 유지된다. 스켈레톤을 영원히
+  // 돌리지 말고 재시도 줄을 보여준다.
+  if (isPending && fetchStatus === "paused") {
+    return (
+      <Section title="Article">
+        <SectionError onRetry={() => void refetch()} />
+      </Section>
+    );
+  }
 
   if (isPending) {
     return (
