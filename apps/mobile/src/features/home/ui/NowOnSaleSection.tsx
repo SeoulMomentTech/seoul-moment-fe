@@ -9,7 +9,23 @@ import { useNowOnSale } from "../model/useHomeLists";
 const GRID_HEIGHT = 420;
 
 export function NowOnSaleSection() {
-  const { data: products, isPending, isError, refetch } = useNowOnSale();
+  const {
+    data: products,
+    isPending,
+    isError,
+    fetchStatus,
+    refetch,
+  } = useNowOnSale();
+
+  // 오프라인이면 요청이 paused 되어 isPending 이 유지된다. 스켈레톤을 영원히
+  // 돌리지 말고 재시도 줄을 보여준다.
+  if (isPending && fetchStatus === "paused") {
+    return (
+      <Section title="Now On Sale">
+        <SectionError onRetry={() => void refetch()} />
+      </Section>
+    );
+  }
 
   if (isPending) {
     return (
