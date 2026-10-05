@@ -6,16 +6,18 @@ import { PostRow } from "@entities/post/ui/PostRow";
 import { formatDate } from "@shared/lib/utils/formatDate";
 import type { NewsWithCategory } from "@shared/services/news";
 import { Section } from "@shared/ui/section";
-import { SectionError, SectionSkeleton } from "@shared/ui/section-state";
+import { SectionError } from "@shared/ui/section-state";
+import {
+  BannerSkeleton,
+  HorizontalCardsSkeleton,
+  PostListSkeleton,
+} from "@shared/ui/skeleton";
 
 import { useNewsDashboard } from "../model/useNewsDashboard";
 
 const FEATURED_HEIGHT = 220;
-const LATEST_HEIGHT = 290;
 const PICK_WIDTH = Math.round(Dimensions.get("window").width * 0.72);
 const PICK_HEIGHT = 160;
-const PICK_LIST_HEIGHT = 240;
-const KEYWORD_LIST_HEIGHT = 240;
 
 function NewsLink({
   id,
@@ -79,7 +81,7 @@ function FeaturedSection() {
   if (isPending) {
     return (
       <Section title="Featured">
-        <SectionSkeleton height={FEATURED_HEIGHT} />
+        <BannerSkeleton height={FEATURED_HEIGHT} inset />
       </Section>
     );
   }
@@ -137,7 +139,7 @@ function LatestSection() {
   if (isPending) {
     return (
       <Section title="Latest">
-        <SectionSkeleton height={LATEST_HEIGHT} />
+        <PostListSkeleton />
       </Section>
     );
   }
@@ -209,7 +211,7 @@ function EditorPickSection() {
   if (isPending) {
     return (
       <Section title="Editor's Pick">
-        <SectionSkeleton height={PICK_LIST_HEIGHT} />
+        <HorizontalCardsSkeleton />
       </Section>
     );
   }
@@ -285,7 +287,7 @@ function HotKeywordSection() {
   if (isPending) {
     return (
       <BandShell>
-        <SectionSkeleton height={KEYWORD_LIST_HEIGHT} />
+        <HorizontalCardsSkeleton />
       </BandShell>
     );
   }

@@ -3,11 +3,10 @@ import { Pressable, View } from "react-native";
 
 import { PostRow } from "@entities/post/ui/PostRow";
 import { Section } from "@shared/ui/section";
-import { SectionError, SectionSkeleton } from "@shared/ui/section-state";
+import { SectionError } from "@shared/ui/section-state";
+import { PostListSkeleton } from "@shared/ui/skeleton";
 
 import { useHomeArticle } from "../model/useHomeLists";
-
-const LIST_HEIGHT = 290;
 
 export function ArticleSection() {
   const router = useRouter();
@@ -32,7 +31,7 @@ export function ArticleSection() {
   if (isPending) {
     return (
       <Section title="Article">
-        <SectionSkeleton height={LIST_HEIGHT} />
+        <PostListSkeleton />
       </Section>
     );
   }

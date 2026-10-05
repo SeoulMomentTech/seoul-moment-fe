@@ -10,7 +10,12 @@ import {
   View,
 } from "react-native";
 
-import { SectionError, SectionSkeleton } from "@shared/ui/section-state";
+import { SectionError } from "@shared/ui/section-state";
+import {
+  BannerSkeleton,
+  CategoryThumbsSkeleton,
+  ProductGridSkeleton,
+} from "@shared/ui/skeleton";
 
 import { useInfiniteProducts } from "../model/useInfiniteProducts";
 import { useProductBanner } from "../model/useProductBanner";
@@ -24,8 +29,6 @@ const SCREEN_WIDTH = Dimensions.get("window").width;
 const BANNER_HEIGHT = 200;
 const CATEGORY_IMAGE = 64;
 const CATEGORY_ITEM_WIDTH = 72;
-const CATEGORY_HEIGHT = 100;
-const PRODUCT_LIST_HEIGHT = 360;
 
 export const GRID_GAP = 12;
 export const GRID_PADDING = 20;
@@ -43,7 +46,7 @@ function BannerPager() {
     return <SectionError onRetry={() => void refetch()} />;
   }
 
-  if (isPending) return <SectionSkeleton height={BANNER_HEIGHT} />;
+  if (isPending) return <BannerSkeleton height={BANNER_HEIGHT} />;
 
   if (isError) return <SectionError onRetry={() => void refetch()} />;
 
@@ -152,7 +155,14 @@ function CategoryScroller() {
     return <SectionError onRetry={() => void refetch()} />;
   }
 
-  if (isPending) return <SectionSkeleton height={CATEGORY_HEIGHT} />;
+  // 실제 스크롤러가 marginTop 20 을 가지므로 같은 여백을 감싸서 준다.
+  if (isPending) {
+    return (
+      <View style={{ marginTop: 20 }}>
+        <CategoryThumbsSkeleton />
+      </View>
+    );
+  }
 
   if (isError) return <SectionError onRetry={() => void refetch()} />;
 
@@ -259,7 +269,7 @@ export function ShopEmpty() {
     return <SectionError onRetry={() => void refetch()} />;
   }
 
-  if (isPending) return <SectionSkeleton height={PRODUCT_LIST_HEIGHT} />;
+  if (isPending) return <ProductGridSkeleton variant="shop" />;
 
   if (isError) return <SectionError onRetry={() => void refetch()} />;
 

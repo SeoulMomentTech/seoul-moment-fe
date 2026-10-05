@@ -13,13 +13,13 @@ import {
   StatusScreen,
   TopScrim,
 } from "@shared/ui/detail-chrome";
-import { SectionError, SectionSkeleton } from "@shared/ui/section-state";
+import { SectionError } from "@shared/ui/section-state";
+import { DetailSkeleton } from "@shared/ui/skeleton";
 
 import { RelatedPosts } from "./RelatedPosts";
 
 const BANNER_HEIGHT = 300;
 // 상태 화면 스켈레톤 높이. 배너보다 낮게 유지한다.
-const SKELETON_HEIGHT = 240;
 const SECTION_IMAGE_HEIGHT = 220;
 // 제목 두 줄 + 카테고리가 들어가는 하단 스크림 높이. 위쪽 스크림(insets.top + 64)과의 사이에
 // BANNER_HEIGHT - 64 - 210 = 26px 의 무보정 구간이 insets 와 무관하게 남는 크기.
@@ -194,7 +194,7 @@ export function DetailScreen<T extends DetailContent>({
   if (isPending) {
     return (
       <StatusScreen>
-        <SectionSkeleton height={SKELETON_HEIGHT} />
+        <DetailSkeleton bannerHeight={BANNER_HEIGHT} />
       </StatusScreen>
     );
   }
