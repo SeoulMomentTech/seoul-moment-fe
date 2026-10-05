@@ -21,7 +21,8 @@ import {
   AccordionTitleText,
   AccordionTrigger,
 } from "@shared/ui/accordion";
-import { SectionError, SectionSkeleton } from "@shared/ui/section-state";
+import { SectionError } from "@shared/ui/section-state";
+import { ChipRowsSkeleton, Shimmer } from "@shared/ui/skeleton";
 
 import { useBrandFilter } from "../model/useBrandFilter";
 import { useProductCategories } from "../model/useProductCategories";
@@ -37,7 +38,6 @@ import type {
 const SHEET_MAX_HEIGHT = "85%";
 const SHEET_ANIMATION_MS = 250;
 const SWATCH_SIZE = 14;
-const LIST_SKELETON_HEIGHT = 56;
 
 interface BottomSheetProps {
   visible: boolean;
@@ -261,7 +261,7 @@ function CategorySection({
   if (isPending && fetchStatus === "paused") {
     body = <SectionError onRetry={() => void refetch()} />;
   } else if (isPending) {
-    body = <SectionSkeleton height={LIST_SKELETON_HEIGHT} />;
+    body = <ChipRowsSkeleton />;
   } else if (isError) {
     body = <SectionError onRetry={() => void refetch()} />;
   } else if (!data || data.list.length === 0) {
@@ -305,7 +305,7 @@ function BrandSection({
   if (isPending && fetchStatus === "paused") {
     body = <SectionError onRetry={() => void refetch()} />;
   } else if (isPending) {
-    body = <SectionSkeleton height={LIST_SKELETON_HEIGHT} />;
+    body = <ChipRowsSkeleton />;
   } else if (isError) {
     body = <SectionError onRetry={() => void refetch()} />;
   } else {
@@ -367,7 +367,7 @@ function OptionsSection({
   if (isPending && fetchStatus === "paused") {
     body = <SectionError onRetry={() => void refetch()} />;
   } else if (isPending) {
-    body = <SectionSkeleton height={LIST_SKELETON_HEIGHT} />;
+    body = <ChipRowsSkeleton />;
   } else if (isError) {
     body = <SectionError onRetry={() => void refetch()} />;
   } else if (!data || data.list.length === 0) {
@@ -540,6 +540,26 @@ export function ShopFilterSheet({
   );
 }
 
+// 정렬 행(px-5 py-4 + body-2 한 줄 = 51)과 같은 크기의 막대. 정렬 옵션은 보통 4~5개라 4행을 둔다.
+function SortRowsSkeleton() {
+  return (
+    <>
+      {[0, 1, 2, 3].map((i) => (
+        <View
+          key={i}
+          style={{
+            height: 51,
+            justifyContent: "center",
+            paddingHorizontal: 20,
+          }}
+        >
+          <Shimmer height={13} radius={4} width="45%" />
+        </View>
+      ))}
+    </>
+  );
+}
+
 function SortSheetContent({ onClose }: { onClose(): void }) {
   const insets = useSafeAreaInsets();
   const { data, isPending, isError, fetchStatus, refetch } =
@@ -553,7 +573,7 @@ function SortSheetContent({ onClose }: { onClose(): void }) {
   if (isPending && fetchStatus === "paused") {
     body = <SectionError onRetry={() => void refetch()} />;
   } else if (isPending) {
-    body = <SectionSkeleton height={LIST_SKELETON_HEIGHT} />;
+    body = <SortRowsSkeleton />;
   } else if (isError) {
     body = <SectionError onRetry={() => void refetch()} />;
   } else if (!data || data.list.length === 0) {
