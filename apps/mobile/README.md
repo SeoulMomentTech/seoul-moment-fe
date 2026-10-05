@@ -36,7 +36,7 @@ iOS 시뮬레이터는 Xcode, Android 에뮬레이터는 Android Studio가 필�
 | :------------------------- | :------------ | :------------------------------- |
 | `EXPO_PUBLIC_API_BASE_URL` | API 서버 주소 | `https://api.seoulmoment.com.tw` |
 
-`EXPO_PUBLIC_` 접두사가 붙은 변수만 앱 번들에 포함됩니다. 로컬 값은 `.env.local`에 둡니다(gitignore 대상).
+`EXPO_PUBLIC_` 접두사가 붙은 변수만 앱 번들에 포함됩니다. 로컬 값은 `apps/mobile/.env`에 둡니다(gitignore 대상). `.env.example`을 `.env`로 복사해 시작하세요. 파일이 없으면 운영 API로 연결됩니다.
 
 ## Scripts
 
@@ -59,7 +59,10 @@ pnpm typecheck:ts6  # TS 6 타입 체크 (TS 7 진단이 의심스러울 때 교
   - `lib/query`: QueryClient 설정, 앱 포커스·네트워크 감지(`appLifecycle.ts`)
   - `lib/hooks/query`: `useAppQuery` / `useAppMutation`
   - `lib/i18n`: 언어 타입과 기기 언어 감지
-- `src/components`, `src/hooks`, `src/constants`: Expo 템플릿에서 온 예시 코드
+- `src/entities`: 도메인별 표현 단위 (`product`의 `ProductCard`, News·Article이 함께 쓰는 `post`의 `PostRow`)
+- `src/features`: 화면 기능 단위. `home`에 홈 섹션 컴포넌트와 쿼리 훅이 있습니다.
+- `src/constants`: `theme.ts`가 탭 바 색상과 `BottomTabInset`을 제공합니다.
+- `src/components`: Expo 템플릿에서 온 예시 코드
 - `src/global.css`: Tailwind / NativeWind 진입점
 
 ## Guidelines

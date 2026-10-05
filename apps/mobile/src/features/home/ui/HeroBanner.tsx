@@ -1,7 +1,7 @@
 import { Image } from "expo-image";
 import { View } from "react-native";
 
-import { SectionError, SectionSkeleton } from "@shared/ui/section-state";
+import { SectionError } from "@shared/ui/section-state";
 
 import { useHomeBanner } from "../model/useHomePrime";
 
@@ -21,7 +21,12 @@ export function HeroBanner() {
   if (isPending && fetchStatus === "paused") {
     return <SectionError onRetry={() => void refetch()} />;
   }
-  if (isPending) return <SectionSkeleton height={BANNER_HEIGHT} />;
+  // SectionSkeleton 은 mx-5 + 둥근 모서리라 풀블리드 배너와 어긋난다. 여기서만 직접 그린다.
+  if (isPending) {
+    return (
+      <View className="bg-neutral-subtle" style={{ height: BANNER_HEIGHT }} />
+    );
+  }
   if (isError) return <SectionError onRetry={() => void refetch()} />;
   // banner 배열이 비면 select 가 undefined 를 준다. 빈 이미지를 띄우지 않는다.
   if (!banner) return null;

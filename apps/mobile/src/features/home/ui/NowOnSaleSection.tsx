@@ -6,7 +6,7 @@ import { SectionError, SectionSkeleton } from "@shared/ui/section-state";
 
 import { useNowOnSale } from "../model/useHomeLists";
 
-const GRID_HEIGHT = 420;
+const GRID_HEIGHT = 500;
 
 export function NowOnSaleSection() {
   const {

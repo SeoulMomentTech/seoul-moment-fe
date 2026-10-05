@@ -1,8 +1,6 @@
 import { RefreshControl, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { useRefreshHome } from "@features/home/model/useRefreshHome";
-
 import { BottomTabInset, Spacing } from "@/constants/theme";
 
 import {
@@ -11,6 +9,7 @@ import {
   NewsSection,
   NowOnSaleSection,
   PromotionSection,
+  useRefreshHome,
 } from "@features/home";
 
 export default function HomeScreen() {
