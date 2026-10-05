@@ -48,7 +48,17 @@ export function NowOnSaleSection() {
 
   return (
     <Section
-      action={<Text className="text-body-3 text-neutral">View all</Text>}
+      action={
+        <Pressable
+          accessibilityLabel="View all products"
+          accessibilityRole="button"
+          hitSlop={8}
+          // 탭 라우트라 push 하지 않는다. RelatedPosts 의 View all 과 같은 처리.
+          onPress={() => router.navigate("/shop")}
+        >
+          <Text className="text-body-3 text-brand font-semibold">View all</Text>
+        </Pressable>
+      }
       title="Now On Sale"
     >
       {/* 항목이 4개로 고정이라 가상화 이득이 없고, 바깥 ScrollView 안에

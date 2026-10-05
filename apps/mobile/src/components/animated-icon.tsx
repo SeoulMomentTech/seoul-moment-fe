@@ -34,9 +34,12 @@ export function AnimatedSplashOverlay() {
     },
   });
 
+  // 네이티브 스플래시(app.json expo-splash-screen)와 같은 배경·같은 로고·같은 폭이라
+  // 네이티브에서 이 오버레이로 넘어가는 순간이 보이지 않는다. 둘 중 하나만 바꾸면 깜빡인다.
   const image = (
     <Image
-      source={require("@/assets/images/expo-logo.png")}
+      contentFit="contain"
+      source={require("@/assets/images/logo.png")}
       style={styles.image}
     />
   );
@@ -150,9 +153,10 @@ const styles = StyleSheet.create({
     height: 128,
     zIndex: 100,
   },
+  // logo.png 는 533x65 워드마크다. 네이티브 스플래시의 imageWidth(200)와 같은 폭으로 맞춘다.
   image: {
-    width: 76,
-    height: 71,
+    width: 200,
+    height: 24,
   },
   background: {
     borderRadius: 40,
@@ -163,7 +167,8 @@ const styles = StyleSheet.create({
   },
   splashOverlay: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: "#208AEF",
+    // --neutral-0. app.json 의 스플래시 backgroundColor 와 같아야 한다.
+    backgroundColor: "#ffffff",
     alignItems: "center",
     justifyContent: "center",
     zIndex: 1000,

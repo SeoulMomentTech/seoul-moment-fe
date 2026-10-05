@@ -1,5 +1,6 @@
 import {
   addNetworkStateListener,
+  getNetworkStateAsync,
   type NetworkState,
   NetworkStateType,
 } from "expo-network";
@@ -34,6 +35,15 @@ export const setupQueryAppLifecycle = () => {
   });
 
   onlineManager.setEventListener((setOnline) => {
+    // addNetworkStateListener 는 "변화" 에만 울린다. onlineManager 는 online=true 로 시작하고
+    // setOnline 은 값이 그대로면 아무도 깨우지 않으므로, 오프라인으로 앱을 켜면
+    // (1) 쿼리가 paused 가 아니라 그냥 실패하고 (2) 연결이 돌아와도 상태가 "변하지" 않아
+    // 재개도 refetch 도 일어나지 않는다. 시작 시점의 실제 상태를 한 번 읽어 seed 한다.
+    void getNetworkStateAsync()
+      .then((state) => setOnline(isOnline(state)))
+      // 상태를 못 읽으면 기본값(online)으로 두는 편이 쿼리를 멈춰 두는 것보다 안전하다.
+      .catch(() => undefined);
+
     const subscription = addNetworkStateListener((state) => {
       setOnline(isOnline(state));
     });
