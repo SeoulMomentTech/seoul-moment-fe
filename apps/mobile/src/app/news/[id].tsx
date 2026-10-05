@@ -23,6 +23,7 @@ const SECTION_GAP = 64;
 // 제목/본문/이미지 블록 사이 간격.
 const BLOCK_GAP = 24;
 const CONTENT_LINE_HEIGHT = 26;
+const AVATAR_SIZE = 24;
 // 스크림은 상태바 영역(insets.top) 아래로 이만큼 더 내려와 옅어진다.
 const SCRIM_EXTRA_HEIGHT = 64;
 // 떠 있는 뒤로가기 버튼(top 8 + 지름 36) 아래로 상태 화면 내용을 내린다.
@@ -269,19 +270,33 @@ export default function NewsDetailScreen() {
             transition={200}
           />
         </View>
-        <View className="mt-5 px-5">
+        {/* 웹 titleBox 와 같은 bg-surface-soft 패널. px-5 부모 밖이라 배너처럼 가장자리까지 닿고, 패딩은 패널이 가진다. */}
+        <View className="bg-surface-soft px-5 py-10">
           {news.category ? (
-            <View className="bg-surface-soft mb-3 self-start rounded-full px-3 py-1">
-              <Text className="text-body-3 text-foreground">
-                {news.category}
-              </Text>
-            </View>
+            <Text className="text-body-3 text-foreground font-semibold">
+              {news.category}
+            </Text>
           ) : null}
-          <Text className="text-title-3 text-foreground font-bold">
+          <Text className="text-title-3 text-foreground mt-3 font-bold">
             {news.title}
           </Text>
           {byline ? (
-            <Text className="text-body-3 text-neutral mt-2">{byline}</Text>
+            <View className="mt-2 flex-row items-center">
+              {/* profileImage 가 빈 문자열이면 빈 원 대신 아바타를 생략한다. */}
+              {news.profileImage ? (
+                <Image
+                  contentFit="cover"
+                  source={news.profileImage}
+                  style={{
+                    width: AVATAR_SIZE,
+                    height: AVATAR_SIZE,
+                    borderRadius: AVATAR_SIZE / 2,
+                    marginRight: 8,
+                  }}
+                />
+              ) : null}
+              <Text className="text-body-3 text-neutral">{byline}</Text>
+            </View>
           ) : null}
           <Text className="text-body-2 text-foreground mt-4">
             {news.content}
