@@ -24,15 +24,9 @@ interface SectionImagesProps {
    * staggered: 좁은 이미지를 좌/우 번갈아 세운다 (브랜드).
    */
   layout?: "stack" | "staggered";
-  /** staggered 에서 첫 이미지를 어느 쪽에 둘지. 섹션마다 번갈아야 한 쪽으로 쏠리지 않는다. */
-  startRight?: boolean;
 }
 
-export function SectionImages({
-  uris,
-  layout = "stack",
-  startRight = false,
-}: SectionImagesProps) {
+export function SectionImages({ uris, layout = "stack" }: SectionImagesProps) {
   // 이미지가 없으면 빈 블록도, 빈 간격도 만들지 않는다.
   if (uris.length === 0) {
     return null;
@@ -52,8 +46,7 @@ export function SectionImages({
             // eslint-disable-next-line react/no-array-index-key
             key={`${index}-${uri}`}
             style={{
-              alignItems:
-                index % 2 === (startRight ? 0 : 1) ? "flex-end" : "flex-start",
+              alignItems: index % 2 === 1 ? "flex-end" : "flex-start",
             }}
           >
             <Image
@@ -107,13 +100,11 @@ export interface DetailSectionContent {
 interface DetailSectionProps {
   section: DetailSectionContent;
   imageLayout?: SectionImagesProps["layout"];
-  startRight?: SectionImagesProps["startRight"];
 }
 
 export function DetailSection({
   section,
   imageLayout = "stack",
-  startRight = false,
 }: DetailSectionProps) {
   const hasText = Boolean(section.title || section.subTitle || section.content);
 
@@ -141,11 +132,7 @@ export function DetailSection({
           ) : null}
         </View>
       ) : null}
-      <SectionImages
-        layout={imageLayout}
-        startRight={startRight}
-        uris={section.imageList}
-      />
+      <SectionImages layout={imageLayout} uris={section.imageList} />
     </View>
   );
 }

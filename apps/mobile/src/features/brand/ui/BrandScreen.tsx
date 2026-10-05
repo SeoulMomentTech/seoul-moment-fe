@@ -100,14 +100,14 @@ export function BrandScreen({ id }: { id: number }) {
         </View>
         {(data.section ?? []).map((section, index) => (
           <DetailSection
-            imageLayout="staggered"
+            // 첫 섹션만 좌우 교차 배치다. 웹도 여기서만 208x320 두 장을 엇갈려 세우고
+            // 나머지 섹션은 넓은 이미지를 쓴다. 이미지가 1장뿐인 섹션을 교차시키면
+            // 한쪽으로 치우친 것처럼만 보인다.
+            imageLayout={index === 0 ? "staggered" : "stack"}
             // 정적 목록이라 순서가 바뀌지 않으므로 index 키가 안전하다.
             // eslint-disable-next-line react/no-array-index-key
             key={`${index}-${section.title}`}
             section={section}
-            // 섹션마다 시작 방향을 뒤집는다. 이미지가 1장뿐인 섹션이 이어질 때
-            // 전부 왼쪽에 붙어 교차 리듬이 사라지는 것을 막는다.
-            startRight={index % 2 === 1}
           />
         ))}
         <View style={{ height: insets.bottom + SECTION_GAP }} />
