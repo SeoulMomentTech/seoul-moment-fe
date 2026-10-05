@@ -13,14 +13,13 @@ import {
   StatusScreen,
   TopScrim,
 } from "@shared/ui/detail-chrome";
+import { DetailSection } from "@shared/ui/detail-section";
 import { SectionError } from "@shared/ui/section-state";
 import { DetailSkeleton } from "@shared/ui/skeleton";
 
 import { RelatedPosts } from "./RelatedPosts";
 
 const BANNER_HEIGHT = 300;
-// 상태 화면 스켈레톤 높이. 배너보다 낮게 유지한다.
-const SECTION_IMAGE_HEIGHT = 220;
 // 제목 두 줄 + 카테고리가 들어가는 하단 스크림 높이. 위쪽 스크림(insets.top + 64)과의 사이에
 // BANNER_HEIGHT - 64 - 210 = 26px 의 무보정 구간이 insets 와 무관하게 남는 크기.
 const BOTTOM_SCRIM_HEIGHT = 210;
@@ -30,74 +29,8 @@ const OVERLAY_TEXT_SHADOW = {
   textShadowOffset: { width: 0, height: 1 },
   textShadowRadius: 4,
 } as const;
-const IMAGE_GAP = 12;
-// 웹 모바일 구간 간격(50~90px)과 같은 결로 섹션 사이를 크게 띄운다.
-const SECTION_GAP = 64;
-// 제목/본문/이미지 블록 사이 간격.
-const BLOCK_GAP = 24;
-const CONTENT_LINE_HEIGHT = 26;
 const LEAD_LINE_HEIGHT = 28;
 const AVATAR_SIZE = 24;
-function SectionImages({ uris }: { uris: string[] }) {
-  // 이미지가 없으면 빈 블록도, 빈 간격도 만들지 않는다.
-  if (uris.length === 0) {
-    return null;
-  }
-
-  return (
-    <View className="px-5" style={{ gap: IMAGE_GAP }}>
-      {uris.map((uri, index) => (
-        <Image
-          contentFit="cover"
-          // 정적 목록이라 순서가 바뀌지 않으므로 index 키가 안전하다.
-          // eslint-disable-next-line react/no-array-index-key
-          key={`${index}-${uri}`}
-          source={uri}
-          style={{
-            width: "100%",
-            height: SECTION_IMAGE_HEIGHT,
-            borderRadius: 12,
-          }}
-          transition={200}
-        />
-      ))}
-    </View>
-  );
-}
-
-/** 모든 섹션이 같은 모양이다: 제목 → 소제목 → 본문 → 이미지, 모두 좌측 정렬. */
-function ArticleSection({ section }: { section: NewsDetailSection }) {
-  const hasText = Boolean(section.title || section.subTitle || section.content);
-
-  return (
-    <View style={{ marginTop: SECTION_GAP, gap: BLOCK_GAP }}>
-      {hasText ? (
-        <View className="px-5" style={{ gap: 12 }}>
-          {section.title ? (
-            <Text className="text-title-4 text-foreground text-left font-semibold">
-              {section.title}
-            </Text>
-          ) : null}
-          {section.subTitle ? (
-            <Text className="text-body-2 text-foreground text-left font-semibold">
-              {section.subTitle}
-            </Text>
-          ) : null}
-          {section.content ? (
-            <Text
-              className="text-body-2 text-foreground text-left"
-              style={{ lineHeight: CONTENT_LINE_HEIGHT }}
-            >
-              {section.content}
-            </Text>
-          ) : null}
-        </View>
-      ) : null}
-      <SectionImages uris={section.imageList} />
-    </View>
-  );
-}
-
 /**
  * 배너 아래쪽에 깔리는 스크림. 제목이 밝은 사진 위에서도 읽히도록 투명에서 어두운 쪽으로 진해진다.
  * 위쪽 TopScrim 과 영역이 겹치지 않도록 높이를 제한한다.
@@ -284,7 +217,7 @@ export function DetailScreen<T extends DetailContent>({
           </Text>
         </View>
         {detail.section.map((section, index) => (
-          <ArticleSection
+          <DetailSection
             // 정적 목록이라 순서가 바뀌지 않으므로 index 키가 안전하다.
             // eslint-disable-next-line react/no-array-index-key
             key={`${index}-${section.title}`}

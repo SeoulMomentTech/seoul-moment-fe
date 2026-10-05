@@ -346,20 +346,24 @@ export function CategoryChipsSkeleton() {
   );
 }
 
+// px-5 py-3 버튼: body-3 한 줄 + 위아래 12 + 테두리 1 x 2.
+const PILL_BUTTON_HEIGHT = LINE_BODY_3 + 24 + 2;
+
 interface BrandHeaderSkeletonProps {
   /** 실제 배너와 같은 높이. 풀블리드라 좌우 여백이 없다. */
   bannerHeight: number;
-  /** 설명 줄 수. 기본 6 — dev 의 소개글 173~197자가 390pt 에서 차지하는 줄 수다. */
+  /** 설명 줄 수. 헤더가 numberOfLines 로 끊는 줄 수와 같아야 한다. */
   lines?: number;
 }
 
 /**
- * 브랜드 헤더(배너 + 이름 + 영문명 + 소개). 높이 = bannerHeight + 20 + 24 + 4 + 17 + 12 + lines x 17.
- * 소개 길이는 브랜드마다 달라 줄 수까지 맞출 수는 없고, 흔한 길이에 맞춘다.
+ * 브랜드 헤더(배너 + 이름 + 영문명 + 소개 + 소개 페이지 버튼).
+ * 높이 = bannerHeight + 20 + 24 + 4 + 17 + 12 + lines x 17 + 16 + 43.
+ * 소개글은 헤더에서 lines 줄로 잘리므로 실제와 줄 수가 어긋나지 않는다.
  */
 export function BrandHeaderSkeleton({
   bannerHeight,
-  lines = 6,
+  lines = 3,
 }: BrandHeaderSkeletonProps) {
   return (
     <View>
@@ -379,6 +383,12 @@ export function BrandHeaderSkeleton({
               width={i === lines - 1 ? "55%" : undefined}
             />
           ))}
+        </View>
+        <View style={{ marginTop: 16 }}>
+          <Shimmer
+            height={PILL_BUTTON_HEIGHT}
+            radius={PILL_BUTTON_HEIGHT / 2}
+          />
         </View>
       </View>
     </View>
