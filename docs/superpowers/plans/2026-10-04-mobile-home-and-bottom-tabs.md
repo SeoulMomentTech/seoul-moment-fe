@@ -79,7 +79,7 @@ pnpm --filter @seoul-moment/mobile lint    # ESLint
 | `src/features/home/ui/NowOnSaleSection.tsx` | 상품 2열 그리드 |
 | `src/features/home/ui/NewsSection.tsx` | 뉴스 행 3개 |
 | `src/features/home/ui/ArticleSection.tsx` | 아티클 행 3개 |
-| `src/features/home/ui/ContactSection.tsx` | 정적 CTA |
+| `src/features/home/ui/ContactSection.tsx` | 정적 CTA (이후 제거됨 — 모바일 카드에는 web과 달리 링크가 없어 삭제했다) |
 | `src/features/home/index.ts` | 섹션 배럴 |
 
 ### 수정하는 파일
@@ -1400,12 +1400,12 @@ EOF
 - Create: `src/features/home/ui/NowOnSaleSection.tsx`
 - Create: `src/features/home/ui/NewsSection.tsx`
 - Create: `src/features/home/ui/ArticleSection.tsx`
-- Create: `src/features/home/ui/ContactSection.tsx`
+- Create: `src/features/home/ui/ContactSection.tsx` (이후 제거됨 — 모바일 카드에는 web과 달리 링크가 없어 삭제했다)
 - Create: `src/features/home/index.ts`
 
 **Interfaces:**
 - Consumes: Task 4의 `Section`, `SectionSkeleton`, `SectionError`, `ProductCard`, `PostRow`. Task 5의 `useNowOnSale`, `useHomeNews`, `useHomeArticle`.
-- Produces: `NowOnSaleSection()`, `NewsSection()`, `ArticleSection()`, `ContactSection()` — 모두 props 없음. 그리고 `src/features/home/index.ts`가 여섯 섹션(`HeroBanner` 포함)을 배럴로 내보낸다.
+- Produces: `NowOnSaleSection()`, `NewsSection()`, `ArticleSection()`, `ContactSection()` (이후 제거됨 — 모바일 카드에는 web과 달리 링크가 없어 삭제했다) — 모두 props 없음. 그리고 `src/features/home/index.ts`가 여섯 섹션(`HeroBanner` 포함)을 배럴로 내보낸다.
 
 - [ ] **Step 1: Now On Sale 섹션을 만든다**
 
@@ -1570,7 +1570,7 @@ export function ArticleSection() {
 }
 ```
 
-- [ ] **Step 4: 컨택트 섹션을 만든다**
+- [ ] **Step 4: 컨택트 섹션을 만든다** (이후 제거됨 — 모바일 카드에는 web과 달리 링크가 없어 삭제했다)
 
 `src/features/home/ui/ContactSection.tsx`. API 없이 정적이다.
 
@@ -1703,10 +1703,10 @@ pnpm dev:mobile       # 레포 루트에서, 뜨면 i
 
 확인할 것:
 - 탭 4개가 뜨고 모두 전환된다
-- 홈에 여섯 블록이 순서대로 뜬다: 배너 → Season Collection → Now On Sale → News → Article → Contact Us
+- 홈에 여섯 블록이 순서대로 뜬다: 배너 → Season Collection → Now On Sale → News → Article → Contact Us (Contact Us 는 이후 제거됨)
 - Now On Sale 에 상품 4개가 2열로, 가격이 `NT$1,500` 꼴로 뜬다
 - News 와 Article 에 각각 3개 행이 썸네일·제목·`작성자 · 2026.06.30` 꼴로 뜬다
-- 맨 아래까지 스크롤했을 때 Contact Us 가 탭바에 가리지 않는다
+- 맨 아래까지 스크롤했을 때 Contact Us 가 탭바에 가리지 않는다 (Contact Us 는 이후 제거됨 — 마지막 섹션이 가리지 않는지로 읽는다)
 
 - [ ] **Step 4: 당겨서 새로고침과 중복 당김을 확인한다 (스펙 완성 기준 3, Review Focus 5)**
 
@@ -1723,7 +1723,7 @@ pnpm dev:mobile       # 레포 루트에서, 뜨면 i
 
 저장하고 시뮬레이터에서 확인:
 - **News 섹션만** "Couldn't load this section" + Retry 한 줄로 접힌다
-- 배너·Season Collection·Now On Sale·Article·Contact 는 **정상 렌더된다**
+- 배너·Season Collection·Now On Sale·Article·Contact 는 **정상 렌더된다** (Contact 는 이후 제거됨)
 - Retry 를 누르면 다시 시도하고 (여전히 실패하므로) 에러 줄이 유지된다
 
 확인 후 `news/list`로 되돌린다.
