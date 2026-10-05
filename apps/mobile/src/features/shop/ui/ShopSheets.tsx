@@ -52,56 +52,59 @@ interface BottomSheetProps {
  * 배경(opacity)과 패널(translateY)을 Animated 로 따로 움직인다.
  *
  * - visible: 호출자가 원하는 열림 상태.
- * - mounted: Modal 의 실제 visible. 닫힘 애니메이션이 끝날 때까지 true 로 남겨 둔다.
- * - children 은 mounted 동안만 마운트되므로, 안에 둔 state(draft) 는 열 때마다 새로 시작한다.
+ * - shown: Modal 이 실제로 화면에 올라온 뒤(onShow)부터 닫힘 애니메이션이 끝날 때까지 true.
+ *   Modal 의 visible 은 `visible || shown` 이라, 닫힘 애니메이션이 끝나기 전에는 내려가지 않는다.
+ * - children 은 Modal 이 보이는 동안만 마운트된다. 닫히는 도중 다시 열리면 Modal 이 그대로
+ *   떠 있어서 children 이 유지되므로, session 키를 바꿔 draft 를 새로 시드한다.
  */
 function BottomSheet({ visible, title, onClose, children }: BottomSheetProps) {
   const { height: windowHeight } = useWindowDimensions();
-  const [mounted, setMounted] = useState(visible);
-  // 닫히는 도중 다시 열렸을 때 content 를 새로 마운트(draft 재시드)하기 위한 키
+  const [shown, setShown] = useState(false);
   const [session, setSession] = useState(0);
-  const [sheetHeight, setSheetHeight] = useState(windowHeight);
-  // 0: 닫힘(배경 투명, 패널은 화면 아래) / 1: 열림(배경 불투명, 패널 제자리)
-  const [progress] = useState(() => new Animated.Value(visible ? 1 : 0));
   const [prevVisible, setPrevVisible] = useState(visible);
+  // 0: 닫힘(배경 투명, 패널은 화면 아래) / 1: 열림(배경 불투명, 패널 제자리)
+  const [progress] = useState(() => new Animated.Value(0));
 
-  // 열림 상태가 바뀌는 렌더에서 mounted 를 맞춘다(effect 에서 setState 하지 않기 위해).
-  // mounted 가 아직 true 인데 다시 열렸다면 닫힘 애니메이션 도중이므로, 키를 바꿔
-  // content 를 새로 마운트해서 draft 를 현재 store 값으로 다시 시드한다.
+  // 열릴 때마다 키를 올린다(effect 에서 setState 하지 않기 위해 렌더 중에 처리).
   if (visible !== prevVisible) {
     setPrevVisible(visible);
-    if (visible) {
-      setMounted(true);
-      if (mounted) setSession((s) => s + 1);
-    }
+    if (visible) setSession((s) => s + 1);
   }
 
+  // 열림 애니메이션은 반드시 Modal 이 올라온 뒤(shown)에만 시작한다.
+  // visible 이 바뀌는 시점의 effect 는 Modal 의 네이티브 뷰가 생기기 전에 돌아서,
+  // 네이티브 드라이버 애니메이션이 아직 없는 뷰에 걸려 progress 가 0 에서 움직이지 않았다
+  // (시트는 마운트됐지만 배경 투명 + 패널이 화면 밖인 채로 보이지 않았다).
+  // 그래서 onShow 에서 shown 을 켜고, 이 effect 가 그 뒤에 애니메이션을 시작한다.
+  // 닫힘이나 닫히는 도중의 재열림도 같은 effect 가 현재 값에서 이어서 처리한다.
   useEffect(() => {
-    // 진행 중이던 반대 방향 애니메이션은 cleanup 의 stop 으로 끊기고, 현재 값에서 이어서 움직인다.
+    if (!shown) return;
     const animation = Animated.timing(progress, {
       toValue: visible ? 1 : 0,
       duration: SHEET_ANIMATION_MS,
       easing: visible ? Easing.out(Easing.cubic) : Easing.in(Easing.cubic),
       useNativeDriver: true,
     });
-    // 중간에 stop 되면 finished 가 false 라서, 다시 열린 시트를 unmount 하지 않는다.
+    // 중간에 stop 되면 finished 가 false 라서, 다시 열린 시트를 내리지 않는다.
     animation.start(({ finished }) => {
-      if (finished && !visible) setMounted(false);
+      if (finished && !visible) setShown(false);
     });
     return () => animation.stop();
-  }, [visible, progress]);
+  }, [visible, shown, progress]);
 
+  // 패널 높이는 화면의 85% 이하라서 windowHeight 만큼 내리면 항상 화면 밖이다.
   const translateY = progress.interpolate({
     inputRange: [0, 1],
-    outputRange: [sheetHeight, 0],
+    outputRange: [windowHeight, 0],
   });
 
   return (
     <Modal
       animationType="none"
       onRequestClose={onClose}
+      onShow={() => setShown(true)}
       transparent
-      visible={mounted}
+      visible={visible || shown}
     >
       <View className="flex-1 justify-end">
         <Animated.View
@@ -125,7 +128,6 @@ function BottomSheet({ visible, title, onClose, children }: BottomSheetProps) {
         </Animated.View>
         <Animated.View
           className="bg-background"
-          onLayout={(e) => setSheetHeight(e.nativeEvent.layout.height)}
           style={{
             maxHeight: SHEET_MAX_HEIGHT,
             borderTopLeftRadius: 20,
