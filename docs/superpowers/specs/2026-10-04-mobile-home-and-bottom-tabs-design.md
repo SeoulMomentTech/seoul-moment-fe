@@ -11,7 +11,7 @@ Expo 템플릿 상태인 `apps/mobile`에 서울모먼트의 **바텀 탭 셸**�
 완성 기준:
 
 1. 바텀 탭이 Home / Shop / News / My 4개로 뜨고 전환된다.
-2. 홈이 dev API 실데이터로 배너·프로모션·Now On Sale·News·Article을 렌더한다. Contact는 정적 CTA다.
+2. 홈이 dev API 실데이터로 배너·프로모션·Now On Sale·News·Article을 렌더한다. (Contact Us 섹션은 모바일 카드에 web과 달리 링크가 없어 제거했다.)
 3. 당겨서 새로고침이 홈의 모든 쿼리를 다시 가져온다.
 4. 한 섹션의 API가 실패해도 나머지 홈은 정상 렌더된다.
 5. `pnpm typecheck:mobile`과 mobile `lint`가 통과한다.
@@ -143,8 +143,9 @@ C안(혼합 레이아웃) — 섹션 성격에 따라 캐러셀 / 그리드 / �
     <NowOnSaleSection />   2열 그리드 4개 + "View all"
     <NewsSection />        썸네일 행 3개
     <ArticleSection />     썸네일 행 3개
-    <ContactSection />     정적 CTA
 ```
+
+Contact Us 섹션은 뺐다. web의 `ContactUS`는 카드가 `/contact` 링크지만 모바일 카드에는 링크가 없어, 눌리지 않는 CTA가 되기 때문이다.
 
 ### 6.1 프로모션은 개수에 따라 모양이 바뀐다
 
@@ -224,7 +225,7 @@ EXPO_PUBLIC_API_BASE_URL=https://api-dev.seoulmoment.com.tw
 2. `pnpm --filter @seoul-moment/mobile lint`
 3. iOS 시뮬레이터 수동 확인
    - 탭 4개 전환
-   - 홈 6개 섹션 렌더 (배너·프로모션·Now On Sale·News·Article·Contact)
+   - 홈 5개 섹션 렌더 (배너·프로모션·Now On Sale·News·Article)
    - 당겨서 새로고침
    - 섹션 실패 격리 — `getNewsList`의 엔드포인트 경로를 일시적으로 잘못된 값으로 바꿔, News 섹션만 에러 줄로 접히고 배너·프로모션·Now On Sale·Article이 정상 렌더되는지 확인한 뒤 되돌린다
 
