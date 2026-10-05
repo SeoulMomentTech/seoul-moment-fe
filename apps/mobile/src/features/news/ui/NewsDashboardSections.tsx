@@ -8,7 +8,7 @@ import type { NewsWithCategory } from "@shared/services/news";
 import { Section } from "@shared/ui/section";
 import { SectionError } from "@shared/ui/section-state";
 import {
-  BannerSkeleton,
+  FeaturedSkeleton,
   HorizontalCardsSkeleton,
   PostListSkeleton,
 } from "@shared/ui/skeleton";
@@ -81,7 +81,7 @@ function FeaturedSection() {
   if (isPending) {
     return (
       <Section title="Featured">
-        <BannerSkeleton height={FEATURED_HEIGHT} inset />
+        <FeaturedSkeleton imageHeight={FEATURED_HEIGHT} />
       </Section>
     );
   }

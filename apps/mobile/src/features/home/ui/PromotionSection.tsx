@@ -4,7 +4,7 @@ import { Dimensions, FlatList, Text, View } from "react-native";
 import type { HomePromotion } from "@shared/services/home";
 import { Section } from "@shared/ui/section";
 import { SectionError } from "@shared/ui/section-state";
-import { HorizontalCardsSkeleton } from "@shared/ui/skeleton";
+import { HeroCardSkeleton } from "@shared/ui/skeleton";
 
 import { useHomePromotion } from "../model/useHomePrime";
 
@@ -34,7 +34,8 @@ export function PromotionSection() {
   if (isPending) {
     return (
       <Section title="Season Collection">
-        <HorizontalCardsSkeleton />
+        {/* dev API 는 프로모션이 1개라 단일 히어로가 일반적인 경우다. */}
+        <HeroCardSkeleton imageHeight={HERO_HEIGHT} />
       </Section>
     );
   }

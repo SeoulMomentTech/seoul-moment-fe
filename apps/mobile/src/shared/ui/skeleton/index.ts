@@ -6,6 +6,8 @@ export {
   CHIP_HEIGHT,
   ChipRowsSkeleton,
   DetailSkeleton,
+  FeaturedSkeleton,
+  HeroCardSkeleton,
   HorizontalCardsSkeleton,
   POST_ROW_HEIGHT,
   PostListSkeleton,
