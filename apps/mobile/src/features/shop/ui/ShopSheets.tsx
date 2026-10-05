@@ -25,7 +25,7 @@ import { SectionError } from "@shared/ui/section-state";
 import { ChipRowsSkeleton, Shimmer } from "@shared/ui/skeleton";
 
 import { useBrandFilter } from "../model/useBrandFilter";
-import { useProductCategories } from "../model/useProductCategories";
+import { useCategories } from "../model/useCategories";
 import { useProductCount } from "../model/useProductCount";
 import { useProductOptionFilters } from "../model/useProductOptionFilters";
 import { useProductSortOptions } from "../model/useProductSortOptions";
@@ -246,6 +246,10 @@ function EmptyNote({ text }: { text: string }) {
   );
 }
 
+/**
+ * 최상위 카테고리(패션·화장품·악세서리). 목록 위 칩 줄이 고르는 상품 카테고리와는 다른 축이고,
+ * product/filter 가 요구하는 categoryId 도 이 값이라 Options 섹션이 여기에 딸려 있다.
+ */
 function CategorySection({
   categoryId,
   onSelect,
@@ -253,8 +257,7 @@ function CategorySection({
   categoryId?: number;
   onSelect(id: number | undefined): void;
 }) {
-  const { data, isPending, isError, fetchStatus, refetch } =
-    useProductCategories();
+  const { data, isPending, isError, fetchStatus, refetch } = useCategories();
 
   let body: ReactNode;
   // 오프라인이면 요청이 paused 되어 isPending 이 유지된다.
@@ -428,9 +431,14 @@ function FilterSheetContent({ onClose }: { onClose(): void }) {
   // 개수는 적용된 필터가 아니라 draft 를 따라간다.
   const { data: count } = useProductCount(draft);
 
-  // 카테고리가 바뀌면 이전 카테고리의 옵션 id 는 의미가 없어서 같이 비운다.
+  // 최상위 카테고리가 바뀌면 그 아래에 매달린 상품 카테고리와 옵션 id 는 모두 의미가 없어진다.
   const selectCategory = (id: number | undefined) =>
-    setDraft((prev) => ({ ...prev, categoryId: id, optionIdList: [] }));
+    setDraft((prev) => ({
+      ...prev,
+      categoryId: id,
+      productCategoryId: undefined,
+      optionIdList: [],
+    }));
 
   const selectBrand = (id: number | undefined) =>
     setDraft((prev) => ({ ...prev, brandId: id }));
