@@ -37,7 +37,8 @@ const BRAND_DESCRIPTION_LINES = 3;
 
 export const GRID_GAP = 12;
 export const GRID_PADDING = 20;
-// ProductCard 루트가 flex-1 이라 셀 너비를 고정해서 감싼다.
+// ProductCard 는 폭을 부모에게 맡기므로(w-full) 셀 너비를 여기서 정해 감싼다.
+// 카드 쪽을 flex-1 로 되돌리면 flexBasis: 0 이 되어 이미지가 넘쳐 아래 행을 덮는다 — ProductCard 주석 참고.
 export const CELL_WIDTH = Math.floor(
   (SCREEN_WIDTH - GRID_PADDING * 2 - GRID_GAP) / 2,
 );
@@ -236,11 +237,14 @@ function CategoryScroller() {
 
   if (!data || data.list.length === 0) return null;
 
-  // 최상위 카테고리가 바뀌면 그 아래에 매달린 상품 카테고리와 옵션 id 는 모두 의미가 없어진다.
+  // 최상위 카테고리가 바뀌면 그 아래에 매달린 상품 카테고리·브랜드·옵션 id 가 모두 의미를 잃는다.
+  // 브랜드는 카테고리와 독립된 축처럼 보이지만 실제로는 대부분의 조합에 상품이 없다
+  // (dev 기준 15개 조합 중 10개가 0건). 남겨 두면 카테고리를 바꾼 순간 빈 목록이 된다.
   const select = (id: number | undefined) =>
     setFilter({
       categoryId: id,
       productCategoryId: undefined,
+      brandId: undefined,
       optionIdList: [],
     });
 
