@@ -73,6 +73,30 @@ export interface GetProductBannerRes {
 export const getProductBanner = () =>
   api.get("product/banner").json<CommonRes<GetProductBannerRes>>();
 
+export interface ProductBrandBanner {
+  brandId: number;
+  banner: string;
+  name: string;
+  englishName: string;
+  /** 평문이다 — 태그 없이 \n 만 들어 있어 Text 에 그대로 넣는다. */
+  description: string;
+  like: number;
+  isLiked: boolean;
+}
+
+/**
+ * @description 브랜드로 좁힌 상품 목록 맨 위에 쓰는 브랜드 소개. 배너·이름·설명·좋아요 수가
+ * 한 번에 온다. name/description 은 Accept-language 를 따르고 englishName 은 따르지 않는다.
+ * 브랜드 목록에 있는 id 라도 404 가 올 수 있으므로(dev 의 1번) 호출부가 실패를 정상 분기로 다뤄야 한다.
+ */
+export const getProductBrandBanner = ({
+  brandId,
+  languageCode,
+}: PublicLanguageCode & { brandId: number }) =>
+  api
+    .get("product/banner/brand", { searchParams: { brandId, languageCode } })
+    .json<CommonRes<ProductBrandBanner>>();
+
 export interface ProductCategory {
   id: number;
   image: string;

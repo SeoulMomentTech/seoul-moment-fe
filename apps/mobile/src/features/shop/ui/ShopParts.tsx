@@ -18,10 +18,10 @@ import {
   ProductGridSkeleton,
 } from "@shared/ui/skeleton";
 
-import { useBrandDetail } from "../model/useBrandDetail";
 import { useCategories } from "../model/useCategories";
 import { useInfiniteProducts } from "../model/useInfiniteProducts";
 import { useProductBanner } from "../model/useProductBanner";
+import { useProductBrandBanner } from "../model/useProductBrandBanner";
 import { useProductSortOptions } from "../model/useProductSortOptions";
 import { useShopFilterBadge } from "../model/useShopFilterBadge";
 import { useShopFilterStore } from "../model/useShopFilterStore";
@@ -40,11 +40,13 @@ export const CELL_WIDTH = Math.floor(
 );
 
 /**
- * 브랜드 하나로 좁혔을 때 배너 자리에 들어가는 소개. 배너 + 이름 + 소개글만 둔다.
- * 좋아요·공유는 이 API 가 주지 않고(브랜드 프로모션 쪽 데이터다) 앱에 로그인도 없어서 뺐다.
+ * 브랜드 하나로 좁혔을 때 배너 자리에 들어가는 소개. product/banner/brand 가 이 자리를 위해
+ * 배너·이름·영문명·소개글·좋아요 수를 한 번에 준다.
+ * 좋아요는 읽기 전용이다 — 앱에 로그인이 없어 isLiked 를 바꿀 수단이 없다.
  */
 function BrandHeader({ id }: { id: number }) {
-  const { data, isPending, isError, fetchStatus, refetch } = useBrandDetail(id);
+  const { data, isPending, isError, fetchStatus, refetch } =
+    useProductBrandBanner(id);
 
   // 오프라인이면 요청이 paused 되어 isPending 이 유지된다.
   if (isPending && fetchStatus === "paused") {
@@ -53,28 +55,44 @@ function BrandHeader({ id }: { id: number }) {
 
   if (isPending) return <BrandHeaderSkeleton bannerHeight={BANNER_HEIGHT} />;
 
-  // 목록에 있는 브랜드인데 상세가 404 인 경우가 있다(dev 의 brand/1). 필터 자체는 멀쩡하므로
+  // 목록에 있는 브랜드인데 404 인 경우가 있다(dev 의 1번). 필터 자체는 멀쩡하므로
   // 에러 줄로 막지 말고 평소 배너로 돌아간다 — 못 그린 건 장식이지 기능이 아니다.
   if (isError || !data) return <BannerPager />;
 
-  const banner = data.mobileBannerList?.[0] ?? data.bannerList?.[0];
+  // 한국어로 보면 name 이 "취(Chwi)", englishName 이 "Chwi" 라 같은 줄이 두 번 되지 않는다.
+  // 영어로 보면 둘이 같아지므로 그때는 영문명을 뺀다.
+  const showEnglishName = Boolean(
+    data.englishName && data.englishName !== data.name,
+  );
 
   return (
     <View>
-      {banner ? (
+      {data.banner ? (
         <Image
           contentFit="cover"
-          source={banner}
+          source={data.banner}
           style={{ width: SCREEN_WIDTH, height: BANNER_HEIGHT }}
           transition={200}
         />
       ) : null}
       <View className="px-5 pt-5">
-        <Text className="text-title-4 text-foreground font-bold">
-          {data.name}
-        </Text>
+        <View className="flex-row items-center justify-between">
+          <Text className="text-title-4 text-foreground flex-1 font-bold">
+            {data.name}
+          </Text>
+          {data.like > 0 ? (
+            <Text className="text-body-3 text-neutral ml-3">
+              {`♡ ${data.like.toLocaleString("en-US")}`}
+            </Text>
+          ) : null}
+        </View>
+        {showEnglishName ? (
+          <Text className="text-body-3 text-neutral mt-1">
+            {data.englishName}
+          </Text>
+        ) : null}
         {data.description ? (
-          <Text className="text-body-3 text-neutral mt-3">
+          <Text className="text-body-3 text-foreground mt-3">
             {data.description}
           </Text>
         ) : null}
