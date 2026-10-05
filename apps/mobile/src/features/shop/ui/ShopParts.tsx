@@ -3,7 +3,6 @@ import { useState } from "react";
 import { Image } from "expo-image";
 import {
   ActivityIndicator,
-  Alert,
   Dimensions,
   FlatList,
   Pressable,
@@ -13,6 +12,7 @@ import {
 
 import { SectionError, SectionSkeleton } from "@shared/ui/section-state";
 
+import { ShopFilterSheet, ShopSortSheet } from "./ShopSheets";
 import { useInfiniteProducts } from "../model/useInfiniteProducts";
 import { useProductBanner } from "../model/useProductBanner";
 import { useProductCategories } from "../model/useProductCategories";
@@ -197,32 +197,20 @@ function FilterBar() {
   const { data: sortOptions } = useProductSortOptions();
   const sortColumn = useShopFilterStore((s) => s.sortColumn);
   const sort = useShopFilterStore((s) => s.sort);
-  const setFilter = useShopFilterStore((s) => s.setFilter);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [sortOpen, setSortOpen] = useState(false);
 
   const current = sortOptions?.list.find(
     (o) => o.sortColumn === sortColumn && o.sort === sort,
   );
 
-  const openSort = () => {
-    if (!sortOptions || sortOptions.list.length === 0) return;
-    Alert.alert("Sort by", undefined, [
-      ...sortOptions.list.map((option) => ({
-        text: option.name,
-        onPress: () =>
-          setFilter({ sortColumn: option.sortColumn, sort: option.sort }),
-      })),
-      { text: "Cancel", style: "cancel" as const },
-    ]);
-  };
-
   return (
     <View className="mb-4 mt-5 flex-row items-center justify-between px-5">
-      {/* 3단계에서 필터 시트를 연결한다. 지금은 배지만 보여 주고 동작은 없다. */}
       <Pressable
         accessibilityLabel="Filter"
         accessibilityRole="button"
         className="border-neutral-subtle flex-row items-center rounded-full border px-4 py-2"
-        onPress={() => undefined}
+        onPress={() => setFilterOpen(true)}
       >
         <Text className="text-body-3 text-foreground font-bold">Filter</Text>
         {badge > 0 ? (
@@ -240,12 +228,17 @@ function FilterBar() {
         accessibilityLabel="Sort"
         accessibilityRole="button"
         hitSlop={8}
-        onPress={openSort}
+        onPress={() => setSortOpen(true)}
       >
         <Text className="text-body-3 text-foreground" numberOfLines={1}>
           {`${current?.name ?? "Sort"} ▾`}
         </Text>
       </Pressable>
+      <ShopFilterSheet
+        onClose={() => setFilterOpen(false)}
+        visible={filterOpen}
+      />
+      <ShopSortSheet onClose={() => setSortOpen(false)} visible={sortOpen} />
     </View>
   );
 }
