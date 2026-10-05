@@ -193,9 +193,12 @@ export function DetailScreen<T extends DetailContent>({
 
   if (isPending) {
     return (
-      <StatusScreen>
-        <DetailSkeleton bannerHeight={BANNER_HEIGHT} />
-      </StatusScreen>
+      <View className="bg-background flex-1">
+        <StatusBar style="dark" />
+        <BackButton />
+        {/* 실제 배너는 상태바 밑까지 풀블리드(높이 + insets.top)다. StatusScreen 의 상단 패딩을 쓰면 배너가 그만큼 아래로 밀리므로 패딩 없는 틀에 놓는다. */}
+        <DetailSkeleton bannerHeight={BANNER_HEIGHT + insets.top} />
+      </View>
     );
   }
 

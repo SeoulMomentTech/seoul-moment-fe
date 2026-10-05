@@ -6,9 +6,11 @@ import { Shimmer } from "./Shimmer";
 // 막대(bar)는 줄 상자(line) 안에 세로 가운데로 놓아 실제 텍스트 줄과 같은 높이를 차지한다.
 export const LINE_BODY_3 = 17;
 export const LINE_BODY_2 = 19;
+export const LINE_BODY_1 = 22;
 export const LINE_TITLE_4 = 24;
 const BAR_BODY_3 = 11;
 const BAR_BODY_2 = 13;
+const BAR_BODY_1 = 14;
 const BAR_TITLE_4 = 16;
 
 const PAGE_PADDING = 20;
@@ -166,6 +168,57 @@ export function BannerSkeleton({
   );
 }
 
+interface HeroCardSkeletonProps {
+  /** 이미지 높이. 실제 PromotionHero 의 HERO_HEIGHT 를 그대로 넘긴다. */
+  imageHeight: number;
+}
+
+/**
+ * PromotionHero 스켈레톤(프로모션이 1개일 때의 단일 풀폭 카드). 좌우 20 여백 포함.
+ * 높이 = imageHeight + 12 + 19 + 4 + 2x17 = imageHeight + 69 (200 이면 269).
+ * 제목 body-2 1줄(mt-3), 설명 body-3 2줄(mt-1) 클램프와 같다.
+ */
+export function HeroCardSkeleton({ imageHeight }: HeroCardSkeletonProps) {
+  return (
+    <View style={{ paddingHorizontal: PAGE_PADDING }}>
+      <Shimmer height={imageHeight} radius={CARD_RADIUS} />
+      <View style={{ marginTop: 12 }}>
+        <Line bar={BAR_BODY_2} line={LINE_BODY_2} width="60%" />
+      </View>
+      <View style={{ marginTop: 4 }}>
+        <Line bar={BAR_BODY_3} line={LINE_BODY_3} />
+        <Line bar={BAR_BODY_3} line={LINE_BODY_3} width="70%" />
+      </View>
+    </View>
+  );
+}
+
+// FeaturedSection 카테고리 알약: py-1 + body-3 한 줄 = 4 + 17 + 4, 아래 mb-2.
+const PILL_HEIGHT = LINE_BODY_3 + 8;
+
+/**
+ * 뉴스 Featured 스켈레톤. 좌우 20 여백 포함.
+ * 높이 = imageHeight + 12 + (25 + 8) + 2x22 + 4 + 17 = imageHeight + 110 (220 이면 330).
+ * 알약(mt-3 블록 안), 제목 body-1 2줄, 바이라인 body-3 1줄(mt-1) 클램프와 같다.
+ */
+export function FeaturedSkeleton({ imageHeight }: HeroCardSkeletonProps) {
+  return (
+    <View style={{ paddingHorizontal: PAGE_PADDING }}>
+      <Shimmer height={imageHeight} radius={CARD_RADIUS} />
+      <View style={{ marginTop: 12 }}>
+        <View style={{ marginBottom: 8 }}>
+          <Shimmer height={PILL_HEIGHT} radius={PILL_HEIGHT / 2} width={72} />
+        </View>
+        <Line bar={BAR_BODY_1} line={LINE_BODY_1} />
+        <Line bar={BAR_BODY_1} line={LINE_BODY_1} width="60%" />
+        <View style={{ marginTop: 4 }}>
+          <Line bar={BAR_BODY_3} line={LINE_BODY_3} width="45%" />
+        </View>
+      </View>
+    </View>
+  );
+}
+
 interface HorizontalCardsSkeletonProps {
   count?: number;
   /** 기본: 화면 폭의 72%(Editor's Pick / Hot Keyword 의 PICK_WIDTH). */
@@ -312,7 +365,7 @@ interface DetailSkeletonProps {
    * product: 갤러리 + 브랜드 + 이름 2줄 + 가격 + 스펙 3줄 (ProductDetailScreen).
    */
   variant?: "article" | "product";
-  /** 기본 article 220, product 300. StatusScreen 이 상단 여백을 이미 주므로 insets 는 더하지 않는다. */
+  /** 기본 article 220, product 300. 실제 배너는 상태바 밑까지 풀블리드라 호출부가 insets.top 을 더해 넘기고, StatusScreen 대신 패딩 없는 틀에 놓는다. */
   bannerHeight?: number;
 }
 
