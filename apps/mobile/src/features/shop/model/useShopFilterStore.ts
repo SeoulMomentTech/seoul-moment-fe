@@ -16,6 +16,11 @@ export type CompleteShopFilter = ShopFilter & Record<keyof ShopFilter, unknown>;
 interface ShopFilterState extends ShopFilter {
   /** 넘긴 키만 덮어쓴다. 시트의 draft 를 "적용" 할 때는 draft 전체를 넘긴다. */
   setFilter(filter: Partial<ShopFilter>): void;
+  /**
+   * 다른 조건을 전부 버리고 브랜드 하나만 건다. 상품 상세에서 브랜드를 눌러 목록으로 갈 때 쓴다.
+   * 남은 카테고리·옵션이 그 브랜드의 상품을 가려 빈 목록이 되는 일을 막는다.
+   */
+  selectOnlyBrand(brandId: number): void;
   /** 정렬을 포함한 모든 조건을 비운다. */
   reset(): void;
 }
@@ -33,6 +38,7 @@ const initialFilter: ShopFilter = {
 export const useShopFilterStore = create<ShopFilterState>()((set) => ({
   ...initialFilter,
   setFilter: (filter) => set(() => ({ ...filter })),
+  selectOnlyBrand: (brandId) => set(() => ({ ...initialFilter, brandId })),
   reset: () => set(() => ({ ...initialFilter })),
 }));
 
