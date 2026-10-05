@@ -3,7 +3,8 @@ import { Dimensions, FlatList, Text, View } from "react-native";
 
 import type { HomePromotion } from "@shared/services/home";
 import { Section } from "@shared/ui/section";
-import { SectionError, SectionSkeleton } from "@shared/ui/section-state";
+import { SectionError } from "@shared/ui/section-state";
+import { HorizontalCardsSkeleton } from "@shared/ui/skeleton";
 
 import { useHomePromotion } from "../model/useHomePrime";
 
@@ -33,7 +34,7 @@ export function PromotionSection() {
   if (isPending) {
     return (
       <Section title="Season Collection">
-        <SectionSkeleton height={HERO_HEIGHT} />
+        <HorizontalCardsSkeleton />
       </Section>
     );
   }

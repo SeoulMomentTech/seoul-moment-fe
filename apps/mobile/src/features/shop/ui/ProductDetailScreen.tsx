@@ -25,12 +25,12 @@ import {
   StatusScreen,
   TopScrim,
 } from "@shared/ui/detail-chrome";
-import { SectionError, SectionSkeleton } from "@shared/ui/section-state";
+import { SectionError } from "@shared/ui/section-state";
+import { DetailSkeleton } from "@shared/ui/skeleton";
 
 import useProductDetail from "../model/useProductDetail";
 
 const GALLERY_HEIGHT = 380;
-const SKELETON_HEIGHT = 240;
 const AVATAR_SIZE = 28;
 const DOT_SIZE = 6;
 // 점 그림자. iOS 는 shadow*, Android 는 elevation 만 먹으므로 둘 다 지정한다.
@@ -266,7 +266,7 @@ export function ProductDetailScreen({ id }: { id: number }) {
   if (isPending) {
     return (
       <StatusScreen>
-        <SectionSkeleton height={SKELETON_HEIGHT} />
+        <DetailSkeleton bannerHeight={GALLERY_HEIGHT} variant="product" />
       </StatusScreen>
     );
   }

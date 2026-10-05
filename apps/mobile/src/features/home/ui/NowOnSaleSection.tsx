@@ -3,11 +3,10 @@ import { Pressable, Text, View } from "react-native";
 
 import { ProductCard } from "@entities/product/ui/ProductCard";
 import { Section } from "@shared/ui/section";
-import { SectionError, SectionSkeleton } from "@shared/ui/section-state";
+import { SectionError } from "@shared/ui/section-state";
+import { ProductGridSkeleton } from "@shared/ui/skeleton";
 
 import { useNowOnSale } from "../model/useHomeLists";
-
-const GRID_HEIGHT = 500;
 
 export function NowOnSaleSection() {
   const router = useRouter();
@@ -32,7 +31,7 @@ export function NowOnSaleSection() {
   if (isPending) {
     return (
       <Section title="Now On Sale">
-        <SectionSkeleton height={GRID_HEIGHT} />
+        <ProductGridSkeleton />
       </Section>
     );
   }

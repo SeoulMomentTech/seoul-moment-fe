@@ -1,11 +1,10 @@
 import { ActivityIndicator, View } from "react-native";
 
 import { Section } from "@shared/ui/section";
-import { SectionError, SectionSkeleton } from "@shared/ui/section-state";
+import { SectionError } from "@shared/ui/section-state";
+import { PostListSkeleton } from "@shared/ui/skeleton";
 
 import { useInfiniteNewsByCategory } from "../model/useInfiniteNewsByCategory";
-
-const LIFESTYLE_HEIGHT = 290;
 
 /**
  * Lifestyle 제목. 첫 페이지가 비어 있으면(로딩·에러 아님) 제목도 숨긴다.
@@ -34,7 +33,7 @@ export function LifestyleEmpty() {
     return <SectionError onRetry={() => void refetch()} />;
   }
 
-  if (isPending) return <SectionSkeleton height={LIFESTYLE_HEIGHT} />;
+  if (isPending) return <PostListSkeleton />;
 
   if (isError) return <SectionError onRetry={() => void refetch()} />;
 
