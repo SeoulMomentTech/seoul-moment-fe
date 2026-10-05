@@ -51,7 +51,11 @@ export function BrandScreen({ id }: { id: number }) {
         <StatusBar style="dark" />
         <BackButton />
         {/* 실제 배너는 상태바 밑까지 풀블리드(높이 + insets.top)다. StatusScreen 의 상단 패딩을 쓰면 배너가 그만큼 아래로 밀린다. */}
-        <DetailSkeleton bannerHeight={BANNER_HEIGHT + insets.top} />
+        {/* 브랜드 인트로는 바이라인이 없고 title-3 이름 한 줄이라 전용 variant 를 쓴다. */}
+        <DetailSkeleton
+          bannerHeight={BANNER_HEIGHT + insets.top}
+          variant="brand"
+        />
       </View>
     );
   }
