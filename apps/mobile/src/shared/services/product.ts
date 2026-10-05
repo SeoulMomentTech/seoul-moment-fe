@@ -146,3 +146,57 @@ export const getProductFilter = ({
       },
     })
     .json<CommonRes<GetProductFilterRes>>();
+
+export interface ProductDetailBrand {
+  id: number;
+  name: string;
+  profileImg: string;
+}
+
+export interface ProductOptionValue {
+  id: number;
+  value: string;
+}
+
+/** 옵션 타입(COLOR, SIZE …)을 키로 한 객체. 상품이 가진 타입만 내려온다. */
+export type ProductDetailOption = Partial<Record<string, ProductOptionValue[]>>;
+
+export interface ProductExternal {
+  id: number;
+  name: string;
+  imageUrl: string;
+  url: string;
+}
+
+export interface GetProductDetailRes {
+  id: number;
+  name: string;
+  brand: ProductDetailBrand;
+  price: number;
+  /** 0 이면 할인 없음. */
+  discountPrice: number;
+  origin: string;
+  /** 출고까지 걸리는 일수. 0 이하면 표시하지 않는다. */
+  shippingInfo: number;
+  shippingCost: number;
+  option: ProductDetailOption;
+  like: number;
+  review: number;
+  reviewAverage: number;
+  /** 세로로 긴 상세 이미지 한 장의 URL (배열이 아니라 문자열). */
+  detailImg: string;
+  subImage: string[];
+  relate: ProductItem[];
+  external: ProductExternal[];
+  isLiked: boolean;
+}
+
+export interface GetProductDetailReq extends PublicLanguageCode {
+  id: number;
+}
+
+/** 상품 상세. 엔드포인트는 `product/{id}` (웹의 v1 은 쓰지 않는다). */
+export const getProductDetail = ({ id, languageCode }: GetProductDetailReq) =>
+  api
+    .get(`product/${id}`, { searchParams: { languageCode } })
+    .json<CommonRes<GetProductDetailRes>>();

@@ -23,6 +23,7 @@ export default function RootLayout() {
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="news/[id]" />
           <Stack.Screen name="article/[id]" />
+          <Stack.Screen name="product/[id]" />
         </Stack>
       </ThemeProvider>
     </QueryProvider>
