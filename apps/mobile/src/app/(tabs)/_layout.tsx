@@ -1,12 +1,14 @@
 import { NativeTabs } from "expo-router/unstable-native-tabs";
 import { View } from "react-native";
 
-import { Colors } from "@/constants/theme";
 import { AppHeader } from "@/shared/ui/app-header";
 
 // 라이트 모드 고정이라 scheme 분기가 없다. NativeTabs 는 className 이 아니라
-// 색 값을 요구하므로 nativewind 토큰 대신 Colors 를 쓴다.
-const colors = Colors.light;
+// 색 값을 요구하므로 nativewind 클래스 대신 디자인 토큰 값을 상수로 미러링한다.
+const TAB_ACTIVE_COLOR = "#f37b2a"; // --brand-500
+const TAB_INACTIVE_COLOR = "#707070"; // --neutral-600
+const TAB_INDICATOR_COLOR = "rgba(243, 123, 42, 0.14)"; // --brand-500 14% 투명도 (Android 선택 pill)
+const TAB_BACKGROUND_COLOR = "#ffffff"; // --neutral-0
 
 export default function TabLayout() {
   // Material 4탭 이상이면 LABEL_VISIBILITY_AUTO 규칙에 의해 선택된 탭만 라벨을 표시한다.
@@ -14,12 +16,12 @@ export default function TabLayout() {
     <View className="bg-background flex-1">
       <AppHeader />
       <NativeTabs
-        backgroundColor={colors.background}
-        iconColor={{ default: colors.textSecondary, selected: colors.text }}
-        indicatorColor={colors.backgroundElement}
+        backgroundColor={TAB_BACKGROUND_COLOR}
+        iconColor={{ default: TAB_INACTIVE_COLOR, selected: TAB_ACTIVE_COLOR }}
+        indicatorColor={TAB_INDICATOR_COLOR}
         labelStyle={{
-          default: { color: colors.textSecondary },
-          selected: { color: colors.text },
+          default: { color: TAB_INACTIVE_COLOR },
+          selected: { color: TAB_ACTIVE_COLOR },
         }}
         labelVisibilityMode="labeled"
       >
