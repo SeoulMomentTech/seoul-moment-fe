@@ -1,4 +1,5 @@
-import { FlatList, RefreshControl, View } from "react-native";
+import { useRouter } from "expo-router";
+import { FlatList, Pressable, RefreshControl, View } from "react-native";
 
 import { ProductCard } from "@entities/product/ui/ProductCard";
 
@@ -19,6 +20,7 @@ import {
 } from "@features/shop";
 
 export default function ShopScreen() {
+  const router = useRouter();
   const { isRefreshing, refresh } = useRefreshShop();
   const { data, hasNextPage, isFetchingNextPage, fetchNextPage } =
     useInfiniteProducts();
@@ -55,9 +57,14 @@ export default function ShopScreen() {
           <RefreshControl onRefresh={refresh} refreshing={isRefreshing} />
         }
         renderItem={({ item }) => (
-          <View style={{ width: CELL_WIDTH }}>
+          <Pressable
+            accessibilityLabel={item.productName}
+            accessibilityRole="button"
+            onPress={() => router.push(`/product/${item.id}`)}
+            style={{ width: CELL_WIDTH }}
+          >
             <ProductCard product={item} />
-          </View>
+          </Pressable>
         )}
         showsVerticalScrollIndicator={false}
       />
