@@ -345,15 +345,17 @@ function BrandSection({
 
 function OptionsSection({
   categoryId,
+  productCategoryId,
   optionIdList,
   onToggle,
 }: {
   categoryId?: number;
+  productCategoryId?: number;
   optionIdList: number[];
   onToggle(id: number): void;
 }) {
   const { data, isPending, isError, fetchStatus, refetch } =
-    useProductOptionFilters(categoryId);
+    useProductOptionFilters(categoryId, productCategoryId);
 
   // product/filter 는 categoryId 가 필수다. 그 값은 시트가 아니라 목록 위 칩 줄에서 정해지므로
   // 안내도 그쪽을 가리킨다. (쿼리가 꺼져 있으면 isPending 이 영원히 유지되므로 아래 가드보다 먼저 거른다.)
@@ -434,9 +436,10 @@ function FilterSheetContent({ onClose }: { onClose(): void }) {
   // 개수는 적용된 필터가 아니라 draft 를 따라간다.
   const { data: count } = useProductCount(draft);
 
-  // 상품 카테고리는 옵션과 다른 축이라(옵션은 최상위 categoryId 에 매달린다) 옵션은 건드리지 않는다.
+  // 옵션 목록은 상품 카테고리로도 좁혀진다. 바꾸면 고른 옵션 id 가 새 목록에 없을 수 있어
+  // 보이지도 않는 채로 적용되므로 같이 비운다.
   const selectProductCategory = (id: number | undefined) =>
-    setDraft((prev) => ({ ...prev, productCategoryId: id }));
+    setDraft((prev) => ({ ...prev, productCategoryId: id, optionIdList: [] }));
 
   const selectBrand = (id: number | undefined) =>
     setDraft((prev) => ({ ...prev, brandId: id }));
@@ -504,6 +507,7 @@ function FilterSheetContent({ onClose }: { onClose(): void }) {
             categoryId={draft.categoryId}
             onToggle={toggleOption}
             optionIdList={draft.optionIdList}
+            productCategoryId={draft.productCategoryId}
           />
         </Accordion>
       </ScrollView>
