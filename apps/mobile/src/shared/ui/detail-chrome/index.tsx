@@ -60,8 +60,10 @@ export function TopScrim({ height }: { height: number }) {
 }
 
 /**
- * 콘텐츠가 없는 상태(잘못된 id, 오프라인, 로딩, 에러) 공통 틀.
+ * 콘텐츠가 없는 상태(잘못된 id, 오프라인, 에러) 공통 틀.
  * 흰 배경이라 스크림 없이 어두운 상태바 글리프를 쓰고, 뒤로가기 버튼은 항상 둔다.
+ * 로딩은 여기에 담지 않는다 — 스켈레톤 배너가 실제 배너처럼 상태바 밑까지 올라가야 해서
+ * 이 상단 패딩이 오히려 높이를 어긋나게 한다.
  */
 export function StatusScreen({ children }: { children: ReactNode }) {
   const insets = useSafeAreaInsets();
