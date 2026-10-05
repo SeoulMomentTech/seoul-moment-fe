@@ -354,7 +354,7 @@ interface BrandHeaderSkeletonProps {
 }
 
 /**
- * 브랜드 헤더(배너 + 이름 + 소개). 높이 = bannerHeight + 20 + 24 + 12 + lines x 17.
+ * 브랜드 헤더(배너 + 이름 + 영문명 + 소개). 높이 = bannerHeight + 20 + 24 + 4 + 17 + 12 + lines x 17.
  * 소개 길이는 브랜드마다 달라 줄 수까지 맞출 수는 없고, 흔한 길이에 맞춘다.
  */
 export function BrandHeaderSkeleton({
@@ -366,6 +366,9 @@ export function BrandHeaderSkeleton({
       <Shimmer height={bannerHeight} radius={0} />
       <View style={{ paddingHorizontal: PAGE_PADDING, paddingTop: 20 }}>
         <Line bar={BAR_TITLE_4} line={LINE_TITLE_4} width="45%" />
+        <View style={{ marginTop: 4 }}>
+          <Line bar={BAR_BODY_3} line={LINE_BODY_3} width="30%" />
+        </View>
         <View style={{ marginTop: 12 }}>
           {Array.from({ length: lines }, (_, i) => (
             <Line
