@@ -11,7 +11,10 @@ import {
   FeaturedSkeleton,
   HorizontalCardsSkeleton,
   PostListSkeleton,
+  Shimmer,
 } from "@shared/ui/skeleton";
+// 줄 상자 높이는 스켈레톤 모듈이 기준값을 갖고 있다. 배럴에는 없어서 모듈에서 바로 가져온다.
+import { LINE_BODY_3, LINE_TITLE_3 } from "@shared/ui/skeleton/shapes";
 
 import { useNewsDashboard } from "../model/useNewsDashboard";
 
@@ -243,27 +246,54 @@ function EditorPickSection() {
   );
 }
 
-// 웹의 Hot Keyword 띠는 어두운 배경인데 이 토큰 세트에는 어두운 색이 없다.
-// 그래서 이 블록만 --foreground 값(#171717)과 흰 글씨를 raw 값으로 쓴다.
-const BAND_BG = "#171717";
-const BAND_TEXT = "#ffffff";
-
-function BandShell({ children }: { children: React.ReactNode }) {
+// 웹의 Hot Keyword 띠는 어두운 배경이다. --foreground(#171717) 가 그 색이라 bg-foreground,
+// 글씨는 --neutral-0 인 text-background 를 쓴다.
+//
+// 제목 블록을 BandShell 이 들고 있는 이유: 예전에는 실제 갈래에만 제목이 있어서
+// 스켈레톤이 66pt(17 + 4 + 29 + 16) 짧았다. 두 갈래가 같은 틀을 지나게 해 다시 어긋나지 않게 한다.
+function BandShell({
+  children,
+  heading,
+}: {
+  children: React.ReactNode;
+  heading?: React.ReactNode;
+}) {
   return (
-    <View className="mt-10 py-8" style={{ backgroundColor: BAND_BG }}>
+    <View className="bg-foreground mt-10 py-8">
+      {heading ? <View className="mb-4 px-5">{heading}</View> : null}
       {children}
     </View>
+  );
+}
+
+// 제목 블록 자리맞춤. 막대는 글자 크기의 약 0.8 로, 다른 스켈레톤 막대와 같은 비율이다.
+const BAND_LABEL_BAR = 11;
+const BAND_NAME_BAR = 19;
+
+function BandHeadingSkeleton() {
+  return (
+    <>
+      <View style={{ height: LINE_BODY_3, justifyContent: "center" }}>
+        <Shimmer height={BAND_LABEL_BAR} radius={4} width={96} />
+      </View>
+      <View
+        style={{
+          height: LINE_TITLE_3,
+          marginTop: 4,
+          justifyContent: "center",
+        }}
+      >
+        <Shimmer height={BAND_NAME_BAR} radius={4} width={140} />
+      </View>
+    </>
   );
 }
 
 // SectionError 는 흰 배경 기준이라 어두운 띠에서는 대비가 낮다. 띠 전용 행을 쓴다.
 function BandError({ onRetry }: { onRetry(): void }) {
   return (
-    <View
-      className="mx-5 flex-row items-center justify-between rounded-lg border px-4 py-3"
-      style={{ borderColor: BAND_TEXT }}
-    >
-      <Text className="text-body-3" style={{ color: BAND_TEXT }}>
+    <View className="border-background mx-5 flex-row items-center justify-between rounded-lg border px-4 py-3">
+      <Text className="text-body-3 text-background">
         Couldn&apos;t load this section
       </Text>
       <Pressable hitSlop={8} onPress={onRetry}>
@@ -286,7 +316,7 @@ function HotKeywordSection() {
 
   if (isPending) {
     return (
-      <BandShell>
+      <BandShell heading={<BandHeadingSkeleton />}>
         <HorizontalCardsSkeleton />
       </BandShell>
     );
@@ -304,23 +334,25 @@ function HotKeywordSection() {
   if (!hashtag || !hashtag.list || hashtag.list.length === 0) return null;
 
   return (
-    <BandShell>
-      <View className="mb-4 px-5">
-        <Text
-          className="text-body-3 font-bold"
-          numberOfLines={1}
-          style={{ color: BAND_TEXT, opacity: 0.7 }}
-        >
-          Hot Keyword
-        </Text>
-        <Text
-          className="text-title-3 mt-1 font-bold"
-          numberOfLines={1}
-          style={{ color: BAND_TEXT }}
-        >
-          {`#${hashtag.name}`}
-        </Text>
-      </View>
+    <BandShell
+      heading={
+        <>
+          <Text
+            className="text-body-3 text-background font-bold"
+            numberOfLines={1}
+            style={{ opacity: 0.7 }}
+          >
+            Hot Keyword
+          </Text>
+          <Text
+            className="text-title-3 text-background mt-1 font-bold"
+            numberOfLines={1}
+          >
+            {`#${hashtag.name}`}
+          </Text>
+        </>
+      }
+    >
       <FlatList
         contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
         data={hashtag.list}
@@ -336,16 +368,15 @@ function HotKeywordSection() {
                 transition={200}
               />
               <Text
-                className="text-body-3 mt-2 font-bold"
+                className="text-body-3 text-background mt-2 font-bold"
                 numberOfLines={2}
-                style={{ color: BAND_TEXT }}
               >
                 {item.title}
               </Text>
               <Text
-                className="text-body-3 mt-1"
+                className="text-body-3 text-background mt-1"
                 numberOfLines={1}
-                style={{ color: BAND_TEXT, opacity: 0.7 }}
+                style={{ opacity: 0.7 }}
               >
                 {byline(item)}
               </Text>
