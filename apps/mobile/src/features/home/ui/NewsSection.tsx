@@ -1,4 +1,5 @@
-import { View } from "react-native";
+import { useRouter } from "expo-router";
+import { Pressable, View } from "react-native";
 
 import { PostRow } from "@entities/post/ui/PostRow";
 import { Section } from "@shared/ui/section";
@@ -9,6 +10,7 @@ import { useHomeNews } from "../model/useHomeLists";
 const LIST_HEIGHT = 290;
 
 export function NewsSection() {
+  const router = useRouter();
   const {
     data: news,
     isPending,
@@ -49,13 +51,19 @@ export function NewsSection() {
     <Section title="News">
       <View>
         {news.map((item) => (
-          <PostRow
-            createDate={item.createDate}
-            imageUrl={item.homeImage}
+          <Pressable
+            accessibilityLabel={item.title}
+            accessibilityRole="button"
             key={item.id}
-            title={item.title}
-            writer={item.writer}
-          />
+            onPress={() => router.push(`/news/${item.id}`)}
+          >
+            <PostRow
+              createDate={item.createDate}
+              imageUrl={item.homeImage}
+              title={item.title}
+              writer={item.writer}
+            />
+          </Pressable>
         ))}
       </View>
     </Section>

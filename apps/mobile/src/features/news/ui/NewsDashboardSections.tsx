@@ -1,7 +1,9 @@
 import { Image } from "expo-image";
-import { Dimensions, FlatList, Text, View } from "react-native";
+import { useRouter } from "expo-router";
+import { Dimensions, FlatList, Pressable, Text, View } from "react-native";
 
 import { PostRow } from "@entities/post/ui/PostRow";
+import { formatDate } from "@shared/lib/utils/formatDate";
 import type { NewsWithCategory } from "@shared/services/news";
 import { Section } from "@shared/ui/section";
 import { SectionError, SectionSkeleton } from "@shared/ui/section-state";
@@ -15,12 +17,26 @@ const PICK_HEIGHT = 160;
 const PICK_LIST_HEIGHT = 240;
 const KEYWORD_LIST_HEIGHT = 240;
 
-const formatDate = (value: string) => {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${date.getFullYear()}.${pad(date.getMonth() + 1)}.${pad(date.getDate())}`;
-};
+function NewsLink({
+  id,
+  title,
+  children,
+}: {
+  id: number;
+  title: string;
+  children: React.ReactNode;
+}) {
+  const router = useRouter();
+  return (
+    <Pressable
+      accessibilityLabel={title}
+      accessibilityRole="button"
+      onPress={() => router.push(`/news/${id}`)}
+    >
+      {children}
+    </Pressable>
+  );
+}
 
 const byline = (item: NewsWithCategory) =>
   [item.writer, formatDate(item.createDate)].filter(Boolean).join(" · ");
@@ -81,26 +97,28 @@ function FeaturedSection() {
 
   return (
     <Section title="Featured">
-      <View className="px-5">
-        <Image
-          contentFit="cover"
-          source={featured.image}
-          style={{ width: "100%", height: FEATURED_HEIGHT, borderRadius: 12 }}
-          transition={200}
-        />
-        <View className="mt-3">
-          <CategoryPill name={featured.newsCategoryName} />
-          <Text
-            className="text-body-1 text-foreground font-bold"
-            numberOfLines={2}
-          >
-            {featured.title}
-          </Text>
-          <Text className="text-body-3 text-neutral mt-1" numberOfLines={1}>
-            {byline(featured)}
-          </Text>
+      <NewsLink id={featured.id} title={featured.title}>
+        <View className="px-5">
+          <Image
+            contentFit="cover"
+            source={featured.image}
+            style={{ width: "100%", height: FEATURED_HEIGHT, borderRadius: 12 }}
+            transition={200}
+          />
+          <View className="mt-3">
+            <CategoryPill name={featured.newsCategoryName} />
+            <Text
+              className="text-body-1 text-foreground font-bold"
+              numberOfLines={2}
+            >
+              {featured.title}
+            </Text>
+            <Text className="text-body-3 text-neutral mt-1" numberOfLines={1}>
+              {byline(featured)}
+            </Text>
+          </View>
         </View>
-      </View>
+      </NewsLink>
     </Section>
   );
 }
@@ -139,13 +157,14 @@ function LatestSection() {
     <Section title="Latest">
       <View>
         {latest.map((item) => (
-          <PostRow
-            createDate={item.createDate}
-            imageUrl={item.homeImage}
-            key={item.id}
-            title={item.title}
-            writer={item.writer}
-          />
+          <NewsLink id={item.id} key={item.id} title={item.title}>
+            <PostRow
+              createDate={item.createDate}
+              imageUrl={item.homeImage}
+              title={item.title}
+              writer={item.writer}
+            />
+          </NewsLink>
         ))}
       </View>
     </Section>
@@ -154,23 +173,25 @@ function LatestSection() {
 
 function PickCard({ item }: { item: NewsWithCategory }) {
   return (
-    <View style={{ width: PICK_WIDTH }}>
-      <Image
-        contentFit="cover"
-        source={item.homeImage}
-        style={{ width: "100%", height: PICK_HEIGHT, borderRadius: 12 }}
-        transition={200}
-      />
-      <Text
-        className="text-body-3 text-foreground mt-2 font-bold"
-        numberOfLines={2}
-      >
-        {item.title}
-      </Text>
-      <Text className="text-body-3 text-neutral mt-1" numberOfLines={1}>
-        {byline(item)}
-      </Text>
-    </View>
+    <NewsLink id={item.id} title={item.title}>
+      <View style={{ width: PICK_WIDTH }}>
+        <Image
+          contentFit="cover"
+          source={item.homeImage}
+          style={{ width: "100%", height: PICK_HEIGHT, borderRadius: 12 }}
+          transition={200}
+        />
+        <Text
+          className="text-body-3 text-foreground mt-2 font-bold"
+          numberOfLines={2}
+        >
+          {item.title}
+        </Text>
+        <Text className="text-body-3 text-neutral mt-1" numberOfLines={1}>
+          {byline(item)}
+        </Text>
+      </View>
+    </NewsLink>
   );
 }
 
@@ -295,28 +316,30 @@ function HotKeywordSection() {
         horizontal
         keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => (
-          <View style={{ width: PICK_WIDTH }}>
-            <Image
-              contentFit="cover"
-              source={item.homeImage}
-              style={{ width: "100%", height: PICK_HEIGHT, borderRadius: 12 }}
-              transition={200}
-            />
-            <Text
-              className="text-body-3 mt-2 font-bold"
-              numberOfLines={2}
-              style={{ color: BAND_TEXT }}
-            >
-              {item.title}
-            </Text>
-            <Text
-              className="text-body-3 mt-1"
-              numberOfLines={1}
-              style={{ color: BAND_TEXT, opacity: 0.7 }}
-            >
-              {byline(item)}
-            </Text>
-          </View>
+          <NewsLink id={item.id} title={item.title}>
+            <View style={{ width: PICK_WIDTH }}>
+              <Image
+                contentFit="cover"
+                source={item.homeImage}
+                style={{ width: "100%", height: PICK_HEIGHT, borderRadius: 12 }}
+                transition={200}
+              />
+              <Text
+                className="text-body-3 mt-2 font-bold"
+                numberOfLines={2}
+                style={{ color: BAND_TEXT }}
+              >
+                {item.title}
+              </Text>
+              <Text
+                className="text-body-3 mt-1"
+                numberOfLines={1}
+                style={{ color: BAND_TEXT, opacity: 0.7 }}
+              >
+                {byline(item)}
+              </Text>
+            </View>
+          </NewsLink>
         )}
         showsHorizontalScrollIndicator={false}
         snapToAlignment="start"

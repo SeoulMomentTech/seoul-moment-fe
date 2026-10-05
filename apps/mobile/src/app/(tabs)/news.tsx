@@ -1,7 +1,7 @@
-import { FlatList, RefreshControl, View } from "react-native";
+import { useRouter } from "expo-router";
+import { FlatList, Pressable, RefreshControl, View } from "react-native";
 
 import { PostRow } from "@entities/post/ui/PostRow";
-import { useInfiniteNewsByCategory } from "@features/news/model/useInfiniteNewsByCategory";
 
 import { BottomTabInset, Spacing } from "@/constants/theme";
 
@@ -10,6 +10,7 @@ import {
   LifestyleFooter,
   LifestyleHeader,
   NewsDashboardSections,
+  useInfiniteNewsByCategory,
   useRefreshNews,
 } from "@features/news";
 
@@ -23,6 +24,7 @@ function NewsListHeader() {
 }
 
 export default function NewsScreen() {
+  const router = useRouter();
   const { isRefreshing, refresh } = useRefreshNews();
   const { data, hasNextPage, isFetchingNextPage, fetchNextPage } =
     useInfiniteNewsByCategory();
@@ -46,12 +48,18 @@ export default function NewsScreen() {
           <RefreshControl onRefresh={refresh} refreshing={isRefreshing} />
         }
         renderItem={({ item }) => (
-          <PostRow
-            createDate={item.createDate}
-            imageUrl={item.homeImage}
-            title={item.title}
-            writer={item.writer}
-          />
+          <Pressable
+            accessibilityLabel={item.title}
+            accessibilityRole="button"
+            onPress={() => router.push(`/news/${item.id}`)}
+          >
+            <PostRow
+              createDate={item.createDate}
+              imageUrl={item.homeImage}
+              title={item.title}
+              writer={item.writer}
+            />
+          </Pressable>
         )}
         showsVerticalScrollIndicator={false}
       />
