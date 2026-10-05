@@ -1,5 +1,4 @@
 import { Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 interface ScreenPlaceholderProps {
   title: string;
@@ -10,11 +9,11 @@ interface ScreenPlaceholderProps {
  */
 export function ScreenPlaceholder({ title }: ScreenPlaceholderProps) {
   return (
-    <SafeAreaView className="bg-background flex-1">
+    <View className="bg-background flex-1">
       <View className="flex-1 items-center justify-center">
         <Text className="text-title-3 text-foreground font-bold">{title}</Text>
         <Text className="text-body-3 text-neutral mt-2">Coming soon</Text>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
