@@ -254,8 +254,21 @@ function BandShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-function BandMessage({ children }: { children: React.ReactNode }) {
-  return <View className="px-5">{children}</View>;
+// SectionError 는 흰 배경 기준이라 어두운 띠에서는 대비가 낮다. 띠 전용 행을 쓴다.
+function BandError({ onRetry }: { onRetry(): void }) {
+  return (
+    <View
+      className="mx-5 flex-row items-center justify-between rounded-lg border px-4 py-3"
+      style={{ borderColor: BAND_TEXT }}
+    >
+      <Text className="text-body-3" style={{ color: BAND_TEXT }}>
+        Couldn&apos;t load this section
+      </Text>
+      <Pressable hitSlop={8} onPress={onRetry}>
+        <Text className="text-body-3 text-brand font-bold">Retry</Text>
+      </Pressable>
+    </View>
+  );
 }
 
 function HotKeywordSection() {
@@ -264,9 +277,7 @@ function HotKeywordSection() {
   if (isPending && fetchStatus === "paused") {
     return (
       <BandShell>
-        <BandMessage>
-          <SectionError onRetry={() => void refetch()} />
-        </BandMessage>
+        <BandError onRetry={() => void refetch()} />
       </BandShell>
     );
   }
@@ -282,9 +293,7 @@ function HotKeywordSection() {
   if (isError) {
     return (
       <BandShell>
-        <BandMessage>
-          <SectionError onRetry={() => void refetch()} />
-        </BandMessage>
+        <BandError onRetry={() => void refetch()} />
       </BandShell>
     );
   }
