@@ -9,7 +9,7 @@ const IMAGE_HEIGHT = 140;
 const CARD_GAP = 12;
 
 /**
- * 뉴스 상세 맨 아래 관련 뉴스. 웹 RelatedList 의 모바일 구간처럼 옅은 배경 위에
+ * 뉴스 상세 맨 아래 관련 뉴스. 웹 RelatedList 의 모바일 구간처럼 중립 회색 배경 위에
  * 제목 줄 + 가로 카드 캐러셀을 둔다. 항목이 없으면 제목도 틀도 그리지 않는다.
  */
 export function RelatedNews({ items }: { items?: NewsLastItem[] }) {
@@ -20,8 +20,7 @@ export function RelatedNews({ items }: { items?: NewsLastItem[] }) {
   }
 
   return (
-    // 상단 헤더 패널과 같은 bg-surface-soft 로 화면의 위아래가 짝을 이룬다.
-    <View className="bg-surface-soft mt-16 pb-12 pt-10">
+    <View className="bg-surface-muted mt-16 pb-12 pt-10">
       <View className="mb-5 flex-row items-end justify-between px-5">
         <Text className="text-title-4 text-foreground font-bold">
           More News
@@ -32,7 +31,7 @@ export function RelatedNews({ items }: { items?: NewsLastItem[] }) {
           hitSlop={8}
           onPress={() => router.push("/news")}
         >
-          <Text className="text-body-3 text-brand font-semibold">More</Text>
+          <Text className="text-body-3 text-brand font-semibold">View all</Text>
         </Pressable>
       </View>
       {/* 세로 ScrollView 안의 가로 리스트라 중첩 스크롤 문제가 없다. */}
