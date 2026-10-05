@@ -346,16 +346,18 @@ function BrandSection({
 function OptionsSection({
   categoryId,
   productCategoryId,
+  brandId,
   optionIdList,
   onToggle,
 }: {
   categoryId?: number;
   productCategoryId?: number;
+  brandId?: number;
   optionIdList: number[];
   onToggle(id: number): void;
 }) {
   const { data, isPending, isError, fetchStatus, refetch } =
-    useProductOptionFilters(categoryId, productCategoryId);
+    useProductOptionFilters({ categoryId, productCategoryId, brandId });
 
   // product/filter 는 categoryId 가 필수다. 그 값은 시트가 아니라 목록 위 칩 줄에서 정해지므로
   // 안내도 그쪽을 가리킨다. (쿼리가 꺼져 있으면 isPending 이 영원히 유지되므로 아래 가드보다 먼저 거른다.)
@@ -379,7 +381,8 @@ function OptionsSection({
   } else if (isError) {
     body = <SectionError onRetry={() => void refetch()} />;
   } else if (!data || data.list.length === 0) {
-    body = <EmptyNote text="No options for this category" />;
+    // 카테고리·브랜드 중 무엇이 좁혔는지는 모르므로 "이 조합" 이라고만 한다.
+    body = <EmptyNote text="No options for this selection" />;
   } else {
     body = (
       <View className="gap-4">
@@ -441,8 +444,9 @@ function FilterSheetContent({ onClose }: { onClose(): void }) {
   const selectProductCategory = (id: number | undefined) =>
     setDraft((prev) => ({ ...prev, productCategoryId: id, optionIdList: [] }));
 
+  // 브랜드도 옵션 목록을 좁히므로 상품 카테고리와 같은 이유로 고른 옵션을 비운다.
   const selectBrand = (id: number | undefined) =>
-    setDraft((prev) => ({ ...prev, brandId: id }));
+    setDraft((prev) => ({ ...prev, brandId: id, optionIdList: [] }));
 
   const toggleOption = (id: number) =>
     setDraft((prev) => ({
@@ -504,6 +508,7 @@ function FilterSheetContent({ onClose }: { onClose(): void }) {
           />
           <BrandSection brandId={draft.brandId} onSelect={selectBrand} />
           <OptionsSection
+            brandId={draft.brandId}
             categoryId={draft.categoryId}
             onToggle={toggleOption}
             optionIdList={draft.optionIdList}
