@@ -2,7 +2,11 @@ import type { TabListProps, TabTriggerSlotProps } from "expo-router/ui";
 import { TabList, Tabs, TabSlot, TabTrigger } from "expo-router/ui";
 import { Pressable, Text, View } from "react-native";
 
+import { useResetShopFilterOnLeave } from "@features/shop";
+
 export default function TabLayout() {
+  useResetShopFilterOnLeave();
+
   return (
     <Tabs>
       <TabSlot style={{ height: "100%" }} />

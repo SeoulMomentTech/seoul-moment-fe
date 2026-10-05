@@ -3,6 +3,8 @@ import { View } from "react-native";
 
 import { AppHeader } from "@/shared/ui/app-header";
 
+import { useResetShopFilterOnLeave } from "@features/shop";
+
 // 라이트 모드 고정이라 scheme 분기가 없다. NativeTabs 는 className 이 아니라
 // 색 값을 요구하므로 nativewind 클래스 대신 디자인 토큰 값을 상수로 미러링한다.
 const TAB_ACTIVE_COLOR = "#f37b2a"; // --brand-500
@@ -12,6 +14,8 @@ const TAB_RIPPLE_COLOR = "rgba(243, 123, 42, 0.24)"; // --brand-500 24% 투명�
 const TAB_BACKGROUND_COLOR = "#ffffff"; // --neutral-0
 
 export default function TabLayout() {
+  useResetShopFilterOnLeave();
+
   // Material 4탭 이상이면 LABEL_VISIBILITY_AUTO 규칙에 의해 선택된 탭만 라벨을 표시한다.
   return (
     <View className="bg-background flex-1">

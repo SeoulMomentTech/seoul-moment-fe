@@ -1,4 +1,5 @@
 export { useRefreshShop } from "./model/useRefreshShop";
+export { useResetShopFilterOnLeave } from "./model/useResetShopFilterOnLeave";
 export { useShopFilterBadge } from "./model/useShopFilterBadge";
 export {
   CELL_WIDTH,
