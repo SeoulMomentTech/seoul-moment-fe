@@ -38,4 +38,6 @@
   --color-border: var(--neutral-200);
   --color-input: var(--neutral-200);
   --color-ring: var(--neutral-200);
+  /* 모바일 전용 중립 회색 면. web/admin 토큰(packages/tailwind-config)에는 영향을 주지 않으려고 여기에만 둔다. */
+  --color-surface-muted: #f6f7f9;
 }

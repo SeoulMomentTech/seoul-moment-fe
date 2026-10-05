@@ -13,16 +13,19 @@ import { SectionError, SectionSkeleton } from "@shared/ui/section-state";
 
 import { RelatedNews, useNewsDetail } from "@features/news";
 
-const BANNER_HEIGHT = 240;
-const FULL_BLEED_HEIGHT = 200;
-const CARD_WIDTH = 264;
-const CARD_HEIGHT = 284;
+const BANNER_HEIGHT = 300;
+// 상태 화면 스켈레톤 높이. 배너보다 낮게 유지한다.
+const SKELETON_HEIGHT = 240;
+const SECTION_IMAGE_HEIGHT = 220;
+// 제목 두 줄 + 카테고리가 들어가는 하단 스크림 높이. 위쪽 스크림(insets.top + 64)과 겹치지 않는 크기.
+const BOTTOM_SCRIM_HEIGHT = 180;
 const IMAGE_GAP = 12;
 // 웹 모바일 구간 간격(50~90px)과 같은 결로 섹션 사이를 크게 띄운다.
 const SECTION_GAP = 64;
 // 제목/본문/이미지 블록 사이 간격.
 const BLOCK_GAP = 24;
 const CONTENT_LINE_HEIGHT = 26;
+const LEAD_LINE_HEIGHT = 28;
 const AVATAR_SIZE = 24;
 // 스크림은 상태바 영역(insets.top) 아래로 이만큼 더 내려와 옅어진다.
 const SCRIM_EXTRA_HEIGHT = 64;
@@ -95,43 +98,14 @@ function StatusScreen({ children }: { children: ReactNode }) {
   );
 }
 
-/**
- * index % 4 로 고르는 섹션 리듬. 웹 모바일 구간과 같다.
- * 0: 가운데 정렬 제목 + 풀블리드 이미지(아래)
- * 1: 세로 카드 이미지(왼쪽 inset, 아래)
- * 2: 세로 카드 이미지(오른쪽 inset, 위)
- * 3: 풀블리드 이미지(위)
- */
-const SECTION_VARIANTS = [
-  { image: "bleed", imageFirst: false, centered: true },
-  { image: "card-left", imageFirst: false, centered: false },
-  { image: "card-right", imageFirst: true, centered: false },
-  { image: "bleed", imageFirst: true, centered: false },
-] as const;
-
-type ImageLayout = (typeof SECTION_VARIANTS)[number]["image"];
-
-function SectionImages({
-  uris,
-  layout,
-}: {
-  uris: string[];
-  layout: ImageLayout;
-}) {
+function SectionImages({ uris }: { uris: string[] }) {
   // 이미지가 없으면 빈 블록도, 빈 간격도 만들지 않는다.
   if (uris.length === 0) {
     return null;
   }
 
-  const isBleed = layout === "bleed";
-  const wrapperClass = isBleed
-    ? ""
-    : layout === "card-right"
-      ? "items-end px-5"
-      : "items-start px-5";
-
   return (
-    <View className={wrapperClass} style={{ gap: IMAGE_GAP }}>
+    <View className="px-5" style={{ gap: IMAGE_GAP }}>
       {uris.map((uri, index) => (
         <Image
           contentFit="cover"
@@ -139,11 +113,11 @@ function SectionImages({
           // eslint-disable-next-line react/no-array-index-key
           key={`${index}-${uri}`}
           source={uri}
-          style={
-            isBleed
-              ? { width: "100%", height: FULL_BLEED_HEIGHT }
-              : { width: CARD_WIDTH, height: CARD_HEIGHT, borderRadius: 12 }
-          }
+          style={{
+            width: "100%",
+            height: SECTION_IMAGE_HEIGHT,
+            borderRadius: 12,
+          }}
           transition={200}
         />
       ))}
@@ -151,54 +125,61 @@ function SectionImages({
   );
 }
 
-function ArticleSection({
-  section,
-  index,
-}: {
-  section: NewsDetailSection;
-  index: number;
-}) {
-  const variant = SECTION_VARIANTS[index % SECTION_VARIANTS.length];
+/** 모든 섹션이 같은 모양이다: 제목 → 소제목 → 본문 → 이미지, 모두 좌측 정렬. */
+function ArticleSection({ section }: { section: NewsDetailSection }) {
   const hasText = Boolean(section.title || section.subTitle || section.content);
-  const headingAlign = variant.centered ? "text-center" : "text-left";
-
-  // 텍스트 블록만 px-5 inset 을 가지므로 풀블리드 이미지는 화면 가장자리까지 닿는다.
-  const text = hasText ? (
-    <View className="px-5" style={{ gap: 12 }}>
-      {section.title ? (
-        <Text
-          className={`text-title-4 text-foreground font-semibold ${headingAlign}`}
-        >
-          {section.title}
-        </Text>
-      ) : null}
-      {section.subTitle ? (
-        <Text
-          className={`text-body-2 text-foreground font-semibold ${headingAlign}`}
-        >
-          {section.subTitle}
-        </Text>
-      ) : null}
-      {section.content ? (
-        <Text
-          className="text-body-2 text-foreground text-left"
-          style={{ lineHeight: CONTENT_LINE_HEIGHT }}
-        >
-          {section.content}
-        </Text>
-      ) : null}
-    </View>
-  ) : null;
-
-  const images = (
-    <SectionImages layout={variant.image} uris={section.imageList} />
-  );
 
   return (
     <View style={{ marginTop: SECTION_GAP, gap: BLOCK_GAP }}>
-      {variant.imageFirst ? images : text}
-      {variant.imageFirst ? text : images}
+      {hasText ? (
+        <View className="px-5" style={{ gap: 12 }}>
+          {section.title ? (
+            <Text className="text-title-4 text-foreground text-left font-semibold">
+              {section.title}
+            </Text>
+          ) : null}
+          {section.subTitle ? (
+            <Text className="text-body-2 text-foreground text-left font-semibold">
+              {section.subTitle}
+            </Text>
+          ) : null}
+          {section.content ? (
+            <Text
+              className="text-body-2 text-foreground text-left"
+              style={{ lineHeight: CONTENT_LINE_HEIGHT }}
+            >
+              {section.content}
+            </Text>
+          ) : null}
+        </View>
+      ) : null}
+      <SectionImages uris={section.imageList} />
     </View>
+  );
+}
+
+/**
+ * 배너 아래쪽에 깔리는 스크림. 제목이 밝은 사진 위에서도 읽히도록 투명에서 어두운 쪽으로 진해진다.
+ * 위쪽 TopScrim 과 영역이 겹치지 않도록 높이를 제한한다.
+ */
+function BottomScrim({ height }: { height: number }) {
+  return (
+    <Svg
+      height={height}
+      pointerEvents="none"
+      style={{ position: "absolute", bottom: 0, left: 0, right: 0 }}
+      width="100%"
+    >
+      <Defs>
+        <LinearGradient id="bottomScrim" x1="0" x2="0" y1="0" y2="1">
+          {/* className 을 받지 못하는 SVG 라 스톱 색을 직접 쓴다. 위는 완전 투명, 아래는 흰 글씨가 읽히는 0.75. */}
+          <Stop offset="0" stopColor="#000000" stopOpacity={0} />
+          <Stop offset="0.55" stopColor="#000000" stopOpacity={0.35} />
+          <Stop offset="1" stopColor="#000000" stopOpacity={0.75} />
+        </LinearGradient>
+      </Defs>
+      <Rect fill="url(#bottomScrim)" height={height} width="100%" x={0} y={0} />
+    </Svg>
   );
 }
 
@@ -237,7 +218,7 @@ export default function NewsDetailScreen() {
   if (isPending) {
     return (
       <StatusScreen>
-        <SectionSkeleton height={BANNER_HEIGHT} />
+        <SectionSkeleton height={SKELETON_HEIGHT} />
       </StatusScreen>
     );
   }
@@ -259,26 +240,40 @@ export default function NewsDetailScreen() {
       {/* 스크림이 고정이라 스크롤 위치와 상관없이 글리프가 항상 어두운 띠 위에 놓이므로 light 가 안전하다. */}
       <StatusBar style="light" />
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={{ height: BANNER_HEIGHT + insets.top }}>
+        <View
+          className="overflow-hidden"
+          style={{ height: BANNER_HEIGHT + insets.top }}
+        >
           <Image
             contentFit="cover"
             source={news.banner}
             style={{ width: "100%", height: "100%" }}
             transition={200}
           />
-        </View>
-        {/* 웹 titleBox 와 같은 bg-surface-soft 패널. px-5 부모 밖이라 배너처럼 가장자리까지 닿고, 패딩은 패널이 가진다. */}
-        <View className="bg-surface-soft px-5 py-10">
-          {news.category ? (
-            <Text className="text-body-3 text-foreground font-semibold">
-              {news.category}
+          <BottomScrim height={BOTTOM_SCRIM_HEIGHT} />
+          <View className="absolute bottom-0 left-0 right-0 px-5 pb-6">
+            {news.category ? (
+              <Text
+                className="text-body-3 font-semibold uppercase"
+                // 사진 위 오버레이라 토큰 대신 흰색을 직접 쓴다.
+                style={{ color: "#FFFFFF", letterSpacing: 1.2 }}
+              >
+                {news.category}
+              </Text>
+            ) : null}
+            <Text
+              className="text-title-3 mt-2 font-bold"
+              numberOfLines={2}
+              // 사진 위 오버레이라 토큰 대신 흰색을 직접 쓴다.
+              style={{ color: "#FFFFFF" }}
+            >
+              {news.title}
             </Text>
-          ) : null}
-          <Text className="text-title-3 text-foreground mt-3 font-bold">
-            {news.title}
-          </Text>
+          </View>
+        </View>
+        <View className="px-5 pt-6">
           {byline ? (
-            <View className="mt-2 flex-row items-center">
+            <View className="flex-row items-center">
               {/* profileImage 가 빈 문자열이면 빈 원 대신 아바타를 생략한다. */}
               {news.profileImage ? (
                 <Image
@@ -295,13 +290,15 @@ export default function NewsDetailScreen() {
               <Text className="text-body-3 text-neutral">{byline}</Text>
             </View>
           ) : null}
-          <Text className="text-body-2 text-foreground mt-4">
+          <Text
+            className="text-body-1 text-foreground mt-4"
+            style={{ lineHeight: LEAD_LINE_HEIGHT }}
+          >
             {news.content}
           </Text>
         </View>
         {news.section.map((section, index) => (
           <ArticleSection
-            index={index}
             // 정적 목록이라 순서가 바뀌지 않으므로 index 키가 안전하다.
             // eslint-disable-next-line react/no-array-index-key
             key={`${index}-${section.title}`}
