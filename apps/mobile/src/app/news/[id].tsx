@@ -1,5 +1,8 @@
+import type { ReactNode } from "react";
+
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg";
@@ -20,7 +23,8 @@ const SECTION_GAP = 64;
 // 제목/본문/이미지 블록 사이 간격.
 const BLOCK_GAP = 24;
 const CONTENT_LINE_HEIGHT = 26;
-const SCRIM_HEIGHT = 120;
+// 스크림은 상태바 영역(insets.top) 아래로 이만큼 더 내려와 옅어진다.
+const SCRIM_EXTRA_HEIGHT = 64;
 // 떠 있는 뒤로가기 버튼(top 8 + 지름 36) 아래로 상태 화면 내용을 내린다.
 const BACK_BUTTON_CLEARANCE = 52;
 
@@ -47,26 +51,46 @@ function BackButton() {
 }
 
 /**
- * 배너 상단 스크림. 밝은 사진 위에서도 뒤로가기 버튼과 상태바 글리프가 보이도록
- * 위에서 아래로 옅어지는 검정 그라디언트를 SVG 로 그린다.
+ * 화면 상단에 고정되는 스크림. 밝은 사진 위에서도 상태바 글리프와 뒤로가기 버튼이
+ * 보이도록 위에서 아래로 옅어지는 검정 그라디언트를 SVG 로 그린다.
  */
-function TopScrim() {
+function TopScrim({ height }: { height: number }) {
   return (
     <Svg
-      height={SCRIM_HEIGHT}
+      height={height}
       pointerEvents="none"
       style={{ position: "absolute", top: 0, left: 0, right: 0 }}
       width="100%"
     >
       <Defs>
         <LinearGradient id="scrim" x1="0" x2="0" y1="0" y2="1">
-          {/* className 을 받지 못하는 SVG 라 스톱 색을 직접 쓴다. */}
-          <Stop offset="0" stopColor="#000000" stopOpacity={0.45} />
+          {/* className 을 받지 못하는 SVG 라 스톱 색을 직접 쓴다. 맨 위 0.5 는 밝은 사진에서도 글리프가 읽히는 값. */}
+          <Stop offset="0" stopColor="#000000" stopOpacity={0.5} />
+          {/* 중간 스톱으로 띠 경계가 도드라지지 않게 부드럽게 줄인다. */}
+          <Stop offset="0.5" stopColor="#000000" stopOpacity={0.2} />
           <Stop offset="1" stopColor="#000000" stopOpacity={0} />
         </LinearGradient>
       </Defs>
-      <Rect fill="url(#scrim)" height={SCRIM_HEIGHT} width="100%" x={0} y={0} />
+      <Rect fill="url(#scrim)" height={height} width="100%" x={0} y={0} />
     </Svg>
+  );
+}
+
+/**
+ * 콘텐츠가 없는 상태(잘못된 id, 오프라인, 로딩, 에러) 공통 틀.
+ * 흰 배경이라 스크림 없이 어두운 상태바 글리프를 쓰고, 뒤로가기 버튼은 항상 둔다.
+ */
+function StatusScreen({ children }: { children: ReactNode }) {
+  const insets = useSafeAreaInsets();
+
+  return (
+    <View className="bg-background flex-1">
+      <StatusBar style="dark" />
+      <BackButton />
+      <View style={{ paddingTop: insets.top + BACK_BUTTON_CLEARANCE }}>
+        {children}
+      </View>
+    </View>
   );
 }
 
@@ -193,12 +217,9 @@ export default function NewsDetailScreen() {
   // 잘못된 id 는 쿼리가 enabled=false 로 idle 에 머문다. 스켈레톤 대신 에러를 보여준다.
   if (!isValidId) {
     return (
-      <View className="bg-background flex-1">
-        <BackButton />
-        <View style={{ paddingTop: insets.top + BACK_BUTTON_CLEARANCE }}>
-          <SectionError onRetry={() => void refetch()} />
-        </View>
-      </View>
+      <StatusScreen>
+        <SectionError onRetry={() => void refetch()} />
+      </StatusScreen>
     );
   }
 
@@ -206,34 +227,25 @@ export default function NewsDetailScreen() {
   // 돌리지 말고 재시도 줄을 보여준다.
   if (isPending && fetchStatus === "paused") {
     return (
-      <View className="bg-background flex-1">
-        <BackButton />
-        <View style={{ paddingTop: insets.top + BACK_BUTTON_CLEARANCE }}>
-          <SectionError onRetry={() => void refetch()} />
-        </View>
-      </View>
+      <StatusScreen>
+        <SectionError onRetry={() => void refetch()} />
+      </StatusScreen>
     );
   }
 
   if (isPending) {
     return (
-      <View className="bg-background flex-1">
-        <BackButton />
-        <View style={{ paddingTop: insets.top + BACK_BUTTON_CLEARANCE }}>
-          <SectionSkeleton height={BANNER_HEIGHT} />
-        </View>
-      </View>
+      <StatusScreen>
+        <SectionSkeleton height={BANNER_HEIGHT} />
+      </StatusScreen>
     );
   }
 
   if (isError) {
     return (
-      <View className="bg-background flex-1">
-        <BackButton />
-        <View style={{ paddingTop: insets.top + BACK_BUTTON_CLEARANCE }}>
-          <SectionError onRetry={() => void refetch()} />
-        </View>
-      </View>
+      <StatusScreen>
+        <SectionError onRetry={() => void refetch()} />
+      </StatusScreen>
     );
   }
 
@@ -243,6 +255,8 @@ export default function NewsDetailScreen() {
 
   return (
     <View className="bg-background flex-1">
+      {/* 스크림이 고정이라 스크롤 위치와 상관없이 글리프가 항상 어두운 띠 위에 놓이므로 light 가 안전하다. */}
+      <StatusBar style="light" />
       <ScrollView
         contentContainerStyle={{ paddingBottom: 48 }}
         showsVerticalScrollIndicator={false}
@@ -254,7 +268,6 @@ export default function NewsDetailScreen() {
             style={{ width: "100%", height: "100%" }}
             transition={200}
           />
-          <TopScrim />
         </View>
         <View className="mt-5 px-5">
           {news.category ? (
@@ -284,6 +297,8 @@ export default function NewsDetailScreen() {
           />
         ))}
       </ScrollView>
+      {/* 스크롤 콘텐츠 위, 뒤로가기 버튼 아래. JSX 순서로 쌓임이 정해진다. */}
+      <TopScrim height={insets.top + SCRIM_EXTRA_HEIGHT} />
       <BackButton />
     </View>
   );
