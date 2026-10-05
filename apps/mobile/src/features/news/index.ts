@@ -8,4 +8,3 @@ export {
 export { useInfiniteNewsByCategory } from "./model/useInfiniteNewsByCategory";
 export { useNewsDashboard } from "./model/useNewsDashboard";
 export { useNewsDetail } from "./model/useNewsDetail";
-export { RelatedNews } from "./ui/RelatedNews";
