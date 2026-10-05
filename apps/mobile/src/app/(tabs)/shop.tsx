@@ -9,16 +9,23 @@ import {
   GRID_GAP,
   GRID_PADDING,
   ShopEmpty,
+  ShopFilterSheet,
   ShopFooter,
   ShopListHeader,
+  ShopSortSheet,
   useInfiniteProducts,
   useRefreshShop,
+  useShopSheetStore,
 } from "@features/shop";
 
 export default function ShopScreen() {
   const { isRefreshing, refresh } = useRefreshShop();
   const { data, hasNextPage, isFetchingNextPage, fetchNextPage } =
     useInfiniteProducts();
+  const filterOpen = useShopSheetStore((s) => s.filterOpen);
+  const sortOpen = useShopSheetStore((s) => s.sortOpen);
+  const setFilterOpen = useShopSheetStore((s) => s.setFilterOpen);
+  const setSortOpen = useShopSheetStore((s) => s.setSortOpen);
 
   return (
     <View className="bg-background flex-1">
@@ -54,6 +61,13 @@ export default function ShopScreen() {
         )}
         showsVerticalScrollIndicator={false}
       />
+      {/* 시트는 FlatList 밖(형제)에 둔다. 헤더 안에 두면 목록이 리렌더될 때 헤더의
+          로컬 상태가 유실되어 열리자마자 닫힌다. 열림 상태는 store 로 끌어올렸다. */}
+      <ShopFilterSheet
+        onClose={() => setFilterOpen(false)}
+        visible={filterOpen}
+      />
+      <ShopSortSheet onClose={() => setSortOpen(false)} visible={sortOpen} />
     </View>
   );
 }
