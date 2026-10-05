@@ -84,9 +84,24 @@ export interface GetProductCategoryRes {
   list: ProductCategory[];
 }
 
-export const getProductCategory = ({ languageCode }: PublicLanguageCode) =>
+export interface GetProductCategoryReq extends PublicLanguageCode {
+  /** 최상위 카테고리로 좁힌다. 없으면 전체 상품 카테고리를 준다. */
+  categoryId?: number;
+}
+
+/**
+ * @description 상품 카테고리(후드/집업, 니트 …). 여기 id 는 `productCategoryId` 이지
+ * `categoryId` 가 아니다 — product 목록에 categoryId 로 넘기면 항상 0건이 온다.
+ */
+export const getProductCategory = ({
+  languageCode,
+  categoryId,
+}: GetProductCategoryReq) =>
   api
-    .get("product/category", { searchParams: { languageCode } })
+    .get("product/category", {
+      searchParams:
+        categoryId == null ? { languageCode } : { languageCode, categoryId },
+    })
     .json<CommonRes<GetProductCategoryRes>>();
 
 export interface ProductSortOption {
