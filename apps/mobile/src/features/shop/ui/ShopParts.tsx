@@ -13,7 +13,7 @@ import {
 import { SectionError } from "@shared/ui/section-state";
 import {
   BannerSkeleton,
-  CategoryThumbsSkeleton,
+  CategoryChipsSkeleton,
   ProductGridSkeleton,
 } from "@shared/ui/skeleton";
 
@@ -27,8 +27,8 @@ import { useShopSheetStore } from "../model/useShopSheetStore";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const BANNER_HEIGHT = 200;
-const CATEGORY_IMAGE = 64;
-const CATEGORY_ITEM_WIDTH = 72;
+// 칩 사이 간격. 필터 시트 칩(CHIP_GAP)과 같은 값이라 두 곳의 리듬이 맞는다.
+const CATEGORY_CHIP_GAP = 8;
 
 export const GRID_GAP = 12;
 export const GRID_PADDING = 20;
@@ -87,14 +87,17 @@ function BannerPager() {
   );
 }
 
-function CategoryThumb({
+/**
+ * 카테고리 칩. 필터 시트의 Chip 과 같은 모양(rounded-full, px-4 py-2)이라
+ * 상품 목록 안에서 '고르는 것'은 전부 같은 생김새를 갖는다.
+ * 폭을 글자에 맡기므로 긴 이름도 잘리지 않는다.
+ */
+function CategoryChip({
   label,
-  image,
   selected,
   onPress,
 }: {
   label: string;
-  image?: string;
   selected: boolean;
   onPress(): void;
 }) {
@@ -103,40 +106,19 @@ function CategoryThumb({
       accessibilityLabel={label}
       accessibilityRole="button"
       accessibilityState={{ selected }}
+      className={
+        selected
+          ? "border-brand rounded-full border-2 px-4 py-2"
+          : "border-neutral-subtle rounded-full border px-4 py-2"
+      }
       onPress={onPress}
-      style={{ width: CATEGORY_ITEM_WIDTH, alignItems: "center" }}
     >
-      <View
-        className={
-          selected
-            ? "border-brand items-center justify-center border-2"
-            : "border-neutral-subtle items-center justify-center border"
-        }
-        style={{
-          width: CATEGORY_IMAGE,
-          height: CATEGORY_IMAGE,
-          borderRadius: CATEGORY_IMAGE / 2,
-          overflow: "hidden",
-        }}
-      >
-        {image ? (
-          <Image
-            contentFit="cover"
-            source={image}
-            style={{ width: "100%", height: "100%" }}
-            transition={200}
-          />
-        ) : (
-          <Text className="text-body-2 text-foreground font-bold">All</Text>
-        )}
-      </View>
       <Text
         className={
           selected
-            ? "text-body-3 text-brand mt-2 font-bold"
-            : "text-body-3 text-foreground mt-2"
+            ? "text-body-3 text-brand font-bold"
+            : "text-body-3 text-foreground"
         }
-        numberOfLines={1}
       >
         {label}
       </Text>
@@ -159,7 +141,7 @@ function CategoryScroller() {
   if (isPending) {
     return (
       <View style={{ marginTop: 20 }}>
-        <CategoryThumbsSkeleton />
+        <CategoryChipsSkeleton />
       </View>
     );
   }
@@ -175,7 +157,7 @@ function CategoryScroller() {
   return (
     <FlatList
       ListHeaderComponent={
-        <CategoryThumb
+        <CategoryChip
           label="All"
           onPress={() => select(undefined)}
           selected={categoryId == null}
@@ -183,14 +165,13 @@ function CategoryScroller() {
       }
       contentContainerStyle={{
         paddingHorizontal: GRID_PADDING,
-        gap: 12,
+        gap: CATEGORY_CHIP_GAP,
       }}
       data={data.list}
       horizontal
       keyExtractor={(item) => String(item.id)}
       renderItem={({ item }) => (
-        <CategoryThumb
-          image={item.image}
+        <CategoryChip
           label={item.name}
           onPress={() => select(item.id === categoryId ? undefined : item.id)}
           selected={item.id === categoryId}
