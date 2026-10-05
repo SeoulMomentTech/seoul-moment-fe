@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { Image } from "expo-image";
 import {
@@ -17,9 +17,9 @@ import {
   ProductGridSkeleton,
 } from "@shared/ui/skeleton";
 
+import { useCategories } from "../model/useCategories";
 import { useInfiniteProducts } from "../model/useInfiniteProducts";
 import { useProductBanner } from "../model/useProductBanner";
-import { useProductCategories } from "../model/useProductCategories";
 import { useProductSortOptions } from "../model/useProductSortOptions";
 import { useShopFilterBadge } from "../model/useShopFilterBadge";
 import { useShopFilterStore } from "../model/useShopFilterStore";
@@ -127,26 +127,13 @@ function CategoryChip({
 }
 
 /**
- * 상품 카테고리 칩 줄. 여기서 고르는 것은 productCategoryId 다 (categoryId 가 아니다).
- * 시트에서 최상위 카테고리를 고르면 그 안의 것만 남는다 — web ProductCategoryFilter 와 같다.
+ * 최상위 카테고리 칩 줄(패션·화장품·악세서리). 여기서 고르는 것은 categoryId 다.
+ * 그 아래 상품 카테고리(후드/집업 등)는 필터 시트가 고르고, 이 선택으로 좁혀진다.
  */
 function CategoryScroller() {
   const categoryId = useShopFilterStore((s) => s.categoryId);
-  const productCategoryId = useShopFilterStore((s) => s.productCategoryId);
   const setFilter = useShopFilterStore((s) => s.setFilter);
-  const { data, isPending, isError, fetchStatus, refetch } =
-    useProductCategories(categoryId);
-
-  // 좁혀진 목록에 더 이상 없는 선택은 스스로 푼다. 그대로 두면 아무 칩도 선택돼 보이지
-  // 않는데 목록만 비는 상태가 된다.
-  const isStale =
-    productCategoryId != null &&
-    data != null &&
-    !data.list.some((item) => item.id === productCategoryId);
-
-  useEffect(() => {
-    if (isStale) setFilter({ productCategoryId: undefined, optionIdList: [] });
-  }, [isStale, setFilter]);
+  const { data, isPending, isError, fetchStatus, refetch } = useCategories();
 
   // 오프라인이면 요청이 paused 되어 isPending 이 유지된다.
   if (isPending && fetchStatus === "paused") {
@@ -166,9 +153,13 @@ function CategoryScroller() {
 
   if (!data || data.list.length === 0) return null;
 
-  // 상품 카테고리가 바뀌면 이전 카테고리의 옵션 id 는 의미가 없어서 같이 비운다.
+  // 최상위 카테고리가 바뀌면 그 아래에 매달린 상품 카테고리와 옵션 id 는 모두 의미가 없어진다.
   const select = (id: number | undefined) =>
-    setFilter({ productCategoryId: id, optionIdList: [] });
+    setFilter({
+      categoryId: id,
+      productCategoryId: undefined,
+      optionIdList: [],
+    });
 
   return (
     <FlatList
@@ -176,7 +167,7 @@ function CategoryScroller() {
         <CategoryChip
           label="All"
           onPress={() => select(undefined)}
-          selected={productCategoryId == null}
+          selected={categoryId == null}
         />
       }
       contentContainerStyle={{
@@ -189,10 +180,8 @@ function CategoryScroller() {
       renderItem={({ item }) => (
         <CategoryChip
           label={item.name}
-          onPress={() =>
-            select(item.id === productCategoryId ? undefined : item.id)
-          }
-          selected={item.id === productCategoryId}
+          onPress={() => select(item.id === categoryId ? undefined : item.id)}
+          selected={item.id === categoryId}
         />
       )}
       showsHorizontalScrollIndicator={false}
