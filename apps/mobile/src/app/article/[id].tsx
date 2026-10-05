@@ -8,9 +8,8 @@ export default function ArticleDetailScreen() {
   const id = Number(rawId);
   const query = useArticleDetail(id);
 
-  // The app has no article list screen (neither does apps/web), so "View all"
-  // points at the News tab, the closest content hub. Should be repointed if
-  // an article list screen is ever added.
+  // 앱에는 아티클 목록 화면이 없다(apps/web 도 마찬가지). 그래서 "View all" 은
+  // 가장 가까운 콘텐츠 허브인 News 탭으로 보낸다. 아티클 목록 화면이 생기면 다시 연결해야 한다.
   return (
     <DetailScreen
       getRelatedItems={(article) => article.lastArticle}
