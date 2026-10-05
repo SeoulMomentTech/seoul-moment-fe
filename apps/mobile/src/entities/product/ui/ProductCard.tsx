@@ -9,7 +9,9 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   return (
-    <View className="flex-1">
+    // flex-1 은 flexBasis: 0 이라 늘어난 셀 안에서 카드 높이가 내용보다 작게 계산돼
+    // aspectRatio 이미지가 넘쳐 아래 카드를 덮는다. 폭은 부모가 정하므로 w-full 만 쓴다.
+    <View className="w-full">
       <Image
         contentFit="cover"
         source={product.image}
