@@ -11,7 +11,15 @@ import { SectionError, SectionSkeleton } from "@shared/ui/section-state";
 import { useNewsDetail } from "@features/news";
 
 const BANNER_HEIGHT = 240;
-const SECTION_IMAGE_HEIGHT = 220;
+const FULL_BLEED_HEIGHT = 200;
+const CARD_WIDTH = 264;
+const CARD_HEIGHT = 284;
+const IMAGE_GAP = 12;
+// 웹 모바일 구간 간격(50~90px)과 같은 결로 섹션 사이를 크게 띄운다.
+const SECTION_GAP = 64;
+// 제목/본문/이미지 블록 사이 간격.
+const BLOCK_GAP = 24;
+const CONTENT_LINE_HEIGHT = 26;
 const SCRIM_HEIGHT = 120;
 // 떠 있는 뒤로가기 버튼(top 8 + 지름 36) 아래로 상태 화면 내용을 내린다.
 const BACK_BUTTON_CLEARANCE = 52;
@@ -62,40 +70,109 @@ function TopScrim() {
   );
 }
 
-function ArticleSection({ section }: { section: NewsDetailSection }) {
+/**
+ * index % 4 로 고르는 섹션 리듬. 웹 모바일 구간과 같다.
+ * 0: 가운데 정렬 제목 + 풀블리드 이미지(아래)
+ * 1: 세로 카드 이미지(왼쪽 inset, 아래)
+ * 2: 세로 카드 이미지(오른쪽 inset, 위)
+ * 3: 풀블리드 이미지(위)
+ */
+const SECTION_VARIANTS = [
+  { image: "bleed", imageFirst: false, centered: true },
+  { image: "card-left", imageFirst: false, centered: false },
+  { image: "card-right", imageFirst: true, centered: false },
+  { image: "bleed", imageFirst: true, centered: false },
+] as const;
+
+type ImageLayout = (typeof SECTION_VARIANTS)[number]["image"];
+
+function SectionImages({
+  uris,
+  layout,
+}: {
+  uris: string[];
+  layout: ImageLayout;
+}) {
+  // 이미지가 없으면 빈 블록도, 빈 간격도 만들지 않는다.
+  if (uris.length === 0) {
+    return null;
+  }
+
+  const isBleed = layout === "bleed";
+  const wrapperClass = isBleed
+    ? ""
+    : layout === "card-right"
+      ? "items-end px-5"
+      : "items-start px-5";
+
   return (
-    <View className="mt-8 px-5">
-      {section.title ? (
-        <Text className="text-title-4 text-foreground font-bold">
-          {section.title}
-        </Text>
-      ) : null}
-      {section.subTitle ? (
-        <Text className="text-body-2 text-neutral mt-1">
-          {section.subTitle}
-        </Text>
-      ) : null}
-      {section.imageList.map((uri, index) => (
+    <View className={wrapperClass} style={{ gap: IMAGE_GAP }}>
+      {uris.map((uri, index) => (
         <Image
           contentFit="cover"
           // 정적 목록이라 순서가 바뀌지 않으므로 index 키가 안전하다.
           // eslint-disable-next-line react/no-array-index-key
           key={`${index}-${uri}`}
           source={uri}
-          style={{
-            width: "100%",
-            height: SECTION_IMAGE_HEIGHT,
-            borderRadius: 12,
-            marginTop: 16,
-          }}
+          style={
+            isBleed
+              ? { width: "100%", height: FULL_BLEED_HEIGHT }
+              : { width: CARD_WIDTH, height: CARD_HEIGHT, borderRadius: 12 }
+          }
           transition={200}
         />
       ))}
+    </View>
+  );
+}
+
+function ArticleSection({
+  section,
+  index,
+}: {
+  section: NewsDetailSection;
+  index: number;
+}) {
+  const variant = SECTION_VARIANTS[index % SECTION_VARIANTS.length];
+  const hasText = Boolean(section.title || section.subTitle || section.content);
+  const headingAlign = variant.centered ? "text-center" : "text-left";
+
+  // 텍스트 블록만 px-5 inset 을 가지므로 풀블리드 이미지는 화면 가장자리까지 닿는다.
+  const text = hasText ? (
+    <View className="px-5" style={{ gap: 12 }}>
+      {section.title ? (
+        <Text
+          className={`text-title-4 text-foreground font-semibold ${headingAlign}`}
+        >
+          {section.title}
+        </Text>
+      ) : null}
+      {section.subTitle ? (
+        <Text
+          className={`text-body-2 text-foreground font-semibold ${headingAlign}`}
+        >
+          {section.subTitle}
+        </Text>
+      ) : null}
       {section.content ? (
-        <Text className="text-body-2 text-foreground mt-4">
+        <Text
+          className="text-body-2 text-foreground text-left"
+          style={{ lineHeight: CONTENT_LINE_HEIGHT }}
+        >
           {section.content}
         </Text>
       ) : null}
+    </View>
+  ) : null;
+
+  const images = (
+    <SectionImages layout={variant.image} uris={section.imageList} />
+  );
+
+  return (
+    <View style={{ marginTop: SECTION_GAP, gap: BLOCK_GAP }}>
+      {variant.imageFirst ? images : text}
+      {variant.imageFirst ? text : images}
     </View>
   );
 }
@@ -199,6 +276,7 @@ export default function NewsDetailScreen() {
         </View>
         {news.section.map((section, index) => (
           <ArticleSection
+            index={index}
             // 정적 목록이라 순서가 바뀌지 않으므로 index 키가 안전하다.
             // eslint-disable-next-line react/no-array-index-key
             key={`${index}-${section.title}`}
