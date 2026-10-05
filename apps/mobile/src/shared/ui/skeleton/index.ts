@@ -1,6 +1,7 @@
 export { Shimmer } from "./Shimmer";
 export {
   BannerSkeleton,
+  BrandHeaderSkeleton,
   CategoryChipsSkeleton,
   CHIP_HEIGHT,
   ChipRowsSkeleton,
