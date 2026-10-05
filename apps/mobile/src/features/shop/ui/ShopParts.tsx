@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { Image } from "expo-image";
+import { useRouter } from "expo-router";
 import {
   ActivityIndicator,
   Dimensions,
@@ -31,6 +32,8 @@ const SCREEN_WIDTH = Dimensions.get("window").width;
 const BANNER_HEIGHT = 200;
 // 칩 사이 간격. 필터 시트 칩(CHIP_GAP)과 같은 값이라 두 곳의 리듬이 맞는다.
 const CATEGORY_CHIP_GAP = 8;
+// 브랜드 소개글을 목록 헤더에서 끊는 줄 수. 스켈레톤도 같은 수를 쓴다.
+const BRAND_DESCRIPTION_LINES = 3;
 
 export const GRID_GAP = 12;
 export const GRID_PADDING = 20;
@@ -45,6 +48,7 @@ export const CELL_WIDTH = Math.floor(
  * 좋아요는 읽기 전용이다 — 앱에 로그인이 없어 isLiked 를 바꿀 수단이 없다.
  */
 function BrandHeader({ id }: { id: number }) {
+  const router = useRouter();
   const { data, isPending, isError, fetchStatus, refetch } =
     useProductBrandBanner(id);
 
@@ -92,10 +96,25 @@ function BrandHeader({ id }: { id: number }) {
           </Text>
         ) : null}
         {data.description ? (
-          <Text className="text-body-3 text-foreground mt-3">
+          // 소개글은 170~400자라 다 펼치면 상품 그리드가 화면 밖으로 밀린다. 3줄에서 끊고
+          // 전문은 소개 페이지에 맡긴다. 기본 ellipsizeMode 가 tail 이라 끝에 … 가 붙는다.
+          <Text
+            className="text-body-3 text-foreground mt-3"
+            numberOfLines={BRAND_DESCRIPTION_LINES}
+          >
             {data.description}
           </Text>
         ) : null}
+        <Pressable
+          accessibilityLabel={`View ${data.name} brand page`}
+          accessibilityRole="button"
+          className="border-neutral-subtle mt-4 items-center rounded-full border py-3"
+          onPress={() => router.push(`/brand/${id}`)}
+        >
+          <Text className="text-body-3 text-foreground font-bold">
+            View brand page
+          </Text>
+        </Pressable>
       </View>
     </View>
   );
