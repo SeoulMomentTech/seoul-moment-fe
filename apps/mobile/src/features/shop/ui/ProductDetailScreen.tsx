@@ -71,6 +71,39 @@ const toOptionRows = (option: ProductDetailOption | undefined) =>
       : [];
   });
 
+/**
+ * 스펙 표에 실제로 들어갈 행만 모은다. 옵션·원산지·배송 정보가 모두 비는 상품이 있어서,
+ * 행을 먼저 세어 두고 비면 블록(위 경계선 + 여백)째로 그리지 않는다.
+ */
+const toSpecRows = (product: GetProductDetailRes) => [
+  ...toOptionRows(product.option).map(({ type, label, text }) => ({
+    key: type,
+    label,
+    value: text,
+  })),
+  ...(product.origin
+    ? [{ key: "origin", label: "Origin", value: product.origin }]
+    : []),
+  ...(product.shippingInfo > 0
+    ? [
+        {
+          key: "shippingInfo",
+          label: "Shipping",
+          value: `Within ${product.shippingInfo} days`,
+        },
+      ]
+    : []),
+  ...(product.shippingCost > 0
+    ? [
+        {
+          key: "shippingCost",
+          label: "Shipping fee",
+          value: formatPrice(product.shippingCost),
+        },
+      ]
+    : []),
+];
+
 function SpecRow({ label, value }: { label: string; value: string }) {
   return (
     <View className="flex-row">
@@ -91,7 +124,8 @@ function Gallery({ uris, height }: { uris: string[]; height: number }) {
   };
 
   return (
-    <View style={{ height }}>
+    // 사진이 늦게 오거나 404 여도 흰 공백이 아니라 의도한 패널로 읽히게 바탕을 깐다.
+    <View className="bg-surface-muted" style={{ height }}>
       <FlatList
         data={uris}
         horizontal
@@ -288,7 +322,8 @@ export function ProductDetailScreen({ id }: { id: number }) {
     );
   }
 
-  const optionRows = toOptionRows(product.option);
+  const galleryUris = product.subImage ?? [];
+  const specRows = toSpecRows(product);
   const hasRating = product.review > 0;
 
   return (
@@ -296,10 +331,13 @@ export function ProductDetailScreen({ id }: { id: number }) {
       {/* 스크림이 고정이라 글리프가 항상 어두운 띠 위에 놓이므로 light 가 안전하다. */}
       <StatusBar style="light" />
       <ScrollView showsVerticalScrollIndicator={false}>
-        <Gallery
-          height={GALLERY_HEIGHT + insets.top}
-          uris={product.subImage ?? []}
-        />
+        {galleryUris.length > 0 ? (
+          <Gallery height={GALLERY_HEIGHT + insets.top} uris={galleryUris} />
+        ) : (
+          // 이미지가 없으면 439pt 빈 상자를 남기지 않는다. 스크림과 뒤로가기 버튼은 그대로
+          // 떠 있으므로, 그 아래로 내용이 시작되게 크롬 높이만큼만 자리를 비운다.
+          <View style={{ height: insets.top + SCRIM_EXTRA_HEIGHT }} />
+        )}
         <View className="px-5 pt-5">
           {/* 브랜드를 누르면 그 브랜드만 건 상품 목록으로 간다. */}
           <Pressable
@@ -346,29 +384,16 @@ export function ProductDetailScreen({ id }: { id: number }) {
             </Text>
           ) : null}
         </View>
-        <View
-          className="border-neutral-subtle mx-5 mt-6 border-t pt-5"
-          style={{ gap: 12 }}
-        >
-          {optionRows.map((row) => (
-            <SpecRow key={row.type} label={row.label} value={row.text} />
-          ))}
-          {product.origin ? (
-            <SpecRow label="Origin" value={product.origin} />
-          ) : null}
-          {product.shippingInfo > 0 ? (
-            <SpecRow
-              label="Shipping"
-              value={`Within ${product.shippingInfo} days`}
-            />
-          ) : null}
-          {product.shippingCost > 0 ? (
-            <SpecRow
-              label="Shipping fee"
-              value={formatPrice(product.shippingCost)}
-            />
-          ) : null}
-        </View>
+        {specRows.length > 0 ? (
+          <View
+            className="border-neutral-subtle mx-5 mt-6 border-t pt-5"
+            style={{ gap: 12 }}
+          >
+            {specRows.map((row) => (
+              <SpecRow key={row.key} label={row.label} value={row.value} />
+            ))}
+          </View>
+        ) : null}
         {product.detailImg ? (
           <View className="mt-10">
             <DetailImage uri={product.detailImg} />

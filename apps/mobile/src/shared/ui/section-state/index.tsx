@@ -13,7 +13,13 @@ export function SectionError({ onRetry }: SectionErrorProps) {
       <Text className="text-body-3 text-neutral">
         Couldn&apos;t load this section
       </Text>
-      <Pressable hitSlop={8} onPress={onRetry}>
+      <Pressable
+        accessibilityLabel="Retry loading this section"
+        accessibilityRole="button"
+        // 글자 한 줄(17pt)뿐이라 8 로는 33pt 에 그친다. 14 로 45pt 를 만든다.
+        hitSlop={14}
+        onPress={onRetry}
+      >
         <Text className="text-body-3 text-brand font-bold">Retry</Text>
       </Pressable>
     </View>

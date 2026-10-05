@@ -6,19 +6,30 @@ import { PostListSkeleton } from "@shared/ui/skeleton";
 
 import { useInfiniteNewsByCategory } from "../model/useInfiniteNewsByCategory";
 
-/**
- * Lifestyle 제목. 첫 페이지가 비어 있으면(로딩·에러 아님) 제목도 숨긴다.
- */
-export function LifestyleHeader() {
-  const { data, isPending, isError } = useInfiniteNewsByCategory();
-
-  if (!isPending && !isError && (!data || data.length === 0)) return null;
-
+/** 제목 줄. 로딩·에러·오프라인에서도 같은 자리를 지킨다. */
+function LifestyleTitle() {
   return (
     <Section title="Lifestyle">
       <View />
     </Section>
   );
+}
+
+/**
+ * Lifestyle 제목. 첫 페이지가 비어 있으면(로딩·에러 아님) 제목도 숨긴다.
+ */
+export function LifestyleHeader() {
+  const { data, isPending, isError, fetchStatus } = useInfiniteNewsByCategory();
+
+  // 오프라인이면 요청이 paused 되어 isPending 이 유지된다. 재시도 줄은 목록 자리의
+  // LifestyleEmpty 가 그리므로, 여기서는 제목을 빈 목록으로 오해해 숨기지 않기만 하면 된다.
+  if (isPending && fetchStatus === "paused") return <LifestyleTitle />;
+
+  if (isPending || isError) return <LifestyleTitle />;
+
+  if (!data || data.length === 0) return null;
+
+  return <LifestyleTitle />;
 }
 
 /**
