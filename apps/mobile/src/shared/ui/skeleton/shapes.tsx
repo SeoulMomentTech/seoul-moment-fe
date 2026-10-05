@@ -317,8 +317,8 @@ export function ChipRowsSkeleton({ rows = 2 }: ChipRowsSkeletonProps) {
   );
 }
 
-// 가로 스크롤러라 잘려 나가는 폭까지 채운다. All(56) + 실제 카테고리 이름 길이쯤.
-const CATEGORY_CHIP_WIDTHS = [56, 128, 72, 120, 96];
+// All + 최상위 카테고리 3개(Fashion / Cosmetic / Accessory)의 칩 폭. 글자 길이에서 눈대중한 값이다.
+const CATEGORY_CHIP_WIDTHS = [56, 88, 100, 108];
 
 /**
  * 상품 목록 카테고리 칩 한 줄. 높이 = CHIP_HEIGHT(35).

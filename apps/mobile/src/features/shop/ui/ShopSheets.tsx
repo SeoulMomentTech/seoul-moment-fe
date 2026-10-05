@@ -25,7 +25,7 @@ import { SectionError } from "@shared/ui/section-state";
 import { ChipRowsSkeleton, Shimmer } from "@shared/ui/skeleton";
 
 import { useBrandFilter } from "../model/useBrandFilter";
-import { useCategories } from "../model/useCategories";
+import { useProductCategories } from "../model/useProductCategories";
 import { useProductCount } from "../model/useProductCount";
 import { useProductOptionFilters } from "../model/useProductOptionFilters";
 import { useProductSortOptions } from "../model/useProductSortOptions";
@@ -247,17 +247,20 @@ function EmptyNote({ text }: { text: string }) {
 }
 
 /**
- * 최상위 카테고리(패션·화장품·악세서리). 목록 위 칩 줄이 고르는 상품 카테고리와는 다른 축이고,
- * product/filter 가 요구하는 categoryId 도 이 값이라 Options 섹션이 여기에 딸려 있다.
+ * 상품 카테고리(후드/집업, 니트 …) = productCategoryId. 목록 위 칩 줄이 고르는 최상위
+ * 카테고리와는 다른 축이고, 그 선택(categoryId)으로 좁혀진 목록만 보여 준다.
  */
-function CategorySection({
+function ProductCategorySection({
   categoryId,
+  productCategoryId,
   onSelect,
 }: {
   categoryId?: number;
+  productCategoryId?: number;
   onSelect(id: number | undefined): void;
 }) {
-  const { data, isPending, isError, fetchStatus, refetch } = useCategories();
+  const { data, isPending, isError, fetchStatus, refetch } =
+    useProductCategories(categoryId);
 
   let body: ReactNode;
   // 오프라인이면 요청이 paused 되어 isPending 이 유지된다.
@@ -278,9 +281,9 @@ function CategorySection({
             label={item.name}
             // 이미 고른 카테고리를 다시 누르면 해제한다.
             onPress={() =>
-              onSelect(item.id === categoryId ? undefined : item.id)
+              onSelect(item.id === productCategoryId ? undefined : item.id)
             }
-            selected={item.id === categoryId}
+            selected={item.id === productCategoryId}
           />
         ))}
       </ChipWrap>
@@ -352,13 +355,13 @@ function OptionsSection({
   const { data, isPending, isError, fetchStatus, refetch } =
     useProductOptionFilters(categoryId);
 
-  // product/filter 는 categoryId 가 필수라, 고르기 전에는 숨기지 않고 비활성 헤더와 안내만 보여 준다.
-  // (쿼리가 꺼져 있으면 isPending 이 영원히 유지되므로 아래 가드보다 먼저 거른다.)
+  // product/filter 는 categoryId 가 필수다. 그 값은 시트가 아니라 목록 위 칩 줄에서 정해지므로
+  // 안내도 그쪽을 가리킨다. (쿼리가 꺼져 있으면 isPending 이 영원히 유지되므로 아래 가드보다 먼저 거른다.)
   if (categoryId == null) {
     return (
       <FilterSection
         disabled
-        hint="Select a category first"
+        hint="Select a category above the list first"
         title="Options"
         value="options"
       />
@@ -431,14 +434,9 @@ function FilterSheetContent({ onClose }: { onClose(): void }) {
   // 개수는 적용된 필터가 아니라 draft 를 따라간다.
   const { data: count } = useProductCount(draft);
 
-  // 최상위 카테고리가 바뀌면 그 아래에 매달린 상품 카테고리와 옵션 id 는 모두 의미가 없어진다.
-  const selectCategory = (id: number | undefined) =>
-    setDraft((prev) => ({
-      ...prev,
-      categoryId: id,
-      productCategoryId: undefined,
-      optionIdList: [],
-    }));
+  // 상품 카테고리는 옵션과 다른 축이라(옵션은 최상위 categoryId 에 매달린다) 옵션은 건드리지 않는다.
+  const selectProductCategory = (id: number | undefined) =>
+    setDraft((prev) => ({ ...prev, productCategoryId: id }));
 
   const selectBrand = (id: number | undefined) =>
     setDraft((prev) => ({ ...prev, brandId: id }));
@@ -451,14 +449,15 @@ function FilterSheetContent({ onClose }: { onClose(): void }) {
         : [...prev.optionIdList, id],
     }));
 
-  // draft 만 비운다. 정렬과 검색어는 시트 밖에서 정하는 값이라 남긴다.
+  // draft 만 비운다. 정렬·검색어·최상위 카테고리는 시트 밖에서 정하는 값이라 남긴다 —
+  // 여기서 지우면 시트 뒤에 보이는 칩 줄의 선택이 말없이 풀린다.
   // 비울 키는 생략하지 말고 undefined 로 명시한다. store 의 set 은 얕게 병합하므로
   // 키가 빠지면 이전 값이 그대로 남아 reset 이 store 에 닿지 않는다.
   const resetDraft = () =>
     setDraft((prev) => ({
       search: prev.search,
       brandId: undefined,
-      categoryId: undefined,
+      categoryId: prev.categoryId,
       productCategoryId: undefined,
       optionIdList: [],
       sortColumn: prev.sortColumn,
@@ -495,9 +494,10 @@ function FilterSheetContent({ onClose }: { onClose(): void }) {
           defaultValue={["category", "brand", "options"]}
           type="multiple"
         >
-          <CategorySection
+          <ProductCategorySection
             categoryId={draft.categoryId}
-            onSelect={selectCategory}
+            onSelect={selectProductCategory}
+            productCategoryId={draft.productCategoryId}
           />
           <BrandSection brandId={draft.brandId} onSelect={selectBrand} />
           <OptionsSection
