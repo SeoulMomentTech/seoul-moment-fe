@@ -3,6 +3,15 @@ import { useState, type ReactNode } from "react";
 import { Modal, Pressable, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionHeader,
+  AccordionIcon,
+  AccordionItem,
+  AccordionTitleText,
+  AccordionTrigger,
+} from "@shared/ui/accordion";
 import { SectionError, SectionSkeleton } from "@shared/ui/section-state";
 
 import { useBrandFilter } from "../model/useBrandFilter";
@@ -127,52 +136,34 @@ function Chip({
   );
 }
 
-function CollapsibleSection({
+function FilterSection({
+  value,
   title,
   hint,
   disabled = false,
   children,
 }: {
+  value: string;
   title: string;
   hint?: string;
   disabled?: boolean;
-  children: ReactNode;
+  children?: ReactNode;
 }) {
-  const [open, setOpen] = useState(true);
-  const expanded = open && !disabled;
-
   return (
-    <View className="border-neutral-subtle border-b py-4">
-      <Pressable
-        accessibilityLabel={title}
-        accessibilityRole="button"
-        accessibilityState={{ disabled, expanded }}
-        className="flex-row items-center justify-between px-5"
-        disabled={disabled}
-        onPress={() => setOpen((prev) => !prev)}
-      >
-        <View className="flex-1">
-          <Text
-            className={
-              disabled
-                ? "text-body-1 text-neutral font-bold"
-                : "text-body-1 text-foreground font-bold"
-            }
-          >
-            {title}
-          </Text>
-          {hint ? (
-            <Text className="text-body-3 text-neutral mt-1">{hint}</Text>
-          ) : null}
-        </View>
-        {disabled ? null : (
-          <Text className="text-body-2 text-neutral">
-            {expanded ? "−" : "+"}
-          </Text>
-        )}
-      </Pressable>
-      {expanded ? <View className="mt-3">{children}</View> : null}
-    </View>
+    <AccordionItem isDisabled={disabled} value={value}>
+      <AccordionHeader>
+        <AccordionTrigger>
+          <View className="flex-1">
+            <AccordionTitleText>{title}</AccordionTitleText>
+            {hint ? (
+              <Text className="text-body-3 text-neutral mt-1">{hint}</Text>
+            ) : null}
+          </View>
+          <AccordionIcon />
+        </AccordionTrigger>
+      </AccordionHeader>
+      <AccordionContent>{children}</AccordionContent>
+    </AccordionItem>
   );
 }
 
@@ -226,7 +217,11 @@ function CategorySection({
     );
   }
 
-  return <CollapsibleSection title="Category">{body}</CollapsibleSection>;
+  return (
+    <FilterSection title="Category" value="category">
+      {body}
+    </FilterSection>
+  );
 }
 
 function BrandSection({
@@ -268,7 +263,11 @@ function BrandSection({
       );
   }
 
-  return <CollapsibleSection title="Brand">{body}</CollapsibleSection>;
+  return (
+    <FilterSection title="Brand" value="brand">
+      {body}
+    </FilterSection>
+  );
 }
 
 function OptionsSection({
@@ -287,13 +286,12 @@ function OptionsSection({
   // (쿼리가 꺼져 있으면 isPending 이 영원히 유지되므로 아래 가드보다 먼저 거른다.)
   if (categoryId == null) {
     return (
-      <CollapsibleSection
+      <FilterSection
         disabled
         hint="Select a category first"
         title="Options"
-      >
-        {null}
-      </CollapsibleSection>
+        value="options"
+      />
     );
   }
 
@@ -332,7 +330,11 @@ function OptionsSection({
     );
   }
 
-  return <CollapsibleSection title="Options">{body}</CollapsibleSection>;
+  return (
+    <FilterSection title="Options" value="options">
+      {body}
+    </FilterSection>
+  );
 }
 
 /**
@@ -397,16 +399,22 @@ function FilterSheetContent({ onClose }: { onClose(): void }) {
   return (
     <>
       <ScrollView style={{ flexShrink: 1 }}>
-        <CategorySection
-          categoryId={draft.categoryId}
-          onSelect={selectCategory}
-        />
-        <BrandSection brandId={draft.brandId} onSelect={selectBrand} />
-        <OptionsSection
-          categoryId={draft.categoryId}
-          onToggle={toggleOption}
-          optionIdList={draft.optionIdList}
-        />
+        {/* 세 섹션 모두 처음엔 펼치고, 서로 독립적으로 접는다. */}
+        <Accordion
+          defaultValue={["category", "brand", "options"]}
+          type="multiple"
+        >
+          <CategorySection
+            categoryId={draft.categoryId}
+            onSelect={selectCategory}
+          />
+          <BrandSection brandId={draft.brandId} onSelect={selectBrand} />
+          <OptionsSection
+            categoryId={draft.categoryId}
+            onToggle={toggleOption}
+            optionIdList={draft.optionIdList}
+          />
+        </Accordion>
       </ScrollView>
       <View
         className="border-neutral-subtle flex-row gap-3 border-t px-5 pt-3"
