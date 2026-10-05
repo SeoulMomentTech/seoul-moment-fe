@@ -17,8 +17,15 @@ const BANNER_HEIGHT = 300;
 // 상태 화면 스켈레톤 높이. 배너보다 낮게 유지한다.
 const SKELETON_HEIGHT = 240;
 const SECTION_IMAGE_HEIGHT = 220;
-// 제목 두 줄 + 카테고리가 들어가는 하단 스크림 높이. 위쪽 스크림(insets.top + 64)과 겹치지 않는 크기.
-const BOTTOM_SCRIM_HEIGHT = 180;
+// 제목 두 줄 + 카테고리가 들어가는 하단 스크림 높이. 위쪽 스크림(insets.top + 64)과의 사이에
+// BANNER_HEIGHT - 64 - 210 = 26px 의 무보정 구간이 insets 와 무관하게 남는 크기.
+const BOTTOM_SCRIM_HEIGHT = 210;
+// 사진 위 흰 글씨 보강용 부드러운 그림자. 외곽선처럼 보이지 않게 반경을 작게 둔다.
+const OVERLAY_TEXT_SHADOW = {
+  textShadowColor: "rgba(0,0,0,0.45)",
+  textShadowOffset: { width: 0, height: 1 },
+  textShadowRadius: 4,
+} as const;
 const IMAGE_GAP = 12;
 // 웹 모바일 구간 간격(50~90px)과 같은 결로 섹션 사이를 크게 띄운다.
 const SECTION_GAP = 64;
@@ -172,10 +179,11 @@ function BottomScrim({ height }: { height: number }) {
     >
       <Defs>
         <LinearGradient id="bottomScrim" x1="0" x2="0" y1="0" y2="1">
-          {/* className 을 받지 못하는 SVG 라 스톱 색을 직접 쓴다. 위는 완전 투명, 아래는 흰 글씨가 읽히는 0.75. */}
+          {/* className 을 받지 못하는 SVG 라 스톱 색을 직접 쓴다. 위는 완전 투명이라 사진 중간에 경계가 생기지 않고, 글씨가 놓이는 구간은 0.6 이상, 바닥은 거의 불투명한 0.92. */}
           <Stop offset="0" stopColor="#000000" stopOpacity={0} />
-          <Stop offset="0.55" stopColor="#000000" stopOpacity={0.35} />
-          <Stop offset="1" stopColor="#000000" stopOpacity={0.75} />
+          <Stop offset="0.3" stopColor="#000000" stopOpacity={0.35} />
+          <Stop offset="0.6" stopColor="#000000" stopOpacity={0.78} />
+          <Stop offset="1" stopColor="#000000" stopOpacity={0.92} />
         </LinearGradient>
       </Defs>
       <Rect fill="url(#bottomScrim)" height={height} width="100%" x={0} y={0} />
@@ -256,7 +264,11 @@ export default function NewsDetailScreen() {
               <Text
                 className="text-body-3 font-semibold uppercase"
                 // 사진 위 오버레이라 토큰 대신 흰색을 직접 쓴다.
-                style={{ color: "#FFFFFF", letterSpacing: 1.2 }}
+                style={{
+                  color: "#FFFFFF",
+                  letterSpacing: 1.2,
+                  ...OVERLAY_TEXT_SHADOW,
+                }}
               >
                 {news.category}
               </Text>
@@ -265,7 +277,7 @@ export default function NewsDetailScreen() {
               className="text-title-3 mt-2 font-bold"
               numberOfLines={2}
               // 사진 위 오버레이라 토큰 대신 흰색을 직접 쓴다.
-              style={{ color: "#FFFFFF" }}
+              style={{ color: "#FFFFFF", ...OVERLAY_TEXT_SHADOW }}
             >
               {news.title}
             </Text>
