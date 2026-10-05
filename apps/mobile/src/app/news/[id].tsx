@@ -11,7 +11,7 @@ import { formatDate } from "@shared/lib/utils/formatDate";
 import type { NewsDetailSection } from "@shared/services/news";
 import { SectionError, SectionSkeleton } from "@shared/ui/section-state";
 
-import { useNewsDetail } from "@features/news";
+import { RelatedNews, useNewsDetail } from "@features/news";
 
 const BANNER_HEIGHT = 240;
 const FULL_BLEED_HEIGHT = 200;
@@ -311,6 +311,7 @@ export default function NewsDetailScreen() {
             section={section}
           />
         ))}
+        <RelatedNews items={news.lastNews} />
       </ScrollView>
       {/* 스크롤 콘텐츠 위, 뒤로가기 버튼 아래. JSX 순서로 쌓임이 정해진다. */}
       <TopScrim height={insets.top + SCRIM_EXTRA_HEIGHT} />
