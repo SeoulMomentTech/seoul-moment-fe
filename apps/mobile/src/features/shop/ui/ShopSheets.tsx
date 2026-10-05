@@ -29,7 +29,10 @@ import { useProductCount } from "../model/useProductCount";
 import { useProductOptionFilters } from "../model/useProductOptionFilters";
 import { useProductSortOptions } from "../model/useProductSortOptions";
 import { useShopFilterStore } from "../model/useShopFilterStore";
-import type { ShopFilter } from "../model/useShopFilterStore";
+import type {
+  CompleteShopFilter,
+  ShopFilter,
+} from "../model/useShopFilterStore";
 
 const SHEET_MAX_HEIGHT = "85%";
 const SHEET_ANIMATION_MS = 250;
@@ -439,16 +442,32 @@ function FilterSheetContent({ onClose }: { onClose(): void }) {
     }));
 
   // draft 만 비운다. 정렬과 검색어는 시트 밖에서 정하는 값이라 남긴다.
+  // 비울 키는 생략하지 말고 undefined 로 명시한다. store 의 set 은 얕게 병합하므로
+  // 키가 빠지면 이전 값이 그대로 남아 reset 이 store 에 닿지 않는다.
   const resetDraft = () =>
     setDraft((prev) => ({
       search: prev.search,
+      brandId: undefined,
+      categoryId: undefined,
+      productCategoryId: undefined,
+      optionIdList: [],
       sortColumn: prev.sortColumn,
       sort: prev.sort,
-      optionIdList: [],
     }));
 
+  // setFilter 는 Partial 병합이라 빠진 키가 조용히 무시된다. ShopFilter 의 모든 키를
+  // 한 번씩 적어야 컴파일되는 타입으로 받아, 키를 빠뜨리면 타입 에러가 나게 한다.
   const apply = () => {
-    setFilter(draft);
+    const complete: CompleteShopFilter = {
+      search: draft.search,
+      brandId: draft.brandId,
+      categoryId: draft.categoryId,
+      productCategoryId: draft.productCategoryId,
+      optionIdList: draft.optionIdList,
+      sortColumn: draft.sortColumn,
+      sort: draft.sort,
+    };
+    setFilter(complete);
     onClose();
   };
 

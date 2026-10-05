@@ -10,6 +10,9 @@ export interface ShopFilter {
   sort?: string;
 }
 
+/** 모든 키를 반드시 적어야 하는 ShopFilter. 값은 undefined 여도 되지만 키는 생략할 수 없다. */
+export type CompleteShopFilter = ShopFilter & Record<keyof ShopFilter, unknown>;
+
 interface ShopFilterState extends ShopFilter {
   /** 넘긴 키만 덮어쓴다. 시트의 draft 를 "적용" 할 때는 draft 전체를 넘긴다. */
   setFilter(filter: Partial<ShopFilter>): void;
