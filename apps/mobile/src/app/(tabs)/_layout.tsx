@@ -8,6 +8,7 @@ import { AppHeader } from "@/shared/ui/app-header";
 const TAB_ACTIVE_COLOR = "#f37b2a"; // --brand-500
 const TAB_INACTIVE_COLOR = "#707070"; // --neutral-600
 const TAB_INDICATOR_COLOR = "rgba(243, 123, 42, 0.14)"; // --brand-500 14% 투명도 (Android 선택 pill)
+const TAB_RIPPLE_COLOR = "rgba(243, 123, 42, 0.24)"; // --brand-500 24% 투명도 (Android 터치 ripple, 인디케이터보다 진하게)
 const TAB_BACKGROUND_COLOR = "#ffffff"; // --neutral-0
 
 export default function TabLayout() {
@@ -24,6 +25,7 @@ export default function TabLayout() {
           selected: { color: TAB_ACTIVE_COLOR },
         }}
         labelVisibilityMode="labeled"
+        rippleColor={TAB_RIPPLE_COLOR}
       >
         <NativeTabs.Trigger name="index">
           <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
