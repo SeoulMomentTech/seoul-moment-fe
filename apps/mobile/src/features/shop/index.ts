@@ -23,3 +23,5 @@ export {
 export type { ShopFilter } from "./model/useShopFilterStore";
 export { useShopSheetStore } from "./model/useShopSheetStore";
 export { ShopFilterSheet, ShopSortSheet } from "./ui/ShopSheets";
+export { default as useProductDetail } from "./model/useProductDetail";
+export { ProductDetailScreen } from "./ui/ProductDetailScreen";
