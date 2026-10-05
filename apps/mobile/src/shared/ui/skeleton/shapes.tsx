@@ -283,48 +283,6 @@ export function HorizontalCardsSkeleton({
   );
 }
 
-// ShopParts CategoryThumb: 폭 72, 원 64, 라벨 mt-2 + 1줄
-const CATEGORY_ITEM_WIDTH = 72;
-const CATEGORY_IMAGE = 64;
-export const CATEGORY_THUMBS_HEIGHT = CATEGORY_IMAGE + 8 + LINE_BODY_3;
-
-interface CategoryThumbsSkeletonProps {
-  /** 기본 5. 폭 72 + 간격 12 라 390pt 에서 4.3개가 보인다. */
-  count?: number;
-}
-
-/** 높이 = 64 + 8 + 17 = 89. 실제 스크롤러의 marginTop 20 은 포함하지 않는다. */
-export function CategoryThumbsSkeleton({
-  count = 5,
-}: CategoryThumbsSkeletonProps) {
-  return (
-    <View
-      style={{
-        flexDirection: "row",
-        gap: GRID_GAP,
-        paddingHorizontal: PAGE_PADDING,
-        overflow: "hidden",
-      }}
-    >
-      {Array.from({ length: count }, (_, i) => (
-        <View
-          key={i}
-          style={{ width: CATEGORY_ITEM_WIDTH, alignItems: "center" }}
-        >
-          <Shimmer
-            height={CATEGORY_IMAGE}
-            radius={CATEGORY_IMAGE / 2}
-            width={CATEGORY_IMAGE}
-          />
-          <View style={{ marginTop: 8 }}>
-            <Line bar={BAR_BODY_3} line={LINE_BODY_3} width={48} />
-          </View>
-        </View>
-      ))}
-    </View>
-  );
-}
-
 // Chip: px-4 py-2 + body-3 한 줄 + 테두리 1 x 2 = 17 + 16 + 2
 export const CHIP_HEIGHT = LINE_BODY_3 + 16 + 2;
 const CHIP_WIDTHS = [72, 96, 80];
@@ -354,6 +312,35 @@ export function ChipRowsSkeleton({ rows = 2 }: ChipRowsSkeletonProps) {
             />
           ))}
         </View>
+      ))}
+    </View>
+  );
+}
+
+// 가로 스크롤러라 잘려 나가는 폭까지 채운다. All(56) + 실제 카테고리 이름 길이쯤.
+const CATEGORY_CHIP_WIDTHS = [56, 128, 72, 120, 96];
+
+/**
+ * 상품 목록 카테고리 칩 한 줄. 높이 = CHIP_HEIGHT(35).
+ * 실제 스크롤러의 marginTop 20 은 호출부가 준다.
+ */
+export function CategoryChipsSkeleton() {
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        gap: CHIP_GAP,
+        paddingHorizontal: PAGE_PADDING,
+        overflow: "hidden",
+      }}
+    >
+      {CATEGORY_CHIP_WIDTHS.map((w) => (
+        <Shimmer
+          height={CHIP_HEIGHT}
+          key={w}
+          radius={CHIP_HEIGHT / 2}
+          width={w}
+        />
       ))}
     </View>
   );
