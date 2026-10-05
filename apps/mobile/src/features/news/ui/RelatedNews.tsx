@@ -21,7 +21,7 @@ export function RelatedNews({ items }: { items?: NewsLastItem[] }) {
 
   return (
     // 상단 헤더 패널과 같은 bg-surface-soft 로 화면의 위아래가 짝을 이룬다.
-    <View className="bg-surface-soft mt-16 py-10">
+    <View className="bg-surface-soft mt-16 pb-12 pt-10">
       <View className="mb-5 flex-row items-end justify-between px-5">
         <Text className="text-title-4 text-foreground font-bold">
           More News
