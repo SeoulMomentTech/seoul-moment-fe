@@ -27,6 +27,9 @@ export default function ShopScreen() {
         ListFooterComponent={ShopFooter}
         ListHeaderComponent={ShopListHeader}
         columnWrapperStyle={{
+          // 행 안에서 셀을 가장 큰 높이로 늘리지 않는다. 상품명이 1~2줄이라
+          // 행 하단이 들쭉날쭉한 것이 정상이다.
+          alignItems: "flex-start",
           gap: GRID_GAP,
           paddingHorizontal: GRID_PADDING,
           marginBottom: Spacing.four,
