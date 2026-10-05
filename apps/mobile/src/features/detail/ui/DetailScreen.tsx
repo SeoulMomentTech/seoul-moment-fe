@@ -321,7 +321,8 @@ export function DetailScreen<T extends DetailContent>({
             </Text>
           </View>
         </View>
-        <View className="px-5 pt-6">
+        {/* 배너 바로 아래에 붙는 전체 폭 인트로 블록. 가로 여백은 안쪽에서 준다. */}
+        <View className="bg-surface-muted px-5 pb-8 pt-6">
           {byline ? (
             <View className="flex-row items-center">
               {/* profileImage 가 빈 문자열이면 빈 원 대신 아바타를 생략한다. */}
