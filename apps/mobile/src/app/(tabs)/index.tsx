@@ -1,5 +1,4 @@
-import { RefreshControl, ScrollView } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { RefreshControl, ScrollView, View } from "react-native";
 
 import { BottomTabInset, Spacing } from "@/constants/theme";
 
@@ -16,7 +15,7 @@ export default function HomeScreen() {
   const { isRefreshing, refresh } = useRefreshHome();
 
   return (
-    <SafeAreaView className="bg-background flex-1" edges={["top"]}>
+    <View className="bg-background flex-1">
       <ScrollView
         contentContainerStyle={{
           paddingBottom: BottomTabInset + Spacing.five,
@@ -32,6 +31,6 @@ export default function HomeScreen() {
         <NewsSection />
         <ArticleSection />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
