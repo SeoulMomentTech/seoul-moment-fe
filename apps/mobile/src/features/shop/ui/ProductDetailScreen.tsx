@@ -29,6 +29,7 @@ import { SectionError } from "@shared/ui/section-state";
 import { DetailSkeleton } from "@shared/ui/skeleton";
 
 import useProductDetail from "../model/useProductDetail";
+import { useShopFilterStore } from "../model/useShopFilterStore";
 
 const GALLERY_HEIGHT = 380;
 const AVATAR_SIZE = 28;
@@ -237,6 +238,8 @@ function RelatedProducts({ items }: { items: GetProductDetailRes["relate"] }) {
  */
 export function ProductDetailScreen({ id }: { id: number }) {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
+  const selectOnlyBrand = useShopFilterStore((s) => s.selectOnlyBrand);
   const {
     data: product,
     isPending,
@@ -298,7 +301,18 @@ export function ProductDetailScreen({ id }: { id: number }) {
           uris={product.subImage ?? []}
         />
         <View className="px-5 pt-5">
-          <View className="flex-row items-center">
+          {/* 브랜드를 누르면 그 브랜드만 건 상품 목록으로 간다. */}
+          <Pressable
+            accessibilityLabel={`View products by ${product.brand.name}`}
+            accessibilityRole="button"
+            className="flex-row items-center"
+            hitSlop={8}
+            onPress={() => {
+              selectOnlyBrand(product.brand.id);
+              // 탭은 이미 스택 아래에 있으므로 push 로 쌓지 않고 그 탭으로 돌아간다.
+              router.navigate("/shop");
+            }}
+          >
             {product.brand.profileImg ? (
               <Image
                 contentFit="cover"
@@ -317,7 +331,8 @@ export function ProductDetailScreen({ id }: { id: number }) {
             >
               {product.brand.name}
             </Text>
-          </View>
+            <Text className="text-body-3 text-neutral ml-2">›</Text>
+          </Pressable>
           <Text className="text-title-4 text-foreground mt-3 font-bold">
             {product.name}
           </Text>
