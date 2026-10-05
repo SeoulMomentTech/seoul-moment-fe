@@ -258,10 +258,7 @@ export default function NewsDetailScreen() {
     <View className="bg-background flex-1">
       {/* 스크림이 고정이라 스크롤 위치와 상관없이 글리프가 항상 어두운 띠 위에 놓이므로 light 가 안전하다. */}
       <StatusBar style="light" />
-      <ScrollView
-        contentContainerStyle={{ paddingBottom: 48 }}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView showsVerticalScrollIndicator={false}>
         <View style={{ height: BANNER_HEIGHT + insets.top }}>
           <Image
             contentFit="cover"
