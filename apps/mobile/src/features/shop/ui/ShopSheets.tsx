@@ -1,6 +1,15 @@
-import { useState, type ReactNode } from "react";
+import { Fragment, useEffect, useState, type ReactNode } from "react";
 
-import { Modal, Pressable, ScrollView, Text, View } from "react-native";
+import {
+  Animated,
+  Easing,
+  Modal,
+  Pressable,
+  ScrollView,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import {
@@ -23,6 +32,7 @@ import { useShopFilterStore } from "../model/useShopFilterStore";
 import type { ShopFilter } from "../model/useShopFilterStore";
 
 const SHEET_MAX_HEIGHT = "85%";
+const SHEET_ANIMATION_MS = 250;
 const SWATCH_SIZE = 14;
 const LIST_SKELETON_HEIGHT = 56;
 
@@ -34,23 +44,65 @@ interface BottomSheetProps {
 }
 
 /**
- * 바텀 시트 라이브러리가 없어서 Modal 로 만든다. 닫히면 Modal 이 children 을 내리므로,
- * 안에 둔 컴포넌트의 state(draft) 는 열 때마다 새로 시작한다.
+ * 바텀 시트 라이브러리가 없어서 Modal 로 만든다.
+ * animationType="slide" 는 딤 배경까지 같이 밀어 올려서, Modal 은 애니메이션 없이 두고
+ * 배경(opacity)과 패널(translateY)을 Animated 로 따로 움직인다.
+ *
+ * - visible: 호출자가 원하는 열림 상태.
+ * - mounted: Modal 의 실제 visible. 닫힘 애니메이션이 끝날 때까지 true 로 남겨 둔다.
+ * - children 은 mounted 동안만 마운트되므로, 안에 둔 state(draft) 는 열 때마다 새로 시작한다.
  */
 function BottomSheet({ visible, title, onClose, children }: BottomSheetProps) {
+  const { height: windowHeight } = useWindowDimensions();
+  const [mounted, setMounted] = useState(visible);
+  // 닫히는 도중 다시 열렸을 때 content 를 새로 마운트(draft 재시드)하기 위한 키
+  const [session, setSession] = useState(0);
+  const [sheetHeight, setSheetHeight] = useState(windowHeight);
+  // 0: 닫힘(배경 투명, 패널은 화면 아래) / 1: 열림(배경 불투명, 패널 제자리)
+  const [progress] = useState(() => new Animated.Value(visible ? 1 : 0));
+  const [prevVisible, setPrevVisible] = useState(visible);
+
+  // 열림 상태가 바뀌는 렌더에서 mounted 를 맞춘다(effect 에서 setState 하지 않기 위해).
+  // mounted 가 아직 true 인데 다시 열렸다면 닫힘 애니메이션 도중이므로, 키를 바꿔
+  // content 를 새로 마운트해서 draft 를 현재 store 값으로 다시 시드한다.
+  if (visible !== prevVisible) {
+    setPrevVisible(visible);
+    if (visible) {
+      setMounted(true);
+      if (mounted) setSession((s) => s + 1);
+    }
+  }
+
+  useEffect(() => {
+    // 진행 중이던 반대 방향 애니메이션은 cleanup 의 stop 으로 끊기고, 현재 값에서 이어서 움직인다.
+    const animation = Animated.timing(progress, {
+      toValue: visible ? 1 : 0,
+      duration: SHEET_ANIMATION_MS,
+      easing: visible ? Easing.out(Easing.cubic) : Easing.in(Easing.cubic),
+      useNativeDriver: true,
+    });
+    // 중간에 stop 되면 finished 가 false 라서, 다시 열린 시트를 unmount 하지 않는다.
+    animation.start(({ finished }) => {
+      if (finished && !visible) setMounted(false);
+    });
+    return () => animation.stop();
+  }, [visible, progress]);
+
+  const translateY = progress.interpolate({
+    inputRange: [0, 1],
+    outputRange: [sheetHeight, 0],
+  });
+
   return (
     <Modal
-      animationType="slide"
+      animationType="none"
       onRequestClose={onClose}
       transparent
-      visible={visible}
+      visible={mounted}
     >
       <View className="flex-1 justify-end">
-        <Pressable
-          accessibilityLabel="Close"
-          accessibilityRole="button"
-          onPress={onClose}
-          // 딤 처리용 반투명 검정
+        <Animated.View
+          // 딤 처리용 반투명 검정. 위치는 고정하고 opacity 만 바뀐다.
           style={{
             position: "absolute",
             top: 0,
@@ -58,14 +110,24 @@ function BottomSheet({ visible, title, onClose, children }: BottomSheetProps) {
             bottom: 0,
             left: 0,
             backgroundColor: "rgba(0,0,0,0.4)",
+            opacity: progress,
           }}
-        />
-        <View
+        >
+          <Pressable
+            accessibilityLabel="Close"
+            accessibilityRole="button"
+            onPress={onClose}
+            style={{ flex: 1 }}
+          />
+        </Animated.View>
+        <Animated.View
           className="bg-background"
+          onLayout={(e) => setSheetHeight(e.nativeEvent.layout.height)}
           style={{
             maxHeight: SHEET_MAX_HEIGHT,
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
+            transform: [{ translateY }],
           }}
         >
           <View className="flex-row items-center justify-between px-5 py-4">
@@ -81,8 +143,8 @@ function BottomSheet({ visible, title, onClose, children }: BottomSheetProps) {
               <Text className="text-body-1 text-neutral">✕</Text>
             </Pressable>
           </View>
-          {children}
-        </View>
+          <Fragment key={session}>{children}</Fragment>
+        </Animated.View>
       </View>
     </Modal>
   );
