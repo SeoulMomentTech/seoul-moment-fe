@@ -12,7 +12,8 @@ export const useRefreshHome = () => {
 
     setIsRefreshing(true);
     void queryClient
-      .refetchQueries({ queryKey: ["home"] })
+      // 화면에 떠 있는 쿼리만 갱신한다. 비활성 캐시까지 다시 받지 않는다.
+      .refetchQueries({ queryKey: ["home"], type: "active" })
       .finally(() => setIsRefreshing(false));
   }, [isRefreshing, queryClient]);
 
