@@ -33,6 +33,15 @@ const GALLERY_HEIGHT = 380;
 const SKELETON_HEIGHT = 240;
 const AVATAR_SIZE = 28;
 const DOT_SIZE = 6;
+// 점 그림자. iOS 는 shadow*, Android 는 elevation 만 먹으므로 둘 다 지정한다.
+// 6pt 점이라 오프셋·반경을 키워 번짐이 아닌 짙은 테두리 느낌의 후광이 되게 한다. 검정은 사진 색과 무관하게 쓰는 값.
+const DOT_SHADOW = {
+  shadowColor: "#000000",
+  shadowOffset: { width: 0, height: 1 },
+  shadowOpacity: 0.5,
+  shadowRadius: 2,
+  elevation: 3,
+} as const;
 const RELATED_CARD_WIDTH = 150;
 const RELATED_GAP = 12;
 const LABEL_WIDTH = 96;
@@ -110,14 +119,21 @@ function Gallery({ uris, height }: { uris: string[]; height: number }) {
               // 정적 목록이라 index 키가 안전하다.
               // eslint-disable-next-line react/no-array-index-key
               key={`${index}-${uri}`}
-              style={{
-                width: DOT_SIZE,
-                height: DOT_SIZE,
-                borderRadius: DOT_SIZE / 2,
-                // 사진 위 점이라 토큰 대신 흰색 계열을 직접 쓴다.
-                backgroundColor:
-                  index === page ? "#FFFFFF" : "rgba(255,255,255,0.5)",
-              }}
+              style={[
+                {
+                  width: index === page ? DOT_SIZE * 2 : DOT_SIZE,
+                  height: DOT_SIZE,
+                  borderRadius: DOT_SIZE / 2,
+                  // 사진 위 점이라 토큰 대신 흰색 계열을 직접 쓴다.
+                  backgroundColor:
+                    index === page ? "#FFFFFF" : "rgba(255,255,255,0.5)",
+                  // 흰 배경 사진에서도 보이도록 옅은 검정 테두리를 둔다. 그림자만으로는 흰 점이 묻힌다.
+                  // 어두운 사진에서는 테두리가 배경에 섞여 거의 드러나지 않는다.
+                  borderWidth: 1,
+                  borderColor: "rgba(0,0,0,0.3)",
+                },
+                DOT_SHADOW,
+              ]}
             />
           ))}
         </View>
