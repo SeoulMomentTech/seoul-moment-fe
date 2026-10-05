@@ -230,6 +230,8 @@ export function DetailScreen<T extends DetailContent>({
           routeBase={relatedRoute}
           viewAllHref={relatedViewAllHref}
         />
+        {/* 관련 글이 없으면 RelatedPosts 가 null 이라 마지막 이미지가 화면 끝에 붙는다. 홈 인디케이터 위로 띄운다. */}
+        <View style={{ height: insets.bottom + 32 }} />
       </ScrollView>
       {/* 스크롤 콘텐츠 위, 뒤로가기 버튼 아래. JSX 순서로 쌓임이 정해진다. */}
       <TopScrim height={insets.top + SCRIM_EXTRA_HEIGHT} />

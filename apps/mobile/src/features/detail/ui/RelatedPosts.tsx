@@ -44,7 +44,8 @@ export function RelatedPosts({
           <Pressable
             accessibilityLabel={heading}
             accessibilityRole="button"
-            hitSlop={8}
+            // 글자 한 줄(17pt)뿐이라 8 로는 33pt 에 그친다. 14 로 45pt 를 만든다.
+            hitSlop={14}
             // 목적지가 탭 라우트라 push 하면 (tabs) 네비게이터가 한 벌 더 쌓여
             // 뒤로가기가 끝없이 늘어난다. 이미 아래 깔린 탭으로 돌아가야 한다.
             onPress={() => router.navigate(viewAllHref)}
