@@ -45,7 +45,9 @@ export function RelatedPosts({
             accessibilityLabel={heading}
             accessibilityRole="button"
             hitSlop={8}
-            onPress={() => router.push(viewAllHref)}
+            // 목적지가 탭 라우트라 push 하면 (tabs) 네비게이터가 한 벌 더 쌓여
+            // 뒤로가기가 끝없이 늘어난다. 이미 아래 깔린 탭으로 돌아가야 한다.
+            onPress={() => router.navigate(viewAllHref)}
           >
             <Text className="text-body-3 text-brand font-semibold">
               View all
