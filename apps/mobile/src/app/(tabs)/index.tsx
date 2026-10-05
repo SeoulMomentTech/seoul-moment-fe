@@ -7,7 +7,6 @@ import { BottomTabInset, Spacing } from "@/constants/theme";
 
 import {
   ArticleSection,
-  ContactSection,
   HeroBanner,
   NewsSection,
   NowOnSaleSection,
@@ -33,7 +32,6 @@ export default function HomeScreen() {
         <NowOnSaleSection />
         <NewsSection />
         <ArticleSection />
-        <ContactSection />
       </ScrollView>
     </SafeAreaView>
   );
