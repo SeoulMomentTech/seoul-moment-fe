@@ -75,6 +75,9 @@ const AccordionItem = React.forwardRef<
 ));
 
 // 트리거의 접근성 속성(label/state)은 item context 의 상태에서 끌어와 항상 같이 내려준다.
+// 세로 여백 py-4 는 AccordionItem(= Pressable 바깥)에 있어 글자 줄(22pt)만 눌린다.
+// 여백을 안으로 옮기면 접힌 내용 아래 여백까지 사라지므로, 같은 16pt 를 hitSlop 으로 덮어
+// 보이는 크기는 그대로 둔 채 54pt 를 누를 수 있게 한다.
 const AccordionTrigger = React.forwardRef<
   React.ElementRef<typeof UIAccordion.Trigger>,
   IAccordionTriggerProps
@@ -86,6 +89,7 @@ const AccordionTrigger = React.forwardRef<
       accessibilityLabel={titleText}
       accessibilityRole="button"
       accessibilityState={{ disabled: !!isDisabled, expanded: !!isExpanded }}
+      hitSlop={{ top: 16, bottom: 16 }}
       ref={ref}
       {...props}
       className={accordionTriggerStyle({ class: className })}

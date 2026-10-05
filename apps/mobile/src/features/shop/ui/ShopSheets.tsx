@@ -142,7 +142,8 @@ function BottomSheet({ visible, title, onClose, children }: BottomSheetProps) {
             <Pressable
               accessibilityLabel="Close"
               accessibilityRole="button"
-              hitSlop={8}
+              // 글리프 한 줄(22pt)이라 8 로는 38pt 에 그친다. 14 로 50pt 를 만든다.
+              hitSlop={14}
               onPress={onClose}
             >
               <Text className="text-body-1 text-neutral">✕</Text>
@@ -155,6 +156,11 @@ function BottomSheet({ visible, title, onClose, children }: BottomSheetProps) {
   );
 }
 
+/**
+ * 필터 시트 칩. 목록 위 CategoryChip 과 같은 규칙이다 — 선택을 테두리 두께가 아니라
+ * 채움으로 나타내 상자 크기가 변하지 않게 한다. flex-wrap 안이라 2pt 만 커져도
+ * 줄 끝 칩이 다음 줄로 넘어간다.
+ */
 function Chip({
   label,
   selected,
@@ -173,9 +179,12 @@ function Chip({
       accessibilityState={{ selected }}
       className={
         selected
-          ? "border-brand flex-row items-center rounded-full border-2 px-4 py-2"
+          ? "bg-brand border-brand flex-row items-center rounded-full border px-4 py-2"
           : "border-neutral-subtle flex-row items-center rounded-full border px-4 py-2"
       }
+      // 칩 높이가 35pt 라 위아래로 5pt 씩 넓혀 44pt 최소 터치 영역을 맞춘다.
+      // 칩 사이 간격이 8pt 뿐이라 좌우는 넓히지 않는다.
+      hitSlop={{ top: 5, bottom: 5 }}
       onPress={onPress}
     >
       {swatch ? (
@@ -193,7 +202,7 @@ function Chip({
       <Text
         className={
           selected
-            ? "text-body-3 text-brand font-bold"
+            ? "text-body-3 text-background"
             : "text-body-3 text-foreground"
         }
       >

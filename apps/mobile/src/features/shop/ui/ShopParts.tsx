@@ -175,6 +175,10 @@ function BannerPager() {
  * 카테고리 칩. 필터 시트의 Chip 과 같은 모양(rounded-full, px-4 py-2)이라
  * 상품 목록 안에서 '고르는 것'은 전부 같은 생김새를 갖는다.
  * 폭을 글자에 맡기므로 긴 이름도 잘리지 않는다.
+ *
+ * 선택은 테두리 두께가 아니라 채움으로 나타낸다. border-2 로 바꾸면 상자가 가로·세로로
+ * 2pt 씩 커져 오른쪽 칩들이 전부 밀리고 스켈레톤(CHIP_HEIGHT=35)과도 어긋난다.
+ * 글자 굵기도 그대로 둬야 글자 폭이 안 변한다 — 대비는 bg-brand 가 충분히 준다.
  */
 function CategoryChip({
   label,
@@ -192,15 +196,18 @@ function CategoryChip({
       accessibilityState={{ selected }}
       className={
         selected
-          ? "border-brand rounded-full border-2 px-4 py-2"
+          ? "bg-brand border-brand rounded-full border px-4 py-2"
           : "border-neutral-subtle rounded-full border px-4 py-2"
       }
+      // 칩 높이가 35pt 라 위아래로 5pt 씩 넓혀 44pt 최소 터치 영역을 맞춘다.
+      // 칩 사이 간격이 8pt 뿐이라 좌우는 넓히지 않는다.
+      hitSlop={{ top: 5, bottom: 5 }}
       onPress={onPress}
     >
       <Text
         className={
           selected
-            ? "text-body-3 text-brand font-bold"
+            ? "text-body-3 text-background"
             : "text-body-3 text-foreground"
         }
       >
@@ -295,6 +302,8 @@ function FilterBar() {
         accessibilityLabel="Filter"
         accessibilityRole="button"
         className="border-neutral-subtle flex-row items-center rounded-full border px-4 py-2"
+        // 칩과 같은 35pt 높이라 위아래 5pt 씩 넓혀 44pt 를 넘긴다.
+        hitSlop={{ top: 5, bottom: 5 }}
         onPress={() => setFilterOpen(true)}
       >
         <Text className="text-body-3 text-foreground font-bold">Filter</Text>
@@ -312,7 +321,8 @@ function FilterBar() {
       <Pressable
         accessibilityLabel="Sort"
         accessibilityRole="button"
-        hitSlop={8}
+        // 글자 한 줄(17pt)뿐이라 8 로는 33pt 에 그친다. 14 로 45pt 를 만든다.
+        hitSlop={14}
         onPress={() => setSortOpen(true)}
       >
         <Text className="text-body-3 text-foreground" numberOfLines={1}>
