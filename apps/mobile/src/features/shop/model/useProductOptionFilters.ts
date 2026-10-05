@@ -5,15 +5,23 @@ import { getProductFilter } from "@shared/services/product";
 
 import type { CommonRes } from "@shared/services";
 
+interface ProductOptionFilterScope {
+  /** 필수. 없으면 요청 자체를 보내지 않는다 (API 가 validation 에러를 준다). */
+  categoryId?: number;
+  productCategoryId?: number;
+  brandId?: number;
+}
+
 /**
- * product/filter 는 categoryId 가 필수다. 카테고리를 고르기 전에는 요청 자체를 보내지 않는다.
- * productCategoryId 를 주면 그 상품 카테고리에 실제로 있는 옵션만 돌려준다.
- * (예: 패션 전체는 사이즈·성별·색상·재질·핏감·제조국가 6그룹, 후드/집업은 색상·성별·사이즈·재질 4그룹)
+ * 지금 고른 조건에 실제로 존재하는 옵션만 가져온다. 셋 다 결과를 좁힌다.
+ * (패션 전체는 6그룹, 패션+후드/집업은 4그룹, 패션+브랜드2는 6그룹이지만 값 구성이 다르다.)
+ * 조합에 상품이 없으면 빈 목록이 오는데, 그건 정상이다 — 고를 옵션이 정말 없다는 뜻이다.
  */
-export const useProductOptionFilters = (
-  categoryId?: number,
-  productCategoryId?: number,
-) => {
+export const useProductOptionFilters = ({
+  categoryId,
+  productCategoryId,
+  brandId,
+}: ProductOptionFilterScope) => {
   const languageCode = useLanguage();
 
   return useAppQuery({
@@ -22,6 +30,7 @@ export const useProductOptionFilters = (
       "option-filters",
       categoryId,
       productCategoryId,
+      brandId,
       languageCode,
     ] as const,
     queryFn: () =>
@@ -29,6 +38,7 @@ export const useProductOptionFilters = (
         languageCode,
         categoryId: categoryId as number,
         productCategoryId,
+        brandId,
       }),
     select: (res: CommonRes<GetProductFilterRes>): GetProductFilterRes =>
       res.data,
