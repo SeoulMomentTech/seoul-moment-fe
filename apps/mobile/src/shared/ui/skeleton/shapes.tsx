@@ -1,5 +1,7 @@
 import { View, useWindowDimensions, type DimensionValue } from "react-native";
 
+import { SECTION_GAP } from "@shared/ui/detail-section";
+
 import { Shimmer } from "./Shimmer";
 
 // 텍스트 줄 높이. 토큰에 line-height 가 없어 플랫폼 기본값(글자 크기 x 약 1.2)을 반올림한 값이다.
@@ -8,10 +10,12 @@ export const LINE_BODY_3 = 17;
 export const LINE_BODY_2 = 19;
 export const LINE_BODY_1 = 22;
 export const LINE_TITLE_4 = 24;
+export const LINE_TITLE_3 = 29;
 const BAR_BODY_3 = 11;
 const BAR_BODY_2 = 13;
 const BAR_BODY_1 = 14;
 const BAR_TITLE_4 = 16;
+const BAR_TITLE_3 = 19;
 
 const PAGE_PADDING = 20;
 const GRID_GAP = 12;
@@ -398,20 +402,24 @@ export function BrandHeaderSkeleton({
 interface DetailSkeletonProps {
   /**
    * article: 배너 + 바이라인 + 리드 3줄 + 제목 2줄 + 본문 4줄 (DetailScreen).
+   * brand: article 과 같은 틀인데 바이라인 자리에 title-3 이름 한 줄이 온다 (BrandScreen).
    * product: 갤러리 + 브랜드 + 이름 2줄 + 가격 + 스펙 3줄 (ProductDetailScreen).
    */
-  variant?: "article" | "product";
+  variant?: "article" | "brand" | "product";
   /** 기본 article 220, product 300. 실제 배너는 상태바 밑까지 풀블리드라 호출부가 insets.top 을 더해 넘기고, StatusScreen 대신 패딩 없는 틀에 놓는다. */
   bannerHeight?: number;
 }
 
 const ARTICLE_LEAD_LINE = 28;
 const ARTICLE_BODY_LINE = 26;
-const ARTICLE_TITLE_LINE = 28;
+// 인트로 블록 안쪽 여백. 실제 블록은 px-5 pb-8 pt-6 이다.
+const INTRO_PADDING_TOP = 24;
+const INTRO_PADDING_BOTTOM = 32;
 
 /**
  * 상세 화면 로딩 상태. 높이(배너 B 별):
- * article = B + 24 + 24 + 16 + 3x28 + 32 + 2x28 + 12 + 4x26 = B + 352 (기본 572).
+ * article = B + (24 + 24 + 16 + 3x28 + 32) + 64 + 2x24 + 12 + 4x26 = B + 408.
+ * brand   = B + (24 + 29 + 16 + 3x28 + 32) + 64 + 2x24 + 12 + 4x26 = B + 413.
  * product = B + 20 + 24 + 12 + 2x24 + 16 + 28 + 24 + 20 + 3x17 + 2x12 = B + 267 (기본 567).
  */
 export function DetailSkeleton({
@@ -451,25 +459,40 @@ export function DetailSkeleton({
     );
   }
 
+  // 브랜드 상세에는 작성자도 날짜도 아바타도 없다. 그 자리에 title-3 이름 한 줄이 온다.
+  const isBrand = variant === "brand";
+
   return (
     <View>
       <Shimmer height={bannerHeight ?? 220} radius={0} />
-      <View style={{ paddingHorizontal: PAGE_PADDING, paddingTop: 24 }}>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 8,
-            height: 24,
-          }}
-        >
-          <Shimmer height={24} radius={12} width={24} />
-          <Shimmer height={BAR_BODY_3} radius={4} width={140} />
-        </View>
+      {/* 실제 인트로 블록은 bg-surface-muted 다. 흰 배경으로 그리면 데이터가 들어오는 순간 톤 다른 패널이 튀어나온다. */}
+      <View
+        className="bg-surface-muted"
+        style={{
+          paddingHorizontal: PAGE_PADDING,
+          paddingTop: INTRO_PADDING_TOP,
+          paddingBottom: INTRO_PADDING_BOTTOM,
+        }}
+      >
+        {isBrand ? (
+          <Line bar={BAR_TITLE_3} line={LINE_TITLE_3} width="55%" />
+        ) : (
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 8,
+              height: 24,
+            }}
+          >
+            <Shimmer height={24} radius={12} width={24} />
+            <Shimmer height={BAR_BODY_3} radius={4} width={140} />
+          </View>
+        )}
         <View style={{ marginTop: 16 }}>
           {[0, 1, 2].map((i) => (
             <Line
-              bar={14}
+              bar={BAR_BODY_1}
               key={i}
               line={ARTICLE_LEAD_LINE}
               width={lineWidth(i, 3)}
@@ -477,9 +500,12 @@ export function DetailSkeleton({
           ))}
         </View>
       </View>
-      <View style={{ paddingHorizontal: PAGE_PADDING, paddingTop: 32 }}>
-        <Line bar={BAR_TITLE_4} line={ARTICLE_TITLE_LINE} />
-        <Line bar={BAR_TITLE_4} line={ARTICLE_TITLE_LINE} width="50%" />
+      {/* 다음에 오는 실제 요소는 DetailSection 이고, 그 루트가 marginTop: SECTION_GAP 이다. 32 로 두면 그만큼 짧다. */}
+      <View
+        style={{ paddingHorizontal: PAGE_PADDING, paddingTop: SECTION_GAP }}
+      >
+        <Line bar={BAR_TITLE_4} line={LINE_TITLE_4} />
+        <Line bar={BAR_TITLE_4} line={LINE_TITLE_4} width="50%" />
         <View style={{ marginTop: 12 }}>
           {[0, 1, 2, 3].map((i) => (
             <Line

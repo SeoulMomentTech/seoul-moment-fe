@@ -34,7 +34,15 @@ export function PromotionSection() {
   if (isPending) {
     return (
       <Section title="Season Collection">
-        {/* dev API 는 프로모션이 1개라 단일 히어로가 일반적인 경우다. */}
+        {/* 프로모션이 1개면 히어로(200 + 12 + 19 + 4 + 2x17 = 269), 2개 이상이면
+            캐러셀(160 + 8 + 17 + 4 + 2x17 = 223)이라 자리 높이가 46 다른데, 응답을
+            받기 전에는 개수를 알 길이 없다. 히어로를 고른다 — dev 응답이 1개라
+            일반적인 경우에 정확히 맞고, 캐러셀로 잡으면 그 일반적인 경우가 어긋난다.
+            지난 개수를 기억해 두는 방법도 생각했지만 모듈 변수·ref·effect setState 가
+            모두 이 저장소의 react-hooks 규칙에 걸린다. 그래서 2개 이상이 오면 섹션이
+            46pt 줄어든다 — 알고 남겨두는 간극이다. 응답이 여러 개로 바뀌면 여기를
+            HorizontalCardsSkeleton(cardWidth=CARD_WIDTH, imageHeight=CARD_HEIGHT)
+            으로 바꾸면 된다. */}
         <HeroCardSkeleton imageHeight={HERO_HEIGHT} />
       </Section>
     );
