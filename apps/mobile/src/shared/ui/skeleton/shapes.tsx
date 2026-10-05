@@ -346,6 +346,42 @@ export function CategoryChipsSkeleton() {
   );
 }
 
+interface BrandHeaderSkeletonProps {
+  /** 실제 배너와 같은 높이. 풀블리드라 좌우 여백이 없다. */
+  bannerHeight: number;
+  /** 설명 줄 수. 기본 6 — dev 의 소개글 173~197자가 390pt 에서 차지하는 줄 수다. */
+  lines?: number;
+}
+
+/**
+ * 브랜드 헤더(배너 + 이름 + 소개). 높이 = bannerHeight + 20 + 24 + 12 + lines x 17.
+ * 소개 길이는 브랜드마다 달라 줄 수까지 맞출 수는 없고, 흔한 길이에 맞춘다.
+ */
+export function BrandHeaderSkeleton({
+  bannerHeight,
+  lines = 6,
+}: BrandHeaderSkeletonProps) {
+  return (
+    <View>
+      <Shimmer height={bannerHeight} radius={0} />
+      <View style={{ paddingHorizontal: PAGE_PADDING, paddingTop: 20 }}>
+        <Line bar={BAR_TITLE_4} line={LINE_TITLE_4} width="45%" />
+        <View style={{ marginTop: 12 }}>
+          {Array.from({ length: lines }, (_, i) => (
+            <Line
+              bar={BAR_BODY_3}
+              key={i}
+              line={LINE_BODY_3}
+              // 마지막 줄만 짧게 끊어 문단처럼 보이게 한다.
+              width={i === lines - 1 ? "55%" : undefined}
+            />
+          ))}
+        </View>
+      </View>
+    </View>
+  );
+}
+
 interface DetailSkeletonProps {
   /**
    * article: 배너 + 바이라인 + 리드 3줄 + 제목 2줄 + 본문 4줄 (DetailScreen).
