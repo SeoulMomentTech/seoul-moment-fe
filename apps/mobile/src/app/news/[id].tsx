@@ -43,10 +43,12 @@ function ArticleSection({ section }: { section: NewsDetailSection }) {
           {section.subTitle}
         </Text>
       ) : null}
-      {section.imageList.map((uri) => (
+      {section.imageList.map((uri, index) => (
         <Image
           contentFit="cover"
-          key={uri}
+          // 정적 목록이라 순서가 바뀌지 않으므로 index 키가 안전하다.
+          // eslint-disable-next-line react/no-array-index-key
+          key={`${index}-${uri}`}
           source={uri}
           style={{
             width: "100%",
@@ -67,14 +69,26 @@ function ArticleSection({ section }: { section: NewsDetailSection }) {
 }
 
 export default function NewsDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id: rawId } = useLocalSearchParams<{ id: string }>();
+  const id = Number(rawId);
+  const isValidId = Number.isFinite(id);
   const {
     data: news,
     isPending,
     isError,
     fetchStatus,
     refetch,
-  } = useNewsDetail(Number(id));
+  } = useNewsDetail(id);
+
+  // 잘못된 id 는 쿼리가 enabled=false 로 idle 에 머문다. 스켈레톤 대신 에러를 보여준다.
+  if (!isValidId) {
+    return (
+      <View className="bg-background flex-1">
+        <BackButton />
+        <SectionError onRetry={() => void refetch()} />
+      </View>
+    );
+  }
 
   // 오프라인이면 요청이 paused 되어 isPending 이 유지된다. 스켈레톤을 영원히
   // 돌리지 말고 재시도 줄을 보여준다.
@@ -140,9 +154,11 @@ export default function NewsDetailScreen() {
             {news.content}
           </Text>
         </View>
-        {news.section.map((section) => (
+        {news.section.map((section, index) => (
           <ArticleSection
-            key={`${section.title}-${section.subTitle}`}
+            // 정적 목록이라 순서가 바뀌지 않으므로 index 키가 안전하다.
+            // eslint-disable-next-line react/no-array-index-key
+            key={`${index}-${section.title}`}
             section={section}
           />
         ))}

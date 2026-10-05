@@ -12,7 +12,8 @@ export const useRefreshNews = () => {
 
     setIsRefreshing(true);
     void queryClient
-      .refetchQueries({ queryKey: ["news"] })
+      // 화면에 떠 있는 쿼리만 갱신한다. 캐시된 상세(inactive)까지 다시 받지 않는다.
+      .refetchQueries({ queryKey: ["news"], type: "active" })
       .finally(() => setIsRefreshing(false));
   }, [isRefreshing, queryClient]);
 
