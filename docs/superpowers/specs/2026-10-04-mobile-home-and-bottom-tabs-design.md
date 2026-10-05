@@ -90,9 +90,11 @@ web의 7레이어 FSD를 베끼지 않고 3레이어만 쓴다.
 
 ```
 src/shared/     services/ (home·product·news·article 추가), lib/, ui/
-src/entities/   product-card/, news-row/, article-card/
+src/entities/   product/ui/ProductCard.tsx, post/ui/PostRow.tsx
 src/features/   home/ui/ (섹션 컴포넌트), home/model/ (쿼리 훅)
 ```
+
+News와 Article은 `post/ui/PostRow.tsx` 하나를 함께 쓴다. 두 API 타입의 필드가 동일해 컴포넌트를 나눌 이유가 없기 때문이다.
 
 `views`·`widgets`는 만들지 않는다 — 화면이 홈 하나라 빈 레이어가 된다.
 
