@@ -7,11 +7,17 @@ import { Colors } from "@/constants/theme";
 const colors = Colors.light;
 
 export default function TabLayout() {
+  // Material 4탭 이상이면 LABEL_VISIBILITY_AUTO 규칙에 의해 선택된 탭만 라벨을 표시한다.
   return (
     <NativeTabs
       backgroundColor={colors.background}
+      iconColor={{ default: colors.textSecondary, selected: colors.text }}
       indicatorColor={colors.backgroundElement}
-      labelStyle={{ selected: { color: colors.text } }}
+      labelStyle={{
+        default: { color: colors.textSecondary },
+        selected: { color: colors.text },
+      }}
+      labelVisibilityMode="labeled"
     >
       <NativeTabs.Trigger name="index">
         <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
