@@ -12,13 +12,13 @@ import {
 
 import { SectionError, SectionSkeleton } from "@shared/ui/section-state";
 
-import { ShopFilterSheet, ShopSortSheet } from "./ShopSheets";
 import { useInfiniteProducts } from "../model/useInfiniteProducts";
 import { useProductBanner } from "../model/useProductBanner";
 import { useProductCategories } from "../model/useProductCategories";
 import { useProductSortOptions } from "../model/useProductSortOptions";
 import { useShopFilterBadge } from "../model/useShopFilterBadge";
 import { useShopFilterStore } from "../model/useShopFilterStore";
+import { useShopSheetStore } from "../model/useShopSheetStore";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const BANNER_HEIGHT = 200;
@@ -197,8 +197,8 @@ function FilterBar() {
   const { data: sortOptions } = useProductSortOptions();
   const sortColumn = useShopFilterStore((s) => s.sortColumn);
   const sort = useShopFilterStore((s) => s.sort);
-  const [filterOpen, setFilterOpen] = useState(false);
-  const [sortOpen, setSortOpen] = useState(false);
+  const setFilterOpen = useShopSheetStore((s) => s.setFilterOpen);
+  const setSortOpen = useShopSheetStore((s) => s.setSortOpen);
 
   const current = sortOptions?.list.find(
     (o) => o.sortColumn === sortColumn && o.sort === sort,
@@ -234,11 +234,6 @@ function FilterBar() {
           {`${current?.name ?? "Sort"} ▾`}
         </Text>
       </Pressable>
-      <ShopFilterSheet
-        onClose={() => setFilterOpen(false)}
-        visible={filterOpen}
-      />
-      <ShopSortSheet onClose={() => setSortOpen(false)} visible={sortOpen} />
     </View>
   );
 }
