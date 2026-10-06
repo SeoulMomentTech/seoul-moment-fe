@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
@@ -17,32 +17,46 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLoginMutation } from "../model/useLoginMutation";
 
 const HEADER_HEIGHT = 52;
-const INPUT_HEIGHT = 52;
-// 워드마크 logo.png 는 533x65. 웹 로그인 헤더(204x24)와 같은 크기로 쓴다.
-const LOGO_WIDTH = 204;
-const LOGO_HEIGHT = 24;
-// placeholder 는 className 을 못 받는다. --neutral-600 값.
-const PLACEHOLDER_COLOR = "#707070";
+const INPUT_HEIGHT = 56;
+
+// 블록 사이 간격을 하나의 스케일로 둔다. 전에는 블록마다 그때그때 붙인 값이라 리듬이 없었다.
+const GAP_TIGHT = 12; // 입력칸 사이
+const GAP_BLOCK = 24; // 블록 안쪽
+const GAP_SECTION = 40; // 블록 사이
+
+// 워드마크 logo.png 는 533x65. 상단에 무게를 주려고 웹(204x24)보다 키운다.
+const LOGO_WIDTH = 240;
+const LOGO_HEIGHT = 29;
+
+// TextInput 의 placeholderTextColor 와 테두리 색은 className 을 받지 못해 토큰 값을 직접 쓴다.
+const PLACEHOLDER_COLOR = "#707070"; // --neutral-600 (= text-neutral)
+const BORDER_IDLE = "#dddddd"; // --neutral-200 (= border-neutral-subtle)
+const BORDER_FOCUS = "#f37b2a"; // --brand-500
 
 // 비어 보이지 않을 정도의 최소 검사만 한다. 진짜 판정은 서버가 한다.
 const looksLikeEmail = (value: string) => /^\S+@\S+\.\S+$/.test(value.trim());
 
 /**
- * 로그인. 블록 구성은 web LoginPage 와 같다 —
- * 헤더 / 폼 / 약관 동의 문구 / 소셜 / 가입 유도.
- * 문구는 web 의 영문 메시지를 쓰되 placeholder 만 짧게 줄였다
- * (웹의 "Please enter your email address." 는 좁은 입력칸에서 잘린다).
+ * 로그인. 블록 구성은 web LoginPage 를 따르되(헤더 / 폼 / 약관 / 소셜 / 가입)
+ * 폰에 맞게 다듬었다 — 아직 없는 기능의 안내는 맨 아래 한 줄로 모으고,
+ * 포커스 테두리와 키보드 넘김을 더했다.
+ * 문구는 web 의 영문 메시지를 쓰되 placeholder 만 짧게 줄였다.
  */
 export function LoginScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const passwordRef = useRef<TextInput>(null);
 
   const mutation = useLoginMutation({ onSuccess: () => router.back() });
 
   const canSubmit =
     looksLikeEmail(email) && password.length > 0 && !mutation.isPending;
+
+  const submit = () => {
+    if (canSubmit) mutation.mutate({ email: email.trim(), password });
+  };
 
   return (
     <View className="bg-background flex-1">
@@ -69,33 +83,53 @@ export function LoginScreen() {
         <ScrollView
           contentContainerStyle={{
             paddingHorizontal: 20,
-            paddingBottom: insets.bottom + 32,
+            paddingBottom: insets.bottom + GAP_SECTION,
           }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <LoginHeader />
+          <View className="items-center" style={{ paddingTop: GAP_SECTION }}>
+            <Image
+              accessibilityLabel="Seoul Moment"
+              contentFit="contain"
+              source={require("@/assets/images/logo.png")}
+              style={{ width: LOGO_WIDTH, height: LOGO_HEIGHT }}
+            />
+            <Text
+              className="text-body-3 text-neutral text-center"
+              style={{ marginTop: GAP_TIGHT }}
+            >
+              Welcome to Seoul Moment.
+            </Text>
+          </View>
 
-          <View className="pt-9" style={{ gap: 14 }}>
+          <View style={{ marginTop: GAP_SECTION, gap: GAP_TIGHT }}>
             <Field
               autoComplete="email"
               keyboardType="email-address"
               onChangeText={setEmail}
+              onSubmitEditing={() => passwordRef.current?.focus()}
               placeholder="Email"
+              returnKeyType="next"
               value={email}
             />
             <Field
               autoComplete="current-password"
+              inputRef={passwordRef}
               onChangeText={setPassword}
+              onSubmitEditing={submit}
               placeholder="Password"
+              returnKeyType="go"
               secureTextEntry
               value={password}
             />
-            {/* 웹에는 /find-password 가 있지만 앱에는 아직 없어 링크를 걸지 않는다. */}
           </View>
 
           {mutation.isError ? (
-            <Text className="text-body-3 text-brand mt-4">
+            <Text
+              className="text-body-3 text-brand"
+              style={{ marginTop: GAP_TIGHT }}
+            >
               Please check your email or password.
             </Text>
           ) : null}
@@ -104,97 +138,84 @@ export function LoginScreen() {
             accessibilityLabel="Login"
             accessibilityRole="button"
             accessibilityState={{ disabled: !canSubmit }}
-            className="bg-foreground mt-8 items-center justify-center rounded-lg py-4"
+            className="bg-foreground items-center justify-center rounded-lg"
             disabled={!canSubmit}
-            onPress={() => mutation.mutate({ email: email.trim(), password })}
-            style={!canSubmit ? { opacity: 0.35 } : undefined}
+            onPress={submit}
+            style={{
+              height: INPUT_HEIGHT,
+              marginTop: GAP_BLOCK,
+              opacity: canSubmit ? 1 : 0.3,
+            }}
           >
             <Text className="text-body-2 text-background font-bold">
               {mutation.isPending ? "Logging in…" : "Login"}
             </Text>
           </Pressable>
 
-          <LoginTerms onPressTerms={() => router.push("/terms")} />
+          <View style={{ marginTop: GAP_BLOCK, gap: 8 }}>
+            <Text className="text-body-3 text-neutral text-center">
+              By logging in, you agree to the terms below of Seoul Moment.
+            </Text>
+            <Pressable
+              accessibilityLabel="Terms of Service and Privacy Policy"
+              accessibilityRole="button"
+              hitSlop={14}
+              onPress={() => router.push("/terms")}
+            >
+              <Text
+                className="text-body-3 text-foreground text-center"
+                style={{ textDecorationLine: "underline" }}
+              >
+                Terms of Service and Privacy Policy
+              </Text>
+            </Pressable>
+          </View>
 
-          {/* 소셜 로그인 자리. 네이티브 SDK·클라이언트 ID·dev build 가 필요해 아직 없다. */}
-          <Text className="text-body-3 text-neutral mt-8 text-center">
-            Social sign-in is coming soon.
+          {/* 아직 없는 기능(소셜 로그인·가입)은 화면을 차지하지 않게 맨 아래 한 줄로 모은다. */}
+          <Text
+            className="text-body-3 text-neutral text-center"
+            style={{ marginTop: GAP_SECTION, opacity: 0.7 }}
+          >
+            Social sign-in and sign-up are coming soon.
           </Text>
-
-          <Register />
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
   );
 }
 
-function LoginHeader() {
-  return (
-    <View className="items-center pt-6" style={{ gap: 16 }}>
-      <Image
-        accessibilityLabel="Seoul Moment"
-        contentFit="contain"
-        source={require("@/assets/images/logo.png")}
-        style={{ width: LOGO_WIDTH, height: LOGO_HEIGHT }}
-      />
-      <Text className="text-body-3 text-neutral text-center">
-        Welcome to Seoul Moment.
-      </Text>
-    </View>
-  );
-}
-
-function LoginTerms({ onPressTerms }: { onPressTerms(): void }) {
-  return (
-    <View className="pt-5" style={{ gap: 10 }}>
-      <Text className="text-body-3 text-foreground text-center">
-        By logging in, you agree to the terms below of Seoul Moment.
-      </Text>
-      <Pressable
-        accessibilityLabel="Terms of Service and Privacy Policy"
-        accessibilityRole="button"
-        hitSlop={14}
-        onPress={onPressTerms}
-      >
-        <Text
-          className="text-body-3 text-neutral text-center"
-          style={{ textDecorationLine: "underline" }}
-        >
-          Terms of Service and Privacy Policy
-        </Text>
-      </Pressable>
-    </View>
-  );
-}
-
-/** 가입 화면이 아직 없어 안내만 둔다. 웹은 여기서 /signup 으로 보낸다. */
-function Register() {
-  return (
-    <View className="border-neutral-subtle mt-10 border-t pt-10">
-      <Text className="text-body-3 text-neutral text-center">
-        Don&apos;t have a Seoul Moment account? Sign-up is coming soon.
-      </Text>
-    </View>
-  );
-}
-
-function Field({
-  ...input
-}: {
+interface FieldProps {
   value: string;
   placeholder: string;
   onChangeText(text: string): void;
+  onSubmitEditing?(): void;
+  returnKeyType?: "next" | "go";
   secureTextEntry?: boolean;
   keyboardType?: "email-address";
   autoComplete?: "email" | "current-password";
-}) {
+  inputRef?: React.RefObject<TextInput | null>;
+}
+
+function Field({ inputRef, ...input }: FieldProps) {
+  // 포커스 테두리가 없으면 어느 칸에 타이핑 중인지 알 수 없다. 테두리 색은
+  // className 으로 못 바꾸므로(동적 값) style 로 준다.
+  const [focused, setFocused] = useState(false);
+
   return (
     <TextInput
       autoCapitalize="none"
       autoCorrect={false}
-      className="border-neutral-subtle text-body-2 text-foreground rounded-lg border px-4"
+      className="bg-surface-muted text-body-2 text-foreground rounded-lg px-4"
+      onBlur={() => setFocused(false)}
+      onFocus={() => setFocused(true)}
       placeholderTextColor={PLACEHOLDER_COLOR}
-      style={{ height: INPUT_HEIGHT }}
+      ref={inputRef}
+      style={{
+        height: INPUT_HEIGHT,
+        borderWidth: 1,
+        borderColor: focused ? BORDER_FOCUS : BORDER_IDLE,
+      }}
+      submitBehavior="submit"
       {...input}
     />
   );
