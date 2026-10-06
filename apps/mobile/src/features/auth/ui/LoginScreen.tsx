@@ -15,14 +15,8 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { AUTH_FIELD_HEIGHT, AuthField } from "./AuthField";
+import { GAP_BLOCK, GAP_SECTION, GAP_TIGHT, HEADER_HEIGHT } from "./layout";
 import { useLoginMutation } from "../model/useLoginMutation";
-
-const HEADER_HEIGHT = 52;
-
-// 블록 사이 간격을 하나의 스케일로 둔다. 전에는 블록마다 그때그때 붙인 값이라 리듬이 없었다.
-const GAP_TIGHT = 12; // 입력칸 사이
-const GAP_BLOCK = 24; // 블록 안쪽
-const GAP_SECTION = 40; // 블록 사이
 
 // 워드마크 logo.png 는 533x65. 상단에 무게를 주려고 웹(204x24)보다 키운다.
 const LOGO_WIDTH = 240;
