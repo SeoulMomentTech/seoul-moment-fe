@@ -14,7 +14,7 @@ import {
 import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { ProductCard } from "@entities/product/ui/ProductCard";
+import { ProductCarousel } from "@entities/product/ui/ProductCarousel";
 import type {
   GetProductDetailRes,
   ProductDetailOption,
@@ -43,8 +43,6 @@ const DOT_SHADOW = {
   shadowRadius: 2,
   elevation: 3,
 } as const;
-const RELATED_CARD_WIDTH = 150;
-const RELATED_GAP = 12;
 const LABEL_WIDTH = 96;
 // detailImg 가 로드되기 전 자리를 잡는 임시 높이. 로드 후엔 원본 비율로 바뀐다.
 const DETAIL_IMAGE_PLACEHOLDER_HEIGHT = 320;
@@ -232,39 +230,6 @@ function DetailImage({ uri }: { uri: string }) {
   );
 }
 
-function RelatedProducts({ items }: { items: GetProductDetailRes["relate"] }) {
-  const router = useRouter();
-
-  if (items.length === 0) {
-    return null;
-  }
-
-  return (
-    <View className="mt-12">
-      <Text className="text-title-4 text-foreground mb-4 px-5 font-bold">
-        Related Products
-      </Text>
-      <FlatList
-        contentContainerStyle={{ paddingHorizontal: 20, gap: RELATED_GAP }}
-        data={items}
-        horizontal
-        keyExtractor={(item) => String(item.id)}
-        renderItem={({ item }) => (
-          <Pressable
-            accessibilityLabel={item.productName}
-            accessibilityRole="button"
-            onPress={() => router.push(`/product/${item.id}`)}
-            style={{ width: RELATED_CARD_WIDTH }}
-          >
-            <ProductCard product={item} />
-          </Pressable>
-        )}
-        showsHorizontalScrollIndicator={false}
-      />
-    </View>
-  );
-}
-
 /**
  * 상품 상세(읽기 전용). 담기·좋아요·옵션 선택은 장바구니와 로그인이 없어 의도적으로 뺐다.
  * 상태 분기(잘못된 id → 오프라인 → 로딩 → 에러 → 콘텐츠)는 DetailScreen 과 같은 순서이고,
@@ -399,7 +364,10 @@ export function ProductDetailScreen({ id }: { id: number }) {
             <DetailImage uri={product.detailImg} />
           </View>
         ) : null}
-        <RelatedProducts items={product.relate ?? []} />
+        <ProductCarousel
+          heading="Related Products"
+          items={product.relate ?? []}
+        />
         <View style={{ height: insets.bottom + 32 }} />
       </ScrollView>
       <TopScrim height={insets.top + SCRIM_EXTRA_HEIGHT} />

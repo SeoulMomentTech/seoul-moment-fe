@@ -13,6 +13,7 @@ import { DetailSection, SECTION_GAP } from "@shared/ui/detail-section";
 import { SectionError } from "@shared/ui/section-state";
 import { DetailSkeleton } from "@shared/ui/skeleton";
 
+import { BrandProducts } from "./BrandProducts";
 import { useBrandDetail } from "../model/useBrandDetail";
 
 const BANNER_HEIGHT = 300;
@@ -114,6 +115,7 @@ export function BrandScreen({ id }: { id: number }) {
             section={section}
           />
         ))}
+        <BrandProducts brandId={id} />
         <View style={{ height: insets.bottom + SECTION_GAP }} />
       </ScrollView>
       <TopScrim height={insets.top + SCRIM_EXTRA_HEIGHT} />
