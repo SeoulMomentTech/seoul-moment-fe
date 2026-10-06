@@ -147,26 +147,8 @@ export function LoginScreen() {
             </Text>
           </Pressable>
 
-          <View style={{ marginTop: GAP_BLOCK, gap: 8 }}>
-            <Text className="text-body-3 text-neutral text-center">
-              By logging in, you agree to the terms below of Seoul Moment.
-            </Text>
-            <Pressable
-              accessibilityLabel="Terms of Service and Privacy Policy"
-              accessibilityRole="button"
-              hitSlop={14}
-              onPress={() => router.push("/terms")}
-            >
-              <Text
-                className="text-body-3 text-foreground text-center"
-                style={{ textDecorationLine: "underline" }}
-              >
-                Terms of Service and Privacy Policy
-              </Text>
-            </Pressable>
-          </View>
-
-          {/* 아직 없는 기능(소셜 로그인·가입)은 화면을 차지하지 않게 맨 아래 한 줄로 모은다. */}
+          {/* 약관 동의 문구는 두지 않는다 — 로그인은 동의를 받는 자리가 아니고,
+              약관은 가입 화면과 My > Help 에서 볼 수 있다. */}
           <Pressable
             accessibilityLabel="Sign up with email"
             accessibilityRole="button"
