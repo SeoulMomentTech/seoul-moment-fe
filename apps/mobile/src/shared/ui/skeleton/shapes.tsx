@@ -154,6 +154,42 @@ export function PostListSkeleton({ count = 3 }: PostListSkeletonProps) {
   );
 }
 
+interface ProductRowSkeletonProps {
+  /** 기본 3. 폭 150 + 간격 12 라 390pt 에서 2.3개가 보인다. */
+  count?: number;
+  /** ProductCarousel 의 CAROUSEL_CARD_WIDTH 와 같아야 한다. */
+  cardWidth?: number;
+}
+
+/**
+ * 제목 + 가로 상품 카드 줄 (ProductCarousel). 바깥 mt-12 는 호출부가 준다.
+ * 높이 = 제목 24 + mb-4 16 + productCardHeight(cardWidth).
+ */
+export function ProductRowSkeleton({
+  count = 3,
+  cardWidth = 150,
+}: ProductRowSkeletonProps) {
+  return (
+    <View>
+      <View style={{ paddingHorizontal: PAGE_PADDING, marginBottom: 16 }}>
+        <Line bar={BAR_TITLE_4} line={LINE_TITLE_4} width="45%" />
+      </View>
+      <View
+        style={{
+          flexDirection: "row",
+          gap: GRID_GAP,
+          paddingHorizontal: PAGE_PADDING,
+          overflow: "hidden",
+        }}
+      >
+        {Array.from({ length: count }, (_, i) => (
+          <ProductCardSkeleton key={i} width={cardWidth} />
+        ))}
+      </View>
+    </View>
+  );
+}
+
 // 홈 뉴스/아티클 슬라이드 카드 치수. 실제 카드(PostSlideCards)가 이 값을 가져다 쓴다 —
 // shared 는 features 를 import 할 수 없으므로 출처를 이쪽에 둔다.
 export const NEWS_CARD_HEIGHT = 360;
