@@ -154,23 +154,24 @@ export function PostListSkeleton({ count = 3 }: PostListSkeletonProps) {
   );
 }
 
-// 홈 뉴스/아티클 슬라이드 카드. 실제 치수는 PostSlideCards 가 소유한다.
-const NEWS_CARD_HEIGHT = 457;
-const ARTICLE_IMAGE_HEIGHT = 300;
+// 홈 뉴스/아티클 슬라이드 카드 치수. 실제 카드(PostSlideCards)가 이 값을 가져다 쓴다 —
+// shared 는 features 를 import 할 수 없으므로 출처를 이쪽에 둔다.
+export const NEWS_CARD_HEIGHT = 360;
+export const ARTICLE_IMAGE_HEIGHT = 230;
 // 슬라이드 아래 페이저 영역: marginTop 40 + 바 1 + 간격 12 + 숫자 줄 20.
 const PAGER_BLOCK = 40 + 1 + 12 + 20;
 
 interface PostSlideSkeletonProps {
   /**
-   * news: 사진 위에 글이 얹힌 풀블리드 카드 (높이 457 고정).
-   * article: 사진 300 + 간격 30 + 제목 2줄 + 본문 3줄 + 바이라인.
+   * news: 사진 위에 글이 얹힌 풀블리드 카드 (높이 고정).
+   * article: 사진 + 간격 30 + 제목 2줄 + 본문 3줄 + 바이라인.
    */
   variant: "news" | "article";
 }
 
 /**
  * 홈 슬라이드 섹션. 두 변형 모두 아래에 페이저 자리(73)를 포함한다.
- * news = 457 + 73 = 530, article = 300 + 30 + 2x22 + 12 + 3x17 + 20 + 17 + 73 = 547.
+ * news = 360 + 73 = 433, article = 230 + 30 + 2x22 + 12 + 3x17 + 20 + 17 + 73 = 477.
  */
 export function PostSlideSkeleton({ variant }: PostSlideSkeletonProps) {
   if (variant === "news") {
