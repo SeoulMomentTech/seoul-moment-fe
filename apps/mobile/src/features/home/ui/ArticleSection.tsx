@@ -1,11 +1,12 @@
 import { useRouter } from "expo-router";
-import { Pressable, View } from "react-native";
+import { Pressable } from "react-native";
 
-import { PostRow } from "@entities/post/ui/PostRow";
 import { Section } from "@shared/ui/section";
 import { SectionError } from "@shared/ui/section-state";
-import { PostListSkeleton } from "@shared/ui/skeleton";
+import { PostSlideSkeleton } from "@shared/ui/skeleton";
+import { SlideCarousel } from "@shared/ui/slide-pager/SlideCarousel";
 
+import { ArticleSlideCard } from "./PostSlideCards";
 import { useHomeArticle } from "../model/useHomeLists";
 
 export function ArticleSection() {
@@ -31,7 +32,7 @@ export function ArticleSection() {
   if (isPending) {
     return (
       <Section title="Article">
-        <PostListSkeleton />
+        <PostSlideSkeleton variant="article" />
       </Section>
     );
   }
@@ -46,25 +47,28 @@ export function ArticleSection() {
 
   if (!articles || articles.length === 0) return null;
 
+  // 웹 홈과 같이 아티클에는 더보기를 두지 않는다 — 전체 목록 화면이 따로 없다.
   return (
     <Section title="Article">
-      <View>
-        {articles.map((item) => (
+      <SlideCarousel
+        data={articles}
+        keyExtractor={(item) => String(item.id)}
+        renderItem={(item) => (
           <Pressable
             accessibilityLabel={item.title}
             accessibilityRole="button"
-            key={item.id}
             onPress={() => router.push(`/article/${item.id}`)}
           >
-            <PostRow
+            <ArticleSlideCard
+              content={item.content}
               createDate={item.createDate}
               imageUrl={item.homeImage}
               title={item.title}
               writer={item.writer}
             />
           </Pressable>
-        ))}
-      </View>
+        )}
+      />
     </Section>
   );
 }

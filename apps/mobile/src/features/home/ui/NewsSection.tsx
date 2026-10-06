@@ -1,11 +1,12 @@
 import { useRouter } from "expo-router";
-import { Pressable, View } from "react-native";
+import { Pressable, Text } from "react-native";
 
-import { PostRow } from "@entities/post/ui/PostRow";
 import { Section } from "@shared/ui/section";
 import { SectionError } from "@shared/ui/section-state";
-import { PostListSkeleton } from "@shared/ui/skeleton";
+import { PostSlideSkeleton } from "@shared/ui/skeleton";
+import { SlideCarousel } from "@shared/ui/slide-pager/SlideCarousel";
 
+import { NEWS_CARD_HEIGHT, NewsSlideCard } from "./PostSlideCards";
 import { useHomeNews } from "../model/useHomeLists";
 
 export function NewsSection() {
@@ -31,7 +32,7 @@ export function NewsSection() {
   if (isPending) {
     return (
       <Section title="News">
-        <PostListSkeleton />
+        <PostSlideSkeleton variant="news" />
       </Section>
     );
   }
@@ -47,24 +48,41 @@ export function NewsSection() {
   if (!news || news.length === 0) return null;
 
   return (
-    <Section title="News">
-      <View>
-        {news.map((item) => (
+    <Section
+      action={
+        <Pressable
+          accessibilityLabel="View all news"
+          accessibilityRole="button"
+          // 글자 한 줄(17pt)뿐이라 8 로는 33pt 에 그친다. 14 로 45pt 를 만든다.
+          hitSlop={14}
+          // 탭 라우트라 push 하면 (tabs) 네비게이터가 한 벌 더 쌓인다.
+          onPress={() => router.navigate("/news")}
+        >
+          <Text className="text-body-3 text-brand font-semibold">View all</Text>
+        </Pressable>
+      }
+      title="News"
+    >
+      <SlideCarousel
+        data={news}
+        keyExtractor={(item) => String(item.id)}
+        renderItem={(item) => (
           <Pressable
             accessibilityLabel={item.title}
             accessibilityRole="button"
-            key={item.id}
             onPress={() => router.push(`/news/${item.id}`)}
+            style={{ height: NEWS_CARD_HEIGHT }}
           >
-            <PostRow
+            <NewsSlideCard
+              content={item.content}
               createDate={item.createDate}
               imageUrl={item.homeImage}
               title={item.title}
               writer={item.writer}
             />
           </Pressable>
-        ))}
-      </View>
+        )}
+      />
     </Section>
   );
 }

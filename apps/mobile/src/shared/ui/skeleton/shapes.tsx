@@ -154,6 +154,56 @@ export function PostListSkeleton({ count = 3 }: PostListSkeletonProps) {
   );
 }
 
+// 홈 뉴스/아티클 슬라이드 카드. 실제 치수는 PostSlideCards 가 소유한다.
+const NEWS_CARD_HEIGHT = 457;
+const ARTICLE_IMAGE_HEIGHT = 300;
+// 슬라이드 아래 페이저 영역: marginTop 40 + 바 1 + 간격 12 + 숫자 줄 20.
+const PAGER_BLOCK = 40 + 1 + 12 + 20;
+
+interface PostSlideSkeletonProps {
+  /**
+   * news: 사진 위에 글이 얹힌 풀블리드 카드 (높이 457 고정).
+   * article: 사진 300 + 간격 30 + 제목 2줄 + 본문 3줄 + 바이라인.
+   */
+  variant: "news" | "article";
+}
+
+/**
+ * 홈 슬라이드 섹션. 두 변형 모두 아래에 페이저 자리(73)를 포함한다.
+ * news = 457 + 73 = 530, article = 300 + 30 + 2x22 + 12 + 3x17 + 20 + 17 + 73 = 547.
+ */
+export function PostSlideSkeleton({ variant }: PostSlideSkeletonProps) {
+  if (variant === "news") {
+    return (
+      <View>
+        <Shimmer height={NEWS_CARD_HEIGHT} radius={0} />
+        <View style={{ marginTop: PAGER_BLOCK }} />
+      </View>
+    );
+  }
+
+  return (
+    <View>
+      <View style={{ paddingHorizontal: PAGE_PADDING }}>
+        <Shimmer height={ARTICLE_IMAGE_HEIGHT} radius={0} />
+        <View style={{ marginTop: 30 }}>
+          <Line bar={BAR_BODY_1} line={LINE_BODY_1} />
+          <Line bar={BAR_BODY_1} line={LINE_BODY_1} width="70%" />
+          <View style={{ marginTop: 12 }}>
+            <Line bar={BAR_BODY_3} line={LINE_BODY_3} />
+            <Line bar={BAR_BODY_3} line={LINE_BODY_3} />
+            <Line bar={BAR_BODY_3} line={LINE_BODY_3} width="60%" />
+          </View>
+          <View style={{ marginTop: 20 }}>
+            <Line bar={BAR_BODY_3} line={LINE_BODY_3} width="45%" />
+          </View>
+        </View>
+      </View>
+      <View style={{ marginTop: PAGER_BLOCK }} />
+    </View>
+  );
+}
+
 interface BannerSkeletonProps {
   height?: number;
   /** true 면 좌우 20 여백 + 둥근 모서리(카드형), false 면 풀블리드. */
