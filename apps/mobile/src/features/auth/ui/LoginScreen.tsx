@@ -154,7 +154,8 @@ export function LoginScreen() {
             accessibilityRole="button"
             className="border-neutral-subtle items-center justify-center rounded-lg border"
             onPress={() => router.push("/signup")}
-            style={{ height: AUTH_FIELD_HEIGHT, marginTop: GAP_SECTION }}
+            // 로그인과 짝을 이루는 선택지라 블록 간격(40)이 아니라 가까이 붙인다.
+            style={{ height: AUTH_FIELD_HEIGHT, marginTop: GAP_TIGHT }}
           >
             <Text className="text-body-2 text-foreground font-bold">
               Sign up with email
