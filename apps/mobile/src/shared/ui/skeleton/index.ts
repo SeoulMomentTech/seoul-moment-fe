@@ -17,5 +17,6 @@ export {
   PostSlideSkeleton,
   ProductCardSkeleton,
   ProductGridSkeleton,
+  ProductRowSkeleton,
   productCardHeight,
 } from "./shapes";
