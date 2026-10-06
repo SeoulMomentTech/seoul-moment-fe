@@ -2,10 +2,8 @@ import { Image } from "expo-image";
 import { Text, View } from "react-native";
 
 import { formatDate } from "@shared/lib/utils/formatDate";
+import { ARTICLE_IMAGE_HEIGHT, NEWS_CARD_HEIGHT } from "@shared/ui/skeleton";
 
-// 웹 모바일 구간(max-sm)의 카드 높이를 그대로 쓴다.
-export const NEWS_CARD_HEIGHT = 457;
-export const ARTICLE_IMAGE_HEIGHT = 300;
 // 아티클은 이미지와 글 사이가 넓다 (웹 max-sm:gap-[30px]).
 const ARTICLE_GAP = 30;
 

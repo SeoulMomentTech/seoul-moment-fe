@@ -3,10 +3,10 @@ import { Pressable, Text } from "react-native";
 
 import { Section } from "@shared/ui/section";
 import { SectionError } from "@shared/ui/section-state";
-import { PostSlideSkeleton } from "@shared/ui/skeleton";
+import { NEWS_CARD_HEIGHT, PostSlideSkeleton } from "@shared/ui/skeleton";
 import { SlideCarousel } from "@shared/ui/slide-pager/SlideCarousel";
 
-import { NEWS_CARD_HEIGHT, NewsSlideCard } from "./PostSlideCards";
+import { NewsSlideCard } from "./PostSlideCards";
 import { useHomeNews } from "../model/useHomeLists";
 
 export function NewsSection() {
