@@ -18,6 +18,8 @@ import { useLoginMutation } from "../model/useLoginMutation";
 
 const HEADER_HEIGHT = 52;
 const INPUT_HEIGHT = 56;
+// 입력칸 안쪽 좌우 여백. 56 높이에 16 은 글자가 테두리에 붙어 보여 화면 좌우 여백(20)과 맞춘다.
+const INPUT_PADDING_X = 20;
 
 // 블록 사이 간격을 하나의 스케일로 둔다. 전에는 블록마다 그때그때 붙인 값이라 리듬이 없었다.
 const GAP_TIGHT = 12; // 입력칸 사이
@@ -205,13 +207,14 @@ function Field({ inputRef, ...input }: FieldProps) {
     <TextInput
       autoCapitalize="none"
       autoCorrect={false}
-      className="bg-surface-muted text-body-2 text-foreground rounded-lg px-4"
+      className="bg-surface-muted text-body-2 text-foreground rounded-lg"
       onBlur={() => setFocused(false)}
       onFocus={() => setFocused(true)}
       placeholderTextColor={PLACEHOLDER_COLOR}
       ref={inputRef}
       style={{
         height: INPUT_HEIGHT,
+        paddingHorizontal: INPUT_PADDING_X,
         borderWidth: 1,
         borderColor: focused ? BORDER_FOCUS : BORDER_IDLE,
       }}
