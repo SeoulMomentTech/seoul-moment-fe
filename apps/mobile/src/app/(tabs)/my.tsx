@@ -1,5 +1,5 @@
-import { ScreenPlaceholder } from "@shared/ui/screen-placeholder";
+import { MyScreen } from "@features/my";
 
-export default function MyScreen() {
-  return <ScreenPlaceholder title="My" />;
+export default function MyRoute() {
+  return <MyScreen />;
 }
