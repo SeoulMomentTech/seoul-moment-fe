@@ -5,8 +5,8 @@ import { getProductList } from "@shared/services/product";
 
 import type { CommonRes } from "@shared/services";
 
-// 가로로 넘기는 줄이라 웹(4개)보다 넉넉히 가져온다.
-const COUNT = 10;
+// 웹 brand-products 위젯과 같은 4개. 소개 페이지의 맛보기지 목록이 아니다.
+const COUNT = 4;
 
 /** 브랜드 소개 하단의 상품 줄. 잘못된 id 면 요청하지 않는다. */
 export const useBrandProducts = (brandId?: number) => {
