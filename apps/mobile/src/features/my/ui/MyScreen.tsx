@@ -1,12 +1,10 @@
-import * as WebBrowser from "expo-web-browser";
+import { useRouter } from "expo-router";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { useLanguage } from "@shared/lib/i18n/useLanguage";
-
 import { BottomTabInset } from "@/constants/theme";
 
-import { MY_MENU_GROUPS, webUrl, type MyMenuItem } from "../model/menu";
+import { MY_MENU_GROUPS, type MyMenuItem } from "../model/menu";
 
 /**
  * 마이페이지(비로그인). 가입 유도 블록 + 구분 밴드 + 그룹별 메뉴.
@@ -14,12 +12,7 @@ import { MY_MENU_GROUPS, webUrl, type MyMenuItem } from "../model/menu";
  */
 export function MyScreen() {
   const insets = useSafeAreaInsets();
-  const languageCode = useLanguage();
-
-  const open = (item: MyMenuItem) => {
-    // 앱에 해당 화면이 없어 웹 페이지를 앱 안 브라우저로 띄운다.
-    void WebBrowser.openBrowserAsync(webUrl(item.path, languageCode));
-  };
+  const router = useRouter();
 
   return (
     <ScrollView
@@ -36,7 +29,11 @@ export function MyScreen() {
             {group.title}
           </Text>
           {group.items.map((item) => (
-            <MenuRow item={item} key={item.path} onPress={() => open(item)} />
+            <MenuRow
+              item={item}
+              key={item.label}
+              onPress={() => router.push(item.href)}
+            />
           ))}
         </View>
       ))}
@@ -77,7 +74,7 @@ function MenuRow({ item, onPress }: { item: MyMenuItem; onPress(): void }) {
   return (
     <Pressable
       accessibilityLabel={item.label}
-      accessibilityRole="link"
+      accessibilityRole="button"
       className="border-neutral-subtle flex-row items-center justify-between border-b px-5"
       onPress={onPress}
       // 줄 높이를 56 으로 잡아 44pt 최소 터치 영역을 넘긴다.
