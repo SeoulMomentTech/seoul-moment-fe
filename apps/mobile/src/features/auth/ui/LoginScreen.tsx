@@ -30,7 +30,8 @@ const looksLikeEmail = (value: string) => /^\S+@\S+\.\S+$/.test(value.trim());
 /**
  * 로그인. 블록 구성은 web LoginPage 와 같다 —
  * 헤더 / 폼 / 약관 동의 문구 / 소셜 / 가입 유도.
- * 문구도 web 의 영문 메시지를 그대로 쓴다.
+ * 문구는 web 의 영문 메시지를 쓰되 placeholder 만 짧게 줄였다
+ * (웹의 "Please enter your email address." 는 좁은 입력칸에서 잘린다).
  */
 export function LoginScreen() {
   const insets = useSafeAreaInsets();
@@ -80,13 +81,13 @@ export function LoginScreen() {
               autoComplete="email"
               keyboardType="email-address"
               onChangeText={setEmail}
-              placeholder="Please enter your email address."
+              placeholder="Email"
               value={email}
             />
             <Field
               autoComplete="current-password"
               onChangeText={setPassword}
-              placeholder="Please enter your password."
+              placeholder="Password"
               secureTextEntry
               value={password}
             />
