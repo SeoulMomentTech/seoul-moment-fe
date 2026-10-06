@@ -12,6 +12,7 @@ export {
   POST_ROW_HEIGHT,
   PostListSkeleton,
   PostRowSkeleton,
+  PostSlideSkeleton,
   ProductCardSkeleton,
   ProductGridSkeleton,
   productCardHeight,

@@ -10,7 +10,9 @@ import { getProductList } from "@shared/services/product";
 import type { CommonRes } from "@shared/services";
 
 const NOW_ON_SALE_COUNT = 4;
-const POST_COUNT = 3;
+// 가로 슬라이드라 개수를 늘려도 홈 길이가 늘지 않는다. 웹 홈과 같은 9 를 쓴다.
+// dev 기준 뉴스는 14건 중 9건, 아티클은 있는 5건이 전부 온다.
+const POST_COUNT = 9;
 
 export const useNowOnSale = () => {
   const languageCode = useLanguage();
