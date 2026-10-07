@@ -1,10 +1,11 @@
 import { ActivityIndicator, View } from "react-native";
 
 import { Section } from "@shared/ui/section";
-import { SectionError } from "@shared/ui/section-state";
+import { EmptyState, SectionError } from "@shared/ui/section-state";
 import { PostListSkeleton } from "@shared/ui/skeleton";
 
 import { useInfiniteNewsByCategory } from "../model/useInfiniteNewsByCategory";
+import { useNewsDashboardIsEmpty } from "../model/useNewsDashboard";
 
 /** 제목 줄. 로딩·에러·오프라인에서도 같은 자리를 지킨다. */
 function LifestyleTitle() {
@@ -38,6 +39,7 @@ export function LifestyleHeader() {
 export function LifestyleEmpty() {
   const { isPending, isError, fetchStatus, refetch } =
     useInfiniteNewsByCategory();
+  const dashboardEmpty = useNewsDashboardIsEmpty();
 
   // 오프라인이면 요청이 paused 되어 isPending 이 유지된다.
   if (isPending && fetchStatus === "paused") {
@@ -48,7 +50,11 @@ export function LifestyleEmpty() {
 
   if (isError) return <SectionError onRetry={() => void refetch()} />;
 
-  return null;
+  // Lifestyle 만 비었으면 위 대시보드가 화면을 채우므로 아무것도 그리지 않는다.
+  // 대시보드까지 비었을 때만 News 탭 전체가 흰 종이라 한 마디가 필요하다.
+  if (!dashboardEmpty) return null;
+
+  return <EmptyState hint="Pull down to refresh." message="No stories yet" />;
 }
 
 export function LifestyleFooter() {

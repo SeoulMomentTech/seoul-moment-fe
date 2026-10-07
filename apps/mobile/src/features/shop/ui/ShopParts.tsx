@@ -11,7 +11,7 @@ import {
 } from "react-native";
 
 import { Touchable } from "@shared/ui/press";
-import { SectionError } from "@shared/ui/section-state";
+import { EmptyState, SectionError } from "@shared/ui/section-state";
 import {
   BannerSkeleton,
   BrandHeaderSkeleton,
@@ -361,13 +361,7 @@ export function ShopEmpty() {
 
   if (isError) return <SectionError onRetry={() => void refetch()} />;
 
-  return (
-    <View className="items-center px-5 py-12">
-      <Text className="text-body-2 text-neutral">
-        No products match these filters
-      </Text>
-    </View>
-  );
+  return <EmptyState message="No products match these filters" />;
 }
 
 export function ShopFooter() {

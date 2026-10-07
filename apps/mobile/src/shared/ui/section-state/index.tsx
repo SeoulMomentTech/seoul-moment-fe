@@ -28,6 +28,30 @@ export function SectionError({ onRetry }: SectionErrorProps) {
   );
 }
 
+interface EmptyStateProps {
+  message: string;
+  /** 사용자가 할 수 있는 일이 있을 때만 둔다. */
+  hint?: string;
+}
+
+/**
+ * "비었다"고 말해야 하는 자리의 하나뿐인 모양. 장식용 섹션이 null 로 사라지는 것은
+ * 그대로 맞지만(빈 제목 자리를 만들지 않는다), 그 자리가 화면 전부가 되면 설명 없는
+ * 흰 종이만 남는다. 그때 이 블록이 한 마디를 한다.
+ */
+export function EmptyState({ message, hint }: EmptyStateProps) {
+  return (
+    <View className="items-center px-5 py-12">
+      <Text className="text-body-2 text-neutral text-center">{message}</Text>
+      {hint ? (
+        <Text className="text-body-3 text-neutral mt-2 text-center">
+          {hint}
+        </Text>
+      ) : null}
+    </View>
+  );
+}
+
 interface ScreenErrorProps {
   onRetry(): void;
   /** 오프라인이라 요청이 멈춘 경우. 문구만 바뀌고 재시도 동작은 같다. */
