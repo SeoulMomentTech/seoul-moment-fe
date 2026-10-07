@@ -189,7 +189,7 @@ function PickCard({ item }: { item: NewsWithCategory }) {
           transition={200}
         />
         <Text
-          className="text-body-2 text-foreground mt-2 font-bold"
+          className="text-body-2 text-foreground mt-3 font-bold"
           numberOfLines={2}
         >
           {item.title}
@@ -363,7 +363,7 @@ function HotKeywordSection() {
                 transition={200}
               />
               <Text
-                className="text-body-2 text-background mt-2 font-bold"
+                className="text-body-2 text-background mt-3 font-bold"
                 numberOfLines={2}
               >
                 {item.title}

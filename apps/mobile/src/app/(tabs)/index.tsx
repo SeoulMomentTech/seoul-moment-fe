@@ -19,7 +19,7 @@ export default function HomeScreen() {
     <View className="bg-background flex-1">
       <ScrollView
         contentContainerStyle={{
-          paddingBottom: BottomTabInset + Spacing.five,
+          paddingBottom: BottomTabInset + Spacing.section,
         }}
         refreshControl={
           <RefreshControl onRefresh={refresh} refreshing={isRefreshing} />

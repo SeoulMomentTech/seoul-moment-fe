@@ -28,6 +28,8 @@ import { Touchable } from "@shared/ui/press";
 import { ScreenError } from "@shared/ui/section-state";
 import { DetailSkeleton } from "@shared/ui/skeleton";
 
+import { Spacing } from "@/constants/theme";
+
 import useProductDetail from "../model/useProductDetail";
 import { useShopFilterStore } from "../model/useShopFilterStore";
 
@@ -371,7 +373,7 @@ export function ProductDetailScreen({ id }: { id: number }) {
           heading="Related Products"
           items={product.relate ?? []}
         />
-        <View style={{ height: insets.bottom + 32 }} />
+        <View style={{ height: insets.bottom + Spacing.section }} />
       </ScrollView>
       <TopScrim height={insets.top + SCRIM_EXTRA_HEIGHT} />
       <BackButton />
