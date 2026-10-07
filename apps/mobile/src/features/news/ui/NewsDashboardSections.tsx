@@ -120,7 +120,7 @@ function FeaturedSection() {
             >
               {featured.title}
             </Text>
-            <Text className="text-body-3 text-neutral mt-1" numberOfLines={1}>
+            <Text className="text-body-5 text-neutral mt-1" numberOfLines={1}>
               {byline(featured)}
             </Text>
           </View>
@@ -189,12 +189,12 @@ function PickCard({ item }: { item: NewsWithCategory }) {
           transition={200}
         />
         <Text
-          className="text-body-3 text-foreground mt-2 font-bold"
+          className="text-body-2 text-foreground mt-2 font-bold"
           numberOfLines={2}
         >
           {item.title}
         </Text>
-        <Text className="text-body-3 text-neutral mt-1" numberOfLines={1}>
+        <Text className="text-body-5 text-neutral mt-1" numberOfLines={1}>
           {byline(item)}
         </Text>
       </View>
@@ -378,13 +378,13 @@ function HotKeywordSection() {
                 transition={200}
               />
               <Text
-                className="text-body-3 text-background mt-2 font-bold"
+                className="text-body-2 text-background mt-2 font-bold"
                 numberOfLines={2}
               >
                 {item.title}
               </Text>
               <Text
-                className="text-body-3 text-background mt-1"
+                className="text-body-5 text-background mt-1"
                 numberOfLines={1}
                 style={{ opacity: 0.7 }}
               >
