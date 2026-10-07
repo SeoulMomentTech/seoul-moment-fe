@@ -6,6 +6,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LegalDocument, type LegalNode } from "@shared/ui/legal-document";
 import { Touchable } from "@shared/ui/press";
 
+import { Spacing } from "@/constants/theme";
+
 const HEADER_HEIGHT = 52;
 
 /**
@@ -53,7 +55,7 @@ export function LegalScreen({
         contentContainerStyle={{
           paddingHorizontal: 20,
           paddingTop: 24,
-          paddingBottom: insets.bottom + 48,
+          paddingBottom: insets.bottom + Spacing.section,
         }}
         showsVerticalScrollIndicator={false}
       >

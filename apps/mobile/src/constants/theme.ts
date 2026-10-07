@@ -40,14 +40,21 @@ export const Fonts = Platform.select({
  * 구분되지 않아 단계가 되지 못하고, 32/36 은 이 앱에 그만한 글자를 둘 자리가 없다.
  */
 
+/**
+ * 세로 리듬. 블록 사이의 간격은 이 네 값만 쓴다.
+ * 전에는 32·40·48·56·64·72·104 가 섞여 있었고, 어느 간격이 무엇을 뜻하는지
+ * 화면에서 읽히지 않았다 — 홈에서 상세로 넘어가면 같은 종류의 경계가 매번 달라졌다.
+ * 이전 Spacing(half~six)은 네 곳의 paddingBottom 에만 쓰이던 장식이라 지웠다.
+ */
 export const Spacing = {
-  half: 2,
-  one: 4,
-  two: 8,
-  three: 16,
-  four: 24,
-  five: 32,
-  six: 64,
+  /** 한 묶음 안 — 이미지와 그 밑 제목, 짝이 되는 버튼 사이. */
+  tight: 12,
+  /** 한 블록 안의 덩어리 사이 — 그리드 행, 폼 묶음과 그 동작. */
+  inner: 24,
+  /** 섹션과 섹션 사이. Section 의 pt-10 과 같은 값이다. */
+  section: 40,
+  /** 장과 장 사이 — 상세 화면의 큰 구간. */
+  chapter: 64,
 } as const;
 
 export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;

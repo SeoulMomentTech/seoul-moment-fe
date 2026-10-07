@@ -14,8 +14,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button } from "@shared/ui/button";
 import { Touchable } from "@shared/ui/press";
 
+import { Spacing } from "@/constants/theme";
+
 import { AUTH_FIELD_HEIGHT, AuthField } from "./AuthField";
-import { GAP_BLOCK, GAP_SECTION, GAP_TIGHT, HEADER_HEIGHT } from "./layout";
+import { HEADER_HEIGHT } from "./layout";
 import { useLoginMutation } from "../model/useLoginMutation";
 import {
   useSendEmailCode,
@@ -126,7 +128,7 @@ export function SignUpScreen() {
         <ScrollView
           contentContainerStyle={{
             paddingHorizontal: 20,
-            paddingBottom: insets.bottom + GAP_SECTION,
+            paddingBottom: insets.bottom + Spacing.section,
           }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
@@ -135,7 +137,7 @@ export function SignUpScreen() {
             Create your account
           </Text>
 
-          <Group label="Email" style={{ marginTop: GAP_SECTION }}>
+          <Group label="Email" style={{ marginTop: Spacing.section }}>
             <View className="flex-row" style={{ gap: 8 }}>
               <View className="flex-1">
                 <AuthField
@@ -210,7 +212,7 @@ export function SignUpScreen() {
             ) : null}
           </Group>
 
-          <Group label="Password" style={{ marginTop: GAP_SECTION }}>
+          <Group label="Password" style={{ marginTop: Spacing.section }}>
             <AuthField
               autoComplete="new-password"
               onChangeText={setPassword}
@@ -234,7 +236,7 @@ export function SignUpScreen() {
             )}
           </Group>
 
-          <Group label="Nickname" style={{ marginTop: GAP_SECTION }}>
+          <Group label="Nickname" style={{ marginTop: Spacing.section }}>
             <AuthField
               onChangeText={setNickname}
               placeholder="Nickname"
@@ -263,12 +265,12 @@ export function SignUpScreen() {
                 : "Create account"
             }
             onPress={submit}
-            style={{ marginTop: GAP_SECTION }}
+            style={{ marginTop: Spacing.section }}
           />
 
           <Text
             className="text-body-3 text-neutral text-center"
-            style={{ marginTop: GAP_BLOCK, opacity: 0.7 }}
+            style={{ marginTop: Spacing.inner, opacity: 0.7 }}
           >
             By creating an account, you agree to our terms.
           </Text>
@@ -278,7 +280,7 @@ export function SignUpScreen() {
   );
 }
 
-/** 라벨 + 그 아래 입력 묶음. 묶음 안은 항상 GAP_TIGHT 로 붙는다. */
+/** 라벨 + 그 아래 입력 묶음. 묶음 안은 항상 Spacing.tight 로 붙는다. */
 function Group({
   label,
   style,
@@ -291,7 +293,7 @@ function Group({
   return (
     <View style={style}>
       <Text className="text-body-3 text-neutral mb-2">{label}</Text>
-      <View style={{ gap: GAP_TIGHT }}>{children}</View>
+      <View style={{ gap: Spacing.tight }}>{children}</View>
     </View>
   );
 }

@@ -17,6 +17,8 @@ import { DetailSection } from "@shared/ui/detail-section";
 import { ScreenError } from "@shared/ui/section-state";
 import { DetailSkeleton } from "@shared/ui/skeleton";
 
+import { Spacing } from "@/constants/theme";
+
 import { RelatedPosts } from "./RelatedPosts";
 
 const BANNER_HEIGHT = 300;
@@ -190,7 +192,7 @@ export function DetailScreen<T extends DetailContent>({
           </View>
         </View>
         {/* 배너 바로 아래에 붙는 전체 폭 인트로 블록. 가로 여백은 안쪽에서 준다. */}
-        <View className="bg-surface-muted px-5 pb-8 pt-6">
+        <View className="bg-surface-muted px-5 pb-6 pt-6">
           {byline ? (
             <View className="flex-row items-center">
               {/* profileImage 가 빈 문자열이면 빈 원 대신 아바타를 생략한다. */}
@@ -231,7 +233,7 @@ export function DetailScreen<T extends DetailContent>({
           viewAllHref={relatedViewAllHref}
         />
         {/* 관련 글이 없으면 RelatedPosts 가 null 이라 마지막 이미지가 화면 끝에 붙는다. 홈 인디케이터 위로 띄운다. */}
-        <View style={{ height: insets.bottom + 32 }} />
+        <View style={{ height: insets.bottom + Spacing.section }} />
       </ScrollView>
       {/* 스크롤 콘텐츠 위, 뒤로가기 버튼 아래. JSX 순서로 쌓임이 정해진다. */}
       <TopScrim height={insets.top + SCRIM_EXTRA_HEIGHT} />
