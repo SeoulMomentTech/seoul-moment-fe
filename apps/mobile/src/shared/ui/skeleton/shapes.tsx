@@ -1,5 +1,6 @@
 import { View, useWindowDimensions, type DimensionValue } from "react-native";
 
+import { BUTTON_HEIGHT } from "@shared/ui/button";
 import { SECTION_GAP } from "@shared/ui/detail-section";
 
 import { Shimmer } from "./Shimmer";
@@ -436,8 +437,8 @@ export function CategoryChipsSkeleton() {
   );
 }
 
-// px-5 py-3 버튼: body-3 한 줄 + 위아래 12 + 테두리 1 x 2.
-const PILL_BUTTON_HEIGHT = LINE_BODY_3 + 24 + 2;
+// 공용 Button 의 secondary/md 높이. 실제 헤더가 쓰는 값을 그대로 가져온다.
+const PILL_BUTTON_HEIGHT = BUTTON_HEIGHT.md;
 
 interface BrandHeaderSkeletonProps {
   /** 실제 배너와 같은 높이. 풀블리드라 좌우 여백이 없다. */
@@ -448,7 +449,7 @@ interface BrandHeaderSkeletonProps {
 
 /**
  * 브랜드 헤더(배너 + 이름 + 영문명 + 소개 + 소개 페이지 버튼).
- * 높이 = bannerHeight + 20 + 24 + 4 + 17 + 12 + lines x 17 + 16 + 43.
+ * 높이 = bannerHeight + 20 + 24 + 4 + 17 + 12 + lines x 17 + 16 + 44.
  * 소개글은 헤더에서 lines 줄로 잘리므로 실제와 줄 수가 어긋나지 않는다.
  */
 export function BrandHeaderSkeleton({

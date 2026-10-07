@@ -20,6 +20,7 @@ import {
   AccordionTitleText,
   AccordionTrigger,
 } from "@shared/ui/accordion";
+import { Button } from "@shared/ui/button";
 import { Touchable } from "@shared/ui/press";
 import { SectionError } from "@shared/ui/section-state";
 import { ChipRowsSkeleton, Shimmer } from "@shared/ui/skeleton";
@@ -531,24 +532,16 @@ function FilterSheetContent({ onClose }: { onClose(): void }) {
         className="border-neutral-subtle flex-row gap-3 border-t px-5 pt-3"
         style={{ paddingBottom: insets.bottom + 12 }}
       >
-        <Touchable
+        <Button
           accessibilityLabel="Reset filters"
-          accessibilityRole="button"
-          className="border-neutral-subtle items-center justify-center rounded-full border px-6 py-3"
+          className="px-6"
+          label="Reset"
           onPress={resetDraft}
-        >
-          <Text className="text-body-2 text-foreground font-bold">Reset</Text>
-        </Touchable>
-        <Touchable
-          accessibilityLabel={applyLabel}
-          accessibilityRole="button"
-          className="bg-brand flex-1 items-center justify-center rounded-full py-3"
-          onPress={apply}
-        >
-          <Text className="text-body-2 text-background font-bold">
-            {applyLabel}
-          </Text>
-        </Touchable>
+          variant="secondary"
+        />
+        {/* 주황이던 자리다. 주요 동작의 색은 앱 전체에서 검정 하나뿐이어야
+            시트가 다른 제품처럼 보이지 않는다. */}
+        <Button className="flex-1" label={applyLabel} onPress={apply} />
       </View>
     </>
   );
