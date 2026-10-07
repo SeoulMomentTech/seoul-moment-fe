@@ -25,7 +25,7 @@ import {
   TopScrim,
 } from "@shared/ui/detail-chrome";
 import { Touchable } from "@shared/ui/press";
-import { SectionError } from "@shared/ui/section-state";
+import { ScreenError } from "@shared/ui/section-state";
 import { DetailSkeleton } from "@shared/ui/skeleton";
 
 import useProductDetail from "../model/useProductDetail";
@@ -251,7 +251,7 @@ export function ProductDetailScreen({ id }: { id: number }) {
   if (!Number.isFinite(id)) {
     return (
       <StatusScreen>
-        <SectionError onRetry={() => void refetch()} />
+        <ScreenError onRetry={() => void refetch()} />
       </StatusScreen>
     );
   }
@@ -260,7 +260,7 @@ export function ProductDetailScreen({ id }: { id: number }) {
   if (isPending && fetchStatus === "paused") {
     return (
       <StatusScreen>
-        <SectionError onRetry={() => void refetch()} />
+        <ScreenError offline onRetry={() => void refetch()} />
       </StatusScreen>
     );
   }
@@ -282,7 +282,7 @@ export function ProductDetailScreen({ id }: { id: number }) {
   if (isError || !product) {
     return (
       <StatusScreen>
-        <SectionError onRetry={() => void refetch()} />
+        <ScreenError onRetry={() => void refetch()} />
       </StatusScreen>
     );
   }

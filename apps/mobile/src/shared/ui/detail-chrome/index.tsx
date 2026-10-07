@@ -76,7 +76,11 @@ export function StatusScreen({ children }: { children: ReactNode }) {
     <View className="bg-background flex-1">
       <StatusBar style="dark" />
       <BackButton />
-      <View style={{ paddingTop: insets.top + BACK_BUTTON_CLEARANCE }}>
+      {/* flex-1 로 남은 높이를 그대로 넘긴다 — ScreenError 가 그 안에서 세로 가운데에 선다. */}
+      <View
+        className="flex-1"
+        style={{ paddingTop: insets.top + BACK_BUTTON_CLEARANCE }}
+      >
         {children}
       </View>
     </View>

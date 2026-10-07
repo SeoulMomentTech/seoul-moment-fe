@@ -10,7 +10,7 @@ import {
   TopScrim,
 } from "@shared/ui/detail-chrome";
 import { DetailSection, SECTION_GAP } from "@shared/ui/detail-section";
-import { SectionError } from "@shared/ui/section-state";
+import { ScreenError } from "@shared/ui/section-state";
 import { DetailSkeleton } from "@shared/ui/skeleton";
 
 import { BrandProducts } from "./BrandProducts";
@@ -32,7 +32,7 @@ export function BrandScreen({ id }: { id: number }) {
   if (!Number.isFinite(id)) {
     return (
       <StatusScreen>
-        <SectionError onRetry={() => void refetch()} />
+        <ScreenError onRetry={() => void refetch()} />
       </StatusScreen>
     );
   }
@@ -41,7 +41,7 @@ export function BrandScreen({ id }: { id: number }) {
   if (isPending && fetchStatus === "paused") {
     return (
       <StatusScreen>
-        <SectionError onRetry={() => void refetch()} />
+        <ScreenError offline onRetry={() => void refetch()} />
       </StatusScreen>
     );
   }
@@ -64,7 +64,7 @@ export function BrandScreen({ id }: { id: number }) {
   if (isError || !data) {
     return (
       <StatusScreen>
-        <SectionError onRetry={() => void refetch()} />
+        <ScreenError onRetry={() => void refetch()} />
       </StatusScreen>
     );
   }
