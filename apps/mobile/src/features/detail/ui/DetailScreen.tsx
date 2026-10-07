@@ -14,7 +14,7 @@ import {
   TopScrim,
 } from "@shared/ui/detail-chrome";
 import { DetailSection } from "@shared/ui/detail-section";
-import { SectionError } from "@shared/ui/section-state";
+import { ScreenError } from "@shared/ui/section-state";
 import { DetailSkeleton } from "@shared/ui/skeleton";
 
 import { RelatedPosts } from "./RelatedPosts";
@@ -109,7 +109,7 @@ export function DetailScreen<T extends DetailContent>({
   if (!isValidId) {
     return (
       <StatusScreen>
-        <SectionError onRetry={() => void refetch()} />
+        <ScreenError onRetry={() => void refetch()} />
       </StatusScreen>
     );
   }
@@ -119,7 +119,7 @@ export function DetailScreen<T extends DetailContent>({
   if (isPending && fetchStatus === "paused") {
     return (
       <StatusScreen>
-        <SectionError onRetry={() => void refetch()} />
+        <ScreenError offline onRetry={() => void refetch()} />
       </StatusScreen>
     );
   }
@@ -138,7 +138,7 @@ export function DetailScreen<T extends DetailContent>({
   if (isError || !detail) {
     return (
       <StatusScreen>
-        <SectionError onRetry={() => void refetch()} />
+        <ScreenError onRetry={() => void refetch()} />
       </StatusScreen>
     );
   }
