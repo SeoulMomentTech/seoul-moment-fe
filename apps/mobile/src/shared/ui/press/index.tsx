@@ -1,4 +1,4 @@
-import type { ComponentProps } from "react";
+import { useState, type ComponentProps } from "react";
 
 import { Platform, Pressable } from "react-native";
 
@@ -50,20 +50,40 @@ type TouchableProps = ComponentProps<typeof Pressable> & {
 /**
  * 앱의 모든 누를 수 있는 것은 이 래퍼를 쓴다. Pressable 을 직접 쓰면 눌러도
  * 화면이 바뀔 때까지 아무 일도 일어나지 않아 고장난 것처럼 보인다.
- * 기존 style 은 그대로 유지하고(함수형 style 도 받는다) 투명도만 앞에 깐다.
+ *
+ * 눌림 상태를 Pressable 의 함수형 style 대신 state 로 들고 있는 이유:
+ * nativewind 는 className 으로 만든 스타일을 inline style 과 병합하는데
+ * (react-native-css 의 deepMergeConfig / flattenStyleArray) 그 경로가 배열·객체만
+ * 다루고 함수는 못 다룬다. 함수를 넘기면 className 은 그대로 먹지만 style 이 통째로
+ * 버려져, 높이를 style 로 주는 버튼·메뉴 줄이 글자 높이로 쪼그라든다.
  */
 export function Touchable({
   feedback = "surface",
   style,
+  onPressIn,
+  onPressOut,
   ...props
 }: TouchableProps) {
+  const [pressed, setPressed] = useState(false);
+
   return (
     <Pressable
       {...props}
       android_ripple={RIPPLE[feedback]}
-      style={(state) => [
-        { opacity: pressedOpacity(feedback, state.pressed) },
-        typeof style === "function" ? style(state) : style,
+      onPressIn={(event) => {
+        setPressed(true);
+        onPressIn?.(event);
+      }}
+      onPressOut={(event) => {
+        setPressed(false);
+        onPressOut?.(event);
+      }}
+      style={[
+        { opacity: pressedOpacity(feedback, pressed) },
+        // 호출부가 함수형을 쓰면 여기서 풀어 배열로 넘긴다 — 위 이유로 함수는 통과시키지 않는다.
+        typeof style === "function"
+          ? style({ pressed, hovered: false })
+          : style,
       ]}
     />
   );
