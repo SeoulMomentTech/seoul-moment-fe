@@ -3,6 +3,7 @@ import { ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useUserAuthStore } from "@shared/lib/auth/useUserAuthStore";
+import { Button } from "@shared/ui/button";
 import { Touchable } from "@shared/ui/press";
 import { Section } from "@shared/ui/section";
 
@@ -54,14 +55,11 @@ function SignUpPitch() {
       <Text className="text-body-3 text-neutral mt-3 text-center">
         Save what you like and pick up where you left off, on any device.
       </Text>
-      <Touchable
-        accessibilityLabel="Sign in"
-        accessibilityRole="button"
-        className="bg-foreground mt-8 items-center justify-center rounded-full py-4"
+      <Button
+        className="mt-8"
+        label="Sign in"
         onPress={() => router.push("/login")}
-      >
-        <Text className="text-body-2 text-background font-bold">Sign in</Text>
-      </Touchable>
+      />
     </View>
   );
 }
@@ -78,14 +76,12 @@ function SignedInHeader() {
       <Text className="text-title-3 text-foreground text-center font-bold">
         You&apos;re signed in
       </Text>
-      <Touchable
-        accessibilityLabel="Sign out"
-        accessibilityRole="button"
-        className="border-neutral-subtle mt-8 items-center justify-center rounded-full border py-4"
+      <Button
+        className="mt-8"
+        label="Sign out"
         onPress={logout}
-      >
-        <Text className="text-body-2 text-foreground font-bold">Sign out</Text>
-      </Touchable>
+        variant="secondary"
+      />
     </View>
   );
 }

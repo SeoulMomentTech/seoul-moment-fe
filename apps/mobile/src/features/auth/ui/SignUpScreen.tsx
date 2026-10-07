@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { Button } from "@shared/ui/button";
 import { Touchable } from "@shared/ui/press";
 
 import { AUTH_FIELD_HEIGHT, AuthField } from "./AuthField";
@@ -253,25 +254,17 @@ export function SignUpScreen() {
             <Note error>Account created. Please sign in.</Note>
           ) : null}
 
-          <Touchable
+          <Button
             accessibilityLabel="Create account"
-            accessibilityRole="button"
-            accessibilityState={{ disabled: !canSubmit }}
-            className="bg-foreground items-center justify-center rounded-lg"
             disabled={!canSubmit}
-            onPress={submit}
-            style={{
-              height: AUTH_FIELD_HEIGHT,
-              marginTop: GAP_SECTION,
-              opacity: canSubmit ? 1 : 0.3,
-            }}
-          >
-            <Text className="text-body-2 text-background font-bold">
-              {signUp.isPending || login.isPending
+            label={
+              signUp.isPending || login.isPending
                 ? "Creating…"
-                : "Create account"}
-            </Text>
-          </Touchable>
+                : "Create account"
+            }
+            onPress={submit}
+            style={{ marginTop: GAP_SECTION }}
+          />
 
           <Text
             className="text-body-3 text-neutral text-center"
@@ -352,21 +345,14 @@ function SideButton({
 }) {
   const off = disabled || busy;
 
+  // 입력칸 옆에 서므로 입력칸과 같은 높이(=lg 56)여야 한다.
   return (
-    <Touchable
-      accessibilityLabel={label}
-      accessibilityRole="button"
-      accessibilityState={{ disabled: off }}
-      className="border-neutral-subtle items-center justify-center rounded-lg border"
+    <Button
       disabled={off}
+      label={label}
       onPress={onPress}
-      style={{
-        width: SIDE_BUTTON_WIDTH,
-        height: AUTH_FIELD_HEIGHT,
-        opacity: off ? 0.3 : 1,
-      }}
-    >
-      <Text className="text-body-3 text-foreground font-bold">{label}</Text>
-    </Touchable>
+      style={{ width: SIDE_BUTTON_WIDTH }}
+      variant="secondary"
+    />
   );
 }

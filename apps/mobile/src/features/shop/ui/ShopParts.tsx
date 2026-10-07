@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 
+import { Button } from "@shared/ui/button";
 import { Touchable } from "@shared/ui/press";
 import { EmptyState, SectionError } from "@shared/ui/section-state";
 import {
@@ -106,16 +107,14 @@ function BrandHeader({ id }: { id: number }) {
             {data.description}
           </Text>
         ) : null}
-        <Touchable
+        <Button
           accessibilityLabel={`View ${data.name} brand page`}
-          accessibilityRole="button"
-          className="border-neutral-subtle mt-4 items-center rounded-full border py-3"
+          className="mt-4"
+          label="View brand page"
           onPress={() => router.push(`/brand/${id}`)}
-        >
-          <Text className="text-body-3 text-foreground font-bold">
-            View brand page
-          </Text>
-        </Touchable>
+          size="md"
+          variant="secondary"
+        />
       </View>
     </View>
   );
