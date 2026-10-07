@@ -16,10 +16,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button } from "@shared/ui/button";
 import { Touchable } from "@shared/ui/press";
 
-import { Spacing } from "@/constants/theme";
+import { HeaderHeight, Spacing } from "@/constants/theme";
 
 import { AuthField } from "./AuthField";
-import { HEADER_HEIGHT } from "./layout";
 import { useLoginMutation } from "../model/useLoginMutation";
 
 // 워드마크 logo.png 는 533x65. 상단에 무게를 주려고 웹(204x24)보다 키운다.
@@ -54,10 +53,14 @@ export function LoginScreen() {
   return (
     <View className="bg-background flex-1">
       <StatusBar style="dark" />
-      <View style={{ paddingTop: insets.top }}>
+      {/* 약관·앱 헤더와 같은 꼴의 머리라 같은 아래 테두리를 가진다. */}
+      <View
+        className="border-neutral-subtle border-b"
+        style={{ paddingTop: insets.top }}
+      >
         <View
           className="flex-row items-center px-5"
-          style={{ height: HEADER_HEIGHT }}
+          style={{ height: HeaderHeight }}
         >
           <Touchable
             accessibilityLabel="Go back"

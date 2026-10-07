@@ -57,5 +57,12 @@ export const Spacing = {
   chapter: 64,
 } as const;
 
+/**
+ * 흰 배경에 막대 하나만 있는 화면 머리의 높이. 앱 헤더·약관·로그인·가입이 모두 같다.
+ * 이 꼴의 머리는 언제나 아래 테두리(border-neutral-subtle border-b)를 가진다 —
+ * 하나만 테두리가 없으면 그 화면만 떠 있는 것처럼 보인다.
+ */
+export const HeaderHeight = 52;
+
 export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;
 export const MaxContentWidth = 800;
