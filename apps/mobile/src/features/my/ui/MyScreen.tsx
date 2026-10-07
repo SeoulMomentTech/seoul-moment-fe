@@ -49,10 +49,21 @@ export function MyScreen() {
   );
 }
 
-/** 위 블록과 메뉴가 같은 왼쪽 선에서 시작하도록, 블록도 줄도 모두 px-5 왼쪽 정렬이다. */
+/**
+ * 위 블록과 메뉴가 같은 왼쪽 선에서 시작하도록 둘 다 px-5 왼쪽 정렬이다.
+ * 다만 정렬만 맞추면 제목·설명·버튼·메뉴 줄이 같은 폭으로 평평하게 쌓여,
+ * 버튼 바로 아래 그어지는 줄 때문에 버튼이 메뉴의 첫 항목처럼 보인다.
+ * 그래서 이 블록은 위아래로 제 영역을 확보해 메뉴와 떨어진 한 덩어리로 읽히게 한다.
+ */
 function ScreenBlock({ children }: { children: React.ReactNode }) {
   return (
-    <View className="px-5" style={{ paddingTop: Spacing.section }}>
+    <View
+      className="px-5"
+      style={{
+        paddingTop: Spacing.chapter,
+        paddingBottom: Spacing.section,
+      }}
+    >
       {children}
     </View>
   );
@@ -70,7 +81,7 @@ function SignUpPitch() {
         className="text-body-3 text-neutral"
         style={{ marginTop: Spacing.tight }}
       >
-        Save what you like and pick up where you left off, on any device.
+        Save what you like and pick up where you left off.
       </Text>
       <Button
         label="Sign in"
@@ -218,8 +229,9 @@ function MenuGroup({
     return <Section title={group.title}>{rows}</Section>;
   }
 
-  // 제목이 없어도 위 블록과의 간격은 섹션 간격 그대로다.
-  return <View style={{ paddingTop: Spacing.section }}>{rows}</View>;
+  // 위 블록이 자기 아래 여백을 갖고 있으므로 여기서 또 띄우지 않는다.
+  // 양쪽이 각자 띄우면 두 배가 되고, 그만큼 화면이 아래로 밀려 더 비어 보인다.
+  return <View>{rows}</View>;
 }
 
 function MenuRow({ item, onPress }: { item: MyMenuItem; onPress(): void }) {
