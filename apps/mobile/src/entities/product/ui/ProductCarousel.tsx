@@ -1,7 +1,8 @@
 import { useRouter } from "expo-router";
-import { FlatList, Pressable, Text, View } from "react-native";
+import { FlatList, Text, View } from "react-native";
 
 import type { ProductItem } from "@shared/services/product";
+import { Touchable } from "@shared/ui/press";
 
 import { ProductCard } from "./ProductCard";
 
@@ -40,14 +41,15 @@ export function ProductCarousel({ heading, items }: ProductCarouselProps) {
         horizontal
         keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => (
-          <Pressable
+          <Touchable
             accessibilityLabel={item.productName}
             accessibilityRole="button"
+            feedback="card"
             onPress={() => router.push(`/product/${item.id}`)}
             style={{ width: CAROUSEL_CARD_WIDTH }}
           >
             <ProductCard product={item} />
-          </Pressable>
+          </Touchable>
         )}
         showsHorizontalScrollIndicator={false}
       />

@@ -2,9 +2,11 @@ import type { ReactNode } from "react";
 
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg";
+
+import { Touchable } from "@shared/ui/press";
 
 // 스크림은 상태바 영역(insets.top) 아래로 이만큼 더 내려와 옅어진다.
 export const SCRIM_EXTRA_HEIGHT = 64;
@@ -16,10 +18,12 @@ export function BackButton() {
   const insets = useSafeAreaInsets();
 
   return (
-    <Pressable
+    <Touchable
       accessibilityLabel="Go back"
       accessibilityRole="button"
       className="absolute left-5 h-9 w-9 items-center justify-center rounded-full"
+      // 사진 위에 뜬 어두운 원이라 흰 리플을 쓰는 overlay 를 고른다.
+      feedback="overlay"
       hitSlop={8}
       onPress={() => router.back()}
       // 배너 사진 위에 떠야 하므로 반투명 검정을 직접 쓴다. 토큰에는 오버레이 색이 없다.
@@ -29,7 +33,7 @@ export function BackButton() {
       <Text className="text-title-4 font-bold" style={{ color: "#FFFFFF" }}>
         ‹
       </Text>
-    </Pressable>
+    </Touchable>
   );
 }
 

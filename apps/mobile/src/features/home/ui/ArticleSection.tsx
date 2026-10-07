@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
-import { Pressable } from "react-native";
 
+import { Touchable } from "@shared/ui/press";
 import { Section } from "@shared/ui/section";
 import { SectionError } from "@shared/ui/section-state";
 import { PostSlideSkeleton } from "@shared/ui/skeleton";
@@ -54,9 +54,10 @@ export function ArticleSection() {
         data={articles}
         keyExtractor={(item) => String(item.id)}
         renderItem={(item) => (
-          <Pressable
+          <Touchable
             accessibilityLabel={item.title}
             accessibilityRole="button"
+            feedback="card"
             onPress={() => router.push(`/article/${item.id}`)}
           >
             <ArticleSlideCard
@@ -66,7 +67,7 @@ export function ArticleSection() {
               title={item.title}
               writer={item.writer}
             />
-          </Pressable>
+          </Touchable>
         )}
       />
     </Section>

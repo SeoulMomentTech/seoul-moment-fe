@@ -1,10 +1,11 @@
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { Dimensions, FlatList, Pressable, Text, View } from "react-native";
+import { Dimensions, FlatList, Text, View } from "react-native";
 
 import { PostRow } from "@entities/post/ui/PostRow";
 import { formatDate } from "@shared/lib/utils/formatDate";
 import type { NewsWithCategory } from "@shared/services/news";
+import { Touchable } from "@shared/ui/press";
 import { Section } from "@shared/ui/section";
 import { SectionError } from "@shared/ui/section-state";
 import {
@@ -33,13 +34,14 @@ function NewsLink({
 }) {
   const router = useRouter();
   return (
-    <Pressable
+    <Touchable
       accessibilityLabel={title}
       accessibilityRole="button"
+      feedback="card"
       onPress={() => router.push(`/news/${id}`)}
     >
       {children}
-    </Pressable>
+    </Touchable>
   );
 }
 
@@ -296,15 +298,17 @@ function BandError({ onRetry }: { onRetry(): void }) {
       <Text className="text-body-3 text-background">
         Couldn&apos;t load this section
       </Text>
-      <Pressable
+      <Touchable
         accessibilityLabel="Retry loading this section"
         accessibilityRole="button"
+        // 어두운 띠 위라 검정 리플이 보이지 않는다. overlay 가 흰 리플을 쓴다.
+        feedback="overlay"
         // 글자 한 줄(17pt)뿐이라 8 로는 33pt 에 그친다. 14 로 45pt 를 만든다.
         hitSlop={14}
         onPress={onRetry}
       >
         <Text className="text-body-3 text-brand font-bold">Retry</Text>
-      </Pressable>
+      </Touchable>
     </View>
   );
 }

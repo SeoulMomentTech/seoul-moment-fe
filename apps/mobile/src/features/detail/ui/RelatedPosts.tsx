@@ -1,9 +1,10 @@
 import { Image } from "expo-image";
 import type { Href } from "expo-router";
 import { useRouter } from "expo-router";
-import { FlatList, Pressable, Text, View } from "react-native";
+import { FlatList, Text, View } from "react-native";
 
 import type { NewsLastItem } from "@shared/services/news";
+import { Touchable } from "@shared/ui/press";
 
 const CARD_WIDTH = 220;
 const IMAGE_HEIGHT = 140;
@@ -41,7 +42,7 @@ export function RelatedPosts({
           {heading}
         </Text>
         {viewAllHref ? (
-          <Pressable
+          <Touchable
             accessibilityLabel={heading}
             accessibilityRole="button"
             // 글자 한 줄(17pt)뿐이라 8 로는 33pt 에 그친다. 14 로 45pt 를 만든다.
@@ -53,7 +54,7 @@ export function RelatedPosts({
             <Text className="text-body-3 text-brand font-semibold">
               View all
             </Text>
-          </Pressable>
+          </Touchable>
         ) : null}
       </View>
       {/* 세로 ScrollView 안의 가로 리스트라 중첩 스크롤 문제가 없다. */}
@@ -63,9 +64,10 @@ export function RelatedPosts({
         horizontal
         keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => (
-          <Pressable
+          <Touchable
             accessibilityLabel={item.title}
             accessibilityRole="button"
+            feedback="card"
             onPress={() => router.push(`${routeBase}/${item.id}`)}
             style={{ width: CARD_WIDTH }}
           >
@@ -86,7 +88,7 @@ export function RelatedPosts({
             >
               {item.title}
             </Text>
-          </Pressable>
+          </Touchable>
         )}
         showsHorizontalScrollIndicator={false}
       />

@@ -1,9 +1,10 @@
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { LegalDocument, type LegalNode } from "@shared/ui/legal-document";
+import { Touchable } from "@shared/ui/press";
 
 const HEADER_HEIGHT = 52;
 
@@ -32,14 +33,14 @@ export function LegalScreen({
           className="flex-row items-center px-5"
           style={{ height: HEADER_HEIGHT }}
         >
-          <Pressable
+          <Touchable
             accessibilityLabel="Go back"
             accessibilityRole="button"
             hitSlop={14}
             onPress={() => router.back()}
           >
             <Text className="text-title-4 text-foreground font-bold">‹</Text>
-          </Pressable>
+          </Touchable>
           <Text
             className="text-body-2 text-foreground ml-3 flex-1 font-bold"
             numberOfLines={1}
