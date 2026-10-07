@@ -1,7 +1,8 @@
 import { useState } from "react";
 
-import { Text, TextInput, View } from "react-native";
+import { TextInput, View } from "react-native";
 
+import { EyeIcon, EyeOffIcon } from "@shared/ui/icons";
 import { Touchable } from "@shared/ui/press";
 
 export const AUTH_FIELD_HEIGHT = 56;
@@ -74,12 +75,14 @@ export function AuthField({
           className="items-center justify-center"
           hitSlop={8}
           onPress={() => setRevealed((on) => !on)}
-          // 글리프 한 자라 터치 영역을 칸 높이만큼 세워 44pt 를 넘긴다.
+          // 아이콘이 20pt 라 터치 영역을 칸 높이만큼 세워 44pt 를 넘긴다.
           style={{ width: 40, height: AUTH_FIELD_HEIGHT }}
         >
-          <Text className="text-body-2 text-neutral">
-            {revealed ? "⦸" : "◉"}
-          </Text>
+          {revealed ? (
+            <EyeOffIcon color={PLACEHOLDER_COLOR} />
+          ) : (
+            <EyeIcon color={PLACEHOLDER_COLOR} />
+          )}
         </Touchable>
       ) : null}
     </View>
