@@ -1,8 +1,9 @@
 import { useRouter } from "expo-router";
-import { FlatList, Text, View } from "react-native";
+import { FlatList } from "react-native";
 
 import type { ProductItem } from "@shared/services/product";
 import { Touchable } from "@shared/ui/press";
+import { Section } from "@shared/ui/section";
 
 import { ProductCard } from "./ProductCard";
 
@@ -28,10 +29,7 @@ export function ProductCarousel({ heading, items }: ProductCarouselProps) {
   }
 
   return (
-    <View className="mt-12">
-      <Text className="text-title-4 text-foreground mb-4 px-5 font-bold">
-        {heading}
-      </Text>
+    <Section title={heading}>
       <FlatList
         contentContainerStyle={{
           paddingHorizontal: PAGE_PADDING,
@@ -53,6 +51,6 @@ export function ProductCarousel({ heading, items }: ProductCarouselProps) {
         )}
         showsHorizontalScrollIndicator={false}
       />
-    </View>
+    </Section>
   );
 }

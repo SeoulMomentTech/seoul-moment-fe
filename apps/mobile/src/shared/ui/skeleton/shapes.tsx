@@ -165,30 +165,26 @@ interface ProductRowSkeletonProps {
 }
 
 /**
- * 제목 + 가로 상품 카드 줄 (ProductCarousel). 바깥 mt-12 는 호출부가 준다.
- * 높이 = 제목 24 + mb-4 16 + productCardHeight(cardWidth).
+ * 가로 상품 카드 줄 (ProductCarousel) 의 본문. 제목 줄과 바깥 간격은 Section 이 그리고,
+ * 로딩 갈래도 같은 Section 을 지나므로 여기서는 카드만 그린다.
+ * 높이 = productCardHeight(cardWidth).
  */
 export function ProductRowSkeleton({
   count = 3,
   cardWidth = 150,
 }: ProductRowSkeletonProps) {
   return (
-    <View>
-      <View style={{ paddingHorizontal: PAGE_PADDING, marginBottom: 16 }}>
-        <Line bar={BAR_TITLE_4} line={LINE_TITLE_4} width="45%" />
-      </View>
-      <View
-        style={{
-          flexDirection: "row",
-          gap: GRID_GAP,
-          paddingHorizontal: PAGE_PADDING,
-          overflow: "hidden",
-        }}
-      >
-        {Array.from({ length: count }, (_, i) => (
-          <ProductCardSkeleton key={i} width={cardWidth} />
-        ))}
-      </View>
+    <View
+      style={{
+        flexDirection: "row",
+        gap: GRID_GAP,
+        paddingHorizontal: PAGE_PADDING,
+        overflow: "hidden",
+      }}
+    >
+      {Array.from({ length: count }, (_, i) => (
+        <ProductCardSkeleton key={i} width={cardWidth} />
+      ))}
     </View>
   );
 }

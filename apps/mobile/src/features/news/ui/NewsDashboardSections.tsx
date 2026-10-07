@@ -251,22 +251,6 @@ function EditorPickSection() {
 // 웹의 Hot Keyword 띠는 어두운 배경이다. --foreground(#171717) 가 그 색이라 bg-foreground,
 // 글씨는 --neutral-0 인 text-background 를 쓴다.
 //
-// 제목 블록을 BandShell 이 들고 있는 이유: 예전에는 실제 갈래에만 제목이 있어서
-// 스켈레톤이 66pt(17 + 4 + 29 + 16) 짧았다. 두 갈래가 같은 틀을 지나게 해 다시 어긋나지 않게 한다.
-function BandShell({
-  children,
-  heading,
-}: {
-  children: React.ReactNode;
-  heading?: React.ReactNode;
-}) {
-  return (
-    <View className="bg-foreground mt-10 py-8">
-      {heading ? <View className="mb-4 px-5">{heading}</View> : null}
-      {children}
-    </View>
-  );
-}
 
 // 제목 블록 자리맞춤. 막대는 글자 크기의 약 0.8 로, 다른 스켈레톤 막대와 같은 비율이다.
 const BAND_LABEL_BAR = 11;
@@ -318,25 +302,25 @@ function HotKeywordSection() {
 
   if (isPending && fetchStatus === "paused") {
     return (
-      <BandShell>
+      <Section tone="dark">
         <BandError onRetry={() => void refetch()} />
-      </BandShell>
+      </Section>
     );
   }
 
   if (isPending) {
     return (
-      <BandShell heading={<BandHeadingSkeleton />}>
+      <Section title={<BandHeadingSkeleton />} tone="dark">
         <HorizontalCardsSkeleton />
-      </BandShell>
+      </Section>
     );
   }
 
   if (isError) {
     return (
-      <BandShell>
+      <Section tone="dark">
         <BandError onRetry={() => void refetch()} />
-      </BandShell>
+      </Section>
     );
   }
 
@@ -344,8 +328,8 @@ function HotKeywordSection() {
   if (!hashtag || !hashtag.list || hashtag.list.length === 0) return null;
 
   return (
-    <BandShell
-      heading={
+    <Section
+      title={
         <>
           <Text
             className="text-body-3 text-background font-bold"
@@ -362,6 +346,7 @@ function HotKeywordSection() {
           </Text>
         </>
       }
+      tone="dark"
     >
       <FlatList
         contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
@@ -397,6 +382,6 @@ function HotKeywordSection() {
         snapToAlignment="start"
         snapToInterval={PICK_WIDTH + 12}
       />
-    </BandShell>
+    </Section>
   );
 }

@@ -1,10 +1,11 @@
 import { Image } from "expo-image";
 import type { Href } from "expo-router";
 import { useRouter } from "expo-router";
-import { FlatList, Text, View } from "react-native";
+import { FlatList, Text } from "react-native";
 
 import type { NewsLastItem } from "@shared/services/news";
 import { Touchable } from "@shared/ui/press";
+import { Section } from "@shared/ui/section";
 
 const CARD_WIDTH = 220;
 const IMAGE_HEIGHT = 140;
@@ -22,6 +23,7 @@ interface RelatedPostsProps {
 /**
  * 상세 맨 아래 관련 글. 웹 RelatedList 의 모바일 구간처럼 중립 회색 배경 위에
  * 제목 줄 + 가로 카드 캐러셀을 둔다. 항목이 없으면 제목도 틀도 그리지 않는다.
+ * 회색 띠와 아래 여백은 Section 의 muted 톤이 쥔다 — 여기서 따로 그리지 않는다.
  */
 export function RelatedPosts({
   items,
@@ -36,12 +38,9 @@ export function RelatedPosts({
   }
 
   return (
-    <View className="bg-surface-muted mt-16 pb-12 pt-10">
-      <View className="mb-5 flex-row items-end justify-between px-5">
-        <Text className="text-title-4 text-foreground font-bold">
-          {heading}
-        </Text>
-        {viewAllHref ? (
+    <Section
+      action={
+        viewAllHref ? (
           <Touchable
             accessibilityLabel={heading}
             accessibilityRole="button"
@@ -55,8 +54,11 @@ export function RelatedPosts({
               View all
             </Text>
           </Touchable>
-        ) : null}
-      </View>
+        ) : null
+      }
+      title={heading}
+      tone="muted"
+    >
       {/* 세로 ScrollView 안의 가로 리스트라 중첩 스크롤 문제가 없다. */}
       <FlatList
         contentContainerStyle={{ paddingHorizontal: 20, gap: CARD_GAP }}
@@ -92,6 +94,6 @@ export function RelatedPosts({
         )}
         showsHorizontalScrollIndicator={false}
       />
-    </View>
+    </Section>
   );
 }

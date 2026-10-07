@@ -1,6 +1,5 @@
-import { View } from "react-native";
-
 import { ProductCarousel } from "@entities/product/ui/ProductCarousel";
+import { Section } from "@shared/ui/section";
 import { SectionError } from "@shared/ui/section-state";
 import { ProductRowSkeleton } from "@shared/ui/skeleton";
 
@@ -16,25 +15,25 @@ export function BrandProducts({ brandId }: { brandId: number }) {
   // 오프라인이면 요청이 paused 되어 isPending 이 유지된다.
   if (isPending && fetchStatus === "paused") {
     return (
-      <View className="mt-12">
+      <Section title={HEADING}>
         <SectionError onRetry={() => void refetch()} />
-      </View>
+      </Section>
     );
   }
 
   if (isPending) {
     return (
-      <View className="mt-12">
+      <Section title={HEADING}>
         <ProductRowSkeleton />
-      </View>
+      </Section>
     );
   }
 
   if (isError) {
     return (
-      <View className="mt-12">
+      <Section title={HEADING}>
         <SectionError onRetry={() => void refetch()} />
-      </View>
+      </Section>
     );
   }
 
