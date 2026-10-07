@@ -8,7 +8,8 @@
     "scheme": "seoulmoment",
     "userInterfaceStyle": "light",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "bundleIdentifier": "tw.com.seoulmoment.app"
     },
     "android": {
       "adaptiveIcon": {
@@ -17,7 +18,9 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "tw.com.seoulmoment.app",
+      "versionCode": 1
     },
     "web": {
       "output": "static",
