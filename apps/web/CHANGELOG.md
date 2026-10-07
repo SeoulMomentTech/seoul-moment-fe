@@ -2,6 +2,18 @@
 
 All notable changes to `@seoul-moment/web` are documented here.
 
+## 1.4.1 — 2026-10-07
+
+### Reverts
+
+- Revert the guest cart (`ed12529a`). It reached production untagged on 2026-09-22
+  (`00506ff`) and is removed again here; signed-out visitors can no longer use the cart.
+
+### Other
+
+- Split design tokens into tokens.css (`aa6ed6b4`)
+- Sync locales from sheet (`428a1101`)
+
 ## 1.4.0 — 2026-09-16
 
 ### Features

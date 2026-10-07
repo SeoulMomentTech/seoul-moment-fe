@@ -2,6 +2,16 @@
 
 All notable changes to `@seoul-moment/admin` are documented here.
 
+## 0.4.0 — 2026-10-07
+
+### Features
+
+- Duplicate product variants and block duplicate SKUs/options (`f2a5d499`)
+
+### Other
+
+- Split design tokens into tokens.css (`aa6ed6b4`)
+
 ## 0.3.0 — 2026-09-17
 
 ### Features
