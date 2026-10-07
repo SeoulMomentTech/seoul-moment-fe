@@ -6,11 +6,11 @@ import {
   ActivityIndicator,
   Dimensions,
   FlatList,
-  Pressable,
   Text,
   View,
 } from "react-native";
 
+import { Touchable } from "@shared/ui/press";
 import { SectionError } from "@shared/ui/section-state";
 import {
   BannerSkeleton,
@@ -106,7 +106,7 @@ function BrandHeader({ id }: { id: number }) {
             {data.description}
           </Text>
         ) : null}
-        <Pressable
+        <Touchable
           accessibilityLabel={`View ${data.name} brand page`}
           accessibilityRole="button"
           className="border-neutral-subtle mt-4 items-center rounded-full border py-3"
@@ -115,7 +115,7 @@ function BrandHeader({ id }: { id: number }) {
           <Text className="text-body-3 text-foreground font-bold">
             View brand page
           </Text>
-        </Pressable>
+        </Touchable>
       </View>
     </View>
   );
@@ -190,7 +190,7 @@ function CategoryChip({
   onPress(): void;
 }) {
   return (
-    <Pressable
+    <Touchable
       accessibilityLabel={label}
       accessibilityRole="button"
       accessibilityState={{ selected }}
@@ -213,7 +213,7 @@ function CategoryChip({
       >
         {label}
       </Text>
-    </Pressable>
+    </Touchable>
   );
 }
 
@@ -298,7 +298,7 @@ function FilterBar() {
 
   return (
     <View className="mb-4 mt-5 flex-row items-center justify-between px-5">
-      <Pressable
+      <Touchable
         accessibilityLabel="Filter"
         accessibilityRole="button"
         className="border-neutral-subtle flex-row items-center rounded-full border px-4 py-2"
@@ -317,8 +317,8 @@ function FilterBar() {
             </Text>
           </View>
         ) : null}
-      </Pressable>
-      <Pressable
+      </Touchable>
+      <Touchable
         accessibilityLabel="Sort"
         accessibilityRole="button"
         // 글자 한 줄(17pt)뿐이라 8 로는 33pt 에 그친다. 14 로 45pt 를 만든다.
@@ -328,7 +328,7 @@ function FilterBar() {
         <Text className="text-body-3 text-foreground" numberOfLines={1}>
           {`${current?.name ?? "Sort"} ▾`}
         </Text>
-      </Pressable>
+      </Touchable>
     </View>
   );
 }

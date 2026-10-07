@@ -1,6 +1,8 @@
 import type { TabListProps, TabTriggerSlotProps } from "expo-router/ui";
 import { TabList, Tabs, TabSlot, TabTrigger } from "expo-router/ui";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
+
+import { Touchable } from "@shared/ui/press";
 
 import { useResetShopFilterOnLeave } from "@features/shop";
 
@@ -32,7 +34,7 @@ export default function TabLayout() {
 
 function TabButton({ children, isFocused, ...props }: TabTriggerSlotProps) {
   return (
-    <Pressable {...props}>
+    <Touchable {...props}>
       <View className="rounded-lg px-4 py-1">
         <Text
           className={
@@ -44,7 +46,7 @@ function TabButton({ children, isFocused, ...props }: TabTriggerSlotProps) {
           {children}
         </Text>
       </View>
-    </Pressable>
+    </Touchable>
   );
 }
 

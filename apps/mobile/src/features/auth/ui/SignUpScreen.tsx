@@ -5,12 +5,13 @@ import { StatusBar } from "expo-status-bar";
 import {
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   ScrollView,
   Text,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+import { Touchable } from "@shared/ui/press";
 
 import { AUTH_FIELD_HEIGHT, AuthField } from "./AuthField";
 import { GAP_BLOCK, GAP_SECTION, GAP_TIGHT, HEADER_HEIGHT } from "./layout";
@@ -107,14 +108,14 @@ export function SignUpScreen() {
           className="flex-row items-center px-5"
           style={{ height: HEADER_HEIGHT }}
         >
-          <Pressable
+          <Touchable
             accessibilityLabel="Go back"
             accessibilityRole="button"
             hitSlop={14}
             onPress={() => router.back()}
           >
             <Text className="text-title-4 text-foreground font-bold">‹</Text>
-          </Pressable>
+          </Touchable>
         </View>
       </View>
       <KeyboardAvoidingView
@@ -252,7 +253,7 @@ export function SignUpScreen() {
             <Note error>Account created. Please sign in.</Note>
           ) : null}
 
-          <Pressable
+          <Touchable
             accessibilityLabel="Create account"
             accessibilityRole="button"
             accessibilityState={{ disabled: !canSubmit }}
@@ -270,7 +271,7 @@ export function SignUpScreen() {
                 ? "Creating…"
                 : "Create account"}
             </Text>
-          </Pressable>
+          </Touchable>
 
           <Text
             className="text-body-3 text-neutral text-center"
@@ -344,7 +345,7 @@ function SideButton({
   const off = disabled || busy;
 
   return (
-    <Pressable
+    <Touchable
       accessibilityLabel={label}
       accessibilityRole="button"
       accessibilityState={{ disabled: off }}
@@ -358,6 +359,6 @@ function SideButton({
       }}
     >
       <Text className="text-body-3 text-foreground font-bold">{label}</Text>
-    </Pressable>
+    </Touchable>
   );
 }
