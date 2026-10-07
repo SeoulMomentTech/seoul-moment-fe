@@ -1,13 +1,15 @@
 import { Image } from "expo-image";
 import { Dimensions, Text, View } from "react-native";
 
+import { Spacing } from "@/constants/theme";
+
 // 섹션 이미지는 원본 비율을 모르는 채로 자리를 잡아야 해서 높이를 고정한다.
 const SECTION_IMAGE_HEIGHT = 220;
 const IMAGE_GAP = 12;
-// 웹 모바일 구간 간격(50~90px)과 같은 결로 섹션 사이를 크게 띄운다.
-export const SECTION_GAP = 64;
+// 웹 모바일 구간 간격(50~90px)과 같은 결로 섹션 사이를 크게 띄운다 — 장 사이 간격이다.
+export const SECTION_GAP = Spacing.chapter;
 // 제목/본문/이미지 블록 사이 간격.
-const BLOCK_GAP = 24;
+const BLOCK_GAP = Spacing.inner;
 const CONTENT_LINE_HEIGHT = 26;
 
 const PAGE_PADDING = 20;

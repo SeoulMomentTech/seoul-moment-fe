@@ -90,7 +90,7 @@ export function BrandScreen({ id }: { id: number }) {
           ) : null}
         </View>
         {/* 배너 바로 아래에 붙는 전체 폭 인트로 블록. 가로 여백은 안쪽에서 준다. */}
-        <View className="bg-surface-muted px-5 pb-8 pt-6">
+        <View className="bg-surface-muted px-5 pb-6 pt-6">
           <Text className="text-title-3 text-foreground font-bold">
             {data.name}
           </Text>

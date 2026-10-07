@@ -16,8 +16,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button } from "@shared/ui/button";
 import { Touchable } from "@shared/ui/press";
 
+import { Spacing } from "@/constants/theme";
+
 import { AuthField } from "./AuthField";
-import { GAP_BLOCK, GAP_SECTION, GAP_TIGHT, HEADER_HEIGHT } from "./layout";
+import { HEADER_HEIGHT } from "./layout";
 import { useLoginMutation } from "../model/useLoginMutation";
 
 // 워드마크 logo.png 는 533x65. 상단에 무게를 주려고 웹(204x24)보다 키운다.
@@ -74,12 +76,15 @@ export function LoginScreen() {
         <ScrollView
           contentContainerStyle={{
             paddingHorizontal: 20,
-            paddingBottom: insets.bottom + GAP_SECTION,
+            paddingBottom: insets.bottom + Spacing.section,
           }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View className="items-center" style={{ paddingTop: GAP_SECTION }}>
+          <View
+            className="items-center"
+            style={{ paddingTop: Spacing.section }}
+          >
             <Image
               accessibilityLabel="Seoul Moment"
               contentFit="contain"
@@ -88,13 +93,13 @@ export function LoginScreen() {
             />
             <Text
               className="text-body-3 text-neutral text-center"
-              style={{ marginTop: GAP_TIGHT }}
+              style={{ marginTop: Spacing.tight }}
             >
               Welcome to Seoul Moment.
             </Text>
           </View>
 
-          <View style={{ marginTop: GAP_SECTION, gap: GAP_TIGHT }}>
+          <View style={{ marginTop: Spacing.section, gap: Spacing.tight }}>
             <AuthField
               autoComplete="email"
               keyboardType="email-address"
@@ -121,7 +126,7 @@ export function LoginScreen() {
               // 브랜드 주황이 아니라 danger 다. 주황은 고르는 것·갈 수 있는 곳을
               // 뜻하므로, 실패를 같은 색으로 말하면 두 뜻이 섞인다.
               className="text-body-3 text-danger"
-              style={{ marginTop: GAP_TIGHT }}
+              style={{ marginTop: Spacing.tight }}
             >
               Please check your email or password.
             </Text>
@@ -132,7 +137,7 @@ export function LoginScreen() {
             disabled={!canSubmit}
             label={mutation.isPending ? "Logging in…" : "Login"}
             onPress={submit}
-            style={{ marginTop: GAP_BLOCK }}
+            style={{ marginTop: Spacing.inner }}
           />
 
           {/* 약관 동의 문구는 두지 않는다 — 로그인은 동의를 받는 자리가 아니고,
@@ -140,15 +145,15 @@ export function LoginScreen() {
           <Button
             label="Sign up with email"
             onPress={() => router.push("/signup")}
-            // 로그인과 짝을 이루는 선택지라 블록 간격(40)이 아니라 가까이 붙인다.
-            style={{ marginTop: GAP_TIGHT }}
+            // 로그인과 짝을 이루는 선택지라 섹션 간격(40)이 아니라 가까이 붙인다.
+            style={{ marginTop: Spacing.tight }}
             variant="secondary"
           />
 
           {/* 소셜 로그인만 아직 없다. 화면을 차지하지 않게 한 줄로 둔다. */}
           <Text
             className="text-body-3 text-neutral text-center"
-            style={{ marginTop: GAP_BLOCK, opacity: 0.7 }}
+            style={{ marginTop: Spacing.inner, opacity: 0.7 }}
           >
             Social sign-in is coming soon.
           </Text>

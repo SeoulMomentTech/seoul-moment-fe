@@ -44,10 +44,11 @@ function lineWidth(index: number, count: number): DimensionValue {
   return index === count - 1 && count > 1 ? "60%" : "100%";
 }
 
-// ProductCard: 정사각 이미지 + 브랜드 body-5(mt-2) + 이름 body-3 2줄 + 가격 body-2(mt-1)
-const CARD_TEXT_HEIGHT = 8 + LINE_BODY_5 + 2 * LINE_BODY_3 + 4 + LINE_BODY_2;
+// ProductCard: 정사각 이미지 + 브랜드 body-5(mt-3) + 이름 body-3 2줄 + 가격 body-2(mt-1).
+// 이미지 밑은 12, 글줄 사이는 4 — 카드 안 간격은 앱 전체에서 이 둘뿐이다.
+const CARD_TEXT_HEIGHT = 12 + LINE_BODY_5 + 2 * LINE_BODY_3 + 4 + LINE_BODY_2;
 
-/** 카드 높이 = cellWidth + 79 (8 + 14 + 34 + 4 + 19). */
+/** 카드 높이 = cellWidth + 83 (12 + 14 + 34 + 4 + 19). */
 export function productCardHeight(cellWidth: number) {
   return cellWidth + CARD_TEXT_HEIGHT;
 }
@@ -63,7 +64,7 @@ export function ProductCardSkeleton({
   return (
     <View style={{ width }}>
       <Shimmer aspectRatio={1} radius={IMAGE_RADIUS} />
-      <View style={{ marginTop: 8 }}>
+      <View style={{ marginTop: 12 }}>
         <Line bar={BAR_BODY_5} line={LINE_BODY_5} width="40%" />
       </View>
       <Line bar={BAR_BODY_3} line={LINE_BODY_3} />
@@ -207,7 +208,7 @@ interface PostSlideSkeletonProps {
 
 /**
  * 홈 슬라이드 섹션. 두 변형 모두 아래에 페이저 자리(73)를 포함한다.
- * news = 360 + 73 = 433, article = 230 + 30 + 2x22 + 12 + 3x17 + 20 + 14 + 73 = 474.
+ * news = 360 + 73 = 433, article = 230 + 30 + 2x22 + 12 + 3x17 + 12 + 14 + 73 = 466.
  */
 export function PostSlideSkeleton({ variant }: PostSlideSkeletonProps) {
   if (variant === "news") {
@@ -231,7 +232,7 @@ export function PostSlideSkeleton({ variant }: PostSlideSkeletonProps) {
             <Line bar={BAR_BODY_3} line={LINE_BODY_3} />
             <Line bar={BAR_BODY_3} line={LINE_BODY_3} width="60%" />
           </View>
-          <View style={{ marginTop: 20 }}>
+          <View style={{ marginTop: 12 }}>
             <Line bar={BAR_BODY_5} line={LINE_BODY_5} width="45%" />
           </View>
         </View>
@@ -317,7 +318,7 @@ interface HorizontalCardsSkeletonProps {
   /** 기본 160(PICK_HEIGHT). 관련 글 캐러셀은 140. */
   imageHeight?: number;
   /**
-   * pick: 이미지 + 제목 2줄(body-2, mt-2) + 메타 1줄(body-5, mt-1).
+   * pick: 이미지 + 제목 2줄(body-2, mt-3) + 메타 1줄(body-5, mt-1).
    * related: 이미지 + 제목 2줄(body-2, mt-3). RelatedPosts 와 같다.
    */
   variant?: "pick" | "related";
@@ -325,7 +326,7 @@ interface HorizontalCardsSkeletonProps {
 
 /**
  * 가로 캐러셀 스켈레톤. 한 화면에 걸리는 만큼만 그린다(스크롤하지 않는다).
- * 높이 pick = imageHeight + 8 + 38 + 4 + 14 = imageHeight + 64 (기본 224).
+ * 높이 pick = imageHeight + 12 + 38 + 4 + 14 = imageHeight + 68 (기본 228).
  * 높이 related = imageHeight + 12 + 38 = imageHeight + 50 (기본 190).
  */
 export function HorizontalCardsSkeleton({
@@ -352,7 +353,7 @@ export function HorizontalCardsSkeleton({
           <Shimmer height={image} radius={CARD_RADIUS} />
           {variant === "pick" ? (
             <>
-              <View style={{ marginTop: 8 }}>
+              <View style={{ marginTop: 12 }}>
                 <Line bar={BAR_BODY_2} line={LINE_BODY_2} />
               </View>
               <Line bar={BAR_BODY_2} line={LINE_BODY_2} width="70%" />
@@ -499,14 +500,14 @@ interface DetailSkeletonProps {
 
 const ARTICLE_LEAD_LINE = 28;
 const ARTICLE_BODY_LINE = 26;
-// 인트로 블록 안쪽 여백. 실제 블록은 px-5 pb-8 pt-6 이다.
+// 인트로 블록 안쪽 여백. 실제 블록은 px-5 pb-6 pt-6 이다.
 const INTRO_PADDING_TOP = 24;
-const INTRO_PADDING_BOTTOM = 32;
+const INTRO_PADDING_BOTTOM = 24;
 
 /**
  * 상세 화면 로딩 상태. 높이(배너 B 별):
- * article = B + (24 + 24 + 16 + 3x28 + 32) + 64 + 2x24 + 12 + 4x26 = B + 408.
- * brand   = B + (24 + 29 + 16 + 3x28 + 32) + 64 + 2x24 + 12 + 4x26 = B + 413.
+ * article = B + (24 + 24 + 16 + 3x28 + 24) + 64 + 2x24 + 12 + 4x26 = B + 400.
+ * brand   = B + (24 + 29 + 16 + 3x28 + 24) + 64 + 2x24 + 12 + 4x26 = B + 405.
  * product = B + 20 + 24 + 12 + 2x24 + 16 + 28 + 24 + 20 + 3x17 + 2x12 = B + 267 (기본 567).
  */
 export function DetailSkeleton({

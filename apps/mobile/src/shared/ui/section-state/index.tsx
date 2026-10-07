@@ -42,7 +42,7 @@ interface EmptyStateProps {
  */
 export function EmptyState({ message, hint }: EmptyStateProps) {
   return (
-    <View className="items-center px-5 py-12">
+    <View className="items-center px-5 py-10">
       <Text className="text-body-2 text-neutral text-center">{message}</Text>
       {hint ? (
         <Text className="text-body-3 text-neutral mt-2 text-center">

@@ -37,7 +37,7 @@ export default function NewsScreen() {
         ListFooterComponent={LifestyleFooter}
         ListHeaderComponent={NewsListHeader}
         contentContainerStyle={{
-          paddingBottom: BottomTabInset + Spacing.five,
+          paddingBottom: BottomTabInset + Spacing.section,
         }}
         data={data ?? []}
         keyExtractor={(item) => String(item.id)}

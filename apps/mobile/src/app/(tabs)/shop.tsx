@@ -42,10 +42,10 @@ export default function ShopScreen() {
           alignItems: "flex-start",
           gap: GRID_GAP,
           paddingHorizontal: GRID_PADDING,
-          marginBottom: Spacing.four,
+          marginBottom: Spacing.inner,
         }}
         contentContainerStyle={{
-          paddingBottom: BottomTabInset + Spacing.five,
+          paddingBottom: BottomTabInset + Spacing.section,
         }}
         data={data ?? []}
         keyExtractor={(item) => String(item.id)}
