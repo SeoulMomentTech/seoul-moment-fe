@@ -303,6 +303,10 @@ function Group({
   );
 }
 
+/**
+ * 입력 아래 한 줄 안내. 실패는 danger 로 말한다 — 브랜드 주황은 선택·이동·주요
+ * 동작을 뜻하는 색이라, 같은 색으로 실패까지 말하면 뜻이 겹친다.
+ */
 function Note({
   children,
   error,
@@ -312,21 +316,25 @@ function Note({
 }) {
   return (
     <Text
-      className={error ? "text-body-3 text-brand" : "text-body-3 text-neutral"}
+      className={error ? "text-body-3 text-danger" : "text-body-3 text-neutral"}
     >
       {children}
     </Text>
   );
 }
 
-/** 인증이 끝난 이메일 옆 표시. 발송 버튼을 대신해 자리를 그대로 채운다. */
+/**
+ * 인증이 끝난 이메일 옆 표시. 발송 버튼을 대신해 자리를 그대로 채운다.
+ * 성공 전용 색은 두지 않는다(팔레트를 늘리지 않는다) — 뜻은 ✓ 와 굵기가 지고,
+ * 색은 본문색을 쓴다. 바로 위 실패 줄이 danger 라 둘이 섞이지 않는다.
+ */
 function Verified() {
   return (
     <View
       className="items-center justify-center"
       style={{ width: SIDE_BUTTON_WIDTH, height: AUTH_FIELD_HEIGHT }}
     >
-      <Text className="text-body-3 text-brand font-bold">✓ Verified</Text>
+      <Text className="text-body-3 text-foreground font-bold">✓ Verified</Text>
     </View>
   );
 }
