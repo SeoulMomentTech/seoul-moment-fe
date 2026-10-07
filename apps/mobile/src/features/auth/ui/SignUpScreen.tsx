@@ -74,18 +74,23 @@ export function SignUpScreen() {
 
   const codeRejected =
     verifyCode.isError || (verifyCode.isSuccess && !verified);
-  const passwordTooShort =
-    password.length > 0 && password.length < MIN_PASSWORD;
-  const passwordMismatch =
-    passwordConfirm.length > 0 && password !== passwordConfirm;
 
-  const canSubmit =
-    verified &&
-    password.length >= MIN_PASSWORD &&
-    password === passwordConfirm &&
-    nickname.trim().length > 0 &&
-    !signUp.isPending &&
-    !login.isPending;
+  /**
+   * 지금 가입을 막고 있는 한 가지. 버튼만 흐려 두면 네 조건 중 무엇이 모자란지
+   * 알 수 없어서, 버튼 바로 위에 그 이유를 적는다. 폼 순서대로 처음 걸리는 것만
+   * 말한다 — 모자란 것을 한꺼번에 늘어놓으면 혼내는 것처럼 읽힌다.
+   */
+  const blocker = !verified
+    ? "Verify your email to continue."
+    : password.length < MIN_PASSWORD
+      ? `Your password needs at least ${MIN_PASSWORD} characters.`
+      : password !== passwordConfirm
+        ? "The two passwords don't match."
+        : nickname.trim().length === 0
+          ? "Choose a nickname."
+          : null;
+
+  const canSubmit = blocker == null && !signUp.isPending && !login.isPending;
 
   const submit = () => {
     if (!canSubmit) return;
@@ -215,34 +220,29 @@ export function SignUpScreen() {
             ) : null}
           </Group>
 
+          {/* 비밀번호 규칙은 아래 blocker 줄이 말한다. 칸 밑에 또 적으면 같은 말이
+              두 군데서 나타났다 사라지며 화면이 들썩인다. */}
           <Group label="Password" style={{ marginTop: Spacing.section }}>
             <AuthField
               autoComplete="new-password"
               onChangeText={setPassword}
-              placeholder="Password"
+              placeholder={`At least ${MIN_PASSWORD} characters`}
               secureTextEntry
               value={password}
             />
             <AuthField
               autoComplete="new-password"
               onChangeText={setPasswordConfirm}
-              placeholder="Confirm password"
+              placeholder="Enter it again"
               secureTextEntry
               value={passwordConfirm}
             />
-            {passwordMismatch ? (
-              <Note error>Passwords don&apos;t match.</Note>
-            ) : (
-              <Note error={passwordTooShort}>
-                At least {MIN_PASSWORD} characters.
-              </Note>
-            )}
           </Group>
 
           <Group label="Nickname" style={{ marginTop: Spacing.section }}>
             <AuthField
               onChangeText={setNickname}
-              placeholder="Nickname"
+              placeholder="How others will see you"
               value={nickname}
             />
             {validateNickname.isError ? (
@@ -250,14 +250,18 @@ export function SignUpScreen() {
             ) : null}
           </Group>
 
-          {signUp.isError ? (
-            <Note error>
-              We couldn&apos;t create your account. Please try again.
-            </Note>
-          ) : null}
-          {login.isError ? (
-            <Note error>Account created. Please sign in.</Note>
-          ) : null}
+          {/* 서버가 거절한 것이 있으면 그것이 먼저다. 없으면 아직 못 채운 것을 말한다. */}
+          <View style={{ marginTop: Spacing.section }}>
+            {signUp.isError ? (
+              <Note error>
+                We couldn&apos;t create your account. Please try again.
+              </Note>
+            ) : login.isError ? (
+              <Note error>Your account is ready. Please sign in.</Note>
+            ) : blocker ? (
+              <Note>{blocker}</Note>
+            ) : null}
+          </View>
 
           <Button
             accessibilityLabel="Create account"
@@ -268,15 +272,32 @@ export function SignUpScreen() {
                 : "Create account"
             }
             onPress={submit}
-            style={{ marginTop: Spacing.section }}
+            style={{ marginTop: Spacing.tight }}
           />
 
-          <Text
-            className="text-body-3 text-neutral text-center"
-            style={{ marginTop: Spacing.inner, opacity: 0.7 }}
+          <View
+            className="flex-row justify-center"
+            style={{ marginTop: Spacing.inner }}
           >
-            By creating an account, you agree to our terms.
-          </Text>
+            <Text className="text-body-3 text-neutral">
+              By creating an account, you agree to our{" "}
+            </Text>
+            {/* 약관 화면이 앱 안에 있으므로 글자로만 두지 않고 실제로 보낸다. */}
+            <Touchable
+              accessibilityLabel="Terms of service"
+              accessibilityRole="button"
+              hitSlop={14}
+              onPress={() => router.push("/terms")}
+            >
+              <Text
+                className="text-body-3 text-foreground"
+                style={{ textDecorationLine: "underline" }}
+              >
+                terms
+              </Text>
+            </Touchable>
+            <Text className="text-body-3 text-neutral">.</Text>
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
