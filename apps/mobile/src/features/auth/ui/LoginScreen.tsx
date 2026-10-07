@@ -117,7 +117,9 @@ export function LoginScreen() {
 
           {mutation.isError ? (
             <Text
-              className="text-body-3 text-brand"
+              // 브랜드 주황이 아니라 danger 다. 주황은 고르는 것·갈 수 있는 곳을
+              // 뜻하므로, 실패를 같은 색으로 말하면 두 뜻이 섞인다.
+              className="text-body-3 text-danger"
               style={{ marginTop: GAP_TIGHT }}
             >
               Please check your email or password.
