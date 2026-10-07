@@ -206,7 +206,7 @@ export function DetailScreen<T extends DetailContent>({
                   }}
                 />
               ) : null}
-              <Text className="text-body-3 text-neutral">{byline}</Text>
+              <Text className="text-body-5 text-neutral">{byline}</Text>
             </View>
           ) : null}
           <Text

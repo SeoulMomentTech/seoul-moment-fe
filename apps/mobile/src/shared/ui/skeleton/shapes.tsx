@@ -11,6 +11,8 @@ export const LINE_BODY_2 = 19;
 export const LINE_BODY_1 = 22;
 export const LINE_TITLE_4 = 24;
 export const LINE_TITLE_3 = 29;
+export const LINE_BODY_5 = 14;
+const BAR_BODY_5 = 10;
 const BAR_BODY_3 = 11;
 const BAR_BODY_2 = 13;
 const BAR_BODY_1 = 14;
@@ -41,10 +43,10 @@ function lineWidth(index: number, count: number): DimensionValue {
   return index === count - 1 && count > 1 ? "60%" : "100%";
 }
 
-// ProductCard: 정사각 이미지 + 브랜드(mt-2) + 이름 2줄 + 가격(mt-1)
-const CARD_TEXT_HEIGHT = 8 + LINE_BODY_3 + 2 * LINE_BODY_3 + 4 + LINE_BODY_3;
+// ProductCard: 정사각 이미지 + 브랜드 body-5(mt-2) + 이름 body-3 2줄 + 가격 body-2(mt-1)
+const CARD_TEXT_HEIGHT = 8 + LINE_BODY_5 + 2 * LINE_BODY_3 + 4 + LINE_BODY_2;
 
-/** 카드 높이 = cellWidth + 80 (8 + 17 + 34 + 4 + 17). */
+/** 카드 높이 = cellWidth + 79 (8 + 14 + 34 + 4 + 19). */
 export function productCardHeight(cellWidth: number) {
   return cellWidth + CARD_TEXT_HEIGHT;
 }
@@ -61,12 +63,12 @@ export function ProductCardSkeleton({
     <View style={{ width }}>
       <Shimmer aspectRatio={1} radius={IMAGE_RADIUS} />
       <View style={{ marginTop: 8 }}>
-        <Line bar={BAR_BODY_3} line={LINE_BODY_3} width="40%" />
+        <Line bar={BAR_BODY_5} line={LINE_BODY_5} width="40%" />
       </View>
       <Line bar={BAR_BODY_3} line={LINE_BODY_3} />
       <Line bar={BAR_BODY_3} line={LINE_BODY_3} width="70%" />
       <View style={{ marginTop: 4 }}>
-        <Line bar={BAR_BODY_3} line={LINE_BODY_3} width="35%" />
+        <Line bar={BAR_BODY_2} line={LINE_BODY_2} width="35%" />
       </View>
     </View>
   );
@@ -112,7 +114,8 @@ export function ProductGridSkeleton({
   );
 }
 
-// PostRow: py-3 + 88x72 썸네일, 텍스트는 제목 2줄 + mt-1 + 메타 1줄(55)이라 썸네일(72)이 행 높이를 정한다.
+// PostRow: py-3 + 88x72 썸네일, 텍스트는 제목 body-2 2줄 + mt-1 + 메타 body-5 1줄(56)이라
+// 여전히 썸네일(72)이 행 높이를 정한다.
 const POST_THUMB_HEIGHT = 72;
 export const POST_ROW_HEIGHT = POST_THUMB_HEIGHT + 24;
 
@@ -129,10 +132,10 @@ export function PostRowSkeleton() {
     >
       <Shimmer height={POST_THUMB_HEIGHT} radius={IMAGE_RADIUS} width={88} />
       <View style={{ flex: 1 }}>
-        <Line bar={BAR_BODY_3} line={LINE_BODY_3} />
-        <Line bar={BAR_BODY_3} line={LINE_BODY_3} width="75%" />
+        <Line bar={BAR_BODY_2} line={LINE_BODY_2} />
+        <Line bar={BAR_BODY_2} line={LINE_BODY_2} width="75%" />
         <View style={{ marginTop: 4 }}>
-          <Line bar={BAR_BODY_3} line={LINE_BODY_3} width="45%" />
+          <Line bar={BAR_BODY_5} line={LINE_BODY_5} width="45%" />
         </View>
       </View>
     </View>
@@ -207,7 +210,7 @@ interface PostSlideSkeletonProps {
 
 /**
  * 홈 슬라이드 섹션. 두 변형 모두 아래에 페이저 자리(73)를 포함한다.
- * news = 360 + 73 = 433, article = 230 + 30 + 2x22 + 12 + 3x17 + 20 + 17 + 73 = 477.
+ * news = 360 + 73 = 433, article = 230 + 30 + 2x22 + 12 + 3x17 + 20 + 14 + 73 = 474.
  */
 export function PostSlideSkeleton({ variant }: PostSlideSkeletonProps) {
   if (variant === "news") {
@@ -232,7 +235,7 @@ export function PostSlideSkeleton({ variant }: PostSlideSkeletonProps) {
             <Line bar={BAR_BODY_3} line={LINE_BODY_3} width="60%" />
           </View>
           <View style={{ marginTop: 20 }}>
-            <Line bar={BAR_BODY_3} line={LINE_BODY_3} width="45%" />
+            <Line bar={BAR_BODY_5} line={LINE_BODY_5} width="45%" />
           </View>
         </View>
       </View>
@@ -289,8 +292,8 @@ const PILL_HEIGHT = LINE_BODY_3 + 8;
 
 /**
  * 뉴스 Featured 스켈레톤. 좌우 20 여백 포함.
- * 높이 = imageHeight + 12 + (25 + 8) + 2x22 + 4 + 17 = imageHeight + 110 (220 이면 330).
- * 알약(mt-3 블록 안), 제목 body-1 2줄, 바이라인 body-3 1줄(mt-1) 클램프와 같다.
+ * 높이 = imageHeight + 12 + (25 + 8) + 2x22 + 4 + 14 = imageHeight + 107 (220 이면 327).
+ * 알약(mt-3 블록 안), 제목 body-1 2줄, 바이라인 body-5 1줄(mt-1) 클램프와 같다.
  */
 export function FeaturedSkeleton({ imageHeight }: HeroCardSkeletonProps) {
   return (
@@ -303,7 +306,7 @@ export function FeaturedSkeleton({ imageHeight }: HeroCardSkeletonProps) {
         <Line bar={BAR_BODY_1} line={LINE_BODY_1} />
         <Line bar={BAR_BODY_1} line={LINE_BODY_1} width="60%" />
         <View style={{ marginTop: 4 }}>
-          <Line bar={BAR_BODY_3} line={LINE_BODY_3} width="45%" />
+          <Line bar={BAR_BODY_5} line={LINE_BODY_5} width="45%" />
         </View>
       </View>
     </View>
@@ -317,7 +320,7 @@ interface HorizontalCardsSkeletonProps {
   /** 기본 160(PICK_HEIGHT). 관련 글 캐러셀은 140. */
   imageHeight?: number;
   /**
-   * pick: 이미지 + 제목 2줄(body-3, mt-2) + 메타 1줄(mt-1).
+   * pick: 이미지 + 제목 2줄(body-2, mt-2) + 메타 1줄(body-5, mt-1).
    * related: 이미지 + 제목 2줄(body-2, mt-3). RelatedPosts 와 같다.
    */
   variant?: "pick" | "related";
@@ -325,7 +328,7 @@ interface HorizontalCardsSkeletonProps {
 
 /**
  * 가로 캐러셀 스켈레톤. 한 화면에 걸리는 만큼만 그린다(스크롤하지 않는다).
- * 높이 pick = imageHeight + 8 + 34 + 4 + 17 = imageHeight + 63 (기본 223).
+ * 높이 pick = imageHeight + 8 + 38 + 4 + 14 = imageHeight + 64 (기본 224).
  * 높이 related = imageHeight + 12 + 38 = imageHeight + 50 (기본 190).
  */
 export function HorizontalCardsSkeleton({
@@ -353,11 +356,11 @@ export function HorizontalCardsSkeleton({
           {variant === "pick" ? (
             <>
               <View style={{ marginTop: 8 }}>
-                <Line bar={BAR_BODY_3} line={LINE_BODY_3} />
+                <Line bar={BAR_BODY_2} line={LINE_BODY_2} />
               </View>
-              <Line bar={BAR_BODY_3} line={LINE_BODY_3} width="70%" />
+              <Line bar={BAR_BODY_2} line={LINE_BODY_2} width="70%" />
               <View style={{ marginTop: 4 }}>
-                <Line bar={BAR_BODY_3} line={LINE_BODY_3} width="40%" />
+                <Line bar={BAR_BODY_5} line={LINE_BODY_5} width="40%" />
               </View>
             </>
           ) : (
@@ -573,7 +576,7 @@ export function DetailSkeleton({
             }}
           >
             <Shimmer height={24} radius={12} width={24} />
-            <Shimmer height={BAR_BODY_3} radius={4} width={140} />
+            <Shimmer height={BAR_BODY_5} radius={4} width={140} />
           </View>
         )}
         <View style={{ marginTop: 16 }}>

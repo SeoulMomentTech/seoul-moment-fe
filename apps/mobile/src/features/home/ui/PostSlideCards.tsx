@@ -64,7 +64,7 @@ export function NewsSlideCard({
           </Text>
         ) : null}
         <Text
-          className="text-body-3 mt-5"
+          className="text-body-5 mt-5"
           style={{ color: "rgba(255,255,255,0.7)" }}
         >
           {byline(writer, createDate)}
@@ -102,7 +102,7 @@ export function ArticleSlideCard({
             {content}
           </Text>
         ) : null}
-        <Text className="text-body-3 text-neutral mt-5">
+        <Text className="text-body-5 text-neutral mt-5">
           {byline(writer, createDate)}
         </Text>
       </View>

@@ -21,12 +21,12 @@ export function PostRow({ title, writer, createDate, imageUrl }: PostRowProps) {
       />
       <View className="flex-1">
         <Text
-          className="text-body-3 text-foreground font-bold"
+          className="text-body-2 text-foreground font-bold"
           numberOfLines={2}
         >
           {title}
         </Text>
-        <Text className="text-body-3 text-neutral mt-1" numberOfLines={1}>
+        <Text className="text-body-5 text-neutral mt-1" numberOfLines={1}>
           {[writer, formatDate(createDate)].filter(Boolean).join(" · ")}
         </Text>
       </View>
