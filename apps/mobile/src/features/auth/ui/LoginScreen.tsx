@@ -13,9 +13,10 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { Button } from "@shared/ui/button";
 import { Touchable } from "@shared/ui/press";
 
-import { AUTH_FIELD_HEIGHT, AuthField } from "./AuthField";
+import { AuthField } from "./AuthField";
 import { GAP_BLOCK, GAP_SECTION, GAP_TIGHT, HEADER_HEIGHT } from "./layout";
 import { useLoginMutation } from "../model/useLoginMutation";
 
@@ -126,38 +127,23 @@ export function LoginScreen() {
             </Text>
           ) : null}
 
-          <Touchable
+          <Button
             accessibilityLabel="Login"
-            accessibilityRole="button"
-            accessibilityState={{ disabled: !canSubmit }}
-            className="bg-foreground items-center justify-center rounded-lg"
             disabled={!canSubmit}
+            label={mutation.isPending ? "Logging in…" : "Login"}
             onPress={submit}
-            style={{
-              height: AUTH_FIELD_HEIGHT,
-              marginTop: GAP_BLOCK,
-              opacity: canSubmit ? 1 : 0.3,
-            }}
-          >
-            <Text className="text-body-2 text-background font-bold">
-              {mutation.isPending ? "Logging in…" : "Login"}
-            </Text>
-          </Touchable>
+            style={{ marginTop: GAP_BLOCK }}
+          />
 
           {/* 약관 동의 문구는 두지 않는다 — 로그인은 동의를 받는 자리가 아니고,
               약관은 가입 화면과 My > Help 에서 볼 수 있다. */}
-          <Touchable
-            accessibilityLabel="Sign up with email"
-            accessibilityRole="button"
-            className="border-neutral-subtle items-center justify-center rounded-lg border"
+          <Button
+            label="Sign up with email"
             onPress={() => router.push("/signup")}
             // 로그인과 짝을 이루는 선택지라 블록 간격(40)이 아니라 가까이 붙인다.
-            style={{ height: AUTH_FIELD_HEIGHT, marginTop: GAP_TIGHT }}
-          >
-            <Text className="text-body-2 text-foreground font-bold">
-              Sign up with email
-            </Text>
-          </Touchable>
+            style={{ marginTop: GAP_TIGHT }}
+            variant="secondary"
+          />
 
           {/* 소셜 로그인만 아직 없다. 화면을 차지하지 않게 한 줄로 둔다. */}
           <Text
