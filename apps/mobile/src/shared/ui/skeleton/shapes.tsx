@@ -375,6 +375,31 @@ export function HorizontalCardsSkeleton({
   );
 }
 
+// MyScreen 로그인 블록의 아바타. 실제 블록(MyScreen 의 Avatar)과 같은 값을 쓴다.
+export const MY_AVATAR_SIZE = 56;
+
+/**
+ * 로그인한 사람 블록. 아바타 + 닉네임(title-3) + 이름(body-3).
+ * 높이 = 56 + 12 + 29 + 4 + 17 = 118. 바깥 위 여백(40)과 아래 Sign out(56)은 화면이 그린다.
+ */
+export function MyProfileSkeleton() {
+  return (
+    <View>
+      <Shimmer
+        height={MY_AVATAR_SIZE}
+        radius={MY_AVATAR_SIZE / 2}
+        width={MY_AVATAR_SIZE}
+      />
+      <View style={{ marginTop: 12 }}>
+        <Line bar={BAR_TITLE_3} line={LINE_TITLE_3} width="45%" />
+      </View>
+      <View style={{ marginTop: 4 }}>
+        <Line bar={BAR_BODY_3} line={LINE_BODY_3} width="30%" />
+      </View>
+    </View>
+  );
+}
+
 // Chip: px-4 py-2 + body-3 한 줄 + 테두리 1 x 2 = 17 + 16 + 2
 export const CHIP_HEIGHT = LINE_BODY_3 + 16 + 2;
 const CHIP_WIDTHS = [72, 96, 80];

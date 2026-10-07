@@ -10,6 +10,8 @@ export {
   FeaturedSkeleton,
   HeroCardSkeleton,
   HorizontalCardsSkeleton,
+  MY_AVATAR_SIZE,
+  MyProfileSkeleton,
   NEWS_CARD_HEIGHT,
   POST_ROW_HEIGHT,
   PostListSkeleton,
