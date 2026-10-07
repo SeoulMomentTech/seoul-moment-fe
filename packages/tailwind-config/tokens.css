@@ -1,0 +1,43 @@
+/*
+ * Seoul Moment 디자인 토큰.
+ * web·admin 은 shared-styles.css 를 통해, mobile(NativeWind)은 이 파일을 직접 import 한다.
+ * NativeWind 가 처리할 수 있도록 tailwindcss 본체·웹 전용 플러그인은 여기서 import 하지 않는다.
+ */
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --brand-500: #f37b2a;
+  --neutral-900: #171717;
+  --neutral-600: #707070;
+  --neutral-200: #dddddd;
+  --neutral-0: #ffffff;
+  --surface-soft: #f0f6ff;
+  --info-500: #0088ff;
+  --danger-500: #ff383c;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-brand: var(--brand-500);
+  --color-brand-foreground: var(--neutral-0);
+  --color-neutral: var(--neutral-600);
+  --color-neutral-subtle: var(--neutral-200);
+  --color-surface-soft: var(--surface-soft);
+  --color-info: var(--info-500);
+  --color-danger: var(--danger-500);
+  --color-orange: var(--brand-500);
+  --color-gray: var(--neutral-600);
+  --color-error: var(--danger-500);
+  --color-sent: var(--info-500);
+
+  --text-title-1: 36px;
+  --text-title-2: 32px;
+  --text-title-3: 24px;
+  --text-title-4: 20px;
+  --text-body-1: 18px;
+  --text-body-2: 16px;
+  --text-body-3: 14px;
+  --text-body-4: 13px;
+  --text-body-5: 12px;
+}

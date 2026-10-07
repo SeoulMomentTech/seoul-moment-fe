@@ -10,19 +10,16 @@ import {
   CartLineRow,
   isCartItemUnavailable,
   sumSelectedAmount,
-  type CartBrandGroup,
+  type UserCartBrandGroup,
 } from "@entities/cart";
 
 interface CartBrandGroupProps {
-  group: CartBrandGroup;
-  selectedVariantIds: ReadonlySet<number>;
-  onToggleLine(productVariantId: number, selected: boolean): void;
-  onToggleGroup(
-    productVariantIds: ReadonlyArray<number>,
-    selected: boolean,
-  ): void;
-  onQuantityChange(productVariantId: number, quantity: number): void;
-  onRemove(productVariantId: number): void;
+  group: UserCartBrandGroup;
+  selectedCartItemIds: ReadonlySet<number>;
+  onToggleLine(cartItemId: number, selected: boolean): void;
+  onToggleGroup(cartItemIds: ReadonlyArray<number>, selected: boolean): void;
+  onQuantityChange(cartItemId: number, quantity: number): void;
+  onRemove(cartItemId: number): void;
 }
 
 /**
@@ -33,7 +30,7 @@ interface CartBrandGroupProps {
  */
 export function CartBrandGroupSection({
   group,
-  selectedVariantIds,
+  selectedCartItemIds,
   onToggleLine,
   onToggleGroup,
   onQuantityChange,
@@ -45,16 +42,16 @@ export function CartBrandGroupSection({
   // 않으면 그 라인이 낀 브랜드는 전체 선택이 영원히 완료되지 않아 체크박스가 중간 상태로 굳는다.
   const selectableIds = group.items
     .filter((item) => !isCartItemUnavailable(item))
-    .map((item) => item.productVariantId);
+    .map((item) => item.cartItemId);
   const selectedInGroup = selectableIds.filter((id) =>
-    selectedVariantIds.has(id),
+    selectedCartItemIds.has(id),
   ).length;
   const allSelected =
     selectableIds.length > 0 && selectedInGroup === selectableIds.length;
 
   const selectedAmount = useMemo(
-    () => sumSelectedAmount(group.items, selectedVariantIds),
-    [group.items, selectedVariantIds],
+    () => sumSelectedAmount(group.items, selectedCartItemIds),
+    [group.items, selectedCartItemIds],
   );
 
   return (
@@ -94,15 +91,15 @@ export function CartBrandGroupSection({
       {group.items.map((item) => (
         <CartLineRow
           item={item}
-          key={item.productVariantId}
+          key={item.cartItemId}
           onQuantityChange={(quantity) =>
-            onQuantityChange(item.productVariantId, quantity)
+            onQuantityChange(item.cartItemId, quantity)
           }
-          onRemove={() => onRemove(item.productVariantId)}
+          onRemove={() => onRemove(item.cartItemId)}
           onSelectedChange={(selected) =>
-            onToggleLine(item.productVariantId, selected)
+            onToggleLine(item.cartItemId, selected)
           }
-          selected={selectedVariantIds.has(item.productVariantId)}
+          selected={selectedCartItemIds.has(item.cartItemId)}
         />
       ))}
     </section>
