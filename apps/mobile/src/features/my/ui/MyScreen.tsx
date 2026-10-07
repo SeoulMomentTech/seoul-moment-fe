@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useUserAuthStore } from "@shared/lib/auth/useUserAuthStore";
 import { Touchable } from "@shared/ui/press";
+import { Section } from "@shared/ui/section";
 
 import { BottomTabInset } from "@/constants/theme";
 
@@ -28,10 +29,7 @@ export function MyScreen() {
       {/* 가입 블록과 메뉴를 가르는 띠. 섹션이 아니라 경계라 좌우 여백 없이 깐다. */}
       <View className="bg-surface-muted" style={{ height: 10 }} />
       {MY_MENU_GROUPS.map((group) => (
-        <View className="pt-8" key={group.title}>
-          <Text className="text-body-3 text-neutral mb-2 px-5">
-            {group.title}
-          </Text>
+        <Section key={group.title} title={group.title}>
           {group.items.map((item) => (
             <MenuRow
               item={item}
@@ -39,7 +37,7 @@ export function MyScreen() {
               onPress={() => router.push(item.href)}
             />
           ))}
-        </View>
+        </Section>
       ))}
     </ScrollView>
   );
