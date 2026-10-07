@@ -1,6 +1,8 @@
 import { useState } from "react";
 
-import { TextInput } from "react-native";
+import { Text, TextInput, View } from "react-native";
+
+import { Touchable } from "@shared/ui/press";
 
 export const AUTH_FIELD_HEIGHT = 56;
 // 입력칸 안쪽 좌우 여백. 56 높이에 16 은 글자가 테두리에 붙어 보여 화면 좌우 여백(20)과 맞춘다.
@@ -17,6 +19,7 @@ interface AuthFieldProps {
   onChangeText(text: string): void;
   onSubmitEditing?(): void;
   returnKeyType?: "next" | "go";
+  /** true 면 글자를 가리고 오른쪽에 보기/숨기기 토글을 둔다. */
   secureTextEntry?: boolean;
   editable?: boolean;
   keyboardType?: "email-address" | "number-pad";
@@ -31,30 +34,54 @@ interface AuthFieldProps {
 export function AuthField({
   inputRef,
   editable = true,
+  secureTextEntry = false,
   ...input
 }: AuthFieldProps) {
   const [focused, setFocused] = useState(false);
+  // 가린 글자는 오타를 확인할 길이 없다. 웹 가입 폼과 같이 눈 토글을 둔다.
+  const [revealed, setRevealed] = useState(false);
 
   return (
-    <TextInput
-      autoCapitalize="none"
-      autoCorrect={false}
-      className="bg-surface-muted text-body-2 text-foreground rounded-lg"
-      editable={editable}
-      onBlur={() => setFocused(false)}
-      onFocus={() => setFocused(true)}
-      placeholderTextColor={PLACEHOLDER_COLOR}
-      ref={inputRef}
+    <View
+      className="bg-surface-muted flex-row items-center rounded-lg"
       style={{
         height: AUTH_FIELD_HEIGHT,
-        paddingHorizontal: PADDING_X,
+        paddingLeft: PADDING_X,
+        paddingRight: secureTextEntry ? PADDING_X / 2 : PADDING_X,
         borderWidth: 1,
         borderColor: focused ? BORDER_FOCUS : BORDER_IDLE,
         // 잠긴 칸(인증 끝난 이메일)은 편집 가능한 칸과 구분되게 흐리게 둔다.
         opacity: editable ? 1 : 0.6,
       }}
-      submitBehavior="submit"
-      {...input}
-    />
+    >
+      <TextInput
+        autoCapitalize="none"
+        autoCorrect={false}
+        className="text-body-2 text-foreground flex-1"
+        editable={editable}
+        onBlur={() => setFocused(false)}
+        onFocus={() => setFocused(true)}
+        placeholderTextColor={PLACEHOLDER_COLOR}
+        ref={inputRef}
+        secureTextEntry={secureTextEntry && !revealed}
+        submitBehavior="submit"
+        {...input}
+      />
+      {secureTextEntry ? (
+        <Touchable
+          accessibilityLabel={revealed ? "Hide password" : "Show password"}
+          accessibilityRole="button"
+          className="items-center justify-center"
+          hitSlop={8}
+          onPress={() => setRevealed((on) => !on)}
+          // 글리프 한 자라 터치 영역을 칸 높이만큼 세워 44pt 를 넘긴다.
+          style={{ width: 40, height: AUTH_FIELD_HEIGHT }}
+        >
+          <Text className="text-body-2 text-neutral">
+            {revealed ? "⦸" : "◉"}
+          </Text>
+        </Touchable>
+      ) : null}
+    </View>
   );
 }
