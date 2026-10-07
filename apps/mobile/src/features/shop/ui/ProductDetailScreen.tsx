@@ -190,8 +190,11 @@ function PriceBlock({ product }: { product: GetProductDetailRes }) {
 
   return (
     <View className="mt-4 flex-row items-baseline" style={{ gap: 8 }}>
+      {/* 할인율은 상태도 동작도 아니라 값에 붙는 설명이다. 브랜드 주황은 "고른 것·갈 수
+          있는 곳"만 뜻하도록 두고(wave 1), 할인율은 옆의 취소선 정가와 같은 회색으로 묶어
+          한 덩어리로 읽히게 한다. 글랜스는 검정 title-4 인 실제 가격이 가져간다. */}
       {hasDiscount && percent > 0 ? (
-        <Text className="text-title-4 text-brand font-bold">{`${percent}%`}</Text>
+        <Text className="text-body-2 text-neutral font-bold">{`${percent}%`}</Text>
       ) : null}
       <Text className="text-title-4 text-foreground font-bold">
         {formatPrice(current)}
