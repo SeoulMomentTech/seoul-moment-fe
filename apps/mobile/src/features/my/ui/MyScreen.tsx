@@ -1,8 +1,9 @@
 import { useRouter } from "expo-router";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useUserAuthStore } from "@shared/lib/auth/useUserAuthStore";
+import { Touchable } from "@shared/ui/press";
 
 import { BottomTabInset } from "@/constants/theme";
 
@@ -55,14 +56,14 @@ function SignUpPitch() {
       <Text className="text-body-3 text-neutral mt-3 text-center">
         Save what you like and pick up where you left off, on any device.
       </Text>
-      <Pressable
+      <Touchable
         accessibilityLabel="Sign in"
         accessibilityRole="button"
         className="bg-foreground mt-8 items-center justify-center rounded-full py-4"
         onPress={() => router.push("/login")}
       >
         <Text className="text-body-2 text-background font-bold">Sign in</Text>
-      </Pressable>
+      </Touchable>
     </View>
   );
 }
@@ -79,21 +80,21 @@ function SignedInHeader() {
       <Text className="text-title-3 text-foreground text-center font-bold">
         You&apos;re signed in
       </Text>
-      <Pressable
+      <Touchable
         accessibilityLabel="Sign out"
         accessibilityRole="button"
         className="border-neutral-subtle mt-8 items-center justify-center rounded-full border py-4"
         onPress={logout}
       >
         <Text className="text-body-2 text-foreground font-bold">Sign out</Text>
-      </Pressable>
+      </Touchable>
     </View>
   );
 }
 
 function MenuRow({ item, onPress }: { item: MyMenuItem; onPress(): void }) {
   return (
-    <Pressable
+    <Touchable
       accessibilityLabel={item.label}
       accessibilityRole="button"
       className="border-neutral-subtle flex-row items-center justify-between border-b px-5"
@@ -103,6 +104,6 @@ function MenuRow({ item, onPress }: { item: MyMenuItem; onPress(): void }) {
     >
       <Text className="text-body-2 text-foreground">{item.label}</Text>
       <Text className="text-body-2 text-neutral">›</Text>
-    </Pressable>
+    </Touchable>
   );
 }

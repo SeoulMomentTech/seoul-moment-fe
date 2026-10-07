@@ -1,4 +1,6 @@
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
+
+import { Touchable } from "@shared/ui/press";
 
 export const PAGER_BAR_HEIGHT = 1;
 export const PAGER_ROW_HEIGHT = 20;
@@ -67,7 +69,7 @@ function Arrow({
   onPress(): void;
 }) {
   return (
-    <Pressable
+    <Touchable
       accessibilityLabel={label}
       accessibilityRole="button"
       accessibilityState={{ disabled }}
@@ -84,6 +86,6 @@ function Arrow({
       >
         {symbol}
       </Text>
-    </Pressable>
+    </Touchable>
   );
 }

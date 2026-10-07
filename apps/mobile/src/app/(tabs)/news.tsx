@@ -1,7 +1,8 @@
 import { useRouter } from "expo-router";
-import { FlatList, Pressable, RefreshControl, View } from "react-native";
+import { FlatList, RefreshControl, View } from "react-native";
 
 import { PostRow } from "@entities/post/ui/PostRow";
+import { Touchable } from "@shared/ui/press";
 
 import { BottomTabInset, Spacing } from "@/constants/theme";
 
@@ -48,7 +49,7 @@ export default function NewsScreen() {
           <RefreshControl onRefresh={refresh} refreshing={isRefreshing} />
         }
         renderItem={({ item }) => (
-          <Pressable
+          <Touchable
             accessibilityLabel={item.title}
             accessibilityRole="button"
             onPress={() => router.push(`/news/${item.id}`)}
@@ -59,7 +60,7 @@ export default function NewsScreen() {
               title={item.title}
               writer={item.writer}
             />
-          </Pressable>
+          </Touchable>
         )}
         showsVerticalScrollIndicator={false}
       />

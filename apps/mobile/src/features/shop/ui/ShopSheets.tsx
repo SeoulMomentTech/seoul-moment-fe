@@ -4,7 +4,6 @@ import {
   Animated,
   Easing,
   Modal,
-  Pressable,
   ScrollView,
   Text,
   useWindowDimensions,
@@ -21,6 +20,7 @@ import {
   AccordionTitleText,
   AccordionTrigger,
 } from "@shared/ui/accordion";
+import { Touchable } from "@shared/ui/press";
 import { SectionError } from "@shared/ui/section-state";
 import { ChipRowsSkeleton, Shimmer } from "@shared/ui/skeleton";
 
@@ -119,9 +119,11 @@ function BottomSheet({ visible, title, onClose, children }: BottomSheetProps) {
             opacity: progress,
           }}
         >
-          <Pressable
+          <Touchable
             accessibilityLabel="Close"
             accessibilityRole="button"
+            // 보이는 면이 없는 터치 영역이다. 투명도를 주면 뒤 배경 자체가 깜빡인다.
+            feedback="none"
             onPress={onClose}
             style={{ flex: 1 }}
           />
@@ -139,7 +141,7 @@ function BottomSheet({ visible, title, onClose, children }: BottomSheetProps) {
             <Text className="text-title-4 text-foreground font-bold">
               {title}
             </Text>
-            <Pressable
+            <Touchable
               accessibilityLabel="Close"
               accessibilityRole="button"
               // 글리프 한 줄(22pt)이라 8 로는 38pt 에 그친다. 14 로 50pt 를 만든다.
@@ -147,7 +149,7 @@ function BottomSheet({ visible, title, onClose, children }: BottomSheetProps) {
               onPress={onClose}
             >
               <Text className="text-body-1 text-neutral">✕</Text>
-            </Pressable>
+            </Touchable>
           </View>
           <Fragment key={session}>{children}</Fragment>
         </Animated.View>
@@ -173,7 +175,7 @@ function Chip({
   onPress(): void;
 }) {
   return (
-    <Pressable
+    <Touchable
       accessibilityLabel={label}
       accessibilityRole="button"
       accessibilityState={{ selected }}
@@ -208,7 +210,7 @@ function Chip({
       >
         {label}
       </Text>
-    </Pressable>
+    </Touchable>
   );
 }
 
@@ -529,15 +531,15 @@ function FilterSheetContent({ onClose }: { onClose(): void }) {
         className="border-neutral-subtle flex-row gap-3 border-t px-5 pt-3"
         style={{ paddingBottom: insets.bottom + 12 }}
       >
-        <Pressable
+        <Touchable
           accessibilityLabel="Reset filters"
           accessibilityRole="button"
           className="border-neutral-subtle items-center justify-center rounded-full border px-6 py-3"
           onPress={resetDraft}
         >
           <Text className="text-body-2 text-foreground font-bold">Reset</Text>
-        </Pressable>
-        <Pressable
+        </Touchable>
+        <Touchable
           accessibilityLabel={applyLabel}
           accessibilityRole="button"
           className="bg-brand flex-1 items-center justify-center rounded-full py-3"
@@ -546,7 +548,7 @@ function FilterSheetContent({ onClose }: { onClose(): void }) {
           <Text className="text-body-2 text-background font-bold">
             {applyLabel}
           </Text>
-        </Pressable>
+        </Touchable>
       </View>
     </>
   );
@@ -608,7 +610,7 @@ function SortSheetContent({ onClose }: { onClose(): void }) {
     body = data.list.map((option) => {
       const selected = option.sortColumn === sortColumn && option.sort === sort;
       return (
-        <Pressable
+        <Touchable
           accessibilityLabel={option.name}
           accessibilityRole="button"
           accessibilityState={{ selected }}
@@ -630,7 +632,7 @@ function SortSheetContent({ onClose }: { onClose(): void }) {
             {option.name}
           </Text>
           {selected ? <Text className="text-body-2 text-brand">✓</Text> : null}
-        </Pressable>
+        </Touchable>
       );
     });
   }

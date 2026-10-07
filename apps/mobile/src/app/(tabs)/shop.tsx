@@ -1,7 +1,8 @@
 import { useRouter } from "expo-router";
-import { FlatList, Pressable, RefreshControl, View } from "react-native";
+import { FlatList, RefreshControl, View } from "react-native";
 
 import { ProductCard } from "@entities/product/ui/ProductCard";
+import { Touchable } from "@shared/ui/press";
 
 import { BottomTabInset, Spacing } from "@/constants/theme";
 
@@ -57,14 +58,15 @@ export default function ShopScreen() {
           <RefreshControl onRefresh={refresh} refreshing={isRefreshing} />
         }
         renderItem={({ item }) => (
-          <Pressable
+          <Touchable
             accessibilityLabel={item.productName}
             accessibilityRole="button"
+            feedback="card"
             onPress={() => router.push(`/product/${item.id}`)}
             style={{ width: CELL_WIDTH }}
           >
             <ProductCard product={item} />
-          </Pressable>
+          </Touchable>
         )}
         showsVerticalScrollIndicator={false}
       />

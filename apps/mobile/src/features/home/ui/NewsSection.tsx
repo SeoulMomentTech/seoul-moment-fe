@@ -1,6 +1,7 @@
 import { useRouter } from "expo-router";
-import { Pressable, Text } from "react-native";
+import { Text } from "react-native";
 
+import { Touchable } from "@shared/ui/press";
 import { Section } from "@shared/ui/section";
 import { SectionError } from "@shared/ui/section-state";
 import { NEWS_CARD_HEIGHT, PostSlideSkeleton } from "@shared/ui/skeleton";
@@ -50,7 +51,7 @@ export function NewsSection() {
   return (
     <Section
       action={
-        <Pressable
+        <Touchable
           accessibilityLabel="View all news"
           accessibilityRole="button"
           // 글자 한 줄(17pt)뿐이라 8 로는 33pt 에 그친다. 14 로 45pt 를 만든다.
@@ -59,7 +60,7 @@ export function NewsSection() {
           onPress={() => router.navigate("/news")}
         >
           <Text className="text-body-3 text-brand font-semibold">View all</Text>
-        </Pressable>
+        </Touchable>
       }
       title="News"
     >
@@ -67,9 +68,10 @@ export function NewsSection() {
         data={news}
         keyExtractor={(item) => String(item.id)}
         renderItem={(item) => (
-          <Pressable
+          <Touchable
             accessibilityLabel={item.title}
             accessibilityRole="button"
+            feedback="card"
             onPress={() => router.push(`/news/${item.id}`)}
             style={{ height: NEWS_CARD_HEIGHT }}
           >
@@ -80,7 +82,7 @@ export function NewsSection() {
               title={item.title}
               writer={item.writer}
             />
-          </Pressable>
+          </Touchable>
         )}
       />
     </Section>

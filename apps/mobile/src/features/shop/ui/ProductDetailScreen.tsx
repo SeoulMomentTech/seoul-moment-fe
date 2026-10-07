@@ -5,7 +5,6 @@ import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import {
   FlatList,
-  Pressable,
   ScrollView,
   Text,
   useWindowDimensions,
@@ -25,6 +24,7 @@ import {
   StatusScreen,
   TopScrim,
 } from "@shared/ui/detail-chrome";
+import { Touchable } from "@shared/ui/press";
 import { SectionError } from "@shared/ui/section-state";
 import { DetailSkeleton } from "@shared/ui/skeleton";
 
@@ -305,7 +305,7 @@ export function ProductDetailScreen({ id }: { id: number }) {
         )}
         <View className="px-5 pt-5">
           {/* 브랜드를 누르면 그 브랜드만 건 상품 목록으로 간다. */}
-          <Pressable
+          <Touchable
             accessibilityLabel={`View products by ${product.brand.name}`}
             accessibilityRole="button"
             className="flex-row items-center"
@@ -335,7 +335,7 @@ export function ProductDetailScreen({ id }: { id: number }) {
               {product.brand.name}
             </Text>
             <Text className="text-body-3 text-neutral ml-2">›</Text>
-          </Pressable>
+          </Touchable>
           <Text className="text-title-4 text-foreground mt-3 font-bold">
             {product.name}
           </Text>

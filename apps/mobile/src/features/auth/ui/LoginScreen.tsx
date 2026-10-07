@@ -7,12 +7,13 @@ import type { TextInput } from "react-native";
 import {
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   ScrollView,
   Text,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+import { Touchable } from "@shared/ui/press";
 
 import { AUTH_FIELD_HEIGHT, AuthField } from "./AuthField";
 import { GAP_BLOCK, GAP_SECTION, GAP_TIGHT, HEADER_HEIGHT } from "./layout";
@@ -55,14 +56,14 @@ export function LoginScreen() {
           className="flex-row items-center px-5"
           style={{ height: HEADER_HEIGHT }}
         >
-          <Pressable
+          <Touchable
             accessibilityLabel="Go back"
             accessibilityRole="button"
             hitSlop={14}
             onPress={() => router.back()}
           >
             <Text className="text-title-4 text-foreground font-bold">‹</Text>
-          </Pressable>
+          </Touchable>
         </View>
       </View>
       <KeyboardAvoidingView
@@ -123,7 +124,7 @@ export function LoginScreen() {
             </Text>
           ) : null}
 
-          <Pressable
+          <Touchable
             accessibilityLabel="Login"
             accessibilityRole="button"
             accessibilityState={{ disabled: !canSubmit }}
@@ -139,11 +140,11 @@ export function LoginScreen() {
             <Text className="text-body-2 text-background font-bold">
               {mutation.isPending ? "Logging in…" : "Login"}
             </Text>
-          </Pressable>
+          </Touchable>
 
           {/* 약관 동의 문구는 두지 않는다 — 로그인은 동의를 받는 자리가 아니고,
               약관은 가입 화면과 My > Help 에서 볼 수 있다. */}
-          <Pressable
+          <Touchable
             accessibilityLabel="Sign up with email"
             accessibilityRole="button"
             className="border-neutral-subtle items-center justify-center rounded-lg border"
@@ -154,7 +155,7 @@ export function LoginScreen() {
             <Text className="text-body-2 text-foreground font-bold">
               Sign up with email
             </Text>
-          </Pressable>
+          </Touchable>
 
           {/* 소셜 로그인만 아직 없다. 화면을 차지하지 않게 한 줄로 둔다. */}
           <Text

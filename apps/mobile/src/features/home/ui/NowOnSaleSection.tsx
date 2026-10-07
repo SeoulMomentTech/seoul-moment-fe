@@ -1,7 +1,8 @@
 import { useRouter } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
 
 import { ProductCard } from "@entities/product/ui/ProductCard";
+import { Touchable } from "@shared/ui/press";
 import { Section } from "@shared/ui/section";
 import { SectionError } from "@shared/ui/section-state";
 import { ProductGridSkeleton } from "@shared/ui/skeleton";
@@ -49,7 +50,7 @@ export function NowOnSaleSection() {
   return (
     <Section
       action={
-        <Pressable
+        <Touchable
           accessibilityLabel="View all products"
           accessibilityRole="button"
           hitSlop={8}
@@ -57,7 +58,7 @@ export function NowOnSaleSection() {
           onPress={() => router.navigate("/shop")}
         >
           <Text className="text-body-3 text-brand font-semibold">View all</Text>
-        </Pressable>
+        </Touchable>
       }
       title="Now On Sale"
     >
@@ -65,15 +66,16 @@ export function NowOnSaleSection() {
           세로 FlatList 를 중첩하지 않으려고 flex-wrap 으로 2열을 만든다. */}
       <View className="flex-row flex-wrap gap-3 px-5">
         {products.map((product) => (
-          <Pressable
+          <Touchable
             accessibilityLabel={product.productName}
             accessibilityRole="button"
+            feedback="card"
             key={product.id}
             onPress={() => router.push(`/product/${product.id}`)}
             style={{ width: "47%" }}
           >
             <ProductCard product={product} />
-          </Pressable>
+          </Touchable>
         ))}
       </View>
     </Section>

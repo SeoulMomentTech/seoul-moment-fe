@@ -6,14 +6,18 @@ import {
   createAccordion,
 } from "@gluestack-ui/core/accordion/creator";
 import { tva } from "@gluestack-ui/utils/nativewind-utils";
-import { Pressable, Text, View } from "react-native";
+import { Text, View } from "react-native";
+
+import { Touchable } from "@shared/ui/press";
 
 // gluestack 의 헤드리스 creator 에 React Native 기본 컴포넌트를 부품으로 꽂는다.
+// Trigger 만 Pressable 대신 Touchable 이다 — 필터 시트의 아코디언 줄도
+// 다른 모든 누를 수 있는 것과 같은 누름 피드백을 갖게 한다.
 const UIAccordion = createAccordion({
   Root: View,
   Item: View,
   Header: View,
-  Trigger: Pressable,
+  Trigger: Touchable,
   Content: View,
   Icon: Text,
   TitleText: Text,
