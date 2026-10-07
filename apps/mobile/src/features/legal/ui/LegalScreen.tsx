@@ -6,9 +6,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LegalDocument, type LegalNode } from "@shared/ui/legal-document";
 import { Touchable } from "@shared/ui/press";
 
-import { Spacing } from "@/constants/theme";
-
-const HEADER_HEIGHT = 52;
+import { HeaderHeight, Spacing } from "@/constants/theme";
 
 /**
  * 약관·개인정보 처리방침 공용 화면. 사진이 없어 상세 화면들과 달리 스크림 없이
@@ -33,7 +31,7 @@ export function LegalScreen({
       >
         <View
           className="flex-row items-center px-5"
-          style={{ height: HEADER_HEIGHT }}
+          style={{ height: HeaderHeight }}
         >
           <Touchable
             accessibilityLabel="Go back"

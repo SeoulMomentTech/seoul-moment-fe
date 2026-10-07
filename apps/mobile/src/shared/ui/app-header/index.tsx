@@ -3,6 +3,8 @@ import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Circle, Path } from "react-native-svg";
 
+import { HeaderHeight } from "@/constants/theme";
+
 // className 을 받지 못하는 SVG 라 nativewind --foreground 토큰 값을 직접 쓴다.
 const FOREGROUND = "#171717";
 
@@ -17,7 +19,10 @@ export function AppHeader() {
       className="bg-background border-neutral-subtle border-b"
       style={{ paddingTop: insets.top }}
     >
-      <View className="h-[52px] flex-row items-center justify-between px-5">
+      <View
+        className="flex-row items-center justify-between px-5"
+        style={{ height: HeaderHeight }}
+      >
         <Image
           accessibilityLabel="Seoul Moment"
           contentFit="contain"
