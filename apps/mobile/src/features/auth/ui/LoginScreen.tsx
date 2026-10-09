@@ -29,10 +29,12 @@ const LOGO_HEIGHT = 29;
 const looksLikeEmail = (value: string) => /^\S+@\S+\.\S+$/.test(value.trim());
 
 /**
- * 로그인. 블록 구성은 web LoginPage 를 따르되(헤더 / 폼 / 약관 / 소셜 / 가입)
- * 폰에 맞게 다듬었다 — 아직 없는 기능의 안내는 맨 아래 한 줄로 모으고,
- * 포커스 테두리와 키보드 넘김을 더했다.
+ * 로그인. 블록 구성은 web LoginPage 를 따르되 폰에 맞게 줄였다 —
+ * 워드마크 / 입력 두 칸 / 로그인 / 가입.
  * 문구는 web 의 영문 메시지를 쓰되 placeholder 만 짧게 줄였다.
+ *
+ * 아직 없는 기능(소셜 로그인)은 알리지 않는다. 화면의 마지막 자리는 다음에 할 일이
+ * 차지해야 하고, 보여 준 적 없는 것을 아쉬워하는 사람은 없다.
  */
 export function LoginScreen() {
   const insets = useSafeAreaInsets();
@@ -41,13 +43,29 @@ export function LoginScreen() {
   const [password, setPassword] = useState("");
   const passwordRef = useRef<TextInput>(null);
 
-  const mutation = useLoginMutation({ onSuccess: () => router.back() });
+  const mutation = useLoginMutation({
+    onSuccess: () => {
+      // 딥링크로 로그인이 첫 화면이면 돌아갈 곳이 없다. 그때는 탭으로 보낸다 —
+      // 없는 뒤로가기를 부르면 성공하고도 로그인 화면에 그대로 남는다.
+      if (router.canGoBack()) router.back();
+      else router.replace("/my");
+    },
+  });
 
   const canSubmit =
     looksLikeEmail(email) && password.length > 0 && !mutation.isPending;
 
   const submit = () => {
     if (canSubmit) mutation.mutate({ email: email.trim(), password });
+  };
+
+  /**
+   * 실패 줄은 값을 고치는 순간 치운다. 남겨 두면 비밀번호를 고쳐 놓고도
+   * "확인해 보세요" 가 그대로 떠 있어, 이미 고친 것을 아직 틀린 것처럼 말한다.
+   */
+  const edit = (set: (value: string) => void) => (value: string) => {
+    if (mutation.isError) mutation.reset();
+    set(value);
   };
 
   return (
@@ -106,7 +124,7 @@ export function LoginScreen() {
             <AuthField
               autoComplete="email"
               keyboardType="email-address"
-              onChangeText={setEmail}
+              onChangeText={edit(setEmail)}
               onSubmitEditing={() => passwordRef.current?.focus()}
               placeholder="Email"
               returnKeyType="next"
@@ -115,7 +133,7 @@ export function LoginScreen() {
             <AuthField
               autoComplete="current-password"
               inputRef={passwordRef}
-              onChangeText={setPassword}
+              onChangeText={edit(setPassword)}
               onSubmitEditing={submit}
               placeholder="Password"
               returnKeyType="go"
@@ -152,14 +170,6 @@ export function LoginScreen() {
             style={{ marginTop: Spacing.tight }}
             variant="secondary"
           />
-
-          {/* 소셜 로그인만 아직 없다. 화면을 차지하지 않게 한 줄로 둔다. */}
-          <Text
-            className="text-body-3 text-neutral text-center"
-            style={{ marginTop: Spacing.inner, opacity: 0.7 }}
-          >
-            Social sign-in is coming soon.
-          </Text>
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
