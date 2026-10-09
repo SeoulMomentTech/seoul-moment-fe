@@ -4,8 +4,8 @@ import { useUserFit } from "@entities/user/model/useUserFit";
 import { AuthField } from "@features/auth/ui/AuthField";
 import { useUserAuthStore } from "@shared/lib/auth/useUserAuthStore";
 import type { GetUserFitRes } from "@shared/services/user";
-import { ChipRow } from "@shared/ui/chip-row";
 import { EmptyState, ScreenError } from "@shared/ui/section-state";
+import { SelectField } from "@shared/ui/select";
 import { PreferencesSkeleton } from "@shared/ui/skeleton";
 
 import {
@@ -140,15 +140,19 @@ function PreferencesForm({ fit }: { fit: GetUserFitRes | null }) {
         <FormSection title="Size Information">
           {SIZE_FIELDS.map((field) => (
             <Field key={field.key} label={field.label}>
-              <ChipRow
-                accessibilityLabel={field.label}
-                onChange={(next) =>
-                  edit({
-                    ...values,
-                    sizes: { ...values.sizes, [field.key]: next },
-                  })
-                }
+              <SelectField
+                clearable
+                onChange={(next) => {
+                  // 시트의 "Not set" 은 빈 문자열로 온다. 그때는 칸 자체를 지운다 —
+                  // 빈 문자열을 남겨 두면 저장할 때 null 이 아니라 "" 가 올라간다.
+                  const sizes = { ...values.sizes };
+                  if (next === "") delete sizes[field.key];
+                  else sizes[field.key] = next;
+                  edit({ ...values, sizes });
+                }}
                 options={field.options}
+                placeholder={`Select ${field.label.toLowerCase()}`}
+                title={field.label}
                 value={values.sizes[field.key]}
               />
             </Field>
