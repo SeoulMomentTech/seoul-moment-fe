@@ -14,6 +14,22 @@ interface IconProps {
 const STROKE_WIDTH = 2;
 const DEFAULT_SIZE = 20;
 
+/**
+ * 채워진 하트. 이 앱에서 하트는 "이미 고른 것"에만 나오므로 빈 하트 변형을 두지 않는다 —
+ * 관심 목록에 있는 줄은 모두 고른 것이고, 고르는 자리(상품 상세)는 아직 없다.
+ * 다른 아이콘과 달리 획이 아니라 면으로 그려서, 줄 끝에서 "켜진 상태"로 읽힌다.
+ */
+export function HeartIcon({ size = DEFAULT_SIZE, color }: IconProps) {
+  return (
+    <Svg fill="none" height={size} viewBox="0 0 24 24" width={size}>
+      <Path
+        d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+        fill={color}
+      />
+    </Svg>
+  );
+}
+
 /** 비밀번호 보기. 눌러서 가린 글자를 드러내는 상태를 뜻한다. */
 export function EyeIcon({ size = DEFAULT_SIZE, color }: IconProps) {
   return (
