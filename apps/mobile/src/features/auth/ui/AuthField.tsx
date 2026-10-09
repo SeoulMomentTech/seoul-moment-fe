@@ -24,6 +24,8 @@ interface AuthFieldProps {
   secureTextEntry?: boolean;
   editable?: boolean;
   keyboardType?: "email-address" | "number-pad";
+  /** 칸이 받는 글자 수의 상한. 연도 4자리처럼 길이가 뜻을 가지는 칸에만 준다. */
+  maxLength?: number;
   autoComplete?: "email" | "current-password" | "new-password";
   inputRef?: React.RefObject<TextInput | null>;
 }
