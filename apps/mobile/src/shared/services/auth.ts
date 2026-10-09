@@ -68,3 +68,24 @@ export const postNicknameValidate = (nickname: string) =>
  */
 export const postUserSignUp = (data: UserSignUpPayload) =>
   api.post("user/auth/signup", { json: data });
+
+export interface VerifyPhoneCodePayload {
+  /** 국가 코드를 포함한 전화번호. 대만은 `+886` 으로 시작한다. */
+  phone: string;
+  /** 6자리 인증 코드 */
+  code: string;
+}
+
+/**
+ * @description 회원 정보 수정용 휴대폰 인증 코드 발송
+ * (access_token 필요 / 응답 없음 / 409: 이미 가입된 휴대폰)
+ */
+export const postInfoPhoneCode = (phone: string) =>
+  api.post("user/auth/info/phone/code", { json: { phone } });
+
+/**
+ * @description 회원 정보 수정용 휴대폰 인증 코드 검증. 통과하면 그 번호가 계정에 붙는다.
+ * (access_token 필요 / 응답 없음 / 401: 코드 만료 또는 불일치)
+ */
+export const postInfoPhoneVerify = ({ phone, code }: VerifyPhoneCodePayload) =>
+  api.post("user/auth/info/phone/verify", { json: { phone, code } });

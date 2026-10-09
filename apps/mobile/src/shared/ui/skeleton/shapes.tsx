@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 import { View, useWindowDimensions, type DimensionValue } from "react-native";
 
 import { BUTTON_HEIGHT } from "@shared/ui/button";
@@ -709,6 +711,194 @@ export function DetailSkeleton({
           ))}
         </View>
       </View>
+    </View>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * 계정 화면(로그인 정보 / 프로필 관리 / 맞춤 정보)
+ *
+ * 세 화면은 같은 리듬을 쓴다 — 섹션 제목(title-4) 밑 12, 칸끼리 24, 칸 안에서는
+ * 라벨(body-3) 밑 12. 아래 상수와 조각이 그 리듬을 한 번만 적어 두고,
+ * 화면과 스켈레톤이 같은 값을 쓴다. 숫자가 갈리면 데이터가 도착하는 순간 화면이 튄다.
+ * ------------------------------------------------------------------ */
+
+// 입력칸·선택칸 높이. features/auth 의 AUTH_FIELD_HEIGHT, shared/ui/select 의
+// SELECT_FIELD_HEIGHT 와 같은 값이다(shared 는 features 를 import 할 수 없어 여기 다시 적는다).
+const ACCOUNT_FIELD_HEIGHT = 56;
+// 저장 버튼. 공용 Button 의 lg.
+const ACCOUNT_SUBMIT_HEIGHT = BUTTON_HEIGHT.lg;
+// 칩 한 줄(ChipRow)의 높이. 가로로 스크롤하므로 보기 개수와 무관하게 고정이다.
+const ACCOUNT_CHIP_ROW_HEIGHT = CHIP_HEIGHT;
+
+const GAP_LABEL = 12;
+const GAP_FIELD = 24;
+const GAP_SECTION = 40;
+
+/**
+ * 수신 동의 한 줄의 높이. 제목 body-3 한 줄 + 설명 body-5 **두 줄 고정** + 위아래 12.
+ *
+ * 설명을 두 줄로 못 박은 것은 의도다. 세 설명 중 하나만 한 줄에 들어가는데,
+ * 줄마다 높이가 달라지면 세 줄이 격자로 읽히지 않고 스켈레톤도 실제 높이를 맞출 수 없다.
+ */
+export const ACCOUNT_TOGGLE_DESC_HEIGHT = 2 * LINE_BODY_5;
+export const ACCOUNT_TOGGLE_ROW_HEIGHT =
+  12 + LINE_BODY_3 + ACCOUNT_TOGGLE_DESC_HEIGHT + 12;
+
+/** 라벨 한 줄 + 12 + 주어진 높이의 칸. */
+function FieldSkeleton({ control }: { control: number }) {
+  return (
+    <View>
+      <Line bar={BAR_BODY_3} line={LINE_BODY_3} width="35%" />
+      <View style={{ marginTop: GAP_LABEL }}>
+        <Shimmer height={control} radius={8} />
+      </View>
+    </View>
+  );
+}
+
+/** 섹션 제목(title-4) + 12 + 칸들(사이 24). */
+function SectionSkeleton({ children }: { children: ReactNode }) {
+  return (
+    <View>
+      <Line bar={BAR_TITLE_4} line={LINE_TITLE_4} width="50%" />
+      <View style={{ marginTop: GAP_LABEL, gap: GAP_FIELD }}>{children}</View>
+    </View>
+  );
+}
+
+/** 안내 한 줄 + 12 + 저장 버튼. 세 화면이 같은 꼬리를 쓴다. 높이 = 24 + 17 + 12 + 56. */
+function SubmitSkeleton() {
+  return (
+    <View style={{ marginTop: GAP_FIELD }}>
+      <Line bar={BAR_BODY_3} line={LINE_BODY_3} width="55%" />
+      <View style={{ marginTop: GAP_LABEL }}>
+        <Shimmer
+          height={ACCOUNT_SUBMIT_HEIGHT}
+          radius={ACCOUNT_SUBMIT_HEIGHT / 2}
+        />
+      </View>
+    </View>
+  );
+}
+
+/**
+ * 로그인 정보 화면의 폼. 화면 제목(title-3)과 그 아래 40 은 화면이 그린다.
+ *
+ * 높이 = 189 + 40 + 381 + 24 + 17 + 12 + 56 = **719**.
+ *   My Account        = 24 + 12 + (17 + 12 + [56 + 12 + 56])        = 189
+ *   Promotions        = 24 + 12 + (17+12+56) + 24 + (17+12+3x69)    = 381
+ *   꼬리(안내 + 저장) = 24 + 17 + 12 + 56                            = 109
+ */
+export function LoginInfoSkeleton() {
+  return (
+    <View>
+      <SectionSkeleton>
+        <View>
+          <Line bar={BAR_BODY_3} line={LINE_BODY_3} width="35%" />
+          <View style={{ marginTop: GAP_LABEL, gap: GAP_LABEL }}>
+            <Shimmer height={ACCOUNT_FIELD_HEIGHT} radius={8} />
+            <Shimmer height={ACCOUNT_FIELD_HEIGHT} radius={8} />
+          </View>
+        </View>
+      </SectionSkeleton>
+      <View style={{ marginTop: GAP_SECTION }}>
+        <SectionSkeleton>
+          <FieldSkeleton control={ACCOUNT_FIELD_HEIGHT} />
+          <View>
+            <Line bar={BAR_BODY_3} line={LINE_BODY_3} width="60%" />
+            <View style={{ marginTop: GAP_LABEL }}>
+              {[0, 1, 2].map((i) => (
+                <View
+                  key={i}
+                  style={{
+                    height: ACCOUNT_TOGGLE_ROW_HEIGHT,
+                    justifyContent: "center",
+                  }}
+                >
+                  <Line bar={BAR_BODY_3} line={LINE_BODY_3} width="70%" />
+                  <View style={{ height: ACCOUNT_TOGGLE_DESC_HEIGHT }}>
+                    <Line bar={BAR_BODY_5} line={LINE_BODY_5} width="90%" />
+                  </View>
+                </View>
+              ))}
+            </View>
+          </View>
+        </SectionSkeleton>
+      </View>
+      <SubmitSkeleton />
+    </View>
+  );
+}
+
+/**
+ * 프로필 관리 화면. 사진 블록까지 포함한다(사진도 받아 와야 아는 값이다).
+ *
+ * 높이 = 82 + 40 + 728 + 24 + 17 + 12 + 56 = **959**.
+ *   사진 블록 = 56 + 12 + 14                                          = 82
+ *   Personal Information
+ *     = 24 + 12 + 85 + 24 + 85 + 24 + 64 + 24 + 85 + 24 + 277         = 728
+ *       (닉네임 85 / 이름 85 / 성별 64 / 생년월일 85 /
+ *        주소 17 + 12 + [56 + 12 + 56 + 12 + 56 + 12 + 56] = 277)
+ *   꼬리                                                              = 109
+ */
+export function ProfileFormSkeleton() {
+  return (
+    <View>
+      <View>
+        <Shimmer
+          height={MY_AVATAR_SIZE}
+          radius={MY_AVATAR_SIZE / 2}
+          width={MY_AVATAR_SIZE}
+        />
+        <View style={{ marginTop: GAP_LABEL }}>
+          <Line bar={BAR_BODY_5} line={LINE_BODY_5} width="65%" />
+        </View>
+      </View>
+      <View style={{ marginTop: GAP_SECTION }}>
+        <SectionSkeleton>
+          <FieldSkeleton control={ACCOUNT_FIELD_HEIGHT} />
+          <FieldSkeleton control={ACCOUNT_FIELD_HEIGHT} />
+          <FieldSkeleton control={ACCOUNT_CHIP_ROW_HEIGHT} />
+          <FieldSkeleton control={ACCOUNT_FIELD_HEIGHT} />
+          <View>
+            <Line bar={BAR_BODY_3} line={LINE_BODY_3} width="35%" />
+            <View style={{ marginTop: GAP_LABEL, gap: GAP_LABEL }}>
+              {[0, 1, 2, 3].map((i) => (
+                <Shimmer height={ACCOUNT_FIELD_HEIGHT} key={i} radius={8} />
+              ))}
+            </View>
+          </View>
+        </SectionSkeleton>
+      </View>
+      <SubmitSkeleton />
+    </View>
+  );
+}
+
+/**
+ * 맞춤 정보 화면. 화면 제목과 그 아래 40 은 화면이 그린다.
+ *
+ * 높이 = 230 + 40 + 364 + 24 + 17 + 12 + 56 = **743**.
+ *   Body Information = 24 + 12 + 85 + 24 + 85                 = 230
+ *   Size Information = 24 + 12 + 64 + 24 + 64 + 24 + 64 + 24 + 64 = 364
+ *   꼬리                                                      = 109
+ */
+export function PreferencesSkeleton() {
+  return (
+    <View>
+      <SectionSkeleton>
+        <FieldSkeleton control={ACCOUNT_FIELD_HEIGHT} />
+        <FieldSkeleton control={ACCOUNT_FIELD_HEIGHT} />
+      </SectionSkeleton>
+      <View style={{ marginTop: GAP_SECTION }}>
+        <SectionSkeleton>
+          {[0, 1, 2, 3].map((i) => (
+            <FieldSkeleton control={ACCOUNT_CHIP_ROW_HEIGHT} key={i} />
+          ))}
+        </SectionSkeleton>
+      </View>
+      <SubmitSkeleton />
     </View>
   );
 }
