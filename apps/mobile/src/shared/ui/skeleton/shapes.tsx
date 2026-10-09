@@ -400,6 +400,85 @@ export function MyProfileSkeleton() {
   );
 }
 
+// 관심 상품 / 최근 본 상품 줄. 썸네일 72 + 위아래 12.
+// 글 묶음은 브랜드 body-5(14) + 이름 body-3(17) + mt-1(4) + 가격 body-2(19) = 54 라
+// 썸네일이 줄 높이를 정한다. 오른쪽 하트(44pt 터치)도 72 보다 작아 높이에 끼어들지 않는다.
+export const MY_LIKE_THUMB_SIZE = 72;
+export const MY_LIKE_ROW_HEIGHT = MY_LIKE_THUMB_SIZE + 24;
+
+interface MyRowListSkeletonProps {
+  /** 줄 수. 기본 3. */
+  count?: number;
+}
+
+/** 관심 상품 목록. 높이 = count x 96. */
+export function MyLikeListSkeleton({ count = 3 }: MyRowListSkeletonProps) {
+  return (
+    <View>
+      {Array.from({ length: count }, (_, i) => (
+        <View
+          key={i}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            paddingHorizontal: PAGE_PADDING,
+            height: MY_LIKE_ROW_HEIGHT,
+          }}
+        >
+          <Shimmer
+            height={MY_LIKE_THUMB_SIZE}
+            radius={IMAGE_RADIUS}
+            width={MY_LIKE_THUMB_SIZE}
+          />
+          <View style={{ flex: 1, marginLeft: 12 }}>
+            <Line bar={BAR_BODY_5} line={LINE_BODY_5} width="35%" />
+            <Line bar={BAR_BODY_3} line={LINE_BODY_3} width="75%" />
+            <View style={{ marginTop: 4 }}>
+              <Line bar={BAR_BODY_2} line={LINE_BODY_2} width="40%" />
+            </View>
+          </View>
+        </View>
+      ))}
+    </View>
+  );
+}
+
+// 관심 브랜드 줄. 머리글자 원 48 + 위아래 12.
+// 글 묶음은 이름 body-2(19) + mt-1(4) + 메타 body-5(14) = 37 이라 원이 높이를 정한다.
+export const MY_BRAND_AVATAR_SIZE = 48;
+export const MY_BRAND_ROW_HEIGHT = MY_BRAND_AVATAR_SIZE + 24;
+
+/** 관심 브랜드 목록. 높이 = count x 72. */
+export function MyBrandListSkeleton({ count = 3 }: MyRowListSkeletonProps) {
+  return (
+    <View>
+      {Array.from({ length: count }, (_, i) => (
+        <View
+          key={i}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            paddingHorizontal: PAGE_PADDING,
+            height: MY_BRAND_ROW_HEIGHT,
+          }}
+        >
+          <Shimmer
+            height={MY_BRAND_AVATAR_SIZE}
+            radius={MY_BRAND_AVATAR_SIZE / 2}
+            width={MY_BRAND_AVATAR_SIZE}
+          />
+          <View style={{ flex: 1, marginLeft: 12 }}>
+            <Line bar={BAR_BODY_2} line={LINE_BODY_2} width="55%" />
+            <View style={{ marginTop: 4 }}>
+              <Line bar={BAR_BODY_5} line={LINE_BODY_5} width="30%" />
+            </View>
+          </View>
+        </View>
+      ))}
+    </View>
+  );
+}
+
 // Chip: px-4 py-2 + body-3 한 줄 + 테두리 1 x 2 = 17 + 16 + 2
 export const CHIP_HEIGHT = LINE_BODY_3 + 16 + 2;
 const CHIP_WIDTHS = [72, 96, 80];
