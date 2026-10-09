@@ -1,3 +1,5 @@
+import type { HTTPError } from "ky";
+
 import type { CommonRes } from ".";
 import { api } from ".";
 
@@ -116,9 +118,24 @@ export type UpdateUserFitReq = UserFitPayload;
 
 /**
  * @description 유저 체형 정보 조회 (access_token 필요)
+ *
+ * 한 번도 저장하지 않았으면 서버가 404 를 준다. ky 는 404 에 예외를 던지므로
+ * 그대로 두면 "불러올 수 없음" 화면이 떠서, 처음 쓰는 사람이 빈 폼에 닿지 못한다.
+ * 여기서만 404 를 data: null 로 바꿔, "없음" 을 실패가 아닌 값으로 흘린다.
+ * 나머지 상태 코드는 그대로 던진다 — 진짜 실패까지 빈 폼으로 덮으면 안 된다.
  */
-export const getUserFit = () =>
-  api.get("user/fit").json<CommonRes<GetUserFitRes | null>>();
+export const getUserFit = async (): Promise<
+  CommonRes<GetUserFitRes | null>
+> => {
+  try {
+    return await api.get("user/fit").json<CommonRes<GetUserFitRes | null>>();
+  } catch (error) {
+    if ((error as HTTPError)?.response?.status === 404) {
+      return { result: true, data: null };
+    }
+    throw error;
+  }
+};
 
 /**
  * @description 유저 체형 정보 생성 (access_token 필요)
