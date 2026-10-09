@@ -3,6 +3,8 @@ import { useRouter } from "expo-router";
 import { Alert, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useUserInfo } from "@entities/user/model/useUserInfo";
+import { useUserProfile } from "@entities/user/model/useUserProfile";
 import { useUserAuthStore } from "@shared/lib/auth/useUserAuthStore";
 import { Button } from "@shared/ui/button";
 import { Touchable } from "@shared/ui/press";
@@ -17,8 +19,6 @@ import {
   type MyMenuGroup,
   type MyMenuItem,
 } from "../model/menu";
-import { useUserInfo } from "../model/useUserInfo";
-import { useUserProfile } from "../model/useUserProfile";
 
 // 줄 높이. 44 는 터치의 바닥이지 디자인이 아니다 — 두 줄짜리 화면에서 56 은 쪼그라들어
 // 보인다. body-2 라벨 한 줄(19)을 위아래 22 로 감싸 64 로 둔다.

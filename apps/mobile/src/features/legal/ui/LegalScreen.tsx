@@ -1,12 +1,11 @@
-import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { LegalDocument, type LegalNode } from "@shared/ui/legal-document";
-import { Touchable } from "@shared/ui/press";
+import { ScreenHeader } from "@shared/ui/screen-header";
 
-import { HeaderHeight, Spacing } from "@/constants/theme";
+import { Spacing } from "@/constants/theme";
 
 /**
  * 약관·개인정보 처리방침 공용 화면. 사진이 없어 상세 화면들과 달리 스크림 없이
@@ -20,35 +19,11 @@ export function LegalScreen({
   document: LegalNode;
 }) {
   const insets = useSafeAreaInsets();
-  const router = useRouter();
 
   return (
     <View className="bg-background flex-1">
       <StatusBar style="dark" />
-      <View
-        className="border-neutral-subtle border-b"
-        style={{ paddingTop: insets.top }}
-      >
-        <View
-          className="flex-row items-center px-5"
-          style={{ height: HeaderHeight }}
-        >
-          <Touchable
-            accessibilityLabel="Go back"
-            accessibilityRole="button"
-            hitSlop={14}
-            onPress={() => router.back()}
-          >
-            <Text className="text-title-4 text-foreground font-bold">‹</Text>
-          </Touchable>
-          <Text
-            className="text-body-2 text-foreground ml-3 flex-1 font-bold"
-            numberOfLines={1}
-          >
-            {title}
-          </Text>
-        </View>
-      </View>
+      <ScreenHeader title={title} />
       <ScrollView
         contentContainerStyle={{
           paddingHorizontal: 20,
