@@ -50,9 +50,15 @@ const parseISODate = (value: string): Date | null => {
  * 세 칸에 숫자를 치게 하면 2월 31일 같은 날이 입력될 수 있어 막는 규칙이 따로 필요한데,
  * 피커는 달력에 없는 날을 애초에 보여 주지 않는다. 범위도 피커가 지킨다.
  *
- * iOS 의 피커는 제자리에 펼쳐지는 물건이라 폼 한가운데서 열면 아래가 통째로 밀린다.
+ * 두 플랫폼 모두 달력이 아니라 연·월·일 휠(spinner)로 고른다.
+ *
+ * iOS 의 피커는 제자리에 펼쳐지는 뷰라 폼 한가운데서 열면 아래가 통째로 밀린다.
  * 그래서 앱의 다른 "고르는 자리"와 같이 바텀 시트 안에 넣고 Done 으로 닫는다.
- * Android 는 운영체제가 제 대화상자를 띄우고 스스로 닫으므로 시트를 쓰지 않는다.
+ *
+ * Android 는 뷰가 아니라 OS 대화상자여서 시트 안에 넣을 수 없다 — 넣으면 시트 위에
+ * 대화상자가 또 뜬다. 그래서 거기서는 시트 없이 대화상자만 띄우고, 모양만 iOS 와
+ * 같은 휠로 맞춘다. 시트 안에 넣으려면 휠을 직접 그려야 하는데, OS 가 가진 것보다
+ * 나을 수 없어 하지 않았다.
  */
 export function DateField({
   value,
@@ -133,8 +139,11 @@ export function DateField({
           </View>
         </BottomSheet>
       ) : open ? (
+        // Android 의 피커는 뷰가 아니라 OS 대화상자라 시트 안에 넣을 수 없다.
+        // display 로 모양만 고를 수 있어, 기본값(버전에 따라 달력)이 아니라
+        // iOS 와 같은 휠이 뜨도록 spinner 를 고른다.
         <DateTimePicker
-          display="default"
+          display="spinner"
           maximumDate={max}
           minimumDate={min}
           mode="date"
