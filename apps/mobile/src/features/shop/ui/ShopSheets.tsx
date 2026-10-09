@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useProductCategories } from "@entities/product/model/useProductCategories";
 import {
   Accordion,
   AccordionContent,
@@ -26,7 +27,6 @@ import { SectionError } from "@shared/ui/section-state";
 import { ChipRowsSkeleton, Shimmer } from "@shared/ui/skeleton";
 
 import { useBrandFilter } from "../model/useBrandFilter";
-import { useProductCategories } from "../model/useProductCategories";
 import { useProductCount } from "../model/useProductCount";
 import { useProductOptionFilters } from "../model/useProductOptionFilters";
 import { useProductSortOptions } from "../model/useProductSortOptions";
