@@ -17,35 +17,33 @@ export interface SizeFieldConfig {
   key: SizeKey;
   label: string;
   options: ChipOption[];
-  /** 숫자로 저장되는 칸(신발·하의)인지. 보기는 문자열이지만 payload 는 number 다. */
-  numeric: boolean;
 }
 
-/** 보기와 순서는 web 의 SIZE_FIELDS 와 같다. */
+/**
+ * 보기와 순서는 web 의 SIZE_FIELDS 와 같다 (신발 220~290/5, 하의 23~37/1, 의류 8단계).
+ * 보기는 모두 문자열이고, payload 로 숫자가 되는 것은 shoeSize 하나뿐이다 —
+ * bottomSize 는 숫자처럼 보여도 서버 타입이 string 이라 그대로 보낸다.
+ */
 export const SIZE_FIELDS: SizeFieldConfig[] = [
   {
     key: "shoeSize",
     label: "Shoes",
     options: toChipOptions(range(220, 290, 5)),
-    numeric: true,
   },
   {
     key: "outerSize",
     label: "Outerwear",
     options: toChipOptions(APPAREL_SIZES),
-    numeric: false,
   },
   {
     key: "topSize",
     label: "Tops",
     options: toChipOptions(APPAREL_SIZES),
-    numeric: false,
   },
   {
     key: "bottomSize",
     label: "Bottoms",
     options: toChipOptions(range(23, 37, 1)),
-    numeric: true,
   },
 ];
 
