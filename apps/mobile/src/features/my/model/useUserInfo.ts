@@ -1,0 +1,23 @@
+import { useUserAuthStore } from "@shared/lib/auth/useUserAuthStore";
+import useAppQuery from "@shared/lib/hooks/query/useAppQuery";
+import type { GetUserInfoRes } from "@shared/services/user";
+import { getUserInfo } from "@shared/services/user";
+
+import type { CommonRes } from "@shared/services";
+
+/**
+ * 계정 정보. 지금 화면이 쓰는 것은 이메일 한 줄뿐이지만 프로필(user/profile)과 다른
+ * 엔드포인트라 따로 받는다 — 둘을 한 훅으로 묶으면 한쪽이 실패할 때 멀쩡한 쪽까지 잃는다.
+ */
+export const useUserInfo = () => {
+  const isAuthenticated = useUserAuthStore((s) => s.isAuthenticated);
+  const id = useUserAuthStore((s) => s.id);
+
+  return useAppQuery({
+    // 계정이 바뀌면 앞사람 이메일이 잠깐 보이지 않게 토큰의 id 를 키에 넣는다.
+    queryKey: ["user", "info", id] as const,
+    queryFn: getUserInfo,
+    select: (res: CommonRes<GetUserInfoRes>): GetUserInfoRes => res.data,
+    enabled: isAuthenticated,
+  });
+};
