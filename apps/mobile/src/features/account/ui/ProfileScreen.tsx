@@ -10,6 +10,7 @@ import { useLanguage } from "@shared/lib/i18n/useLanguage";
 import { getCityOptions, getDistrictOptions } from "@shared/lib/regions";
 import type { UserProfile } from "@shared/services/user";
 import { ChipRow } from "@shared/ui/chip-row";
+import { DateField } from "@shared/ui/date-field";
 import { EmptyState, ScreenError } from "@shared/ui/section-state";
 import { SelectField } from "@shared/ui/select";
 import { MY_AVATAR_SIZE, ProfileFormSkeleton } from "@shared/ui/skeleton";
@@ -25,7 +26,6 @@ import {
   SubmitBar,
 } from "./parts";
 import {
-  birthDateProblem,
   digitsOnly,
   formValuesToProfilePayload,
   GENDER_OPTIONS,
@@ -36,10 +36,6 @@ import {
   profileToFormValues,
 } from "../lib/profile";
 import { type ProfileSaveStep, useSaveProfile } from "../model/useSaveProfile";
-
-const YEAR_DIGITS = 4;
-const MONTH_DIGITS = 2;
-const DAY_DIGITS = 2;
 
 const FAILURE_MESSAGE: Record<ProfileSaveStep, string> = {
   "nickname-taken": "That nickname is taken. Try another.",
@@ -135,9 +131,7 @@ function ProfileForm({ profile }: { profile: UserProfile }) {
   const nameChanged = name !== initial.name;
   const restChanged =
     values.gender !== initial.gender ||
-    values.birthYear !== initial.birthYear ||
-    values.birthMonth !== initial.birthMonth ||
-    values.birthDay !== initial.birthDay ||
+    values.birthDate !== initial.birthDate ||
     values.postalCode !== initial.postalCode ||
     values.city !== initial.city ||
     values.district !== initial.district ||
@@ -151,10 +145,9 @@ function ProfileForm({ profile }: { profile: UserProfile }) {
     ? "Your nickname can be 2-20 letters and numbers."
     : name === ""
       ? "Enter your name."
-      : (birthDateProblem(values) ??
-        (nicknameChanged || nameChanged || restChanged
-          ? null
-          : "Change something to save."));
+      : nicknameChanged || nameChanged || restChanged
+        ? null
+        : "Change something to save.";
 
   const submit = () =>
     save.mutate({
@@ -200,44 +193,16 @@ function ProfileForm({ profile }: { profile: UserProfile }) {
 
             <Field label="Date of Birth">
               {/*
-                web 은 연·월·일을 각각 선택 상자로 받지만, 연도만 77개라 폰에서는
-                그 목록을 훑는 것이 네 자리를 치는 것보다 느리다. 숫자 키패드로 받는다.
+                web 은 연·월·일을 각각 선택 상자로 받는다. 폰에서는 한 번에 고르는
+                네이티브 피커가 낫다 — 2월 31일 같은 날이 아예 나오지 않아
+                따로 막을 규칙도 필요 없다.
               */}
-              <View className="flex-row" style={{ gap: Spacing.tight }}>
-                <View className="flex-1">
-                  <AuthField
-                    keyboardType="number-pad"
-                    maxLength={YEAR_DIGITS}
-                    onChangeText={(value) =>
-                      edit({ birthYear: digitsOnly(value, YEAR_DIGITS) })
-                    }
-                    placeholder="YYYY"
-                    value={values.birthYear}
-                  />
-                </View>
-                <View className="flex-1">
-                  <AuthField
-                    keyboardType="number-pad"
-                    maxLength={MONTH_DIGITS}
-                    onChangeText={(value) =>
-                      edit({ birthMonth: digitsOnly(value, MONTH_DIGITS) })
-                    }
-                    placeholder="MM"
-                    value={values.birthMonth}
-                  />
-                </View>
-                <View className="flex-1">
-                  <AuthField
-                    keyboardType="number-pad"
-                    maxLength={DAY_DIGITS}
-                    onChangeText={(value) =>
-                      edit({ birthDay: digitsOnly(value, DAY_DIGITS) })
-                    }
-                    placeholder="DD"
-                    value={values.birthDay}
-                  />
-                </View>
-              </View>
+              <DateField
+                onChange={(next) => edit({ birthDate: next })}
+                placeholder="Select your date of birth"
+                title="Date of Birth"
+                value={values.birthDate}
+              />
             </Field>
 
             <Field label="Region">
