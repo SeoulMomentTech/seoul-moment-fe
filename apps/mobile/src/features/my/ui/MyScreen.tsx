@@ -14,11 +14,7 @@ import { MY_AVATAR_SIZE, MyProfileSkeleton } from "@shared/ui/skeleton";
 import { BottomTabInset, Spacing } from "@/constants/theme";
 
 import { MyLikes } from "./MyLikes";
-import {
-  MY_MENU_GROUPS,
-  type MyMenuGroup,
-  type MyMenuItem,
-} from "../model/menu";
+import { myMenuGroups, type MyMenuGroup, type MyMenuItem } from "../model/menu";
 
 // 줄 높이. 44 는 터치의 바닥이지 디자인이 아니다 — 두 줄짜리 화면에서 56 은 쪼그라들어
 // 보인다. body-2 라벨 한 줄(19)을 위아래 22 로 감싸 64 로 둔다.
@@ -27,18 +23,18 @@ const MENU_ROW_HEIGHT = 64;
 /**
  * 마이페이지. 가입 유도(또는 이름·이메일) 블록 + 관심 목록 + 메뉴.
  *
- * 계정 줄(로그인 정보·프로필 관리·맞춤 정보)은 일부러 두지 않았다. web 에는 있지만
- * 앱에는 그 화면들이 없어서, 줄만 깔면 눌러도 아무 데도 가지 않는 컨트롤이 네 개 생긴다.
- * 메뉴는 아직 로그인 여부와 무관하다 — 계정이 필요한 항목이 생기면 그때 갈린다.
+ * 메뉴는 로그인 여부로 갈린다 — 계정 줄(로그인 정보·프로필 관리·맞춤 정보)은
+ * 로그인한 사람에게만 뜻이 있다.
  */
 export function MyScreen() {
   const insets = useSafeAreaInsets();
   const isAuthenticated = useUserAuthStore((s) => s.isAuthenticated);
 
+  const groups = myMenuGroups(isAuthenticated);
   // 묶음이 하나뿐이면 묶음 제목을 그리지 않는다. 묶음 제목은 "이것과 저것을 가른다"는
   // 뜻이라, 가를 상대가 없으면 제목·구분 띠·간격이 그것이 묶는 두 줄보다 무거워진다.
-  // 계정 줄(장바구니·관심상품·프로필)이 들어와 묶음이 둘이 되면 제목이 저절로 돌아온다.
-  const hasGroups = MY_MENU_GROUPS.length > 1;
+  // 로그인해서 계정 묶음이 붙으면 둘이 되어 두 제목이 함께 돌아온다.
+  const hasGroups = groups.length > 1;
 
   return (
     <ScrollView
@@ -48,7 +44,7 @@ export function MyScreen() {
     >
       {isAuthenticated ? <SignedInHeader /> : <SignUpPitch />}
       {isAuthenticated ? <MyLikes /> : null}
-      {MY_MENU_GROUPS.map((group) => (
+      {groups.map((group) => (
         <MenuGroup group={group} key={group.title} withTitle={hasGroups} />
       ))}
     </ScrollView>
@@ -186,16 +182,34 @@ function SignedInShell({
   children: React.ReactNode;
   onSignOut(): void;
 }) {
+  const router = useRouter();
+
   return (
     // 아래 관심 목록의 섹션 위 간격(40)이 이 블록과의 사이를 띄운다.
     <ScreenBlock bottom={0}>
       {children}
-      <Button
-        label="Sign out"
-        onPress={onSignOut}
-        style={{ marginTop: Spacing.inner }}
-        variant="secondary"
-      />
+      {/*
+        둘 다 secondary 다. 채운 검정은 "그 화면에서 하려던 일"을 뜻하는데,
+        마이 탭에 온 이유가 프로필 수정도 로그아웃도 아니다 — 둘 중 하나를 칠하면
+        오지 않은 사람에게 그 길을 권하는 꼴이 된다. web 도 둘을 나란히 둔다.
+      */}
+      <View
+        className="flex-row"
+        style={{ marginTop: Spacing.inner, gap: Spacing.tight }}
+      >
+        <Button
+          className="flex-1"
+          label="Manage profile"
+          onPress={() => router.push("/account/profile")}
+          variant="secondary"
+        />
+        <Button
+          className="flex-1"
+          label="Sign out"
+          onPress={onSignOut}
+          variant="secondary"
+        />
+      </View>
     </ScreenBlock>
   );
 }
