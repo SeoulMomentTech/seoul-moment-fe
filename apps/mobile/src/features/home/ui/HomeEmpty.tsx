@@ -1,8 +1,11 @@
 import { View } from "react-native";
 
-import { EmptyState } from "@shared/ui/section-state";
+import { EMPTY_ICON_SIZE, InboxIcon } from "@shared/ui/icons";
+import { EmptyState } from "@shared/ui/section-state"; // --neutral-600
 
 import { useHomeIsEmpty } from "../model/useHomeIsEmpty";
+
+const EMPTY_ICON_COLOR = "#707070";
 
 /**
  * 다섯 섹션이 모두 빈 응답일 때만 그린다. 섹션들이 이미 전부 null 이라 이 블록이
@@ -15,7 +18,11 @@ export function HomeEmpty() {
 
   return (
     <View className="pt-16">
-      <EmptyState hint="Pull down to refresh." message="Nothing here yet" />
+      <EmptyState
+        hint="Pull down to refresh."
+        icon={<InboxIcon color={EMPTY_ICON_COLOR} size={EMPTY_ICON_SIZE} />}
+        message="Nothing here yet"
+      />
     </View>
   );
 }

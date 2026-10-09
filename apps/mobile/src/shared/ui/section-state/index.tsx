@@ -1,7 +1,11 @@
+import type { ReactNode } from "react";
+
 import { Text, View } from "react-native";
 
 import { Button } from "@shared/ui/button";
 import { Touchable } from "@shared/ui/press";
+
+import { Spacing } from "@/constants/theme";
 
 interface SectionErrorProps {
   onRetry(): void;
@@ -33,6 +37,11 @@ interface EmptyStateProps {
   message: string;
   /** 사용자가 할 수 있는 일이 있을 때만 둔다. */
   hint?: string;
+  /**
+   * 글 위에 세우는 아이콘. 무엇이 비었는지에 따라 호출부가 고른다 —
+   * 어떤 자리든 맞는 하나를 여기서 정하면 결국 아무것도 뜻하지 않는 그림이 된다.
+   */
+  icon?: ReactNode;
 }
 
 /**
@@ -40,10 +49,22 @@ interface EmptyStateProps {
  * 그대로 맞지만(빈 제목 자리를 만들지 않는다), 그 자리가 화면 전부가 되면 설명 없는
  * 흰 종이만 남는다. 그때 이 블록이 한 마디를 한다.
  */
-export function EmptyState({ message, hint }: EmptyStateProps) {
+export function EmptyState({ message, hint, icon }: EmptyStateProps) {
   return (
     <View className="items-center px-5 py-10">
-      <Text className="text-body-2 text-neutral text-center">{message}</Text>
+      {/* 아이콘은 읽는 것이 아니라 가리키는 것이라 읽어 주지 않는다. */}
+      {icon ? (
+        <View
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+          style={{ marginBottom: Spacing.tight }}
+        >
+          {icon}
+        </View>
+      ) : null}
+      <Text className="text-body-2 text-foreground text-center font-bold">
+        {message}
+      </Text>
       {hint ? (
         <Text className="text-body-3 text-neutral mt-2 text-center">
           {hint}

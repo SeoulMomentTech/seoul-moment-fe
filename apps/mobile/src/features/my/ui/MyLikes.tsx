@@ -6,7 +6,12 @@ import { Alert, FlatList, Text, View } from "react-native";
 
 import { useProductCategories } from "@entities/product/model/useProductCategories";
 import { CHIP_GAP, Chip } from "@shared/ui/chip";
-import { HeartIcon } from "@shared/ui/icons";
+import {
+  ClockIcon,
+  EMPTY_ICON_SIZE,
+  HeartIcon,
+  HeartOutlineIcon,
+} from "@shared/ui/icons";
 import { Touchable } from "@shared/ui/press";
 import { Section } from "@shared/ui/section";
 import { EmptyState, SectionError } from "@shared/ui/section-state";
@@ -32,6 +37,8 @@ import { useUnlikeProduct } from "../model/useUnlikeProduct";
 const PAGE_PADDING = 20;
 // 하트의 터치 상자. 아이콘은 24 지만 상자는 44 여야 손가락에 맞는다.
 const HEART_TOUCH = 44;
+// 빈 화면 아이콘 색. SVG 는 className 을 못 받아 --neutral-600 값을 직접 쓴다.
+const EMPTY_ICON_COLOR = "#707070";
 const HEART_ICON = 24;
 // --brand-500. SVG 는 className 을 못 받아 토큰 값을 직접 넘긴다.
 const BRAND_COLOR = "#f37b2a";
@@ -144,7 +151,15 @@ function LikedProductsTab() {
   } else if (isError) {
     body = <SectionError onRetry={() => void refetch()} />;
   } else if (!data || data.list.length === 0) {
-    body = <EmptyState message="No liked products yet" />;
+    body = (
+      <EmptyState
+        hint="Tap the heart on a product to keep it here."
+        icon={
+          <HeartOutlineIcon color={EMPTY_ICON_COLOR} size={EMPTY_ICON_SIZE} />
+        }
+        message="No liked products yet"
+      />
+    );
   } else {
     body = data.list.map((item) => (
       <ProductRow
@@ -186,7 +201,15 @@ function LikedBrandsTab() {
   if (isError) return <SectionError onRetry={() => void refetch()} />;
 
   if (!data || data.list.length === 0) {
-    return <EmptyState message="No liked brands yet" />;
+    return (
+      <EmptyState
+        hint="Brands you follow will show up here."
+        icon={
+          <HeartOutlineIcon color={EMPTY_ICON_COLOR} size={EMPTY_ICON_SIZE} />
+        }
+        message="No liked brands yet"
+      />
+    );
   }
 
   return (
@@ -223,6 +246,7 @@ function RecentTab() {
     return (
       <EmptyState
         hint="Products you open will show up here."
+        icon={<ClockIcon color={EMPTY_ICON_COLOR} size={EMPTY_ICON_SIZE} />}
         message="Nothing viewed yet"
       />
     );
