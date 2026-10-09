@@ -18,9 +18,9 @@ interface InfoItem {
 }
 
 const ITEMS: ReadonlyArray<InfoItem> = [
-  { labelKey: "login_info", href: "/mypage" },
-  { labelKey: "profile_settings", href: "/mypage" },
-  { labelKey: "personalized_info", href: "/mypage" },
+  { labelKey: "login_info", href: "/mypage/login-info" },
+  { labelKey: "profile_settings", href: "/mypage/profile" },
+  { labelKey: "personalized_info", href: "/mypage/custom-info" },
 ];
 
 export default function MyPageInfoList({ className }: MyPageInfoListProps) {
