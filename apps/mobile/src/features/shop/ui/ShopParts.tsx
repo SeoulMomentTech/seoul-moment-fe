@@ -12,6 +12,7 @@ import {
 
 import { Button } from "@shared/ui/button";
 import { CHIP_GAP, Chip } from "@shared/ui/chip";
+import { EMPTY_ICON_SIZE, SearchIcon } from "@shared/ui/icons";
 import { Touchable } from "@shared/ui/press";
 import { EmptyState, SectionError } from "@shared/ui/section-state";
 import {
@@ -31,6 +32,8 @@ import { useShopFilterStore } from "../model/useShopFilterStore";
 import { useShopSheetStore } from "../model/useShopSheetStore";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
+// 빈 화면 아이콘 색. SVG 는 className 을 못 받아 --neutral-600 값을 직접 쓴다.
+const EMPTY_ICON_COLOR = "#707070";
 const BANNER_HEIGHT = 200;
 // 브랜드 소개글을 목록 헤더에서 끊는 줄 수. 스켈레톤도 같은 수를 쓴다.
 const BRAND_DESCRIPTION_LINES = 3;
@@ -313,7 +316,13 @@ export function ShopEmpty() {
 
   if (isError) return <SectionError onRetry={() => void refetch()} />;
 
-  return <EmptyState message="No products match these filters" />;
+  return (
+    <EmptyState
+      hint="Try removing a filter."
+      icon={<SearchIcon color={EMPTY_ICON_COLOR} size={EMPTY_ICON_SIZE} />}
+      message="No products match these filters"
+    />
+  );
 }
 
 export function ShopFooter() {

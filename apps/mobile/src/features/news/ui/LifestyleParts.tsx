@@ -1,5 +1,6 @@
 import { ActivityIndicator, View } from "react-native";
 
+import { EMPTY_ICON_SIZE, InboxIcon } from "@shared/ui/icons";
 import { Section } from "@shared/ui/section";
 import { EmptyState, SectionError } from "@shared/ui/section-state";
 import { PostListSkeleton } from "@shared/ui/skeleton";
@@ -19,6 +20,9 @@ function LifestyleTitle() {
 /**
  * Lifestyle 제목. 첫 페이지가 비어 있으면(로딩·에러 아님) 제목도 숨긴다.
  */
+// 빈 화면 아이콘 색. SVG 는 className 을 못 받아 --neutral-600 값을 직접 쓴다.
+const EMPTY_ICON_COLOR = "#707070";
+
 export function LifestyleHeader() {
   const { data, isPending, isError, fetchStatus } = useInfiniteNewsByCategory();
 
@@ -54,7 +58,13 @@ export function LifestyleEmpty() {
   // 대시보드까지 비었을 때만 News 탭 전체가 흰 종이라 한 마디가 필요하다.
   if (!dashboardEmpty) return null;
 
-  return <EmptyState hint="Pull down to refresh." message="No stories yet" />;
+  return (
+    <EmptyState
+      hint="Pull down to refresh."
+      icon={<InboxIcon color={EMPTY_ICON_COLOR} size={EMPTY_ICON_SIZE} />}
+      message="No stories yet"
+    />
+  );
 }
 
 export function LifestyleFooter() {
