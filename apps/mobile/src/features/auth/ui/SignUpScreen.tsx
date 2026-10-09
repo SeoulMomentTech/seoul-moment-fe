@@ -16,7 +16,7 @@ import { Touchable } from "@shared/ui/press";
 
 import { HeaderHeight, Spacing } from "@/constants/theme";
 
-import { AuthField } from "./AuthField";
+import { AUTH_FIELD_HEIGHT, AuthField } from "./AuthField";
 import {
   allTermsAgreed,
   NO_TERMS_AGREED,
@@ -81,8 +81,19 @@ export function SignUpScreen() {
       onSuccess: () => setResendIn(RESEND_SECONDS),
     });
 
+  // 한 번이라도 코드를 받았으면 그 뒤로는 "검증" 단계다. 재발송은 안내 줄이 맡는다.
+  const codeSent = sendCode.isSuccess;
   const codeRejected =
     verifyCode.isError || (verifyCode.isSuccess && !verified);
+
+  /**
+   * 값을 고치면 그 값에 대한 지난 실패를 치운다. 남겨 두면 이미 고친 것을 아직
+   * 틀린 것처럼 말한다. 가입·로그인 실패는 어느 칸을 고치든 다시 시도할 일이라 함께 지운다.
+   */
+  const clearSubmitErrors = () => {
+    if (signUp.isError) signUp.reset();
+    if (login.isError) login.reset();
+  };
 
   /**
    * 지금 가입을 막고 있는 한 가지. 버튼만 흐려 두면 무엇이 모자란지 알 수 없어서,
@@ -168,6 +179,9 @@ export function SignUpScreen() {
                 // 이메일을 고치면 앞서 받은 인증은 더 이상 그 주소의 것이 아니다.
                 setVerified(false);
                 setCode("");
+                sendCode.reset();
+                verifyCode.reset();
+                clearSubmitErrors();
               }}
               placeholder="Email"
               value={email}
@@ -179,38 +193,38 @@ export function SignUpScreen() {
                 <AuthField
                   editable={!verified}
                   keyboardType="number-pad"
-                  onChangeText={setCode}
+                  onChangeText={(value) => {
+                    setCode(value);
+                    verifyCode.reset();
+                    clearSubmitErrors();
+                  }}
                   placeholder="Verification Code"
                   value={code}
                 />
               </View>
               {verified ? (
                 <Verified />
+              ) : codeSent ? (
+                // 코드를 받은 뒤 옆 버튼이 맡는 일은 검증 하나다. 다시 받는 길은
+                // 아래 안내 줄에 둔다 — 버튼 하나가 발송과 검증을 번갈아 맡으면
+                // 메일이 오지 않았을 때 다시 보낼 방법이 사라진다.
+                <Button
+                  disabled={code.trim().length === 0 || verifyCode.isPending}
+                  label="Verify"
+                  onPress={() =>
+                    verifyCode.mutate(
+                      { email: email.trim(), code: code.trim() },
+                      { onSuccess: (res) => setVerified(res.success) },
+                    )
+                  }
+                  style={{ width: SIDE_BUTTON_WIDTH }}
+                  variant="secondary"
+                />
               ) : (
                 <Button
-                  disabled={
-                    sendCode.isSuccess
-                      ? code.trim().length === 0 || verifyCode.isPending
-                      : !looksLikeEmail(email) ||
-                        resendIn > 0 ||
-                        sendCode.isPending
-                  }
-                  label={
-                    sendCode.isSuccess
-                      ? "Verify"
-                      : resendIn > 0
-                        ? `${resendIn}s`
-                        : "Send Code"
-                  }
-                  onPress={
-                    sendCode.isSuccess
-                      ? () =>
-                          verifyCode.mutate(
-                            { email: email.trim(), code: code.trim() },
-                            { onSuccess: (res) => setVerified(res.success) },
-                          )
-                      : send
-                  }
+                  disabled={!looksLikeEmail(email) || sendCode.isPending}
+                  label="Send Code"
+                  onPress={send}
                   style={{ width: SIDE_BUTTON_WIDTH }}
                   variant="secondary"
                 />
@@ -218,20 +232,30 @@ export function SignUpScreen() {
             </View>
 
             <AuthField
-              onChangeText={setNickname}
+              onChangeText={(value) => {
+                setNickname(value);
+                validateNickname.reset();
+                clearSubmitErrors();
+              }}
               placeholder="Letters and numbers only (2-20)"
               value={nickname}
             />
             <AuthField
               autoComplete="new-password"
-              onChangeText={setPassword}
+              onChangeText={(value) => {
+                setPassword(value);
+                clearSubmitErrors();
+              }}
               placeholder="Password"
               secureTextEntry
               value={password}
             />
             <AuthField
               autoComplete="new-password"
-              onChangeText={setPasswordConfirm}
+              onChangeText={(value) => {
+                setPasswordConfirm(value);
+                clearSubmitErrors();
+              }}
               placeholder="Confirm Password"
               secureTextEntry
               value={passwordConfirm}
@@ -240,9 +264,12 @@ export function SignUpScreen() {
 
           {/* 이메일 쪽 서버 응답만 칸 가까이 둔다. 나머지 규칙은 버튼 위 한 줄이 맡는다. */}
           <EmailNote
+            busy={sendCode.isPending}
             codeRejected={codeRejected}
-            codeSent={sendCode.isSuccess}
+            codeSent={codeSent}
             email={email.trim()}
+            onResend={send}
+            resendIn={resendIn}
             sendFailed={sendCode.isError}
             verified={verified}
           />
@@ -304,19 +331,28 @@ export function SignUpScreen() {
   );
 }
 
-/** 인증 줄 아래 한 줄. 네 상태가 한 자리를 나눠 쓰므로 줄이 늘었다 줄지 않는다. */
+/**
+ * 인증 줄 아래 한 줄. 여러 상태가 한 자리를 나눠 쓰므로 줄이 늘었다 줄지 않는다.
+ * 코드를 받은 뒤의 재발송도 여기 있다 — 옆 버튼은 검증을 맡고 있어 자리가 없다.
+ */
 function EmailNote({
   sendFailed,
   codeSent,
   codeRejected,
   verified,
   email,
+  resendIn,
+  busy,
+  onResend,
 }: {
   sendFailed: boolean;
   codeSent: boolean;
   codeRejected: boolean;
   verified: boolean;
   email: string;
+  resendIn: number;
+  busy: boolean;
+  onResend(): void;
 }) {
   if (verified) return null;
 
@@ -344,6 +380,7 @@ function EmailNote({
     return (
       <NoteBlock>
         <Note>The verification code has been sent to {email}.</Note>
+        <Resend busy={busy} onPress={onResend} secondsLeft={resendIn} />
       </NoteBlock>
     );
   }
@@ -351,8 +388,49 @@ function EmailNote({
   return null;
 }
 
+/** 코드가 오지 않았을 때의 길. 대기 중에는 남은 초를 보여 주고 누르지 못하게 한다. */
+function Resend({
+  secondsLeft,
+  busy,
+  onPress,
+}: {
+  secondsLeft: number;
+  busy: boolean;
+  onPress(): void;
+}) {
+  const waiting = secondsLeft > 0 || busy;
+
+  if (waiting) {
+    return (
+      <Note>
+        {busy ? "Sending…" : `You can send it again in ${secondsLeft}s.`}
+      </Note>
+    );
+  }
+
+  return (
+    <Touchable
+      accessibilityLabel="Send the code again"
+      accessibilityRole="button"
+      hitSlop={14}
+      onPress={onPress}
+    >
+      <Text
+        className="text-body-3 text-foreground"
+        style={{ textDecorationLine: "underline" }}
+      >
+        Didn&apos;t get it? Send it again
+      </Text>
+    </Touchable>
+  );
+}
+
 function NoteBlock({ children }: { children: React.ReactNode }) {
-  return <View style={{ marginTop: Spacing.tight }}>{children}</View>;
+  return (
+    <View style={{ marginTop: Spacing.tight, gap: Spacing.tight / 2 }}>
+      {children}
+    </View>
+  );
 }
 
 /**
@@ -383,7 +461,7 @@ function Verified() {
   return (
     <View
       className="items-center justify-center"
-      style={{ width: SIDE_BUTTON_WIDTH, height: 56 }}
+      style={{ width: SIDE_BUTTON_WIDTH, height: AUTH_FIELD_HEIGHT }}
     >
       <Text className="text-body-3 text-foreground font-bold">✓ Verified</Text>
     </View>
