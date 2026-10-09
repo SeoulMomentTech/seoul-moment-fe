@@ -11,6 +11,7 @@ import {
 } from "react-native";
 
 import { Button } from "@shared/ui/button";
+import { CHIP_GAP, Chip } from "@shared/ui/chip";
 import { Touchable } from "@shared/ui/press";
 import { EmptyState, SectionError } from "@shared/ui/section-state";
 import {
@@ -31,8 +32,6 @@ import { useShopSheetStore } from "../model/useShopSheetStore";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const BANNER_HEIGHT = 200;
-// 칩 사이 간격. 필터 시트 칩(CHIP_GAP)과 같은 값이라 두 곳의 리듬이 맞는다.
-const CATEGORY_CHIP_GAP = 8;
 // 브랜드 소개글을 목록 헤더에서 끊는 줄 수. 스켈레톤도 같은 수를 쓴다.
 const BRAND_DESCRIPTION_LINES = 3;
 
@@ -171,52 +170,6 @@ function BannerPager() {
 }
 
 /**
- * 카테고리 칩. 필터 시트의 Chip 과 같은 모양(rounded-full, px-4 py-2)이라
- * 상품 목록 안에서 '고르는 것'은 전부 같은 생김새를 갖는다.
- * 폭을 글자에 맡기므로 긴 이름도 잘리지 않는다.
- *
- * 선택은 테두리 두께가 아니라 채움으로 나타낸다. border-2 로 바꾸면 상자가 가로·세로로
- * 2pt 씩 커져 오른쪽 칩들이 전부 밀리고 스켈레톤(CHIP_HEIGHT=35)과도 어긋난다.
- * 글자 굵기도 그대로 둬야 글자 폭이 안 변한다 — 대비는 bg-brand 가 충분히 준다.
- */
-function CategoryChip({
-  label,
-  selected,
-  onPress,
-}: {
-  label: string;
-  selected: boolean;
-  onPress(): void;
-}) {
-  return (
-    <Touchable
-      accessibilityLabel={label}
-      accessibilityRole="button"
-      accessibilityState={{ selected }}
-      className={
-        selected
-          ? "bg-brand border-brand rounded-full border px-4 py-2"
-          : "border-neutral-subtle rounded-full border px-4 py-2"
-      }
-      // 칩 높이가 35pt 라 위아래로 5pt 씩 넓혀 44pt 최소 터치 영역을 맞춘다.
-      // 칩 사이 간격이 8pt 뿐이라 좌우는 넓히지 않는다.
-      hitSlop={{ top: 5, bottom: 5 }}
-      onPress={onPress}
-    >
-      <Text
-        className={
-          selected
-            ? "text-body-3 text-background"
-            : "text-body-3 text-foreground"
-        }
-      >
-        {label}
-      </Text>
-    </Touchable>
-  );
-}
-
-/**
  * 최상위 카테고리 칩 줄(패션·화장품·악세서리). 여기서 고르는 것은 categoryId 다.
  * 그 아래 상품 카테고리(후드/집업 등)는 필터 시트가 고르고, 이 선택으로 좁혀진다.
  */
@@ -257,7 +210,7 @@ function CategoryScroller() {
   return (
     <FlatList
       ListHeaderComponent={
-        <CategoryChip
+        <Chip
           label="All"
           onPress={() => select(undefined)}
           selected={categoryId == null}
@@ -265,13 +218,13 @@ function CategoryScroller() {
       }
       contentContainerStyle={{
         paddingHorizontal: GRID_PADDING,
-        gap: CATEGORY_CHIP_GAP,
+        gap: CHIP_GAP,
       }}
       data={data.list}
       horizontal
       keyExtractor={(item) => String(item.id)}
       renderItem={({ item }) => (
-        <CategoryChip
+        <Chip
           label={item.name}
           onPress={() => select(item.id === categoryId ? undefined : item.id)}
           selected={item.id === categoryId}
