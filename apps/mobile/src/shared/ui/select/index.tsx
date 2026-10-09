@@ -33,6 +33,12 @@ interface SelectFieldProps {
   title: string;
   /** 앞 칸을 먼저 골라야 열 수 있는 칸(도시 없이 區를 고를 수 없다). */
   disabled?: boolean;
+  /**
+   * 고른 것을 다시 비울 수 있는 칸인지. 켜면 시트 맨 위에 "비우기" 줄이 선다.
+   * 칩은 고른 것을 다시 눌러 비우지만 시트에는 그런 자리가 없어서, 비우는 길이
+   * 필요한 칸(사이즈처럼 null 로 저장되는 것)은 이 줄 없이는 되돌릴 수 없다.
+   */
+  clearable?: boolean;
 }
 
 /**
@@ -40,8 +46,9 @@ interface SelectFieldProps {
  * 목록에서 하나를 고른다 — 폼 안에서는 입력칸과 같은 높이·테두리를 써서
  * 글자를 치는 칸과 고르는 칸이 한 줄기로 읽히게 한다.
  *
- * 짧은 토큰(사이즈·성별)은 이 칸이 아니라 ChipRow 를 쓴다. 보기가 열 개 남짓에
- * 글자가 서너 자면 시트를 여는 두 번의 탭보다 한 줄에 다 보이는 편이 빠르다.
+ * 성별처럼 보기가 두세 개뿐이고 한 줄에 다 보이는 값은 ChipRow 가 낫다.
+ * 그보다 많아지면 칩 줄이 폼을 가로로 흐르는 띠로 채워 어느 칸이 무엇인지 흐려지므로,
+ * 고른 값만 한 줄로 보이는 이 칸을 쓴다(사이즈 네 칸이 그래서 여기로 왔다).
  */
 export function SelectField({
   options,
@@ -50,6 +57,7 @@ export function SelectField({
   placeholder,
   title,
   disabled = false,
+  clearable = false,
 }: SelectFieldProps) {
   const [open, setOpen] = useState(false);
   const selected = options.find((option) => option.value === value);
@@ -84,6 +92,7 @@ export function SelectField({
         <Text className="text-body-1 text-neutral">›</Text>
       </Touchable>
       <OptionSheet
+        clearable={clearable}
         onClose={() => setOpen(false)}
         onSelect={(next) => {
           onChange(next);
@@ -103,6 +112,7 @@ function OptionSheet({
   title,
   options,
   value,
+  clearable,
   onSelect,
   onClose,
 }: {
@@ -110,6 +120,7 @@ function OptionSheet({
   title: string;
   options: readonly SelectOption[];
   value?: string;
+  clearable: boolean;
   onSelect(next: string): void;
   onClose(): void;
 }) {
@@ -128,35 +139,49 @@ function OptionSheet({
             </Text>
           </View>
         ) : (
-          options.map((option) => {
-            const selected = option.value === value;
-
-            return (
+          <>
+            {/* 비우는 줄은 맨 위에 둔다. 값이 없을 때는 비울 것도 없어 그리지 않는다. */}
+            {clearable && value != null ? (
               <Touchable
-                accessibilityLabel={option.label}
+                accessibilityLabel={`Clear ${title.toLowerCase()}`}
                 accessibilityRole="button"
-                accessibilityState={{ selected }}
-                className="flex-row items-center justify-between px-5"
-                key={option.value}
-                onPress={() => onSelect(option.value)}
+                className="border-neutral-subtle flex-row items-center border-b px-5"
+                onPress={() => onSelect("")}
                 style={{ height: OPTION_ROW_HEIGHT }}
               >
-                <Text
-                  className={
-                    // 고른 것은 "지금 고른 것"이라 브랜드 색이다 — 정렬 시트와 같은 규칙.
-                    selected
-                      ? "text-body-2 text-brand font-bold"
-                      : "text-body-2 text-foreground"
-                  }
-                >
-                  {option.label}
-                </Text>
-                {selected ? (
-                  <Text className="text-body-2 text-brand">✓</Text>
-                ) : null}
+                <Text className="text-body-2 text-neutral">Not set</Text>
               </Touchable>
-            );
-          })
+            ) : null}
+            {options.map((option) => {
+              const selected = option.value === value;
+
+              return (
+                <Touchable
+                  accessibilityLabel={option.label}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected }}
+                  className="flex-row items-center justify-between px-5"
+                  key={option.value}
+                  onPress={() => onSelect(option.value)}
+                  style={{ height: OPTION_ROW_HEIGHT }}
+                >
+                  <Text
+                    className={
+                      // 고른 것은 "지금 고른 것"이라 브랜드 색이다 — 정렬 시트와 같은 규칙.
+                      selected
+                        ? "text-body-2 text-brand font-bold"
+                        : "text-body-2 text-foreground"
+                    }
+                  >
+                    {option.label}
+                  </Text>
+                  {selected ? (
+                    <Text className="text-body-2 text-brand">✓</Text>
+                  ) : null}
+                </Touchable>
+              );
+            })}
+          </>
         )}
       </ScrollView>
     </BottomSheet>
