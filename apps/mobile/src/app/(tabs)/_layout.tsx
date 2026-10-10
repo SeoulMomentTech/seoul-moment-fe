@@ -1,6 +1,8 @@
 import { NativeTabs } from "expo-router/unstable-native-tabs";
 import { View } from "react-native";
 
+import { useUserCartCount } from "@entities/cart/model/useUserCartCount";
+
 import { AppHeader } from "@/shared/ui/app-header";
 
 import { useResetShopFilterOnLeave } from "@features/shop";
@@ -15,11 +17,14 @@ const TAB_BACKGROUND_COLOR = "#ffffff"; // --neutral-0
 
 export default function TabLayout() {
   useResetShopFilterOnLeave();
+  // 로그아웃 상태에서는 쿼리가 꺼져 있어 요청이 나가지 않고 data 는 undefined 로 남는다 —
+  // 헤더는 그것을 "모른다"로 읽어 뱃지를 그리지 않는다.
+  const cartCount = useUserCartCount();
 
   // Material 4탭 이상이면 LABEL_VISIBILITY_AUTO 규칙에 의해 선택된 탭만 라벨을 표시한다.
   return (
     <View className="bg-background flex-1">
-      <AppHeader />
+      <AppHeader cartCount={cartCount.data} />
       <NativeTabs
         backgroundColor={TAB_BACKGROUND_COLOR}
         iconColor={{ default: TAB_INACTIVE_COLOR, selected: TAB_ACTIVE_COLOR }}
