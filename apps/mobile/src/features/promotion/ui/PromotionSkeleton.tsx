@@ -1,19 +1,19 @@
 import { View, type DimensionValue } from "react-native";
 
-import { CAROUSEL_CARD_WIDTH } from "@entities/product/ui/ProductCarousel";
 import { CHIP_GAP } from "@shared/ui/chip";
 import {
   CHIP_HEIGHT,
   LINE_BODY_5,
   LINE_TITLE_3,
   LINE_TITLE_4,
-  ProductRowSkeleton,
+  ProductGridSkeleton,
   Shimmer,
 } from "@shared/ui/skeleton";
 import { CAROUSEL_PAGER_BLOCK } from "@shared/ui/slide-pager/SlideCarousel";
 
 import { Spacing } from "@/constants/theme";
 
+import { FOOTER_BAND_HEIGHT } from "./BrandFooterLinks";
 import {
   DESCRIPTION_LINE_HEIGHT,
   DESCRIPTION_LINES,
@@ -37,6 +37,11 @@ const TITLE_GAP = 16;
 // 팝업 일정 알약. 개수는 응답에 달렸으므로 dev 와 같은 3개를 대표로 둔다.
 const POPUP_TAB_COUNT = 3;
 const POPUP_TAB_WIDTH = 100;
+// 상품 칸 수. 응답에 달린 값이라(dev 는 6) 맞히는 것이 아니라 가장 흔한 쪽에 건다.
+const PRODUCT_COUNT = 6;
+// 소개 블록 밑 버튼 두 개. Button size="md" 와 BrandIntroduction 의 gap 과 같은 값이다.
+const INTRO_BUTTON_HEIGHT = 44;
+const INTRO_BUTTON_GAP = Spacing.tight;
 
 function Line({
   line,
@@ -100,8 +105,23 @@ function IntroSkeleton() {
           />
         ))}
       </View>
-      <View style={{ marginTop: 16 }}>
-        <Shimmer height={44} radius={22} />
+      {/* 버튼 둘(Brand / Shop)이 나란히 선다. */}
+      <View
+        className="flex-row"
+        style={{ marginTop: 16, gap: INTRO_BUTTON_GAP }}
+      >
+        <View style={{ flex: 1 }}>
+          <Shimmer
+            height={INTRO_BUTTON_HEIGHT}
+            radius={INTRO_BUTTON_HEIGHT / 2}
+          />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Shimmer
+            height={INTRO_BUTTON_HEIGHT}
+            radius={INTRO_BUTTON_HEIGHT / 2}
+          />
+        </View>
       </View>
     </View>
   );
@@ -137,19 +157,26 @@ function LookbookSkeleton() {
   );
 }
 
-/** 상품 줄. 높이 = 40 + 24 + 16 + 233 = **313**. */
+/**
+ * 상품 그리드. 높이 = 40 + 24 + 16 + 3행 x 카드(칸폭+83) + 2 x 24.
+ * 393pt 화면에서 칸 폭 170 이면 40 + 24 + 16 + 3x253 + 48 = **887**.
+ *
+ * 가로 줄은 개수와 무관하게 한 줄이었지만 그리드는 아니다 — 상품이 4개면 한 행(253pt)이
+ * 덜 온다. 그래도 그리드를 쓰는 것은 웹 모바일이 grid-cols-2 이고, 프로모션이 팔려는
+ * 상품을 스와이프 뒤에 숨기지 않기 위해서다.
+ */
 function ProductsSkeleton() {
   return (
     <View style={{ paddingTop: SECTION_TOP }}>
       <SectionTitle width="45%" />
-      <ProductRowSkeleton cardWidth={CAROUSEL_CARD_WIDTH} />
+      <ProductGridSkeleton count={PRODUCT_COUNT} variant="shop" />
     </View>
   );
 }
 
 /**
  * 팝업. 일정 알약과 슬라이드 장수는 응답에 달렸으므로 둘 다 있는 쪽(알약 한 줄, 여러 장)을 그린다.
- * 높이 = 40 + 24 + 16 + 35 + 12 + 230 + 73 + 24 + 274 = **728**.
+ * 높이 = 40 + 24 + 16 + 35 + 12 + 230 + 73 + 24 + POPUP_INFO_HEIGHT(330) = **784**.
  */
 function PopupSkeleton() {
   return (
@@ -212,11 +239,29 @@ function NoticeSkeleton() {
 }
 
 /**
- * 배너 아래 본문 전체. 높이 = 407 + 1096 + 313 + 728 + 264 = **2808**.
+ * 페이지를 끝내는 브랜드 대표색 띠. 색은 상세가 와야 알 수 있어서 회색으로 둔다 —
+ * 띠의 자리와 높이만 미리 잡아 두면 색은 나중에 칠해진다.
+ */
+function FooterSkeleton({ bottomInset }: { bottomInset: number }) {
+  return (
+    <View
+      className="bg-surface-muted"
+      style={{ height: FOOTER_BAND_HEIGHT + bottomInset }}
+    />
+  );
+}
+
+/**
+ * 배너 아래 본문 전체. 블록 순서는 PromotionScreen 과 같다.
+ * 높이 = 407 + 878 + 887 + 784 + 264 + (216 + 아래 안전 영역) = **3436 + 안전 영역**.
  * 온라인 이벤트는 dev 응답에 하나도 없어 자리를 잡지 않는다 — 있는 줄 알고 자리를 비워 두면
  * 대부분의 경우에 빈 칸이 생긴다.
  */
-export function PromotionBodySkeleton() {
+export function PromotionBodySkeleton({
+  bottomInset = 0,
+}: {
+  bottomInset?: number;
+}) {
   return (
     <View>
       <IntroSkeleton />
@@ -224,6 +269,7 @@ export function PromotionBodySkeleton() {
       <ProductsSkeleton />
       <PopupSkeleton />
       <NoticeSkeleton />
+      <FooterSkeleton bottomInset={bottomInset} />
     </View>
   );
 }
@@ -233,14 +279,20 @@ export function PromotionBodySkeleton() {
  * 웹 로딩 화면도 탭을 그리고, dev 의 유일한 프로모션이 2개 브랜드다.
  * 브랜드가 하나뿐인 프로모션에서는 목록이 도착하는 순간 60pt 가 줄어든다. 알고 남겨 둔 간극이다.
  *
- * 높이 = bannerHeight + 60 + 2808.
+ * 높이 = bannerHeight + 60 + 본문.
  */
-export function PromotionSkeleton({ bannerHeight }: { bannerHeight: number }) {
+export function PromotionSkeleton({
+  bannerHeight,
+  bottomInset = 0,
+}: {
+  bannerHeight: number;
+  bottomInset?: number;
+}) {
   return (
     <View>
       <Shimmer height={bannerHeight} radius={0} />
       <View style={{ height: SWITCHER_HEIGHT }} />
-      <PromotionBodySkeleton />
+      <PromotionBodySkeleton bottomInset={bottomInset} />
     </View>
   );
 }
