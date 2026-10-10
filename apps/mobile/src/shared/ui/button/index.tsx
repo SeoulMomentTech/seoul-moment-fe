@@ -8,8 +8,11 @@ import { Touchable } from "@shared/ui/press";
  *             브랜드 주황은 "고른 것·갈 수 있는 곳"만 뜻하도록 두고(wave 1),
  *             주요 동작까지 주황으로 칠하면 어느 색이 "주요"인지 배울 수 없다.
  * secondary — 같은 자리의 다른 선택지. 외곽선만 둔다.
+ * onColor   — 앱이 고르지 않은 색 위에 놓이는 버튼(프로모션 끝의 브랜드 대표색 띠).
+ *             흰 바탕이라 어떤 브랜드 색 위에서도 읽히고, 옅은 테두리는 띠 색이
+ *             흰색에 가까울 때 버튼 모양이 사라지지 않게 한다.
  */
-type ButtonVariant = "primary" | "secondary";
+type ButtonVariant = "primary" | "secondary" | "onColor";
 
 /**
  * lg — 화면 하나가 걸린 동작(로그인, 가입, 필터 적용). 입력칸과 같은 56.
@@ -29,11 +32,13 @@ const SHAPE = "items-center justify-center rounded-full";
 const FILL: Record<ButtonVariant, string> = {
   primary: "bg-foreground",
   secondary: "border-neutral-subtle border",
+  onColor: "bg-background border-neutral-subtle border",
 };
 
 const LABEL_COLOR: Record<ButtonVariant, string> = {
   primary: "text-background",
   secondary: "text-foreground",
+  onColor: "text-foreground",
 };
 
 const LABEL_SIZE: Record<ButtonSize, string> = {

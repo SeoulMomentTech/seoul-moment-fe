@@ -1,7 +1,6 @@
 import { useState } from "react";
 
 import { Image } from "expo-image";
-import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import {
   FlatList,
@@ -30,8 +29,8 @@ import { DetailSkeleton } from "@shared/ui/skeleton";
 
 import { Spacing } from "@/constants/theme";
 
+import { useOpenBrandShop } from "../model/useOpenBrandShop";
 import useProductDetail from "../model/useProductDetail";
-import { useShopFilterStore } from "../model/useShopFilterStore";
 
 const GALLERY_HEIGHT = 380;
 const AVATAR_SIZE = 28;
@@ -242,8 +241,7 @@ function DetailImage({ uri }: { uri: string }) {
  */
 export function ProductDetailScreen({ id }: { id: number }) {
   const insets = useSafeAreaInsets();
-  const router = useRouter();
-  const selectOnlyBrand = useShopFilterStore((s) => s.selectOnlyBrand);
+  const openBrandShop = useOpenBrandShop();
   const {
     data: product,
     isPending,
@@ -315,11 +313,7 @@ export function ProductDetailScreen({ id }: { id: number }) {
             accessibilityRole="button"
             className="flex-row items-center"
             hitSlop={8}
-            onPress={() => {
-              selectOnlyBrand(product.brand.id);
-              // 탭은 이미 스택 아래에 있으므로 push 로 쌓지 않고 그 탭으로 돌아간다.
-              router.navigate("/shop");
-            }}
+            onPress={() => openBrandShop(product.brand.id)}
           >
             {product.brand.profileImg ? (
               <Image

@@ -1,10 +1,12 @@
 import { useState } from "react";
 
 import { Image } from "expo-image";
+import * as Linking from "expo-linking";
 import { ScrollView, Text, View, useWindowDimensions } from "react-native";
 
 import { formatDate } from "@shared/lib/utils/formatDate";
 import type { BrandPromotionPopup } from "@shared/services/brandPromotion";
+import { BUTTON_HEIGHT, Button } from "@shared/ui/button";
 import { CHIP_GAP, Chip } from "@shared/ui/chip";
 import { Section } from "@shared/ui/section";
 import {
@@ -26,7 +28,12 @@ const ADDRESS_LINES = 2;
 const DESCRIPTION_LINES = 4;
 const DESCRIPTION_LINE_HEIGHT = 22;
 
-/** 제목 + 네 줄 + 설명. 스켈레톤이 같은 값을 쓴다. */
+/**
+ * 제목 + 네 줄 + 설명 + 지도 버튼. 스켈레톤이 같은 값을 쓴다.
+ *
+ * 좌표가 없는 팝업은 지도 버튼이 없어 56pt 만큼 짧아진다. dev 의 팝업에는 좌표가 다 있고,
+ * 블록이 짧아지는 쪽은 스켈레톤이 남긴 자리를 덜 쓰는 것이라 아래가 겹치지는 않는다.
+ */
 export const POPUP_INFO_HEIGHT =
   LINE_BODY_2 +
   ROW_GAP +
@@ -34,7 +41,28 @@ export const POPUP_INFO_HEIGHT =
   ROW_GAP +
   LINE_BODY_5 +
   8 +
-  DESCRIPTION_LINE_HEIGHT * DESCRIPTION_LINES;
+  DESCRIPTION_LINE_HEIGHT * DESCRIPTION_LINES +
+  ROW_GAP +
+  BUTTON_HEIGHT.md;
+
+/** 좌표는 문자열로 온다("37.5826"). 숫자가 아닌 값이 오면 지도를 열지 않는다. */
+const COORDINATE = /^-?\d+(?:\.\d+)?$/;
+
+/**
+ * 웹은 이 자리에 구글 지도를 iframe 으로 박는다. 폰에서는 지도를 화면 안에 끼워 넣는 대신
+ * 기기의 지도 앱으로 넘긴다 — 길찾기도 저장도 거기서 되고, 새 의존성도 필요 없다.
+ * 주소가 아니라 좌표로 보내는 것은 웹과 같다(주소 검색은 같은 이름의 다른 가게를 집는다).
+ */
+const mapUrl = (popup: BrandPromotionPopup) => {
+  if (
+    !COORDINATE.test(popup.latitude ?? "") ||
+    !COORDINATE.test(popup.longitude ?? "")
+  ) {
+    return undefined;
+  }
+
+  return `https://www.google.com/maps/search/?api=1&query=${popup.latitude},${popup.longitude}`;
+};
 
 /**
  * 상시 진행인 팝업은 끝나는 날에 아주 먼 미래(dev 는 2399-01-01)가 온다.
@@ -86,8 +114,7 @@ function InfoRow({ label, value, lines = 1 }: InfoRowProps) {
 
 /**
  * 오프라인·팝업 일정. 웹은 이미지 슬라이더 옆에 정보를 세우고 그 아래 지도를 깔지만,
- * 폰에서는 세로로 쌓고 지도는 두지 않는다 — 지도는 새 의존성 없이 그릴 수 없고,
- * 주소가 이미 같은 말을 한다.
+ * 폰에서는 세로로 쌓고, 지도는 화면에 박는 대신 기기의 지도 앱을 여는 버튼으로 둔다.
  *
  * 일정이 둘 이상이면 시작일 알약으로 고른다. 고른 것을 다시 눌러도 비워지지 않는다.
  */
@@ -104,6 +131,7 @@ export function BrandOfflinePopup({
   const active =
     popupList.find((popup) => popup.id === selectedId) ?? popupList[0];
   const hasTabs = popupList.length > 1;
+  const mapLink = mapUrl(active);
 
   return (
     <Section title="Offline & Pop-up Events">
@@ -175,6 +203,16 @@ export function BrandOfflinePopup({
         >
           {active.description}
         </Text>
+        {mapLink ? (
+          <Button
+            accessibilityLabel={`Open ${active.place} in Maps`}
+            label="Open in Maps"
+            onPress={() => void Linking.openURL(mapLink)}
+            size="md"
+            style={{ marginTop: ROW_GAP }}
+            variant="secondary"
+          />
+        ) : null}
       </View>
     </Section>
   );

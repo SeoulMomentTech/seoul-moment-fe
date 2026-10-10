@@ -2,10 +2,10 @@ import { useState } from "react";
 
 import { Image } from "expo-image";
 import { StatusBar } from "expo-status-bar";
-import { ScrollView, View } from "react-native";
+import { ScrollView, View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { ProductCarousel } from "@entities/product/ui/ProductCarousel";
+import { ProductGrid } from "@entities/product/ui/ProductGrid";
 import {
   BackButton,
   SCRIM_EXTRA_HEIGHT,
@@ -21,6 +21,7 @@ import {
 
 import { Spacing } from "@/constants/theme";
 
+import { BrandFooterLinks } from "./BrandFooterLinks";
 import { BrandIntroduction } from "./BrandIntroduction";
 import { BrandLookbook } from "./BrandLookbook";
 import { BrandOfflinePopup } from "./BrandOfflinePopup";
@@ -33,8 +34,12 @@ import {
   usePromotionDetail,
 } from "../model/usePromotionQueries";
 
-// 뉴스·아티클·브랜드 상세와 같은 배너 높이. 사진이 먼저 오는 화면들은 한 가족이다.
-const BANNER_HEIGHT = 300;
+/**
+ * 모바일 배너 원본의 가로세로비(dev 의 mobileImageUrl 은 1080x1350 = 4:5).
+ * 다른 상세 화면처럼 300pt 로 자르면 세로로 찍은 이 사진의 아래 40% 가 날아간다.
+ * 웹도 이 자리만 656px 로 따로 키운다 — 프로모션 배너는 섬네일이 아니라 표지다.
+ */
+const BANNER_ASPECT = 5 / 4;
 // 빈 화면 아이콘 색. SVG 는 className 을 못 받아 --neutral-600 값을 직접 쓴다.
 const EMPTY_ICON_COLOR = "#707070";
 /** en.json 의 promotion_special_event. 앞 공백만 떼고 쓴다. */
@@ -50,6 +55,9 @@ const PRODUCTS_HEADING = "Brand Products";
  */
 export function PromotionScreen({ promotionId }: { promotionId: number }) {
   const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+  // 상태바 밑까지 풀블리드라 화면 폭이 그대로 사진의 폭이다.
+  const bannerHeight = Math.round(width * BANNER_ASPECT);
   const [selectedId, setSelectedId] = useState<number>();
   const brandsQuery = usePromotionBrands(promotionId);
   const brands = brandsQuery.data?.list ?? [];
@@ -82,9 +90,12 @@ export function PromotionScreen({ promotionId }: { promotionId: number }) {
       <View className="bg-background flex-1">
         <StatusBar style="dark" />
         <BackButton />
-        {/* 실제 배너는 상태바 밑까지 풀블리드(높이 + insets.top)다. StatusScreen 의 상단 패딩을
-            쓰면 배너가 그만큼 아래로 밀린다. */}
-        <PromotionSkeleton bannerHeight={BANNER_HEIGHT + insets.top} />
+        {/* 실제 배너는 상태바 밑까지 풀블리드다. StatusScreen 의 상단 패딩을 쓰면
+            배너가 그만큼 아래로 밀린다. */}
+        <PromotionSkeleton
+          bannerHeight={bannerHeight}
+          bottomInset={insets.bottom}
+        />
       </View>
     );
   }
@@ -122,27 +133,31 @@ export function PromotionScreen({ promotionId }: { promotionId: number }) {
       return (
         <View style={{ paddingTop: Spacing.section }}>
           <SectionError onRetry={() => void detailQuery.refetch()} />
+          <View style={{ height: insets.bottom + Spacing.section }} />
         </View>
       );
     }
 
     if (detailQuery.isPending) {
-      return <PromotionBodySkeleton />;
+      return <PromotionBodySkeleton bottomInset={insets.bottom} />;
     }
 
     if (detailQuery.isError || !detail) {
       return (
         <View style={{ paddingTop: Spacing.section }}>
           <SectionError onRetry={() => void detailQuery.refetch()} />
+          <View style={{ height: insets.bottom + Spacing.section }} />
         </View>
       );
     }
 
+    // 블록 순서는 웹 PromotionPage 와 같다 — 소개 · 룩북 · 상품 · 오프라인 팝업 ·
+    // 온라인 쿠폰 · 공지 · 브랜드 띠. 전에는 쿠폰이 팝업보다 위에 있었다.
     return (
       <>
         <BrandIntroduction brand={detail.brand} />
         <BrandLookbook sectionList={detail.sectionList} />
-        <ProductCarousel
+        <ProductGrid
           heading={PRODUCTS_HEADING}
           items={detail.productList.map((product) => ({
             id: product.id,
@@ -152,9 +167,11 @@ export function PromotionScreen({ promotionId }: { promotionId: number }) {
             image: product.imageUrl,
           }))}
         />
-        <BrandOnlineEvent eventList={detail.eventList} />
         <BrandOfflinePopup popupList={detail.popupList} />
+        <BrandOnlineEvent eventList={detail.eventList} />
         <PromotionNotices noticeList={detail.noticeList} />
+        {/* 맨 아래 여백은 이 띠가 쥔다(안전 영역까지). 밑에 흰 줄을 남기지 않는다. */}
+        <BrandFooterLinks brand={detail.brand} />
       </>
     );
   };
@@ -166,7 +183,7 @@ export function PromotionScreen({ promotionId }: { promotionId: number }) {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View
           className="bg-surface-muted overflow-hidden"
-          style={{ height: BANNER_HEIGHT + insets.top }}
+          style={{ height: bannerHeight }}
         >
           {bannerUri ? (
             <Image
@@ -186,7 +203,6 @@ export function PromotionScreen({ promotionId }: { promotionId: number }) {
           />
         ) : null}
         {renderBody()}
-        <View style={{ height: insets.bottom + Spacing.section }} />
       </ScrollView>
       <TopScrim height={insets.top + SCRIM_EXTRA_HEIGHT} />
       <BackButton />
