@@ -25,6 +25,7 @@ export default function RootLayout() {
           <Stack.Screen name="article/[id]" />
           <Stack.Screen name="product/[id]" />
           <Stack.Screen name="brand/[id]" />
+          <Stack.Screen name="promotion/[id]" />
           <Stack.Screen name="login" />
           <Stack.Screen name="signup" />
           <Stack.Screen name="account/login-info" />
