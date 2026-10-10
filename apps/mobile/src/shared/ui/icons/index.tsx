@@ -151,3 +151,52 @@ export function InboxIcon({ size = DEFAULT_SIZE, color }: IconProps) {
     </Svg>
   );
 }
+
+/**
+ * 장바구니. 헤더의 단추와 빈 장바구니 화면이 같이 쓴다 — 머리에서 누른 그림과 도착한
+ * 화면의 그림이 같아야 "이 화면이 그 장바구니"임이 설명 없이 읽힌다.
+ *
+ * 바퀴만 면으로 그린다. 6pt 도 안 되는 원을 획으로 그리면 가운데가 메워져 점처럼 보이고,
+ * 그 크기에서는 그냥 칠한 쪽이 또렷하다.
+ */
+export function CartIcon({ size = DEFAULT_SIZE, color }: IconProps) {
+  return (
+    <Svg fill="none" height={size} viewBox="0 0 24 24" width={size}>
+      <Circle cx={9} cy={21} fill={color} r={1} />
+      <Circle cx={20} cy={21} fill={color} r={1} />
+      <Path
+        d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"
+        stroke={color}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={STROKE_WIDTH}
+      />
+    </Svg>
+  );
+}
+
+/** 지우기·닫기. 장바구니에서 한 줄을 들어내는 단추가 쓴다. */
+export function CloseIcon({ size = DEFAULT_SIZE, color }: IconProps) {
+  return (
+    <Svg fill="none" height={size} viewBox="0 0 24 24" width={size}>
+      <Line
+        stroke={color}
+        strokeLinecap="round"
+        strokeWidth={STROKE_WIDTH}
+        x1={6}
+        x2={18}
+        y1={6}
+        y2={18}
+      />
+      <Line
+        stroke={color}
+        strokeLinecap="round"
+        strokeWidth={STROKE_WIDTH}
+        x1={18}
+        x2={6}
+        y1={6}
+        y2={18}
+      />
+    </Svg>
+  );
+}
