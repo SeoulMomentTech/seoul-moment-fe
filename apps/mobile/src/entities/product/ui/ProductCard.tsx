@@ -3,8 +3,18 @@ import { Text, View } from "react-native";
 
 import type { ProductItem } from "@shared/services/product";
 
+/**
+ * 카드가 실제로 읽는 다섯 칸. 상품 목록(ProductItem) 말고도 프로모션 상세의
+ * productList 처럼 색·좋아요 없이 오는 응답이 같은 카드를 쓰므로, 전체 ProductItem 을
+ * 요구하지 않는다. ProductItem 은 이 타입에 그대로 대입된다.
+ */
+export type ProductCardItem = Pick<
+  ProductItem,
+  "id" | "brandName" | "productName" | "price" | "image"
+>;
+
 interface ProductCardProps {
-  product: ProductItem;
+  product: ProductCardItem;
 }
 
 export function ProductCard({ product }: ProductCardProps) {
