@@ -4,6 +4,9 @@ import { View, useWindowDimensions, type DimensionValue } from "react-native";
 
 import { BUTTON_HEIGHT } from "@shared/ui/button";
 import { SECTION_GAP } from "@shared/ui/detail-section";
+import { STEPPER_HEIGHT, STEPPER_WIDTH } from "@shared/ui/quantity-stepper";
+
+import { Spacing } from "@/constants/theme";
 
 import { Shimmer } from "./Shimmer";
 
@@ -899,6 +902,93 @@ export function PreferencesSkeleton() {
         </SectionSkeleton>
       </View>
       <SubmitSkeleton />
+    </View>
+  );
+}
+
+// 장바구니 한 줄. 썸네일 96 + 위아래 12.
+// 글 묶음은 이름 body-2(19) + 4 + 메타 두 줄(2 x body-5 = 28) + 4 + 가격 body-2(19)
+// + 12 + 스테퍼(44) = 130 이라 여기서는 글이 줄 높이를 정한다 — 썸네일 96 은 그 안에 든다.
+// 메타 자리를 두 줄로 못 박은 이유는 둘째 줄(품절 · 남은 재고)이 줄마다 있다 없다 하기
+// 때문이다. 자리를 비워 두지 않으면 같은 목록의 줄 높이가 서로 달라진다.
+export const CART_THUMB_SIZE = 96;
+export const CART_META_HEIGHT = 2 * LINE_BODY_5;
+export const CART_BRAND_AVATAR_SIZE = 24;
+export const CART_ROW_HEIGHT =
+  LINE_BODY_2 +
+  4 +
+  CART_META_HEIGHT +
+  4 +
+  LINE_BODY_2 +
+  12 +
+  STEPPER_HEIGHT +
+  2 * 12;
+
+interface CartSkeletonProps {
+  /** 줄 수. 기본 3. */
+  count?: number;
+}
+
+/**
+ * 장바구니. 화면 제목과 그 아래 개수 줄은 데이터 없이도 그릴 수 있으므로 화면이 직접 그리고,
+ * 여기서는 브랜드 묶음 하나만 흉내 낸다 — 아직 브랜드가 몇이고 줄이 몇인지 모르기 때문이다.
+ * 금액 요약은 그리지 않는다. 숫자가 없는 요약은 뜻이 없고, 어차피 첫 화면 아래에 있다.
+ *
+ * 높이 = 40(섹션 간격) + 24(브랜드 줄) + 16 + count x 154. 기본 3줄이면 **542**.
+ */
+export function CartSkeleton({ count = 3 }: CartSkeletonProps) {
+  return (
+    <View style={{ paddingTop: Spacing.section }}>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          paddingHorizontal: PAGE_PADDING,
+          marginBottom: 16,
+        }}
+      >
+        <Shimmer
+          height={CART_BRAND_AVATAR_SIZE}
+          radius={CART_BRAND_AVATAR_SIZE / 2}
+          width={CART_BRAND_AVATAR_SIZE}
+        />
+        <View style={{ flex: 1, marginLeft: 8 }}>
+          <Line bar={BAR_TITLE_4} line={LINE_TITLE_4} width="45%" />
+        </View>
+      </View>
+      {Array.from({ length: count }, (_, i) => (
+        <View
+          key={i}
+          style={{
+            flexDirection: "row",
+            paddingHorizontal: PAGE_PADDING,
+            paddingVertical: 12,
+            height: CART_ROW_HEIGHT,
+          }}
+        >
+          <Shimmer
+            height={CART_THUMB_SIZE}
+            radius={IMAGE_RADIUS}
+            width={CART_THUMB_SIZE}
+          />
+          <View style={{ flex: 1, marginLeft: 12 }}>
+            <Line bar={BAR_BODY_2} line={LINE_BODY_2} width="80%" />
+            <View style={{ marginTop: 4, height: CART_META_HEIGHT }}>
+              <Line bar={BAR_BODY_5} line={LINE_BODY_5} width="45%" />
+            </View>
+            <View style={{ marginTop: 4 }}>
+              <Line bar={BAR_BODY_2} line={LINE_BODY_2} width="35%" />
+            </View>
+            <View style={{ marginTop: 12 }}>
+              <Shimmer
+                height={STEPPER_HEIGHT}
+                radius={STEPPER_HEIGHT / 2}
+                width={STEPPER_WIDTH}
+              />
+            </View>
+          </View>
+        </View>
+      ))}
     </View>
   );
 }
