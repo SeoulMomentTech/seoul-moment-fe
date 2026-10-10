@@ -19,6 +19,7 @@ import {
   DESCRIPTION_LINES,
   LOGO_HEIGHT,
   NOTICE_LINES,
+  SHARE_BUTTON_SIZE,
 } from "./BrandIntroduction";
 import { LOOKBOOK_GAP } from "./BrandLookbook";
 import { POPUP_IMAGE_HEIGHT, POPUP_INFO_HEIGHT } from "./BrandOfflinePopup";
@@ -78,7 +79,15 @@ function IntroSkeleton() {
       className="bg-surface-muted"
       style={{ paddingHorizontal: PAGE_PADDING, paddingVertical: 24 }}
     >
-      <Shimmer height={LOGO_HEIGHT} width={140} />
+      {/* 로고와 공유 단추가 한 줄이다. 줄 높이는 둘 중 큰 로고(48)가 정한다. */}
+      <View className="flex-row items-start justify-between">
+        <Shimmer height={LOGO_HEIGHT} width={140} />
+        <Shimmer
+          height={SHARE_BUTTON_SIZE}
+          radius={SHARE_BUTTON_SIZE / 2}
+          width={SHARE_BUTTON_SIZE}
+        />
+      </View>
       <View style={{ marginTop: 16 }}>
         <Line bar={BAR_TITLE_3} line={LINE_TITLE_3} width="50%" />
       </View>

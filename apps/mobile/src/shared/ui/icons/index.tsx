@@ -200,3 +200,35 @@ export function CloseIcon({ size = DEFAULT_SIZE, color }: IconProps) {
     </Svg>
   );
 }
+
+/**
+ * 내보내기. 웹이 쓰는 lucide Share2 와 같은 그림이다 — 점 셋을 선 둘이 잇는다.
+ * iOS 의 사각형+화살표 대신 이 그림을 쓰는 것은 안드로이드에서도 같게 보이기 위해서다.
+ */
+export function ShareIcon({ size = DEFAULT_SIZE, color }: IconProps) {
+  return (
+    <Svg fill="none" height={size} viewBox="0 0 24 24" width={size}>
+      <Circle cx={18} cy={5} r={3} stroke={color} strokeWidth={STROKE_WIDTH} />
+      <Circle cx={6} cy={12} r={3} stroke={color} strokeWidth={STROKE_WIDTH} />
+      <Circle cx={18} cy={19} r={3} stroke={color} strokeWidth={STROKE_WIDTH} />
+      <Line
+        stroke={color}
+        strokeLinecap="round"
+        strokeWidth={STROKE_WIDTH}
+        x1={8.59}
+        x2={15.42}
+        y1={13.51}
+        y2={17.49}
+      />
+      <Line
+        stroke={color}
+        strokeLinecap="round"
+        strokeWidth={STROKE_WIDTH}
+        x1={15.41}
+        x2={8.59}
+        y1={6.51}
+        y2={10.49}
+      />
+    </Svg>
+  );
+}
