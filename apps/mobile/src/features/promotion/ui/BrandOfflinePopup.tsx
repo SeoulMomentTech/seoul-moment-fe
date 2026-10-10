@@ -27,9 +27,15 @@ const ROW_GAP = Spacing.tight;
 const ADDRESS_LINES = 2;
 const DESCRIPTION_LINES = 4;
 const DESCRIPTION_LINE_HEIGHT = 22;
+/**
+ * 정보 블록 아래 여백. Section(plain)은 위 간격만 쥐고 아래는 비워 두는 것이 원칙이라,
+ * 지도 버튼이 섹션의 맨 끝 줄이면 바로 뒤 공지 띠의 회색이 버튼에 붙는다.
+ * 이 블록만 자기 아래를 챙긴다.
+ */
+const INFO_BOTTOM_GAP = Spacing.inner;
 
 /**
- * 제목 + 네 줄 + 설명 + 지도 버튼. 스켈레톤이 같은 값을 쓴다.
+ * 제목 + 네 줄 + 설명 + 지도 버튼 + 아래 여백. 스켈레톤이 같은 값을 쓴다.
  *
  * 좌표가 없는 팝업은 지도 버튼이 없어 56pt 만큼 짧아진다. dev 의 팝업에는 좌표가 다 있고,
  * 블록이 짧아지는 쪽은 스켈레톤이 남긴 자리를 덜 쓰는 것이라 아래가 겹치지는 않는다.
@@ -43,7 +49,8 @@ export const POPUP_INFO_HEIGHT =
   8 +
   DESCRIPTION_LINE_HEIGHT * DESCRIPTION_LINES +
   ROW_GAP +
-  BUTTON_HEIGHT.md;
+  BUTTON_HEIGHT.md +
+  INFO_BOTTOM_GAP;
 
 /** 좌표는 문자열로 온다("37.5826"). 숫자가 아닌 값이 오면 지도를 열지 않는다. */
 const COORDINATE = /^-?\d+(?:\.\d+)?$/;
@@ -171,7 +178,10 @@ export function BrandOfflinePopup({
           )}
         />
       </View>
-      <View className="px-5" style={{ marginTop: Spacing.inner }}>
+      <View
+        className="px-5"
+        style={{ marginTop: Spacing.inner, paddingBottom: INFO_BOTTOM_GAP }}
+      >
         <Text
           className="text-body-2 text-foreground font-bold"
           numberOfLines={1}
