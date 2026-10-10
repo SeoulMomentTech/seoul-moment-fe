@@ -109,8 +109,11 @@ function IntroSkeleton() {
 
 /**
  * 룩북. 묶음 수와 종류는 응답을 받기 전에는 알 수 없어서, 웹 로딩 화면과 같이
- * TYPE_1 한 장 + TYPE_2 두 장을 대표로 둔다.
- * 높이 = 40 + 540 + 40 + 2x218 + 40 = **1096**.
+ * TYPE_1 한 장 + TYPE_2 한 줄(두 장이 나란히)을 대표로 둔다.
+ * 높이 = 40 + 540 + 40 + 218 + 40 = **878**.
+ *
+ * 실제 묶음이 다섯이면 화면이 그만큼 늘어난다. 장수도 종류도 응답에 달려 있어
+ * 어떤 숫자를 적어도 틀리는 자리라, 맞추는 대신 "사진이 온다"는 것만 보여 준다.
  */
 function LookbookSkeleton() {
   return (
@@ -120,9 +123,14 @@ function LookbookSkeleton() {
     >
       <View style={{ gap: LOOKBOOK_GAP }}>
         <Shimmer height={540} radius={0} />
-        <View>
-          <Shimmer height={218} radius={0} />
-          <Shimmer height={218} radius={0} />
+        {/* TYPE_2 는 웹과 같이 두 장이 한 줄에 나란히 선다. */}
+        <View className="flex-row">
+          <View style={{ flex: 1 }}>
+            <Shimmer height={218} radius={0} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Shimmer height={218} radius={0} />
+          </View>
         </View>
       </View>
     </View>
