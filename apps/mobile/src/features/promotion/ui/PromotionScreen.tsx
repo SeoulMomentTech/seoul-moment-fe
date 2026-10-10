@@ -142,7 +142,9 @@ export function PromotionScreen({ promotionId }: { promotionId: number }) {
       return <PromotionBodySkeleton bottomInset={insets.bottom} />;
     }
 
-    if (detailQuery.isError || !detail) {
+    // activeId 는 상세가 있으면 반드시 있다(없으면 쿼리가 enabled=false 로 idle 이다).
+    // 타입을 좁히려고 여기 함께 둔다.
+    if (detailQuery.isError || !detail || activeId === undefined) {
       return (
         <View style={{ paddingTop: Spacing.section }}>
           <SectionError onRetry={() => void detailQuery.refetch()} />
@@ -155,7 +157,11 @@ export function PromotionScreen({ promotionId }: { promotionId: number }) {
     // 온라인 쿠폰 · 공지 · 브랜드 띠. 전에는 쿠폰이 팝업보다 위에 있었다.
     return (
       <>
-        <BrandIntroduction brand={detail.brand} />
+        <BrandIntroduction
+          brand={detail.brand}
+          brandPromotionId={activeId}
+          promotionId={promotionId}
+        />
         <BrandLookbook sectionList={detail.sectionList} />
         <ProductGrid
           heading={PRODUCTS_HEADING}
