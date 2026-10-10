@@ -1,11 +1,10 @@
 import { useRouter } from "expo-router";
 import { FlatList } from "react-native";
 
-import type { ProductItem } from "@shared/services/product";
 import { Touchable } from "@shared/ui/press";
 import { Section } from "@shared/ui/section";
 
-import { ProductCard } from "./ProductCard";
+import { ProductCard, type ProductCardItem } from "./ProductCard";
 
 export const CAROUSEL_CARD_WIDTH = 150;
 export const CAROUSEL_GAP = 12;
@@ -13,7 +12,7 @@ const PAGE_PADDING = 20;
 
 interface ProductCarouselProps {
   heading: string;
-  items: ProductItem[];
+  items: ProductCardItem[];
 }
 
 /**
