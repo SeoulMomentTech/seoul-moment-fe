@@ -1,7 +1,11 @@
+import type { PropsWithChildren } from "react";
+
 import { Image } from "expo-image";
+import { useRouter } from "expo-router";
 import { Dimensions, FlatList, Text, View } from "react-native";
 
 import type { HomePromotion } from "@shared/services/home";
+import { Touchable } from "@shared/ui/press";
 import { Section } from "@shared/ui/section";
 import { SectionError } from "@shared/ui/section-state";
 import { HeroCardSkeleton } from "@shared/ui/skeleton";
@@ -81,9 +85,33 @@ export function PromotionSection() {
   );
 }
 
+/**
+ * 카드 전체가 프로모션 상세로 가는 문이다. 면적 대부분이 사진이라 리플 대신
+ * 얕은 투명도(feedback="card")를 쓴다 — 상품 카드와 같은 결이다.
+ */
+function PromotionLink({
+  promotion,
+  children,
+  width,
+}: PropsWithChildren<{ promotion: HomePromotion; width?: number }>) {
+  const router = useRouter();
+
+  return (
+    <Touchable
+      accessibilityLabel={promotion.title}
+      accessibilityRole="button"
+      feedback="card"
+      onPress={() => router.push(`/promotion/${promotion.promotionId}`)}
+      style={width === undefined ? undefined : { width }}
+    >
+      {children}
+    </Touchable>
+  );
+}
+
 function PromotionHero({ promotion }: { promotion: HomePromotion }) {
   return (
-    <View>
+    <PromotionLink promotion={promotion}>
       <Image
         contentFit="cover"
         source={promotion.imageUrl}
@@ -101,13 +129,13 @@ function PromotionHero({ promotion }: { promotion: HomePromotion }) {
       <Text className="text-body-3 text-neutral mt-1" numberOfLines={2}>
         {promotion.description}
       </Text>
-    </View>
+    </PromotionLink>
   );
 }
 
 function PromotionCard({ promotion }: { promotion: HomePromotion }) {
   return (
-    <View style={{ width: CARD_WIDTH }}>
+    <PromotionLink promotion={promotion} width={CARD_WIDTH}>
       <Image
         contentFit="cover"
         source={promotion.imageUrl}
@@ -123,6 +151,6 @@ function PromotionCard({ promotion }: { promotion: HomePromotion }) {
       <Text className="text-body-3 text-neutral mt-1" numberOfLines={2}>
         {promotion.description}
       </Text>
-    </View>
+    </PromotionLink>
   );
 }
