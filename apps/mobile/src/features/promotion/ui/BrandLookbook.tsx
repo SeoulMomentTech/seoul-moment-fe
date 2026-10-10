@@ -40,8 +40,9 @@ const isKnownType = (type: string): type is BrandSectionType =>
   type in SECTION_IMAGE_HEIGHT;
 
 /**
- * 룩북 묶음 하나. 세 종류 모두 "전체 폭 이미지를 위에서 아래로 쌓는다"는 점은 같고
- * 한 장의 높이와 장수만 다르다 — 폰에서는 가로로 나란히 세우면 한 장이 97pt 로 쪼그라든다.
+ * 룩북 묶음 하나. 여러 장인 종류(TYPE_2 둘, TYPE_3 넷)는 웹과 같이 가로로 나란히 세운다 —
+ * 웹의 HStack 은 폰에서도 행을 유지하고 gap 만 0 으로 줄인다. 그래서 TYPE_3 의 한 장은
+ * 폰에서 화면 폭의 1/4 이 되는데, 높이 120 과 함께 보면 그것이 의도된 띠 모양이다.
  */
 function LookbookGroup({ section }: { section: BrandPromotionSection }) {
   // 모르는 종류는 아무것도 그리지 않는다(웹 SwitchCase 의 defaultComponent={null} 과 같다).
@@ -53,7 +54,8 @@ function LookbookGroup({ section }: { section: BrandPromotionSection }) {
   if (uris.length === 0) return null;
 
   return (
-    <View>
+    // 한 장짜리도 같은 행에 담는다 — flex-1 이 한 칸이면 폭 전체가 되어 결과가 같다.
+    <View className="flex-row">
       {uris.map((uri, index) => (
         <Image
           contentFit="cover"
@@ -61,7 +63,8 @@ function LookbookGroup({ section }: { section: BrandPromotionSection }) {
           // eslint-disable-next-line react/no-array-index-key
           key={`${index}-${uri}`}
           source={uri}
-          style={{ width: "100%", height: SECTION_IMAGE_HEIGHT[section.type] }}
+          // 웹의 flex-1 과 같다. 장수로 나눈 폭을 각자 가진다.
+          style={{ flex: 1, height: SECTION_IMAGE_HEIGHT[section.type] }}
           transition={200}
         />
       ))}
