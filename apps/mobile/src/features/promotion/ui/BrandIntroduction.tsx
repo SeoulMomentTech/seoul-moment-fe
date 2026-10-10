@@ -2,6 +2,7 @@ import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { Text, View } from "react-native";
 
+import { useOpenBrandShop } from "@features/shop/model/useOpenBrandShop";
 import type { BrandPromotionBrandDetail } from "@shared/services/brandPromotion";
 import { Button } from "@shared/ui/button";
 
@@ -39,6 +40,7 @@ interface BrandIntroductionProps {
  */
 export function BrandIntroduction({ brand }: BrandIntroductionProps) {
   const router = useRouter();
+  const openBrandShop = useOpenBrandShop();
 
   return (
     <View className="bg-surface-muted px-5 pb-6 pt-6">
@@ -79,14 +81,27 @@ export function BrandIntroduction({ brand }: BrandIntroductionProps) {
       >
         {BRAND_NOTICE}
       </Text>
-      <Button
-        accessibilityLabel={`View ${brand.name} brand page`}
-        className="mt-4"
-        label="View brand page"
-        onPress={() => router.push(`/brand/${brand.id}`)}
-        size="md"
-        variant="secondary"
-      />
+      {/* 웹과 같은 두 갈래다 — 브랜드를 더 보거나(Brand), 그 브랜드 상품을 사거나(Shop).
+          글자도 웹의 promotion_brand / shop 을 그대로 쓰고, 무엇으로 가는지는
+          낭독기가 읽는 이름에 풀어 둔다. */}
+      <View className="mt-4 flex-row" style={{ gap: Spacing.tight }}>
+        <Button
+          accessibilityLabel={`View ${brand.name} brand page`}
+          className="flex-1"
+          label="Brand"
+          onPress={() => router.push(`/brand/${brand.id}`)}
+          size="md"
+          variant="secondary"
+        />
+        <Button
+          accessibilityLabel={`Shop ${brand.name} products`}
+          className="flex-1"
+          label="Shop"
+          onPress={() => openBrandShop(brand.id)}
+          size="md"
+          variant="secondary"
+        />
+      </View>
     </View>
   );
 }
