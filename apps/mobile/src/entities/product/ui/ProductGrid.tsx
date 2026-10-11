@@ -4,13 +4,13 @@ import { View, useWindowDimensions } from "react-native";
 import { Touchable } from "@shared/ui/press";
 import { Section } from "@shared/ui/section";
 
-import { Spacing } from "@/constants/theme";
+import { CardRow, Spacing } from "@/constants/theme";
 
 import { ProductCard, type ProductCardItem } from "./ProductCard";
 
-const PAGE_PADDING = 20;
+const PAGE_PADDING = CardRow.padding;
 /** 열 사이. 칸 폭을 구하는 식이 shapes.tsx 의 variant="shop" 과 같아야 한다. */
-export const GRID_COLUMN_GAP = 12;
+export const GRID_COLUMN_GAP = CardRow.gap;
 /** 행 사이. 카드 밑에 글이 세 줄 붙어 있어 열 간격보다 넓어야 행이 갈린다. */
 export const GRID_ROW_GAP = Spacing.inner;
 

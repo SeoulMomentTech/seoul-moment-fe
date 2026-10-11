@@ -10,6 +10,8 @@ import { Section } from "@shared/ui/section";
 import { SectionError } from "@shared/ui/section-state";
 import { HeroCardSkeleton } from "@shared/ui/skeleton";
 
+import { CardRow } from "@/constants/theme";
+
 import { useHomePromotion } from "../model/useHomePrime";
 
 const HERO_HEIGHT = 200;
@@ -71,7 +73,10 @@ export function PromotionSection() {
         </View>
       ) : (
         <FlatList
-          contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
+          contentContainerStyle={{
+            paddingHorizontal: CardRow.padding,
+            gap: CardRow.gap,
+          }}
           data={promotions}
           horizontal
           keyExtractor={(item) => String(item.promotionId)}

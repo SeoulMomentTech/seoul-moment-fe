@@ -7,7 +7,7 @@ import type {
 } from "@shared/services/brandPromotion";
 import { Section } from "@shared/ui/section";
 
-import { Spacing } from "@/constants/theme";
+import { CardRow, Spacing } from "@/constants/theme";
 
 const CARD_WIDTH = 280;
 const COUPON_IMAGE_HEIGHT = 200;
@@ -74,7 +74,10 @@ export function BrandOnlineEvent({
       {events.map((event) => (
         <Section key={event.id} title={event.title}>
           <FlatList
-            contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
+            contentContainerStyle={{
+              paddingHorizontal: CardRow.padding,
+              gap: CardRow.gap,
+            }}
             data={event.couponList}
             horizontal
             keyExtractor={(coupon) => String(coupon.id)}
