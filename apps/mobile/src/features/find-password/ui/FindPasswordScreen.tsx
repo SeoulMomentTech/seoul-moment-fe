@@ -13,11 +13,12 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { AuthField } from "@features/auth/ui/AuthField";
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { passwordMeetsRules } from "@shared/lib/utils/password";
 import { toTaiwanPhoneNumber } from "@shared/lib/utils/phone";
 import { Button } from "@shared/ui/button";
 import { Chip, CHIP_GAP } from "@shared/ui/chip";
-import { CODE_SENT_MESSAGE, FieldNote, ResendRow } from "@shared/ui/field-note";
+import { FieldNote, ResendRow } from "@shared/ui/field-note";
 import {
   PASSWORD_CHECKLIST_TOP,
   PasswordChecklist,
@@ -61,6 +62,7 @@ const statusOf = (error: unknown) =>
  * 일회용 토큰은 Authorization 을 직접 세워 보내므로 로그인 세션과 섞이지 않는다.
  */
 export function FindPasswordScreen() {
+  const t = useTranslations();
   const insets = useSafeAreaInsets();
   const router = useRouter();
 
@@ -170,7 +172,7 @@ export function FindPasswordScreen() {
           style={{ height: HeaderHeight }}
         >
           <Touchable
-            accessibilityLabel="Go back"
+            accessibilityLabel={t("back")}
             accessibilityRole="button"
             hitSlop={14}
             onPress={goToLogin}
@@ -196,17 +198,17 @@ export function FindPasswordScreen() {
             className="text-title-3 text-foreground text-center font-bold"
             style={{ paddingTop: Spacing.inner }}
           >
-            Forgot Password?
+            {t("forgot_password_1")}
           </Text>
           <Text
             className="text-body-3 text-neutral text-center"
             style={{ marginTop: Spacing.tight }}
           >
             {done
-              ? "You can sign in with your new password."
+              ? t("sign_in_with_new_password")
               : token
-                ? "Choose a new password for your account."
-                : "Don't worry! We'll help you reset your password."}
+                ? t("choose_new_password")
+                : t("find_password_intro")}
           </Text>
 
           {done ? (
@@ -314,6 +316,8 @@ function VerifyStep({
   onRequestCode,
   onSubmitCode,
 }: VerifyStepProps) {
+  const t = useTranslations();
+
   return (
     <>
       {/* 웹은 밑줄 탭으로 가르지만, 이 앱에서 "둘 중 하나 고르기"의 생김새는 칩 하나뿐이다.
@@ -323,12 +327,12 @@ function VerifyStep({
         style={{ marginTop: Spacing.section, gap: CHIP_GAP }}
       >
         <Chip
-          label="Email"
+          label={t("email")}
           onPress={() => onChangeMethod("email")}
           selected={method === "email"}
         />
         <Chip
-          label="Mobile Number"
+          label={t("mobile_number")}
           onPress={() => onChangeMethod("phone")}
           selected={method === "phone"}
         />
@@ -338,9 +342,7 @@ function VerifyStep({
         className="text-body-3 text-neutral text-center"
         style={{ marginTop: Spacing.inner }}
       >
-        {method === "email"
-          ? "Please enter the email address you used when signing up."
-          : "Please enter the mobile number you used when signing up."}
+        {method === "email" ? t("enter_signup_email") : t("enter_signup_phone")}
       </Text>
 
       <View style={{ marginTop: Spacing.inner, gap: Spacing.tight }}>
@@ -348,7 +350,7 @@ function VerifyStep({
           autoComplete={method === "email" ? "email" : undefined}
           keyboardType={method === "email" ? "email-address" : "number-pad"}
           onChangeText={onChangeAccount}
-          placeholder={method === "email" ? "Email" : "Mobile number"}
+          placeholder={method === "email" ? t("email") : t("mobile_number")}
           value={account}
         />
 
@@ -362,7 +364,7 @@ function VerifyStep({
               onChangeText={onChangeCode}
               onComplete={onSubmitCode}
               otp={method === "email" ? "email" : "sms"}
-              placeholder="Verification Code"
+              placeholder={t("verification_code")}
               value={code}
             />
           </View>
@@ -371,7 +373,7 @@ function VerifyStep({
             // 버튼 하나가 발송과 검증을 번갈아 맡으면 코드가 안 왔을 때 길이 사라진다.
             <Button
               disabled={code.trim().length === 0 || busyVerifying}
-              label="Verify"
+              label={t("verify")}
               // 인자 없이 부른다 — Pressable 은 제스처 이벤트를 넘기는데,
               // 그것이 코드 값 자리에 들어오면 trim() 에서 터진다.
               onPress={() => onSubmitCode()}
@@ -381,7 +383,7 @@ function VerifyStep({
           ) : (
             <Button
               disabled={!accountLooksReady || busySending}
-              label="Send Code"
+              label={t("send_verification_code")}
               onPress={onRequestCode}
               style={{ width: SIDE_BUTTON_WIDTH }}
               variant="secondary"
@@ -424,6 +426,8 @@ function VerifyNote({
   busy: boolean;
   onResend(): void;
 }) {
+  const t = useTranslations();
+
   if (sendFailed) {
     // 보내지 못했으면 다시 보내기 줄을 두지 않는다 — 옆 버튼이 아직 "Send Code" 다.
     return (
@@ -431,9 +435,9 @@ function VerifyNote({
         <FieldNote error>
           {sendStatus === 404
             ? method === "email"
-              ? "We couldn't find an account with that email."
-              : "We couldn't find an account with that number."
-            : "We couldn't send the code. Please try again."}
+              ? t("account_not_found_email")
+              : t("account_not_found_phone")
+            : t("code_send_failed")}
         </FieldNote>
       </View>
     );
@@ -442,9 +446,7 @@ function VerifyNote({
   if (verifyFailed) {
     return (
       <View style={{ marginTop: Spacing.tight, gap: Spacing.tight }}>
-        <FieldNote error>
-          The verification code does not match, or it has expired.
-        </FieldNote>
+        <FieldNote error>{t("code_not_match")}</FieldNote>
         <ResendRow busy={busy} onResend={onResend} secondsLeft={resendIn} />
       </View>
     );
@@ -455,7 +457,7 @@ function VerifyNote({
       <View style={{ marginTop: Spacing.tight }}>
         <ResendRow
           busy={busy}
-          message={CODE_SENT_MESSAGE}
+          message={t("verification_code_sent")}
           onResend={onResend}
           secondsLeft={resendIn}
         />
@@ -488,6 +490,7 @@ function ResetStep({
   onSubmit(): void;
   onRestart(): void;
 }) {
+  const t = useTranslations();
   const matches = password.length > 0 && password === passwordConfirm;
   const canSubmit = passwordMeetsRules(password) && matches && !busy;
 
@@ -497,14 +500,14 @@ function ResetStep({
         <AuthField
           autoComplete="new-password"
           onChangeText={onChangePassword}
-          placeholder="Enter Password"
+          placeholder={t("enter_password_input")}
           secureTextEntry
           value={password}
         />
         <AuthField
           autoComplete="new-password"
           onChangeText={onChangeConfirm}
-          placeholder="Re-enter Password"
+          placeholder={t("re_enter_password_input")}
           secureTextEntry
           value={passwordConfirm}
         />
@@ -516,29 +519,25 @@ function ResetStep({
 
       <View style={{ marginTop: Spacing.tight }}>
         {expired ? (
-          <FieldNote error>
-            This reset link has expired. Please verify your account again.
-          </FieldNote>
+          <FieldNote error>{t("reset_link_expired")}</FieldNote>
         ) : failed ? (
-          <FieldNote error>
-            We couldn&apos;t change your password. Please try again.
-          </FieldNote>
+          <FieldNote error>{t("password_change_failed")}</FieldNote>
         ) : password.length > 0 && !matches ? (
-          <FieldNote>The two passwords don&apos;t match.</FieldNote>
+          <FieldNote>{t("password_mismatch")}</FieldNote>
         ) : null}
       </View>
 
       {expired ? (
         <Button
-          label="Start over"
+          label={t("start_over")}
           onPress={onRestart}
           style={{ marginTop: Spacing.tight }}
         />
       ) : (
         <Button
-          accessibilityLabel="Change password"
+          accessibilityLabel={t("change_password")}
           disabled={!canSubmit}
-          label={busy ? "Saving…" : "Change password"}
+          label={busy ? t("saving") : t("change_password")}
           onPress={onSubmit}
           style={{ marginTop: Spacing.tight }}
         />
@@ -551,13 +550,15 @@ function ResetStep({
  * 끝. 바뀌었다고 말하고 끝낸다 — 말없이 화면을 닫으면 바뀐 것인지 취소된 것인지 알 수 없다.
  */
 function DoneStep({ onSignIn }: { onSignIn(): void }) {
+  const t = useTranslations();
+
   return (
     <View style={{ marginTop: Spacing.section }}>
       <Text className="text-body-2 text-foreground text-center font-bold">
-        Your password has been changed.
+        {t("password_changed")}
       </Text>
       <Button
-        label="Sign in"
+        label={t("login")}
         onPress={onSignIn}
         style={{ marginTop: Spacing.inner }}
       />

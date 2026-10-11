@@ -1,10 +1,11 @@
+import type { MessageKey } from "@shared/lib/i18n/translate";
 import type { UpdateUserProfileReq, UserProfile } from "@shared/services/user";
-import type { ChipOption } from "@shared/ui/chip-row";
 
-export const GENDER_OPTIONS: ChipOption[] = [
-  { value: "MALE", label: "Male" },
-  { value: "FEMALE", label: "Female" },
-  { value: "OTHER", label: "Other / Prefer not to say" },
+/** 글자가 아니라 언어팩 키를 들고 있다 — 이 목록은 화면 밖이라 여기서 번역할 수 없다. */
+export const GENDER_OPTIONS: { value: string; labelKey: MessageKey }[] = [
+  { value: "MALE", labelKey: "male" },
+  { value: "FEMALE", labelKey: "female" },
+  { value: "OTHER", labelKey: "other" },
 ];
 
 /** 닉네임 규칙은 가입 화면과 같다. 자세한 판정은 서버가 한다. */

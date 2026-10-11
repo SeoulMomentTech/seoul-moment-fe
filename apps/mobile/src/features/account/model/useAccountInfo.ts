@@ -3,6 +3,7 @@ import type { HTTPError } from "ky";
 import { userInfoKey } from "@entities/user/model/keys";
 import { useUserAuthStore } from "@shared/lib/auth/useUserAuthStore";
 import useAppMutation from "@shared/lib/hooks/query/useAppMutation";
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import type { VerifyPhoneCodePayload } from "@shared/services/auth";
 import { postInfoPhoneCode, postInfoPhoneVerify } from "@shared/services/auth";
 import type { UpdateUserInfoReq } from "@shared/services/user";
@@ -31,13 +32,14 @@ const useRefetchUserInfo = () => {
 
 /** 수신 동의 저장. 이메일은 바꿀 수 없고 전화번호는 인증이 따로 세운다. */
 export const useUpdateUserInfo = () => {
+  const t = useTranslations();
   const refetch = useRefetchUserInfo();
 
   return useAppMutation<unknown, HTTPError, UpdateUserInfoReq>({
     mutationFn: updateUserInfo,
     onSuccess: () => {
       void refetch();
-      showToast("Your changes have been saved.");
+      showToast(t("changes_saved"));
     },
   });
 };
@@ -51,13 +53,14 @@ export const useSendPhoneCode = () =>
  * 401 은 코드가 만료됐거나 틀렸다는 뜻이다.
  */
 export const useVerifyPhoneCode = () => {
+  const t = useTranslations();
   const refetch = useRefetchUserInfo();
 
   return useAppMutation<unknown, HTTPError, VerifyPhoneCodePayload>({
     mutationFn: postInfoPhoneVerify,
     onSuccess: () => {
       void refetch();
-      showToast("Your changes have been saved.");
+      showToast(t("changes_saved"));
     },
   });
 };

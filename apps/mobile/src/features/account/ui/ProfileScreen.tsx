@@ -6,7 +6,9 @@ import { Text, View } from "react-native";
 import { useUserProfile } from "@entities/user/model/useUserProfile";
 import { AuthField } from "@features/auth/ui/AuthField";
 import { useUserAuthStore } from "@shared/lib/auth/useUserAuthStore";
+import type { MessageKey } from "@shared/lib/i18n/translate";
 import { useLanguage } from "@shared/lib/i18n/useLanguage";
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { getCityOptions, getDistrictOptions } from "@shared/lib/regions";
 import type { UserProfile } from "@shared/services/user";
 import { ChipRow } from "@shared/ui/chip-row";
@@ -37,12 +39,12 @@ import {
 } from "../lib/profile";
 import { type ProfileSaveStep, useSaveProfile } from "../model/useSaveProfile";
 
-const FAILURE_MESSAGE: Record<ProfileSaveStep, string> = {
-  "nickname-taken": "That nickname is taken. Try another.",
-  nickname: "We couldn't save your nickname. Please try again.",
+const FAILURE_MESSAGE: Record<ProfileSaveStep, MessageKey> = {
+  "nickname-taken": "nickname_taken",
+  nickname: "save_nickname_failed",
   // 닉네임은 이미 저장된 뒤라, 다시 누르면 남은 것만 다시 보낸다.
-  name: "We couldn't save your name. Please try again.",
-  profile: "We couldn't save your details. Please try again.",
+  name: "save_name_failed",
+  profile: "save_details_failed",
 };
 
 /**
@@ -53,6 +55,7 @@ const FAILURE_MESSAGE: Record<ProfileSaveStep, string> = {
  * 그것은 의존성을 하나 더 들이는 결정이라 이 화면이 혼자 내릴 일이 아니다.
  */
 export function ProfileScreen() {
+  const t = useTranslations();
   const isAuthenticated = useUserAuthStore((s) => s.isAuthenticated);
   const profile = useUserProfile();
 
@@ -61,8 +64,8 @@ export function ProfileScreen() {
     return (
       <AccountShell>
         <EmptyState
-          hint="Sign in from the My tab to manage your profile."
-          message="You're signed out"
+          hint={t("sign_in_from_my_profile")}
+          message={t("signed_out")}
         />
       </AccountShell>
     );
@@ -80,7 +83,7 @@ export function ProfileScreen() {
   if (profile.isPending) {
     return (
       <AccountShell>
-        <AccountBody title="Manage profile">
+        <AccountBody title={t("profile_settings")}>
           <ProfileFormSkeleton />
         </AccountBody>
       </AccountShell>
@@ -97,7 +100,7 @@ export function ProfileScreen() {
 
   return (
     <AccountShell>
-      <AccountBody title="Manage profile">
+      <AccountBody title={t("profile_settings")}>
         <ProfileForm profile={profile.data} />
       </AccountBody>
     </AccountShell>
@@ -105,6 +108,11 @@ export function ProfileScreen() {
 }
 
 function ProfileForm({ profile }: { profile: UserProfile }) {
+  const t = useTranslations();
+  const genderOptions = GENDER_OPTIONS.map(({ value, labelKey }) => ({
+    value,
+    label: t(labelKey),
+  }));
   const locale = useLanguage();
   const save = useSaveProfile();
 
@@ -148,12 +156,12 @@ function ProfileForm({ profile }: { profile: UserProfile }) {
    */
   const blocker =
     nicknameChanged && !NICKNAME_RULE.test(nickname)
-      ? "Your nickname can be 2-20 letters and numbers."
+      ? t("nickname_rule_hint")
       : nameChanged && name === ""
-        ? "Enter your name."
+        ? t("enter_name_required")
         : nicknameChanged || nameChanged || restChanged
           ? null
-          : "Change something to save.";
+          : t("change_something_to_save");
 
   const submit = () =>
     save.mutate({
@@ -168,36 +176,36 @@ function ProfileForm({ profile }: { profile: UserProfile }) {
 
       <View style={{ marginTop: Spacing.section }}>
         <FormSections>
-          <FormSection title="Personal Information">
-            <Field label="Nickname">
+          <FormSection title={t("personal_info")}>
+            <Field label={t("nickname")}>
               <AuthField
                 maxLength={NICKNAME_MAX_LENGTH}
                 onChangeText={(value) => edit({ nickname: value })}
-                placeholder="Use only letters and numbers (2–20 characters)."
+                placeholder={t("allowed_input")}
                 value={values.nickname}
               />
             </Field>
 
-            <Field label="Name">
+            <Field label={t("name")}>
               <AuthField
                 onChangeText={(value) => edit({ name: value })}
-                placeholder="Enter your name"
+                placeholder={t("input_name")}
                 value={values.name}
               />
             </Field>
 
-            <Field label="Gender">
+            <Field label={t("gender")}>
               <ChipRow
-                accessibilityLabel="Gender"
+                accessibilityLabel={t("gender")}
                 onChange={(next) =>
                   edit({ gender: next as UserProfile["gender"] | undefined })
                 }
-                options={GENDER_OPTIONS}
+                options={genderOptions}
                 value={values.gender}
               />
             </Field>
 
-            <Field label="Date of Birth">
+            <Field label={t("date_of_birth")}>
               {/*
                 web 은 연·월·일을 각각 선택 상자로 받는다. 폰에서는 한 번에 고르는
                 네이티브 피커가 낫다 — 2월 31일 같은 날이 아예 나오지 않아
@@ -205,13 +213,13 @@ function ProfileForm({ profile }: { profile: UserProfile }) {
               */}
               <DateField
                 onChange={(next) => edit({ birthDate: next })}
-                placeholder="Select your date of birth"
-                title="Date of Birth"
+                placeholder={t("select_date_of_birth")}
+                title={t("date_of_birth")}
                 value={values.birthDate}
               />
             </Field>
 
-            <Field label="Region">
+            <Field label={t("region")}>
               <View style={{ gap: Spacing.tight }}>
                 <AuthField
                   keyboardType="number-pad"
@@ -221,7 +229,7 @@ function ProfileForm({ profile }: { profile: UserProfile }) {
                       postalCode: digitsOnly(value, POSTAL_CODE_MAX_LENGTH),
                     })
                   }
-                  placeholder="Postal Code"
+                  placeholder={t("postal_code")}
                   value={values.postalCode}
                 />
                 <SelectField
@@ -230,21 +238,21 @@ function ProfileForm({ profile }: { profile: UserProfile }) {
                     edit({ city: next, district: undefined })
                   }
                   options={cityOptions}
-                  placeholder="City"
-                  title="City"
+                  placeholder={t("city")}
+                  title={t("city")}
                   value={values.city}
                 />
                 <SelectField
                   disabled={!values.city}
                   onChange={(next) => edit({ district: next })}
                   options={districtOptions}
-                  placeholder="District"
-                  title="District"
+                  placeholder={t("district")}
+                  title={t("district")}
                   value={values.district}
                 />
                 <AuthField
                   onChangeText={(value) => edit({ detailAddress: value })}
-                  placeholder="Detailed Address"
+                  placeholder={t("detail_address")}
                   value={values.detailAddress}
                 />
               </View>
@@ -256,9 +264,9 @@ function ProfileForm({ profile }: { profile: UserProfile }) {
       <SubmitBar
         blocker={blocker}
         busy={save.isPending}
-        busyLabel="Saving…"
-        failure={save.error ? FAILURE_MESSAGE[save.error.step] : null}
-        label="Save Changes"
+        busyLabel={t("saving")}
+        failure={save.error ? t(FAILURE_MESSAGE[save.error.step]) : null}
+        label={t("save_changes")}
         onPress={submit}
       />
     </>
@@ -271,10 +279,12 @@ function ProfileForm({ profile }: { profile: UserProfile }) {
  * 보이게 두느니, 어디서 바꿀 수 있는지 한 줄로 말한다.
  */
 function PhotoBlock({ uri, nickname }: { uri?: string; nickname: string }) {
+  const t = useTranslations();
+
   return (
     <View>
       <View
-        accessibilityLabel={`${nickname}'s profile photo`}
+        accessibilityLabel={t("profile_photo_of", { name: nickname })}
         className="bg-surface-muted overflow-hidden"
         style={{
           width: MY_AVATAR_SIZE,
@@ -295,7 +305,7 @@ function PhotoBlock({ uri, nickname }: { uri?: string; nickname: string }) {
         className="text-body-5 text-neutral"
         style={{ marginTop: Spacing.tight }}
       >
-        Your profile photo can be changed on the website.
+        {t("profile_photo_web_only")}
       </Text>
     </View>
   );

@@ -4,6 +4,7 @@ import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useOpenBrandShop } from "@features/shop/model/useOpenBrandShop";
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import type { BrandPromotionBrandDetail } from "@shared/services/brandPromotion";
 import { Button, BUTTON_HEIGHT } from "@shared/ui/button";
 
@@ -34,6 +35,7 @@ export function BrandFooterLinks({
 }: {
   brand: BrandPromotionBrandDetail;
 }) {
+  const t = useTranslations();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const openBrandShop = useOpenBrandShop();
@@ -69,7 +71,7 @@ export function BrandFooterLinks({
         <Button
           accessibilityLabel={`View ${brand.name} brand page`}
           className="flex-1"
-          label="Brand"
+          label={t("brand")}
           onPress={() => router.push(`/brand/${brand.id}`)}
           size="md"
           variant="onColor"
@@ -77,7 +79,7 @@ export function BrandFooterLinks({
         <Button
           accessibilityLabel={`Shop ${brand.name} products`}
           className="flex-1"
-          label="Shop"
+          label={t("shop")}
           onPress={() => openBrandShop(brand.id)}
           size="md"
           variant="onColor"

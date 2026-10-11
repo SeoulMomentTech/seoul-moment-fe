@@ -17,6 +17,7 @@ import { Field, FormSection, FormSections } from "@features/account/ui/parts";
 import { AuthField } from "@features/auth/ui/AuthField";
 import { useUserAuthStore } from "@shared/lib/auth/useUserAuthStore";
 import { useLanguage } from "@shared/lib/i18n/useLanguage";
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { getCityOptions, getDistrictOptions } from "@shared/lib/regions";
 import type {
   UserCartBrandGroup,
@@ -65,6 +66,7 @@ const PAYMENT_METHODS: readonly {
  * 읽으면 다른 기기에서 수량을 바꾼 순간 둘이 갈라지고 어느 쪽이 옳은지 알 수 없어진다.
  */
 export function OrderScreen({ cartItemIds }: { cartItemIds: number[] }) {
+  const t = useTranslations();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const locale = useLanguage();
@@ -88,9 +90,9 @@ export function OrderScreen({ cartItemIds }: { cartItemIds: number[] }) {
     return (
       <Shell>
         <EmptyState
-          hint="Sign in from the My tab to place an order."
+          hint={t("sign_in_from_my_order")}
           icon={<CartIcon color={EMPTY_ICON_COLOR} size={EMPTY_ICON_SIZE} />}
-          message="You're signed out"
+          message={t("signed_out")}
         />
       </Shell>
     );
@@ -100,9 +102,9 @@ export function OrderScreen({ cartItemIds }: { cartItemIds: number[] }) {
     return (
       <Shell>
         <EmptyState
-          hint="Add something to your cart first."
+          hint={t("cart_add_first")}
           icon={<CartIcon color={EMPTY_ICON_COLOR} size={EMPTY_ICON_SIZE} />}
-          message="There's nothing to order"
+          message={t("order_no_selection")}
         />
       </Shell>
     );
@@ -141,9 +143,9 @@ export function OrderScreen({ cartItemIds }: { cartItemIds: number[] }) {
     return (
       <Shell>
         <EmptyState
-          hint="These items may have sold out."
+          hint={t("order_items_sold_out_hint")}
           icon={<CartIcon color={EMPTY_ICON_COLOR} size={EMPTY_ICON_SIZE} />}
-          message="None of these can be ordered"
+          message={t("order_items_unavailable")}
         />
       </Shell>
     );
@@ -166,11 +168,13 @@ export function OrderScreen({ cartItemIds }: { cartItemIds: number[] }) {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <Text className="text-title-3 text-foreground font-bold">Order</Text>
+          <Text className="text-title-3 text-foreground font-bold">
+            {t("order_sheet")}
+          </Text>
 
           <View style={{ marginTop: Spacing.section }}>
             <FormSections>
-              <FormSection title="Items">
+              <FormSection title={t("order_items")}>
                 <View style={{ gap: Spacing.inner }}>
                   {groups.map((group) => (
                     <BrandGroup group={group} key={group.brandId} />
@@ -178,36 +182,36 @@ export function OrderScreen({ cartItemIds }: { cartItemIds: number[] }) {
                 </View>
               </FormSection>
 
-              <FormSection title="Shipping address">
+              <FormSection title={t("shipping_address")}>
                 {shipping.canUseDefault ? (
                   <View
                     className="flex-row"
                     style={{ gap: CHIP_GAP, marginBottom: Spacing.tight }}
                   >
                     <Chip
-                      label="Saved address"
+                      label={t("saved_address")}
                       onPress={() => shipping.setUseDefault(true)}
                       selected={shipping.useDefault}
                     />
                     <Chip
-                      label="New address"
+                      label={t("new_address")}
                       onPress={() => shipping.setUseDefault(false)}
                       selected={!shipping.useDefault}
                     />
                   </View>
                 ) : null}
 
-                <Field label="Recipient">
+                <Field label={t("recipient_name")}>
                   <AuthField
                     onChangeText={(value) =>
                       shipping.edit({ recipientName: value })
                     }
-                    placeholder="Name"
+                    placeholder={t("name")}
                     value={shipping.values.recipientName}
                   />
                 </Field>
 
-                <Field label="Mobile number">
+                <Field label={t("mobile_number")}>
                   <AuthField
                     keyboardType="number-pad"
                     onChangeText={(value) => shipping.edit({ phone: value })}
@@ -216,7 +220,7 @@ export function OrderScreen({ cartItemIds }: { cartItemIds: number[] }) {
                   />
                 </Field>
 
-                <Field label="Region">
+                <Field label={t("region")}>
                   <View style={{ gap: Spacing.tight }}>
                     <AuthField
                       keyboardType="number-pad"
@@ -224,46 +228,46 @@ export function OrderScreen({ cartItemIds }: { cartItemIds: number[] }) {
                       onChangeText={(value) =>
                         shipping.edit({ postalCode: value })
                       }
-                      placeholder="Postal Code"
+                      placeholder={t("postal_code")}
                       value={shipping.values.postalCode}
                     />
                     <SelectField
                       onChange={shipping.selectCity}
                       options={cityOptions}
-                      placeholder="City"
-                      title="City"
+                      placeholder={t("city")}
+                      title={t("city")}
                       value={shipping.values.city}
                     />
                     <SelectField
                       disabled={!shipping.values.city}
                       onChange={shipping.selectDistrict}
                       options={districtOptions}
-                      placeholder="District"
-                      title="District"
+                      placeholder={t("district")}
+                      title={t("district")}
                       value={shipping.values.district}
                     />
                     <AuthField
                       onChangeText={(value) =>
                         shipping.edit({ detailAddress: value })
                       }
-                      placeholder="Detailed Address"
+                      placeholder={t("detail_address")}
                       value={shipping.values.detailAddress}
                     />
                   </View>
                 </Field>
 
-                <Field label="Delivery note (optional)">
+                <Field label={t("shipping_request")}>
                   <AuthField
                     onChangeText={(value) =>
                       shipping.edit({ requestMessage: value })
                     }
-                    placeholder="Leave it with the front desk, etc."
+                    placeholder={t("shipping_request_guard")}
                     value={shipping.values.requestMessage}
                   />
                 </Field>
               </FormSection>
 
-              <FormSection title="Payment method">
+              <FormSection title={t("payment_method")}>
                 <View className="flex-row" style={{ gap: CHIP_GAP }}>
                   {PAYMENT_METHODS.map((method) => (
                     <Chip
@@ -278,7 +282,7 @@ export function OrderScreen({ cartItemIds }: { cartItemIds: number[] }) {
                 </View>
               </FormSection>
 
-              <FormSection title="Payment amount">
+              <FormSection title={t("payment_amount")}>
                 <Amounts
                   isRecalculating={preview.isPlaceholderData}
                   preview={preview.data}
@@ -373,31 +377,39 @@ function Amounts({
   region: string;
   isRecalculating: boolean;
 }) {
+  const t = useTranslations();
   const fixed = !preview.isShippingEstimated;
 
   return (
     <View style={{ opacity: isRecalculating ? 0.4 : 1 }}>
       <AmountRow
-        label="Items"
+        label={t("order_items")}
         value={formatPrice(preview.totalProductAmount)}
       />
       <AmountRow
         label={
           fixed
-            ? `Shipping · ${region}${preview.isRemoteIsland ? " (outlying island)" : ""}`
-            : "Shipping"
+            ? t(
+                preview.isRemoteIsland
+                  ? "shipping_to_remote_island"
+                  : "shipping_to_region",
+                { region },
+              )
+            : t("shipping_fee")
         }
         value={
           fixed
             ? preview.shippingFee > 0
               ? formatPrice(preview.shippingFee)
-              : "Free"
-            : "Set by your address"
+              : t("free_shipping")
+            : t("shipping_set_by_address")
         }
       />
       {preview.amountToFreeShipping > 0 ? (
         <Text className="text-body-5 text-foreground font-bold">
-          {`Add ${formatPrice(preview.amountToFreeShipping)} more for free shipping`}
+          {t("free_shipping_remaining", {
+            amount: formatPrice(preview.amountToFreeShipping),
+          })}
         </Text>
       ) : null}
       <View
@@ -406,7 +418,7 @@ function Amounts({
       >
         <AmountRow
           emphasis
-          label="Total"
+          label={t("total_product_amount")}
           value={formatPrice(
             fixed ? preview.totalAmount : preview.totalProductAmount,
           )}
@@ -467,6 +479,7 @@ function OrderBar({
   addressReady: boolean;
   onViewCart(): void;
 }) {
+  const t = useTranslations();
   const insets = useSafeAreaInsets();
 
   return (
@@ -478,7 +491,9 @@ function OrderBar({
       }}
     >
       <View className="flex-row items-center justify-between">
-        <Text className="text-body-3 text-neutral">Total</Text>
+        <Text className="text-body-3 text-neutral">
+          {t("total_product_amount")}
+        </Text>
         <Text className="text-body-1 text-foreground font-bold">
           {formatPrice(total)}
         </Text>
@@ -486,7 +501,7 @@ function OrderBar({
       {/* 아직 낼 수 없으므로 잠가 둔다. 누를 수는 있는데 아무 일도 안 일어나는 것보다 낫다. */}
       <Button
         disabled
-        label="Pay now"
+        label={t("pay_now")}
         onPress={onViewCart}
         style={{ marginTop: Spacing.tight }}
       />
@@ -496,8 +511,8 @@ function OrderBar({
         style={{ marginTop: 6, height: BAR_NOTE_LINE }}
       >
         {addressReady
-          ? "Payment isn't available in the app yet."
-          : "Enter a shipping address to see the final total."}
+          ? t("payment_not_available_yet")
+          : t("enter_address_for_total")}
       </Text>
     </View>
   );

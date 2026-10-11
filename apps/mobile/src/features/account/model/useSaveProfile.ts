@@ -1,6 +1,7 @@
 import { userProfileKey } from "@entities/user/model/keys";
 import { useUserAuthStore } from "@shared/lib/auth/useUserAuthStore";
 import useAppMutation from "@shared/lib/hooks/query/useAppMutation";
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { postNicknameValidate } from "@shared/services/auth";
 import type { UpdateUserProfileReq } from "@shared/services/user";
 import {
@@ -46,6 +47,7 @@ export interface SaveProfileInput {
  * (data: null) 서버가 저장한 값을 돌려주지 않는다.
  */
 export const useSaveProfile = () => {
+  const t = useTranslations();
   const queryClient = useQueryClient();
   const id = useUserAuthStore((s) => s.id);
 
@@ -71,7 +73,7 @@ export const useSaveProfile = () => {
         throw new ProfileSaveError("profile");
       });
     },
-    onSuccess: () => showToast("Your changes have been saved."),
+    onSuccess: () => showToast(t("changes_saved")),
     onSettled: () =>
       void queryClient.invalidateQueries({ queryKey: userProfileKey(id) }),
   });

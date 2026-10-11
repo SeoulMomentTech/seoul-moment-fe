@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useUserInfo } from "@entities/user/model/useUserInfo";
 import { useUserProfile } from "@entities/user/model/useUserProfile";
 import { useUserAuthStore } from "@shared/lib/auth/useUserAuthStore";
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { Button } from "@shared/ui/button";
 import { useCartBadgeScrollCollapse } from "@shared/ui/cart-button/collapse";
 import { Touchable } from "@shared/ui/press";
@@ -48,7 +49,7 @@ export function MyScreen() {
       {isAuthenticated ? <SignedInHeader /> : <SignUpPitch />}
       {isAuthenticated ? <MyLikes /> : null}
       {groups.map((group) => (
-        <MenuGroup group={group} key={group.title} withTitle={hasGroups} />
+        <MenuGroup group={group} key={group.titleKey} withTitle={hasGroups} />
       ))}
     </ScrollView>
   );
@@ -82,21 +83,22 @@ function ScreenBlock({
 }
 
 function SignUpPitch() {
+  const t = useTranslations();
   const router = useRouter();
 
   return (
     <ScreenBlock>
       <Text className="text-title-3 text-foreground font-bold">
-        Join Seoul Moment
+        {t("join_seoul_moment")}
       </Text>
       <Text
         className="text-body-3 text-neutral"
         style={{ marginTop: Spacing.tight }}
       >
-        Save what you like and pick up where you left off.
+        {t("my_signed_out_hint")}
       </Text>
       <Button
-        label="Sign in"
+        label={t("login")}
         onPress={() => router.push("/login")}
         style={{ marginTop: Spacing.inner }}
       />
@@ -115,20 +117,17 @@ function SignUpPitch() {
  * 어느 갈래에서도 아래 관심 목록과 메뉴는 그대로 동작한다.
  */
 function SignedInHeader() {
+  const t = useTranslations();
   const logout = useUserAuthStore((s) => s.logout);
   const profile = useUserProfile();
   const info = useUserInfo();
 
   const confirmSignOut = () =>
     // 앱에서 되돌릴 수 없는 유일한 동작이라 한 번 묻는다.
-    Alert.alert(
-      "Sign out?",
-      "You'll need to sign in again to see your account.",
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "Sign out", style: "destructive", onPress: logout },
-      ],
-    );
+    Alert.alert(t("sign_out_confirm"), t("sign_out_confirm_body"), [
+      { text: t("cancel"), style: "cancel" },
+      { text: t("sign_out"), style: "destructive", onPress: logout },
+    ]);
 
   const paused =
     (profile.isPending && profile.fetchStatus === "paused") ||
@@ -137,10 +136,7 @@ function SignedInHeader() {
   if (paused) {
     return (
       <SignedInShell onSignOut={confirmSignOut}>
-        <IdentityText
-          detail="You appear to be offline."
-          nickname="You're signed in"
-        />
+        <IdentityText detail={t("offline_short")} nickname={t("signed_in")} />
       </SignedInShell>
     );
   }
@@ -159,8 +155,8 @@ function SignedInHeader() {
     return (
       <SignedInShell onSignOut={confirmSignOut}>
         <IdentityText
-          detail="We couldn't load your profile."
-          nickname="You're signed in"
+          detail={t("profile_load_failed")}
+          nickname={t("signed_in")}
         />
       </SignedInShell>
     );
@@ -185,6 +181,7 @@ function SignedInShell({
   children: React.ReactNode;
   onSignOut(): void;
 }) {
+  const t = useTranslations();
   const router = useRouter();
 
   return (
@@ -202,13 +199,13 @@ function SignedInShell({
       >
         <Button
           className="flex-1"
-          label="Manage profile"
+          label={t("profile_settings")}
           onPress={() => router.push("/account/profile")}
           variant="secondary"
         />
         <Button
           className="flex-1"
-          label="Sign out"
+          label={t("sign_out")}
           onPress={onSignOut}
           variant="secondary"
         />
@@ -270,18 +267,19 @@ function MenuGroup({
   group: MyMenuGroup;
   withTitle: boolean;
 }) {
+  const t = useTranslations();
   const router = useRouter();
 
   const rows = group.items.map((item) => (
     <MenuRow
       item={item}
-      key={item.label}
+      key={item.labelKey}
       onPress={() => router.push(item.href)}
     />
   ));
 
   if (withTitle) {
-    return <Section title={group.title}>{rows}</Section>;
+    return <Section title={t(group.titleKey)}>{rows}</Section>;
   }
 
   // 위 블록이 자기 아래 여백을 갖고 있으므로 여기서 또 띄우지 않는다.
@@ -290,9 +288,11 @@ function MenuGroup({
 }
 
 function MenuRow({ item, onPress }: { item: MyMenuItem; onPress(): void }) {
+  const t = useTranslations();
+
   return (
     <Touchable
-      accessibilityLabel={item.label}
+      accessibilityLabel={t(item.labelKey)}
       accessibilityRole="button"
       // 줄 사이 선은 줄의 위에 긋는다. 아래에 그으면 마지막 줄 밑에 아무것도 없는
       // 선이 남는다. 첫 줄의 윗선이 위 블록과 메뉴를 가르는 선을 겸한다.
@@ -300,7 +300,7 @@ function MenuRow({ item, onPress }: { item: MyMenuItem; onPress(): void }) {
       onPress={onPress}
       style={{ height: MENU_ROW_HEIGHT }}
     >
-      <Text className="text-body-2 text-foreground">{item.label}</Text>
+      <Text className="text-body-2 text-foreground">{t(item.labelKey)}</Text>
       <Text className="text-body-1 text-neutral">›</Text>
     </Touchable>
   );

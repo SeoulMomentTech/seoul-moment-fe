@@ -5,10 +5,12 @@ import { Text, View } from "react-native";
 import { useUserInfo } from "@entities/user/model/useUserInfo";
 import { AUTH_FIELD_HEIGHT, AuthField } from "@features/auth/ui/AuthField";
 import { useUserAuthStore } from "@shared/lib/auth/useUserAuthStore";
+import type { MessageKey } from "@shared/lib/i18n/translate";
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { TAIWAN_DIAL_CODE, toTaiwanPhoneNumber } from "@shared/lib/utils/phone";
 import type { UserInfo } from "@shared/services/user";
 import { Button } from "@shared/ui/button";
-import { CODE_SENT_MESSAGE, FieldNote, ResendRow } from "@shared/ui/field-note";
+import { FieldNote, ResendRow } from "@shared/ui/field-note";
 import { EmptyState, ScreenError } from "@shared/ui/section-state";
 import { LoginInfoSkeleton } from "@shared/ui/skeleton";
 
@@ -45,25 +47,23 @@ type Agreements = Pick<
 
 const NOTIFICATION_OPTIONS: {
   key: keyof Agreements;
-  title: string;
-  description: string;
+  titleKey: MessageKey;
+  descriptionKey: MessageKey;
 }[] = [
   {
     key: "newProductAgreed",
-    title: "New Arrivals & Promotion Alerts",
-    description:
-      "Personal Exclusive Offers & Price Drop Alerts for Saved Items",
+    titleKey: "new_arrivals_alerts",
+    descriptionKey: "personal_offers_alerts",
   },
   {
     key: "adAgreed",
-    title: "Marketing & Promotional Emails",
-    description: "Ongoing Promotion Notifications",
+    titleKey: "marketing_promotion_emails",
+    descriptionKey: "ongoing_promotion_notification",
   },
   {
     key: "recommendAgreed",
-    title: "Personalized Product Suggestions",
-    description:
-      "Personal Exclusive Offers & Price Drop Alerts for Saved Items",
+    titleKey: "personalized_product_suggestions",
+    descriptionKey: "personal_offers_alerts",
   },
 ];
 
@@ -82,6 +82,7 @@ const hasEnoughDigits = (phone: string) =>
  * 가입 화면이 이미 같은 모양(코드 칸 + 곁들임 버튼 + 아래 안내 한 줄)을 쓰고 있다.
  */
 export function LoginInfoScreen() {
+  const t = useTranslations();
   const isAuthenticated = useUserAuthStore((s) => s.isAuthenticated);
   const info = useUserInfo();
 
@@ -90,8 +91,8 @@ export function LoginInfoScreen() {
     return (
       <AccountShell>
         <EmptyState
-          hint="Sign in from the My tab to manage your account."
-          message="You're signed out"
+          hint={t("sign_in_from_my_account")}
+          message={t("signed_out")}
         />
       </AccountShell>
     );
@@ -109,7 +110,7 @@ export function LoginInfoScreen() {
   if (info.isPending) {
     return (
       <AccountShell>
-        <AccountBody title="Login info">
+        <AccountBody title={t("login_info")}>
           <LoginInfoSkeleton />
         </AccountBody>
       </AccountShell>
@@ -126,7 +127,7 @@ export function LoginInfoScreen() {
 
   return (
     <AccountShell>
-      <AccountBody title="Login info">
+      <AccountBody title={t("login_info")}>
         {/* 계정이 바뀌면 폼을 새로 시드한다 — 아래 상태는 처음 받은 값에서 출발한다. */}
         <LoginInfoForm info={info.data} key={info.data.email} />
       </AccountBody>
@@ -135,6 +136,7 @@ export function LoginInfoScreen() {
 }
 
 function LoginInfoForm({ info }: { info: UserInfo }) {
+  const t = useTranslations();
   const [phone, setPhone] = useState(() => info.phone ?? "");
   const [code, setCode] = useState("");
   const [resendIn, setResendIn] = useState(0);
@@ -189,8 +191,8 @@ function LoginInfoForm({ info }: { info: UserInfo }) {
   return (
     <>
       <FormSections>
-        <FormSection title="My Account">
-          <Field label="Mobile Number">
+        <FormSection title={t("my_account")}>
+          <Field label={t("mobile_number")}>
             <View style={{ gap: Spacing.tight }}>
               <AuthField
                 keyboardType="number-pad"
@@ -201,7 +203,7 @@ function LoginInfoForm({ info }: { info: UserInfo }) {
                   sendCode.reset();
                   verifyCode.reset();
                 }}
-                placeholder="Please enter your mobile number."
+                placeholder={t("input_phone")}
                 value={phone}
               />
               {/* 인증 줄은 늘 자리를 지킨다. 발송 후에만 나타나게 하면 그 순간 아래가 전부 밀린다. */}
@@ -218,7 +220,7 @@ function LoginInfoForm({ info }: { info: UserInfo }) {
                     }}
                     onComplete={submitCode}
                     otp="sms"
-                    placeholder="Verification Code"
+                    placeholder={t("verification_code")}
                     value={code}
                   />
                 </View>
@@ -230,7 +232,7 @@ function LoginInfoForm({ info }: { info: UserInfo }) {
                   // 문자가 오지 않았을 때 다시 보낼 방법이 사라진다.
                   <Button
                     disabled={code.trim().length === 0 || verifyCode.isPending}
-                    label="Verify"
+                    label={t("verify")}
                     onPress={() => submitCode()}
                     style={{ width: SIDE_BUTTON_WIDTH }}
                     variant="secondary"
@@ -238,7 +240,7 @@ function LoginInfoForm({ info }: { info: UserInfo }) {
                 ) : (
                   <Button
                     disabled={!hasEnoughDigits(phone) || sendCode.isPending}
-                    label="Send Code"
+                    label={t("send_verification_code")}
                     onPress={send}
                     style={{ width: SIDE_BUTTON_WIDTH }}
                     variant="secondary"
@@ -258,23 +260,23 @@ function LoginInfoForm({ info }: { info: UserInfo }) {
           </Field>
         </FormSection>
 
-        <FormSection title="Promotions & Benefits">
-          <Field label="Email Address">
+        <FormSection title={t("promotion_benefits")}>
+          <Field label={t("email_address")}>
             {/* 이메일은 계정 그 자체라 앱에서 바꿀 수 없다. 읽기 전용으로 둔다. */}
             {/* onChangeText 는 쓰이지 않는다 — editable 이 false 라 글자가 들어오지 않는다. */}
             <AuthField
               editable={false}
               onChangeText={noop}
-              placeholder="Email Address"
+              placeholder={t("email_address")}
               value={info.email}
             />
           </Field>
-          <Field label="Notification Settings (Email & Phone)">
+          <Field label={t("email_phone")}>
             <View>
               {NOTIFICATION_OPTIONS.map((option) => (
                 <ToggleRow
                   checked={agreements[option.key]}
-                  description={option.description}
+                  description={t(option.descriptionKey)}
                   key={option.key}
                   onToggle={() => {
                     setAgreements((prev) => ({
@@ -284,7 +286,7 @@ function LoginInfoForm({ info }: { info: UserInfo }) {
                     // 값을 고치면 지난 실패를 치운다 — 이미 고친 것을 아직 틀린 것처럼 말하지 않는다.
                     if (updateInfo.isError) updateInfo.reset();
                   }}
-                  title={option.title}
+                  title={t(option.titleKey)}
                 />
               ))}
             </View>
@@ -293,15 +295,11 @@ function LoginInfoForm({ info }: { info: UserInfo }) {
       </FormSections>
 
       <SubmitBar
-        blocker={isDirty ? null : "Change a setting to save."}
+        blocker={isDirty ? null : t("change_setting_to_save")}
         busy={updateInfo.isPending}
-        busyLabel="Saving…"
-        failure={
-          updateInfo.isError
-            ? "We couldn't save your settings. Please try again."
-            : null
-        }
-        label="Save Changes"
+        busyLabel={t("saving")}
+        failure={updateInfo.isError ? t("save_settings_failed") : null}
+        label={t("save_changes")}
         onPress={() => updateInfo.mutate(agreements)}
       />
     </>
@@ -329,23 +327,19 @@ function PhoneNote({
   busy: boolean;
   onResend(): void;
 }) {
+  const t = useTranslations();
+
   if (verified) return null;
 
   if (sendFailed) {
     // 보내지 못했으면 다시 보내기 줄을 두지 않는다 — 옆 버튼이 아직 "Send Code" 다.
-    return (
-      <FieldNote error>
-        That number is already in use, or the code couldn&apos;t be sent.
-      </FieldNote>
-    );
+    return <FieldNote error>{t("phone_taken_or_send_failed")}</FieldNote>;
   }
 
   if (codeRejected) {
     return (
       <View style={{ gap: Spacing.tight }}>
-        <FieldNote error>
-          The verification code does not match or has expired.
-        </FieldNote>
+        <FieldNote error>{t("code_not_match")}</FieldNote>
         <ResendRow busy={busy} onResend={onResend} secondsLeft={resendIn} />
       </View>
     );
@@ -356,7 +350,7 @@ function PhoneNote({
     return (
       <ResendRow
         busy={busy}
-        message={CODE_SENT_MESSAGE}
+        message={t("verification_code_sent")}
         onResend={onResend}
         secondsLeft={resendIn}
       />
@@ -373,12 +367,16 @@ function PhoneNote({
  * 성공 전용 색은 두지 않는다(팔레트를 늘리지 않는다) — 뜻은 ✓ 와 굵기가 진다.
  */
 function Verified() {
+  const t = useTranslations();
+
   return (
     <View
       className="items-center justify-center"
       style={{ width: SIDE_BUTTON_WIDTH, height: AUTH_FIELD_HEIGHT }}
     >
-      <Text className="text-body-3 text-foreground font-bold">✓ Verified</Text>
+      <Text className="text-body-3 text-foreground font-bold">
+        {t("verified_mark")}
+      </Text>
     </View>
   );
 }

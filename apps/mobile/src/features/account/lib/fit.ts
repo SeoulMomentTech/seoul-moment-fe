@@ -1,3 +1,4 @@
+import type { MessageKey } from "@shared/lib/i18n/translate";
 import type { GetUserFitRes, UserFitPayload } from "@shared/services/user";
 import { toChipOptions, type ChipOption } from "@shared/ui/chip-row";
 
@@ -15,7 +16,8 @@ export type SizeKey = "shoeSize" | "outerSize" | "topSize" | "bottomSize";
 
 export interface SizeFieldConfig {
   key: SizeKey;
-  label: string;
+  /** 글자가 아니라 언어팩 키다 — 이 목록은 화면 밖이라 여기서 번역할 수 없다. */
+  labelKey: MessageKey;
   options: ChipOption[];
 }
 
@@ -27,22 +29,22 @@ export interface SizeFieldConfig {
 export const SIZE_FIELDS: SizeFieldConfig[] = [
   {
     key: "shoeSize",
-    label: "Shoes",
+    labelKey: "shoes",
     options: toChipOptions(range(220, 290, 5)),
   },
   {
     key: "outerSize",
-    label: "Outerwear",
+    labelKey: "outer_wear",
     options: toChipOptions(APPAREL_SIZES),
   },
   {
     key: "topSize",
-    label: "Tops",
+    labelKey: "tops",
     options: toChipOptions(APPAREL_SIZES),
   },
   {
     key: "bottomSize",
-    label: "Bottoms",
+    labelKey: "bottoms",
     options: toChipOptions(range(23, 37, 1)),
   },
 ];

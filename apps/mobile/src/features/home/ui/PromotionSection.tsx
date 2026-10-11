@@ -4,6 +4,7 @@ import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { Dimensions, FlatList, Text, View } from "react-native";
 
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import type { HomePromotion } from "@shared/services/home";
 import { Touchable } from "@shared/ui/press";
 import { Section } from "@shared/ui/section";
@@ -19,6 +20,7 @@ const CARD_WIDTH = Math.round(Dimensions.get("window").width * 0.72);
 const CARD_HEIGHT = 160;
 
 export function PromotionSection() {
+  const t = useTranslations();
   const {
     data: promotions,
     isPending,
@@ -31,7 +33,7 @@ export function PromotionSection() {
   // 돌리지 말고 재시도 줄을 보여준다.
   if (isPending && fetchStatus === "paused") {
     return (
-      <Section title="Season Collection">
+      <Section title={t("season_collection")}>
         <SectionError onRetry={() => void refetch()} />
       </Section>
     );
@@ -39,7 +41,7 @@ export function PromotionSection() {
 
   if (isPending) {
     return (
-      <Section title="Season Collection">
+      <Section title={t("season_collection")}>
         {/* 프로모션이 1개면 히어로(200 + 12 + 19 + 4 + 2x17 = 269), 2개 이상이면
             캐러셀(160 + 12 + 19 + 4 + 2x17 = 229)이라 자리 높이가 40 다른데, 응답을
             받기 전에는 개수를 알 길이 없다. 히어로를 고른다 — dev 응답이 1개라
@@ -56,7 +58,7 @@ export function PromotionSection() {
 
   if (isError) {
     return (
-      <Section title="Season Collection">
+      <Section title={t("season_collection")}>
         <SectionError onRetry={() => void refetch()} />
       </Section>
     );
@@ -66,7 +68,7 @@ export function PromotionSection() {
   if (!promotions || promotions.length === 0) return null;
 
   return (
-    <Section title="Season Collection">
+    <Section title={t("season_collection")}>
       {promotions.length === 1 ? (
         <View className="px-5">
           <PromotionHero promotion={promotions[0]} />

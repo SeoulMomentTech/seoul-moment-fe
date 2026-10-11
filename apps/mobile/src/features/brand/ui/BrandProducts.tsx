@@ -1,21 +1,21 @@
 import { ProductCarousel } from "@entities/product/ui/ProductCarousel";
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { Section } from "@shared/ui/section";
 import { SectionError } from "@shared/ui/section-state";
 import { ProductRowSkeleton } from "@shared/ui/skeleton";
 
 import { useBrandProducts } from "../model/useBrandProducts";
 
-const HEADING = "Brand Products";
-
 /** 브랜드 소개 맨 아래 상품 줄. 섹션이 실패해도 소개 본문은 그대로 남는다. */
 export function BrandProducts({ brandId }: { brandId: number }) {
+  const t = useTranslations();
   const { data, isPending, isError, fetchStatus, refetch } =
     useBrandProducts(brandId);
 
   // 오프라인이면 요청이 paused 되어 isPending 이 유지된다.
   if (isPending && fetchStatus === "paused") {
     return (
-      <Section title={HEADING}>
+      <Section title={t("brand_products")}>
         <SectionError onRetry={() => void refetch()} />
       </Section>
     );
@@ -23,7 +23,7 @@ export function BrandProducts({ brandId }: { brandId: number }) {
 
   if (isPending) {
     return (
-      <Section title={HEADING}>
+      <Section title={t("brand_products")}>
         <ProductRowSkeleton />
       </Section>
     );
@@ -31,7 +31,7 @@ export function BrandProducts({ brandId }: { brandId: number }) {
 
   if (isError) {
     return (
-      <Section title={HEADING}>
+      <Section title={t("brand_products")}>
         <SectionError onRetry={() => void refetch()} />
       </Section>
     );
@@ -42,5 +42,5 @@ export function BrandProducts({ brandId }: { brandId: number }) {
     return null;
   }
 
-  return <ProductCarousel heading={HEADING} items={data} />;
+  return <ProductCarousel heading={t("brand_products")} items={data} />;
 }

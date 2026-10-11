@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { useUserFit } from "@entities/user/model/useUserFit";
 import { AuthField } from "@features/auth/ui/AuthField";
 import { useUserAuthStore } from "@shared/lib/auth/useUserAuthStore";
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import type { GetUserFitRes } from "@shared/services/user";
 import { EmptyState, ScreenError } from "@shared/ui/section-state";
 import { SelectField } from "@shared/ui/select";
@@ -38,6 +39,7 @@ import { useSaveFit } from "../model/useSaveFit";
  * 기기 폭에 따라 달라지지도 않는다 — 상품 목록 위 카테고리 줄과 같은 물건이다.
  */
 export function PreferencesScreen() {
+  const t = useTranslations();
   const isAuthenticated = useUserAuthStore((s) => s.isAuthenticated);
   const fit = useUserFit();
 
@@ -46,8 +48,8 @@ export function PreferencesScreen() {
     return (
       <AccountShell>
         <EmptyState
-          hint="Sign in from the My tab to set your preferences."
-          message="You're signed out"
+          hint={t("sign_in_from_my_preferences")}
+          message={t("signed_out")}
         />
       </AccountShell>
     );
@@ -65,7 +67,7 @@ export function PreferencesScreen() {
   if (fit.isPending) {
     return (
       <AccountShell>
-        <AccountBody title="My preferences">
+        <AccountBody title={t("personalized_info")}>
           <PreferencesSkeleton />
         </AccountBody>
       </AccountShell>
@@ -83,7 +85,7 @@ export function PreferencesScreen() {
   // data 가 null 인 것은 실패가 아니라 "아직 저장한 적 없다"는 뜻이다. 빈 폼으로 연다.
   return (
     <AccountShell>
-      <AccountBody title="My preferences">
+      <AccountBody title={t("personalized_info")}>
         <PreferencesForm fit={fit.data ?? null} />
       </AccountBody>
     </AccountShell>
@@ -91,6 +93,7 @@ export function PreferencesScreen() {
 }
 
 function PreferencesForm({ fit }: { fit: GetUserFitRes | null }) {
+  const t = useTranslations();
   const initial = useMemo(() => fitToFormValues(fit), [fit]);
   const [values, setValues] = useState<FitFormValues>(() => initial);
   const save = useSaveFit({ exists: fit != null });
@@ -106,40 +109,40 @@ function PreferencesForm({ fit }: { fit: GetUserFitRes | null }) {
 
   /** 저장을 막고 있는 한 가지. 아무것도 적지 않은 사람에게는 "바뀐 게 없다"가 아니라 무엇을 하라고 말한다. */
   const blocker = !filled
-    ? "Enter at least one measurement to save."
+    ? t("enter_one_measurement")
     : changed
       ? null
-      : "Change something to save.";
+      : t("change_something_to_save");
 
   return (
     <>
       <FormSections>
-        <FormSection title="Body Information">
-          <Field label="Height">
+        <FormSection title={t("body_info")}>
+          <Field label={t("height")}>
             <AuthField
               keyboardType="number-pad"
               onChangeText={(value) =>
                 edit({ ...values, height: clampNumeric(value, MAX_HEIGHT) })
               }
-              placeholder="Please enter your height."
+              placeholder={t("enter_height")}
               value={values.height}
             />
           </Field>
-          <Field label="Weight">
+          <Field label={t("weight")}>
             <AuthField
               keyboardType="number-pad"
               onChangeText={(value) =>
                 edit({ ...values, weight: clampNumeric(value, MAX_WEIGHT) })
               }
-              placeholder="Please enter your weight."
+              placeholder={t("enter_weight")}
               value={values.weight}
             />
           </Field>
         </FormSection>
 
-        <FormSection title="Size Information">
+        <FormSection title={t("size_info")}>
           {SIZE_FIELDS.map((field) => (
-            <Field key={field.key} label={field.label}>
+            <Field key={field.key} label={t(field.labelKey)}>
               <SelectField
                 clearable
                 onChange={(next) => {
@@ -151,8 +154,10 @@ function PreferencesForm({ fit }: { fit: GetUserFitRes | null }) {
                   edit({ ...values, sizes });
                 }}
                 options={field.options}
-                placeholder={`Select ${field.label.toLowerCase()}`}
-                title={field.label}
+                placeholder={t("select_size_for", {
+                  name: t(field.labelKey),
+                })}
+                title={t(field.labelKey)}
                 value={values.sizes[field.key]}
               />
             </Field>
@@ -163,13 +168,9 @@ function PreferencesForm({ fit }: { fit: GetUserFitRes | null }) {
       <SubmitBar
         blocker={blocker}
         busy={save.isPending}
-        busyLabel="Saving…"
-        failure={
-          save.isError
-            ? "We couldn't save your preferences. Please try again."
-            : null
-        }
-        label="Save Changes"
+        busyLabel={t("saving")}
+        failure={save.isError ? t("save_preferences_failed") : null}
+        label={t("save_changes")}
         onPress={() => save.mutate(formValuesToFitPayload(values))}
       />
     </>

@@ -2,15 +2,17 @@ import type { Href } from "expo-router";
 import { useRouter } from "expo-router";
 import { Text, View } from "react-native";
 
+import type { MessageKey } from "@shared/lib/i18n/translate";
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { Touchable } from "@shared/ui/press";
 
 import { Spacing } from "@/constants/theme";
 
 export type TermKey = "termsOfService" | "privacyPolicy";
 
-const TERM_ITEMS: { key: TermKey; label: string; href: Href }[] = [
-  { key: "termsOfService", label: "Terms of Service", href: "/terms" },
-  { key: "privacyPolicy", label: "Privacy Policy", href: "/policy" },
+const TERM_ITEMS: { key: TermKey; labelKey: MessageKey; href: Href }[] = [
+  { key: "termsOfService", labelKey: "terms_of_service", href: "/terms" },
+  { key: "privacyPolicy", labelKey: "privacy_policy", href: "/policy" },
 ];
 
 const BOX_SIZE = 20;
@@ -39,29 +41,28 @@ export function TermsConsent({
   values: TermsAgreed;
   onChange(next: TermsAgreed): void;
 }) {
+  const t = useTranslations();
   const router = useRouter();
   const all = allTermsAgreed(values);
 
   return (
     <View>
-      <Text className="text-body-3 text-neutral">
-        Terms of Service &amp; Policies
-      </Text>
+      <Text className="text-body-3 text-neutral">{t("tos_policies")}</Text>
       <View className="border-neutral-subtle border-b">
         <CheckRow
           checked={all}
-          label="Agree to All"
+          label={t("agree_to_all")}
           onToggle={() =>
             onChange({ termsOfService: !all, privacyPolicy: !all })
           }
         />
       </View>
-      {TERM_ITEMS.map(({ key, label, href }) => (
+      {TERM_ITEMS.map(({ key, labelKey, href }) => (
         <CheckRow
           checked={values[key]}
           detailHref={href}
           key={key}
-          label={label}
+          label={t(labelKey)}
           onDetail={() => router.push(href)}
           onToggle={() => onChange({ ...values, [key]: !values[key] })}
         />
@@ -83,6 +84,8 @@ function CheckRow({
   onDetail?(): void;
   detailHref?: Href;
 }) {
+  const t = useTranslations();
+
   return (
     <View
       className="flex-row items-center justify-between"
@@ -118,13 +121,13 @@ function CheckRow({
       </Touchable>
       {onDetail && detailHref ? (
         <Touchable
-          accessibilityLabel={`${label} details`}
+          accessibilityLabel={t("view_details_of", { name: label })}
           accessibilityRole="button"
           className="flex-row items-center"
           onPress={onDetail}
           style={{ height: ROW_HEIGHT, paddingLeft: Spacing.tight }}
         >
-          <Text className="text-body-3 text-neutral">Details ›</Text>
+          <Text className="text-body-3 text-neutral">{t("details")} ›</Text>
         </Touchable>
       ) : null}
     </View>

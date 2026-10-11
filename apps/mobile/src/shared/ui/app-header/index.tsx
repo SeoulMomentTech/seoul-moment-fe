@@ -2,6 +2,7 @@ import { Image } from "expo-image";
 import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { CartButtonView } from "@shared/ui/cart-button";
 
 import { HeaderHeight } from "@/constants/theme";
@@ -19,6 +20,7 @@ interface AppHeaderProps {
  * 받은 숫자를 어떻게 보일지만 정한다.
  */
 export function AppHeader({ cartCount }: AppHeaderProps) {
+  const t = useTranslations();
   const insets = useSafeAreaInsets();
 
   return (
@@ -31,7 +33,7 @@ export function AppHeader({ cartCount }: AppHeaderProps) {
         style={{ height: HeaderHeight }}
       >
         <Image
-          accessibilityLabel="Seoul Moment"
+          accessibilityLabel={t("title")}
           contentFit="contain"
           source={require("@/assets/images/logo.png")}
           style={{ width: 164, height: 20 }}

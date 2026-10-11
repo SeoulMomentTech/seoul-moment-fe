@@ -9,6 +9,7 @@ import {
   listProductVariantChoices,
 } from "@entities/product/lib/variantChoices";
 import { useUserAuthStore } from "@shared/lib/auth/useUserAuthStore";
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import type { GetProductDetailRes } from "@shared/services/product";
 import { BUTTON_HEIGHT, Button } from "@shared/ui/button";
 import { HeartIcon, HeartOutlineIcon } from "@shared/ui/icons";
@@ -37,6 +38,7 @@ const LIKE_OFF = "#171717"; // --foreground
  * 담을 곳 자체가 없고, 누르고 나서 "로그인하세요"를 보는 것보다 바로 가는 편이 짧다.
  */
 export function AddToCartBar({ product }: { product: GetProductDetailRes }) {
+  const t = useTranslations();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const isAuthenticated = useUserAuthStore((s) => s.isAuthenticated);
@@ -64,10 +66,10 @@ export function AddToCartBar({ product }: { product: GetProductDetailRes }) {
   const soldOut = isProductSoldOut(variants);
 
   const label = !hasChoices
-    ? "Unavailable"
+    ? t("product_unavailable")
     : soldOut
-      ? "Sold out"
-      : "Add to cart";
+      ? t("sold_out")
+      : t("add_to_cart");
 
   return (
     <>

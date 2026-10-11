@@ -9,6 +9,7 @@ import {
   View,
 } from "react-native";
 
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { Touchable } from "@shared/ui/press";
 
 const SHEET_MAX_HEIGHT = "85%";
@@ -40,6 +41,7 @@ export function BottomSheet({
   onClose,
   children,
 }: BottomSheetProps) {
+  const t = useTranslations();
   const { height: windowHeight } = useWindowDimensions();
   const [shown, setShown] = useState(false);
   const [session, setSession] = useState(0);
@@ -102,7 +104,7 @@ export function BottomSheet({
           }}
         >
           <Touchable
-            accessibilityLabel="Close"
+            accessibilityLabel={t("close")}
             accessibilityRole="button"
             // 보이는 면이 없는 터치 영역이다. 투명도를 주면 뒤 배경 자체가 깜빡인다.
             feedback="none"
@@ -124,7 +126,7 @@ export function BottomSheet({
               {title}
             </Text>
             <Touchable
-              accessibilityLabel="Close"
+              accessibilityLabel={t("close")}
               accessibilityRole="button"
               // 글리프 한 줄(22pt)이라 8 로는 38pt 에 그친다. 14 로 50pt 를 만든다.
               hitSlop={14}

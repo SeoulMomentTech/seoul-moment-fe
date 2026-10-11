@@ -1,5 +1,6 @@
 import { useRouter } from "expo-router";
 
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { Touchable } from "@shared/ui/press";
 import { Section } from "@shared/ui/section";
 import { SectionError } from "@shared/ui/section-state";
@@ -10,6 +11,7 @@ import { ArticleSlideCard } from "./PostSlideCards";
 import { useHomeArticle } from "../model/useHomeLists";
 
 export function ArticleSection() {
+  const t = useTranslations();
   const router = useRouter();
   const {
     data: articles,
@@ -23,7 +25,7 @@ export function ArticleSection() {
   // 돌리지 말고 재시도 줄을 보여준다.
   if (isPending && fetchStatus === "paused") {
     return (
-      <Section title="Article">
+      <Section title={t("article")}>
         <SectionError onRetry={() => void refetch()} />
       </Section>
     );
@@ -31,7 +33,7 @@ export function ArticleSection() {
 
   if (isPending) {
     return (
-      <Section title="Article">
+      <Section title={t("article")}>
         <PostSlideSkeleton variant="article" />
       </Section>
     );
@@ -39,7 +41,7 @@ export function ArticleSection() {
 
   if (isError) {
     return (
-      <Section title="Article">
+      <Section title={t("article")}>
         <SectionError onRetry={() => void refetch()} />
       </Section>
     );
@@ -49,7 +51,7 @@ export function ArticleSection() {
 
   // 웹 홈과 같이 아티클에는 더보기를 두지 않는다 — 전체 목록 화면이 따로 없다.
   return (
-    <Section title="Article">
+    <Section title={t("article")}>
       <SlideCarousel
         data={articles}
         keyExtractor={(item) => String(item.id)}

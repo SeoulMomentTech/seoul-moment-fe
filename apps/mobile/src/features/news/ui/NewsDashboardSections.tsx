@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import { Dimensions, FlatList, Text, View } from "react-native";
 
 import { PostRow } from "@entities/post/ui/PostRow";
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { formatDate } from "@shared/lib/utils/formatDate";
 import type { NewsWithCategory } from "@shared/services/news";
 import { Touchable } from "@shared/ui/press";
@@ -73,13 +74,14 @@ function CategoryPill({ name }: { name: string }) {
 }
 
 function FeaturedSection() {
+  const t = useTranslations();
   const { data, isPending, isError, fetchStatus, refetch } = useNewsDashboard();
 
   // 오프라인이면 요청이 paused 되어 isPending 이 유지된다. 스켈레톤을 영원히
   // 돌리지 말고 재시도 줄을 보여준다.
   if (isPending && fetchStatus === "paused") {
     return (
-      <Section title="Featured">
+      <Section title={t("featured")}>
         <SectionError onRetry={() => void refetch()} />
       </Section>
     );
@@ -87,7 +89,7 @@ function FeaturedSection() {
 
   if (isPending) {
     return (
-      <Section title="Featured">
+      <Section title={t("featured")}>
         <FeaturedSkeleton imageHeight={FEATURED_HEIGHT} />
       </Section>
     );
@@ -95,7 +97,7 @@ function FeaturedSection() {
 
   if (isError) {
     return (
-      <Section title="Featured">
+      <Section title={t("featured")}>
         <SectionError onRetry={() => void refetch()} />
       </Section>
     );
@@ -105,7 +107,7 @@ function FeaturedSection() {
   if (!featured) return null;
 
   return (
-    <Section title="Featured">
+    <Section title={t("featured")}>
       <NewsLink id={featured.id} title={featured.title}>
         <View className="px-5">
           <Image
@@ -133,11 +135,12 @@ function FeaturedSection() {
 }
 
 function LatestSection() {
+  const t = useTranslations();
   const { data, isPending, isError, fetchStatus, refetch } = useNewsDashboard();
 
   if (isPending && fetchStatus === "paused") {
     return (
-      <Section title="Latest">
+      <Section title={t("latest")}>
         <SectionError onRetry={() => void refetch()} />
       </Section>
     );
@@ -145,7 +148,7 @@ function LatestSection() {
 
   if (isPending) {
     return (
-      <Section title="Latest">
+      <Section title={t("latest")}>
         <PostListSkeleton />
       </Section>
     );
@@ -153,7 +156,7 @@ function LatestSection() {
 
   if (isError) {
     return (
-      <Section title="Latest">
+      <Section title={t("latest")}>
         <SectionError onRetry={() => void refetch()} />
       </Section>
     );
@@ -163,7 +166,7 @@ function LatestSection() {
   if (latest.length === 0) return null;
 
   return (
-    <Section title="Latest">
+    <Section title={t("latest")}>
       <View>
         {latest.map((item) => (
           <NewsLink id={item.id} key={item.id} title={item.title}>
@@ -205,11 +208,12 @@ function PickCard({ item }: { item: NewsWithCategory }) {
 }
 
 function EditorPickSection() {
+  const t = useTranslations();
   const { data, isPending, isError, fetchStatus, refetch } = useNewsDashboard();
 
   if (isPending && fetchStatus === "paused") {
     return (
-      <Section title="Editor's Pick">
+      <Section title={t("editors_pick")}>
         <SectionError onRetry={() => void refetch()} />
       </Section>
     );
@@ -217,7 +221,7 @@ function EditorPickSection() {
 
   if (isPending) {
     return (
-      <Section title="Editor's Pick">
+      <Section title={t("editors_pick")}>
         <HorizontalCardsSkeleton />
       </Section>
     );
@@ -225,7 +229,7 @@ function EditorPickSection() {
 
   if (isError) {
     return (
-      <Section title="Editor's Pick">
+      <Section title={t("editors_pick")}>
         <SectionError onRetry={() => void refetch()} />
       </Section>
     );
@@ -235,7 +239,7 @@ function EditorPickSection() {
   if (picks.length === 0) return null;
 
   return (
-    <Section title="Editor's Pick">
+    <Section title={t("editors_pick")}>
       <FlatList
         contentContainerStyle={{
           paddingHorizontal: CardRow.padding,
@@ -282,13 +286,14 @@ function BandHeadingSkeleton() {
 
 // SectionError 는 흰 배경 기준이라 어두운 띠에서는 대비가 낮다. 띠 전용 행을 쓴다.
 function BandError({ onRetry }: { onRetry(): void }) {
+  const t = useTranslations();
   return (
     <View className="border-background mx-5 flex-row items-center justify-between rounded-lg border px-4 py-3">
       <Text className="text-body-3 text-background">
-        Couldn&apos;t load this section
+        {t("section_load_failed")}
       </Text>
       <Touchable
-        accessibilityLabel="Retry loading this section"
+        accessibilityLabel={t("retry_section")}
         accessibilityRole="button"
         // 어두운 띠 위라 검정 리플이 보이지 않는다. overlay 가 흰 리플을 쓴다.
         feedback="overlay"
@@ -296,13 +301,16 @@ function BandError({ onRetry }: { onRetry(): void }) {
         hitSlop={14}
         onPress={onRetry}
       >
-        <Text className="text-body-3 text-brand font-bold">Retry</Text>
+        <Text className="text-body-3 text-brand font-bold">
+          {t("try_again")}
+        </Text>
       </Touchable>
     </View>
   );
 }
 
 function HotKeywordSection() {
+  const t = useTranslations();
   const { data, isPending, isError, fetchStatus, refetch } = useNewsDashboard();
 
   if (isPending && fetchStatus === "paused") {
@@ -341,7 +349,7 @@ function HotKeywordSection() {
             numberOfLines={1}
             style={{ opacity: 0.7 }}
           >
-            Hot Keyword
+            {t("hot_keyword")}
           </Text>
           <Text
             className="text-title-3 text-background mt-1 font-bold"

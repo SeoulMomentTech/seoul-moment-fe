@@ -1,5 +1,6 @@
 import { ActivityIndicator, View } from "react-native";
 
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { EMPTY_ICON_SIZE, InboxIcon } from "@shared/ui/icons";
 import { Section } from "@shared/ui/section";
 import { EmptyState, SectionError } from "@shared/ui/section-state";
@@ -10,8 +11,9 @@ import { useNewsDashboardIsEmpty } from "../model/useNewsDashboard";
 
 /** 제목 줄. 로딩·에러·오프라인에서도 같은 자리를 지킨다. */
 function LifestyleTitle() {
+  const t = useTranslations();
   return (
-    <Section title="Lifestyle">
+    <Section title={t("lifestyle")}>
       <View />
     </Section>
   );
@@ -41,6 +43,7 @@ export function LifestyleHeader() {
  * Lifestyle 목록이 비어 있을 때만 FlatList 가 그린다. 가드 순서는 홈 섹션과 같다.
  */
 export function LifestyleEmpty() {
+  const t = useTranslations();
   const { isPending, isError, fetchStatus, refetch } =
     useInfiniteNewsByCategory();
   const dashboardEmpty = useNewsDashboardIsEmpty();
@@ -60,9 +63,9 @@ export function LifestyleEmpty() {
 
   return (
     <EmptyState
-      hint="Pull down to refresh."
+      hint={t("pull_to_refresh")}
       icon={<InboxIcon color={EMPTY_ICON_COLOR} size={EMPTY_ICON_SIZE} />}
-      message="No stories yet"
+      message={t("no_stories_yet")}
     />
   );
 }

@@ -1,5 +1,6 @@
 import { ScrollView, View } from "react-native";
 
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import type { BrandPromotionBrand } from "@shared/services/brandPromotion";
 import { CHIP_GAP, Chip } from "@shared/ui/chip";
 import { CHIP_HEIGHT } from "@shared/ui/skeleton";
@@ -30,13 +31,14 @@ export function BrandSwitcher({
   selectedId,
   onSelect,
 }: BrandSwitcherProps) {
+  const t = useTranslations();
   return (
     <View
       className="border-neutral-subtle bg-background border-b"
       style={{ paddingVertical: Spacing.tight }}
     >
       <ScrollView
-        accessibilityLabel="Brands in this promotion"
+        accessibilityLabel={t("promotion_brands")}
         contentContainerStyle={{ paddingHorizontal: 20, gap: CHIP_GAP }}
         horizontal
         showsHorizontalScrollIndicator={false}

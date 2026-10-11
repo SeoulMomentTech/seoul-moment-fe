@@ -1,5 +1,6 @@
 import { Text, View } from "react-native";
 
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { Touchable } from "@shared/ui/press";
 
 export const PAGER_BAR_HEIGHT = 1;
@@ -25,6 +26,7 @@ interface SlidePagerProps {
  * 장이 하나뿐이면 넘길 곳이 없으므로 호출부가 그릴지 말지 정한다.
  */
 export function SlidePager({ index, total, onPrev, onNext }: SlidePagerProps) {
+  const t = useTranslations();
   const current = index + 1;
   const isFirst = index === 0;
   const isLast = index === total - 1;
@@ -46,12 +48,17 @@ export function SlidePager({ index, total, onPrev, onNext }: SlidePagerProps) {
       >
         <Arrow
           disabled={isFirst}
-          label="Previous"
+          label={t("previous")}
           onPress={onPrev}
           symbol="‹"
         />
         <Text className="text-body-3 text-neutral">{`${current} / ${total}`}</Text>
-        <Arrow disabled={isLast} label="Next" onPress={onNext} symbol="›" />
+        <Arrow
+          disabled={isLast}
+          label={t("next")}
+          onPress={onNext}
+          symbol="›"
+        />
       </View>
     </View>
   );

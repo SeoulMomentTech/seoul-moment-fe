@@ -1,5 +1,6 @@
 import { View } from "react-native";
 
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { EMPTY_ICON_SIZE, InboxIcon } from "@shared/ui/icons";
 import { EmptyState } from "@shared/ui/section-state"; // --neutral-600
 
@@ -12,6 +13,7 @@ const EMPTY_ICON_COLOR = "#707070";
  * 화면의 유일한 내용이 되므로, 위쪽에 여백을 줘 흰 종이 맨 위에 붙지 않게 한다.
  */
 export function HomeEmpty() {
+  const t = useTranslations();
   const isEmpty = useHomeIsEmpty();
 
   if (!isEmpty) return null;
@@ -19,9 +21,9 @@ export function HomeEmpty() {
   return (
     <View className="pt-16">
       <EmptyState
-        hint="Pull down to refresh."
+        hint={t("pull_to_refresh")}
         icon={<InboxIcon color={EMPTY_ICON_COLOR} size={EMPTY_ICON_SIZE} />}
-        message="Nothing here yet"
+        message={t("nothing_here_yet")}
       />
     </View>
   );

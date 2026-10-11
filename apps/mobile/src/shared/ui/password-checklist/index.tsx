@@ -1,5 +1,6 @@
 import { Text, View } from "react-native";
 
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import {
   PASSWORD_RULES,
   PASSWORD_RULE_LABELS,
@@ -22,10 +23,13 @@ const ROW_GAP = 6;
  * 지켰는지 다시 셀 수 없고, 줄 수가 줄면서 아래 버튼이 올라온다.
  */
 export function PasswordChecklist({ value }: { value: string }) {
+  const t = useTranslations();
+
   return (
     <View style={{ gap: ROW_GAP }}>
-      {PASSWORD_RULE_LABELS.map(({ key, label }) => {
+      {PASSWORD_RULE_LABELS.map(({ key, labelKey }) => {
         const met = PASSWORD_RULES[key](value);
+        const label = t(labelKey);
 
         return (
           <View className="flex-row items-center" key={key}>
@@ -39,7 +43,12 @@ export function PasswordChecklist({ value }: { value: string }) {
               <CheckIcon color={met ? MET : UNMET} size={ICON_SIZE} />
             </View>
             <Text
-              accessibilityLabel={`${label}${met ? ", met" : ", not met"}`}
+              accessibilityLabel={t(
+                met ? "password_rule_met" : "password_rule_unmet",
+                {
+                  rule: label,
+                },
+              )}
               className={
                 met
                   ? "text-body-5 text-foreground flex-1"

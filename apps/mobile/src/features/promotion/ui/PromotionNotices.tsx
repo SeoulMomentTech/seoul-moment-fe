@@ -1,5 +1,6 @@
 import { Text, View } from "react-native";
 
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import type { BrandPromotionNotice } from "@shared/services/brandPromotion";
 import { Section } from "@shared/ui/section";
 
@@ -20,10 +21,11 @@ export function PromotionNotices({
 }: {
   noticeList: BrandPromotionNotice[];
 }) {
+  const t = useTranslations();
   if (noticeList.length === 0) return null;
 
   return (
-    <Section title="Notice" tone="muted">
+    <Section title={t("promotion_notice")} tone="muted">
       <View className="px-5" style={{ gap: NOTICE_GAP }}>
         {noticeList.map((notice) => (
           <View className="flex-row" key={notice.id}>

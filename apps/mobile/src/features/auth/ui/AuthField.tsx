@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { Platform, TextInput, View } from "react-native";
 
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { EyeIcon, EyeOffIcon } from "@shared/ui/icons";
 import { Touchable } from "@shared/ui/press";
 
@@ -79,6 +80,7 @@ export function AuthField({
   onComplete,
   ...input
 }: AuthFieldProps) {
+  const t = useTranslations();
   const [focused, setFocused] = useState(false);
   // 가린 글자는 오타를 확인할 길이 없다. 웹 가입 폼과 같이 눈 토글을 둔다.
   const [revealed, setRevealed] = useState(false);
@@ -127,7 +129,7 @@ export function AuthField({
       />
       {secureTextEntry ? (
         <Touchable
-          accessibilityLabel={revealed ? "Hide password" : "Show password"}
+          accessibilityLabel={t(revealed ? "hide_password" : "show_password")}
           accessibilityRole="button"
           className="items-center justify-center"
           hitSlop={8}

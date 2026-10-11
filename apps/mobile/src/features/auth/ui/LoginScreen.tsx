@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { Button } from "@shared/ui/button";
 import { Touchable } from "@shared/ui/press";
 
@@ -38,6 +39,7 @@ const looksLikeEmail = (value: string) => /^\S+@\S+\.\S+$/.test(value.trim());
  * 차지해야 하고, 보여 준 적 없는 것을 아쉬워하는 사람은 없다.
  */
 export function LoginScreen() {
+  const t = useTranslations();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -82,7 +84,7 @@ export function LoginScreen() {
           style={{ height: HeaderHeight }}
         >
           <Touchable
-            accessibilityLabel="Go back"
+            accessibilityLabel={t("back")}
             accessibilityRole="button"
             hitSlop={14}
             onPress={() => router.back()}
@@ -108,7 +110,7 @@ export function LoginScreen() {
             style={{ paddingTop: Spacing.section }}
           >
             <Image
-              accessibilityLabel="Seoul Moment"
+              accessibilityLabel={t("title")}
               contentFit="contain"
               source={require("@/assets/images/logo.png")}
               style={{ width: LOGO_WIDTH, height: LOGO_HEIGHT }}
@@ -117,7 +119,7 @@ export function LoginScreen() {
               className="text-body-3 text-neutral text-center"
               style={{ marginTop: Spacing.tight }}
             >
-              Welcome to Seoul Moment.
+              {t("welcome_to_seoulmoment")}
             </Text>
           </View>
 
@@ -127,7 +129,7 @@ export function LoginScreen() {
               keyboardType="email-address"
               onChangeText={edit(setEmail)}
               onSubmitEditing={() => passwordRef.current?.focus()}
-              placeholder="Email"
+              placeholder={t("email")}
               returnKeyType="next"
               value={email}
             />
@@ -136,7 +138,7 @@ export function LoginScreen() {
               inputRef={passwordRef}
               onChangeText={edit(setPassword)}
               onSubmitEditing={submit}
-              placeholder="Password"
+              placeholder={t("enter_password_input")}
               returnKeyType="go"
               secureTextEntry
               value={password}
@@ -150,14 +152,14 @@ export function LoginScreen() {
               className="text-body-3 text-danger"
               style={{ marginTop: Spacing.tight }}
             >
-              Please check your email or password.
+              {t("login_failed")}
             </Text>
           ) : null}
 
           <Button
-            accessibilityLabel="Login"
+            accessibilityLabel={t("login")}
             disabled={!canSubmit}
-            label={mutation.isPending ? "Logging in…" : "Login"}
+            label={mutation.isPending ? t("logging_in_progress") : t("login")}
             onPress={submit}
             style={{ marginTop: Spacing.inner }}
           />
@@ -167,7 +169,7 @@ export function LoginScreen() {
               "다시 해 보기"의 연장이라는 뜻이 끊긴다. */}
           <View className="items-center" style={{ marginTop: Spacing.tight }}>
             <Touchable
-              accessibilityLabel="Forgot your password"
+              accessibilityLabel={t("forgot_password_1")}
               accessibilityRole="button"
               hitSlop={14}
               onPress={() => router.push("/find-password")}
@@ -176,7 +178,7 @@ export function LoginScreen() {
                 className="text-body-3 text-neutral"
                 style={{ textDecorationLine: "underline" }}
               >
-                Forgot your password?
+                {t("forgot_password_1")}
               </Text>
             </Touchable>
           </View>
@@ -188,7 +190,7 @@ export function LoginScreen() {
               가입은 "계정이 없다"는 다른 갈래라 맨 아래에 두되, 섹션 간격(40)까지
               벌리지는 않는다 — 그만큼 비우면 그 자리에 무언가 빠진 것처럼 보인다. */}
           <Button
-            label="Sign up with email"
+            label={t("sign_up_with_email")}
             onPress={() => router.push("/signup")}
             style={{ marginTop: Spacing.inner }}
             variant="secondary"
