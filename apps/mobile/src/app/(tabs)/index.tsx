@@ -1,5 +1,7 @@
 import { RefreshControl, ScrollView, View } from "react-native";
 
+import { useCartBadgeScrollCollapse } from "@shared/ui/cart-button/collapse";
+
 import { BottomTabInset, Spacing } from "@/constants/theme";
 
 import {
@@ -13,11 +15,13 @@ import {
 } from "@features/home";
 
 export default function HomeScreen() {
+  const badgeScroll = useCartBadgeScrollCollapse();
   const { isRefreshing, refresh } = useRefreshHome();
 
   return (
     <View className="bg-background flex-1">
       <ScrollView
+        {...badgeScroll}
         contentContainerStyle={{
           paddingBottom: BottomTabInset + Spacing.section,
         }}

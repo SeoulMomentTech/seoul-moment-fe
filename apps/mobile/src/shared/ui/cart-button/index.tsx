@@ -1,8 +1,10 @@
 import { useRouter } from "expo-router";
-import { Text, View } from "react-native";
+import { Animated, Text } from "react-native";
 
 import { CartIcon } from "@shared/ui/icons";
 import { Touchable } from "@shared/ui/press";
+
+import { cartBadgeCollapse } from "./collapse";
 
 // className 을 받지 못하는 SVG 라 토큰 값을 직접 쓴다.
 const FOREGROUND = "#171717";
@@ -17,6 +19,20 @@ const OVERLAY_BACKGROUND = "rgba(0,0,0,0.45)";
 const BADGE_SIZE = 18;
 /** 이보다 많으면 정확한 수를 세는 뜻이 없다. 자릿수가 늘어 뱃지가 아이콘을 덮기도 한다. */
 const MAX_BADGE_COUNT = 99;
+/** 접혔을 때의 크기. 18pt 뱃지가 8pt 점이 된다 — 숫자는 못 읽어도 있다는 것은 남는다. */
+const COLLAPSED_SCALE = 0.45;
+
+const badgeScale = cartBadgeCollapse.interpolate({
+  inputRange: [0, 1],
+  outputRange: [1, COLLAPSED_SCALE],
+});
+
+// 숫자는 크기보다 먼저 사라진다. 끝까지 남겨 두면 줄어드는 동안 뭉개진 글자가 보인다.
+const countOpacity = cartBadgeCollapse.interpolate({
+  inputRange: [0, 0.5],
+  outputRange: [1, 0],
+  extrapolate: "clamp",
+});
 
 /**
  * plain   — 흰 머리 막대 위. 검은 글리프만 둔다.
@@ -72,7 +88,7 @@ export function CartButtonView({ count, tone = "plain" }: CartButtonViewProps) {
       <CartIcon color={overlay ? ON_PHOTO : FOREGROUND} size={ICON_SIZE} />
       {hasBadge ? (
         // 수는 바로 옆 이름("Cart, 3 items")이 이미 말하므로 따로 읽어 주지 않는다.
-        <View
+        <Animated.View
           accessibilityElementsHidden
           className="bg-brand absolute items-center justify-center rounded-full"
           importantForAccessibility="no-hide-descendants"
@@ -82,12 +98,16 @@ export function CartButtonView({ count, tone = "plain" }: CartButtonViewProps) {
             height: BADGE_SIZE,
             minWidth: BADGE_SIZE,
             paddingHorizontal: 4,
+            transform: [{ scale: badgeScale }],
           }}
         >
-          <Text className="text-body-5 text-background font-bold">
-            {count > MAX_BADGE_COUNT ? `${MAX_BADGE_COUNT}+` : count}
-          </Text>
-        </View>
+          {/* 투명도는 글자가 아니라 상자에 건다 — Animated.Text 는 이 앱에서 쓴 적이 없다. */}
+          <Animated.View style={{ opacity: countOpacity }}>
+            <Text className="text-body-5 text-background font-bold">
+              {count > MAX_BADGE_COUNT ? `${MAX_BADGE_COUNT}+` : count}
+            </Text>
+          </Animated.View>
+        </Animated.View>
       ) : null}
     </Touchable>
   );

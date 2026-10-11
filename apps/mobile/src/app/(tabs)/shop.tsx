@@ -2,6 +2,7 @@ import { useRouter } from "expo-router";
 import { FlatList, RefreshControl, View } from "react-native";
 
 import { ProductCard } from "@entities/product/ui/ProductCard";
+import { useCartBadgeScrollCollapse } from "@shared/ui/cart-button/collapse";
 import { Touchable } from "@shared/ui/press";
 
 import { BottomTabInset, Spacing } from "@/constants/theme";
@@ -21,6 +22,7 @@ import {
 } from "@features/shop";
 
 export default function ShopScreen() {
+  const badgeScroll = useCartBadgeScrollCollapse();
   const router = useRouter();
   const { isRefreshing, refresh } = useRefreshShop();
   const { data, hasNextPage, isFetchingNextPage, fetchNextPage } =
@@ -33,6 +35,7 @@ export default function ShopScreen() {
   return (
     <View className="bg-background flex-1">
       <FlatList
+        {...badgeScroll}
         ListEmptyComponent={ShopEmpty}
         ListFooterComponent={ShopFooter}
         ListHeaderComponent={ShopListHeader}

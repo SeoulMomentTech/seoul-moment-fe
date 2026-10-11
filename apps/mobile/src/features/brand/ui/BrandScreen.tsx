@@ -4,6 +4,7 @@ import { ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CartButton } from "@entities/cart/ui/CartButton";
+import { useCartBadgeScrollCollapse } from "@shared/ui/cart-button/collapse";
 import {
   BackButton,
   SCRIM_EXTRA_HEIGHT,
@@ -26,6 +27,7 @@ const LEAD_LINE_HEIGHT = 28;
  * 날짜·작성자·관련 글이 없는 것만 다르다.
  */
 export function BrandScreen({ id }: { id: number }) {
+  const badgeScroll = useCartBadgeScrollCollapse();
   const insets = useSafeAreaInsets();
   const { data, isPending, isError, fetchStatus, refetch } = useBrandDetail(id);
 
@@ -77,7 +79,7 @@ export function BrandScreen({ id }: { id: number }) {
     <View className="bg-background flex-1">
       {/* 스크림이 고정이라 글리프가 항상 어두운 띠 위에 놓이므로 light 가 안전하다. */}
       <StatusBar style="light" />
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} {...badgeScroll}>
         <View
           className="bg-surface-muted overflow-hidden"
           style={{ height: BANNER_HEIGHT + insets.top }}
