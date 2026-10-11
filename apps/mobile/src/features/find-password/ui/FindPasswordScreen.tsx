@@ -13,15 +13,15 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { AuthField } from "@features/auth/ui/AuthField";
-import {
-  PASSWORD_RULES,
-  PASSWORD_RULE_LABELS,
-  passwordMeetsRules,
-} from "@shared/lib/utils/password";
+import { passwordMeetsRules } from "@shared/lib/utils/password";
 import { toTaiwanPhoneNumber } from "@shared/lib/utils/phone";
 import { Button } from "@shared/ui/button";
 import { Chip, CHIP_GAP } from "@shared/ui/chip";
 import { CODE_SENT_MESSAGE, FieldNote, ResendRow } from "@shared/ui/field-note";
+import {
+  PASSWORD_CHECKLIST_TOP,
+  PasswordChecklist,
+} from "@shared/ui/password-checklist";
 import { Touchable } from "@shared/ui/press";
 
 import { HeaderHeight, Spacing } from "@/constants/theme";
@@ -510,40 +510,8 @@ function ResetStep({
         />
       </View>
 
-      {/* 다섯 줄이 늘 같은 자리에 있고 글자 색만 바뀐다 — 지킨 것이 사라지면
-          무엇을 지켰는지 다시 셀 수 없다. */}
-      <View style={{ marginTop: Spacing.inner, gap: 6 }}>
-        {PASSWORD_RULE_LABELS.map(({ key, label }) => {
-          const passed = PASSWORD_RULES[key](password);
-          return (
-            <View className="flex-row" key={key}>
-              {/* 체크 표시는 읽는 것이 아니라 켜짐·꺼짐이라 낭독기에서 숨긴다.
-                  상태는 글자 쪽 accessibilityLabel 이 말한다. */}
-              <Text
-                accessibilityElementsHidden
-                className={
-                  passed
-                    ? "text-body-5 text-foreground"
-                    : "text-body-5 text-neutral"
-                }
-                importantForAccessibility="no-hide-descendants"
-                style={{ width: 18 }}
-              >
-                ✓
-              </Text>
-              <Text
-                accessibilityLabel={`${label}${passed ? ", met" : ", not met"}`}
-                className={
-                  passed
-                    ? "text-body-5 text-foreground flex-1"
-                    : "text-body-5 text-neutral flex-1"
-                }
-              >
-                {label}
-              </Text>
-            </View>
-          );
-        })}
+      <View style={{ marginTop: PASSWORD_CHECKLIST_TOP }}>
+        <PasswordChecklist value={password} />
       </View>
 
       <View style={{ marginTop: Spacing.tight }}>

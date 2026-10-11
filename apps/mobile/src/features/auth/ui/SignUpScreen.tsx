@@ -11,8 +11,13 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { passwordMeetsRules } from "@shared/lib/utils/password";
 import { Button } from "@shared/ui/button";
 import { CODE_SENT_MESSAGE, FieldNote, ResendRow } from "@shared/ui/field-note";
+import {
+  PASSWORD_CHECKLIST_TOP,
+  PasswordChecklist,
+} from "@shared/ui/password-checklist";
 import { Touchable } from "@shared/ui/press";
 
 import { HeaderHeight, Spacing } from "@/constants/theme";
@@ -38,8 +43,6 @@ const SIDE_BUTTON_WIDTH = 112;
 const RESEND_SECONDS = 60;
 
 const looksLikeEmail = (value: string) => /^\S+@\S+\.\S+$/.test(value.trim());
-// 웹과 같은 규칙. 자세한 판정은 서버가 한다.
-const MIN_PASSWORD = 8;
 const NICKNAME_RULE = /^[A-Za-z0-9]{2,20}$/;
 // 서버가 주는 코드는 여섯 자리다. 다 치면 버튼 없이 넘어간다.
 const CODE_LENGTH = 6;
@@ -118,8 +121,8 @@ export function SignUpScreen() {
     ? "Verify your email to continue."
     : !NICKNAME_RULE.test(nickname.trim())
       ? "Your nickname can be 2-20 letters and numbers."
-      : password.length < MIN_PASSWORD
-        ? `Your password needs at least ${MIN_PASSWORD} characters.`
+      : !passwordMeetsRules(password)
+        ? "Your password needs to meet all five rules below."
         : password !== passwordConfirm
           ? "The two passwords don't match."
           : !allTermsAgreed(terms)
@@ -273,6 +276,12 @@ export function SignUpScreen() {
               secureTextEntry
               value={passwordConfirm}
             />
+          </View>
+
+          {/* 규칙은 치는 동안 보여야 뜻이 있다 — 버튼 위 한 줄로만 말하면
+              무엇이 모자란지 다섯 중 어느 것인지 알 수 없다. */}
+          <View style={{ marginTop: PASSWORD_CHECKLIST_TOP }}>
+            <PasswordChecklist value={password} />
           </View>
 
           {/* 이메일 쪽 서버 응답만 칸 가까이 둔다. 나머지 규칙은 버튼 위 한 줄이 맡는다. */}

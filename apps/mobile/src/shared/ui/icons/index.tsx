@@ -262,3 +262,18 @@ export function ChevronDownIcon({ size = DEFAULT_SIZE, color }: IconProps) {
     </Svg>
   );
 }
+
+/** 지킨 것. 비밀번호 규칙 목록이 줄마다 켜고 끈다. */
+export function CheckIcon({ size = DEFAULT_SIZE, color }: IconProps) {
+  return (
+    <Svg fill="none" height={size} viewBox="0 0 24 24" width={size}>
+      <Path
+        d="M4 12.5l5.5 5.5L20 6.5"
+        stroke={color}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2.5}
+      />
+    </Svg>
+  );
+}
