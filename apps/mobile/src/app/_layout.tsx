@@ -29,6 +29,7 @@ export default function RootLayout() {
           <Stack.Screen name="cart" />
           <Stack.Screen name="login" />
           <Stack.Screen name="signup" />
+          <Stack.Screen name="find-password" />
           <Stack.Screen name="account/login-info" />
           <Stack.Screen name="account/profile" />
           <Stack.Screen name="account/preferences" />

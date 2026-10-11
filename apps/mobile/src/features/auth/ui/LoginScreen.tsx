@@ -161,13 +161,31 @@ export function LoginScreen() {
             style={{ marginTop: Spacing.inner }}
           />
 
+          {/* 비밀번호를 잊은 사람에게는 가입보다 이 길이 먼저다. 버튼 둘 사이가 아니라
+              로그인 바로 아래에 두어, "다시 해 보기"의 연장으로 읽히게 한다. */}
+          <View className="items-center" style={{ marginTop: Spacing.tight }}>
+            <Touchable
+              accessibilityLabel="Forgot your password"
+              accessibilityRole="button"
+              hitSlop={14}
+              onPress={() => router.push("/find-password")}
+            >
+              <Text
+                className="text-body-3 text-neutral"
+                style={{ textDecorationLine: "underline" }}
+              >
+                Forgot your password?
+              </Text>
+            </Touchable>
+          </View>
+
           {/* 약관 동의 문구는 두지 않는다 — 로그인은 동의를 받는 자리가 아니고,
               약관은 가입 화면과 My > Help 에서 볼 수 있다. */}
           <Button
             label="Sign up with email"
             onPress={() => router.push("/signup")}
             // 로그인과 짝을 이루는 선택지라 섹션 간격(40)이 아니라 가까이 붙인다.
-            style={{ marginTop: Spacing.tight }}
+            style={{ marginTop: Spacing.inner }}
             variant="secondary"
           />
         </ScrollView>
