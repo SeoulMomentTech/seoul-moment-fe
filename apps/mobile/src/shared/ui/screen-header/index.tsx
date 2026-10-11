@@ -39,7 +39,12 @@ export function ScreenHeader({ title }: ScreenHeaderProps) {
           accessibilityRole="button"
           // 글리프 한 줄(24pt)이라 14 로 넓혀 44pt 터치 영역을 넘긴다.
           hitSlop={14}
-          onPress={() => router.back()}
+          // 딥링크로 바로 들어오면 돌아갈 자리가 없다. 그때 back 을 부르면 아무 일도
+          // 일어나지 않아 화면에 갇힌다(탭 바도 없다). 그 경우에는 탭의 뿌리로 보낸다.
+          onPress={() => {
+            if (router.canGoBack()) router.back();
+            else router.replace("/");
+          }}
         >
           <Text className="text-title-4 text-foreground font-bold">‹</Text>
         </Touchable>

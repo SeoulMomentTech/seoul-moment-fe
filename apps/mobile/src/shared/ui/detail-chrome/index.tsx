@@ -25,7 +25,12 @@ export function BackButton() {
       // 사진 위에 뜬 어두운 원이라 흰 리플을 쓰는 overlay 를 고른다.
       feedback="overlay"
       hitSlop={8}
-      onPress={() => router.back()}
+      // 딥링크로 바로 들어오면 돌아갈 자리가 없다. 그때 back 을 부르면 아무 일도
+      // 일어나지 않아 화면에 갇힌다(탭 바도 없다). 그 경우에는 탭의 뿌리로 보낸다.
+      onPress={() => {
+        if (router.canGoBack()) router.back();
+        else router.replace("/");
+      }}
       // 배너 사진 위에 떠야 하므로 반투명 검정을 직접 쓴다. 토큰에는 오버레이 색이 없다.
       style={{ top: insets.top + 8, backgroundColor: "rgba(0,0,0,0.45)" }}
     >
