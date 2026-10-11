@@ -185,11 +185,12 @@ export function LoginScreen() {
 
           {/* 약관 동의 문구는 두지 않는다 — 로그인은 동의를 받는 자리가 아니고,
               약관은 가입 화면과 My > Help 에서 볼 수 있다.
-              가입은 "계정이 없다"는 다른 갈래라 맨 아래, 섹션 간격만큼 떨어뜨린다. */}
+              가입은 "계정이 없다"는 다른 갈래라 맨 아래에 두되, 섹션 간격(40)까지
+              벌리지는 않는다 — 그만큼 비우면 그 자리에 무언가 빠진 것처럼 보인다. */}
           <Button
             label="Sign up with email"
             onPress={() => router.push("/signup")}
-            style={{ marginTop: Spacing.section }}
+            style={{ marginTop: Spacing.inner }}
             variant="secondary"
           />
         </ScrollView>
