@@ -5,6 +5,7 @@ import { ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg";
 
+import { CartButton } from "@entities/cart/ui/CartButton";
 import { formatDate } from "@shared/lib/utils/formatDate";
 import type { NewsDetailSection, NewsLastItem } from "@shared/services/news";
 import {
@@ -131,6 +132,7 @@ export function DetailScreen<T extends DetailContent>({
       <View className="bg-background flex-1">
         <StatusBar style="dark" />
         <BackButton />
+        <CartButton tone="overlay" />
         {/* 실제 배너는 상태바 밑까지 풀블리드(높이 + insets.top)다. StatusScreen 의 상단 패딩을 쓰면 배너가 그만큼 아래로 밀리므로 패딩 없는 틀에 놓는다. */}
         <DetailSkeleton bannerHeight={BANNER_HEIGHT + insets.top} />
       </View>
@@ -238,6 +240,7 @@ export function DetailScreen<T extends DetailContent>({
       {/* 스크롤 콘텐츠 위, 뒤로가기 버튼 아래. JSX 순서로 쌓임이 정해진다. */}
       <TopScrim height={insets.top + SCRIM_EXTRA_HEIGHT} />
       <BackButton />
+      <CartButton tone="overlay" />
     </View>
   );
 }

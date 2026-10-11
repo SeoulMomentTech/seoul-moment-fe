@@ -3,6 +3,7 @@ import { StatusBar } from "expo-status-bar";
 import { ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { CartButton } from "@entities/cart/ui/CartButton";
 import {
   BackButton,
   SCRIM_EXTRA_HEIGHT,
@@ -51,6 +52,7 @@ export function BrandScreen({ id }: { id: number }) {
       <View className="bg-background flex-1">
         <StatusBar style="dark" />
         <BackButton />
+        <CartButton tone="overlay" />
         {/* 실제 배너는 상태바 밑까지 풀블리드(높이 + insets.top)다. StatusScreen 의 상단 패딩을 쓰면 배너가 그만큼 아래로 밀린다. */}
         {/* 브랜드 인트로는 바이라인이 없고 title-3 이름 한 줄이라 전용 variant 를 쓴다. */}
         <DetailSkeleton
@@ -120,6 +122,7 @@ export function BrandScreen({ id }: { id: number }) {
       </ScrollView>
       <TopScrim height={insets.top + SCRIM_EXTRA_HEIGHT} />
       <BackButton />
+      <CartButton tone="overlay" />
     </View>
   );
 }
