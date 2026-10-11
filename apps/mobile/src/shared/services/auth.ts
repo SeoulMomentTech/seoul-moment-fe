@@ -1,5 +1,5 @@
 import type { CommonRes } from ".";
-import { api } from ".";
+import { api, SKIP_AUTH_RETRY_HEADER } from ".";
 
 export interface UserLoginPayload {
   email: string;
@@ -89,3 +89,72 @@ export const postInfoPhoneCode = (phone: string) =>
  */
 export const postInfoPhoneVerify = ({ phone, code }: VerifyPhoneCodePayload) =>
   api.post("user/auth/info/phone/verify", { json: { phone, code } });
+
+export interface PasswordVerifyRes {
+  /** 비밀번호 변경 때 Authorization 으로 쓰는 일회용 토큰. */
+  token: string;
+}
+
+/**
+ * @description 비밀번호 찾기용 이메일 코드 발송 (응답 없음 / 404: 가입되지 않은 이메일)
+ */
+export const postPasswordEmailCode = (email: string) =>
+  api.post("user/auth/password/email/code", { json: { email } });
+
+/**
+ * @description 비밀번호 찾기용 이메일 코드 검증 (401: 코드 만료 또는 불일치)
+ *
+ * 401 은 "코드가 틀렸다"는 뜻이지 "로그인이 끊겼다"가 아니다. 건너뛰기 헤더가 없으면
+ * ky 의 afterResponse 가 리프레시를 돌려 멀쩡한 세션을 끊거나 요청을 다시 보낸다.
+ */
+export const postPasswordEmailVerify = (data: {
+  email: string;
+  code: string;
+}) =>
+  api
+    .post("user/auth/password/email/verify", {
+      json: data,
+      headers: { [SKIP_AUTH_RETRY_HEADER]: "1" },
+    })
+    .json<CommonRes<PasswordVerifyRes>>();
+
+/**
+ * @description 비밀번호 찾기용 휴대폰 코드 발송 (응답 없음 / 404: 가입되지 않은 번호)
+ */
+export const postPasswordPhoneCode = (phone: string) =>
+  api.post("user/auth/password/phone/code", { json: { phone } });
+
+/**
+ * @description 비밀번호 찾기용 휴대폰 코드 검증 (401: 코드 만료 또는 불일치)
+ */
+export const postPasswordPhoneVerify = (data: {
+  phone: string;
+  code: string;
+}) =>
+  api
+    .post("user/auth/password/phone/verify", {
+      json: data,
+      headers: { [SKIP_AUTH_RETRY_HEADER]: "1" },
+    })
+    .json<CommonRes<PasswordVerifyRes>>();
+
+/**
+ * @description 비밀번호 변경 (검증이 준 일회용 토큰 필요 / 401: 토큰 만료·변조)
+ *
+ * Authorization 을 직접 세우면 attachAccessTokenHandler 가 덮어쓰지 않는다 —
+ * 로그인한 채로 들어와도 액세스 토큰이 아니라 이 일회용 토큰으로 나간다.
+ */
+export const patchPassword = ({
+  password,
+  token,
+}: {
+  password: string;
+  token: string;
+}) =>
+  api.patch("user/auth/password", {
+    json: { password },
+    headers: {
+      Authorization: `Bearer ${token}`,
+      [SKIP_AUTH_RETRY_HEADER]: "1",
+    },
+  });

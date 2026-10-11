@@ -19,7 +19,12 @@ export interface ExtendedHTTPError extends HTTPError {
   isReported?: boolean;
 }
 
-const SKIP_AUTH_RETRY_HEADER = "x-skip-auth-retry";
+/**
+ * 이 헤더가 붙은 요청은 401 을 받아도 토큰 재발급·재시도를 타지 않는다.
+ * 재발급 요청 자체와, 401 이 "로그인이 끊겼다"가 아니라 그 요청만의 뜻을 가지는 곳
+ * (비밀번호 찾기의 코드 불일치·일회용 토큰 만료)이 쓴다.
+ */
+export const SKIP_AUTH_RETRY_HEADER = "x-skip-auth-retry";
 
 const attachAccessTokenHandler = async (request: Request) => {
   // 앱 시작 직후 요청이 SecureStore 복원보다 먼저 나가면 토큰이 빠진다. 복원 Promise 는
