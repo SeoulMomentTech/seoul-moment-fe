@@ -31,6 +31,8 @@ import {
 
 // 곁들임 버튼 폭. 가입 화면과 같은 값이라 두 화면의 인증 줄이 같은 자리에서 끊긴다.
 const SIDE_BUTTON_WIDTH = 112;
+// 서버가 주는 코드는 여섯 자리다. 다 치면 버튼 없이 넘어간다.
+const CODE_LENGTH = 6;
 // 재발송 대기. 가입 화면과 같은 60초다.
 const RESEND_SECONDS = 60;
 // 대만 휴대폰 번호는 0 과 국가 코드를 뗀 뒤 9자리다. 8 아래면 보낼 것도 없다.
@@ -161,6 +163,18 @@ function LoginInfoForm({ info }: { info: UserInfo }) {
   const phoneVerified =
     accountPhone != null && normalizedPhone === accountPhone;
 
+  /**
+   * 옆 버튼과 자동 제출이 같은 길을 쓴다. 왕복 중에는 다시 보내지 않는다.
+   *
+   * 값을 인자로 받는 이유가 있다 — 자동 제출은 state 가 갱신되기 전에 불리므로,
+   * 여기서 code 를 읽으면 마지막 한 자가 빠진 코드를 보낸다.
+   */
+  const submitCode = (value: string = code) => {
+    const trimmed = value.trim();
+    if (trimmed.length === 0 || verifyCode.isPending) return;
+    verifyCode.mutate({ phone: normalizedPhone, code: trimmed });
+  };
+
   const send = () =>
     sendCode.mutate(normalizedPhone, {
       onSuccess: () => setResendIn(RESEND_SECONDS),
@@ -195,11 +209,15 @@ function LoginInfoForm({ info }: { info: UserInfo }) {
                 <View className="flex-1">
                   <AuthField
                     editable={!phoneVerified}
+                    invalid={verifyCode.isError}
                     keyboardType="number-pad"
+                    maxLength={CODE_LENGTH}
                     onChangeText={(value) => {
                       setCode(value);
                       verifyCode.reset();
                     }}
+                    onComplete={submitCode}
+                    otp="sms"
                     placeholder="Verification Code"
                     value={code}
                   />
@@ -213,12 +231,7 @@ function LoginInfoForm({ info }: { info: UserInfo }) {
                   <Button
                     disabled={code.trim().length === 0 || verifyCode.isPending}
                     label="Verify"
-                    onPress={() =>
-                      verifyCode.mutate({
-                        phone: normalizedPhone,
-                        code: code.trim(),
-                      })
-                    }
+                    onPress={() => submitCode()}
                     style={{ width: SIDE_BUTTON_WIDTH }}
                     variant="secondary"
                   />

@@ -41,6 +41,8 @@ const SIDE_BUTTON_WIDTH = 112;
 const RESEND_SECONDS = 60;
 
 const looksLikeEmail = (value: string) => /^\S+@\S+\.\S+$/.test(value.trim());
+// 서버가 주는 코드는 여섯 자리다(swagger: "코드 (6자리)"). 다 치면 버튼 없이 넘어간다.
+const CODE_LENGTH = 6;
 // +886 을 붙인 뒤의 최소 길이. 대만 휴대폰은 9자리다.
 const MIN_PHONE_LENGTH = "+886".length + 9;
 
@@ -125,16 +127,25 @@ export function FindPasswordScreen() {
     });
   };
 
-  const submitCode = () => {
+  /**
+   * 옆 버튼과 자동 제출이 같은 길을 쓴다. 왕복 중에는 다시 보내지 않는다.
+   *
+   * 값을 인자로 받는 이유가 있다 — 자동 제출은 state 가 갱신되기 전에 불리므로,
+   * 여기서 code 를 읽으면 마지막 한 자가 빠진 코드를 보낸다.
+   */
+  const submitCode = (value: string = code) => {
+    const trimmed = value.trim();
+    if (trimmed.length === 0 || verify.isPending) return;
+
     if (method === "email") {
       verifyEmail.mutate(
-        { email: normalized, code: code.trim() },
+        { email: normalized, code: trimmed },
         { onSuccess: (res) => setToken(res.data.token) },
       );
       return;
     }
     verifyPhone.mutate(
-      { phone: normalized, code: code.trim() },
+      { phone: normalized, code: trimmed },
       { onSuccess: (res) => setToken(res.data.token) },
     );
   };
@@ -281,7 +292,7 @@ interface VerifyStepProps {
   verifyFailed: boolean;
   resendIn: number;
   onRequestCode(): void;
-  onSubmitCode(): void;
+  onSubmitCode(value?: string): void;
 }
 
 /** 첫 걸음. 가입할 때 쓴 이메일 또는 번호를 코드로 확인한다. */
@@ -345,8 +356,12 @@ function VerifyStep({
         <View className="flex-row" style={{ gap: Spacing.tight }}>
           <View className="flex-1">
             <AuthField
+              invalid={verifyFailed}
               keyboardType="number-pad"
+              maxLength={CODE_LENGTH}
               onChangeText={onChangeCode}
+              onComplete={onSubmitCode}
+              otp={method === "email" ? "email" : "sms"}
               placeholder="Verification Code"
               value={code}
             />
@@ -357,7 +372,9 @@ function VerifyStep({
             <Button
               disabled={code.trim().length === 0 || busyVerifying}
               label="Verify"
-              onPress={onSubmitCode}
+              // 인자 없이 부른다 — Pressable 은 제스처 이벤트를 넘기는데,
+              // 그것이 코드 값 자리에 들어오면 trim() 에서 터진다.
+              onPress={() => onSubmitCode()}
               style={{ width: SIDE_BUTTON_WIDTH }}
               variant="secondary"
             />

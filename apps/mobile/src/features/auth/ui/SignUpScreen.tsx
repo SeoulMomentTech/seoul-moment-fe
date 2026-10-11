@@ -41,6 +41,8 @@ const looksLikeEmail = (value: string) => /^\S+@\S+\.\S+$/.test(value.trim());
 // 웹과 같은 규칙. 자세한 판정은 서버가 한다.
 const MIN_PASSWORD = 8;
 const NICKNAME_RULE = /^[A-Za-z0-9]{2,20}$/;
+// 서버가 주는 코드는 여섯 자리다. 다 치면 버튼 없이 넘어간다.
+const CODE_LENGTH = 6;
 
 /**
  * 이메일 회원가입. 칸 순서와 구성은 web SignupForm 과 같다 —
@@ -81,6 +83,17 @@ export function SignUpScreen() {
     sendCode.mutate(email.trim(), {
       onSuccess: () => setResendIn(RESEND_SECONDS),
     });
+
+  /** 옆 버튼과 자동 제출이 같은 길을 쓴다. 왕복 중에는 다시 보내지 않는다. */
+  const submitCode = (value: string = code) => {
+    const trimmed = value.trim();
+    if (trimmed.length === 0 || verifyCode.isPending) return;
+
+    verifyCode.mutate(
+      { email: email.trim(), code: trimmed },
+      { onSuccess: (res) => setVerified(res.success) },
+    );
+  };
 
   // 한 번이라도 코드를 받았으면 그 뒤로는 "검증" 단계다. 재발송은 안내 줄이 맡는다.
   const codeSent = sendCode.isSuccess;
@@ -193,12 +206,16 @@ export function SignUpScreen() {
               <View className="flex-1">
                 <AuthField
                   editable={!verified}
+                  invalid={codeRejected}
                   keyboardType="number-pad"
+                  maxLength={CODE_LENGTH}
                   onChangeText={(value) => {
                     setCode(value);
                     verifyCode.reset();
                     clearSubmitErrors();
                   }}
+                  onComplete={submitCode}
+                  otp="email"
                   placeholder="Verification Code"
                   value={code}
                 />
@@ -212,12 +229,7 @@ export function SignUpScreen() {
                 <Button
                   disabled={code.trim().length === 0 || verifyCode.isPending}
                   label="Verify"
-                  onPress={() =>
-                    verifyCode.mutate(
-                      { email: email.trim(), code: code.trim() },
-                      { onSuccess: (res) => setVerified(res.success) },
-                    )
-                  }
+                  onPress={() => submitCode()}
                   style={{ width: SIDE_BUTTON_WIDTH }}
                   variant="secondary"
                 />
