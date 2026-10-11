@@ -1,11 +1,12 @@
 import { useState } from "react";
 
 import { useRouter } from "expo-router";
-import { Alert, View } from "react-native";
+import { Alert, Text, View } from "react-native";
 
 import { useUserAuthStore } from "@shared/lib/auth/useUserAuthStore";
-import { Button } from "@shared/ui/button";
+import { BUTTON_HEIGHT } from "@shared/ui/button";
 import { FieldNote } from "@shared/ui/field-note";
+import { Touchable } from "@shared/ui/press";
 
 import { Spacing } from "@/constants/theme";
 
@@ -17,6 +18,19 @@ import {
 import { classifySnsAuthResponse } from "../lib/snsAuthOutcome";
 import { useLineLink, useLineLogin } from "../model/useSnsAuth";
 import { useSnsSignUpStore } from "../model/useSnsSignUpStore";
+
+/**
+ * LINE 로그인 버튼의 색. **LINE 의 버튼 가이드라인이 정한 값이라 바꾸지 않는다** —
+ * 바탕 #06C755 에 흰 글자, 누르면 그 위에 검정 30% 를 덮는다(= #048B3B).
+ *
+ * 흰 글자 / 초록 바탕은 2.26:1 로 본문 기준(4.5)에 못 미친다. 알고 두는 것이다 —
+ * 이 버튼은 LINE 의 자산이고, 색을 고치는 쪽이 가이드라인 위반이다.
+ *
+ * 로고는 넣지 않았다. 가이드라인이 "다른 아이콘이나 고친 아이콘으로 바꾸지 말 것"을
+ * 명시하므로 비슷하게 그려 넣을 수 없고, 공식 템플릿의 아이콘 파일이 있어야 한다.
+ */
+const LINE_GREEN = "#06C755";
+const LINE_GREEN_PRESSED = "#048B3B";
 
 /**
  * LINE 으로 계속하기. 누르면 네 갈래 중 하나로 끝난다 —
@@ -131,13 +145,29 @@ export function LineLoginButton() {
 
   return (
     <View>
-      <Button
+      {/* 공용 Button 을 쓰지 않는다 — 색도 누름 표현도 LINE 이 정해 둔 것이라
+          variant 하나로 섞을 수 있는 종류가 아니다. */}
+      <Touchable
+        accessibilityLabel="Continue with LINE"
+        accessibilityRole="button"
+        accessibilityState={{ disabled: busy }}
+        className="items-center justify-center rounded-full"
         disabled={busy}
-        label={busy ? "Connecting…" : "Continue with LINE"}
+        // 누름은 투명도가 아니라 검정 30% 덮기다. 투명도로 하면 흰 바탕 위에서
+        // 초록이 옅어져, 가이드라인이 말하는 "어두워지는" 것과 반대가 된다.
+        feedback="none"
         onPress={() => void start()}
-        style={{ marginTop: Spacing.tight }}
-        variant="secondary"
-      />
+        style={({ pressed }) => ({
+          height: BUTTON_HEIGHT.lg,
+          marginTop: Spacing.tight,
+          backgroundColor: pressed ? LINE_GREEN_PRESSED : LINE_GREEN,
+          opacity: busy ? 0.6 : 1,
+        })}
+      >
+        <Text className="text-body-2 font-bold" style={{ color: "#FFFFFF" }}>
+          {busy ? "Connecting…" : "Continue with LINE"}
+        </Text>
+      </Touchable>
       {problem ? (
         <View style={{ marginTop: Spacing.tight }}>
           <FieldNote error>{problem}</FieldNote>
