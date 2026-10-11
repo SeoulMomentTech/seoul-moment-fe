@@ -5,6 +5,7 @@ import { StatusBar } from "expo-status-bar";
 import { ScrollView, View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { CartButton } from "@entities/cart/ui/CartButton";
 import { ProductGrid } from "@entities/product/ui/ProductGrid";
 import {
   BackButton,
@@ -90,6 +91,7 @@ export function PromotionScreen({ promotionId }: { promotionId: number }) {
       <View className="bg-background flex-1">
         <StatusBar style="dark" />
         <BackButton />
+        <CartButton tone="overlay" />
         {/* 실제 배너는 상태바 밑까지 풀블리드다. StatusScreen 의 상단 패딩을 쓰면
             배너가 그만큼 아래로 밀린다. */}
         <PromotionSkeleton
@@ -212,6 +214,7 @@ export function PromotionScreen({ promotionId }: { promotionId: number }) {
       </ScrollView>
       <TopScrim height={insets.top + SCRIM_EXTRA_HEIGHT} />
       <BackButton />
+      <CartButton tone="overlay" />
     </View>
   );
 }
