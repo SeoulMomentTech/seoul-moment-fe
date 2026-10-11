@@ -140,14 +140,20 @@ function ProfileForm({ profile }: { profile: UserProfile }) {
   /**
    * 지금 저장을 막고 있는 한 가지. 폼 순서대로 처음 걸리는 것만 말한다 —
    * 모자란 것을 한꺼번에 늘어놓으면 혼내는 것처럼 읽힌다. 가입 화면과 같은 규칙이다.
+   *
+   * 검사는 **고친 칸에만** 건다. 서버에 이미 들어 있는 값이 규칙에 어긋난다고 해서
+   * 상관없는 칸의 수정까지 막으면 안 된다 — 이름이 빈 계정에서는 주소만 고치려 해도
+   * "Enter your name." 에 걸려 아무것도 저장할 수 없었다. 안 고친 칸은 요청에서
+   * undefined 로 빠지므로 애초에 보내지도 않는다.
    */
-  const blocker = !NICKNAME_RULE.test(nickname)
-    ? "Your nickname can be 2-20 letters and numbers."
-    : name === ""
-      ? "Enter your name."
-      : nicknameChanged || nameChanged || restChanged
-        ? null
-        : "Change something to save.";
+  const blocker =
+    nicknameChanged && !NICKNAME_RULE.test(nickname)
+      ? "Your nickname can be 2-20 letters and numbers."
+      : nameChanged && name === ""
+        ? "Enter your name."
+        : nicknameChanged || nameChanged || restChanged
+          ? null
+          : "Change something to save.";
 
   const submit = () =>
     save.mutate({
