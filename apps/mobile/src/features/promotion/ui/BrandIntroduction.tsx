@@ -7,7 +7,7 @@ import { useLanguage } from "@shared/lib/i18n/useLanguage";
 import { shareWebLink } from "@shared/lib/share";
 import type { BrandPromotionBrandDetail } from "@shared/services/brandPromotion";
 import { Button } from "@shared/ui/button";
-import { ShareIcon } from "@shared/ui/icons";
+import { HeartIcon, ShareIcon } from "@shared/ui/icons";
 import { Touchable } from "@shared/ui/press";
 
 import { Spacing } from "@/constants/theme";
@@ -26,6 +26,11 @@ export const NOTICE_LINES = 2;
 /** 공유 단추. 44pt 터치 최소치이고, 로고(48)보다 낮아 윗줄 높이를 바꾸지 않는다. */
 export const SHARE_BUTTON_SIZE = 44;
 const SHARE_ICON_SIZE = 22;
+/** 숫자 옆 메타 아이콘. 글자와 같은 줄에 서므로 body-3(14) 보다 살짝 작게 둔다. */
+const META_ICON_SIZE = 13;
+// SVG 는 className 을 못 받아 --neutral-600 값을 직접 쓴다.
+const META_ICON_COLOR = "#707070";
+
 // SVG 는 className 을 못 받아 --foreground 값을 직접 쓴다.
 const SHARE_ICON_COLOR = "#171717";
 
@@ -98,9 +103,14 @@ export function BrandIntroduction({
       >
         {brand.name}
       </Text>
-      <Text className="text-body-5 text-neutral mt-1">
-        {`♡ ${brand.likeCount.toLocaleString("en-US")}`}
-      </Text>
+      {/* 글리프(♡) 대신 아이콘이다. 글리프는 기기 글꼴마다 크기와 세로 위치가 달라
+          같은 줄의 숫자와 어긋난다. */}
+      <View className="mt-1 flex-row items-center">
+        <HeartIcon color={META_ICON_COLOR} size={META_ICON_SIZE} />
+        <Text className="text-body-5 text-neutral ml-1">
+          {brand.likeCount.toLocaleString("en-US")}
+        </Text>
+      </View>
       {brand.description ? (
         <Text
           className="text-body-3 text-foreground"

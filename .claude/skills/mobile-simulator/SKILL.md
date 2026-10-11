@@ -72,8 +72,12 @@ export PATH="$PATH:$HOME/Library/Android/sdk/platform-tools:$HOME/Library/Androi
 exp://$IP:8081/--/product/1
 exp://$IP:8081/--/cart
 exp://$IP:8081/--/order?cart=1,2
-exp://$IP:8081                      # 홈(탭)
+exp://$IP:8081/--/shop              # 탭도 경로가 있다 (shop · news · my)
 ```
+
+**홈 탭(`/`)은 딥링크로 못 간다** — 경로가 비어서 `exp://$IP:8081` 도 `/--/` 도 이미 열린
+화면을 그대로 둔다. 다른 탭으로 간 뒤 탭 바의 Home 을 누르거나(좌표는 §6), 뒤로가기를
+반복해 스택을 비운다.
 
 **첫 번들은 60~90초** 걸린다. 그 뒤 같은 세션의 이동은 10초 안쪽이다.
 

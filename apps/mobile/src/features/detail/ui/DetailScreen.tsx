@@ -187,7 +187,10 @@ export function DetailScreen<T extends DetailContent>({
             ) : null}
             <Text
               className="text-title-3 mt-2 font-bold"
-              numberOfLines={2}
+              // 세 줄까지 둔다. 본문이 제목을 다시 말하지 않아서, 두 줄에서 자르면
+              // 머리글을 끝까지 읽을 방법이 없어진다. 아래 스크림이 210pt 라
+              // 세 줄(category 17 + 8 + 93 + pb 24 = 142)까지는 어두운 띠 안에 들어온다.
+              numberOfLines={3}
               // 사진 위 오버레이라 토큰 대신 흰색을 직접 쓴다.
               style={{ color: "#FFFFFF", ...OVERLAY_TEXT_SHADOW }}
             >

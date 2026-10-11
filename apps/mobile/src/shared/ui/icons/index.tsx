@@ -232,3 +232,33 @@ export function ShareIcon({ size = DEFAULT_SIZE, color }: IconProps) {
     </Svg>
   );
 }
+
+/**
+ * 평점. 하트와 같이 "면으로 칠한" 아이콘이다 — 둘 다 숫자 옆에서 그 숫자가 무엇인지
+ * 말하는 표시라, 선으로 그리면 같은 줄의 글자보다 흐려 보인다.
+ */
+export function StarIcon({ size = DEFAULT_SIZE, color }: IconProps) {
+  return (
+    <Svg fill="none" height={size} viewBox="0 0 24 24" width={size}>
+      <Path
+        d="M12 2.5l2.9 5.88 6.6.96-4.75 4.63 1.12 6.53L12 17.4l-5.87 3.1 1.12-6.53L2.5 9.34l6.6-.96L12 2.5z"
+        fill={color}
+      />
+    </Svg>
+  );
+}
+
+/** 아래로 펼쳐지는 것. 정렬 단추처럼 "누르면 고를 것이 나온다"를 뜻한다. */
+export function ChevronDownIcon({ size = DEFAULT_SIZE, color }: IconProps) {
+  return (
+    <Svg fill="none" height={size} viewBox="0 0 24 24" width={size}>
+      <Path
+        d="M6 9l6 6 6-6"
+        stroke={color}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={STROKE_WIDTH}
+      />
+    </Svg>
+  );
+}
