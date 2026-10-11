@@ -12,13 +12,20 @@ import { create } from "zustand";
 
 import { Touchable } from "@shared/ui/press";
 
-import { BottomTabInset, Spacing } from "@/constants/theme";
+import { HeaderHeight, Spacing } from "@/constants/theme";
 
 /** 스스로 사라지기까지. 한 줄을 읽고 눈을 떼기에 넉넉한 길이다. */
 const VISIBLE_MS = 3200;
 const FADE_MS = 180;
-/** 탭 바가 있는 화면에서도 가리지 않도록 그 위로 띄운다. */
-const LIFT = BottomTabInset + Spacing.tight;
+/** 들고 날 때 미끄러지는 거리. 방향을 알아볼 만큼만 움직인다. */
+const SLIDE = 8;
+/**
+ * 상태바 아래로 내려오는 거리. 화면 머리(52)를 지나 자리를 잡는다 —
+ * 머리 막대가 있는 화면에서는 그 바로 밑에, 사진 위에 뒤로가기만 떠 있는
+ * 상세 화면(top 8 + 지름 36)에서는 그 버튼 아래에 떨어진다. 어느 쪽이든
+ * 돌아갈 길을 가리지 않는다.
+ */
+const DROP = HeaderHeight + Spacing.tight;
 
 interface ToastState {
   message: string | null;
@@ -59,6 +66,11 @@ export function ToastHost() {
   const hide = useToastStore((s) => s.hide);
   // BottomSheet 와 같은 꼴이다 — 렌더 중에 ref.current 를 읽지 않기 위해 state 에 둔다.
   const [opacity] = useState(() => new Animated.Value(0));
+  // 위에서 내려와 앉고, 사라질 때 같은 길로 올라간다. 투명도 하나가 둘 다 몬다.
+  const slide = opacity.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-SLIDE, 0],
+  });
 
   useEffect(() => {
     if (!message) return undefined;
@@ -98,8 +110,9 @@ export function ToastHost() {
         position: "absolute",
         left: Spacing.tight,
         right: Spacing.tight,
-        bottom: insets.bottom + LIFT,
+        top: insets.top + DROP,
         opacity,
+        transform: [{ translateY: slide }],
       }}
     >
       <Touchable
