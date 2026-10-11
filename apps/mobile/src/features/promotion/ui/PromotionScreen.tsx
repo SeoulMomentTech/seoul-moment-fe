@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CartButton } from "@entities/cart/ui/CartButton";
 import { ProductGrid } from "@entities/product/ui/ProductGrid";
+import { useCartBadgeScrollCollapse } from "@shared/ui/cart-button/collapse";
 import {
   BackButton,
   SCRIM_EXTRA_HEIGHT,
@@ -55,6 +56,7 @@ const PRODUCTS_HEADING = "Brand Products";
  * 상세 쿼리는 고른 id 가 생길 때까지 enabled=false 로 묶여 있다.
  */
 export function PromotionScreen({ promotionId }: { promotionId: number }) {
+  const badgeScroll = useCartBadgeScrollCollapse();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   // 상태바 밑까지 풀블리드라 화면 폭이 그대로 사진의 폭이다.
@@ -188,7 +190,7 @@ export function PromotionScreen({ promotionId }: { promotionId: number }) {
     <View className="bg-background flex-1">
       {/* 스크림이 고정이라 글리프가 항상 어두운 띠 위에 놓이므로 light 가 안전하다. */}
       <StatusBar style="light" />
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} {...badgeScroll}>
         <View
           className="bg-surface-muted overflow-hidden"
           style={{ height: bannerHeight }}

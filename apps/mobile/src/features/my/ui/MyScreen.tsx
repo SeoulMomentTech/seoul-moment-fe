@@ -7,6 +7,7 @@ import { useUserInfo } from "@entities/user/model/useUserInfo";
 import { useUserProfile } from "@entities/user/model/useUserProfile";
 import { useUserAuthStore } from "@shared/lib/auth/useUserAuthStore";
 import { Button } from "@shared/ui/button";
+import { useCartBadgeScrollCollapse } from "@shared/ui/cart-button/collapse";
 import { Touchable } from "@shared/ui/press";
 import { Section } from "@shared/ui/section";
 import { MY_AVATAR_SIZE, MyProfileSkeleton } from "@shared/ui/skeleton";
@@ -27,6 +28,7 @@ const MENU_ROW_HEIGHT = 64;
  * 로그인한 사람에게만 뜻이 있다.
  */
 export function MyScreen() {
+  const badgeScroll = useCartBadgeScrollCollapse();
   const insets = useSafeAreaInsets();
   const isAuthenticated = useUserAuthStore((s) => s.isAuthenticated);
 
@@ -38,6 +40,7 @@ export function MyScreen() {
 
   return (
     <ScrollView
+      {...badgeScroll}
       className="bg-background flex-1"
       contentContainerStyle={{ paddingBottom: insets.bottom + BottomTabInset }}
       showsVerticalScrollIndicator={false}

@@ -2,6 +2,7 @@ import { useRouter } from "expo-router";
 import { FlatList, RefreshControl, View } from "react-native";
 
 import { PostRow } from "@entities/post/ui/PostRow";
+import { useCartBadgeScrollCollapse } from "@shared/ui/cart-button/collapse";
 import { Touchable } from "@shared/ui/press";
 
 import { BottomTabInset, Spacing } from "@/constants/theme";
@@ -25,6 +26,7 @@ function NewsListHeader() {
 }
 
 export default function NewsScreen() {
+  const badgeScroll = useCartBadgeScrollCollapse();
   const router = useRouter();
   const { isRefreshing, refresh } = useRefreshNews();
   const { data, hasNextPage, isFetchingNextPage, fetchNextPage } =
@@ -33,6 +35,7 @@ export default function NewsScreen() {
   return (
     <View className="bg-background flex-1">
       <FlatList
+        {...badgeScroll}
         ListEmptyComponent={LifestyleEmpty}
         ListFooterComponent={LifestyleFooter}
         ListHeaderComponent={NewsListHeader}

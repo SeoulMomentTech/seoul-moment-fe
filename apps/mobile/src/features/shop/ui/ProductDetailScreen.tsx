@@ -19,6 +19,7 @@ import type {
   GetProductDetailRes,
   ProductDetailOption,
 } from "@shared/services/product";
+import { useCartBadgeScrollCollapse } from "@shared/ui/cart-button/collapse";
 import {
   BackButton,
   SCRIM_EXTRA_HEIGHT,
@@ -225,6 +226,7 @@ function DetailImage({ uri }: { uri: string }) {
  * 모든 분기에 뒤로가기 버튼이 있다.
  */
 export function ProductDetailScreen({ id }: { id: number }) {
+  const badgeScroll = useCartBadgeScrollCollapse();
   const insets = useSafeAreaInsets();
   const openBrandShop = useOpenBrandShop();
   const {
@@ -284,7 +286,7 @@ export function ProductDetailScreen({ id }: { id: number }) {
     <View className="bg-background flex-1">
       {/* 스크림이 고정이라 글리프가 항상 어두운 띠 위에 놓이므로 light 가 안전하다. */}
       <StatusBar style="light" />
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} {...badgeScroll}>
         {galleryUris.length > 0 ? (
           <Gallery height={GALLERY_HEIGHT + insets.top} uris={galleryUris} />
         ) : (

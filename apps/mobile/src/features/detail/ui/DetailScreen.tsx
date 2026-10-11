@@ -8,6 +8,7 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg";
 import { CartButton } from "@entities/cart/ui/CartButton";
 import { formatDate } from "@shared/lib/utils/formatDate";
 import type { NewsDetailSection, NewsLastItem } from "@shared/services/news";
+import { useCartBadgeScrollCollapse } from "@shared/ui/cart-button/collapse";
 import {
   BackButton,
   SCRIM_EXTRA_HEIGHT,
@@ -104,6 +105,7 @@ export function DetailScreen<T extends DetailContent>({
   relatedHeading,
   relatedViewAllHref,
 }: DetailScreenProps<T>) {
+  const badgeScroll = useCartBadgeScrollCollapse();
   const insets = useSafeAreaInsets();
   const isValidId = Number.isFinite(id);
   const { data: detail, isPending, isError, fetchStatus, refetch } = query;
@@ -157,7 +159,7 @@ export function DetailScreen<T extends DetailContent>({
     <View className="bg-background flex-1">
       {/* 스크림이 고정이라 스크롤 위치와 상관없이 글리프가 항상 어두운 띠 위에 놓이므로 light 가 안전하다. */}
       <StatusBar style="light" />
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} {...badgeScroll}>
         <View
           className="overflow-hidden"
           style={{ height: BANNER_HEIGHT + insets.top }}
