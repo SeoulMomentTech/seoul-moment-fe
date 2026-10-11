@@ -171,9 +171,6 @@ function PreferencesForm({ fit }: { fit: GetUserFitRes | null }) {
         }
         label="Save Changes"
         onPress={() => save.mutate(formValuesToFitPayload(values))}
-        success={
-          save.isSuccess && !changed ? "Your changes have been saved." : null
-        }
       />
     </>
   );

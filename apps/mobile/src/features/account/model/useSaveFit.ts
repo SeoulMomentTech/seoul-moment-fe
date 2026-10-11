@@ -5,6 +5,7 @@ import { useUserAuthStore } from "@shared/lib/auth/useUserAuthStore";
 import useAppMutation from "@shared/lib/hooks/query/useAppMutation";
 import type { UserFitPayload } from "@shared/services/user";
 import { createUserFit, updateUserFit } from "@shared/services/user";
+import { showToast } from "@shared/ui/toast";
 
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -23,7 +24,9 @@ export const useSaveFit = ({ exists }: { exists: boolean }) => {
 
   return useAppMutation<unknown, HTTPError, UserFitPayload>({
     mutationFn: exists ? updateUserFit : createUserFit,
-    onSuccess: () =>
-      void queryClient.invalidateQueries({ queryKey: userFitKey(id) }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: userFitKey(id) });
+      showToast("Your changes have been saved.");
+    },
   });
 };
