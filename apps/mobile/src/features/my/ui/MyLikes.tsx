@@ -177,12 +177,23 @@ function LikedProductsTab() {
     ));
   }
 
+  // 고른 카테고리가 있으면 비어 있어도 칩 줄을 남긴다 — 되돌아갈 길이 사라지면
+  // 무엇을 보고 있었는지 알 수 없다. 다만 "All" 인데도 비었다면 담은 것이 하나도
+  // 없다는 뜻이라, 거를 것이 없는 칩 줄은 빈 화면 위의 소음일 뿐이다.
+  const hasNothingLiked =
+    productCategoryId === undefined &&
+    !isPending &&
+    !isError &&
+    !data?.list.length;
+
   return (
     <View>
-      <CategoryFilter
-        onChange={setProductCategoryId}
-        value={productCategoryId}
-      />
+      {hasNothingLiked ? null : (
+        <CategoryFilter
+          onChange={setProductCategoryId}
+          value={productCategoryId}
+        />
+      )}
       {body}
     </View>
   );
@@ -429,8 +440,8 @@ function BrandRow({
   // 영어로 보면 둘이 같아지므로 그때는 좋아요 수만 남긴다 (ShopParts 의 BrandHeader 와 같은 규칙).
   const meta =
     brandName && brandName !== title
-      ? `${brandName} · ♡ ${likeCount.toLocaleString("en-US")}`
-      : `♡ ${likeCount.toLocaleString("en-US")}`;
+      ? `${brandName} · ${likeCount.toLocaleString("en-US")} likes`
+      : `${likeCount.toLocaleString("en-US")} likes`;
 
   return (
     <View

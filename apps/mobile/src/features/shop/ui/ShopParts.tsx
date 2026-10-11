@@ -12,7 +12,12 @@ import {
 
 import { Button } from "@shared/ui/button";
 import { CHIP_GAP, Chip } from "@shared/ui/chip";
-import { EMPTY_ICON_SIZE, SearchIcon } from "@shared/ui/icons";
+import {
+  ChevronDownIcon,
+  EMPTY_ICON_SIZE,
+  HeartIcon,
+  SearchIcon,
+} from "@shared/ui/icons";
 import { Touchable } from "@shared/ui/press";
 import { EmptyState, SectionError } from "@shared/ui/section-state";
 import {
@@ -34,6 +39,13 @@ import { useShopSheetStore } from "../model/useShopSheetStore";
 const SCREEN_WIDTH = Dimensions.get("window").width;
 // 빈 화면 아이콘 색. SVG 는 className 을 못 받아 --neutral-600 값을 직접 쓴다.
 const EMPTY_ICON_COLOR = "#707070";
+/** 숫자 옆 메타 아이콘. 글자와 같은 줄에 서므로 body-3(14) 보다 살짝 작게 둔다. */
+const META_ICON_SIZE = 13;
+// SVG 는 className 을 못 받아 --neutral-600 값을 직접 쓴다.
+const META_ICON_COLOR = "#707070";
+/** 정렬 이름이 차지할 수 있는 최대 폭. 넘치면 말줄임표로 끊는다. */
+const SORT_LABEL_MAX_WIDTH = 160;
+
 const BANNER_HEIGHT = 200;
 // 브랜드 소개글을 목록 헤더에서 끊는 줄 수. 스켈레톤도 같은 수를 쓴다.
 const BRAND_DESCRIPTION_LINES = 3;
@@ -89,9 +101,12 @@ function BrandHeader({ id }: { id: number }) {
             {data.name}
           </Text>
           {data.like > 0 ? (
-            <Text className="text-body-3 text-neutral ml-3">
-              {`♡ ${data.like.toLocaleString("en-US")}`}
-            </Text>
+            <View className="ml-3 flex-row items-center">
+              <HeartIcon color={META_ICON_COLOR} size={META_ICON_SIZE} />
+              <Text className="text-body-3 text-neutral ml-1">
+                {data.like.toLocaleString("en-US")}
+              </Text>
+            </View>
           ) : null}
         </View>
         {showEnglishName ? (
@@ -273,16 +288,25 @@ function FilterBar() {
           </View>
         ) : null}
       </Touchable>
+      {/* Filter 와 같은 줄에 선 같은 등급의 단추라 같은 모양을 가진다.
+          한쪽만 맨 글자면 둘 중 하나는 눌리는 것으로 보이지 않는다. */}
       <Touchable
         accessibilityLabel="Sort"
         accessibilityRole="button"
-        // 글자 한 줄(17pt)뿐이라 8 로는 33pt 에 그친다. 14 로 45pt 를 만든다.
-        hitSlop={14}
+        className="border-neutral-subtle flex-row items-center rounded-full border px-4 py-2"
+        // 칩과 같은 35pt 높이라 위아래 5pt 씩 넓혀 44pt 를 넘긴다.
+        hitSlop={{ top: 5, bottom: 5 }}
         onPress={() => setSortOpen(true)}
       >
-        <Text className="text-body-3 text-foreground" numberOfLines={1}>
-          {`${current?.name ?? "Sort"} ▾`}
+        <Text
+          className="text-body-3 text-foreground"
+          numberOfLines={1}
+          // 정렬 이름이 길어도(Price: low to high) 왼쪽 Filter 를 밀지 않는다.
+          style={{ maxWidth: SORT_LABEL_MAX_WIDTH }}
+        >
+          {current?.name ?? "Sort"}
         </Text>
+        <ChevronDownIcon color={META_ICON_COLOR} size={META_ICON_SIZE} />
       </Touchable>
     </View>
   );

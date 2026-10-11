@@ -26,6 +26,7 @@ import {
   StatusScreen,
   TopScrim,
 } from "@shared/ui/detail-chrome";
+import { HeartIcon, StarIcon } from "@shared/ui/icons";
 import { Touchable } from "@shared/ui/press";
 import { ScreenError } from "@shared/ui/section-state";
 import { DetailSkeleton } from "@shared/ui/skeleton";
@@ -38,6 +39,11 @@ import useProductDetail from "../model/useProductDetail";
 
 const GALLERY_HEIGHT = 380;
 const AVATAR_SIZE = 28;
+/** 숫자 옆 메타 아이콘. 글자와 같은 줄에 서므로 body-3(14) 보다 살짝 작게 둔다. */
+const META_ICON_SIZE = 13;
+// SVG 는 className 을 못 받아 --neutral-600 값을 직접 쓴다.
+const META_ICON_COLOR = "#707070";
+
 const DOT_SIZE = 6;
 // 점 그림자. iOS 는 shadow*, Android 는 elevation 만 먹으므로 둘 다 지정한다.
 // 6pt 점이라 오프셋·반경을 키워 번짐이 아닌 짙은 테두리 느낌의 후광이 되게 한다. 검정은 사진 색과 무관하게 쓰는 값.
@@ -327,13 +333,25 @@ export function ProductDetailScreen({ id }: { id: number }) {
             {product.name}
           </Text>
           <PriceBlock product={product} />
+          {/* 글리프(★♡) 대신 아이콘이다. 글리프는 기기 글꼴마다 크기와 세로 위치가
+              달라 같은 줄의 숫자와 어긋난다. */}
           {hasRating ? (
-            <Text className="text-body-3 text-foreground mt-3">
-              {`★ ${product.reviewAverage} (${product.review.toLocaleString("en-US")})`}
-              {product.like > 0
-                ? `  ·  ${product.like.toLocaleString("en-US")} likes`
-                : ""}
-            </Text>
+            <View className="mt-3 flex-row items-center">
+              <StarIcon color={META_ICON_COLOR} size={META_ICON_SIZE} />
+              <Text className="text-body-3 text-foreground ml-1">
+                {`${product.reviewAverage} (${product.review.toLocaleString("en-US")})`}
+              </Text>
+              {product.like > 0 ? (
+                <>
+                  <View className="ml-3">
+                    <HeartIcon color={META_ICON_COLOR} size={META_ICON_SIZE} />
+                  </View>
+                  <Text className="text-body-3 text-foreground ml-1">
+                    {product.like.toLocaleString("en-US")}
+                  </Text>
+                </>
+              ) : null}
+            </View>
           ) : null}
         </View>
         {specRows.length > 0 ? (
