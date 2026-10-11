@@ -222,13 +222,13 @@ function CartBody({ cart }: { cart: GetUserCartRes }) {
     );
 
   /**
-   * 지우기는 한 번 묻고 지운다. 앱에는 담는 자리가 없어 되돌릴 방법이 없다 —
-   * 관심 목록의 하트처럼 "다시 누르면 돌아온다"가 성립하지 않는다.
+   * 지우기는 한 번 묻고 지운다. 되돌리기가 없어서다 — 다시 담으려면 상품을 찾아
+   * 조합을 다시 골라야 하므로, 관심 목록의 하트처럼 "다시 누르면 돌아온다"가 아니다.
    */
   const confirmRemove = (item: UserCartItem) =>
     Alert.alert(
       "Remove from cart",
-      `${item.productName} will be removed. You can't add it back from the app.`,
+      `${item.productName} will be removed. You'd have to pick its option again to re-add it.`,
       [
         { text: "Cancel", style: "cancel" },
         {
@@ -260,6 +260,7 @@ function CartBody({ cart }: { cart: GetUserCartRes }) {
         </Section>
       ))}
       <CartSummary cart={cart} />
+      <OrderCta cart={cart} />
     </ScrollView>
   );
 }
@@ -450,6 +451,33 @@ function LineStatus({ item }: { item: UserCartItem }) {
  *
  * 그래서 수량을 바꾸거나 줄을 지우면 낙관적으로 고치지 않고 장바구니를 다시 읽는다.
  */
+/**
+ * 주문서로 가는 길. 합계 바로 아래에 둔다 — 방금 읽은 금액과 그 금액을 내러 가는 단추는
+ * 붙어 있어야 한다.
+ *
+ * 살 수 없는 줄(품절·판매중지)은 빼고 넘긴다. 서버가 금액 합계에서도 빼는 줄이라
+ * 같이 보내면 주문서가 주문할 수 없는 줄을 들고 열린다.
+ */
+function OrderCta({ cart }: { cart: GetUserCartRes }) {
+  const router = useRouter();
+
+  const orderableIds = cart.brandGroups.flatMap((group) =>
+    group.items
+      .filter((item) => !isCartItemUnavailable(item))
+      .map((item) => item.cartItemId),
+  );
+
+  return (
+    <View className="px-5" style={{ marginTop: Spacing.inner }}>
+      <Button
+        disabled={orderableIds.length === 0}
+        label="Order"
+        onPress={() => router.push(`/order?cart=${orderableIds.join(",")}`)}
+      />
+    </View>
+  );
+}
+
 function CartSummary({ cart }: { cart: GetUserCartRes }) {
   return (
     <View

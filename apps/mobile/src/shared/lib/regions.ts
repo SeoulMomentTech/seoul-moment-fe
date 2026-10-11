@@ -44,3 +44,18 @@ export const getDistrictOptions = (
     label: locale === "en" ? area.AreaEngName : area.AreaName,
   }));
 };
+
+/**
+ * 縣市·區 한 쌍의 우편번호. 區가 정해지면 하나로 결정되므로 사용자가 외울 이유가 없다.
+ * web 의 findZipCode 와 같은 규칙이다.
+ */
+export const findZipCode = (
+  cityValue: string | undefined,
+  districtValue: string | undefined,
+): string | undefined => {
+  if (!cityValue || !districtValue) return undefined;
+
+  return cities
+    .find((city) => city.CityName === cityValue)
+    ?.AreaList.find((area) => area.AreaName === districtValue)?.ZipCode;
+};
