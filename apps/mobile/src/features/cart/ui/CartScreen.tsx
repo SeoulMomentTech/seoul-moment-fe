@@ -41,6 +41,7 @@ import {
   LINE_BODY_2,
   LINE_BODY_5,
 } from "@shared/ui/skeleton";
+import { showToast } from "@shared/ui/toast";
 
 import { Spacing } from "@/constants/theme";
 
@@ -192,11 +193,11 @@ function SignedOut() {
 /** 실패를 알리는 한 가지 자리. 재고 부족만 문구가 다르다 — 다시 눌러도 같은 답이 온다. */
 const warnCartFailure = (error: unknown) => {
   if (isNotEnoughStockError(error)) {
-    Alert.alert("Not enough stock", "We've refreshed what's left in stock.");
+    showToast("Not enough stock. We've refreshed what's left.");
     return;
   }
 
-  Alert.alert("Couldn't update your cart", "Please try again in a moment.");
+  showToast("Couldn't update your cart. Please try again.");
 };
 
 function CartBody({ cart }: { cart: GetUserCartRes }) {

@@ -5,6 +5,7 @@ import * as SplashScreen from "expo-splash-screen";
 
 import { hydrateUserAuth } from "@shared/lib/auth/useUserAuthStore";
 import { QueryProvider } from "@shared/lib/query/QueryProvider";
+import { ToastHost } from "@shared/ui/toast";
 
 import { AnimatedSplashOverlay } from "@/components/animated-icon";
 
@@ -19,6 +20,7 @@ export default function RootLayout() {
           userInterfaceStyle 도 "light" 다. */}
       <ThemeProvider value={DefaultTheme}>
         <AnimatedSplashOverlay />
+        {/* 화면 위에 떠야 하므로 Stack 보다 뒤에 둔다. */}
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="news/[id]" />
@@ -38,6 +40,7 @@ export default function RootLayout() {
           <Stack.Screen name="terms" />
           <Stack.Screen name="policy" />
         </Stack>
+        <ToastHost />
       </ThemeProvider>
     </QueryProvider>
   );
