@@ -2,7 +2,7 @@ import { useState, type ReactNode } from "react";
 
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { Alert, FlatList, Text, View } from "react-native";
+import { FlatList, Text, View } from "react-native";
 
 import { useProductCategories } from "@entities/product/model/useProductCategories";
 import { CHIP_GAP, Chip } from "@shared/ui/chip";
@@ -24,6 +24,7 @@ import {
   MyBrandListSkeleton,
   MyLikeListSkeleton,
 } from "@shared/ui/skeleton";
+import { showToast } from "@shared/ui/toast";
 
 import { Spacing } from "@/constants/theme";
 
@@ -128,9 +129,14 @@ function TabBar({
   );
 }
 
-/** 해제가 실패했을 때. 줄이 되살아나는 이유를 말하지 않으면 눌린 적이 없던 것처럼 보인다. */
+/**
+ * 해제가 실패했을 때. 줄이 되살아나는 이유를 말하지 않으면 눌린 적이 없던 것처럼 보인다.
+ *
+ * 묻는 것이 아니라 알리는 것이라 토스트다 — 하트 한 번에 대화상자가 떠서 탭을 받아야
+ * 사라지면, 사용자가 할 일이 없는 소식에 손을 쓰게 만드는 셈이다.
+ */
 const warnUnlikeFailed = () =>
-  Alert.alert("Couldn't update your likes", "Please try again in a moment.");
+  showToast("Couldn't update your likes. Please try again.");
 
 function LikedProductsTab() {
   const [productCategoryId, setProductCategoryId] = useState<number>();
