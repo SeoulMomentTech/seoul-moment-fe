@@ -60,6 +60,13 @@ export const getUserProductLikeList = ({
 /**
  * @description 관심 상품 해제. 본문 없이 204 만 오므로 .json() 을 부르지 않는다.
  */
+/**
+ * @description 상품 좋아요 추가 (access_token 필요).
+ * 409 는 이미 눌러 둔 것이라는 뜻이라 실패로 다루지 않아도 된다.
+ */
+export const postUserProductLike = (productItemId: number) =>
+  api.post("user/like/product", { json: { productItemId } });
+
 export const deleteUserProductLike = (productItemId: number) =>
   api.delete(`user/like/product/${productItemId}`);
 
