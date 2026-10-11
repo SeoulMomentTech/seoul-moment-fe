@@ -21,6 +21,7 @@ import {
 import { toTaiwanPhoneNumber } from "@shared/lib/utils/phone";
 import { Button } from "@shared/ui/button";
 import { Chip, CHIP_GAP } from "@shared/ui/chip";
+import { CODE_SENT_MESSAGE, FieldNote, ResendRow } from "@shared/ui/field-note";
 import { Touchable } from "@shared/ui/press";
 
 import { HeaderHeight, Spacing } from "@/constants/theme";
@@ -386,7 +387,7 @@ function VerifyStep({
   );
 }
 
-/** 인증 줄 아래 한 줄. 여러 상태가 한 자리를 나눠 쓴다. */
+/** 인증 줄 아래. 실패는 제 줄을 갖고, 보냄·다시 보내기는 한 줄을 나눠 쓴다. */
 function VerifyNote({
   method,
   sendFailed,
@@ -407,36 +408,41 @@ function VerifyNote({
   onResend(): void;
 }) {
   if (sendFailed) {
+    // 보내지 못했으면 다시 보내기 줄을 두지 않는다 — 옆 버튼이 아직 "Send Code" 다.
     return (
-      <NoteBlock>
-        <Note error>
+      <View style={{ marginTop: Spacing.tight }}>
+        <FieldNote error>
           {sendStatus === 404
             ? method === "email"
               ? "We couldn't find an account with that email."
               : "We couldn't find an account with that number."
             : "We couldn't send the code. Please try again."}
-        </Note>
-      </NoteBlock>
+        </FieldNote>
+      </View>
     );
   }
 
   if (verifyFailed) {
     return (
-      <NoteBlock>
-        <Note error>
+      <View style={{ marginTop: Spacing.tight, gap: Spacing.tight }}>
+        <FieldNote error>
           The verification code does not match, or it has expired.
-        </Note>
-        <Resend busy={busy} onPress={onResend} secondsLeft={resendIn} />
-      </NoteBlock>
+        </FieldNote>
+        <ResendRow busy={busy} onResend={onResend} secondsLeft={resendIn} />
+      </View>
     );
   }
 
   if (codeSent) {
     return (
-      <NoteBlock>
-        <Note>Verification code has been sent.</Note>
-        <Resend busy={busy} onPress={onResend} secondsLeft={resendIn} />
-      </NoteBlock>
+      <View style={{ marginTop: Spacing.tight }}>
+        <ResendRow
+          busy={busy}
+          message={CODE_SENT_MESSAGE}
+          onResend={onResend}
+          secondsLeft={resendIn}
+        />
+      </View>
     );
   }
 
@@ -525,15 +531,15 @@ function ResetStep({
 
       <View style={{ marginTop: Spacing.tight }}>
         {expired ? (
-          <Note error>
+          <FieldNote error>
             This reset link has expired. Please verify your account again.
-          </Note>
+          </FieldNote>
         ) : failed ? (
-          <Note error>
+          <FieldNote error>
             We couldn&apos;t change your password. Please try again.
-          </Note>
+          </FieldNote>
         ) : password.length > 0 && !matches ? (
-          <Note>The two passwords don&apos;t match.</Note>
+          <FieldNote>The two passwords don&apos;t match.</FieldNote>
         ) : null}
       </View>
 
@@ -571,67 +577,5 @@ function DoneStep({ onSignIn }: { onSignIn(): void }) {
         style={{ marginTop: Spacing.inner }}
       />
     </View>
-  );
-}
-
-function NoteBlock({ children }: { children: React.ReactNode }) {
-  return (
-    <View style={{ marginTop: Spacing.tight, gap: Spacing.tight / 2 }}>
-      {children}
-    </View>
-  );
-}
-
-/** 코드가 오지 않았을 때의 길. 대기 중에는 남은 초를 보여 주고 누르지 못하게 한다. */
-function Resend({
-  secondsLeft,
-  busy,
-  onPress,
-}: {
-  secondsLeft: number;
-  busy: boolean;
-  onPress(): void;
-}) {
-  const waiting = secondsLeft > 0 || busy;
-
-  if (waiting) {
-    return (
-      <Note>
-        {busy ? "Sending…" : `You can send it again in ${secondsLeft}s.`}
-      </Note>
-    );
-  }
-
-  return (
-    <Touchable
-      accessibilityLabel="Send the code again"
-      accessibilityRole="button"
-      hitSlop={14}
-      onPress={onPress}
-    >
-      <Text
-        className="text-body-3 text-foreground"
-        style={{ textDecorationLine: "underline" }}
-      >
-        Didn&apos;t get it? Send it again
-      </Text>
-    </Touchable>
-  );
-}
-
-/** 한 줄 안내. 실패는 danger 로 말한다 — 브랜드 주황은 고르는 것·가는 곳의 색이다. */
-function Note({
-  children,
-  error,
-}: {
-  children: React.ReactNode;
-  error?: boolean;
-}) {
-  return (
-    <Text
-      className={error ? "text-body-3 text-danger" : "text-body-3 text-neutral"}
-    >
-      {children}
-    </Text>
   );
 }

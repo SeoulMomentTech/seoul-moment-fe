@@ -12,6 +12,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Button } from "@shared/ui/button";
+import { CODE_SENT_MESSAGE, FieldNote, ResendRow } from "@shared/ui/field-note";
 import { Touchable } from "@shared/ui/press";
 
 import { HeaderHeight, Spacing } from "@/constants/theme";
@@ -267,7 +268,6 @@ export function SignUpScreen() {
             busy={sendCode.isPending}
             codeRejected={codeRejected}
             codeSent={codeSent}
-            email={email.trim()}
             onResend={send}
             resendIn={resendIn}
             sendFailed={sendCode.isError}
@@ -281,15 +281,17 @@ export function SignUpScreen() {
           {/* 서버가 거절한 것이 있으면 그것이 먼저다. 없으면 아직 못 채운 것을 말한다. */}
           <View style={{ marginTop: Spacing.inner }}>
             {signUp.isError ? (
-              <Note error>
+              <FieldNote error>
                 We couldn&apos;t create your account. Please try again.
-              </Note>
+              </FieldNote>
             ) : validateNickname.isError ? (
-              <Note error>That nickname is taken. Try another.</Note>
+              <FieldNote error>That nickname is taken. Try another.</FieldNote>
             ) : login.isError ? (
-              <Note error>Your account is ready. Please sign in.</Note>
+              <FieldNote error>
+                Your account is ready. Please sign in.
+              </FieldNote>
             ) : blocker ? (
-              <Note>{blocker}</Note>
+              <FieldNote>{blocker}</FieldNote>
             ) : null}
           </View>
 
@@ -332,15 +334,14 @@ export function SignUpScreen() {
 }
 
 /**
- * 인증 줄 아래 한 줄. 여러 상태가 한 자리를 나눠 쓰므로 줄이 늘었다 줄지 않는다.
- * 코드를 받은 뒤의 재발송도 여기 있다 — 옆 버튼은 검증을 맡고 있어 자리가 없다.
+ * 인증 줄 아래. 실패는 제 줄을 갖고, 보냄·다시 보내기는 한 줄을 나눠 쓴다.
+ * 보낸 주소를 되풀이하지 않는 것은 바로 위 칸에 그대로 적혀 있기 때문이다.
  */
 function EmailNote({
   sendFailed,
   codeSent,
   codeRejected,
   verified,
-  email,
   resendIn,
   busy,
   onResend,
@@ -349,7 +350,6 @@ function EmailNote({
   codeSent: boolean;
   codeRejected: boolean;
   verified: boolean;
-  email: string;
   resendIn: number;
   busy: boolean;
   onResend(): void;
@@ -357,100 +357,41 @@ function EmailNote({
   if (verified) return null;
 
   if (sendFailed) {
+    // 보내지 못했으면 다시 보내기 줄을 두지 않는다 — 옆 버튼이 아직 "Send Code" 다.
     return (
-      <NoteBlock>
-        <Note error>
+      <View style={{ marginTop: Spacing.tight }}>
+        <FieldNote error>
           That email is already registered, or the code couldn&apos;t be sent.
-        </Note>
-      </NoteBlock>
+        </FieldNote>
+      </View>
     );
   }
 
   if (codeRejected) {
     return (
-      <NoteBlock>
-        <Note error>
+      <View style={{ marginTop: Spacing.tight, gap: Spacing.tight }}>
+        <FieldNote error>
           The verification code does not match. Please check and try again.
-        </Note>
-      </NoteBlock>
+        </FieldNote>
+        <ResendRow busy={busy} onResend={onResend} secondsLeft={resendIn} />
+      </View>
     );
   }
 
   if (codeSent) {
     return (
-      <NoteBlock>
-        <Note>The verification code has been sent to {email}.</Note>
-        <Resend busy={busy} onPress={onResend} secondsLeft={resendIn} />
-      </NoteBlock>
+      <View style={{ marginTop: Spacing.tight }}>
+        <ResendRow
+          busy={busy}
+          message={CODE_SENT_MESSAGE}
+          onResend={onResend}
+          secondsLeft={resendIn}
+        />
+      </View>
     );
   }
 
   return null;
-}
-
-/** 코드가 오지 않았을 때의 길. 대기 중에는 남은 초를 보여 주고 누르지 못하게 한다. */
-function Resend({
-  secondsLeft,
-  busy,
-  onPress,
-}: {
-  secondsLeft: number;
-  busy: boolean;
-  onPress(): void;
-}) {
-  const waiting = secondsLeft > 0 || busy;
-
-  if (waiting) {
-    return (
-      <Note>
-        {busy ? "Sending…" : `You can send it again in ${secondsLeft}s.`}
-      </Note>
-    );
-  }
-
-  return (
-    <Touchable
-      accessibilityLabel="Send the code again"
-      accessibilityRole="button"
-      hitSlop={14}
-      onPress={onPress}
-    >
-      <Text
-        className="text-body-3 text-foreground"
-        style={{ textDecorationLine: "underline" }}
-      >
-        Didn&apos;t get it? Send it again
-      </Text>
-    </Touchable>
-  );
-}
-
-function NoteBlock({ children }: { children: React.ReactNode }) {
-  return (
-    <View style={{ marginTop: Spacing.tight, gap: Spacing.tight / 2 }}>
-      {children}
-    </View>
-  );
-}
-
-/**
- * 한 줄 안내. 실패는 danger 로 말한다 — 브랜드 주황은 선택·이동·주요 동작을
- * 뜻하는 색이라, 같은 색으로 실패까지 말하면 뜻이 겹친다.
- */
-function Note({
-  children,
-  error,
-}: {
-  children: React.ReactNode;
-  error?: boolean;
-}) {
-  return (
-    <Text
-      className={error ? "text-body-3 text-danger" : "text-body-3 text-neutral"}
-    >
-      {children}
-    </Text>
-  );
 }
 
 /**
