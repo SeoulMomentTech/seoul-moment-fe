@@ -30,10 +30,15 @@ export type GetUserProfileRes = UserProfile;
 export const getUserProfile = () =>
   api.get("user/profile").json<CommonRes<GetUserProfileRes>>();
 
-/** 닉네임·이름·사진은 각자 전용 엔드포인트가 있어 이 PATCH 가 받지 않는다. */
-export type UpdateUserProfileReq = Omit<
-  UserProfile,
-  "nickname" | "name" | "profileImageUrl"
+/**
+ * 닉네임·이름·사진은 각자 전용 엔드포인트가 있어 이 PATCH 가 받지 않는다.
+ *
+ * 나머지도 모두 **선택**이다(swagger 의 PATCH /user/profile). 고치지 않은 칸은
+ * 보내지 않는 것이 맞다 — 특히 birthDate 는 자리가 YYYY-MM-DD 라, 아직 고르지 않았다고
+ * 빈 문자열을 넣으면 서버가 그것을 날짜로 읽으려 든다.
+ */
+export type UpdateUserProfileReq = Partial<
+  Omit<UserProfile, "nickname" | "name" | "profileImageUrl">
 >;
 
 /**

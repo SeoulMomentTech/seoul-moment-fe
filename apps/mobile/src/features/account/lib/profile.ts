@@ -48,7 +48,10 @@ export function formValuesToProfilePayload(
   return {
     // 성별은 필수 필드라 고르지 않았으면 "밝히지 않음"으로 보낸다(web 과 같다).
     gender: values.gender ?? "OTHER",
-    birthDate: values.birthDate,
+    // 아직 고른 적 없는 생일은 **보내지 않는다**. 빈 문자열을 날짜 자리에 넣으면
+    // 서버가 그것을 날짜로 읽어 오늘로 굳어진다 — "설정 안 함"과 "오늘이 생일"이
+    // 구분되지 않게 된다. PATCH 의 칸은 전부 선택이라 빼면 그대로 둔다는 뜻이다.
+    ...(values.birthDate ? { birthDate: values.birthDate } : null),
     postalCode: values.postalCode.trim(),
     city: values.city ?? "",
     district: values.district ?? "",
