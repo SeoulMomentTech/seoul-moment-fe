@@ -1,12 +1,18 @@
 import type { HTTPError } from "ky";
 
 import useAppMutation from "@shared/lib/hooks/query/useAppMutation";
-import type { UpdateUserCartItemReq } from "@shared/services/userCart";
+import type {
+  CreateUserCartItemsReq,
+  CreateUserCartItemsRes,
+  UpdateUserCartItemReq,
+} from "@shared/services/userCart";
 import {
+  createUserCartItems,
   deleteUserCartItem,
   updateUserCartItem,
 } from "@shared/services/userCart";
 
+import type { CommonRes } from "@shared/services";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { USER_CART_KEY } from "./keys";
@@ -44,12 +50,32 @@ export const useUpdateCartItemQuantity = () => {
   });
 };
 
-/** 줄 삭제. 앱에는 담는 자리가 없어 되돌릴 수 없으므로, 호출부가 먼저 한 번 묻는다. */
+/** 줄 삭제. 되돌릴 수 없으므로 호출부가 먼저 한 번 묻는다. */
 export const useRemoveCartItem = () => {
   const refresh = useCartRefresh();
 
   return useAppMutation<unknown, HTTPError, number>({
     mutationFn: deleteUserCartItem,
+    onSettled: refresh,
+  });
+};
+
+/**
+ * 담기. 성공하면 응답이 담긴 뒤의 라인 수까지 주지만 그 값을 캐시에 직접 쓰지 않고
+ * 목록·뱃지를 함께 무효화한다 — 수량 변경과 같은 이유다(위 설명 참고).
+ *
+ * 409 는 재고 부족이다(isNotEnoughStockError). 404 는 없는 조합인데, 상세를 보고 고른
+ * 조합이라 이쪽이 뜨면 그 사이에 상품이 바뀐 것이다.
+ */
+export const useAddToCart = () => {
+  const refresh = useCartRefresh();
+
+  return useAppMutation<
+    CommonRes<CreateUserCartItemsRes>,
+    HTTPError,
+    CreateUserCartItemsReq
+  >({
+    mutationFn: createUserCartItems,
     onSettled: refresh,
   });
 };

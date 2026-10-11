@@ -12,6 +12,7 @@ import {
 import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { listOptionAxes } from "@entities/product/lib/options";
 import { ProductCarousel } from "@entities/product/ui/ProductCarousel";
 import type {
   GetProductDetailRes,
@@ -29,6 +30,7 @@ import { DetailSkeleton } from "@shared/ui/skeleton";
 
 import { Spacing } from "@/constants/theme";
 
+import { ADD_TO_CART_BAR_HEIGHT, AddToCartBar } from "./AddToCartBar";
 import { useOpenBrandShop } from "../model/useOpenBrandShop";
 import useProductDetail from "../model/useProductDetail";
 
@@ -49,26 +51,15 @@ const LABEL_WIDTH = 96;
 const DETAIL_IMAGE_PLACEHOLDER_HEIGHT = 320;
 
 // 웹 OPTION_AXIS_ORDER / 라벨과 같은 순서. 목록에 없는 타입(GENDER 등)은 웹처럼 그리지 않는다.
-const OPTION_LABELS: readonly (readonly [string, string])[] = [
-  ["COLOR", "Color"],
-  ["SIZE", "Size"],
-  ["VOLUME", "Volume"],
-  ["TEXTURE", "Texture"],
-  ["MATERIAL", "Material"],
-  ["FIT", "Fit"],
-];
-
 const formatPrice = (value: number) => `NT$${value.toLocaleString("en-US")}`;
 
 /** 옵션 객체를 정해진 순서의 (라벨, 값 문자열) 행으로 바꾼다. 값이 없는 타입은 뺀다. */
 const toOptionRows = (option: ProductDetailOption | undefined) =>
-  OPTION_LABELS.flatMap(([type, label]) => {
-    const values = option?.[type];
-
-    return values && values.length > 0
-      ? [{ type, label, text: values.map((v) => v.value).join(" / ") }]
-      : [];
-  });
+  listOptionAxes(option).map(({ type, label, values }) => ({
+    type,
+    label,
+    text: values.map((v) => v.value).join(" / "),
+  }));
 
 /**
  * 스펙 표에 실제로 들어갈 행만 모은다. 옵션·원산지·배송 정보가 모두 비는 상품이 있어서,
@@ -92,15 +83,8 @@ const toSpecRows = (product: GetProductDetailRes) => [
         },
       ]
     : []),
-  ...(product.shippingCost > 0
-    ? [
-        {
-          key: "shippingCost",
-          label: "Shipping fee",
-          value: formatPrice(product.shippingCost),
-        },
-      ]
-    : []),
+  // 배송비 행은 두지 않는다 — v1 응답에 shippingCost 가 없고, 금액은 주문서에서
+  // 배송지까지 보고 확정된다. 웹 상세도 배송비를 적지 않는다.
 ];
 
 function SpecRow({ label, value }: { label: string; value: string }) {
@@ -367,8 +351,15 @@ export function ProductDetailScreen({ id }: { id: number }) {
           heading="Related Products"
           items={product.relate ?? []}
         />
-        <View style={{ height: insets.bottom + Spacing.section }} />
+        {/* 담기 바가 가리는 만큼 비워 둔다. 바가 쥐는 안전 영역까지 더한다 —
+            빼먹으면 마지막 줄이 바 밑에 깔린다. */}
+        <View
+          style={{
+            height: ADD_TO_CART_BAR_HEIGHT + insets.bottom + Spacing.section,
+          }}
+        />
       </ScrollView>
+      <AddToCartBar product={product} />
       <TopScrim height={insets.top + SCRIM_EXTRA_HEIGHT} />
       <BackButton />
     </View>

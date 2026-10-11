@@ -200,6 +200,19 @@ export interface ProductOptionValue {
 /** 옵션 타입(COLOR, SIZE …)을 키로 한 객체. 상품이 가진 타입만 내려온다. */
 export type ProductDetailOption = Partial<Record<string, ProductOptionValue[]>>;
 
+/**
+ * 살 수 있는 조합 하나(SKU). option 은 축별로 어떤 값이 있는지만 말하고,
+ * 그중 실제로 존재하는 조합은 여기에만 있다 — 담을 때 서버가 요구하는 id 도 이것이다.
+ */
+export interface ProductVariant {
+  id: number;
+  sku: string;
+  /** 이 조합을 이루는 옵션값 id. option 안의 값 id 와 맞춰 이름을 찾는다. */
+  optionValueIds: number[];
+  stockQuantity: number;
+  isSoldOut: boolean;
+}
+
 export interface ProductExternal {
   id: number;
   name: string;
@@ -217,8 +230,8 @@ export interface GetProductDetailRes {
   origin: string;
   /** 출고까지 걸리는 일수. 0 이하면 표시하지 않는다. */
   shippingInfo: number;
-  shippingCost: number;
   option: ProductDetailOption;
+  variants: ProductVariant[];
   like: number;
   review: number;
   reviewAverage: number;
@@ -234,8 +247,14 @@ export interface GetProductDetailReq extends PublicLanguageCode {
   id: number;
 }
 
-/** 상품 상세. 엔드포인트는 `product/{id}` (웹의 v1 은 쓰지 않는다). */
+/**
+ * 상품 상세. 웹과 같은 `product/v1/{id}` 를 쓴다.
+ *
+ * v0(`product/{id}`) 과의 차이는 두 칸뿐인데, 둘 다 한쪽에만 있다 —
+ * v1 은 `variants`(조합·재고)를 주고 `shippingCost` 를 뺀다. 담으려면 조합 id 가 반드시
+ * 필요하고 배송비는 주문서에서 확정되므로 v1 을 고른다. 웹도 같은 이유로 v1 만 쓴다.
+ */
 export const getProductDetail = ({ id, languageCode }: GetProductDetailReq) =>
   api
-    .get(`product/${id}`, { searchParams: { languageCode } })
+    .get(`product/v1/${id}`, { searchParams: { languageCode } })
     .json<CommonRes<GetProductDetailRes>>();
