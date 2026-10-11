@@ -1,13 +1,13 @@
 ---
 name: mobile-simulator
-description: apps/mobile 을 안드로이드 에뮬레이터에서 눈으로 확인한다. 화면을 딥링크로 열고, 탭·스크롤하고, 스크린샷을 찍어 읽는다. "에뮬레이터", "시뮬레이터", "화면 확인", "스크린샷", "실제로 어떻게 보이는지", "동작 확인" 같은 요청에 사용한다.
+description: apps/mobile 을 에뮬레이터/시뮬레이터에서 눈으로 확인한다. 화면을 딥링크로 열고 스크린샷을 찍어 읽으며, 안드로이드에서는 탭·스크롤까지 한다. 플랫폼은 인자로 고른다(android | ios, 기본 android). "에뮬레이터", "시뮬레이터", "화면 확인", "스크린샷", "실제로 어떻게 보이는지", "동작 확인" 같은 요청에 사용한다.
 ---
 
 # Mobile Simulator Skill
 
-`apps/mobile` 의 화면을 **실제로 보고 만져서** 확인한다. 타입체크·린트·번들은 레이아웃이
-깨진 것도, 성공 경로가 한 번도 안 돈 것도 잡지 못한다 — 이 저장소에서 그런 결함이
-여러 번 전부 통과한 적이 있다.
+`apps/mobile` 의 화면을 **실제로 보고** 확인한다. 타입체크·린트·번들은 레이아웃이 깨진
+것도, 성공 경로가 한 번도 안 돈 것도 잡지 못한다 — 이 저장소에서 그런 결함이 여러 번
+전부 통과한 적이 있다.
 
 ## 0. 절대 하지 않는 것
 
@@ -15,70 +15,85 @@ description: apps/mobile 을 안드로이드 에뮬레이터에서 눈으로 확
 건드리면 작업 흐름을 끊는다. 이미 떠 있는 것에 **붙기만** 한다. 안 떠 있으면 멈추고
 사용자에게 띄워 달라고 말한다.
 
-## 1. 안드로이드를 쓴다
+## 1. 플랫폼 고르기
 
-iOS 가 아니라 안드로이드다. 이유는 하나뿐이다 — **adb 는 탭과 스크롤이 된다.**
-iOS 쪽은 `simctl boot` 이 런타임만 켜고 Simulator.app 창은 열리지 않아서(이 환경에서
-`open -a Simulator` 는 동작하지 않는다) 입력 도구가 붙을 창이 없다. 딥링크와 스크린샷만
-되고 탭은 사람에게 부탁해야 한다. 안드로이드는 그 제약이 없다.
+인자로 받는다 — `android` 또는 `ios`. **인자가 없으면 android.**
+
+| | android | ios |
+| --- | --- | --- |
+| 화면 열기·보기 | ✅ | ✅ |
+| **탭·스크롤·뒤로가기** | ✅ | ❌ 사람이 해야 한다 |
+
+iOS 에서 입력이 안 되는 이유: `simctl boot` 은 런타임만 켜고 Simulator.app 창을 열지
+않는다. 이 환경에서 `open -a Simulator` 는 동작하지 않아(조용히 실패한다) 입력 도구가
+붙을 창이 없다. 창이 없어도 **스크린샷은 찍힌다** — 못 하는 것은 입력뿐이다.
+
+그래서 기본은 android 다. **사용자가 ios 를 고르면 그대로 따르되**, 탭이 필요한
+지점에서 "여기는 눌러 주셔야 한다"고 말하고 그다음을 이어 간다.
+
+사용자가 ios 를 골랐는데 Simulator.app 창이 안 떠 있으면, 사용자에게
+`! open -a Simulator` 를 실행해 달라고 부탁한다(직접 열려고 반복 시도하지 않는다).
+
+## 2. 서버와 주소 — 두 플랫폼 공통
+
+Expo Go 는 Metro 가 바인딩한 **LAN 주소**로만 붙는다. `127.0.0.1` 로 열면 실패한다
+(iOS 는 `LSApplicationWorkspaceErrorDomain code=115`).
 
 ```bash
-export PATH="$PATH:$HOME/Library/Android/sdk/platform-tools"
-adb devices -l                                   # emulator-5554 가 device 로 보여야 한다
-adb shell pm list packages | grep exponent       # host.exp.exponent (Expo Go)
+curl -s -m 5 http://127.0.0.1:8081/status    # packager-status:running 이어야 한다
+IP=$(ipconfig getifaddr en0)                 # 예: 192.168.0.28
 ```
 
-에뮬레이터가 없으면 멈추고 사용자에게 띄워 달라고 말한다.
-
-## 2. 접속 주소 — **127.0.0.1 이 아니다**
-
-Expo Go 는 Metro 가 바인딩한 **LAN 주소**로만 붙는다.
+## 3. 명령 대조표
 
 ```bash
-curl -s -m 5 http://127.0.0.1:8081/status        # packager-status:running
-IP=$(ipconfig getifaddr en0)                     # 예: 192.168.0.28
+export PATH="$PATH:$HOME/Library/Android/sdk/platform-tools:$HOME/Library/Android/sdk/emulator"
 ```
 
-## 3. 화면 열기 — 딥링크
+| 할 일 | android | ios |
+| --- | --- | --- |
+| 기기 확인 | `adb devices -l` | `xcrun simctl list devices booted` |
+| 기기 띄우기 | `emulator -avd $(emulator -list-avds \| head -1) &` | `xcrun simctl boot <UDID>` |
+| Expo Go 확인 | `adb shell pm list packages \| grep exponent` | `xcrun simctl listapps booted \| grep Exponent` |
+| Expo Go 실행 | (딥링크가 띄운다) | `xcrun simctl launch booted host.exp.Exponent` |
+| 화면 열기 | `adb shell am start -a android.intent.action.VIEW -d "<url>"` | `xcrun simctl openurl booted "<url>"` |
+| 스크린샷 | `adb exec-out screencap -p > f.png` | `xcrun simctl io booted screenshot f.png` |
+| 해상도 | `adb shell wm size` | 스크린샷 크기로 본다 |
+| 탭 | `adb shell input tap X Y` | — |
+| 스크롤 | `adb shell input swipe X Y1 X Y2 250` | — |
+| 뒤로가기 | `adb shell input keyevent 4` | — |
+
+## 4. 화면 열기 — 딥링크
 
 탭 없이 **어느 화면이든** 바로 연다. Expo Go 에서는 `/--/` 뒤에 앱 경로를 붙인다.
 경로는 `apps/mobile/src/app/` 의 파일 구조 그대로이고 쿼리도 먹는다.
 
-```bash
-adb shell am start -a android.intent.action.VIEW -d "exp://$IP:8081/--/product/1"
-adb shell am start -a android.intent.action.VIEW -d "exp://$IP:8081/--/cart"
-adb shell am start -a android.intent.action.VIEW -d "exp://$IP:8081/--/order?cart=1,2"
-adb shell am start -a android.intent.action.VIEW -d "exp://$IP:8081"      # 홈
+```
+exp://$IP:8081/--/product/1
+exp://$IP:8081/--/cart
+exp://$IP:8081/--/order?cart=1,2
+exp://$IP:8081                      # 홈(탭)
 ```
 
 **첫 번들은 60~90초** 걸린다. 그 뒤 같은 세션의 이동은 10초 안쪽이다.
 
-## 4. 스크린샷 — 반드시 줄여서 읽는다
+## 5. 스크린샷 — 반드시 줄여서 읽는다
 
-원본은 1080x2220 PNG 라 그대로 읽으면 컨텍스트를 크게 먹는다(3MB → 150KB).
+원본은 3MB 넘는 PNG 라 그대로 읽으면 컨텍스트를 크게 먹는다(줄이면 150KB).
 
 ```bash
-adb exec-out screencap -p > "$S/shot.png"
 sips -Z 800 "$S/shot.png" --out "$S/shot-small.png"
 ```
 
 `shot-small.png` 를 Read 로 읽는다. 800px 면 뱃지 숫자까지 읽힌다.
-`sips -c` 로 자르려 들지 말 것 — 가운데를 잘라서 원하는 부분이 안 나온다.
+`sips -c` 로 자르려 들지 말 것 — 위가 아니라 **가운데**를 잘라서 원하는 데가 안 나온다.
 
-## 5. 탭·스크롤
+## 6. 좌표 (android)
 
-좌표는 **실제 해상도 기준**이다. 줄인 스크린샷에서 잰 좌표에 `2220/줄인높이` 를 곱한다
-(800 으로 줄였으면 2.775배).
+좌표는 **기기 픽셀 기준**이다. 줄인 스크린샷에서 잰 값에 `실제높이/줄인높이` 를 곱한다
+(1080x2220 을 800 으로 줄였으면 2.775배). 가로 가운데는 540.
 
-```bash
-adb shell wm size                                # Physical size: 1080x2220
-adb shell input tap 540 1943                     # 가로 가운데 = 540
-adb shell input swipe 540 1700 540 600 250       # 아래로 스크롤(위로 쓸기)
-adb shell input swipe 540 700 540 1500 200       # 위로 스크롤
-adb shell input keyevent 4                       # 뒤로가기
-```
-
-## 6. 확인할 것
+## 7. 확인할 것
 
 이것들이 번들을 통과하고도 깨졌던 것들이다.
 
@@ -88,9 +103,10 @@ adb shell input keyevent 4                       # 뒤로가기
 - 안전 영역: 아래 인디케이터에 버튼이 물리지 않는가
 - 글자: 한 줄 가정한 자리가 두 줄로 넘치지 않는가
 - **성공 경로**: 로그인이 필요한 동작(담기·주문)은 눌러서 끝까지 가 본다.
-  에뮬레이터에 로그인 세션이 남아 있으면 그대로 쓸 수 있다.
+  기기에 로그인 세션이 남아 있으면 그대로 쓸 수 있다. (android 전용)
 
-## 7. 끝내고
+## 8. 끝내고
 
-에뮬레이터는 켜 둔다. 끄면 다음 확인이 다시 90초를 쓴다.
+기기는 켜 둔다. 끄면 다음 확인이 다시 90초를 쓴다.
+내가 띄운 기기만 내린다 — 사용자가 이미 띄워 둔 것은 그대로 둔다.
 **개발 서버는 절대 건드리지 않는다.**
