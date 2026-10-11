@@ -8,7 +8,7 @@ import { useUserAuthStore } from "@shared/lib/auth/useUserAuthStore";
 import { TAIWAN_DIAL_CODE, toTaiwanPhoneNumber } from "@shared/lib/utils/phone";
 import type { UserInfo } from "@shared/services/user";
 import { Button } from "@shared/ui/button";
-import { Touchable } from "@shared/ui/press";
+import { CODE_SENT_MESSAGE, FieldNote, ResendRow } from "@shared/ui/field-note";
 import { EmptyState, ScreenError } from "@shared/ui/section-state";
 import { LoginInfoSkeleton } from "@shared/ui/skeleton";
 
@@ -20,7 +20,6 @@ import {
   Field,
   FormSection,
   FormSections,
-  Note,
   SubmitBar,
   ToggleRow,
 } from "./parts";
@@ -238,7 +237,6 @@ function LoginInfoForm({ info }: { info: UserInfo }) {
                 codeRejected={verifyCode.isError}
                 codeSent={codeSent}
                 onResend={send}
-                phone={normalizedPhone}
                 resendIn={resendIn}
                 sendFailed={sendCode.isError}
                 verified={phoneVerified}
@@ -311,7 +309,6 @@ function PhoneNote({
   codeSent,
   codeRejected,
   verified,
-  phone,
   resendIn,
   busy,
   onResend,
@@ -320,7 +317,6 @@ function PhoneNote({
   codeSent: boolean;
   codeRejected: boolean;
   verified: boolean;
-  phone: string;
   resendIn: number;
   busy: boolean;
   onResend(): void;
@@ -328,28 +324,34 @@ function PhoneNote({
   if (verified) return null;
 
   if (sendFailed) {
+    // 보내지 못했으면 다시 보내기 줄을 두지 않는다 — 옆 버튼이 아직 "Send Code" 다.
     return (
-      <Note error>
+      <FieldNote error>
         That number is already in use, or the code couldn&apos;t be sent.
-      </Note>
+      </FieldNote>
     );
   }
 
   if (codeRejected) {
     return (
-      <Note error>
-        The verification code does not match or has expired. Send a new one and
-        try again.
-      </Note>
+      <View style={{ gap: Spacing.tight }}>
+        <FieldNote error>
+          The verification code does not match or has expired.
+        </FieldNote>
+        <ResendRow busy={busy} onResend={onResend} secondsLeft={resendIn} />
+      </View>
     );
   }
 
   if (codeSent) {
+    // 보낸 번호를 되풀이하지 않는다 — 바로 위 칸에 그대로 적혀 있다.
     return (
-      <View style={{ gap: Spacing.tight }}>
-        <Note>The verification code has been sent to {phone}.</Note>
-        <Resend busy={busy} onPress={onResend} secondsLeft={resendIn} />
-      </View>
+      <ResendRow
+        busy={busy}
+        message={CODE_SENT_MESSAGE}
+        onResend={onResend}
+        secondsLeft={resendIn}
+      />
     );
   }
 
@@ -357,41 +359,6 @@ function PhoneNote({
 }
 
 /** 코드가 오지 않았을 때의 길. 대기 중에는 남은 초를 보여 주고 누르지 못하게 한다. */
-function Resend({
-  secondsLeft,
-  busy,
-  onPress,
-}: {
-  secondsLeft: number;
-  busy: boolean;
-  onPress(): void;
-}) {
-  const waiting = secondsLeft > 0 || busy;
-
-  if (waiting) {
-    return (
-      <Note>
-        {busy ? "Sending…" : `You can send it again in ${secondsLeft}s.`}
-      </Note>
-    );
-  }
-
-  return (
-    <Touchable
-      accessibilityLabel="Send the code again"
-      accessibilityRole="button"
-      hitSlop={14}
-      onPress={onPress}
-    >
-      <Text
-        className="text-body-3 text-foreground"
-        style={{ textDecorationLine: "underline" }}
-      >
-        Didn&apos;t get it? Send it again
-      </Text>
-    </Touchable>
-  );
-}
 
 /**
  * 인증이 끝난 자리. 버튼을 대신해 같은 폭·높이를 채운다.
