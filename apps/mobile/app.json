@@ -8,12 +8,11 @@
     "scheme": "seoulmoment",
     "userInterfaceStyle": "light",
     "ios": {
-      "icon": "./assets/expo.icon",
       "bundleIdentifier": "tw.com.seoulmoment.app"
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#171717",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
