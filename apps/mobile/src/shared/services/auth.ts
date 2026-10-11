@@ -158,3 +158,87 @@ export const patchPassword = ({
       [SKIP_AUTH_RETRY_HEADER]: "1",
     },
   });
+
+/**
+ * SNS(LINE) 로그인 응답. 한 응답이 네 갈래를 모두 담는다 — 어느 갈래인지는
+ * 플래그가 아니라 **어떤 토큰이 왔는지**로 가린다(classifySnsAuthResponse).
+ *
+ * 이메일 인증(line/email/verify)도 같은 모양으로 돌아오므로 판정이 한 벌이면 된다.
+ */
+export interface PostSnsLoginRes {
+  /** 이미 연결된 계정이면 이 둘이 온다. */
+  token?: string;
+  refreshToken?: string;
+  /** provider 가 이메일을 주지 않았을 때(사용자가 동의 화면에서 거부). */
+  needsEmail?: boolean;
+  emailToken?: string;
+  /** 그 이메일로 이미 가입된 계정이 있을 때. */
+  needsLinkConfirm: boolean;
+  linkToken?: string;
+  /** 가입된 이메일이 없을 때. */
+  needsSignup?: boolean;
+  signupToken?: string;
+  /** 연결·가입 화면에 보여 줄 SNS 이메일. */
+  email?: string;
+  /** 닉네임 칸의 기본값으로 쓰라고 주는 SNS 표시 이름. 그대로 저장되지는 않는다. */
+  name?: string;
+}
+
+/**
+ * @description LINE 로그인 / 연결확인 / 신규가입 분기 (1단계).
+ * 401: 유효하지 않은 idToken / 409: 그 계정에 이미 다른 SNS 가 연결됨(계정당 하나)
+ */
+export const postLineLogin = (idToken: string) =>
+  api
+    .post("user/auth/line/login", { json: { idToken } })
+    .json<CommonRes<PostSnsLoginRes>>();
+
+/**
+ * @description LINE 계정 연결 (2-A단계). 기존 계정에 SNS 를 붙이고 로그인시킨다.
+ * 401: linkToken 만료·변조 / 409: 이미 연결된 LINE 계정
+ */
+export const postLineLink = (linkToken: string) =>
+  api
+    .post("user/auth/line/link", { json: { linkToken } })
+    .json<CommonRes<UserLoginResponse>>();
+
+export interface PostSnsSignUpReq {
+  signupToken: string;
+  nickname: string;
+  newProductAgreed?: boolean;
+  adAgreed?: boolean;
+  recommendAgreed?: boolean;
+}
+
+/**
+ * @description LINE SNS 회원가입 (2-B단계). 이메일 가입과 달리 토큰을 바로 준다.
+ * 401: signupToken 만료·변조 / 409: 이미 쓰는 닉네임 또는 이미 가입된 이메일
+ */
+export const postLineSignUp = (data: PostSnsSignUpReq) =>
+  api
+    .post("user/auth/line/signup", { json: data })
+    .json<CommonRes<UserLoginResponse>>();
+
+export interface LineEmailCodeReq {
+  emailToken: string;
+  email: string;
+}
+
+/**
+ * @description LINE 이 이메일을 주지 않았을 때 직접 받은 주소로 코드 발송 (1-B단계).
+ * 401: emailToken 만료·변조
+ */
+export const postLineEmailCode = (data: LineEmailCodeReq) =>
+  api.post("user/auth/line/email/code", { json: data });
+
+/**
+ * @description 그 코드 검증 (1-B단계). 통과하면 login 과 **같은 모양**이 돌아오므로
+ * 호출부가 같은 판정을 다시 돌린다 — 이미 연결된 계정이면 바로 로그인되기도 한다.
+ * 401: emailToken 만료·변조 또는 코드 만료·불일치
+ */
+export const postLineEmailVerify = (
+  data: LineEmailCodeReq & { code: string },
+) =>
+  api
+    .post("user/auth/line/email/verify", { json: data })
+    .json<CommonRes<PostSnsLoginRes>>();

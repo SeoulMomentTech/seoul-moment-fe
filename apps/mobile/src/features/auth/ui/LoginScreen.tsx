@@ -19,6 +19,7 @@ import { Touchable } from "@shared/ui/press";
 import { HeaderHeight, Spacing } from "@/constants/theme";
 
 import { AuthField } from "./AuthField";
+import { LineLoginButton } from "./LineLoginButton";
 import { useLoginMutation } from "../model/useLoginMutation";
 
 // 워드마크 logo.png 는 533x65. 상단에 무게를 주려고 웹(204x24)보다 키운다.
@@ -160,6 +161,10 @@ export function LoginScreen() {
             onPress={submit}
             style={{ marginTop: Spacing.inner }}
           />
+
+          {/* SNS 는 이메일 가입과 같은 등급의 선택지라 그 바로 위에 선다.
+              채널 ID 가 설정돼 있지 않으면 스스로 아무것도 그리지 않는다. */}
+          <LineLoginButton />
 
           {/* 비밀번호를 잊은 사람에게는 가입보다 이 길이 먼저다. 버튼 둘 사이가 아니라
               로그인 바로 아래에 두어, "다시 해 보기"의 연장으로 읽히게 한다. */}
