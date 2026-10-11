@@ -7,6 +7,7 @@ import type { VerifyPhoneCodePayload } from "@shared/services/auth";
 import { postInfoPhoneCode, postInfoPhoneVerify } from "@shared/services/auth";
 import type { UpdateUserInfoReq } from "@shared/services/user";
 import { updateUserInfo } from "@shared/services/user";
+import { showToast } from "@shared/ui/toast";
 
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -34,7 +35,10 @@ export const useUpdateUserInfo = () => {
 
   return useAppMutation<unknown, HTTPError, UpdateUserInfoReq>({
     mutationFn: updateUserInfo,
-    onSuccess: () => void refetch(),
+    onSuccess: () => {
+      void refetch();
+      showToast("Your changes have been saved.");
+    },
   });
 };
 
@@ -51,6 +55,9 @@ export const useVerifyPhoneCode = () => {
 
   return useAppMutation<unknown, HTTPError, VerifyPhoneCodePayload>({
     mutationFn: postInfoPhoneVerify,
-    onSuccess: () => void refetch(),
+    onSuccess: () => {
+      void refetch();
+      showToast("Your changes have been saved.");
+    },
   });
 };

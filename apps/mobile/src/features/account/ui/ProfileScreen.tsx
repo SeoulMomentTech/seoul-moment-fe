@@ -260,11 +260,6 @@ function ProfileForm({ profile }: { profile: UserProfile }) {
         failure={save.error ? FAILURE_MESSAGE[save.error.step] : null}
         label="Save Changes"
         onPress={submit}
-        success={
-          save.isSuccess && blocker === "Change something to save."
-            ? "Your profile has been saved."
-            : null
-        }
       />
     </>
   );

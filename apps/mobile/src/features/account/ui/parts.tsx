@@ -142,7 +142,6 @@ export function Note({
 export function SubmitBar({
   blocker,
   failure,
-  success = null,
   label,
   busyLabel,
   busy,
@@ -152,8 +151,6 @@ export function SubmitBar({
   blocker: string | null;
   /** 방금 실패한 이유와 되돌릴 방법. 있으면 다른 무엇보다 먼저 보인다. */
   failure: string | null;
-  /** 방금 저장됐다는 말. 토스트가 없는 앱이라 이 줄이 그 자리를 맡는다. */
-  success?: string | null;
   label: string;
   busyLabel: string;
   busy: boolean;
@@ -165,8 +162,6 @@ export function SubmitBar({
       <View style={{ marginTop: Spacing.inner, minHeight: NOTE_LINE }}>
         {failure ? (
           <Note error>{failure}</Note>
-        ) : success ? (
-          <Note>{success}</Note>
         ) : blocker ? (
           <Note>{blocker}</Note>
         ) : null}

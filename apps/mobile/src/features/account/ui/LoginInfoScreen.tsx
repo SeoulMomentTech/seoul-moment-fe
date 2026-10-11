@@ -303,11 +303,6 @@ function LoginInfoForm({ info }: { info: UserInfo }) {
         }
         label="Save Changes"
         onPress={() => updateInfo.mutate(agreements)}
-        success={
-          updateInfo.isSuccess && !isDirty
-            ? "Your changes have been saved."
-            : null
-        }
       />
     </>
   );

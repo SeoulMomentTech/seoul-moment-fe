@@ -8,6 +8,7 @@ import {
   updateUserProfileName,
   updateUserProfileNickname,
 } from "@shared/services/user";
+import { showToast } from "@shared/ui/toast";
 
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -70,6 +71,7 @@ export const useSaveProfile = () => {
         throw new ProfileSaveError("profile");
       });
     },
+    onSuccess: () => showToast("Your changes have been saved."),
     onSettled: () =>
       void queryClient.invalidateQueries({ queryKey: userProfileKey(id) }),
   });
