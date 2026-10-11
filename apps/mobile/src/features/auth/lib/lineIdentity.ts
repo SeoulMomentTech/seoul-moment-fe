@@ -7,8 +7,19 @@
  * 화면까지 Expo Go 에서 함께 죽는다.
  */
 
+import Constants, { ExecutionEnvironment } from "expo-constants";
+
 // 값이 아니라 타입만 가져온다. import type 은 번들에서 지워지므로 Expo Go 에서도 안전하다.
 import type * as LineModule from "@xmartlabs/react-native-line";
+
+/**
+ * Expo Go 인지. 여기서는 모듈을 **불러 보지도 않는다** —
+ * NativeLineLogin 은 평가되는 순간 TurboModuleRegistry.getEnforcing 으로 던지는데,
+ * 그 던짐이 import() 를 감싼 try/catch 를 빠져나가 LogBox 를 띄운다(실제로 그랬다).
+ * 그래서 잡는 대신 아예 닿지 않는다.
+ */
+const isExpoGo =
+  Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
 
 /** LINE Developers Console 의 채널 ID. 채널 시크릿은 쓰지 않는다. */
 export const LINE_CHANNEL_ID = process.env.EXPO_PUBLIC_LINE_CHANNEL_ID;
@@ -49,7 +60,7 @@ let ready = false;
  * 브라우저로 넘어간다 — 어느 쪽인지는 SDK 가 알아서 고른다.
  */
 export const requestLineIdToken = async (): Promise<string> => {
-  if (!LINE_CHANNEL_ID) throw new LineUnavailableError();
+  if (!LINE_CHANNEL_ID || isExpoGo) throw new LineUnavailableError();
 
   let line: typeof LineModule;
   try {
@@ -61,6 +72,7 @@ export const requestLineIdToken = async (): Promise<string> => {
     }
   } catch {
     // 네이티브 쪽이 없다는 뜻이다. 사용자의 잘못이 아니므로 그렇게 말한다.
+    // dev build 인데도 못 찾는 경우(설치 직후 네이티브가 안 붙음 등).
     throw new LineUnavailableError();
   }
 
