@@ -4,6 +4,7 @@ import { Text, View } from "react-native";
 
 import { useOpenBrandShop } from "@features/shop/model/useOpenBrandShop";
 import { useLanguage } from "@shared/lib/i18n/useLanguage";
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { shareWebLink } from "@shared/lib/share";
 import type { BrandPromotionBrandDetail } from "@shared/services/brandPromotion";
 import { Button } from "@shared/ui/button";
@@ -61,6 +62,7 @@ export function BrandIntroduction({
   promotionId,
   brandPromotionId,
 }: BrandIntroductionProps) {
+  const t = useTranslations();
   const router = useRouter();
   const language = useLanguage();
   const openBrandShop = useOpenBrandShop();
@@ -134,7 +136,7 @@ export function BrandIntroduction({
         <Button
           accessibilityLabel={`View ${brand.name} brand page`}
           className="flex-1"
-          label="Brand"
+          label={t("brand")}
           onPress={() => router.push(`/brand/${brand.id}`)}
           size="md"
           variant="secondary"
@@ -142,7 +144,7 @@ export function BrandIntroduction({
         <Button
           accessibilityLabel={`Shop ${brand.name} products`}
           className="flex-1"
-          label="Shop"
+          label={t("shop")}
           onPress={() => openBrandShop(brand.id)}
           size="md"
           variant="secondary"

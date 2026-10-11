@@ -2,6 +2,7 @@ import { useRouter } from "expo-router";
 import { Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { Touchable } from "@shared/ui/press";
 
 import { HeaderHeight } from "@/constants/theme";
@@ -22,6 +23,7 @@ interface ScreenHeaderProps {
  * 약관·계정 화면이 같은 것을 쓴다. 새 화면이 또 손으로 그리기 전에 여기로 온다.
  */
 export function ScreenHeader({ title }: ScreenHeaderProps) {
+  const t = useTranslations();
   const insets = useSafeAreaInsets();
   const router = useRouter();
 
@@ -35,7 +37,7 @@ export function ScreenHeader({ title }: ScreenHeaderProps) {
         style={{ height: HeaderHeight }}
       >
         <Touchable
-          accessibilityLabel="Go back"
+          accessibilityLabel={t("back")}
           accessibilityRole="button"
           // 글리프 한 줄(24pt)이라 14 로 넓혀 44pt 터치 영역을 넘긴다.
           hitSlop={14}

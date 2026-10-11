@@ -1,6 +1,7 @@
 import { useRouter } from "expo-router";
 import { Text } from "react-native";
 
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { Touchable } from "@shared/ui/press";
 import { Section } from "@shared/ui/section";
 import { SectionError } from "@shared/ui/section-state";
@@ -11,6 +12,7 @@ import { NewsSlideCard } from "./PostSlideCards";
 import { useHomeNews } from "../model/useHomeLists";
 
 export function NewsSection() {
+  const t = useTranslations();
   const router = useRouter();
   const {
     data: news,
@@ -24,7 +26,7 @@ export function NewsSection() {
   // 돌리지 말고 재시도 줄을 보여준다.
   if (isPending && fetchStatus === "paused") {
     return (
-      <Section title="News">
+      <Section title={t("news")}>
         <SectionError onRetry={() => void refetch()} />
       </Section>
     );
@@ -32,7 +34,7 @@ export function NewsSection() {
 
   if (isPending) {
     return (
-      <Section title="News">
+      <Section title={t("news")}>
         <PostSlideSkeleton variant="news" />
       </Section>
     );
@@ -40,7 +42,7 @@ export function NewsSection() {
 
   if (isError) {
     return (
-      <Section title="News">
+      <Section title={t("news")}>
         <SectionError onRetry={() => void refetch()} />
       </Section>
     );
@@ -52,17 +54,19 @@ export function NewsSection() {
     <Section
       action={
         <Touchable
-          accessibilityLabel="View all news"
+          accessibilityLabel={t("view_all_news")}
           accessibilityRole="button"
           // 글자 한 줄(17pt)뿐이라 8 로는 33pt 에 그친다. 14 로 45pt 를 만든다.
           hitSlop={14}
           // 탭 라우트라 push 하면 (tabs) 네비게이터가 한 벌 더 쌓인다.
           onPress={() => router.navigate("/news")}
         >
-          <Text className="text-body-3 text-brand font-semibold">View all</Text>
+          <Text className="text-body-3 text-brand font-semibold">
+            {t("view_all")}
+          </Text>
         </Touchable>
       }
-      title="News"
+      title={t("news")}
     >
       <SlideCarousel
         data={news}

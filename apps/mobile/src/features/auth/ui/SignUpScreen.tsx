@@ -11,9 +11,10 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { passwordMeetsRules } from "@shared/lib/utils/password";
 import { Button } from "@shared/ui/button";
-import { CODE_SENT_MESSAGE, FieldNote, ResendRow } from "@shared/ui/field-note";
+import { FieldNote, ResendRow } from "@shared/ui/field-note";
 import {
   PASSWORD_CHECKLIST_TOP,
   PasswordChecklist,
@@ -56,6 +57,7 @@ const CODE_LENGTH = 6;
  * 가입 응답이 204 라 토큰이 없어, 끝나면 같은 자격증명으로 바로 로그인한다.
  */
 export function SignUpScreen() {
+  const t = useTranslations();
   const insets = useSafeAreaInsets();
   const router = useRouter();
 
@@ -118,15 +120,15 @@ export function SignUpScreen() {
    * 모자란 것을 한꺼번에 늘어놓으면 혼내는 것처럼 읽힌다.
    */
   const blocker = !verified
-    ? "Verify your email to continue."
+    ? t("verify_email_to_continue")
     : !NICKNAME_RULE.test(nickname.trim())
-      ? "Your nickname can be 2-20 letters and numbers."
+      ? t("nickname_rule_hint")
       : !passwordMeetsRules(password)
-        ? "Your password needs to meet all five rules below."
+        ? t("password_rules_required")
         : password !== passwordConfirm
-          ? "The two passwords don't match."
+          ? t("password_mismatch")
           : !allTermsAgreed(terms)
-            ? "Please agree to the terms and the privacy policy."
+            ? t("agree_terms_required")
             : null;
 
   const canSubmit = blocker == null && !signUp.isPending && !login.isPending;
@@ -158,7 +160,7 @@ export function SignUpScreen() {
           style={{ height: HeaderHeight }}
         >
           <Touchable
-            accessibilityLabel="Go back"
+            accessibilityLabel={t("back")}
             accessibilityRole="button"
             hitSlop={14}
             onPress={() => router.back()}
@@ -183,7 +185,7 @@ export function SignUpScreen() {
             className="text-title-3 text-foreground text-center font-bold"
             style={{ paddingTop: Spacing.inner }}
           >
-            Sign Up
+            {t("sign_up")}
           </Text>
 
           <View style={{ marginTop: Spacing.section, gap: Spacing.tight }}>
@@ -200,7 +202,7 @@ export function SignUpScreen() {
                 verifyCode.reset();
                 clearSubmitErrors();
               }}
-              placeholder="Email"
+              placeholder={t("email")}
               value={email}
             />
 
@@ -219,7 +221,7 @@ export function SignUpScreen() {
                   }}
                   onComplete={submitCode}
                   otp="email"
-                  placeholder="Verification Code"
+                  placeholder={t("verification_code")}
                   value={code}
                 />
               </View>
@@ -231,7 +233,7 @@ export function SignUpScreen() {
                 // 메일이 오지 않았을 때 다시 보낼 방법이 사라진다.
                 <Button
                   disabled={code.trim().length === 0 || verifyCode.isPending}
-                  label="Verify"
+                  label={t("verify")}
                   onPress={() => submitCode()}
                   style={{ width: SIDE_BUTTON_WIDTH }}
                   variant="secondary"
@@ -239,7 +241,7 @@ export function SignUpScreen() {
               ) : (
                 <Button
                   disabled={!looksLikeEmail(email) || sendCode.isPending}
-                  label="Send Code"
+                  label={t("send_verification_code")}
                   onPress={send}
                   style={{ width: SIDE_BUTTON_WIDTH }}
                   variant="secondary"
@@ -253,7 +255,7 @@ export function SignUpScreen() {
                 validateNickname.reset();
                 clearSubmitErrors();
               }}
-              placeholder="Letters and numbers only (2-20)"
+              placeholder={t("allowed_input")}
               value={nickname}
             />
             <AuthField
@@ -262,7 +264,7 @@ export function SignUpScreen() {
                 setPassword(value);
                 clearSubmitErrors();
               }}
-              placeholder="Password"
+              placeholder={t("enter_password_input")}
               secureTextEntry
               value={password}
             />
@@ -272,7 +274,7 @@ export function SignUpScreen() {
                 setPasswordConfirm(value);
                 clearSubmitErrors();
               }}
-              placeholder="Confirm Password"
+              placeholder={t("confirm_password")}
               secureTextEntry
               value={passwordConfirm}
             />
@@ -302,25 +304,23 @@ export function SignUpScreen() {
           {/* 서버가 거절한 것이 있으면 그것이 먼저다. 없으면 아직 못 채운 것을 말한다. */}
           <View style={{ marginTop: Spacing.inner }}>
             {signUp.isError ? (
-              <FieldNote error>
-                We couldn&apos;t create your account. Please try again.
-              </FieldNote>
+              <FieldNote error>{t("signup_failed")}</FieldNote>
             ) : validateNickname.isError ? (
-              <FieldNote error>That nickname is taken. Try another.</FieldNote>
+              <FieldNote error>{t("nickname_taken")}</FieldNote>
             ) : login.isError ? (
-              <FieldNote error>
-                Your account is ready. Please sign in.
-              </FieldNote>
+              <FieldNote error>{t("account_ready")}</FieldNote>
             ) : blocker ? (
               <FieldNote>{blocker}</FieldNote>
             ) : null}
           </View>
 
           <Button
-            accessibilityLabel="Sign Up"
+            accessibilityLabel={t("sign_up")}
             disabled={!canSubmit}
             label={
-              signUp.isPending || login.isPending ? "Creating…" : "Sign Up"
+              signUp.isPending || login.isPending
+                ? t("creating_account")
+                : t("sign_up")
             }
             onPress={submit}
             style={{ marginTop: Spacing.tight }}
@@ -331,10 +331,10 @@ export function SignUpScreen() {
             style={{ marginTop: Spacing.inner }}
           >
             <Text className="text-body-3 text-neutral">
-              Already have an account?{" "}
+              {t("already_have_an_account")}{" "}
             </Text>
             <Touchable
-              accessibilityLabel="Login"
+              accessibilityLabel={t("login")}
               accessibilityRole="button"
               hitSlop={14}
               // 로그인에서 넘어온 화면이라 또 쌓지 않고 되돌아간다.
@@ -344,7 +344,7 @@ export function SignUpScreen() {
                 className="text-body-3 text-foreground"
                 style={{ textDecorationLine: "underline" }}
               >
-                Login
+                {t("login")}
               </Text>
             </Touchable>
           </View>
@@ -375,15 +375,15 @@ function EmailNote({
   busy: boolean;
   onResend(): void;
 }) {
+  const t = useTranslations();
+
   if (verified) return null;
 
   if (sendFailed) {
     // 보내지 못했으면 다시 보내기 줄을 두지 않는다 — 옆 버튼이 아직 "Send Code" 다.
     return (
       <View style={{ marginTop: Spacing.tight }}>
-        <FieldNote error>
-          That email is already registered, or the code couldn&apos;t be sent.
-        </FieldNote>
+        <FieldNote error>{t("email_taken_or_send_failed")}</FieldNote>
       </View>
     );
   }
@@ -391,9 +391,7 @@ function EmailNote({
   if (codeRejected) {
     return (
       <View style={{ marginTop: Spacing.tight, gap: Spacing.tight }}>
-        <FieldNote error>
-          The verification code does not match. Please check and try again.
-        </FieldNote>
+        <FieldNote error>{t("code_not_match")}</FieldNote>
         <ResendRow busy={busy} onResend={onResend} secondsLeft={resendIn} />
       </View>
     );
@@ -404,7 +402,7 @@ function EmailNote({
       <View style={{ marginTop: Spacing.tight }}>
         <ResendRow
           busy={busy}
-          message={CODE_SENT_MESSAGE}
+          message={t("verification_code_sent")}
           onResend={onResend}
           secondsLeft={resendIn}
         />
@@ -420,12 +418,16 @@ function EmailNote({
  * 성공 전용 색은 두지 않는다(팔레트를 늘리지 않는다) — 뜻은 ✓ 와 굵기가 진다.
  */
 function Verified() {
+  const t = useTranslations();
+
   return (
     <View
       className="items-center justify-center"
       style={{ width: SIDE_BUTTON_WIDTH, height: AUTH_FIELD_HEIGHT }}
     >
-      <Text className="text-body-3 text-foreground font-bold">✓ Verified</Text>
+      <Text className="text-body-3 text-foreground font-bold">
+        {t("verified_mark")}
+      </Text>
     </View>
   );
 }

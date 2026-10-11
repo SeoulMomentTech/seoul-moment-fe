@@ -1,5 +1,7 @@
 import { Text, View } from "react-native";
 
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
+
 import { Spacing } from "@/constants/theme";
 
 import { LineLoginButton } from "./LineLoginButton";
@@ -13,6 +15,7 @@ import { isLineLoginConfigured } from "../lib/lineIdentity";
  * 그리지 않는다 — 아무것도 없는 자리 위에 "or continue with" 만 남으면 더 이상하다.
  */
 export function SocialLoginSection() {
+  const t = useTranslations();
   // provider 를 더할 때 이 줄에 or 로 잇는다.
   const hasAnyProvider = isLineLoginConfigured;
 
@@ -20,7 +23,7 @@ export function SocialLoginSection() {
 
   return (
     <View style={{ marginTop: Spacing.section }}>
-      <Divider label="or continue with" />
+      <Divider label={t("or_continue_with")} />
       {/* 대만에서는 LINE 이 먼저다. 쓰는 사람이 더 많은 쪽이 위에 선다. */}
       <LineLoginButton />
     </View>

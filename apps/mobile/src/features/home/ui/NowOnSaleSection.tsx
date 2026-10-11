@@ -2,6 +2,7 @@ import { useRouter } from "expo-router";
 import { Text, View } from "react-native";
 
 import { ProductCard } from "@entities/product/ui/ProductCard";
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { Touchable } from "@shared/ui/press";
 import { Section } from "@shared/ui/section";
 import { SectionError } from "@shared/ui/section-state";
@@ -10,6 +11,7 @@ import { ProductGridSkeleton } from "@shared/ui/skeleton";
 import { useNowOnSale } from "../model/useHomeLists";
 
 export function NowOnSaleSection() {
+  const t = useTranslations();
   const router = useRouter();
   const {
     data: products,
@@ -23,7 +25,7 @@ export function NowOnSaleSection() {
   // 돌리지 말고 재시도 줄을 보여준다.
   if (isPending && fetchStatus === "paused") {
     return (
-      <Section title="Now On Sale">
+      <Section title={t("now_on_sale")}>
         <SectionError onRetry={() => void refetch()} />
       </Section>
     );
@@ -31,7 +33,7 @@ export function NowOnSaleSection() {
 
   if (isPending) {
     return (
-      <Section title="Now On Sale">
+      <Section title={t("now_on_sale")}>
         <ProductGridSkeleton />
       </Section>
     );
@@ -39,7 +41,7 @@ export function NowOnSaleSection() {
 
   if (isError) {
     return (
-      <Section title="Now On Sale">
+      <Section title={t("now_on_sale")}>
         <SectionError onRetry={() => void refetch()} />
       </Section>
     );
@@ -51,16 +53,18 @@ export function NowOnSaleSection() {
     <Section
       action={
         <Touchable
-          accessibilityLabel="View all products"
+          accessibilityLabel={t("view_all_products")}
           accessibilityRole="button"
           hitSlop={8}
           // 탭 라우트라 push 하지 않는다. RelatedPosts 의 View all 과 같은 처리.
           onPress={() => router.navigate("/shop")}
         >
-          <Text className="text-body-3 text-brand font-semibold">View all</Text>
+          <Text className="text-body-3 text-brand font-semibold">
+            {t("view_all")}
+          </Text>
         </Touchable>
       }
-      title="Now On Sale"
+      title={t("now_on_sale")}
     >
       {/* 항목이 4개로 고정이라 가상화 이득이 없고, 바깥 ScrollView 안에
           세로 FlatList 를 중첩하지 않으려고 flex-wrap 으로 2열을 만든다. */}

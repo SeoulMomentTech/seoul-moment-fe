@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import { Text, View } from "react-native";
 
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { Touchable } from "@shared/ui/press";
 
 import { Spacing } from "@/constants/theme";
@@ -25,9 +26,6 @@ export function FieldNote({
     </Text>
   );
 }
-
-/** 코드를 보냈다는 말. 보낸 곳은 바로 위 칸에 그대로 적혀 있어 여기서 되풀이하지 않는다. */
-export const CODE_SENT_MESSAGE = "Verification code sent.";
 
 interface ResendRowProps {
   /** 왼쪽에 적히는 상태. 생략하면 다시 보내기만 오른쪽에 남는다(실패 줄 아래가 그렇다). */
@@ -56,6 +54,7 @@ export function ResendRow({
   busy,
   onResend,
 }: ResendRowProps) {
+  const t = useTranslations();
   const waiting = secondsLeft > 0 || busy;
 
   return (
@@ -66,11 +65,11 @@ export function ResendRow({
       </Text>
       {waiting ? (
         <Text className="text-body-3 text-neutral">
-          {busy ? "Sending…" : `Resend in ${secondsLeft}s`}
+          {busy ? t("sending") : t("resend_in", { seconds: secondsLeft })}
         </Text>
       ) : (
         <Touchable
-          accessibilityLabel="Send the code again"
+          accessibilityLabel={t("send_code_again")}
           accessibilityRole="button"
           hitSlop={14}
           onPress={onResend}
@@ -79,7 +78,7 @@ export function ResendRow({
             className="text-body-3 text-foreground"
             style={{ textDecorationLine: "underline" }}
           >
-            Resend
+            {t("resend")}
           </Text>
         </Touchable>
       )}

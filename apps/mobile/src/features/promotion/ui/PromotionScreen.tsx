@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CartButton } from "@entities/cart/ui/CartButton";
 import { ProductGrid } from "@entities/product/ui/ProductGrid";
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { useCartBadgeScrollCollapse } from "@shared/ui/cart-button/collapse";
 import {
   BackButton,
@@ -45,7 +46,6 @@ const BANNER_ASPECT = 5 / 4;
 // 빈 화면 아이콘 색. SVG 는 className 을 못 받아 --neutral-600 값을 직접 쓴다.
 const EMPTY_ICON_COLOR = "#707070";
 /** en.json 의 promotion_special_event. 앞 공백만 떼고 쓴다. */
-const PRODUCTS_HEADING = "Brand Products";
 
 /**
  * 브랜드 프로모션 상세. 웹은 /promotion/[id] 와 /promotion/[id]/brand/[brandPromotionId]
@@ -56,6 +56,7 @@ const PRODUCTS_HEADING = "Brand Products";
  * 상세 쿼리는 고른 id 가 생길 때까지 enabled=false 로 묶여 있다.
  */
 export function PromotionScreen({ promotionId }: { promotionId: number }) {
+  const t = useTranslations();
   const badgeScroll = useCartBadgeScrollCollapse();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
@@ -116,9 +117,9 @@ export function PromotionScreen({ promotionId }: { promotionId: number }) {
     return (
       <StatusScreen>
         <EmptyState
-          hint="Check back soon."
+          hint={t("check_back_soon")}
           icon={<InboxIcon color={EMPTY_ICON_COLOR} size={EMPTY_ICON_SIZE} />}
-          message="This promotion has no brands yet"
+          message={t("promotion_no_brands")}
         />
       </StatusScreen>
     );
@@ -168,7 +169,7 @@ export function PromotionScreen({ promotionId }: { promotionId: number }) {
         />
         <BrandLookbook sectionList={detail.sectionList} />
         <ProductGrid
-          heading={PRODUCTS_HEADING}
+          heading={t("brand_products")}
           items={detail.productList.map((product) => ({
             id: product.id,
             brandName: product.brandName,

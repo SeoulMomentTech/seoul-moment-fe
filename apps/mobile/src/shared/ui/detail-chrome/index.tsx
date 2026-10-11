@@ -6,6 +6,7 @@ import { Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Svg, { Defs, LinearGradient, Rect, Stop } from "react-native-svg";
 
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { Touchable } from "@shared/ui/press";
 
 // 스크림은 상태바 영역(insets.top) 아래로 이만큼 더 내려와 옅어진다.
@@ -14,12 +15,13 @@ export const SCRIM_EXTRA_HEIGHT = 64;
 const BACK_BUTTON_CLEARANCE = 52;
 
 export function BackButton() {
+  const t = useTranslations();
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
   return (
     <Touchable
-      accessibilityLabel="Go back"
+      accessibilityLabel={t("back")}
       accessibilityRole="button"
       className="absolute left-5 h-9 w-9 items-center justify-center rounded-full"
       // 사진 위에 뜬 어두운 원이라 흰 리플을 쓰는 overlay 를 고른다.

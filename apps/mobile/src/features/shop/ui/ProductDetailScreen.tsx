@@ -15,6 +15,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { CartButton } from "@entities/cart/ui/CartButton";
 import { listOptionAxes } from "@entities/product/lib/options";
 import { ProductCarousel } from "@entities/product/ui/ProductCarousel";
+import type { Translate } from "@shared/lib/i18n/useTranslations";
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import type {
   GetProductDetailRes,
   ProductDetailOption,
@@ -62,10 +64,10 @@ const DETAIL_IMAGE_PLACEHOLDER_HEIGHT = 320;
 const formatPrice = (value: number) => `NT$${value.toLocaleString("en-US")}`;
 
 /** 옵션 객체를 정해진 순서의 (라벨, 값 문자열) 행으로 바꾼다. 값이 없는 타입은 뺀다. */
-const toOptionRows = (option: ProductDetailOption | undefined) =>
-  listOptionAxes(option).map(({ type, label, values }) => ({
+const toOptionRows = (option: ProductDetailOption | undefined, t: Translate) =>
+  listOptionAxes(option).map(({ type, labelKey, values }) => ({
     type,
-    label,
+    label: t(labelKey),
     text: values.map((v) => v.value).join(" / "),
   }));
 
@@ -73,21 +75,21 @@ const toOptionRows = (option: ProductDetailOption | undefined) =>
  * 스펙 표에 실제로 들어갈 행만 모은다. 옵션·원산지·배송 정보가 모두 비는 상품이 있어서,
  * 행을 먼저 세어 두고 비면 블록(위 경계선 + 여백)째로 그리지 않는다.
  */
-const toSpecRows = (product: GetProductDetailRes) => [
-  ...toOptionRows(product.option).map(({ type, label, text }) => ({
+const toSpecRows = (product: GetProductDetailRes, t: Translate) => [
+  ...toOptionRows(product.option, t).map(({ type, label, text }) => ({
     key: type,
     label,
     value: text,
   })),
   ...(product.origin
-    ? [{ key: "origin", label: "Origin", value: product.origin }]
+    ? [{ key: "origin", label: t("place_of_origin"), value: product.origin }]
     : []),
   ...(product.shippingInfo > 0
     ? [
         {
           key: "shippingInfo",
-          label: "Shipping",
-          value: `Within ${product.shippingInfo} days`,
+          label: t("shipping_information"),
+          value: t("ships_within_days", { days: product.shippingInfo }),
         },
       ]
     : []),
@@ -232,6 +234,7 @@ function DetailImage({ uri }: { uri: string }) {
  * 모든 분기에 뒤로가기 버튼이 있다.
  */
 export function ProductDetailScreen({ id }: { id: number }) {
+  const t = useTranslations();
   const badgeScroll = useCartBadgeScrollCollapse();
   const insets = useSafeAreaInsets();
   const openBrandShop = useOpenBrandShop();
@@ -285,7 +288,7 @@ export function ProductDetailScreen({ id }: { id: number }) {
   }
 
   const galleryUris = product.subImage ?? [];
-  const specRows = toSpecRows(product);
+  const specRows = toSpecRows(product, t);
   const hasRating = product.review > 0;
 
   return (
@@ -370,7 +373,7 @@ export function ProductDetailScreen({ id }: { id: number }) {
           </View>
         ) : null}
         <ProductCarousel
-          heading="Related Products"
+          heading={t("related_products")}
           items={product.relate ?? []}
         />
         {/* 담기 바가 가리는 만큼 비워 둔다. 바가 쥐는 안전 영역까지 더한다 —

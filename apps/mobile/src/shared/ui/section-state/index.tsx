@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import { Text, View } from "react-native";
 
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { Button } from "@shared/ui/button";
 import { Touchable } from "@shared/ui/press";
 
@@ -15,19 +16,23 @@ interface SectionErrorProps {
  * 한 섹션이 실패해도 홈 전체가 죽지 않게, 그 섹션만 한 줄로 접는다.
  */
 export function SectionError({ onRetry }: SectionErrorProps) {
+  const t = useTranslations();
+
   return (
     <View className="border-neutral-subtle mx-5 flex-row items-center justify-between rounded-lg border px-4 py-3">
       <Text className="text-body-3 text-neutral">
-        Couldn&apos;t load this section
+        {t("section_load_failed")}
       </Text>
       <Touchable
-        accessibilityLabel="Retry loading this section"
+        accessibilityLabel={t("retry_section")}
         accessibilityRole="button"
         // 글자 한 줄(17pt)뿐이라 8 로는 33pt 에 그친다. 14 로 45pt 를 만든다.
         hitSlop={14}
         onPress={onRetry}
       >
-        <Text className="text-body-3 text-brand font-bold">Retry</Text>
+        <Text className="text-body-3 text-brand font-bold">
+          {t("try_again")}
+        </Text>
       </Touchable>
     </View>
   );
@@ -87,20 +92,20 @@ interface ScreenErrorProps {
  * secondary/md 다 — 'View brand page'(ShopParts) 와 같은 모양이다.
  */
 export function ScreenError({ onRetry, offline = false }: ScreenErrorProps) {
+  const t = useTranslations();
+
   return (
     <View className="flex-1 items-center justify-center px-5">
       <Text className="text-title-4 text-foreground text-center font-bold">
-        {offline ? "You appear to be offline" : "We couldn't load this page"}
+        {offline ? t("offline_title") : t("page_load_failed")}
       </Text>
       <Text className="text-body-3 text-neutral mt-2 text-center">
-        {offline
-          ? "Check your connection and try again."
-          : "Please try again in a moment."}
+        {offline ? t("offline_hint") : t("try_again_moment")}
       </Text>
       <Button
-        accessibilityLabel="Retry loading this page"
+        accessibilityLabel={t("retry_page")}
         className="mt-6 px-6"
-        label="Retry"
+        label={t("try_again")}
         onPress={onRetry}
         size="md"
         variant="secondary"

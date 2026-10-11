@@ -2,6 +2,7 @@ import { NativeTabs } from "expo-router/unstable-native-tabs";
 import { View } from "react-native";
 
 import { useUserCartCount } from "@entities/cart/model/useUserCartCount";
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 
 import { AppHeader } from "@/shared/ui/app-header";
 
@@ -16,6 +17,8 @@ const TAB_RIPPLE_COLOR = "rgba(243, 123, 42, 0.24)"; // --brand-500 24% 투명�
 const TAB_BACKGROUND_COLOR = "#ffffff"; // --neutral-0
 
 export default function TabLayout() {
+  const t = useTranslations();
+
   useResetShopFilterOnLeave();
   // 로그아웃 상태에서는 쿼리가 꺼져 있어 요청이 나가지 않고 data 는 undefined 로 남는다 —
   // 헤더는 그것을 "모른다"로 읽어 뱃지를 그리지 않는다.
@@ -37,7 +40,7 @@ export default function TabLayout() {
         rippleColor={TAB_RIPPLE_COLOR}
       >
         <NativeTabs.Trigger name="index">
-          <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Label>{t("home")}</NativeTabs.Trigger.Label>
           <NativeTabs.Trigger.Icon
             md="home"
             sf={{ default: "house", selected: "house.fill" }}
@@ -45,7 +48,7 @@ export default function TabLayout() {
         </NativeTabs.Trigger>
 
         <NativeTabs.Trigger name="shop">
-          <NativeTabs.Trigger.Label>Shop</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Label>{t("shop")}</NativeTabs.Trigger.Label>
           <NativeTabs.Trigger.Icon
             md="shopping_bag"
             sf={{ default: "bag", selected: "bag.fill" }}
@@ -53,7 +56,7 @@ export default function TabLayout() {
         </NativeTabs.Trigger>
 
         <NativeTabs.Trigger name="news">
-          <NativeTabs.Trigger.Label>News</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Label>{t("news")}</NativeTabs.Trigger.Label>
           <NativeTabs.Trigger.Icon
             md="newspaper"
             sf={{ default: "newspaper", selected: "newspaper.fill" }}
@@ -61,7 +64,7 @@ export default function TabLayout() {
         </NativeTabs.Trigger>
 
         <NativeTabs.Trigger name="my">
-          <NativeTabs.Trigger.Label>My</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Label>{t("my_account")}</NativeTabs.Trigger.Label>
           <NativeTabs.Trigger.Icon
             md="person"
             sf={{ default: "person", selected: "person.fill" }}

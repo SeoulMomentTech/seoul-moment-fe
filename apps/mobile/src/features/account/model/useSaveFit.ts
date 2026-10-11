@@ -3,6 +3,7 @@ import type { HTTPError } from "ky";
 import { userFitKey } from "@entities/user/model/keys";
 import { useUserAuthStore } from "@shared/lib/auth/useUserAuthStore";
 import useAppMutation from "@shared/lib/hooks/query/useAppMutation";
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import type { UserFitPayload } from "@shared/services/user";
 import { createUserFit, updateUserFit } from "@shared/services/user";
 import { showToast } from "@shared/ui/toast";
@@ -19,6 +20,7 @@ import { useQueryClient } from "@tanstack/react-query";
  * 다음 저장이 PATCH 로 간다.
  */
 export const useSaveFit = ({ exists }: { exists: boolean }) => {
+  const t = useTranslations();
   const queryClient = useQueryClient();
   const id = useUserAuthStore((s) => s.id);
 
@@ -26,7 +28,7 @@ export const useSaveFit = ({ exists }: { exists: boolean }) => {
     mutationFn: exists ? updateUserFit : createUserFit,
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: userFitKey(id) });
-      showToast("Your changes have been saved.");
+      showToast(t("changes_saved"));
     },
   });
 };

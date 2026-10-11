@@ -12,8 +12,9 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useUserAuthStore } from "@shared/lib/auth/useUserAuthStore";
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { Button } from "@shared/ui/button";
-import { CODE_SENT_MESSAGE, FieldNote, ResendRow } from "@shared/ui/field-note";
+import { FieldNote, ResendRow } from "@shared/ui/field-note";
 import { Touchable } from "@shared/ui/press";
 
 import { HeaderHeight, Spacing } from "@/constants/theme";
@@ -49,6 +50,7 @@ const looksLikeEmail = (value: string) => /^\S+@\S+\.\S+$/.test(value.trim());
  * 돌아오므로 같은 판정을 다시 돌린다 — 이미 연결된 계정이면 거기서 바로 로그인된다.
  */
 export function SnsSignUpScreen() {
+  const t = useTranslations();
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const login = useUserAuthStore((s) => s.login);
@@ -73,10 +75,10 @@ export function SnsSignUpScreen() {
     return (
       <Shell>
         <Text className="text-body-3 text-neutral text-center">
-          Start from the sign-in screen to continue with LINE.
+          {t("sns_start_from_sign_in")}
         </Text>
         <Button
-          label="Go to sign in"
+          label={t("go_to_sign_in")}
           onPress={() => router.replace("/login")}
           style={{ marginTop: Spacing.inner }}
         />
@@ -134,11 +136,11 @@ export function SnsSignUpScreen() {
   const ready = context.kind === "ready";
 
   const blocker = !ready
-    ? "Verify your email to continue."
+    ? t("verify_email_to_continue")
     : !NICKNAME_RULE.test(nickname.trim())
-      ? "Your nickname can be 2-20 letters and numbers."
+      ? t("nickname_rule_hint")
       : !allTermsAgreed(terms)
-        ? "Please agree to the terms and the privacy policy."
+        ? t("agree_terms_required")
         : null;
 
   const submit = () => {
@@ -153,15 +155,15 @@ export function SnsSignUpScreen() {
   return (
     <Shell>
       <Text className="text-title-3 text-foreground text-center font-bold">
-        Create your account
+        {t("create_your_account")}
       </Text>
       <Text
         className="text-body-3 text-neutral text-center"
         style={{ marginTop: Spacing.tight }}
       >
         {ready && context.email
-          ? `Continuing as ${context.email}`
-          : "Continuing with LINE"}
+          ? t("continuing_as", { email: context.email })
+          : t("continuing_with_line")}
       </Text>
 
       <View style={{ marginTop: Spacing.section, gap: Spacing.tight }}>
@@ -171,7 +173,7 @@ export function SnsSignUpScreen() {
               setNickname(value);
               if (signUp.isError) signUp.reset();
             }}
-            placeholder="Letters and numbers only (2-20)"
+            placeholder={t("allowed_input")}
             value={nickname}
           />
         ) : (
@@ -187,7 +189,7 @@ export function SnsSignUpScreen() {
                 sendCode.reset();
                 verifyCode.reset();
               }}
-              placeholder="Email"
+              placeholder={t("email")}
               value={email}
             />
             <View className="flex-row" style={{ gap: Spacing.tight }}>
@@ -202,14 +204,14 @@ export function SnsSignUpScreen() {
                   }}
                   onComplete={submitCode}
                   otp="email"
-                  placeholder="Verification Code"
+                  placeholder={t("verification_code")}
                   value={code}
                 />
               </View>
               {sendCode.isSuccess ? (
                 <Button
                   disabled={code.trim().length === 0 || verifyCode.isPending}
-                  label="Verify"
+                  label={t("verify")}
                   onPress={() => submitCode()}
                   style={{ width: SIDE_BUTTON_WIDTH }}
                   variant="secondary"
@@ -217,7 +219,7 @@ export function SnsSignUpScreen() {
               ) : (
                 <Button
                   disabled={!looksLikeEmail(email) || sendCode.isPending}
-                  label="Send Code"
+                  label={t("send_verification_code")}
                   onPress={send}
                   style={{ width: SIDE_BUTTON_WIDTH }}
                   variant="secondary"
@@ -245,18 +247,16 @@ export function SnsSignUpScreen() {
 
       <View style={{ marginTop: Spacing.inner }}>
         {signUp.isError ? (
-          <FieldNote error>
-            That nickname is taken, or this account already exists.
-          </FieldNote>
+          <FieldNote error>{t("nickname_or_account_taken")}</FieldNote>
         ) : blocker ? (
           <FieldNote>{blocker}</FieldNote>
         ) : null}
       </View>
 
       <Button
-        accessibilityLabel="Create account"
+        accessibilityLabel={t("create_account")}
         disabled={blocker != null || signUp.isPending}
-        label={signUp.isPending ? "Creating…" : "Create account"}
+        label={signUp.isPending ? t("creating_account") : t("create_account")}
         onPress={submit}
         style={{ marginTop: Spacing.tight, marginBottom: insets.bottom }}
       />
@@ -266,6 +266,7 @@ export function SnsSignUpScreen() {
 
 /** 로그인·가입과 같은 머리와 같은 본문 틀. */
 function Shell({ children }: { children: React.ReactNode }) {
+  const t = useTranslations();
   const insets = useSafeAreaInsets();
   const router = useRouter();
 
@@ -281,7 +282,7 @@ function Shell({ children }: { children: React.ReactNode }) {
           style={{ height: HeaderHeight }}
         >
           <Touchable
-            accessibilityLabel="Go back"
+            accessibilityLabel={t("back")}
             accessibilityRole="button"
             hitSlop={14}
             onPress={() => router.back()}
@@ -325,12 +326,12 @@ function EmailNote({
   busy: boolean;
   onResend(): void;
 }) {
+  const t = useTranslations();
+
   if (sendFailed) {
     return (
       <View style={{ marginTop: Spacing.tight }}>
-        <FieldNote error>
-          We couldn&apos;t send the code. Please try again.
-        </FieldNote>
+        <FieldNote error>{t("code_send_failed")}</FieldNote>
       </View>
     );
   }
@@ -338,9 +339,7 @@ function EmailNote({
   if (rejected) {
     return (
       <View style={{ marginTop: Spacing.tight, gap: Spacing.tight }}>
-        <FieldNote error>
-          The verification code does not match, or it has expired.
-        </FieldNote>
+        <FieldNote error>{t("code_not_match")}</FieldNote>
         <ResendRow busy={busy} onResend={onResend} secondsLeft={resendIn} />
       </View>
     );
@@ -351,7 +350,7 @@ function EmailNote({
       <View style={{ marginTop: Spacing.tight }}>
         <ResendRow
           busy={busy}
-          message={CODE_SENT_MESSAGE}
+          message={t("verification_code_sent")}
           onResend={onResend}
           secondsLeft={resendIn}
         />

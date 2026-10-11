@@ -1,6 +1,7 @@
 import { Image } from "expo-image";
 import { FlatList, Text, View } from "react-native";
 
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import type {
   BrandPromotionCoupon,
   BrandPromotionEvent,
@@ -17,11 +18,16 @@ const EXPIRED = "EXPIRED";
 const EXPIRED_OPACITY = 0.4;
 
 function CouponCard({ coupon }: { coupon: BrandPromotionCoupon }) {
+  const t = useTranslations();
   const isExpired = coupon.status === EXPIRED;
 
   return (
     <View
-      accessibilityLabel={isExpired ? `${coupon.title}, expired` : coupon.title}
+      accessibilityLabel={
+        isExpired
+          ? t("coupon_expired_label", { title: coupon.title })
+          : coupon.title
+      }
       className="border-neutral-subtle rounded-lg border p-4"
       style={{ width: CARD_WIDTH, opacity: isExpired ? EXPIRED_OPACITY : 1 }}
     >
@@ -48,7 +54,9 @@ function CouponCard({ coupon }: { coupon: BrandPromotionCoupon }) {
       />
       {isExpired ? (
         // 흐리게만 두면 "이미지가 아직 안 떴다"로 읽힌다. 한 마디로 이유를 말한다.
-        <Text className="text-body-5 text-danger mt-2 font-bold">Expired</Text>
+        <Text className="text-body-5 text-danger mt-2 font-bold">
+          {t("promotion_expired")}
+        </Text>
       ) : null}
     </View>
   );

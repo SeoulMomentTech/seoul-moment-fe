@@ -20,6 +20,8 @@ import {
 } from "@entities/cart/model/useCartMutations";
 import { useUserCart } from "@entities/cart/model/useUserCart";
 import { useUserAuthStore } from "@shared/lib/auth/useUserAuthStore";
+import type { Translate } from "@shared/lib/i18n/useTranslations";
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import type {
   GetUserCartRes,
   UserCartBrandGroup,
@@ -68,6 +70,7 @@ const SUMMARY_ROW_HEIGHT = 2 * LINE_BODY_2;
  * 로그아웃을 맨 앞에 두는 이유는 그때 쿼리가 꺼져 있어 isPending 이 영원히 유지되기 때문이다.
  */
 export function CartScreen() {
+  const t = useTranslations();
   const isAuthenticated = useUserAuthStore((s) => s.isAuthenticated);
   const cart = useUserCart();
 
@@ -119,9 +122,9 @@ export function CartScreen() {
         <CartTitle count={cart.data.totalCount} />
         <View className="flex-1 justify-center">
           <EmptyState
-            hint="Items you add in the web shop show up here."
+            hint={t("cart_web_hint")}
             icon={<CartIcon color={EMPTY_ICON_COLOR} size={EMPTY_ICON_SIZE} />}
-            message="Your cart is empty"
+            message={t("cart_empty")}
           />
         </View>
       </CartShell>
@@ -154,13 +157,18 @@ function CartShell({ children }: { children: ReactNode }) {
  * 화면이 한 번 더 움직인다.
  */
 function CartTitle({ count }: { count?: number }) {
+  const t = useTranslations();
   return (
     <View className="px-5" style={{ paddingTop: Spacing.inner }}>
-      <Text className="text-title-3 text-foreground font-bold">Cart</Text>
+      <Text className="text-title-3 text-foreground font-bold">
+        {t("cart")}
+      </Text>
       <View className="mt-1" style={{ height: LINE_BODY_5 }}>
         {count == null ? null : (
           <Text className="text-body-5 text-neutral">
-            {count === 1 ? "1 item" : `${count} items`}
+            {count === 1
+              ? t("cart_one_item")
+              : t("cart_count_items", { count })}
           </Text>
         )}
       </View>
@@ -175,33 +183,35 @@ function CartTitle({ count }: { count?: number }) {
  */
 function SignedOut() {
   const router = useRouter();
+  const t = useTranslations();
 
   return (
     <View className="flex-1 justify-center">
       <EmptyState
-        hint="Your cart is saved to your account."
+        hint={t("cart_saved_hint")}
         icon={<CartIcon color={EMPTY_ICON_COLOR} size={EMPTY_ICON_SIZE} />}
-        message="You're signed out"
+        message={t("signed_out")}
       />
       <View className="px-5">
-        <Button label="Sign in" onPress={() => router.push("/login")} />
+        <Button label={t("login")} onPress={() => router.push("/login")} />
       </View>
     </View>
   );
 }
 
 /** 실패를 알리는 한 가지 자리. 재고 부족만 문구가 다르다 — 다시 눌러도 같은 답이 온다. */
-const warnCartFailure = (error: unknown) => {
+const warnCartFailure = (error: unknown, t: Translate) => {
   if (isNotEnoughStockError(error)) {
-    showToast("Not enough stock. We've refreshed what's left.");
+    showToast(t("stock_refreshed"));
     return;
   }
 
-  showToast("Couldn't update your cart. Please try again.");
+  showToast(t("cart_update_failed"));
 };
 
 function CartBody({ cart }: { cart: GetUserCartRes }) {
   const insets = useSafeAreaInsets();
+  const t = useTranslations();
   const update = useUpdateCartItemQuantity();
   const remove = useRemoveCartItem();
 
@@ -218,7 +228,7 @@ function CartBody({ cart }: { cart: GetUserCartRes }) {
     update.mutate(
       { cartItemId: item.cartItemId, quantity },
       {
-        onError: warnCartFailure,
+        onError: (error) => warnCartFailure(error, t),
       },
     );
 
@@ -228,15 +238,17 @@ function CartBody({ cart }: { cart: GetUserCartRes }) {
    */
   const confirmRemove = (item: UserCartItem) =>
     Alert.alert(
-      "Remove from cart",
-      `${item.productName} will be removed. You'd have to pick its option again to re-add it.`,
+      t("remove_from_cart"),
+      t("remove_from_cart_confirm", { name: item.productName }),
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t("cancel"), style: "cancel" },
         {
-          text: "Remove",
+          text: t("remove"),
           style: "destructive",
           onPress: () =>
-            remove.mutate(item.cartItemId, { onError: warnCartFailure }),
+            remove.mutate(item.cartItemId, {
+              onError: (error) => warnCartFailure(error, t),
+            }),
         },
       ],
     );
@@ -426,10 +438,11 @@ function CartRow({
  * "고른 것 · 갈 수 있는 곳"만 뜻한다.
  */
 function LineStatus({ item }: { item: UserCartItem }) {
+  const t = useTranslations();
   if (isCartItemUnavailable(item)) {
     return (
       <Text className="text-body-5 text-danger font-bold" numberOfLines={1}>
-        Sold out
+        {t("sold_out")}
       </Text>
     );
   }
@@ -437,7 +450,7 @@ function LineStatus({ item }: { item: UserCartItem }) {
   if (isCartItemLowStock(item)) {
     return (
       <Text className="text-body-5 text-foreground font-bold" numberOfLines={1}>
-        {`Only ${item.stockQuantity} left`}
+        {t("stock_left", { stock: item.stockQuantity })}
       </Text>
     );
   }
@@ -460,6 +473,7 @@ function LineStatus({ item }: { item: UserCartItem }) {
  * 같이 보내면 주문서가 주문할 수 없는 줄을 들고 열린다.
  */
 function OrderCta({ cart }: { cart: GetUserCartRes }) {
+  const t = useTranslations();
   const router = useRouter();
 
   const orderableIds = cart.brandGroups.flatMap((group) =>
@@ -472,7 +486,7 @@ function OrderCta({ cart }: { cart: GetUserCartRes }) {
     <View className="px-5" style={{ marginTop: Spacing.inner }}>
       <Button
         disabled={orderableIds.length === 0}
-        label="Order"
+        label={t("order_sheet")}
         onPress={() => router.push(`/order?cart=${orderableIds.join(",")}`)}
       />
     </View>
@@ -480,20 +494,24 @@ function OrderCta({ cart }: { cart: GetUserCartRes }) {
 }
 
 function CartSummary({ cart }: { cart: GetUserCartRes }) {
+  const t = useTranslations();
   return (
     <View
       className="border-neutral-subtle mx-5 rounded-lg border p-4"
       style={{ marginTop: Spacing.section }}
     >
-      <SummaryRow label="Total" value={formatPrice(cart.totalProductAmount)} />
+      <SummaryRow
+        label={t("total_product_amount")}
+        value={formatPrice(cart.totalProductAmount)}
+      />
       {/* 배송지가 아직 없어 본섬 기준으로 계산한 값이다. 금액 옆에서 바로 알 수 있어야
           이 숫자를 확정 배송비로 읽지 않는다 — 확정은 주문서에서 한다. */}
       <SummaryRow
-        label="Shipping fee (main island est.)"
+        label={t("cart_shipping_fee_estimate")}
         value={
           cart.estimatedShippingFee > 0
             ? formatPrice(cart.estimatedShippingFee)
-            : "Free"
+            : t("free_shipping")
         }
       />
       {/* 이미 무료배송이면 자리만 비워 둔다 — 수량을 바꿀 때마다 카드 높이가 들썩이지 않게. */}
@@ -510,7 +528,7 @@ function CartSummary({ cart }: { cart: GetUserCartRes }) {
         className="text-body-5 text-neutral"
         style={{ marginTop: Spacing.tight }}
       >
-        Shipping is charged once per order, even across different brands.
+        {t("order_single_shipping_fee_note")}
       </Text>
 
       <View
@@ -519,7 +537,7 @@ function CartSummary({ cart }: { cart: GetUserCartRes }) {
       >
         <SummaryRow
           emphasis
-          label="Estimated total"
+          label={t("estimated_total_amount")}
           value={formatPrice(cart.estimatedTotalAmount)}
         />
       </View>

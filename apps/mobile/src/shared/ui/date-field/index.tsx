@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { Platform, Text, View } from "react-native";
 
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { BottomSheet } from "@shared/ui/bottom-sheet";
 import { Button } from "@shared/ui/button";
 import { Touchable } from "@shared/ui/press";
@@ -68,6 +69,7 @@ export function DateField({
   minimumDate,
   maximumDate,
 }: DateFieldProps) {
+  const t = useTranslations();
   const [open, setOpen] = useState(false);
   const selected = parseISODate(value);
   const today = new Date();
@@ -130,7 +132,7 @@ export function DateField({
           </View>
           <View className="px-5" style={{ paddingBottom: Spacing.inner }}>
             <Button
-              label="Done"
+              label={t("done")}
               onPress={() => {
                 onChange(toISODate(draft));
                 setOpen(false);

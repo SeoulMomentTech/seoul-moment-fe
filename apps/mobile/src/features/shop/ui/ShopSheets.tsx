@@ -4,6 +4,7 @@ import { ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useProductCategories } from "@entities/product/model/useProductCategories";
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import {
   Accordion,
   AccordionContent,
@@ -146,6 +147,7 @@ function ProductCategorySection({
 }) {
   const { data, isPending, isError, fetchStatus, refetch } =
     useProductCategories(categoryId);
+  const t = useTranslations();
 
   let body: ReactNode;
   // 오프라인이면 요청이 paused 되어 isPending 이 유지된다.
@@ -156,7 +158,7 @@ function ProductCategorySection({
   } else if (isError) {
     body = <SectionError onRetry={() => void refetch()} />;
   } else if (!data || data.list.length === 0) {
-    body = <EmptyNote text="No categories" />;
+    body = <EmptyNote text={t("no_categories")} />;
   } else {
     body = (
       <ChipWrap>
@@ -176,7 +178,7 @@ function ProductCategorySection({
   }
 
   return (
-    <FilterSection title="Category" value="category">
+    <FilterSection title={t("category")} value="category">
       {body}
     </FilterSection>
   );
@@ -190,6 +192,7 @@ function BrandSection({
   onSelect(id: number | undefined): void;
 }) {
   const { data, isPending, isError, fetchStatus, refetch } = useBrandFilter();
+  const t = useTranslations();
 
   let body: ReactNode;
   // 오프라인이면 요청이 paused 되어 isPending 이 유지된다.
@@ -204,7 +207,7 @@ function BrandSection({
     const brands = (data?.list ?? []).flatMap((group) => group.brandNameList);
     body =
       brands.length === 0 ? (
-        <EmptyNote text="No brands" />
+        <EmptyNote text={t("no_brands")} />
       ) : (
         <ChipWrap>
           {brands.map((brand) => (
@@ -222,7 +225,7 @@ function BrandSection({
   }
 
   return (
-    <FilterSection title="Brand" value="brand">
+    <FilterSection title={t("brand")} value="brand">
       {body}
     </FilterSection>
   );
@@ -243,6 +246,7 @@ function OptionsSection({
 }) {
   const { data, isPending, isError, fetchStatus, refetch } =
     useProductOptionFilters({ categoryId, productCategoryId, brandId });
+  const t = useTranslations();
 
   // product/filter 는 categoryId 가 필수다. 그 값은 시트가 아니라 목록 위 칩 줄에서 정해지므로
   // 안내도 그쪽을 가리킨다. (쿼리가 꺼져 있으면 isPending 이 영원히 유지되므로 아래 가드보다 먼저 거른다.)
@@ -250,8 +254,8 @@ function OptionsSection({
     return (
       <FilterSection
         disabled
-        hint="Select a category above the list first"
-        title="Options"
+        hint={t("select_category_first")}
+        title={t("select_options")}
         value="options"
       />
     );
@@ -267,7 +271,7 @@ function OptionsSection({
     body = <SectionError onRetry={() => void refetch()} />;
   } else if (!data || data.list.length === 0) {
     // 카테고리·브랜드 중 무엇이 좁혔는지는 모르므로 "이 조합" 이라고만 한다.
-    body = <EmptyNote text="No options for this selection" />;
+    body = <EmptyNote text={t("no_options_for_selection")} />;
   } else {
     body = (
       <View className="gap-4">
@@ -294,7 +298,7 @@ function OptionsSection({
   }
 
   return (
-    <FilterSection title="Options" value="options">
+    <FilterSection title={t("select_options")} value="options">
       {body}
     </FilterSection>
   );
@@ -305,6 +309,7 @@ function OptionsSection({
  * store 에는 "적용" 을 눌렀을 때만 쓴다.
  */
 function FilterSheetContent({ onClose }: { onClose(): void }) {
+  const t = useTranslations();
   const insets = useSafeAreaInsets();
   const setFilter = useShopFilterStore((s) => s.setFilter);
 
@@ -375,8 +380,8 @@ function FilterSheetContent({ onClose }: { onClose(): void }) {
   // 로딩·실패·오프라인이면 data 가 없다. 이전 값이나 0 대신 중립 문구를 쓴다.
   const applyLabel =
     typeof count === "number"
-      ? `View ${count.toLocaleString("en-US")} items`
-      : "View items";
+      ? t("view_count_items", { count: count.toLocaleString("en-US") })
+      : t("view_items");
 
   return (
     <>
@@ -406,9 +411,9 @@ function FilterSheetContent({ onClose }: { onClose(): void }) {
         style={{ paddingBottom: insets.bottom + 12 }}
       >
         <Button
-          accessibilityLabel="Reset filters"
+          accessibilityLabel={t("reset_filters")}
           className="px-6"
-          label="Reset"
+          label={t("reset")}
           onPress={resetDraft}
           variant="secondary"
         />
@@ -427,8 +432,10 @@ export function ShopFilterSheet({
   visible: boolean;
   onClose(): void;
 }) {
+  const t = useTranslations();
+
   return (
-    <BottomSheet onClose={onClose} title="Filter" visible={visible}>
+    <BottomSheet onClose={onClose} title={t("select_filter")} visible={visible}>
       <FilterSheetContent onClose={onClose} />
     </BottomSheet>
   );
@@ -455,6 +462,7 @@ function SortRowsSkeleton() {
 }
 
 function SortSheetContent({ onClose }: { onClose(): void }) {
+  const t = useTranslations();
   const insets = useSafeAreaInsets();
   const { data, isPending, isError, fetchStatus, refetch } =
     useProductSortOptions();
@@ -471,7 +479,7 @@ function SortSheetContent({ onClose }: { onClose(): void }) {
   } else if (isError) {
     body = <SectionError onRetry={() => void refetch()} />;
   } else if (!data || data.list.length === 0) {
-    body = <EmptyNote text="No sort options" />;
+    body = <EmptyNote text={t("no_sort_options")} />;
   } else {
     body = data.list.map((option) => {
       const selected = option.sortColumn === sortColumn && option.sort === sort;
@@ -520,8 +528,10 @@ export function ShopSortSheet({
   visible: boolean;
   onClose(): void;
 }) {
+  const t = useTranslations();
+
   return (
-    <BottomSheet onClose={onClose} title="Sort by" visible={visible}>
+    <BottomSheet onClose={onClose} title={t("sort_by")} visible={visible}>
       <SortSheetContent onClose={onClose} />
     </BottomSheet>
   );

@@ -3,6 +3,7 @@ import type { Href } from "expo-router";
 import { useRouter } from "expo-router";
 import { FlatList, Text } from "react-native";
 
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import type { NewsLastItem } from "@shared/services/news";
 import { Touchable } from "@shared/ui/press";
 import { Section } from "@shared/ui/section";
@@ -31,6 +32,7 @@ export function RelatedPosts({
   heading,
   viewAllHref,
 }: RelatedPostsProps) {
+  const t = useTranslations();
   const router = useRouter();
 
   if (!items || items.length === 0) {
@@ -51,7 +53,7 @@ export function RelatedPosts({
             onPress={() => router.navigate(viewAllHref)}
           >
             <Text className="text-body-3 text-brand font-semibold">
-              View all
+              {t("view_all")}
             </Text>
           </Touchable>
         ) : null

@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import { Alert, Text, View } from "react-native";
 
 import { useUserAuthStore } from "@shared/lib/auth/useUserAuthStore";
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { BUTTON_HEIGHT } from "@shared/ui/button";
 import { FieldNote } from "@shared/ui/field-note";
 import { Touchable } from "@shared/ui/press";
@@ -40,6 +41,7 @@ const LINE_GREEN_PRESSED = "#048B3B";
  * 채널 ID 가 없으면 버튼 자체를 그리지 않는다 — 웹도 LIFF ID 가 없으면 숨긴다.
  */
 export function LineLoginButton() {
+  const t = useTranslations();
   const router = useRouter();
   const login = useUserAuthStore((s) => s.login);
   const setContext = useSnsSignUpStore((s) => s.set);
@@ -56,30 +58,25 @@ export function LineLoginButton() {
   };
 
   const confirmLink = (email: string, linkToken: string) =>
-    Alert.alert(
-      "Link your LINE account",
-      `${email} already has an account. Link LINE to it and sign in?`,
-      [
-        { text: "Cancel", style: "cancel", onPress: () => setBusy(false) },
-        {
-          text: "Link",
-          onPress: () =>
-            lineLink.mutate(linkToken, {
-              onSuccess: (res) => {
-                login({
-                  accessToken: res.data.token,
-                  refreshToken: res.data.refreshToken,
-                });
-                setBusy(false);
-                if (router.canGoBack()) router.back();
-                else router.replace("/my");
-              },
-              onError: () =>
-                fail("We couldn't link that account. Please try again."),
-            }),
-        },
-      ],
-    );
+    Alert.alert(t("link_line_account"), t("line_link_confirm", { email }), [
+      { text: t("cancel"), style: "cancel", onPress: () => setBusy(false) },
+      {
+        text: t("connect"),
+        onPress: () =>
+          lineLink.mutate(linkToken, {
+            onSuccess: (res) => {
+              login({
+                accessToken: res.data.token,
+                refreshToken: res.data.refreshToken,
+              });
+              setBusy(false);
+              if (router.canGoBack()) router.back();
+              else router.replace("/my");
+            },
+            onError: () => fail(t("line_link_failed")),
+          }),
+      },
+    ]);
 
   const start = async () => {
     setProblem(undefined);
@@ -91,7 +88,7 @@ export function LineLoginButton() {
     } catch (error) {
       // 사용자가 동의 화면을 닫은 것도 여기로 온다. 그때는 아무 말도 하지 않는다.
       if (error instanceof LineUnavailableError) {
-        fail("LINE sign-in isn't available in this build.");
+        fail(t("line_unavailable"));
       } else {
         setBusy(false);
       }
@@ -135,11 +132,10 @@ export function LineLoginButton() {
             return;
           default:
             // 서버가 나아갈 단계를 주지 않았다. 다시 눌러도 같을 가능성이 높다.
-            fail("We couldn't continue with LINE. Please try again later.");
+            fail(t("line_continue_failed"));
         }
       },
-      onError: () =>
-        fail("We couldn't continue with LINE. Please try again later."),
+      onError: () => fail(t("line_continue_failed")),
     });
   };
 
@@ -148,7 +144,7 @@ export function LineLoginButton() {
       {/* 공용 Button 을 쓰지 않는다 — 색도 누름 표현도 LINE 이 정해 둔 것이라
           variant 하나로 섞을 수 있는 종류가 아니다. */}
       <Touchable
-        accessibilityLabel="Continue with LINE"
+        accessibilityLabel={t("login_in_with_line")}
         accessibilityRole="button"
         accessibilityState={{ disabled: busy }}
         className="items-center justify-center rounded-full"
@@ -165,7 +161,7 @@ export function LineLoginButton() {
         })}
       >
         <Text className="text-body-2 font-bold" style={{ color: "#FFFFFF" }}>
-          {busy ? "Connecting…" : "Continue with LINE"}
+          {busy ? t("connecting") : t("login_in_with_line")}
         </Text>
       </Touchable>
       {problem ? (

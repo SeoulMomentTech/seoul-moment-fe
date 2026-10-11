@@ -4,6 +4,7 @@ import { Image } from "expo-image";
 import * as Linking from "expo-linking";
 import { ScrollView, Text, View, useWindowDimensions } from "react-native";
 
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { formatDate } from "@shared/lib/utils/formatDate";
 import type { BrandPromotionPopup } from "@shared/services/brandPromotion";
 import { BUTTON_HEIGHT, Button } from "@shared/ui/button";
@@ -130,6 +131,7 @@ export function BrandOfflinePopup({
 }: {
   popupList: BrandPromotionPopup[];
 }) {
+  const t = useTranslations();
   const { width } = useWindowDimensions();
   const [selectedId, setSelectedId] = useState<number>();
 
@@ -141,11 +143,11 @@ export function BrandOfflinePopup({
   const mapLink = mapUrl(active);
 
   return (
-    <Section title="Offline & Pop-up Events">
+    <Section title={t("offline_popup_event")}>
       {hasTabs ? (
         <View style={{ height: POPUP_TABS_HEIGHT }}>
           <ScrollView
-            accessibilityLabel="Pop-up schedule"
+            accessibilityLabel={t("pop_up_schedule")}
             contentContainerStyle={{ paddingHorizontal: 20, gap: CHIP_GAP }}
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -189,13 +191,13 @@ export function BrandOfflinePopup({
           {active.title}
         </Text>
         <View style={{ marginTop: ROW_GAP, gap: ROW_GAP }}>
-          <InfoRow label="Location" value={active.place} />
-          <InfoRow label="Date" value={formatPeriod(active)} />
-          <InfoRow label="Time" value={formatHours(active)} />
+          <InfoRow label={t("location")} value={active.place} />
+          <InfoRow label={t("date")} value={formatPeriod(active)} />
+          <InfoRow label={t("time")} value={formatHours(active)} />
           {/* en.json 의 promotion_address 는 소문자 'address' 다. 위 세 줄과 나란히 놓으면
               그 줄만 오타처럼 보여 첫 글자만 올린다. */}
           <InfoRow
-            label="Address"
+            label={t("promotion_address")}
             lines={ADDRESS_LINES}
             value={active.address}
           />
@@ -204,7 +206,7 @@ export function BrandOfflinePopup({
           className="text-body-5 text-neutral"
           style={{ marginTop: ROW_GAP }}
         >
-          Description
+          {t("promotion_description")}
         </Text>
         <Text
           className="text-body-3 text-foreground"
@@ -216,7 +218,7 @@ export function BrandOfflinePopup({
         {mapLink ? (
           <Button
             accessibilityLabel={`Open ${active.place} in Maps`}
-            label="Open in Maps"
+            label={t("open_in_maps")}
             onPress={() => void Linking.openURL(mapLink)}
             size="md"
             style={{ marginTop: ROW_GAP }}

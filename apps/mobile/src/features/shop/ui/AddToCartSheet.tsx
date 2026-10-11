@@ -7,6 +7,7 @@ import { getMaxLineQuantity } from "@entities/cart/lib/cart";
 import { isNotEnoughStockError } from "@entities/cart/lib/cartError";
 import { useAddToCart } from "@entities/cart/model/useCartMutations";
 import type { ProductVariantChoice } from "@entities/product/lib/variantChoices";
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { BottomSheet } from "@shared/ui/bottom-sheet";
 import { Button } from "@shared/ui/button";
 import { FieldNote } from "@shared/ui/field-note";
@@ -41,6 +42,7 @@ export function AddToCartSheet({
   choices,
 }: AddToCartSheetProps) {
   const router = useRouter();
+  const t = useTranslations();
   const addToCart = useAddToCart();
 
   // 고를 것이 하나뿐이면 고르는 일이 아니다. 미리 골라 두고 수량만 남긴다.
@@ -72,7 +74,7 @@ export function AddToCartSheet({
   return (
     <BottomSheet
       onClose={onClose}
-      title={added ? "Added to cart" : "Select an option"}
+      title={added ? t("added_to_cart") : t("select_an_option")}
       visible={visible}
     >
       <View
@@ -109,7 +111,7 @@ export function AddToCartSheet({
 
             <View className="flex-row items-center justify-between">
               <Text className="text-body-2 text-foreground font-bold">
-                Quantity
+                {t("quantity")}
               </Text>
               <QuantityStepper
                 disabled={!selected || addToCart.isPending}
@@ -123,14 +125,16 @@ export function AddToCartSheet({
             {addToCart.isError ? (
               <FieldNote error>
                 {isNotEnoughStockError(addToCart.error)
-                  ? "There isn't enough stock for that quantity."
-                  : "We couldn't add this to your cart. Please try again."}
+                  ? t("stock_not_enough")
+                  : t("cart_add_unavailable")}
               </FieldNote>
             ) : null}
 
             <Button
               disabled={!selected || addToCart.isPending}
-              label={addToCart.isPending ? "Adding…" : "Add to cart"}
+              label={
+                addToCart.isPending ? t("adding_to_cart") : t("add_to_cart")
+              }
               onPress={submit}
             />
           </>
@@ -150,6 +154,7 @@ function ChoiceRow({
   selected: boolean;
   onPress(): void;
 }) {
+  const t = useTranslations();
   const low = choice.isPurchasable && choice.stockQuantity <= LOW_STOCK;
 
   return (
@@ -170,10 +175,10 @@ function ChoiceRow({
         {choice.label}
       </Text>
       {!choice.isPurchasable ? (
-        <Text className="text-body-5 text-neutral ml-3">Sold out</Text>
+        <Text className="text-body-5 text-neutral ml-3">{t("sold_out")}</Text>
       ) : low ? (
         <Text className="text-body-5 text-neutral ml-3">
-          {`${choice.stockQuantity} left`}
+          {t("stock_left_count", { stock: choice.stockQuantity })}
         </Text>
       ) : null}
     </Touchable>
@@ -190,14 +195,19 @@ function Added({
   onViewCart(): void;
   onClose(): void;
 }) {
+  const t = useTranslations();
   return (
     <>
       <Text className="text-body-3 text-neutral" numberOfLines={2}>
         {summary}
       </Text>
       <View style={{ gap: Spacing.tight }}>
-        <Button label="View cart" onPress={onViewCart} />
-        <Button label="Keep shopping" onPress={onClose} variant="secondary" />
+        <Button label={t("view_cart")} onPress={onViewCart} />
+        <Button
+          label={t("keep_shopping")}
+          onPress={onClose}
+          variant="secondary"
+        />
       </View>
     </>
   );

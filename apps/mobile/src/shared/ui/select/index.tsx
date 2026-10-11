@@ -3,6 +3,7 @@ import { useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { BottomSheet } from "@shared/ui/bottom-sheet";
 import { Touchable } from "@shared/ui/press";
 
@@ -124,6 +125,7 @@ function OptionSheet({
   onSelect(next: string): void;
   onClose(): void;
 }) {
+  const t = useTranslations();
   const insets = useSafeAreaInsets();
 
   return (
@@ -135,7 +137,7 @@ function OptionSheet({
         {options.length === 0 ? (
           <View className="px-5 pb-4">
             <Text className="text-body-3 text-neutral">
-              Nothing to choose from yet.
+              {t("nothing_to_choose")}
             </Text>
           </View>
         ) : (
@@ -149,7 +151,7 @@ function OptionSheet({
                 onPress={() => onSelect("")}
                 style={{ height: OPTION_ROW_HEIGHT }}
               >
-                <Text className="text-body-2 text-neutral">Not set</Text>
+                <Text className="text-body-2 text-neutral">{t("not_set")}</Text>
               </Touchable>
             ) : null}
             {options.map((option) => {

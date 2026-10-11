@@ -2,11 +2,14 @@ import type { TabListProps, TabTriggerSlotProps } from "expo-router/ui";
 import { TabList, Tabs, TabSlot, TabTrigger } from "expo-router/ui";
 import { Text, View } from "react-native";
 
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { Touchable } from "@shared/ui/press";
 
 import { useResetShopFilterOnLeave } from "@features/shop";
 
 export default function TabLayout() {
+  const t = useTranslations();
+
   useResetShopFilterOnLeave();
 
   return (
@@ -15,16 +18,16 @@ export default function TabLayout() {
       <TabList asChild>
         <WebTabList>
           <TabTrigger asChild href="/" name="index">
-            <TabButton>Home</TabButton>
+            <TabButton>{t("home")}</TabButton>
           </TabTrigger>
           <TabTrigger asChild href="/shop" name="shop">
-            <TabButton>Shop</TabButton>
+            <TabButton>{t("shop")}</TabButton>
           </TabTrigger>
           <TabTrigger asChild href="/news" name="news">
-            <TabButton>News</TabButton>
+            <TabButton>{t("news")}</TabButton>
           </TabTrigger>
           <TabTrigger asChild href="/my" name="my">
-            <TabButton>My</TabButton>
+            <TabButton>{t("my_account")}</TabButton>
           </TabTrigger>
         </WebTabList>
       </TabList>

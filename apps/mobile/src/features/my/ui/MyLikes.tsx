@@ -5,6 +5,9 @@ import { useRouter } from "expo-router";
 import { FlatList, Text, View } from "react-native";
 
 import { useProductCategories } from "@entities/product/model/useProductCategories";
+import type { MessageKey } from "@shared/lib/i18n/translate";
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
+import type { Translate } from "@shared/lib/i18n/useTranslations";
 import { CHIP_GAP, Chip } from "@shared/ui/chip";
 import {
   ClockIcon,
@@ -48,10 +51,10 @@ const TAB_HEIGHT = 44;
 
 type LikesTab = "product" | "brand" | "recent";
 
-const TABS: { value: LikesTab; label: string }[] = [
-  { value: "product", label: "Products" },
-  { value: "brand", label: "Brands" },
-  { value: "recent", label: "Recently viewed" },
+const TABS: { value: LikesTab; labelKey: MessageKey }[] = [
+  { value: "product", labelKey: "likes_tab_products" },
+  { value: "brand", labelKey: "likes_tab_brands" },
+  { value: "recent", labelKey: "likes_tab_recent" },
 ];
 
 /**
@@ -62,12 +65,13 @@ const TABS: { value: LikesTab; label: string }[] = [
  * 실패는 언제나 탭 본문 안에서 끝난다.
  */
 export function MyLikes() {
+  const t = useTranslations();
   const [tab, setTab] = useState<LikesTab>("product");
 
   return (
     // 아래 메뉴가 마지막 줄에 붙지 않도록 이 블록이 제 아래 여백을 쥔다.
     <View style={{ paddingBottom: Spacing.section }}>
-      <Section title="Likes">
+      <Section title={t("favorites")}>
         <TabBar onChange={setTab} value={tab} />
         {tab === "product" ? <LikedProductsTab /> : null}
         {tab === "brand" ? <LikedBrandsTab /> : null}
@@ -91,6 +95,8 @@ function TabBar({
   value: LikesTab;
   onChange(next: LikesTab): void;
 }) {
+  const t = useTranslations();
+
   return (
     <View className="border-neutral-subtle border-b">
       {/* 간격은 12 다. 24 로 벌리면 "Recently viewed" 까지 세 칸이 320pt 폭(SE)에서 넘친다. */}
@@ -100,7 +106,7 @@ function TabBar({
 
           return (
             <Touchable
-              accessibilityLabel={item.label}
+              accessibilityLabel={t(item.labelKey)}
               accessibilityRole="button"
               accessibilityState={{ selected }}
               className={
@@ -119,7 +125,7 @@ function TabBar({
                     : "text-body-2 text-neutral"
                 }
               >
-                {item.label}
+                {t(item.labelKey)}
               </Text>
             </Touchable>
           );
@@ -135,10 +141,10 @@ function TabBar({
  * 묻는 것이 아니라 알리는 것이라 토스트다 — 하트 한 번에 대화상자가 떠서 탭을 받아야
  * 사라지면, 사용자가 할 일이 없는 소식에 손을 쓰게 만드는 셈이다.
  */
-const warnUnlikeFailed = () =>
-  showToast("Couldn't update your likes. Please try again.");
+const warnUnlikeFailed = (t: Translate) => showToast(t("likes_update_failed"));
 
 function LikedProductsTab() {
+  const t = useTranslations();
   const [productCategoryId, setProductCategoryId] = useState<number>();
   const { data, isPending, isError, fetchStatus, refetch } =
     useLikedProducts(productCategoryId);
@@ -159,11 +165,11 @@ function LikedProductsTab() {
   } else if (!data || data.list.length === 0) {
     body = (
       <EmptyState
-        hint="Tap the heart on a product to keep it here."
+        hint={t("likes_empty_hint")}
         icon={
           <HeartOutlineIcon color={EMPTY_ICON_COLOR} size={EMPTY_ICON_SIZE} />
         }
-        message="No liked products yet"
+        message={t("no_favorite_products")}
       />
     );
   } else {
@@ -174,7 +180,9 @@ function LikedProductsTab() {
         imageUrl={item.imageUrl}
         key={item.productItemId}
         onUnlike={() =>
-          unlike.mutate(item.productItemId, { onError: warnUnlikeFailed })
+          unlike.mutate(item.productItemId, {
+            onError: () => warnUnlikeFailed(t),
+          })
         }
         price={item.price}
         productItemId={item.productItemId}
@@ -206,6 +214,7 @@ function LikedProductsTab() {
 }
 
 function LikedBrandsTab() {
+  const t = useTranslations();
   const { data, isPending, isError, fetchStatus, refetch } = useLikedBrands();
   const unlike = useUnlikeBrand();
 
@@ -220,11 +229,11 @@ function LikedBrandsTab() {
   if (!data || data.list.length === 0) {
     return (
       <EmptyState
-        hint="Brands you follow will show up here."
+        hint={t("brands_empty_hint")}
         icon={
           <HeartOutlineIcon color={EMPTY_ICON_COLOR} size={EMPTY_ICON_SIZE} />
         }
-        message="No liked brands yet"
+        message={t("no_favorite_brands")}
       />
     );
   }
@@ -239,7 +248,9 @@ function LikedBrandsTab() {
           key={brand.brandId}
           likeCount={brand.totalLikeCount}
           onUnlike={() =>
-            unlike.mutate(brand.brandId, { onError: warnUnlikeFailed })
+            unlike.mutate(brand.brandId, {
+              onError: () => warnUnlikeFailed(t),
+            })
           }
         />
       ))}
@@ -248,6 +259,7 @@ function LikedBrandsTab() {
 }
 
 function RecentTab() {
+  const t = useTranslations();
   const { data, isPending, isError, fetchStatus, refetch } =
     useRecentProducts();
 
@@ -262,9 +274,9 @@ function RecentTab() {
   if (!data || data.list.length === 0) {
     return (
       <EmptyState
-        hint="Products you open will show up here."
+        hint={t("viewed_empty_hint")}
         icon={<ClockIcon color={EMPTY_ICON_COLOR} size={EMPTY_ICON_SIZE} />}
-        message="Nothing viewed yet"
+        message={t("no_viewed_products")}
       />
     );
   }
@@ -298,6 +310,7 @@ function CategoryFilter({
   value?: number;
   onChange(next: number | undefined): void;
 }) {
+  const t = useTranslations();
   const { data, isPending, isError, fetchStatus } = useProductCategories();
 
   if (isPending && fetchStatus === "paused") return null;
@@ -316,7 +329,7 @@ function CategoryFilter({
     <FlatList
       ListHeaderComponent={
         <Chip
-          label="All"
+          label={t("subcategory_all")}
           onPress={() => onChange(undefined)}
           selected={value == null}
         />
@@ -376,6 +389,7 @@ function ProductRow({
   /** 없으면 하트를 그리지 않는다(최근 본 상품). */
   onUnlike?(): void;
 }) {
+  const t = useTranslations();
   const router = useRouter();
 
   return (
@@ -414,7 +428,7 @@ function ProductRow({
       </Touchable>
       {onUnlike ? (
         <HeartButton
-          label={`Remove ${productName} from likes`}
+          label={t("remove_from_likes", { name: productName })}
           onPress={onUnlike}
         />
       ) : null}
@@ -439,6 +453,7 @@ function BrandRow({
   likeCount: number;
   onUnlike(): void;
 }) {
+  const t = useTranslations();
   const router = useRouter();
 
   const title = englishBrandName || brandName;
@@ -455,7 +470,7 @@ function BrandRow({
       style={{ height: MY_BRAND_ROW_HEIGHT }}
     >
       <Touchable
-        accessibilityLabel={`View ${title}`}
+        accessibilityLabel={t("view_item", { name: title })}
         accessibilityRole="button"
         className="flex-1 flex-row items-center"
         onPress={() => router.push(`/brand/${brandId}`)}
@@ -481,7 +496,10 @@ function BrandRow({
           </Text>
         </View>
       </Touchable>
-      <HeartButton label={`Remove ${title} from likes`} onPress={onUnlike} />
+      <HeartButton
+        label={t("remove_from_likes", { name: title })}
+        onPress={onUnlike}
+      />
     </View>
   );
 }

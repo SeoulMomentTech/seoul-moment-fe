@@ -1,31 +1,33 @@
 import type { Href } from "expo-router";
 
+import type { MessageKey } from "@shared/lib/i18n/translate";
+
 export interface MyMenuItem {
-  label: string;
+  labelKey: MessageKey;
   href: Href;
 }
 
 export interface MyMenuGroup {
-  title: string;
+  titleKey: MessageKey;
   items: MyMenuItem[];
 }
 
 /** 로그인해야 뜻이 생기는 줄들. 비로그인에게는 전부 401 화면으로 가는 길일 뿐이다. */
 const MY_INFO_GROUP: MyMenuGroup = {
-  title: "My info",
+  titleKey: "my_info",
   items: [
-    { label: "Login info", href: "/account/login-info" },
-    { label: "Manage profile", href: "/account/profile" },
-    { label: "My preferences", href: "/account/preferences" },
+    { labelKey: "login_info", href: "/account/login-info" },
+    { labelKey: "profile_settings", href: "/account/profile" },
+    { labelKey: "personalized_info", href: "/account/preferences" },
   ],
 };
 
 /** 누구나 읽을 수 있는 글. 로그인과 무관하다. */
 const HELP_GROUP: MyMenuGroup = {
-  title: "Help",
+  titleKey: "help",
   items: [
-    { label: "Terms of service", href: "/terms" },
-    { label: "Privacy policy", href: "/policy" },
+    { labelKey: "terms_of_service", href: "/terms" },
+    { labelKey: "privacy_policy", href: "/policy" },
   ],
 };
 

@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 
+import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { Button } from "@shared/ui/button";
 import { CHIP_GAP, Chip } from "@shared/ui/chip";
 import {
@@ -66,6 +67,7 @@ export const CELL_WIDTH = Math.floor(
  * 좋아요는 읽기 전용이다 — 앱에 로그인이 없어 isLiked 를 바꿀 수단이 없다.
  */
 function BrandHeader({ id }: { id: number }) {
+  const t = useTranslations();
   const router = useRouter();
   const { data, isPending, isError, fetchStatus, refetch } =
     useProductBrandBanner(id);
@@ -129,7 +131,7 @@ function BrandHeader({ id }: { id: number }) {
         <Button
           accessibilityLabel={`View ${data.name} brand page`}
           className="mt-4"
-          label="View brand page"
+          label={t("view_brand_page")}
           onPress={() => router.push(`/brand/${id}`)}
           size="md"
           variant="secondary"
@@ -194,6 +196,7 @@ function BannerPager() {
  * 그 아래 상품 카테고리(후드/집업 등)는 필터 시트가 고르고, 이 선택으로 좁혀진다.
  */
 function CategoryScroller() {
+  const t = useTranslations();
   const categoryId = useShopFilterStore((s) => s.categoryId);
   const setFilter = useShopFilterStore((s) => s.setFilter);
   const { data, isPending, isError, fetchStatus, refetch } = useCategories();
@@ -231,7 +234,7 @@ function CategoryScroller() {
     <FlatList
       ListHeaderComponent={
         <Chip
-          label="All"
+          label={t("subcategory_all")}
           onPress={() => select(undefined)}
           selected={categoryId == null}
         />
@@ -257,6 +260,7 @@ function CategoryScroller() {
 }
 
 function FilterBar() {
+  const t = useTranslations();
   const badge = useShopFilterBadge();
   const { data: sortOptions } = useProductSortOptions();
   const sortColumn = useShopFilterStore((s) => s.sortColumn);
@@ -271,14 +275,16 @@ function FilterBar() {
   return (
     <View className="mb-4 mt-5 flex-row items-center justify-between px-5">
       <Touchable
-        accessibilityLabel="Filter"
+        accessibilityLabel={t("select_filter")}
         accessibilityRole="button"
         className="border-neutral-subtle flex-row items-center rounded-full border px-4 py-2"
         // 칩과 같은 35pt 높이라 위아래 5pt 씩 넓혀 44pt 를 넘긴다.
         hitSlop={{ top: 5, bottom: 5 }}
         onPress={() => setFilterOpen(true)}
       >
-        <Text className="text-body-3 text-foreground font-bold">Filter</Text>
+        <Text className="text-body-3 text-foreground font-bold">
+          {t("select_filter")}
+        </Text>
         {badge > 0 ? (
           <View
             className="bg-brand ml-2 items-center justify-center"
@@ -293,7 +299,7 @@ function FilterBar() {
       {/* Filter 와 같은 줄에 선 같은 등급의 단추라 같은 모양을 가진다.
           한쪽만 맨 글자면 둘 중 하나는 눌리는 것으로 보이지 않는다. */}
       <Touchable
-        accessibilityLabel="Sort"
+        accessibilityLabel={t("sort")}
         accessibilityRole="button"
         className="border-neutral-subtle flex-row items-center rounded-full border px-4 py-2"
         // 칩과 같은 35pt 높이라 위아래 5pt 씩 넓혀 44pt 를 넘긴다.
@@ -306,7 +312,7 @@ function FilterBar() {
           // 정렬 이름이 길어도(Price: low to high) 왼쪽 Filter 를 밀지 않는다.
           style={{ maxWidth: SORT_LABEL_MAX_WIDTH }}
         >
-          {current?.name ?? "Sort"}
+          {current?.name ?? t("sort")}
         </Text>
         <ChevronDownIcon color={META_ICON_COLOR} size={META_ICON_SIZE} />
       </Touchable>
@@ -331,6 +337,7 @@ export function ShopListHeader() {
  * 상품이 하나도 없을 때만 FlatList 가 그린다. 가드 순서는 홈 섹션과 같다.
  */
 export function ShopEmpty() {
+  const t = useTranslations();
   const { isPending, isError, fetchStatus, refetch } = useInfiniteProducts();
 
   // 오프라인이면 요청이 paused 되어 isPending 이 유지된다.
@@ -344,9 +351,9 @@ export function ShopEmpty() {
 
   return (
     <EmptyState
-      hint="Try removing a filter."
+      hint={t("try_removing_filter")}
       icon={<SearchIcon color={EMPTY_ICON_COLOR} size={EMPTY_ICON_SIZE} />}
-      message="No products match these filters"
+      message={t("no_products_match_filters")}
     />
   );
 }
