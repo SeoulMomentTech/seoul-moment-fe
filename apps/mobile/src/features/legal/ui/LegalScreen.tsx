@@ -27,7 +27,7 @@ export function LegalScreen({
       <ScrollView
         contentContainerStyle={{
           paddingHorizontal: 20,
-          paddingTop: 24,
+          paddingTop: Spacing.inner,
           paddingBottom: insets.bottom + Spacing.section,
         }}
         showsVerticalScrollIndicator={false}

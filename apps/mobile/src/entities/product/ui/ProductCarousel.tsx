@@ -4,11 +4,13 @@ import { FlatList } from "react-native";
 import { Touchable } from "@shared/ui/press";
 import { Section } from "@shared/ui/section";
 
+import { CardRow } from "@/constants/theme";
+
 import { ProductCard, type ProductCardItem } from "./ProductCard";
 
 export const CAROUSEL_CARD_WIDTH = 150;
-export const CAROUSEL_GAP = 12;
-const PAGE_PADDING = 20;
+export const CAROUSEL_GAP = CardRow.gap;
+const PAGE_PADDING = CardRow.padding;
 
 interface ProductCarouselProps {
   heading: string;

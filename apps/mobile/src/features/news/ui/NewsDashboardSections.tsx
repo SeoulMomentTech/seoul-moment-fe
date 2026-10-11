@@ -17,6 +17,8 @@ import {
 // 줄 상자 높이는 스켈레톤 모듈이 기준값을 갖고 있다. 배럴에는 없어서 모듈에서 바로 가져온다.
 import { LINE_BODY_3, LINE_TITLE_3 } from "@shared/ui/skeleton/shapes";
 
+import { CardRow } from "@/constants/theme";
+
 import { useNewsDashboard } from "../model/useNewsDashboard";
 
 const FEATURED_HEIGHT = 220;
@@ -235,7 +237,10 @@ function EditorPickSection() {
   return (
     <Section title="Editor's Pick">
       <FlatList
-        contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
+        contentContainerStyle={{
+          paddingHorizontal: CardRow.padding,
+          gap: CardRow.gap,
+        }}
         data={picks}
         horizontal
         keyExtractor={(item) => String(item.id)}
@@ -349,7 +354,10 @@ function HotKeywordSection() {
       tone="dark"
     >
       <FlatList
-        contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}
+        contentContainerStyle={{
+          paddingHorizontal: CardRow.padding,
+          gap: CardRow.gap,
+        }}
         data={hashtag.list}
         horizontal
         keyExtractor={(item) => String(item.id)}

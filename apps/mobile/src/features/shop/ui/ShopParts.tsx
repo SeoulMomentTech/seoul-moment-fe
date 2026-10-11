@@ -27,6 +27,8 @@ import {
   ProductGridSkeleton,
 } from "@shared/ui/skeleton";
 
+import { CardRow } from "@/constants/theme";
+
 import { useCategories } from "../model/useCategories";
 import { useInfiniteProducts } from "../model/useInfiniteProducts";
 import { useProductBanner } from "../model/useProductBanner";
@@ -50,8 +52,8 @@ const BANNER_HEIGHT = 200;
 // 브랜드 소개글을 목록 헤더에서 끊는 줄 수. 스켈레톤도 같은 수를 쓴다.
 const BRAND_DESCRIPTION_LINES = 3;
 
-export const GRID_GAP = 12;
-export const GRID_PADDING = 20;
+export const GRID_GAP = CardRow.gap;
+export const GRID_PADDING = CardRow.padding;
 // ProductCard 는 폭을 부모에게 맡기므로(w-full) 셀 너비를 여기서 정해 감싼다.
 // 카드 쪽을 flex-1 로 되돌리면 flexBasis: 0 이 되어 이미지가 넘쳐 아래 행을 덮는다 — ProductCard 주석 참고.
 export const CELL_WIDTH = Math.floor(
