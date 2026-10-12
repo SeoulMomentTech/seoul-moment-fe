@@ -5,11 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "seoulmoment",
     "userInterfaceStyle": "light",
-    "ios": {
-      "bundleIdentifier": "tw.com.seoulmoment.app"
-    },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#171717",
@@ -18,7 +14,6 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "tw.com.seoulmoment.app",
       "versionCode": 1
     },
     "web": {
