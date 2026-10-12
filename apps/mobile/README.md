@@ -32,11 +32,27 @@ iOS 시뮬레이터는 Xcode, Android 에뮬레이터는 Android Studio가 필�
 
 ### 환경 변수
 
-| 변수                       | 설명          | 기본값                           |
-| :------------------------- | :------------ | :------------------------------- |
-| `EXPO_PUBLIC_API_BASE_URL` | API 서버 주소 | `https://api.seoulmoment.com.tw` |
+| 변수                       | 설명                     | 기본값                           |
+| :------------------------- | :----------------------- | :------------------------------- |
+| `EXPO_PUBLIC_API_BASE_URL` | API 서버 주소            | `https://api.seoulmoment.com.tw` |
+| `EXPO_PUBLIC_WEB_BASE_URL` | 공유 링크에 쓰는 웹 주소 | `https://seoulmoment.com.tw`     |
 
 `EXPO_PUBLIC_` 접두사가 붙은 변수만 앱 번들에 포함됩니다. 로컬 값은 `apps/mobile/.env`에 둡니다(gitignore 대상). `.env.example`을 `.env`로 복사해 시작하세요. 파일이 없으면 운영 API로 연결됩니다.
+
+### dev / live 빌드
+
+`app.config.ts`가 `APP_VARIANT`에 따라 앱 이름·package·scheme을 바꿉니다. 빌드 프로필(`eas.json`)이 API 주소와 함께 이 값을 넣습니다.
+
+|                    | dev (`APP_VARIANT=development`) | live (미지정)            |
+| :----------------- | :------------------------------ | :----------------------- |
+| package / bundleId | `tw.com.seoulmoment.app.dev`    | `tw.com.seoulmoment.app` |
+| 앱 이름            | Seoul Moment (Dev)              | Seoul Moment             |
+| scheme             | `seoulmoment-dev://`            | `seoulmoment://`         |
+| API                | `api-dev.seoulmoment.com.tw`    | `api.seoulmoment.com.tw` |
+| 웹(공유 링크)      | `dev-seoulmoment.netlify.app`   | `seoulmoment.com.tw`     |
+| EAS 프로필         | `development` (내부 배포 APK)   | `production`             |
+
+package가 달라 한 기기에 두 앱을 같이 설치할 수 있습니다. 로컬 `expo run:*`는 `APP_VARIANT`가 없으므로 live 식별자로 빌드됩니다(API는 `.env`를 따릅니다). 로컬에서 dev 앱을 만들려면 `APP_VARIANT=development npx expo run:android`처럼 넘깁니다. LINE 등 package·bundleId를 등록하는 외부 콘솔에는 dev 식별자도 따로 등록해야 합니다.
 
 ## Scripts
 
@@ -111,4 +127,4 @@ npx expo install --check   # SDK 호환 버전 점검
 ## Not Yet
 
 - 에러 리포팅(Sentry)과 에러 토스트는 아직 없습니다. 연결 지점은 `services/index.ts`와 `lib/query/queryClient.ts`에 TODO로 남아 있습니다.
-- EAS Build / Submit 설정과 네이티브 프로젝트(`ios/`, `android/`)는 아직 없습니다.
+- `eas.json`에 빌드 프로필만 있고, EAS 프로젝트 연결(`eas init`)·서명 인증서·Submit 설정은 아직 없습니다. 네이티브 프로젝트(`ios/`, `android/`)는 커밋하지 않습니다.
