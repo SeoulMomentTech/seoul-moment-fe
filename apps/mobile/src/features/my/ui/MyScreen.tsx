@@ -9,18 +9,15 @@ import { useUserAuthStore } from "@shared/lib/auth/useUserAuthStore";
 import { useTranslations } from "@shared/lib/i18n/useTranslations";
 import { Button } from "@shared/ui/button";
 import { useCartBadgeScrollCollapse } from "@shared/ui/cart-button/collapse";
-import { Touchable } from "@shared/ui/press";
 import { Section } from "@shared/ui/section";
 import { MY_AVATAR_SIZE, MyProfileSkeleton } from "@shared/ui/skeleton";
 
 import { BottomTabInset, Spacing } from "@/constants/theme";
 
+import { LanguageSetting } from "./LanguageSetting";
+import { MenuRow } from "./MenuRow";
 import { MyLikes } from "./MyLikes";
-import { myMenuGroups, type MyMenuGroup, type MyMenuItem } from "../model/menu";
-
-// 줄 높이. 44 는 터치의 바닥이지 디자인이 아니다 — 두 줄짜리 화면에서 56 은 쪼그라들어
-// 보인다. body-2 라벨 한 줄(19)을 위아래 22 로 감싸 64 로 둔다.
-const MENU_ROW_HEIGHT = 64;
+import { HELP_GROUP, MY_INFO_GROUP, type MyMenuGroup } from "../model/menu";
 
 /**
  * 마이페이지. 가입 유도(또는 이름·이메일) 블록 + 관심 목록 + 메뉴.
@@ -33,12 +30,6 @@ export function MyScreen() {
   const insets = useSafeAreaInsets();
   const isAuthenticated = useUserAuthStore((s) => s.isAuthenticated);
 
-  const groups = myMenuGroups(isAuthenticated);
-  // 묶음이 하나뿐이면 묶음 제목을 그리지 않는다. 묶음 제목은 "이것과 저것을 가른다"는
-  // 뜻이라, 가를 상대가 없으면 제목·구분 띠·간격이 그것이 묶는 두 줄보다 무거워진다.
-  // 로그인해서 계정 묶음이 붙으면 둘이 되어 두 제목이 함께 돌아온다.
-  const hasGroups = groups.length > 1;
-
   return (
     <ScrollView
       {...badgeScroll}
@@ -48,9 +39,10 @@ export function MyScreen() {
     >
       {isAuthenticated ? <SignedInHeader /> : <SignUpPitch />}
       {isAuthenticated ? <MyLikes /> : null}
-      {groups.map((group) => (
-        <MenuGroup group={group} key={group.titleKey} withTitle={hasGroups} />
-      ))}
+      {/* 계정 줄은 로그인한 사람에게만 뜻이 있다. 설정과 도움말은 누구에게나 있다. */}
+      {isAuthenticated ? <MenuGroup group={MY_INFO_GROUP} /> : null}
+      <LanguageSetting />
+      <MenuGroup group={HELP_GROUP} />
     </ScrollView>
   );
 }
@@ -260,48 +252,23 @@ function IdentityText({
   );
 }
 
-function MenuGroup({
-  group,
-  withTitle,
-}: {
-  group: MyMenuGroup;
-  withTitle: boolean;
-}) {
+/**
+ * 묶음 하나. 제목은 늘 그린다 — 설정 묶음이 언제나 있어 가를 상대가 적어도 하나는
+ * 있기 때문이다. 전에는 묶음이 하나뿐인 비로그인 화면에서 제목을 숨겼었다.
+ */
+function MenuGroup({ group }: { group: MyMenuGroup }) {
   const t = useTranslations();
   const router = useRouter();
 
-  const rows = group.items.map((item) => (
-    <MenuRow
-      item={item}
-      key={item.labelKey}
-      onPress={() => router.push(item.href)}
-    />
-  ));
-
-  if (withTitle) {
-    return <Section title={t(group.titleKey)}>{rows}</Section>;
-  }
-
-  // 위 블록이 자기 아래 여백을 갖고 있으므로 여기서 또 띄우지 않는다.
-  // 양쪽이 각자 띄우면 두 배가 되고, 그만큼 화면이 아래로 밀려 더 비어 보인다.
-  return <View>{rows}</View>;
-}
-
-function MenuRow({ item, onPress }: { item: MyMenuItem; onPress(): void }) {
-  const t = useTranslations();
-
   return (
-    <Touchable
-      accessibilityLabel={t(item.labelKey)}
-      accessibilityRole="button"
-      // 줄 사이 선은 줄의 위에 긋는다. 아래에 그으면 마지막 줄 밑에 아무것도 없는
-      // 선이 남는다. 첫 줄의 윗선이 위 블록과 메뉴를 가르는 선을 겸한다.
-      className="border-neutral-subtle flex-row items-center justify-between border-t px-5"
-      onPress={onPress}
-      style={{ height: MENU_ROW_HEIGHT }}
-    >
-      <Text className="text-body-2 text-foreground">{t(item.labelKey)}</Text>
-      <Text className="text-body-1 text-neutral">›</Text>
-    </Touchable>
+    <Section title={t(group.titleKey)}>
+      {group.items.map((item) => (
+        <MenuRow
+          key={item.labelKey}
+          label={t(item.labelKey)}
+          onPress={() => router.push(item.href)}
+        />
+      ))}
+    </Section>
   );
 }

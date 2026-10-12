@@ -108,7 +108,11 @@ export function SelectField({
   );
 }
 
-function OptionSheet({
+/**
+ * 고르는 시트. SelectField 가 쓰지만, 칸 없이 시트만 필요한 자리(마이페이지의 언어)도
+ * 같은 것을 쓴다 — 앱에서 "여럿 중 하나 고르기"의 생김새는 이 하나뿐이어야 한다.
+ */
+export function OptionSheet({
   visible,
   title,
   options,

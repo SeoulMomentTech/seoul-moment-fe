@@ -556,5 +556,7 @@
   "shipping_set_by_address": "배송지에 따라 결정",
   "payment_not_available_yet": "앱에서는 아직 결제할 수 없습니다.",
   "enter_address_for_total": "배송지를 입력하면 최종 금액이 나옵니다.",
-  "stock_left_count": "{stock}개 남음"
+  "stock_left_count": "{stock}개 남음",
+  "settings": "설정",
+  "language_setting": "언어"
 }

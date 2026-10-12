@@ -556,5 +556,7 @@
   "shipping_set_by_address": "Set by your address",
   "payment_not_available_yet": "Payment isn't available in the app yet.",
   "enter_address_for_total": "Enter a shipping address to see the final total.",
-  "stock_left_count": "{stock} left"
+  "stock_left_count": "{stock} left",
+  "settings": "Settings",
+  "language_setting": "Language"
 }
