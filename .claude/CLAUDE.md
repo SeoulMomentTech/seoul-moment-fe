@@ -4,10 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Seoul Moment frontend monorepo: a multilingual e-commerce/content platform with two apps and shared packages.
+Seoul Moment frontend monorepo: a multilingual e-commerce/content platform with three apps and shared packages.
 
 - **apps/web** - Next.js 16 (App Router, Turbopack) main service with i18n (ko, en, zh-TW)
 - **apps/admin** - Vite 7 + React Router v7 SPA admin backoffice
+- **apps/mobile** - Expo SDK 57 + React Native iOS/Android app (Expo Router, NativeWind v5), porting web screen by screen
 - **packages/ui** - Shared Radix UI component library (@seoul-moment/ui)
 - **packages/tailwind-config** - Shared Tailwind CSS v4 config
 - **packages/eslint-config** - Shared ESLint v9 config
@@ -16,6 +17,7 @@ Seoul Moment frontend monorepo: a multilingual e-commerce/content platform with 
 App-specific guides (commands, architecture, API layer, conventions):
 - Web: [`apps/web/.claude/CLAUDE.md`](../../apps/web/.claude/CLAUDE.md)
 - Admin: [`apps/admin/.claude/CLAUDE.md`](../../apps/admin/.claude/CLAUDE.md)
+- Mobile: [`apps/mobile/AGENTS.md`](../../apps/mobile/AGENTS.md) (loaded through `apps/mobile/CLAUDE.md`)
 - UI: [`packages/ui/.claude/CLAUDE.md`](../../packages/ui/.claude/CLAUDE.md)
 
 ## Monorepo Tooling
@@ -95,13 +97,13 @@ Common monorepo-wide tasks (filtered variants live in sub-CLAUDE.md files):
 pnpm dev                  # Run dev for every workspace (turbo run dev)
 pnpm build                # Build every workspace
 pnpm lint                 # Lint every workspace
-pnpm lint:fix:all         # Auto-fix web + admin
+pnpm lint:fix:all         # Auto-fix web + admin + mobile
 pnpm typecheck            # Type-check every workspace with TS 7 (web runs `next typegen` first)
 pnpm test:e2e             # Run all Playwright e2e suites
-pnpm i18n:sync            # Sync web translations from Google Sheets
+pnpm i18n:sync            # Sync web + mobile translations from Google Sheets
 ```
 
-App-scoped shortcuts (`dev:web`, `dev:admin`, `build:ui`, `test:web-e2e`, etc.) are also exposed at root via Turborepo `--filter`.
+App-scoped shortcuts (`dev:web`, `dev:admin`, `dev:mobile`, `build:ui`, `test:web-e2e`, etc.) are also exposed at root via Turborepo `--filter`.
 
 ## Detailed References
 
@@ -109,5 +111,6 @@ For deeper conventions with code examples, see `.claude/references/`:
 
 - **[general.md](references/general.md)** — TypeScript rules, ESLint conventions, import ordering, restricted imports, FSD layer rules, React rules, Toss frontend principles
 - **[style.md](references/style.md)** — Tailwind v4 design tokens, CSS import order, @seoul-moment/ui component catalog and patterns, custom animations
-- **[api.md](references/api.md)** — Web (ky) / Admin (axios) API layers, service file patterns, query hook wrappers, token refresh flow
+- **[api.md](references/api.md)** — Web (ky) / Admin (axios) / Mobile (ky + token refresh) API layers, service file patterns, query hook wrappers, token refresh flow
+- **[mobile.md](references/mobile.md)** — Mobile app layers, API/query rules, `shared/ui` primitives, styling roles, i18n, native modules & dev build, build variants, React Native gotchas
 - **[sns-auth-flow.md](references/sns-auth-flow.md)** — Web SNS(Google) 로그인·가입 3-step 플로우 (login/link/signup), 공통 가입 화면 + Google 전용 통신 계층
