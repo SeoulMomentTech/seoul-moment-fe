@@ -556,5 +556,7 @@
   "shipping_set_by_address": "依地址計算",
   "payment_not_available_yet": "App 目前尚無法結帳。",
   "enter_address_for_total": "輸入地址後即可顯示最終金額。",
-  "stock_left_count": "剩餘 {stock} 件"
+  "stock_left_count": "剩餘 {stock} 件",
+  "settings": "設定",
+  "language_setting": "語言"
 }
