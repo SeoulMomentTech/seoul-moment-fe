@@ -2,6 +2,8 @@
 
 `apps/web`의 SNS(소셜) 로그인·가입 동작을 한 곳에서 추적하기 위한 참조 문서. 코드의 정답은 아니며, 의도와 구조를 빠르게 파악하기 위한 지도다. 라인 번호는 작성 시점 기준이므로 어긋날 수 있다 — 함수명을 anchor로 보면 된다.
 
+> **mobile(`apps/mobile`)** 은 같은 백엔드 3-step 과 4분기를 따르지만 id_token 계층이 다르다 — LIFF 대신 네이티브 LINE SDK(`@xmartlabs/react-native-line`)를 쓰고, 분기 판단은 `features/auth/lib/snsAuthOutcome.ts` 의 `classifySnsAuthResponse` 가 한다. 이메일 scope 는 요청하지 않아 `needsEmail` 분기가 기본 경로다. Google 은 아직 없다. 네이티브 모듈·dev build 주의점은 [mobile.md](mobile.md#native-modules--dev-build).
+
 ---
 
 ## 1. 개요

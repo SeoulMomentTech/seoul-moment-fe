@@ -201,6 +201,21 @@ const { mutate } = useAppMutation({
 
 ---
 
+## Mobile App — ky HTTP Client
+
+**Location**: `apps/mobile/src/shared/services/`
+
+Same interface as web (`CommonRes<T>`, `PublicLanguageCode`, service files chaining `.json<CommonRes<T>>()`), plus authentication:
+
+- Access token from SecureStore, attached after `hydrateUserAuth()` resolves.
+- 401 → one refresh through `user/auth/one-time-token`, then replay. Calls where 401 means "wrong code" or "expired one-time token" set `SKIP_AUTH_RETRY_HEADER`.
+- `languageCode` becomes `Accept-language` on GET only; POST/PATCH services set the header themselves.
+- No error reporting yet (5xx logged in `__DEV__`).
+
+Details and the reasoning behind each rule: [mobile.md](mobile.md#api-layer).
+
+---
+
 ## Comparison Summary
 
 | Aspect           | Web (ky)                        | Admin (Axios)                      |
