@@ -2,6 +2,19 @@
 
 All notable changes to `@seoul-moment/web` are documented here.
 
+## 1.4.2 — 2026-10-14
+
+### Fixes
+
+- Emit per-locale sitemap entries with real lastmod (`e8a1fed7`)
+- Link mobile my page info menu to its sub pages (`7c7ea3b2`). It reached production
+  untagged on 2026-10-13, together with `fc082102` and `11cbddf6`.
+
+### Other
+
+- Remove cart menu from mypage sidebar (`11cbddf6`)
+- Sync locales from sheet (`d59f4f7d`, `fc082102`)
+
 ## 1.4.1 — 2026-10-07
 
 ### Reverts
