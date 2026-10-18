@@ -66,7 +66,7 @@ export default function ProductGallery({
             >
               <Image
                 alt={`${productName} - ${idx + 1}`}
-                className="h-full"
+                className="h-full object-contain"
                 fetchPriority={idx === 0 ? "high" : "auto"}
                 height={800}
                 loading={idx === 0 ? "eager" : "lazy"}
