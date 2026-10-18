@@ -69,6 +69,7 @@ export default function ProductImageZoomModal({
                 height={1200}
                 sizes="(max-width: 640px) 100vw, 810px"
                 src={src}
+                unoptimized
                 width={1200}
               />
             </div>

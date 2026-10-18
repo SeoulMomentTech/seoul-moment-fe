@@ -75,12 +75,13 @@ Then judge what survives:
 
 Promotion itself is safe either way: `git merge` unions both sides, so merging `develop` into `main` **never reverts** a `main`-only commit. The actual risk drift creates is that `develop`-based work can later regress a fix that only exists on `main` — a warning, not a release blocker.
 
-**Known-benign baseline** (verified 2026-08-19) — these two always survive the filters and can be ignored:
+**Known-benign baseline** (verified 2026-10-14) — these always survive the filters and can be ignored:
 
 | Commit | Date | Why benign |
 |---|---|---|
 | `df4e59d chore(web): add Google AdSense ads.txt` | 2026-06-22 | `apps/web/public/ads.txt` exists on **both** branches; only the SHAs differ |
 | `db7df45 feat: enhance Partners component to handle empty states` | 2025-11-02 | Pre-monorepo path (`src/features/about/...`), superseded by the restructure |
+| `fc1ab42 feat(admin): make brand promotion popup list optional` | 2026-08-14 | Its five `apps/admin/src/pages/BrandPromotionPage/**` + `shared/services/brandPromotion.ts` files are identical on both branches; only the SHAs differ |
 
 If the filtered list contains only these, say "no pending hotfixes" and move on.
 
@@ -231,7 +232,17 @@ gh label create release --description "Production release: promotion PR into mai
 
 Two traps — read both before running anything:
 
-1. **There are no checks on this PR.** `ci.yml` triggers only on `branches: [develop]`, so a PR into `main` has zero checks and `gh pr checks` may exit non-zero with "no checks reported". That is **not** a failure — do not wait for checks and do not treat it as a blocker. State in the PR body that CI validated this exact tree on the Phase 2 PR, with a link.
+1. **The check you see is the `develop` push run, not a PR run.** `ci.yml` has no `pull_request` trigger for `main`, but it does run on `push: develop`. Merging the Phase 2 PR pushes `develop`, and that run lands on the exact SHA this PR uses as its head — so GitHub shows it here as `Typecheck & Lint`, often still `pending` (`mergeStateStatus: UNSTABLE`) right after the PR is opened. Wait for it:
+
+   ```bash
+   gh pr checks <n> --watch --fail-fast
+   ```
+
+   - **pass** → merge.
+   - **fail** → stop; the tree on `develop` is broken even though the Phase 2 PR passed. Report the run URL and let the user decide.
+   - **"no checks reported"** (the push run was skipped or cancelled — e.g. `cancel-in-progress` when `develop` moved again) → not a failure. Fall back to the Phase 2 PR's CI result, and say so.
+
+   Either way, link the Phase 2 PR in the body as where CI validated this tree.
 
 2. **Never pass `--delete-branch`.** The head branch here is `develop`. Deleting it destroys the integration branch.
 
