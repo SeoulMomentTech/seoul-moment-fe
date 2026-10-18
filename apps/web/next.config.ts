@@ -39,6 +39,8 @@ const nextConfig: NextConfig = {
       },
     ],
     minimumCacheTTL: 86400,
+    // 기본값은 [75]. 상품 갤러리가 90 을 쓴다 (목록에 없는 quality 는 경고 후 가까운 값으로 보정됨).
+    qualities: [75, 90],
   },
   productionBrowserSourceMaps: true,
   // TS 7은 컴파일러 API를 제공하지 않아(안정 API는 7.1 예정) typescript-eslint 등이 쓰지 못한다.
