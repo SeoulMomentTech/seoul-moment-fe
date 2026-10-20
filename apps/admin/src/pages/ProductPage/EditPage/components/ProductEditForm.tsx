@@ -115,7 +115,7 @@ export default function ProductEditForm({
           price: Number(values.price),
           discountPrice: values.discountPrice
             ? Number(values.discountPrice)
-            : undefined,
+            : null,
           shippingCost: Number(values.shippingCost),
           shippingInfo: Number(values.shippingInfo),
           imageUrlList: values.imageUrlList.map(stripImageDomain),
