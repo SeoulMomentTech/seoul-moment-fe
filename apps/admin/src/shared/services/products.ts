@@ -88,7 +88,7 @@ export interface UpdateAdminProductItemRequest {
   productId?: number;
   mainImageUrl?: string;
   price?: number;
-  discountPrice?: number;
+  discountPrice?: number | null;
   shippingCost?: number;
   shippingInfo?: number;
   imageUrlList?: string[];
