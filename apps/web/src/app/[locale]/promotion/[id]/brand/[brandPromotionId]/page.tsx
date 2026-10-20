@@ -9,6 +9,7 @@ import { reportMetadataError } from "@shared/lib/utils/log/report-metadata-error
 import { getBrandPromotionDetailV1 } from "@shared/services/brandPromotion";
 
 import type { LanguageType } from "@/i18n/const";
+import { buildLocalizedAlternates } from "@/i18n/metadata";
 import { resolveLocale } from "@/i18n/routing";
 
 import { PromotionPage } from "@views/promotion";
@@ -37,6 +38,12 @@ export async function generateMetadata({
       locale,
     );
 
+    // 다른 프로모션의 브랜드 id 가 붙은 URL 은 페이지가 notFound 를 내므로
+    // 그 주소로 canonical 을 만들지 않는다.
+    if (promotion.promotionId !== promotionId) {
+      return {};
+    }
+
     const description = stripHtml(promotion.brand.description).slice(0, 160);
     const ogImage = promotion.sectionList?.[0]?.imageUrlList?.[0];
     const title = `${t("seo_brand_promotion_title", { Brand: promotion.brand.name })}`;
@@ -44,6 +51,10 @@ export async function generateMetadata({
     return {
       title,
       description,
+      alternates: buildLocalizedAlternates(
+        locale,
+        `/promotion/${promotionId}/brand/${parsedBrandPromotionId}`,
+      ),
       openGraph: {
         title,
         description,
