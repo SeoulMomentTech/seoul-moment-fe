@@ -2,6 +2,13 @@
 
 All notable changes to `@seoul-moment/admin` are documented here.
 
+## 0.4.1 — 2026-10-20
+
+### Fixes
+
+- Send null discountPrice when cleared on product item edit (`c93cf76b`)
+- Raise image upload timeout to 120s (`0dd90951`)
+
 ## 0.4.0 — 2026-10-07
 
 ### Features
