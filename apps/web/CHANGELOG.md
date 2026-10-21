@@ -2,6 +2,19 @@
 
 All notable changes to `@seoul-moment/web` are documented here.
 
+## 1.4.3 — 2026-10-21
+
+### Fixes
+
+- Return a real 307 from the promotion entry URL (`11b78628`)
+- Add canonical and hreflang to brand promotion pages (`ad09883e`)
+- Add canonical and hreflang metadata to contact page (`f6ee8b74`)
+- Raise product gallery image quality to 90 (`e1f71ed4`)
+- Keep product images sharp in gallery and zoom modal (`bf54bd2c`)
+
+`bf54bd2c` and `e1f71ed4` reached production untagged on 2026-10-20 with the admin v0.4.1
+release and are recorded here.
+
 ## 1.4.2 — 2026-10-14
 
 ### Fixes
