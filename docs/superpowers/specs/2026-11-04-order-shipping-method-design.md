@@ -169,6 +169,22 @@
 
 로그인 상태는 `useUserAuthStore`(persist)가 이미 유지하므로 추가 작업 없음.
 
+입력값을 URL 쿼리로 들고 다니지 않는다. 받는 분·전화번호·주소는 개인정보라 주소창·히스토리·
+서버 로그에 남기지 않고, 쿼리에 실리는 것은 서버가 붙여 주는 `cvsStoreToken`과 주문 대상
+(`?cart=`/`?buy=`)뿐이다.
+
+### 왜 같은 탭인가 (검토한 대안)
+
+- **iframe(srcdoc) 모달**: API 지도 HTML은 CORS `*`라 받아올 수 있고 ECPay 테스트 지도는
+  프레임을 막지 않지만, ECPay가 `MapInfo` 쿠키에 기대므로 iframe 안에서는 서드파티 쿠키가
+  되어 Safari·iOS에서 깨질 가능성이 높다. 우리 API는 `X-Frame-Options: SAMEORIGIN`이라
+  콜백 페이지도 프레임 안에서 막힌다. `returnUrl` 허용 목록 문제도 그대로 남는다.
+- **팝업 창**: 쿠키·프레임 문제는 없지만 LINE 인앱 브라우저와 팝업 차단에서 깨진다.
+- **같은 탭**(채택): 서버가 전제한 방식이고 LINE 인앱을 포함해 어디서나 동작한다.
+  LINE 인앱도 같은 탭으로 연다. 외부 브라우저 규칙은 결제창(`handoffUrl`)에만 해당한다.
+  저장소가 막혀 draft 없이 돌아오는 경우는 토큰을 버리고 "주문할 것이 없음" 화면이 뜬다.
+  복귀 페이지 하나만 더 두면 iframe·팝업은 나중에 개선으로 얹을 수 있다.
+
 ## 상태 모델
 
 `useOrderShipping`을 확장한다. 바깥 API는 지금 것에 다음을 더한다.
@@ -268,8 +284,23 @@ features/order/
 - 복귀 처리: `/order?cvsStoreToken=x` + draft 있음 → `sourceHref`로 replace, draft 없음 →
   토큰 폐기. 실제 서버 왕복이 안 되는 환경에서도 URL을 손으로 만들어 재현할 수 있게
   이 경로를 모델 단위로 분리한다.
-- 화면 테스트는 기존 관행(모델 단위 Vitest)을 따르고, 지도 왕복은 수동 확인(dev API 는
-  테스트 환경이라 고정 매장이 돌아온다).
+- 화면 테스트는 기존 관행(모델 단위 Vitest)을 따른다.
+
+### 지도 왕복 수동 확인 (로컬)
+
+2026-11-04 dev API로 확인한 사실: `returnUrl`이 `localhost`면 서버는 리다이렉트하지 않고
+자기 페이지(`/logistics/cvs/map/reply`)에 매장명·`token=…`을 보여 준다. 그 토큰은 로그인 없이
+`GET logistics/cvs/store/{token}`으로 조회된다. ECPay 테스트 환경은 지도 대신 고정 매장
+버튼("選定門市")을 준다.
+
+로컬 절차:
+1. 로컬 주문서에서 체인 칩 → dev API 지도 → ECPay 고정 매장 선택 → 서버 페이지에서 토큰 복사
+2. `http://localhost:3000/{locale}/order?cvsStoreToken={토큰}`을 직접 열기
+3. 이후는 실제와 같다: draft 복원 → 원래 주문서로 이동 → 매장 조회 → 카드 → 배송비 확정
+
+자동 리다이렉트 한 단계는 dev 프론트 배포본에서 릴리스 전 체크 항목으로 확인한다.
+백엔드에 dev 환경의 `returnUrl` 허용 목록에 `http://localhost:3000`을 넣어 달라고 요청해
+두면 이 수동 단계가 사라진다 (서버 환경 설정, 별도 요청).
 
 ## 빌더에게 맡기는 것
 
