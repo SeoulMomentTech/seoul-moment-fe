@@ -111,6 +111,10 @@
 - 택배: 지금처럼 縣市·區가 다 있을 때만 확정.
 - 편의점: 매장 토큰이 있을 때만 확정. 지역 라벨은 `"{체인 표시명} {storeName} · 본섬/외섬"`.
   매장 전이거나 조회 실패면 택배와 같은 "확정 전" 표시(배송비 `null`).
+- 미리보기에 `cvsStoreToken`을 넣는 것은 **매장 조회가 성공한 뒤**다. 만료·무효 토큰에
+  미리보기가 어떻게 답하는지 스웨거에 없고, 미리보기가 에러를 주면 `OrderPage`의 `isError`
+  분기가 주문서 전체를 비워 버린다. 매장 조회(404 처리 가능)를 먼저 통과시키면 그 위험이
+  없다. 왕복이 한 번 늘고 그동안 "확정 전"으로 보이는 것은 감수한다. (제 판단)
 - 탭을 바꾸면 미리보기 키가 바뀌어 자동 재조회된다. 직전 값은 `keepPreviousData`로
   유지되는 기존 동작을 그대로 쓴다.
 
@@ -149,13 +153,17 @@
   **즉시 삭제**한다. SNS 로그인의 `linePending`처럼 "읽으면서 지우기" 때문에 생긴 버그를
   피하려고 삭제를 미루지는 않는다. 여기서는 LIFF 같은 이중 리다이렉트가 없고,
   StrictMode 이중 실행은 `useRef`로 한 번만 처리한다. (제 판단)
-- 돌아올 때 URL의 `?cvsStoreToken=`은 nuqs로 읽어 `cvs.storeToken`에 넣은 뒤 **URL에서
-  지운다**(`history: "replace"`). 새로고침이나 뒤로가기로 토큰이 다시 흘러들어오지 않게
-  한다. 복원과 토큰 반영 순서: draft 복원 → URL 토큰이 있으면 그것으로 덮어쓰기.
-- `returnUrl`은 `window.location.href`에서 기존 `cvsStoreToken`을 뗀 값. locale 접두와
-  `?cart=`/`?buy=`가 그대로 들어간다. 로컬 개발(`localhost`)에서는 서버의
-  `STOREFRONT_BASE_URL`과 달라 서버 페이지에 매장이 표시되는 데서 끝날 수 있다. 이건
-  환경 제약이라 코드로 우회하지 않는다.
+- `returnUrl`은 **쿼리 없는** 주문서 경로다: `{origin}/{locale}/order`. 서버가
+  `{returnUrl}?cvsStoreToken=…`을 문자 그대로 붙이는지 `&`로 합치는지 알 수 없으므로
+  쿼리가 있는 URL을 넘기지 않는다. 주문 대상은 draft의 `sourceHref`가 들고 있다.
+  (제 판단 — 어느 쪽이든 깨지지 않는 쪽을 골랐다.)
+- 복귀 처리: `/order?cvsStoreToken=x`로 돌아오면 URL에 주문 대상이 없으므로 draft를 먼저
+  읽는다. draft가 있으면 토큰을 draft의 `cvs.storeToken`에 넣고 `router.replace(sourceHref)`로
+  원래 주문서(`?cart=`/`?buy=`)로 옮긴 뒤, 거기서 draft를 복원한다. draft가 없거나 만료면
+  토큰을 버리고 기존 "주문할 것이 없음" 화면이 그대로 뜬다. 토큰은 URL에서 draft로 옮긴
+  뒤 지워지므로 새로고침·뒤로가기로 다시 흘러들지 않는다.
+- 로컬 개발(`localhost`)에서는 서버의 `STOREFRONT_BASE_URL`과 달라 서버 페이지에 매장이
+  표시되는 데서 끝날 수 있다. 이건 환경 제약이라 코드로 우회하지 않는다.
 - 기본 배송지 체크가 켜진 상태에서 돌아오면 프로필 재주입 효과(`fillFromProfile`)가
   복원값을 덮는다. 복원 뒤에만 프로필 주입이 돌도록 순서를 보장한다.
 
@@ -201,6 +209,11 @@ export const orderCvsPickupSchema = z.object({
 ```
 
 에러 키 맵도 `SHIPPING_ERROR_KEY`처럼 분리해 둔다.
+
+받는 분 규칙은 스웨거 문구(중문 2–5자 또는 영문 4–10자, 공백·숫자 불가)를 그대로 옮긴
+것이고 서버의 실제 정규식은 확인하지 못했다. 다음 작업(주문 생성 연결)에서 400 응답의
+`message`를 받는 분 필드 에러로 보여 주는 자리를 마련해, 클라이언트 규칙이 서버보다
+느슨해도 사용자가 이유를 알 수 있게 한다. (제 판단)
 
 ## 컴포넌트 구조
 
@@ -250,7 +263,11 @@ features/order/
   입력 변환) 케이스.
 - `orderDraft.test.ts`: 저장·복원, TTL 초과, 다른 `sourceHref` 무시, 복원 후 삭제.
 - `useOrderShipping.test.ts`: 탭 전환 시 양쪽 값 보존, 편의점 `isValid`가 매장 토큰 +
-  스키마에 의존, `previewShipping`/`submitShipping` 분기, URL `cvsStoreToken` 반영 후 제거.
+  스키마에 의존, `previewShipping`은 매장 조회 성공 뒤에만 토큰을 품음,
+  `submitShipping` 분기.
+- 복귀 처리: `/order?cvsStoreToken=x` + draft 있음 → `sourceHref`로 replace, draft 없음 →
+  토큰 폐기. 실제 서버 왕복이 안 되는 환경에서도 URL을 손으로 만들어 재현할 수 있게
+  이 경로를 모델 단위로 분리한다.
 - 화면 테스트는 기존 관행(모델 단위 Vitest)을 따르고, 지도 왕복은 수동 확인(dev API 는
   테스트 환경이라 고정 매장이 돌아온다).
 
