@@ -25,7 +25,9 @@ import { peekOrderDraft, saveOrderDraft } from "./orderDraft";
 export const useOrderCvsReturn = (source: OrderSource | null) => {
   const router = useRouter();
   const [token, setToken] = useQueryState("cvsStoreToken", parseAsString);
-  const [isRedirecting, setIsRedirecting] = useState(false);
+  // 옮겨 가는 목적지. 같은 라우트 안에서 쿼리만 바뀌므로 훅은 다시 마운트되지 않는다 —
+  // 불리언으로 들고 있으면 도착한 뒤에도 영영 "이동 중" 이라 목적지와 현재 위치를 비교한다.
+  const [redirectHref, setRedirectHref] = useState<string | null>(null);
   const handledRef = useRef(false);
 
   useEffect(() => {
@@ -49,9 +51,12 @@ export const useOrderCvsReturn = (source: OrderSource | null) => {
       return;
     }
 
-    setIsRedirecting(true);
+    setRedirectHref(draft.sourceHref);
     router.replace(draft.sourceHref);
   }, [token, source, setToken, router]);
+
+  const currentHref = source ? toOrderHref(source) : null;
+  const isRedirecting = redirectHref !== null && currentHref !== redirectHref;
 
   return { isRedirecting };
 };

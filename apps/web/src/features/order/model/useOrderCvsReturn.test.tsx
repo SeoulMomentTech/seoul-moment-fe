@@ -98,6 +98,29 @@ describe("useOrderCvsReturn", () => {
     expect(result.current.isRedirecting).toBe(false);
   });
 
+  it("원래 주문서로 옮겨지면 isRedirecting 이 풀린다", async () => {
+    saveOrderDraft(draft);
+
+    // 같은 라우트 안에서 쿼리만 바뀌므로 훅은 다시 마운트되지 않고 source 만 바뀐다
+    const { result, rerender } = renderHook(
+      ({ source }: { source: OrderSource | null }) => useOrderCvsReturn(source),
+      {
+        initialProps: { source: null },
+        wrapper: ({ children }: { children: ReactNode }) => (
+          <NuqsTestingAdapter searchParams="?cvsStoreToken=tok123">
+            {children}
+          </NuqsTestingAdapter>
+        ),
+      },
+    );
+
+    await waitFor(() => expect(result.current.isRedirecting).toBe(true));
+
+    rerender({ source: { type: "cart", cartItemIds: [1, 2] } });
+
+    await waitFor(() => expect(result.current.isRedirecting).toBe(false));
+  });
+
   it("토큰이 없으면 아무것도 하지 않는다", () => {
     saveOrderDraft(draft);
 
