@@ -84,7 +84,7 @@ const beforeErrorHandler = async (error: HTTPError) => {
   return Promise.reject(error);
 };
 
-const API_PREFIX_URL =
+export const API_PREFIX_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://api.seoulmoment.com.tw";
 
 // 토큰 재발급 전용 ky 인스턴스. 401 retry hook 이 붙은 메인 api 를 다시 호출하면

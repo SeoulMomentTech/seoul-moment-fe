@@ -1,66 +1,85 @@
 "use client";
 
+import type { HTTPError } from "ky";
+
 import { useLanguage } from "@shared/lib/hooks";
 import useAppQuery from "@shared/lib/hooks/query/useAppQuery";
 import {
   postUserOrderPreview,
   type PostUserOrderPreviewReq,
   type PostUserOrderPreviewRes,
+  type UserOrderShippingType,
 } from "@shared/services/userOrder";
 
 import type { LanguageType } from "@/i18n/const";
 
 import { keepPreviousData } from "@tanstack/react-query";
 
+import { orderQueryKeys } from "./queryKey";
 import { toOrderSourceBody, type OrderSource } from "../model/orderSource";
 
 interface UseOrderPreviewQueryParams {
   /** 주문 대상. URL 에 없거나 잘못됐으면 `null` 이고 호출하지 않는다 */
   source: OrderSource | null;
-  /** 배송지 縣市. 생략하면 서버가 본섬 기준 예상 배송비를 준다 */
+  /** 배송 방법. 생략하면 택배(HOME) */
+  shippingType?: UserOrderShippingType;
+  /** 배송지 縣市. 생략하면 서버가 본섬 기준 예상 배송비를 준다 (HOME) */
   city?: string;
-  /** 배송지 區/鄉 */
+  /** 배송지 區/鄉 (HOME) */
   district?: string;
+  /** 전자지도에서 고른 매장 토큰. 생략하면 본섬 기준 예상 배송비를 준다 (CVS) */
+  cvsStoreToken?: string;
 }
 
+type PreviewShippingInput = Omit<UseOrderPreviewQueryParams, "source">;
+
 /**
- * 주소는 縣市·區 가 함께 있을 때만 보낸다. 서버가 둘을 같이 받아야 지역을 정할 수 있어서
- * 한쪽만 담긴 요청은 아예 만들어지지 않게 분기한다.
+ * 택배는 縣市·區 가 함께 있을 때만 보낸다. 서버가 둘을 같이 받아야 지역을 정할 수 있어서
+ * 한쪽만 담긴 요청은 아예 만들어지지 않게 분기한다. 편의점 픽업은 매장 토큰이 지역이다.
  */
 const toPreviewRequest = (
   source: OrderSource,
   languageCode: LanguageType,
-  city?: string,
-  district?: string,
-): PostUserOrderPreviewReq =>
-  city && district
-    ? { ...toOrderSourceBody(source), city, district, languageCode }
-    : { ...toOrderSourceBody(source), languageCode };
+  { shippingType, city, district, cvsStoreToken }: PreviewShippingInput,
+): PostUserOrderPreviewReq => {
+  const base = { ...toOrderSourceBody(source), languageCode };
+
+  if (shippingType === "CVS") {
+    return cvsStoreToken
+      ? { ...base, shippingType: "CVS", cvsStoreToken }
+      : { ...base, shippingType: "CVS" };
+  }
+
+  return city && district ? { ...base, city, district } : base;
+};
 
 /**
  * 주문서에 그릴 라인과 금액. POST 이지만 DB 를 바꾸지 않는 조회라 쿼리로 다룬다.
  *
- * 주소가 없어도 부른다 — 서버가 본섬 기준 예상값(`isShippingEstimated`)을 주므로 라인
- * 목록만 먼저 그릴 수 있다. 배송비를 확정으로 쓸지는 화면이 그 플래그를 보고 정한다.
+ * 주소(또는 매장)가 없어도 부른다 — 서버가 본섬 기준 예상값(`isShippingEstimated`)을 주므로
+ * 라인 목록만 먼저 그릴 수 있다. 배송비를 확정으로 쓸지는 화면이 그 플래그를 보고 정한다.
  * 주소가 바뀌면 키가 바뀌어 자동으로 다시 확정된다.
  */
 export const useOrderPreviewQuery = ({
   source,
-  city,
-  district,
+  ...shipping
 }: UseOrderPreviewQueryParams) => {
   const languageCode = useLanguage();
 
   const request = source
-    ? toPreviewRequest(source, languageCode, city, district)
+    ? toPreviewRequest(source, languageCode, shipping)
     : null;
 
   return useAppQuery<
     Awaited<ReturnType<typeof postUserOrderPreview>>,
-    Error,
+    HTTPError,
     PostUserOrderPreviewRes
   >({
-    queryKey: ["order", "preview", source, city, district, languageCode],
+    queryKey: orderQueryKeys.preview({
+      source,
+      languageCode,
+      ...shipping,
+    }),
     queryFn: () => {
       // enabled 가 막고 있어 여기서는 요청이 반드시 만들어져 있다
       if (!request) throw new Error("order preview needs an order source");
