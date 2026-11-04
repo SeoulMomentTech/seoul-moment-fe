@@ -558,5 +558,14 @@
   "enter_address_for_total": "Enter a shipping address to see the final total.",
   "stock_left_count": "{stock} left",
   "settings": "Settings",
-  "language_setting": "Language"
+  "language_setting": "Language",
+  "shipping_method_home": "Home delivery",
+  "shipping_method_cvs": "Convenience store pickup",
+  "cvs_chain": "Convenience store",
+  "cvs_store_empty": "Choose a convenience store to pick a branch",
+  "cvs_store_expired": "Your store selection expired. Please choose again",
+  "cvs_store_reselect": "Choose another store",
+  "cvs_recipient_placeholder": "Full name (2–5 Chinese or 4–10 English letters)",
+  "cvs_recipient_invalid": "ID is checked at pickup. Enter your real name: 2–5 Chinese or 4–10 English letters",
+  "cvs_phone_invalid": "Enter a 10-digit mobile number starting with 09"
 }
