@@ -31,11 +31,15 @@ export const useOrderItems = ({
     refetch,
   } = useOrderPreviewQuery(
     previewShipping.shippingType === "CVS"
-      ? {
-          source,
-          shippingType: "CVS",
-          cvsStoreToken: previewShipping.cvsStoreToken,
-        }
+      ? // 매장이 정해지기 전에는 서버가 어차피 본섬 기준 예상값을 주므로 배송 입력을 아예
+        // 보내지 않는다 — 택배의 "주소 없음"과 같은 요청이라 캐시도 한 줄로 합쳐진다.
+        previewShipping.cvsStoreToken
+        ? {
+            source,
+            shippingType: "CVS",
+            cvsStoreToken: previewShipping.cvsStoreToken,
+          }
+        : { source }
       : {
           source,
           city: previewShipping.city,
