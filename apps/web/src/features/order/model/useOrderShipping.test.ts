@@ -261,6 +261,39 @@ describe("useOrderShipping", () => {
       expect(navigateTo).toHaveBeenCalledTimes(1);
     });
 
+    it("매장이 있어도 다시 고르기는 draft 를 저장하고 같은 체인 지도로 간다", async () => {
+      saveOrderDraft(cvsDraft);
+      const { result } = render({ source, profile, userInfo });
+
+      await waitFor(() => expect(result.current.cvs.store).toEqual(store));
+
+      act(() => result.current.cvs.reselectStore());
+
+      expect(peekOrderDraft()).toMatchObject({ cvs: { chain: "UNIMART" } });
+      expect(navigateTo).toHaveBeenCalledWith(
+        expect.stringContaining("chain=UNIMART"),
+      );
+    });
+
+    it("매장 조회가 404 가 아닌 오류면 에러로 표시하고 토큰은 지키며 다시 시도할 수 있다", async () => {
+      getLogisticsCvsStore.mockRejectedValueOnce(
+        Object.assign(new Error("500"), { response: { status: 500 } }),
+      );
+      saveOrderDraft(cvsDraft);
+
+      const { result } = render({ source, profile, userInfo });
+
+      await waitFor(() => expect(result.current.cvs.isStoreError).toBe(true));
+      expect(result.current.cvs.isStoreExpired).toBe(false);
+      expect(result.current.cvs.storeToken).toBe("tok123");
+      expect(result.current.isValid).toBe(false);
+
+      act(() => result.current.cvs.retryStore());
+
+      await waitFor(() => expect(result.current.cvs.store).toEqual(store));
+      expect(result.current.cvs.isStoreError).toBe(false);
+    });
+
     it("draft 를 복원하면 매장 조회 성공 뒤에야 미리보기에 토큰이 들어가고 제출값이 생긴다", async () => {
       let resolveStore: (() => void) | undefined;
       getLogisticsCvsStore.mockImplementation(

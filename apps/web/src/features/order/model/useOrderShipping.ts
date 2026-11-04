@@ -143,7 +143,12 @@ export const useOrderShipping = ({
     data: store,
     isLoading: isStoreLoading,
     error: storeError,
+    refetch: refetchStore,
   } = useLogisticsCvsStoreQuery(storeToken);
+
+  // 404 는 만료(토큰을 비우고 다시 고르게 한다). 그 밖 오류는 토큰을 지킨 채 다시 시도한다 —
+  // 지도를 다녀온 직후 네트워크가 잠깐 끊긴 것뿐인데 매장을 다시 고르게 하면 안 된다.
+  const isStoreError = !!storeError && storeError.response?.status !== 404;
 
   const { reset, setValue, watch, getValues } = form;
   const { reset: resetCvs, watch: watchCvs, getValues: getCvsValues } = cvsForm;
@@ -243,14 +248,11 @@ export const useOrderShipping = ({
   );
 
   /**
-   * 전자지도로 떠난다. 이미 고른 매장의 체인이면 그대로 둔다 — 다시 고르는 길은 카드의
-   * "매장 다시 고르기"다. 떠나기 직전에 입력 전부를 draft 로 남기고, 복귀 주소는 쿼리 없는
+   * 전자지도로 떠난다. 떠나기 직전에 입력 전부를 draft 로 남기고, 복귀 주소는 쿼리 없는
    * 주문서 경로만 넘긴다(주문 대상은 draft 가 들고 있다).
    */
-  const openCvsMap = useCallback(
+  const leaveForMap = useCallback(
     (next: CvsChain) => {
-      if (next === chain && storeToken && store) return;
-
       if (sourceHref) {
         const cvsValues = getCvsValues();
 
@@ -278,9 +280,6 @@ export const useOrderShipping = ({
       );
     },
     [
-      chain,
-      storeToken,
-      store,
       sourceHref,
       getCvsValues,
       getValues,
@@ -289,6 +288,25 @@ export const useOrderShipping = ({
       locale,
     ],
   );
+
+  /** 체인 칩. 이미 고른 매장의 체인이면 그대로 둔다 — 다시 고르는 길은 `reselectStore` 다 */
+  const openCvsMap = useCallback(
+    (next: CvsChain) => {
+      if (next === chain && storeToken && store) return;
+
+      leaveForMap(next);
+    },
+    [chain, storeToken, store, leaveForMap],
+  );
+
+  /** 카드의 "매장 다시 고르기". 같은 체인이라도 지도로 간다 */
+  const reselectStore = useCallback(() => {
+    if (chain) leaveForMap(chain);
+  }, [chain, leaveForMap]);
+
+  const retryStore = useCallback(() => {
+    void refetchStore();
+  }, [refetchStore]);
 
   const values = watch();
   const cvsValues = watchCvs();
@@ -386,8 +404,11 @@ export const useOrderShipping = ({
       store,
       isStoreLoading,
       isStoreExpired,
+      isStoreError,
       form: cvsForm,
       openCvsMap,
+      reselectStore,
+      retryStore,
     },
     previewShipping,
     isValid,

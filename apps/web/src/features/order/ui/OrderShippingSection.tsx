@@ -110,9 +110,12 @@ export function OrderShippingSection({
         <OrderCvsPickupPanel
           chain={cvs.chain}
           form={cvs.form}
+          isStoreError={cvs.isStoreError}
           isStoreExpired={cvs.isStoreExpired}
           isStoreLoading={cvs.isStoreLoading}
           onOpenMap={cvs.openCvsMap}
+          onReselect={cvs.reselectStore}
+          onRetry={cvs.retryStore}
           store={cvs.store}
         />
       </>

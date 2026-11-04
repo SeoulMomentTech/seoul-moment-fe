@@ -15,6 +15,8 @@ import {
 } from "../model/schema";
 
 const onOpenMap = vi.fn();
+const onReselect = vi.fn();
+const onRetry = vi.fn();
 
 const store = {
   storeToken: "tok123",
@@ -29,7 +31,7 @@ const store = {
 
 type PanelProps = Omit<
   Parameters<typeof OrderCvsPickupPanel>[0],
-  "form" | "onOpenMap"
+  "form" | "onOpenMap" | "onReselect" | "onRetry"
 >;
 
 function Panel(props: Partial<PanelProps>) {
@@ -42,9 +44,12 @@ function Panel(props: Partial<PanelProps>) {
     <OrderCvsPickupPanel
       chain={null}
       form={form}
+      isStoreError={false}
       isStoreExpired={false}
       isStoreLoading={false}
       onOpenMap={onOpenMap}
+      onReselect={onReselect}
+      onRetry={onRetry}
       store={undefined}
       {...props}
     />
@@ -58,7 +63,11 @@ const wrapper = ({ children }: { children: ReactNode }) => (
 );
 
 describe("OrderCvsPickupPanel", () => {
-  afterEach(() => onOpenMap.mockReset());
+  afterEach(() => {
+    onOpenMap.mockReset();
+    onReselect.mockReset();
+    onRetry.mockReset();
+  });
 
   it("매장이 없으면 안내 문구와 체인 칩 세 개를 그린다", () => {
     render(<Panel />, { wrapper });
@@ -91,7 +100,18 @@ describe("OrderCvsPickupPanel", () => {
       screen.getByRole("button", { name: new RegExp(ko.cvs_store_reselect) }),
     );
 
-    expect(onOpenMap).toHaveBeenCalledWith("UNIMART");
+    // 같은 체인 칩은 무시되므로 재선택은 칩과 다른 경로를 타야 한다
+    expect(onReselect).toHaveBeenCalledTimes(1);
+    expect(onOpenMap).not.toHaveBeenCalled();
+  });
+
+  it("조회 실패면 다시 시도 버튼이 onRetry 를 부른다", () => {
+    render(<Panel chain="UNIMART" isStoreError />, { wrapper });
+
+    fireEvent.click(screen.getByRole("button", { name: ko.please_try_again }));
+
+    expect(onRetry).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText(ko.cvs_store_empty)).not.toBeInTheDocument();
   });
 
   it("만료면 만료 문구를 그린다", () => {

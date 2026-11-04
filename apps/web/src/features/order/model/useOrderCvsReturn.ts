@@ -56,7 +56,12 @@ export const useOrderCvsReturn = (source: OrderSource | null) => {
   }, [token, source, setToken, router]);
 
   const currentHref = source ? toOrderHref(source) : null;
-  const isRedirecting = redirectHref !== null && currentHref !== redirectHref;
+  // 토큰만 있고 주문 대상이 없는 첫 프레임도 "이동 중" 이다 — effect 가 돌기 전에
+  // "주문할 것이 없음" 이 한 번 그려졌다 사라지면 안 된다. draft 가 없어 토큰을 지우면
+  // 그 순간 풀린다.
+  const isRedirecting =
+    (!!token && !source) ||
+    (redirectHref !== null && currentHref !== redirectHref);
 
   return { isRedirecting };
 };

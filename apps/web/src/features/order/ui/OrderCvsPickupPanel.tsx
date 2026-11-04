@@ -33,8 +33,12 @@ interface OrderCvsPickupPanelProps {
   store: GetLogisticsCvsStoreRes | undefined;
   isStoreLoading: boolean;
   isStoreExpired: boolean;
-  /** 체인 칩·"매장 다시 고르기" 가 부른다. 전자지도로 떠난다 */
+  isStoreError: boolean;
+  /** 체인 칩. 이미 고른 매장의 체인이면 무시된다 */
   onOpenMap(chain: CvsChain): void;
+  /** 카드의 "매장 다시 고르기". 같은 체인이라도 지도로 간다 */
+  onReselect(): void;
+  onRetry(): void;
 }
 
 /**
@@ -47,7 +51,10 @@ export function OrderCvsPickupPanel({
   store,
   isStoreLoading,
   isStoreExpired,
+  isStoreError,
   onOpenMap,
+  onReselect,
+  onRetry,
 }: OrderCvsPickupPanelProps) {
   const t = useTranslations();
 
@@ -81,9 +88,11 @@ export function OrderCvsPickupPanel({
       </div>
 
       <OrderCvsStoreCard
+        isError={isStoreError}
         isExpired={isStoreExpired}
         isLoading={isStoreLoading}
-        onReselect={() => chain && onOpenMap(chain)}
+        onReselect={onReselect}
+        onRetry={onRetry}
         store={store}
       />
 

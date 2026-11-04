@@ -105,7 +105,7 @@ describe("useOrderCvsReturn", () => {
     const { result, rerender } = renderHook(
       ({ source }: { source: OrderSource | null }) => useOrderCvsReturn(source),
       {
-        initialProps: { source: null },
+        initialProps: { source: null as OrderSource | null },
         wrapper: ({ children }: { children: ReactNode }) => (
           <NuqsTestingAdapter searchParams="?cvsStoreToken=tok123">
             {children}
@@ -119,6 +119,30 @@ describe("useOrderCvsReturn", () => {
     rerender({ source: { type: "cart", cartItemIds: [1, 2] } });
 
     await waitFor(() => expect(result.current.isRedirecting).toBe(false));
+  });
+
+  it("토큰을 들고 돌아온 첫 렌더부터 이동 중으로 본다", async () => {
+    saveOrderDraft(draft);
+    const seen: boolean[] = [];
+
+    renderHook(
+      () => {
+        const result = useOrderCvsReturn(null);
+        seen.push(result.isRedirecting);
+        return result;
+      },
+      {
+        wrapper: ({ children }: { children: ReactNode }) => (
+          <NuqsTestingAdapter searchParams="?cvsStoreToken=tok123">
+            {children}
+          </NuqsTestingAdapter>
+        ),
+      },
+    );
+
+    await waitFor(() => expect(replace).toHaveBeenCalled());
+    // 첫 프레임에 "주문할 것이 없음" 이 깜박이지 않아야 한다
+    expect(seen[0]).toBe(true);
   });
 
   it("토큰이 없으면 아무것도 하지 않는다", () => {
