@@ -626,5 +626,18 @@
   "payment_copied": "복사했어요",
   "payment_retry_notice": "결제창을 닫았거나 보이지 않으면 다시 결제하기를 눌러 주세요",
   "payment_result_not_found_title": "결제 정보를 찾을 수 없어요",
-  "payment_result_not_found_hint": "링크가 잘못됐거나 7일이 지났어요"
+  "payment_result_not_found_hint": "링크가 잘못됐거나 7일이 지났어요",
+  "order_detail_title": "주문 상세",
+  "order_detail_view": "주문 상세 보기",
+  "order_ordered_at": "주문 일시",
+  "order_status_pending": "결제 전",
+  "order_status_payment_waiting": "입금 대기",
+  "order_status_paid": "결제 완료",
+  "order_status_canceled": "주문 취소",
+  "order_status_failed": "처리 실패",
+  "order_detail_payment": "결제 정보",
+  "order_repay_notice": "아직 결제되지 않은 주문이에요. 24시간 안에 결제하지 않으면 자동으로 취소돼요",
+  "order_detail_not_found": "주문을 찾을 수 없어요",
+  "invoice_no": "발표 번호",
+  "invoice_issuing": "결제가 확정되면 발행돼요"
 }

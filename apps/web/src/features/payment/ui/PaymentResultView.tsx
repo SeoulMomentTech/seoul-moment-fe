@@ -116,7 +116,12 @@ export function PaymentResultView({
 
       return (
         <StatusCard
-          actions={<ContinueShopping />}
+          actions={
+            <AfterPaymentActions
+              isGuest={isGuest}
+              orderId={state.result.orderId}
+            />
+          }
           icon={
             <CheckIcon aria-hidden className={ICON_CLASS} strokeWidth={2.4} />
           }
@@ -135,7 +140,12 @@ export function PaymentResultView({
     case "waiting":
       return (
         <StatusCard
-          actions={<ContinueShopping />}
+          actions={
+            <AfterPaymentActions
+              isGuest={isGuest}
+              orderId={state.result.orderId}
+            />
+          }
           icon={<Clock3Icon aria-hidden className={ICON_CLASS} />}
           meta={<OrderNumber value={state.result.orderNumber} />}
           title={t("payment_waiting_title")}
@@ -150,8 +160,15 @@ export function PaymentResultView({
         <StatusCard
           actions={
             <>
+              {/* 로그인돼 있으면 주문 상세에서 같은 주문으로 다시 결제할 수 있다 */}
               <Button asChild variant="outline">
-                <Link href="/cart">{t("go_to_cart")}</Link>
+                {isGuest ? (
+                  <Link href="/cart">{t("go_to_cart")}</Link>
+                ) : (
+                  <Link href={`/mypage/order/${state.result.orderId}`}>
+                    {t("order_detail_view")}
+                  </Link>
+                )}
               </Button>
               <Button asChild>
                 <Link href="/">{t("payment_continue_shopping")}</Link>
@@ -183,6 +200,33 @@ export function PaymentResultView({
 function OrderNumber({ value }: { value: string }) {
   return (
     <p className="text-body-4 font-mono tabular-nums text-black/50">{value}</p>
+  );
+}
+
+/**
+ * 완료·입금 대기. 로그인돼 있으면 주문 상세를 앞세우고, 로그인 없는 브라우저(LINE 에서 외부로
+ * 넘어온 경우)는 상세를 열 수 없으니 쇼핑 계속하기만 둔다.
+ */
+function AfterPaymentActions({
+  orderId,
+  isGuest,
+}: {
+  orderId: number;
+  isGuest: boolean;
+}) {
+  const t = useTranslations();
+
+  if (isGuest) return <ContinueShopping />;
+
+  return (
+    <>
+      <Button asChild variant="outline">
+        <Link href="/">{t("payment_continue_shopping")}</Link>
+      </Button>
+      <Button asChild>
+        <Link href={`/mypage/order/${orderId}`}>{t("order_detail_view")}</Link>
+      </Button>
+    </>
   );
 }
 
