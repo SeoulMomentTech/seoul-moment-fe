@@ -558,5 +558,15 @@
   "enter_address_for_total": "배송지를 입력하면 최종 금액이 나옵니다.",
   "stock_left_count": "{stock}개 남음",
   "settings": "설정",
-  "language_setting": "언어"
+  "language_setting": "언어",
+  "shipping_method_home": "택배",
+  "shipping_method_cvs": "편의점 픽업",
+  "cvs_chain": "편의점",
+  "cvs_store_empty": "위에서 편의점을 누르면 매장 지도로 이동해요",
+  "cvs_store_expired": "매장 선택이 만료되었어요. 다시 골라 주세요",
+  "cvs_store_reselect": "매장 다시 고르기",
+  "cvs_recipient_placeholder": "실명 (중문 2–5자 / 영문 4–10자)",
+  "cvs_recipient_invalid": "수령 시 신분증과 대조하니 실명을 중문 2–5자 또는 영문 4–10자로 입력해 주세요",
+  "cvs_phone_invalid": "09로 시작하는 10자리 휴대폰 번호를 입력해 주세요",
+  "cvs_store_empty_title": "아직 고른 매장이 없어요"
 }

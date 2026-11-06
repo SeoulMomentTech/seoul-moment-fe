@@ -8,6 +8,7 @@ import type { UseFormReturn } from "react-hook-form";
 import { useLanguage } from "@shared/lib/hooks";
 import { getCityOptions, getDistrictOptions } from "@shared/lib/regions";
 import { cn } from "@shared/lib/style";
+import type { UserOrderShippingType } from "@shared/services/userOrder";
 import { Checkbox } from "@shared/ui/checkbox";
 import {
   Select,
@@ -19,6 +20,18 @@ import {
 
 import { Input, Label } from "@seoul-moment/ui";
 
+import { OrderCvsPickupPanel } from "./OrderCvsPickupPanel";
+import {
+  ADDRESS_COLUMN_CLASS,
+  FIELD_LABEL_CLASS,
+  FieldError,
+  FieldLabel,
+  INPUT_CLASS,
+  ReadOnlyField,
+  ReadOnlyValue,
+  TWO_COLUMN_CLASS,
+} from "./orderFields";
+import { OrderShippingMethodTabs } from "./OrderShippingMethodTabs";
 import {
   SHIPPING_ERROR_KEY,
   SHIPPING_REQUEST_KEYS,
@@ -26,16 +39,7 @@ import {
   toTaiwanMobileE164,
   type OrderShippingValues,
 } from "../model/schema";
-
-const FIELD_LABEL_CLASS = "text-body-3 text-black";
-const INPUT_CLASS = "h-12 py-0";
-
-/** 읽기 전용 모드와 편집 폼이 같은 자리를 쓰도록 두 격자를 공유한다 */
-const TWO_COLUMN_CLASS = cn("grid grid-cols-2 gap-3", "max-sm:grid-cols-1");
-const ADDRESS_COLUMN_CLASS = cn(
-  "grid grid-cols-[96px_1fr_1fr] gap-2",
-  "max-sm:grid-cols-1",
-);
+import type { useOrderShipping } from "../model/useOrderShipping";
 
 interface OrderShippingSectionProps {
   form: UseFormReturn<OrderShippingValues>;
@@ -44,6 +48,10 @@ interface OrderShippingSectionProps {
   onUseDefaultChange(useDefault: boolean): void;
   onCityChange(city: string): void;
   onDistrictChange(district: string): void;
+  shippingMethod: UserOrderShippingType;
+  onShippingMethodChange(next: UserOrderShippingType): void;
+  /** `useOrderShipping` 의 편의점 묶음을 그대로 받는다 */
+  cvs: ReturnType<typeof useOrderShipping>["cvs"];
 }
 
 /**
@@ -60,6 +68,9 @@ export function OrderShippingSection({
   onUseDefaultChange,
   onCityChange,
   onDistrictChange,
+  shippingMethod,
+  onShippingMethodChange,
+  cvs,
 }: OrderShippingSectionProps) {
   const t = useTranslations();
   const locale = useLanguage();
@@ -84,8 +95,37 @@ export function OrderShippingSection({
 
   const phoneField = register("phone");
 
+  const tabs = (
+    <OrderShippingMethodTabs
+      onChange={onShippingMethodChange}
+      value={shippingMethod}
+    />
+  );
+
+  // 편의점 픽업은 기본 배송지 체크도 배송 요청사항도 없다 — 서버 cvsPickup 에 그 자리가 없다.
+  if (shippingMethod === "CVS") {
+    return (
+      <>
+        {tabs}
+        <OrderCvsPickupPanel
+          chain={cvs.chain}
+          form={cvs.form}
+          isStoreError={cvs.isStoreError}
+          isStoreExpired={cvs.isStoreExpired}
+          isStoreLoading={cvs.isStoreLoading}
+          onOpenMap={cvs.openCvsMap}
+          onReselect={cvs.reselectStore}
+          onRetry={cvs.retryStore}
+          store={cvs.store}
+        />
+      </>
+    );
+  }
+
   return (
     <>
+      {tabs}
+
       {/* 프로필에 주소나 연락처가 없으면 기본 배송지라는 선택지 자체가 없다 */}
       {canUseDefault && (
         <label className="text-body-3 mb-4 flex cursor-pointer items-center gap-2">
@@ -270,87 +310,5 @@ export function OrderShippingSection({
         </Select>
       </div>
     </>
-  );
-}
-
-/**
- * 필수 필드 라벨. `htmlFor` 가 없으면 읽기 전용 값이라 가리킬 폼 요소가 없다 — `label` 대신
- * `span` 으로 낸다.
- */
-function FieldLabel({
-  htmlFor,
-  children,
-}: {
-  htmlFor?: string;
-  children: string;
-}) {
-  const content = (
-    <>
-      {children}
-      <span className="text-danger ml-0.5">*</span>
-    </>
-  );
-
-  if (!htmlFor) {
-    return <span className={FIELD_LABEL_CLASS}>{content}</span>;
-  }
-
-  return (
-    <Label className={FIELD_LABEL_CLASS} htmlFor={htmlFor}>
-      {content}
-    </Label>
-  );
-}
-
-/** 편집 폼의 `Input` 과 같은 크기의 읽기 전용 칸. 채움색으로 못 고치는 값임을 알린다. */
-function ReadOnlyValue({
-  className,
-  children,
-}: {
-  className?: string;
-  children?: string;
-}) {
-  return (
-    <p
-      className={cn(
-        "text-body-3 flex h-12 items-center rounded-[4px] border border-black/20 bg-black/5 px-3",
-        className,
-      )}
-    >
-      {children}
-    </p>
-  );
-}
-
-function ReadOnlyField({
-  label,
-  valueClassName,
-  children,
-}: {
-  label: string;
-  valueClassName?: string;
-  children?: string;
-}) {
-  return (
-    <div className="grid gap-2">
-      <FieldLabel>{label}</FieldLabel>
-      <ReadOnlyValue className={valueClassName}>{children}</ReadOnlyValue>
-    </div>
-  );
-}
-
-/**
- * 에러 자리는 문구가 없어도 비워 둔다 — 검증이 `onBlur` 라, 포커스를 뗄 때마다 아래 필드가
- * 밀렸다 돌아오면 입력하던 자리를 놓친다. `aria-describedby` 가 가리킬 대상도 늘 있어야 한다.
- */
-function FieldError({ id, children }: { id: string; children?: string }) {
-  return (
-    <p
-      className="text-body-5 text-danger min-h-4 leading-4"
-      id={id}
-      role="alert"
-    >
-      {children}
-    </p>
   );
 }

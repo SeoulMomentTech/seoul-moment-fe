@@ -94,3 +94,34 @@ export const SHIPPING_ERROR_KEY: Record<keyof OrderShippingValues, string> = {
   detailAddress: "enter_detail_address",
   requestMessage: "please_try_again",
 };
+
+/**
+ * 편의점 수령인 실명. 수령 시 신분증과 대조하므로 서버 규칙(중문 2–5자 또는 영문 4–10자,
+ * 공백·숫자 불가)을 그대로 옮겼다.
+ */
+export const isValidCvsRecipientName = (value: string): boolean =>
+  /^[一-鿿]{2,5}$/.test(value) || /^[A-Za-z]{4,10}$/.test(value);
+
+/**
+ * 편의점 수령인 휴대폰. 서버가 받는 형식은 택배(`+886…`)와 달리 `09` + 8자리다.
+ * 어떤 형식으로 들어왔든 국내 9자리로 맞춘 뒤 `0` 을 붙인다. 유효하지 않으면 빈 문자열.
+ */
+export const toCvsPhone = (value: string): string =>
+  isValidTaiwanMobile(value) ? `0${toLocalMobile(value)}` : "";
+
+export const isValidCvsPhone = (value: string): boolean =>
+  toCvsPhone(value) !== "";
+
+export const orderCvsPickupSchema = z.object({
+  recipientName: z.string().trim().refine(isValidCvsRecipientName),
+  phone: z.string().refine(isValidCvsPhone),
+});
+
+export type OrderCvsPickupValues = z.infer<typeof orderCvsPickupSchema>;
+
+export const orderCvsPickupResolver = zodResolver(orderCvsPickupSchema);
+
+export const CVS_ERROR_KEY: Record<keyof OrderCvsPickupValues, string> = {
+  recipientName: "cvs_recipient_invalid",
+  phone: "cvs_phone_invalid",
+};

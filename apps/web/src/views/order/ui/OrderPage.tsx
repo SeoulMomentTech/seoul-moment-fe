@@ -1,21 +1,20 @@
 "use client";
 
-import { useState } from "react";
-
 import { ShoppingCartIcon } from "lucide-react";
 
 import { useTranslations } from "next-intl";
 
 import AuthOnly from "@shared/lib/components/AuthOnly";
 import { cn } from "@shared/lib/style";
-import type { UserOrderPaymentMethod } from "@shared/services/userOrder";
 import { Empty } from "@shared/ui/empty";
 import FixedBox from "@shared/ui/fixed-box";
 
 import { Link } from "@/i18n/navigation";
 
+import { useOrderSource } from "@entities/order";
 import { useGetUserInfoQuery, useGetUserProfileQuery } from "@entities/user";
 import {
+  getCvsChainLabel,
   OrderAmountRows,
   OrderBar,
   OrderItemList,
@@ -23,6 +22,7 @@ import {
   OrderSection,
   OrderShippingSection,
   OrderSummary,
+  useOrderCvsReturn,
   useOrderItems,
   useOrderShipping,
 } from "@features/order";
@@ -74,12 +74,14 @@ export function OrderPage() {
   const { data: profile } = useGetUserProfileQuery();
   const { data: userInfo } = useGetUserInfoQuery();
 
-  const shipping = useOrderShipping({ profile, userInfo });
+  // 주문 대상은 URL 이 들고 있다. 전자지도에서 돌아온 직후에는 URL 에 토큰만 있고 대상이
+  // 없어, 복귀 훅이 draft 의 주문서로 옮기는 동안 잠깐 비어 있다.
+  const source = useOrderSource();
+  const { isRedirecting } = useOrderCvsReturn(source);
 
-  const [paymentMethod, setPaymentMethod] =
-    useState<UserOrderPaymentMethod>("LINE_PAY");
+  const shipping = useOrderShipping({ profile, userInfo, source });
 
-  // 라인도 금액도 미리보기 응답에서 읽는다. 주문 대상은 URL 이 들고 있다.
+  // 라인도 금액도 미리보기 응답에서 읽는다.
   const {
     groups,
     itemCount,
@@ -88,21 +90,28 @@ export function OrderPage() {
     isError,
     isRecalculating,
     hasNoSelection,
-  } = useOrderItems({ city: shipping.city, district: shipping.district });
+  } = useOrderItems({ source, previewShipping: shipping.previewShipping });
 
-  // 주소가 없으면 서버가 본섬 기준 예상 배송비를 주지만 주문서는 확정값만 그린다 —
+  // 주소(또는 매장)가 없으면 서버가 본섬 기준 예상 배송비를 주지만 주문서는 확정값만 그린다 —
   // 예상값을 그대로 쓰면 주소를 넣기 전인데 확정 금액처럼 읽힌다.
   const productAmount = preview?.totalProductAmount ?? 0;
   const isShippingFixed = preview != null && !preview.isShippingEstimated;
 
+  const cvsStore =
+    shipping.shippingMethod === "CVS" ? shipping.cvs.store : undefined;
+
+  const regionLabel = !isShippingFixed
+    ? null
+    : `${
+        cvsStore
+          ? `${getCvsChainLabel(cvsStore.chain)} ${cvsStore.storeName}`
+          : `${shipping.city} ${shipping.district}`
+      } · ${t(preview.isRemoteIsland ? "remote_island" : "main_island")}`;
+
   const amounts = {
     productAmount,
     shippingFee: isShippingFixed ? preview.shippingFee : null,
-    regionLabel: isShippingFixed
-      ? `${shipping.city} ${shipping.district} · ${t(
-          preview.isRemoteIsland ? "remote_island" : "main_island",
-        )}`
-      : null,
+    regionLabel,
     totalAmount: isShippingFixed ? preview.totalAmount : productAmount,
     isRecalculating,
   };
@@ -124,7 +133,9 @@ export function OrderPage() {
           {t("order_sheet")}
         </h1>
 
-        {hasNoSelection ? (
+        {isRedirecting ? (
+          <OrderSkeleton />
+        ) : hasNoSelection ? (
           <OrderEmpty description={t("order_no_selection")} />
         ) : isPending ? (
           <OrderSkeleton />
@@ -151,18 +162,21 @@ export function OrderPage() {
                 <OrderSection title={t("shipping_address")}>
                   <OrderShippingSection
                     canUseDefault={shipping.canUseDefault}
+                    cvs={shipping.cvs}
                     form={shipping.form}
                     onCityChange={shipping.handleCityChange}
                     onDistrictChange={shipping.handleDistrictChange}
+                    onShippingMethodChange={shipping.setShippingMethod}
                     onUseDefaultChange={shipping.setUseDefaultShipping}
+                    shippingMethod={shipping.shippingMethod}
                     useDefaultShipping={shipping.useDefaultShipping}
                   />
                 </OrderSection>
 
                 <OrderSection title={t("payment_method")}>
                   <OrderPaymentSection
-                    onChange={setPaymentMethod}
-                    value={paymentMethod}
+                    onChange={shipping.setPaymentMethod}
+                    value={shipping.paymentMethod}
                   />
                 </OrderSection>
 

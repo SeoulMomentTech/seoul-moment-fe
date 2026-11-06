@@ -2,9 +2,14 @@ import { describe, expect, it } from "vitest";
 
 import { findZipCode } from "@shared/lib/regions";
 
+import { getCvsChainLabel } from "./cvsChain";
 import {
+  isValidCvsPhone,
+  isValidCvsRecipientName,
   isValidTaiwanMobile,
+  orderCvsPickupSchema,
   orderShippingSchema,
+  toCvsPhone,
   toPhoneDigits,
   toPhoneInput,
   toTaiwanMobileE164,
@@ -124,5 +129,85 @@ describe("orderShippingSchema", () => {
     expect(
       orderShippingSchema.safeParse({ ...valid, postalCode: "" }).success,
     ).toBe(false);
+  });
+});
+
+describe("isValidCvsRecipientName", () => {
+  it.each(["李佳蓉", "王明", "歐陽靖雯慧"])(
+    "중문 2–5자 %s 를 허용한다",
+    (v) => {
+      expect(isValidCvsRecipientName(v)).toBe(true);
+    },
+  );
+
+  it.each(["Amy", "JohnSmith", "ChristopherA"])(
+    "영문은 4–10자일 때만 허용한다 (%s)",
+    (v) => {
+      expect(isValidCvsRecipientName(v)).toBe(v.length >= 4 && v.length <= 10);
+    },
+  );
+
+  it("공백·숫자·한 글자·혼용은 거부한다", () => {
+    for (const v of [
+      "李",
+      "李佳蓉慧雯靖",
+      "John Smith",
+      "John1",
+      "李Amy",
+      "",
+    ]) {
+      expect(isValidCvsRecipientName(v)).toBe(false);
+    }
+  });
+});
+
+describe("toCvsPhone / isValidCvsPhone", () => {
+  it.each([
+    "+886912345678",
+    "+886 912 345 678",
+    "886912345678",
+    "0912345678",
+    "912345678",
+    "0912-345-678",
+  ])("%s → 0912345678", (v) => {
+    expect(toCvsPhone(v)).toBe("0912345678");
+    expect(isValidCvsPhone(v)).toBe(true);
+  });
+
+  it("09 가 아니거나 자리수가 어긋나면 빈 문자열이다", () => {
+    expect(toCvsPhone("0212345678")).toBe("");
+    expect(toCvsPhone("09123456789")).toBe("");
+    expect(isValidCvsPhone("")).toBe(false);
+  });
+});
+
+describe("orderCvsPickupSchema", () => {
+  it("실명과 휴대폰이 맞아야 통과한다", () => {
+    expect(
+      orderCvsPickupSchema.safeParse({
+        recipientName: "李佳蓉",
+        phone: "0912345678",
+      }).success,
+    ).toBe(true);
+    expect(
+      orderCvsPickupSchema.safeParse({
+        recipientName: "李",
+        phone: "0912345678",
+      }).success,
+    ).toBe(false);
+    expect(
+      orderCvsPickupSchema.safeParse({
+        recipientName: "李佳蓉",
+        phone: "+886912",
+      }).success,
+    ).toBe(false);
+  });
+});
+
+describe("getCvsChainLabel", () => {
+  it("UNIMART → 7-ELEVEN, FAMI → 全家, HILIFE → 萊爾富", () => {
+    expect(getCvsChainLabel("UNIMART")).toBe("7-ELEVEN");
+    expect(getCvsChainLabel("FAMI")).toBe("全家");
+    expect(getCvsChainLabel("HILIFE")).toBe("萊爾富");
   });
 });

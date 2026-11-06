@@ -1,12 +1,14 @@
 "use client";
 
-import { useOrderPreviewQuery, useOrderSource } from "@entities/order";
+import { useOrderPreviewQuery, type OrderSource } from "@entities/order";
+
+import type { OrderPreviewShipping } from "./useOrderShipping";
 
 interface UseOrderItemsParams {
-  /** 배송지 縣市. 있으면 배송비가 확정된다 */
-  city?: string;
-  /** 배송지 區/鄉 */
-  district?: string;
+  /** 주문 대상. URL 에 없거나 잘못됐으면 `null` 이고 호출하지 않는다 */
+  source: OrderSource | null;
+  /** 배송비를 정하는 입력. 택배는 縣市·區, 편의점은 매장 토큰 */
+  previewShipping: OrderPreviewShipping;
 }
 
 /**
@@ -17,16 +19,33 @@ interface UseOrderItemsParams {
  * 나오니 서로 어긋날 수도 없다 — 목록은 장바구니에서, 합계는 미리보기에서 읽으면 다른
  * 탭에서 수량을 바꾼 순간 둘이 갈라지고 어느 쪽이 옳은지 화면에서 알 수 없어진다.
  */
-export const useOrderItems = ({ city, district }: UseOrderItemsParams) => {
-  const source = useOrderSource();
-
+export const useOrderItems = ({
+  source,
+  previewShipping,
+}: UseOrderItemsParams) => {
   const {
     data: preview,
     isPending,
     isError,
     isPlaceholderData,
     refetch,
-  } = useOrderPreviewQuery({ source, city, district });
+  } = useOrderPreviewQuery(
+    previewShipping.shippingType === "CVS"
+      ? // 매장이 정해지기 전에는 서버가 어차피 본섬 기준 예상값을 주므로 배송 입력을 아예
+        // 보내지 않는다 — 택배의 "주소 없음"과 같은 요청이라 캐시도 한 줄로 합쳐진다.
+        previewShipping.cvsStoreToken
+        ? {
+            source,
+            shippingType: "CVS",
+            cvsStoreToken: previewShipping.cvsStoreToken,
+          }
+        : { source }
+      : {
+          source,
+          city: previewShipping.city,
+          district: previewShipping.district,
+        },
+  );
 
   const groups = preview?.brandGroups ?? [];
 

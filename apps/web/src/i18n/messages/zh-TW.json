@@ -558,5 +558,15 @@
   "enter_address_for_total": "輸入地址後即可顯示最終金額。",
   "stock_left_count": "剩餘 {stock} 件",
   "settings": "設定",
-  "language_setting": "語言"
+  "language_setting": "語言",
+  "shipping_method_home": "宅配",
+  "shipping_method_cvs": "超商取貨",
+  "cvs_chain": "超商",
+  "cvs_store_empty": "點選上方超商即可前往門市地圖",
+  "cvs_store_expired": "門市選擇已過期，請重新選擇",
+  "cvs_store_reselect": "重新選擇門市",
+  "cvs_recipient_placeholder": "真實姓名（中文2–5字 / 英文4–10字）",
+  "cvs_recipient_invalid": "取貨時需核對證件，請輸入真實姓名：中文2–5字或英文4–10字",
+  "cvs_phone_invalid": "請輸入09開頭的10碼手機號碼",
+  "cvs_store_empty_title": "尚未選擇門市"
 }
