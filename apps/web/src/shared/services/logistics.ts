@@ -20,8 +20,9 @@ export interface CvsStore {
 export interface GetLogisticsCvsMapParams {
   chain: CvsChain;
   /**
-   * 매장을 고른 뒤 돌아올 프론트 주소(주문서). 프론트 도메인으로 시작해야 하며, 아니면
-   * 서버가 무시하고 고른 매장을 보여준다.
+   * 매장을 고른 뒤 돌아올 프론트 주소(주문서). 서버의 STOREFRONT_BASE_URL 로 시작해야
+   * 하며(dev·local 은 `http://localhost:{포트}` 도 받는다), 아니면 서버가 무시하고 고른
+   * 매장을 보여준다. 주문 대상 쿼리를 붙여 보내면 `&cvsStoreToken=` 으로 합쳐 돌아온다.
    */
   returnUrl?: string;
 }
