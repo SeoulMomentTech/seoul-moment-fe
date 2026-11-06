@@ -13,6 +13,8 @@ export { OrderShippingSection } from "./ui/OrderShippingSection";
 export { OrderSummary } from "./ui/OrderSummary";
 export { CVS_CHAINS, getCvsChainLabel } from "./model/cvsChain";
 export { INVOICE_TYPES, type OrderInvoiceValues } from "./model/invoiceSchema";
+export { clearOrderDraft } from "./model/orderDraft";
+export { clearPendingOrder } from "./model/pendingOrder";
 export { useOrderCvsReturn } from "./model/useOrderCvsReturn";
 export { useOrderInvoice } from "./model/useOrderInvoice";
 export { useOrderItems } from "./model/useOrderItems";

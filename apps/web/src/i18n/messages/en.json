@@ -600,5 +600,21 @@
   "payment_stock_shortage_hint": "Change the quantity or remove the item, then pay again",
   "payment_go_to_product": "View product",
   "payment_order_number": "Order number",
-  "payment_failed_title": "Payment not completed"
+  "payment_failed_title": "Payment not completed",
+  "payment_result_title": "Payment result",
+  "payment_checking_title": "Confirming your payment… please wait",
+  "payment_checking_delayed": "This is taking longer than usual. Please check your orders a little later",
+  "payment_paid_title": "Payment complete",
+  "payment_paid_line_hint": "If you came from LINE, the order there now shows as complete",
+  "payment_waiting_title": "Waiting for your deposit",
+  "payment_virtual_account": "Virtual account",
+  "payment_cvs_code_label": "超商代碼 (convenience store payment code)",
+  "payment_deadline": "Pay by {date} · the order is cancelled automatically after that",
+  "payment_reason_canceled": "The payment was cancelled",
+  "payment_reason_expired": "The payment session expired",
+  "payment_reason_failed": "The payment was declined",
+  "payment_order_kept": "Your order is saved. You can pay again",
+  "payment_result_not_found": "We couldn't find this payment. The link may be wrong or older than 7 days",
+  "payment_continue_shopping": "Continue shopping",
+  "seo_payment_result_title": "Payment result | Seoul Moment"
 }
