@@ -36,17 +36,29 @@ export function Button({
   children,
   ...props
 }: ButtonProps) {
-  const Comp = asChild ? Slot : "button";
+  const classes = cn(
+    "inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-transparent focus:ring-offset-0 disabled:bg-black/10",
+    "cursor-pointer disabled:cursor-not-allowed disabled:text-black/40",
+    VARIANT_CLASSES[variant],
+    SIZE_CLASSES[size],
+    className,
+  );
+
+  // asChild 면 자식(링크 등)을 감싸지 않는다. 감싸면 Slot 이 버튼 스타일을 감싼 div 에 입혀
+  // 정작 링크는 글자 크기만큼만 눌린다.
+  if (asChild) {
+    return (
+      <Slot className={classes} data-slot="button" {...props}>
+        {children}
+      </Slot>
+    );
+  }
 
   return (
-    <Comp
-      className={cn(
-        "inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-transparent focus:ring-offset-0 disabled:bg-black/10",
-        "cursor-pointer disabled:cursor-not-allowed disabled:text-black/40",
-        VARIANT_CLASSES[variant],
-        SIZE_CLASSES[size],
-        className,
-      )}
+    // type 은 호출부가 props 로 넘긴다. 기본값을 박으면 폼 안에서 type 없이 쓰던 submit 버튼이 깨진다
+    // eslint-disable-next-line react/button-has-type
+    <button
+      className={classes}
       data-slot="button"
       disabled={isLoading || disabled}
       {...props}
@@ -60,6 +72,6 @@ export function Button({
           children
         )}
       </div>
-    </Comp>
+    </button>
   );
 }
