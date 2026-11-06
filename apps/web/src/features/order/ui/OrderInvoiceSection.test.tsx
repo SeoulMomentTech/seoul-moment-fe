@@ -109,18 +109,42 @@ describe("OrderInvoiceSection", () => {
     expect(mobileCheck).toHaveBeenCalledWith("/ABC1234");
   });
 
-  it("등록되지 않은 값이면 빨간 안내가 뜬다", async () => {
+  it("등록되지 않은 값이면 빨간 안내가 뜨고 입력칸도 invalid 로 표시된다", async () => {
     mobileCheck.mockResolvedValue(ok({ valid: false, verified: true }));
     renderSection();
 
     fireEvent.click(
       screen.getByRole("radio", { name: ko.invoice_type_mobile_barcode }),
     );
-    typeAndBlur(screen.getByPlaceholderText("/ABC1234"), "/ABC1234");
+    const input = screen.getByPlaceholderText("/ABC1234");
+    typeAndBlur(input, "/ABC1234");
 
     expect(await screen.findByText(ko.invoice_check_not_found)).toHaveClass(
       "text-danger",
     );
+    expect(input).toHaveAttribute("aria-invalid", "true");
+  });
+
+  it("상태 줄은 문구가 바뀌어도 같은 live region(role=status) 을 유지한다", async () => {
+    mobileCheck.mockResolvedValue(ok({ valid: false, verified: true }));
+    renderSection();
+
+    fireEvent.click(
+      screen.getByRole("radio", { name: ko.invoice_type_mobile_barcode }),
+    );
+    const input = screen.getByPlaceholderText("/ABC1234");
+    const statusLine = document.getElementById(
+      "order-invoice-mobile-barcode-status",
+    );
+
+    expect(statusLine).toHaveAttribute("role", "status");
+    typeAndBlur(input, "ABC");
+    await screen.findByText(ko.invoice_mobile_barcode_invalid);
+    expect(statusLine).toHaveAttribute("role", "status");
+
+    typeAndBlur(input, "/ABC1234");
+    await screen.findByText(ko.invoice_check_not_found);
+    expect(statusLine).toHaveAttribute("role", "status");
   });
 
   it("愛心碼가 확인되면 기부처 이름이 뜬다", async () => {

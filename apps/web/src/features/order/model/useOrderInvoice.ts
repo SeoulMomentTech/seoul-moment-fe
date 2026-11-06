@@ -62,6 +62,18 @@ const toCheckedValues = (values: OrderInvoiceValues): CheckedValues => ({
   COMPANY: toDigits(values.companyTaxId),
 });
 
+/** 타입별로 제출에 실리는(= 에러를 볼) 폼 칸 */
+const FIELDS_OF_TYPE: Record<
+  UserOrderInvoiceType,
+  ReadonlyArray<Exclude<keyof OrderInvoiceValues, "type">>
+> = {
+  MEMBER_CARRIER: [],
+  MOBILE_BARCODE: ["mobileBarcode"],
+  CITIZEN_CERT: ["citizenCert"],
+  DONATION: ["loveCode"],
+  COMPANY: ["companyTaxId", "companyName"],
+};
+
 const FORMAT_CHECK: Record<CheckableType, (value: string) => boolean> = {
   MOBILE_BARCODE: isValidMobileBarcode,
   DONATION: isValidLoveCode,
@@ -82,7 +94,14 @@ export const useOrderInvoice = () => {
     defaultValues: INVOICE_DEFAULT_VALUES,
     mode: "onBlur",
   });
-  const { watch, getValues, setValue, setError, reset } = form;
+  const {
+    watch,
+    getValues,
+    setValue,
+    setError,
+    reset,
+    formState: { errors },
+  } = form;
 
   const values = watch();
   const type = values.type;
@@ -131,8 +150,12 @@ export const useOrderInvoice = () => {
   }, [type, checked, current, mobileQuery, loveQuery, companyQuery]);
 
   const isFormatValid = orderInvoiceSchema.safeParse(values).success;
+  // 주문 생성 400 으로 건 서버 에러(applyServerFieldError)는 형식·확인 결과와 별개로 막는다.
+  // 사용자가 그 칸을 고쳐 다시 blur 하면 리졸버가 지운다.
+  const hasFieldError = FIELDS_OF_TYPE[type].some((field) => !!errors[field]);
   const isValid =
     isFormatValid &&
+    !hasFieldError &&
     (!isCheckable(type) ||
       check.status === "valid" ||
       check.status === "unverified");

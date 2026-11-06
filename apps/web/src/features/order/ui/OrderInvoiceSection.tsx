@@ -125,6 +125,9 @@ function InvoicePanel({ invoice, type }: InvoicePanelProps) {
     };
   };
 
+  /** 서버가 "등록되지 않은 값" 이라고 한 칸은 형식 오류와 같은 모양으로 표시한다 */
+  const serverInvalid = check.status === "invalid";
+
   const errorFor = (name: Exclude<keyof OrderInvoiceValues, "type">) =>
     errors[name]?.message ? t(errors[name].message) : undefined;
 
@@ -145,9 +148,12 @@ function InvoicePanel({ invoice, type }: InvoicePanelProps) {
         >
           <Input
             aria-describedby="order-invoice-mobile-barcode-status"
-            aria-invalid={!!errors.mobileBarcode}
+            aria-invalid={!!errors.mobileBarcode || serverInvalid}
             autoCapitalize="characters"
-            className={cn(INPUT_CLASS, errors.mobileBarcode && "border-danger")}
+            className={cn(
+              INPUT_CLASS,
+              (errors.mobileBarcode || serverInvalid) && "border-danger",
+            )}
             id="order-invoice-mobile-barcode"
             placeholder="/ABC1234"
             {...field("mobileBarcode")}
@@ -186,11 +192,11 @@ function InvoicePanel({ invoice, type }: InvoicePanelProps) {
         >
           <Input
             aria-describedby="order-invoice-love-code-status"
-            aria-invalid={!!errors.loveCode}
+            aria-invalid={!!errors.loveCode || serverInvalid}
             className={cn(
               INPUT_CLASS,
               "tabular-nums",
-              errors.loveCode && "border-danger",
+              (errors.loveCode || serverInvalid) && "border-danger",
             )}
             id="order-invoice-love-code"
             inputMode="numeric"
@@ -211,11 +217,11 @@ function InvoicePanel({ invoice, type }: InvoicePanelProps) {
           >
             <Input
               aria-describedby="order-invoice-company-tax-id-status"
-              aria-invalid={!!errors.companyTaxId}
+              aria-invalid={!!errors.companyTaxId || serverInvalid}
               className={cn(
                 INPUT_CLASS,
                 "tabular-nums",
-                errors.companyTaxId && "border-danger",
+                (errors.companyTaxId || serverInvalid) && "border-danger",
               )}
               id="order-invoice-company-tax-id"
               inputMode="numeric"
@@ -323,7 +329,8 @@ function StatusLine({
     <p
       className={cn("text-body-5 min-h-4 leading-4", TONE_CLASS[tone])}
       id={id}
-      role={tone === "danger" ? "alert" : "status"}
+      // role 을 바꾸면 문구가 바뀌는 순간 live region 이 아니어서 읽어 주지 않는다 — 고정한다
+      role="status"
     >
       {text}
     </p>

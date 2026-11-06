@@ -222,6 +222,21 @@ describe("useOrderInvoice", () => {
     );
   });
 
+  it("서버가 거절한 값은 확인 결과가 캐시돼 있어도 isValid 가 false 다", async () => {
+    mobileCheck.mockResolvedValue(ok({ valid: true, verified: true }));
+    const { result } = render();
+
+    act(() => result.current.setType("MOBILE_BARCODE"));
+    act(() => result.current.form.setValue("mobileBarcode", "/ABC1234"));
+    act(() => result.current.confirmField());
+    await waitFor(() => expect(result.current.isValid).toBe(true));
+
+    act(() => result.current.applyServerFieldError("carrierNum"));
+
+    expect(result.current.isValid).toBe(false);
+    expect(result.current.submitInvoice).toBeUndefined();
+  });
+
   it("restoreDraft 는 값을 복원하고 확인을 한 번 부른다", async () => {
     loveCheck.mockResolvedValue(ok({ valid: true, verified: true, name: "x" }));
     const { result } = render();
