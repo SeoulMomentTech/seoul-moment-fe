@@ -589,5 +589,16 @@
   "invoice_checking": "Checking…",
   "invoice_check_verified": "✓ Verified",
   "invoice_check_unverified": "We couldn't verify it right now, so only the format was checked. You can still order",
-  "invoice_company_name_placeholder": "Filled in after the check. You can also type it"
+  "invoice_company_name_placeholder": "Filled in after the check. You can also type it",
+  "payment_processing": "Processing…",
+  "payment_external_title": "Paying in your external browser",
+  "payment_external_hint": "This screen updates automatically once payment is done",
+  "payment_retry": "Pay again",
+  "payment_not_paid_retry_hint": "The payment didn't go through. You can pay again",
+  "payment_start_failed": "We couldn't start the payment. Please try again",
+  "payment_stock_shortage_title": "Some items are out of stock",
+  "payment_stock_shortage_hint": "Change the quantity or remove the item, then pay again",
+  "payment_go_to_product": "View product",
+  "payment_order_number": "Order number",
+  "payment_failed_title": "Payment not completed"
 }

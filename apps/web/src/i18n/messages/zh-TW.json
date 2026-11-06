@@ -589,5 +589,16 @@
   "invoice_checking": "確認中…",
   "invoice_check_verified": "✓ 已確認",
   "invoice_check_unverified": "目前無法即時確認，僅檢查了格式，仍可下單",
-  "invoice_company_name_placeholder": "確認後自動帶入，也可自行輸入"
+  "invoice_company_name_placeholder": "確認後自動帶入，也可自行輸入",
+  "payment_processing": "處理中…",
+  "payment_external_title": "正在外部瀏覽器付款",
+  "payment_external_hint": "完成付款後，此畫面會自動更新",
+  "payment_retry": "重新付款",
+  "payment_not_paid_retry_hint": "付款未完成，您可以重新付款",
+  "payment_start_failed": "無法開始付款，請再試一次",
+  "payment_stock_shortage_title": "部分商品庫存不足",
+  "payment_stock_shortage_hint": "請調整數量或移除商品後重新付款",
+  "payment_go_to_product": "查看商品",
+  "payment_order_number": "訂單編號",
+  "payment_failed_title": "付款未完成"
 }

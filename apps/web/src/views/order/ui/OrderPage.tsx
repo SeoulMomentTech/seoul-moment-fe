@@ -22,13 +22,16 @@ import {
   OrderInvoiceSection,
   OrderItemList,
   OrderPaymentSection,
+  OrderPaymentWaiting,
   OrderSection,
   OrderShippingSection,
+  OrderStockShortage,
   OrderSummary,
   useOrderCvsReturn,
   useOrderInvoice,
   useOrderItems,
   useOrderShipping,
+  useOrderSubmit,
 } from "@features/order";
 import { Button, Skeleton } from "@seoul-moment/ui";
 
@@ -108,7 +111,21 @@ export function OrderPage() {
     isError,
     isRecalculating,
     hasNoSelection,
+    refetch: refetchPreview,
   } = useOrderItems({ source, previewShipping: shipping.previewShipping });
+
+  const submit = useOrderSubmit({
+    source,
+    preview,
+    paymentMethod: shipping.paymentMethod,
+    submitShipping: shipping.submitShipping,
+    invoice,
+    onStoreExpired: shipping.cvs.expireStore,
+    onPreviewStale: () => void refetchPreview(),
+  });
+
+  const canSubmit =
+    shipping.isValid && invoice.isSubmittable && !submit.isSubmitting;
 
   // 주소(또는 매장)가 없으면 서버가 본섬 기준 예상 배송비를 주지만 주문서는 확정값만 그린다 —
   // 예상값을 그대로 쓰면 주소를 넣기 전인데 확정 금액처럼 읽힌다.
@@ -161,6 +178,12 @@ export function OrderPage() {
           <OrderEmpty description={t("please_try_again")} />
         ) : !groups.length ? (
           <OrderEmpty description={t("order_items_unavailable")} />
+        ) : submit.external ? (
+          <OrderPaymentWaiting
+            external={submit.external}
+            isRetrying={submit.isRetrying}
+            onRetry={submit.retryPayment}
+          />
         ) : (
           <>
             <div
@@ -211,14 +234,32 @@ export function OrderPage() {
                   title={t("payment_amount")}
                 >
                   <OrderAmountRows {...amounts} />
+                  {submit.stockShortage && source && (
+                    <OrderStockShortage
+                      className="mt-4"
+                      groups={groups}
+                      shortage={submit.stockShortage}
+                      source={source}
+                    />
+                  )}
                 </OrderSection>
               </div>
 
-              <OrderSummary
-                {...amounts}
-                canSubmit={shipping.isValid && invoice.isValid}
-                className="top-19 sticky max-sm:hidden"
-              />
+              <div className="top-19 sticky grid gap-4 max-sm:hidden">
+                {submit.stockShortage && source && (
+                  <OrderStockShortage
+                    groups={groups}
+                    shortage={submit.stockShortage}
+                    source={source}
+                  />
+                )}
+                <OrderSummary
+                  {...amounts}
+                  canSubmit={canSubmit}
+                  isSubmitting={submit.isSubmitting}
+                  onSubmit={() => void submit.submit()}
+                />
+              </div>
             </div>
 
             <FixedBox
@@ -226,7 +267,9 @@ export function OrderPage() {
               direction="bottom"
             >
               <OrderBar
-                canSubmit={shipping.isValid && invoice.isValid}
+                canSubmit={canSubmit}
+                isSubmitting={submit.isSubmitting}
+                onSubmit={() => void submit.submit()}
                 totalAmount={amounts.totalAmount}
               />
             </FixedBox>

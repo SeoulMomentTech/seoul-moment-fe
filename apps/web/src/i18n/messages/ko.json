@@ -589,5 +589,16 @@
   "invoice_checking": "확인 중…",
   "invoice_check_verified": "✓ 확인되었어요",
   "invoice_check_unverified": "지금은 확인이 어려워 형식만 검사했어요. 그대로 주문할 수 있어요",
-  "invoice_company_name_placeholder": "확인 후 자동으로 채워져요. 직접 입력해도 돼요"
+  "invoice_company_name_placeholder": "확인 후 자동으로 채워져요. 직접 입력해도 돼요",
+  "payment_processing": "처리 중…",
+  "payment_external_title": "외부 브라우저에서 결제 중",
+  "payment_external_hint": "결제를 마치면 이 화면이 자동으로 바뀝니다",
+  "payment_retry": "다시 결제하기",
+  "payment_not_paid_retry_hint": "결제되지 않았습니다. 다시 결제할 수 있어요",
+  "payment_start_failed": "결제를 시작할 수 없어요. 다시 시도해 주세요",
+  "payment_stock_shortage_title": "재고가 부족한 상품이 있어요",
+  "payment_stock_shortage_hint": "수량을 바꾸거나 빼고 다시 결제해 주세요",
+  "payment_go_to_product": "상품 보러 가기",
+  "payment_order_number": "주문번호",
+  "payment_failed_title": "결제되지 않았습니다"
 }
