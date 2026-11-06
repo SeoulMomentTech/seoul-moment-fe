@@ -616,5 +616,8 @@
   "payment_order_kept": "Your order is saved. You can pay again",
   "payment_result_not_found": "We couldn't find this payment. The link may be wrong or older than 7 days",
   "payment_continue_shopping": "Continue shopping",
-  "seo_payment_result_title": "Payment result | Seoul Moment"
+  "seo_payment_result_title": "Payment result | Seoul Moment",
+  "payment_opening_window": "Opening the payment page…",
+  "payment_new_tab_title": "Paying in a new tab",
+  "payment_new_tab_hint": "This screen updates automatically once you finish in the payment tab. If you closed it, press Pay again"
 }

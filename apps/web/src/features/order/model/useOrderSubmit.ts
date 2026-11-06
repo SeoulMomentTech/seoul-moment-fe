@@ -21,7 +21,7 @@ import {
 } from "@entities/order";
 
 import { clearOrderDraft } from "./orderDraft";
-import { openPaymentWindow } from "./paymentWindow";
+import { openPaymentTab, openPaymentWindow } from "./paymentWindow";
 import {
   clearPendingOrder,
   findPendingOrder,
@@ -32,8 +32,10 @@ import {
 import type { useOrderInvoice } from "./useOrderInvoice";
 import type { OrderSubmitShipping } from "./useOrderShipping";
 
-/** 외부 브라우저로 결제창을 넘긴 뒤, 이 화면이 결과를 기다리는 데 필요한 것 */
+/** 결제창을 다른 곳(외부 브라우저·새 탭)에 연 뒤, 이 화면이 결과를 기다리는 데 필요한 것 */
 export interface ExternalPayment {
+  /** 어디에 열었는지 — 대기 화면의 문구가 다르다 */
+  mode: "external" | "new-tab";
   orderId: number;
   orderNumber: string;
   /** 이번 시도. 주문 상세의 payment.paymentId 와 맞춰 "이번 시도가 실패했다" 를 가린다 */
@@ -109,7 +111,10 @@ export const useOrderSubmit = ({
 
   /** 결제 시작 → 결제창. 실패는 던진다(호출부가 분기) */
   const startAndOpen = useCallback(
-    async (order: { orderId: number; orderNumber: string }) => {
+    async (
+      order: { orderId: number; orderNumber: string },
+      paymentTab: Window | null,
+    ) => {
       const { data: payment } = await startPayment.mutateAsync(order.orderId);
 
       updatePendingOrder({ resultToken: payment.resultToken });
@@ -122,9 +127,10 @@ export const useOrderSubmit = ({
         return null;
       }
 
-      const mode = await openPaymentWindow(payment.handoffUrl);
-      if (mode === "external") {
+      const mode = await openPaymentWindow(payment.handoffUrl, paymentTab);
+      if (mode !== "same-tab") {
         setExternal({
+          mode,
           orderId: order.orderId,
           orderNumber: order.orderNumber,
           paymentId: payment.paymentId,
@@ -207,6 +213,9 @@ export const useOrderSubmit = ({
     // 같은 탭으로 떠나는 중이면 가드를 풀지 않는다 — 풀면 페이지가 바뀌기 전 두 번째 탭이
     // 결제 시작을 다시 불러, 서버가 지금 열리는 결제창의 시도를 닫아 버린다
     let leaving = false;
+    // 데스크톱은 클릭과 같은 틱에 빈 탭을 연다(첫 await 전). 결제창이 거기 열리지 않으면 닫는다.
+    const paymentTab = openPaymentTab(t("payment_opening_window"));
+    let tabUsed = false;
 
     try {
       const checked = await invoice.ensureChecked();
@@ -254,11 +263,14 @@ export const useOrderSubmit = ({
       }
 
       try {
-        leaving = (await startAndOpen(order)) === "same-tab";
+        const mode = await startAndOpen(order, paymentTab);
+        leaving = mode === "same-tab";
+        tabUsed = mode === "new-tab";
       } catch (error) {
         await handleStartError(error);
       }
     } finally {
+      if (!tabUsed) paymentTab?.close();
       if (!leaving) {
         submittingRef.current = false;
         setIsSubmitting(false);
@@ -275,6 +287,7 @@ export const useOrderSubmit = ({
     handleCreateError,
     handleStartError,
     getFreshPreview,
+    t,
   ]);
 
   // 결제창에서 뒤로 오면 bfcache 가 "처리 중" 상태 그대로 페이지를 되살린다. 그때만 가드를 푼다.
@@ -297,16 +310,20 @@ export const useOrderSubmit = ({
   const retryPayment = useCallback(async () => {
     if (!external || isRetrying) return;
 
+    const paymentTab = openPaymentTab(t("payment_opening_window"));
+    let tabUsed = false;
+
     setIsRetrying(true);
     try {
-      await startAndOpen(external);
+      tabUsed = (await startAndOpen(external, paymentTab)) === "new-tab";
     } catch (error) {
       const info = await readErrorInfo(error);
       if (info.status !== 409) await handleStartError(error);
     } finally {
+      if (!tabUsed) paymentTab?.close();
       setIsRetrying(false);
     }
-  }, [external, isRetrying, startAndOpen, handleStartError]);
+  }, [external, isRetrying, startAndOpen, handleStartError, t]);
 
   return {
     submit,

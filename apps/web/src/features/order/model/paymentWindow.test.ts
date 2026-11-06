@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   isLineInAppBrowser,
+  openPaymentTab,
   openPaymentWindow,
   withExternalBrowser,
 } from "./paymentWindow";
@@ -101,5 +102,85 @@ describe("paymentWindow", () => {
     expect(navigateTo).toHaveBeenCalledWith(
       "https://pg.test/handoff/x?openExternalBrowser=1",
     );
+  });
+
+  describe("새 탭(데스크톱)", () => {
+    const fakeTab = () => {
+      const doc = { title: "", body: { textContent: "" } };
+
+      return {
+        opener: {} as unknown,
+        closed: false,
+        close: vi.fn(),
+        location: { href: "" },
+        document: doc,
+      };
+    };
+
+    const setPointer = (fine: boolean) =>
+      vi.stubGlobal("matchMedia", vi.fn().mockReturnValue({ matches: fine }));
+
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    it("마우스 기기면 빈 탭을 먼저 열고 opener 를 끊는다", () => {
+      setUserAgent(SAFARI_UA);
+      setPointer(true);
+      const tab = fakeTab();
+      const open = vi.spyOn(window, "open").mockReturnValue(tab as never);
+
+      expect(openPaymentTab("결제창을 여는 중…")).toBe(tab);
+      expect(open).toHaveBeenCalledWith("", "_blank");
+      expect(tab.opener).toBeNull();
+      expect(tab.document.body.textContent).toBe("결제창을 여는 중…");
+    });
+
+    it("터치 기기면 열지 않는다", () => {
+      setUserAgent(SAFARI_UA);
+      setPointer(false);
+      const open = vi.spyOn(window, "open");
+
+      expect(openPaymentTab("x")).toBeNull();
+      expect(open).not.toHaveBeenCalled();
+    });
+
+    it("LINE 안이면 열지 않는다", () => {
+      setUserAgent(LINE_UA);
+      setPointer(true);
+      const open = vi.spyOn(window, "open");
+
+      expect(openPaymentTab("x")).toBeNull();
+      expect(open).not.toHaveBeenCalled();
+    });
+
+    it("팝업이 막히면 null", () => {
+      setUserAgent(SAFARI_UA);
+      setPointer(true);
+      vi.spyOn(window, "open").mockReturnValue(null);
+
+      expect(openPaymentTab("x")).toBeNull();
+    });
+
+    it("미리 연 탭이 있으면 그 탭을 결제창으로 보낸다", async () => {
+      setUserAgent(SAFARI_UA);
+      const tab = fakeTab();
+
+      await expect(
+        openPaymentWindow(url, tab as unknown as Window),
+      ).resolves.toBe("new-tab");
+      expect(tab.location.href).toBe(url);
+      expect(navigateTo).not.toHaveBeenCalled();
+    });
+
+    it("미리 연 탭을 사용자가 닫았으면 같은 탭으로 간다", async () => {
+      setUserAgent(SAFARI_UA);
+      const tab = { ...fakeTab(), closed: true };
+
+      await expect(
+        openPaymentWindow(url, tab as unknown as Window),
+      ).resolves.toBe("same-tab");
+      expect(navigateTo).toHaveBeenCalledWith(url);
+    });
   });
 });

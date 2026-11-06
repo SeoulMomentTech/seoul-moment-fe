@@ -27,8 +27,11 @@ vi.mock("@shared/services/userOrder", async (importOriginal) => ({
 }));
 
 const openPaymentWindow = vi.fn();
+const openPaymentTab = vi.fn();
 vi.mock("./paymentWindow", () => ({
-  openPaymentWindow: (url: string) => openPaymentWindow(url),
+  openPaymentWindow: (url: string, tab?: unknown) =>
+    openPaymentWindow(url, tab),
+  openPaymentTab: (text: string) => openPaymentTab(text),
 }));
 
 const toastError = vi.fn();
@@ -111,6 +114,7 @@ const startedPayment = {
 
 const messages = {
   payment_start_failed: "결제를 시작할 수 없어요",
+  payment_opening_window: "결제창을 여는 중…",
   please_try_again: "다시 시도해주세요",
 };
 
@@ -162,6 +166,7 @@ describe("useOrderSubmit", () => {
     postUserOrderPayment.mockResolvedValue(startedPayment);
     openPaymentWindow.mockResolvedValue("same-tab");
     getFreshPreview.mockResolvedValue(preview);
+    openPaymentTab.mockReturnValue(null);
   });
 
   afterEach(() => {
@@ -190,6 +195,7 @@ describe("useOrderSubmit", () => {
     });
     expect(openPaymentWindow).toHaveBeenCalledWith(
       startedPayment.data.handoffUrl,
+      null,
     );
     expect(sessionStorage.getItem(ORDER_DRAFT_KEY)).toBeNull();
     expect(result.current.external).toBeNull();
@@ -380,6 +386,7 @@ describe("useOrderSubmit", () => {
     await act(() => result.current.submit());
 
     expect(result.current.external).toEqual({
+      mode: "external",
       orderId: 481,
       orderNumber: "SM-20261104-000481",
       paymentId: 12,
@@ -465,6 +472,101 @@ describe("useOrderSubmit", () => {
     expect(postUserOrderPayment).toHaveBeenCalledWith({
       orderId: 481,
       languageCode: "ko",
+    });
+  });
+
+  describe("새 탭(데스크톱)", () => {
+    const tab = () => ({ close: vi.fn(), closed: false });
+
+    it("클릭 순간 빈 탭을 열고, 결제창이 그 탭에 열리면 원래 탭은 대기 화면이 된다", async () => {
+      const paymentTab = tab();
+      openPaymentTab.mockReturnValue(paymentTab);
+      openPaymentWindow.mockResolvedValue("new-tab");
+      const { result } = render();
+
+      await act(() => result.current.submit());
+
+      expect(openPaymentTab).toHaveBeenCalledWith(
+        messages.payment_opening_window,
+      );
+      expect(openPaymentWindow).toHaveBeenCalledWith(
+        startedPayment.data.handoffUrl,
+        paymentTab,
+      );
+      expect(paymentTab.close).not.toHaveBeenCalled();
+      expect(result.current.external).toMatchObject({
+        mode: "new-tab",
+        orderId: 481,
+        resultToken: "Xy9",
+      });
+      expect(result.current.isSubmitting).toBe(false);
+    });
+
+    it("빈 탭은 API 를 기다리기 전에(동기로) 연다", () => {
+      openPaymentTab.mockReturnValue(tab());
+      const { result } = render();
+
+      void result.current.submit();
+
+      expect(openPaymentTab).toHaveBeenCalledTimes(1);
+      expect(ensureChecked).toHaveBeenCalledTimes(1);
+    });
+
+    it("전자발표 확인이 막히면 빈 탭을 닫는다", async () => {
+      const paymentTab = tab();
+      openPaymentTab.mockReturnValue(paymentTab);
+      ensureChecked.mockResolvedValue({ ok: false });
+      const { result } = render();
+
+      await act(() => result.current.submit());
+
+      expect(paymentTab.close).toHaveBeenCalledTimes(1);
+    });
+
+    it("주문 생성이 실패하면 빈 탭을 닫는다", async () => {
+      const paymentTab = tab();
+      openPaymentTab.mockReturnValue(paymentTab);
+      createUserOrder.mockRejectedValue(
+        httpError(400, { message: "bad", data: { field: "loveCode" } }),
+      );
+      const { result } = render();
+
+      await act(() => result.current.submit());
+
+      expect(paymentTab.close).toHaveBeenCalledTimes(1);
+    });
+
+    it("재고 부족이면 빈 탭을 닫는다", async () => {
+      const paymentTab = tab();
+      openPaymentTab.mockReturnValue(paymentTab);
+      postUserOrderPayment.mockRejectedValue(
+        httpError(409, { message: "m", data: { productVariantIds: [101] } }),
+      );
+      const { result } = render();
+
+      await act(() => result.current.submit());
+
+      expect(paymentTab.close).toHaveBeenCalledTimes(1);
+      expect(result.current.stockShortage).toEqual({
+        productVariantIds: [101],
+      });
+    });
+
+    it("다시 결제하기도 새 탭으로 연다", async () => {
+      openPaymentTab.mockReturnValue(tab());
+      openPaymentWindow.mockResolvedValue("new-tab");
+      const { result } = render();
+      await act(() => result.current.submit());
+
+      const retryTab = tab();
+      openPaymentTab.mockReturnValue(retryTab);
+      await act(() => result.current.retryPayment());
+
+      expect(openPaymentWindow).toHaveBeenLastCalledWith(
+        startedPayment.data.handoffUrl,
+        retryTab,
+      );
+      expect(retryTab.close).not.toHaveBeenCalled();
     });
   });
 });

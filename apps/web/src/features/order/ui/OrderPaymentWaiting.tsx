@@ -18,6 +18,14 @@ const ORDER_POLL_MS = 4000;
 
 const FAILED_STATUSES = new Set(["FAILED", "CANCELED", "EXPIRED"]);
 
+const COPY: Record<ExternalPayment["mode"], { title: string; hint: string }> = {
+  external: {
+    title: "payment_external_title",
+    hint: "payment_external_hint",
+  },
+  "new-tab": { title: "payment_new_tab_title", hint: "payment_new_tab_hint" },
+};
+
 interface OrderPaymentWaitingProps {
   external: ExternalPayment;
   /** "다시 결제하기" — 결제 시작만 다시 부른다. 끝나면(409 포함) 주문을 즉시 다시 읽는다 */
@@ -73,14 +81,16 @@ export function OrderPaymentWaiting({
       <div className="grid gap-1">
         <p className="text-body-1 font-bold">
           {t(
-            isAttemptFailed ? "payment_failed_title" : "payment_external_title",
+            isAttemptFailed
+              ? "payment_failed_title"
+              : COPY[external.mode].title,
           )}
         </p>
         <p className="text-body-4 text-neutral" role="status">
           {t(
             isAttemptFailed
               ? "payment_not_paid_retry_hint"
-              : "payment_external_hint",
+              : COPY[external.mode].hint,
           )}
         </p>
       </div>

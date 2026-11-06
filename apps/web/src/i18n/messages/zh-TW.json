@@ -616,5 +616,8 @@
   "payment_order_kept": "訂單已保留，您可以重新付款",
   "payment_result_not_found": "找不到付款資訊，連結可能有誤或已超過 7 天",
   "payment_continue_shopping": "繼續購物",
-  "seo_payment_result_title": "付款結果 | Seoul Moment"
+  "seo_payment_result_title": "付款結果 | Seoul Moment",
+  "payment_opening_window": "正在開啟付款頁面…",
+  "payment_new_tab_title": "正在新分頁付款",
+  "payment_new_tab_hint": "在付款分頁完成付款後，此畫面會自動更新。若已關閉分頁，請按「重新付款」"
 }

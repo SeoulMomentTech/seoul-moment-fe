@@ -43,6 +43,7 @@ const detail = (
 });
 
 const external = {
+  mode: "external" as const,
   orderId: 481,
   orderNumber: "SM-20261104-000481",
   paymentId: 12,
@@ -185,5 +186,22 @@ describe("OrderPaymentWaiting", () => {
 
     expect(onRetry).toHaveBeenCalledTimes(1);
     await waitFor(() => expect(getUserOrderDetail).toHaveBeenCalledTimes(2));
+  });
+
+  it("새 탭 모드면 새 탭에서 결제 중이라는 문구다", async () => {
+    getUserOrderDetail.mockResolvedValue(detail("PENDING"));
+
+    render(
+      <OrderPaymentWaiting
+        external={{ ...external, mode: "new-tab" }}
+        isRetrying={false}
+        onRetry={vi.fn()}
+      />,
+      { wrapper },
+    );
+
+    expect(screen.getByText(ko.payment_new_tab_title)).toBeInTheDocument();
+    expect(screen.getByText(ko.payment_new_tab_hint)).toBeInTheDocument();
+    expect(screen.queryByText(ko.payment_external_title)).toBeNull();
   });
 });
