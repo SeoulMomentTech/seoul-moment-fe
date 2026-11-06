@@ -3,6 +3,7 @@ export { OrderBar } from "./ui/OrderBar";
 export { OrderCvsPickupPanel } from "./ui/OrderCvsPickupPanel";
 export { OrderCvsStoreCard } from "./ui/OrderCvsStoreCard";
 export { OrderInvoiceSection } from "./ui/OrderInvoiceSection";
+export { OrderDetail } from "./ui/OrderDetail";
 export { OrderItemList } from "./ui/OrderItemList";
 export { OrderPaymentSection } from "./ui/OrderPaymentSection";
 export { OrderPaymentWaiting } from "./ui/OrderPaymentWaiting";

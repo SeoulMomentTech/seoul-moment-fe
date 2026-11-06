@@ -40,6 +40,9 @@ const wrapper = ({ children }: { children: ReactNode }) => (
   </NextIntlClientProvider>
 );
 
+const renderGuest = (state: Parameters<typeof PaymentResultView>[0]["state"]) =>
+  render(<PaymentResultView isGuest state={state} />, { wrapper });
+
 const renderView = (state: Parameters<typeof PaymentResultView>[0]["state"]) =>
   render(<PaymentResultView state={state} />, { wrapper });
 
@@ -180,8 +183,8 @@ describe("PaymentResultView", () => {
     expect(screen.queryByText(/土地銀行/)).toBeNull();
   });
 
-  it("failed CANCELED 는 취소 사유와 장바구니 버튼을 그린다", () => {
-    renderView({
+  it("failed CANCELED 는 취소 사유와(로그인 없으면) 장바구니 버튼을 그린다", () => {
+    renderGuest({
       kind: "failed",
       result: result(
         { status: "CANCELED", failureCode: "10100058" },
@@ -296,5 +299,48 @@ describe("PaymentResultView", () => {
     );
 
     expect(screen.getByText(ko.payment_paid_line_hint)).toBeInTheDocument();
+  });
+
+  describe("주문 상세 보기", () => {
+    const paid = { kind: "paid" as const, result: result({ status: "PAID" }) };
+
+    it.each([
+      ["paid", paid],
+      [
+        "waiting",
+        {
+          kind: "waiting" as const,
+          result: result(
+            {
+              status: "WAITING_DEPOSIT",
+              depositInfo: { paymentType: "CVS_CVS", paymentNo: "LLL1" },
+            },
+            "PAYMENT_WAITING",
+          ),
+        },
+      ],
+      [
+        "failed",
+        {
+          kind: "failed" as const,
+          result: result({ status: "CANCELED" }, "PENDING"),
+          reason: "canceled" as const,
+        },
+      ],
+    ])("로그인 상태의 %s 화면은 주문 상세로 가는 버튼이 있다", (_, state) => {
+      renderView(state);
+
+      expect(
+        screen.getByRole("link", { name: ko.order_detail_view }),
+      ).toHaveAttribute("href", "/ko/mypage/order/481");
+    });
+
+    it("로그인 없는 브라우저에서는 주문 상세 버튼이 없다", () => {
+      renderGuest(paid);
+
+      expect(
+        screen.queryByRole("link", { name: ko.order_detail_view }),
+      ).toBeNull();
+    });
   });
 });

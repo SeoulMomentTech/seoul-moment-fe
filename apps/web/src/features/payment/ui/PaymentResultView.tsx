@@ -10,7 +10,6 @@ import {
 
 import { useTranslations } from "next-intl";
 
-import { useCopyToClipboard } from "@shared/lib/hooks";
 import { toNTCurrency } from "@shared/lib/utils";
 import type { GetPaymentResultRes } from "@shared/services/payment";
 import {
@@ -22,14 +21,13 @@ import {
 
 import { Link } from "@/i18n/navigation";
 
+import { formatTaipeiDateTime, PaymentDepositInfo } from "@entities/payment";
 import { Button } from "@seoul-moment/ui";
 
-import { getBankName } from "../model/bankName";
 import type {
   PaymentFailureReason,
   PaymentResultState,
 } from "../model/paymentResultState";
-import { formatTaipeiDateTime } from "../model/taipeiTime";
 
 const METHOD_LABEL: Partial<
   Record<GetPaymentResultRes["payment"]["method"], string>
@@ -118,7 +116,12 @@ export function PaymentResultView({
 
       return (
         <StatusCard
-          actions={<ContinueShopping />}
+          actions={
+            <AfterPaymentActions
+              isGuest={isGuest}
+              orderId={state.result.orderId}
+            />
+          }
           icon={
             <CheckIcon aria-hidden className={ICON_CLASS} strokeWidth={2.4} />
           }
@@ -137,13 +140,18 @@ export function PaymentResultView({
     case "waiting":
       return (
         <StatusCard
-          actions={<ContinueShopping />}
+          actions={
+            <AfterPaymentActions
+              isGuest={isGuest}
+              orderId={state.result.orderId}
+            />
+          }
           icon={<Clock3Icon aria-hidden className={ICON_CLASS} />}
           meta={<OrderNumber value={state.result.orderNumber} />}
           title={t("payment_waiting_title")}
           tone="progress"
         >
-          <DepositInfo payment={state.result.payment} />
+          <PaymentDepositInfo payment={state.result.payment} />
         </StatusCard>
       );
 
@@ -152,8 +160,15 @@ export function PaymentResultView({
         <StatusCard
           actions={
             <>
+              {/* 로그인돼 있으면 주문 상세에서 같은 주문으로 다시 결제할 수 있다 */}
               <Button asChild variant="outline">
-                <Link href="/cart">{t("go_to_cart")}</Link>
+                {isGuest ? (
+                  <Link href="/cart">{t("go_to_cart")}</Link>
+                ) : (
+                  <Link href={`/mypage/order/${state.result.orderId}`}>
+                    {t("order_detail_view")}
+                  </Link>
+                )}
               </Button>
               <Button asChild>
                 <Link href="/">{t("payment_continue_shopping")}</Link>
@@ -188,6 +203,33 @@ function OrderNumber({ value }: { value: string }) {
   );
 }
 
+/**
+ * 완료·입금 대기. 로그인돼 있으면 주문 상세를 앞세우고, 로그인 없는 브라우저(LINE 에서 외부로
+ * 넘어온 경우)는 상세를 열 수 없으니 쇼핑 계속하기만 둔다.
+ */
+function AfterPaymentActions({
+  orderId,
+  isGuest,
+}: {
+  orderId: number;
+  isGuest: boolean;
+}) {
+  const t = useTranslations();
+
+  if (isGuest) return <ContinueShopping />;
+
+  return (
+    <>
+      <Button asChild variant="outline">
+        <Link href="/">{t("payment_continue_shopping")}</Link>
+      </Button>
+      <Button asChild>
+        <Link href={`/mypage/order/${orderId}`}>{t("order_detail_view")}</Link>
+      </Button>
+    </>
+  );
+}
+
 function ContinueShopping() {
   const t = useTranslations();
 
@@ -195,69 +237,5 @@ function ContinueShopping() {
     <Button asChild>
       <Link href="/">{t("payment_continue_shopping")}</Link>
     </Button>
-  );
-}
-
-/** ATM 은 은행·가상계좌, 편의점은 납부 코드. 번호는 복사할 수 있고, 기한은 대만 시각으로 */
-function DepositInfo({ payment }: { payment: GetPaymentResultRes["payment"] }) {
-  const t = useTranslations();
-  const info = payment.depositInfo;
-  if (!info) return null;
-
-  const isAtm = info.paymentType.startsWith("ATM_");
-  const number = (isAtm ? info.account : info.paymentNo) ?? "";
-
-  const rows: StatusInfoRow[] = [
-    ...(isAtm
-      ? [
-          {
-            label: "ATM 轉帳",
-            value: `${getBankName(info.bankCode ?? "")} (${info.bankCode ?? ""})`,
-          },
-        ]
-      : []),
-    {
-      label: isAtm ? t("payment_virtual_account") : t("payment_cvs_code_label"),
-      value: <CopyableNumber value={number} />,
-    },
-    {
-      label: t("payment_amount"),
-      value: toNTCurrency(payment.amount),
-      total: true,
-    },
-  ];
-
-  return (
-    <>
-      <StatusInfo rows={rows} />
-      {payment.expireAt && (
-        <StatusNotice tone="warn">
-          {t("payment_deadline", {
-            date: formatTaipeiDateTime(payment.expireAt),
-          })}
-        </StatusNotice>
-      )}
-    </>
-  );
-}
-
-function CopyableNumber({ value }: { value: string }) {
-  const t = useTranslations();
-  const { copy, copiedText } = useCopyToClipboard();
-  const copied = copiedText === value;
-
-  return (
-    <span className="inline-flex items-center gap-2">
-      <span className="text-body-2 font-mono font-bold tracking-wide">
-        {value}
-      </span>
-      <button
-        className="text-body-5 shrink-0 rounded-[4px] border border-black/15 bg-white px-2 py-1 font-semibold"
-        onClick={() => void copy(value)}
-        type="button"
-      >
-        {t(copied ? "payment_copied" : "payment_copy")}
-      </button>
-    </span>
   );
 }

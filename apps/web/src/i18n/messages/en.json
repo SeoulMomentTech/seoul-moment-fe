@@ -626,5 +626,18 @@
   "payment_copied": "Copied",
   "payment_retry_notice": "If you closed the payment page or can't see it, press Pay again",
   "payment_result_not_found_title": "We couldn't find this payment",
-  "payment_result_not_found_hint": "The link may be wrong or older than 7 days"
+  "payment_result_not_found_hint": "The link may be wrong or older than 7 days",
+  "order_detail_title": "Order details",
+  "order_detail_view": "View order",
+  "order_ordered_at": "Ordered at",
+  "order_status_pending": "Awaiting payment",
+  "order_status_payment_waiting": "Awaiting deposit",
+  "order_status_paid": "Paid",
+  "order_status_canceled": "Cancelled",
+  "order_status_failed": "Failed",
+  "order_detail_payment": "Payment",
+  "order_repay_notice": "This order hasn't been paid yet. It's cancelled automatically if not paid within 24 hours",
+  "order_detail_not_found": "We couldn't find this order",
+  "invoice_no": "Invoice number",
+  "invoice_issuing": "Issued once payment is confirmed"
 }
