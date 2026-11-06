@@ -489,12 +489,12 @@ describe("useOrderShipping", () => {
       expect(result.current.paymentMethod).toBe("ECPAY");
     });
 
-    it("draft 의 LINE_PAY 는 ECPAY 로 복원된다", async () => {
+    it("draft 의 LINE_PAY 는 그대로 복원된다", async () => {
       saveOrderDraft({ ...cvsDraft, paymentMethod: "LINE_PAY" });
       const { result } = render({ source, profile, userInfo });
 
       await waitFor(() => expect(result.current.shippingMethod).toBe("CVS"));
-      expect(result.current.paymentMethod).toBe("ECPAY");
+      expect(result.current.paymentMethod).toBe("LINE_PAY");
     });
 
     it("expireStore 는 매장을 만료 처리한다", async () => {

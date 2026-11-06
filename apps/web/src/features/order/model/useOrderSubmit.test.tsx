@@ -29,8 +29,8 @@ vi.mock("@shared/services/userOrder", async (importOriginal) => ({
 const openPaymentWindow = vi.fn();
 const openPaymentTab = vi.fn();
 vi.mock("./paymentWindow", () => ({
-  openPaymentWindow: (url: string, tab?: unknown) =>
-    openPaymentWindow(url, tab),
+  openPaymentWindow: (links: unknown, tab?: unknown) =>
+    openPaymentWindow(links, tab),
   openPaymentTab: (text: string) => openPaymentTab(text),
 }));
 
@@ -193,10 +193,7 @@ describe("useOrderSubmit", () => {
       orderId: 481,
       languageCode: "ko",
     });
-    expect(openPaymentWindow).toHaveBeenCalledWith(
-      startedPayment.data.handoffUrl,
-      null,
-    );
+    expect(openPaymentWindow).toHaveBeenCalledWith(startedPayment.data, null);
     expect(sessionStorage.getItem(ORDER_DRAFT_KEY)).toBeNull();
     expect(result.current.external).toBeNull();
   });
@@ -379,6 +376,40 @@ describe("useOrderSubmit", () => {
     expect(openPaymentWindow).toHaveBeenCalledTimes(1);
   });
 
+  it("LINE Pay 는 결제 시작 응답을 그대로 넘기고, LINE 앱으로 열면 대기 화면이 된다", async () => {
+    const linePay = {
+      ...startedPayment.data,
+      method: "LINE_PAY",
+      handoffUrl: null,
+      paymentUrl: "https://sandbox-web-pay.line.me/web/payment/x",
+      appUrl: "line://pay/payment/x",
+    };
+    postUserOrderPayment.mockResolvedValue({ result: true, data: linePay });
+    openPaymentWindow.mockResolvedValue("line-app");
+    const { result } = render();
+
+    await act(() => result.current.submit());
+
+    expect(openPaymentWindow).toHaveBeenCalledWith(linePay, null);
+    expect(toastError).not.toHaveBeenCalled();
+    expect(result.current.external).toMatchObject({
+      mode: "line-app",
+      orderId: 481,
+      resultToken: "Xy9",
+    });
+  });
+
+  it("열 결제창이 없으면 결제 시작 실패를 토스트하고 다시 누를 수 있다", async () => {
+    openPaymentWindow.mockResolvedValue(null);
+    const { result } = render();
+
+    await act(() => result.current.submit());
+
+    expect(toastError).toHaveBeenCalledWith(messages.payment_start_failed);
+    expect(result.current.external).toBeNull();
+    expect(result.current.isSubmitting).toBe(false);
+  });
+
   it("external 이면 대기 정보를 내놓는다", async () => {
     openPaymentWindow.mockResolvedValue("external");
     const { result } = render();
@@ -490,7 +521,7 @@ describe("useOrderSubmit", () => {
         messages.payment_opening_window,
       );
       expect(openPaymentWindow).toHaveBeenCalledWith(
-        startedPayment.data.handoffUrl,
+        startedPayment.data,
         paymentTab,
       );
       expect(paymentTab.close).not.toHaveBeenCalled();
@@ -563,7 +594,7 @@ describe("useOrderSubmit", () => {
       await act(() => result.current.retryPayment());
 
       expect(openPaymentWindow).toHaveBeenLastCalledWith(
-        startedPayment.data.handoffUrl,
+        startedPayment.data,
         retryTab,
       );
       expect(retryTab.close).not.toHaveBeenCalled();

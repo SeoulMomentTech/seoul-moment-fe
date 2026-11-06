@@ -352,9 +352,12 @@ export interface PostUserOrderPaymentRes {
    * 30분 안에 한 번만 열 수 있다
    */
   handoffUrl?: string | null;
-  /** LINE_PAY — 결제 페이지 (웹) */
+  /**
+   * LINE_PAY — 결제 페이지(웹). LINE 밖에서 연다(데스크톱·휴대폰 브라우저). Slack 같은 다른 앱의
+   * 인앱 브라우저에서는 "LINE 앱 업데이트" 화면에 막힌다. 약 20분 유효
+   */
   paymentUrl?: string | null;
-  /** LINE_PAY — LINE 앱으로 여는 결제 페이지 */
+  /** LINE_PAY — LINE 안에서 여는 결제 페이지(`line://`). 외부 브라우저로 넘기지 않는다 */
   appUrl?: string | null;
   /** 로그인 없이 결제 결과를 보는 토큰. 결제 후 결과 페이지(?h=)로 넘어오는 값과 같다 */
   resultToken: string;

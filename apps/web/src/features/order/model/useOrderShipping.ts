@@ -194,10 +194,7 @@ export const useOrderShipping = ({
 
       skipProfileFillRef.current = !draft.home.useDefaultShipping;
       setShippingMethod(draft.shippingMethod);
-      // LINE Pay 는 아직 결제 시작이 안 된다(샌드박스 키 없음). 옛 draft 의 선택은 ECPay 로 되돌린다.
-      setPaymentMethod(
-        draft.paymentMethod === "LINE_PAY" ? "ECPAY" : draft.paymentMethod,
-      );
+      setPaymentMethod(draft.paymentMethod);
       setUseDefaultShippingState(draft.home.useDefaultShipping);
       reset(draft.home.values);
       setChain(draft.cvs.chain);

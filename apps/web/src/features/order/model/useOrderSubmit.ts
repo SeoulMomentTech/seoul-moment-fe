@@ -21,7 +21,11 @@ import {
 } from "@entities/order";
 
 import { clearOrderDraft } from "./orderDraft";
-import { openPaymentTab, openPaymentWindow } from "./paymentWindow";
+import {
+  openPaymentTab,
+  openPaymentWindow,
+  type PaymentWindowMode,
+} from "./paymentWindow";
 import {
   clearPendingOrder,
   findPendingOrder,
@@ -35,7 +39,7 @@ import type { OrderSubmitShipping } from "./useOrderShipping";
 /** 결제창을 다른 곳(외부 브라우저·새 탭)에 연 뒤, 이 화면이 결과를 기다리는 데 필요한 것 */
 export interface ExternalPayment {
   /** 어디에 열었는지 — 대기 화면의 문구가 다르다 */
-  mode: "external" | "new-tab";
+  mode: Exclude<PaymentWindowMode, "same-tab">;
   orderId: number;
   orderNumber: string;
   /** 이번 시도. 주문 상세의 payment.paymentId 와 맞춰 "이번 시도가 실패했다" 를 가린다 */
@@ -121,13 +125,13 @@ export const useOrderSubmit = ({
       // 결제창으로 떠나면 지도 왕복용 입력 보관은 더 쓸 일이 없다
       clearOrderDraft();
 
-      if (!payment.handoffUrl) {
+      const mode = await openPaymentWindow(payment, paymentTab);
+      if (!mode) {
         toast.error(t("payment_start_failed"));
 
         return null;
       }
 
-      const mode = await openPaymentWindow(payment.handoffUrl, paymentTab);
       if (mode !== "same-tab") {
         setExternal({
           mode,

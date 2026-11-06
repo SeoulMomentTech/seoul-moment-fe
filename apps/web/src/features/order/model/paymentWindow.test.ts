@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   isLineInAppBrowser,
+  isOtherInAppBrowser,
   openPaymentTab,
   openPaymentWindow,
   withExternalBrowser,
@@ -18,6 +19,11 @@ vi.mock("@shared/lib/liff", () => ({
 }));
 
 const url = "https://pg.test/handoff/x";
+const ecpay = { handoffUrl: url };
+const linePay = {
+  paymentUrl: "https://sandbox-web-pay.line.me/web/payment/x",
+  appUrl: "line://pay/payment/x",
+};
 const LINE_UA =
   "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Line/14.0.0 LIFF";
 const SAFARI_UA =
@@ -49,10 +55,74 @@ describe("paymentWindow", () => {
     );
   });
 
+  it("다른 앱의 인앱 브라우저 판정 — LINE 은 제외", () => {
+    expect(
+      isOtherInAppBrowser(
+        "Mozilla/5.0 (iPhone) AppleWebKit/605.1.15 Mobile/15E148 Slack/24.10",
+      ),
+    ).toBe(true);
+    expect(
+      isOtherInAppBrowser(
+        "Mozilla/5.0 (iPhone) AppleWebKit/605.1.15 Instagram 300.0",
+      ),
+    ).toBe(true);
+    expect(
+      isOtherInAppBrowser(
+        "Mozilla/5.0 (iPhone) AppleWebKit/605.1.15 [FBAN/FBIOS;FBAV/450.0]",
+      ),
+    ).toBe(true);
+    expect(isOtherInAppBrowser("Mozilla/5.0 (iPhone) KAKAOTALK 10.0")).toBe(
+      true,
+    );
+    expect(
+      isOtherInAppBrowser(
+        "Mozilla/5.0 (Linux; Android 14; wv) AppleWebKit/537.36 Chrome/120 Mobile",
+      ),
+    ).toBe(true);
+    expect(isOtherInAppBrowser(LINE_UA)).toBe(false);
+    expect(isOtherInAppBrowser(SAFARI_UA)).toBe(false);
+  });
+
+  it("결제창 URL 이 없으면 null 이고 아무 데도 가지 않는다", async () => {
+    setUserAgent(SAFARI_UA);
+
+    await expect(
+      openPaymentWindow({ handoffUrl: null, paymentUrl: null }),
+    ).resolves.toBeNull();
+    expect(navigateTo).not.toHaveBeenCalled();
+  });
+
+  describe("LINE Pay", () => {
+    it("일반 브라우저는 paymentUrl 로 같은 탭에서 간다", async () => {
+      setUserAgent(SAFARI_UA);
+
+      await expect(openPaymentWindow(linePay)).resolves.toBe("same-tab");
+      expect(navigateTo).toHaveBeenCalledWith(linePay.paymentUrl);
+    });
+
+    it("LINE 안에서는 appUrl 로 가고 외부 브라우저로 넘기지 않는다", async () => {
+      setUserAgent(LINE_UA);
+      isLiffConfigured.mockReturnValue(true);
+
+      await expect(openPaymentWindow(linePay)).resolves.toBe("line-app");
+      expect(navigateTo).toHaveBeenCalledWith(linePay.appUrl);
+      expect(ensureLiff).not.toHaveBeenCalled();
+    });
+
+    it("LINE 안인데 appUrl 이 없으면 paymentUrl 로 간다", async () => {
+      setUserAgent(LINE_UA);
+
+      await expect(
+        openPaymentWindow({ ...linePay, appUrl: null }),
+      ).resolves.toBe("same-tab");
+      expect(navigateTo).toHaveBeenCalledWith(linePay.paymentUrl);
+    });
+  });
+
   it("일반 브라우저는 같은 탭으로 간다", async () => {
     setUserAgent(SAFARI_UA);
 
-    await expect(openPaymentWindow(url)).resolves.toBe("same-tab");
+    await expect(openPaymentWindow(ecpay)).resolves.toBe("same-tab");
     expect(navigateTo).toHaveBeenCalledWith(url);
     expect(ensureLiff).not.toHaveBeenCalled();
   });
@@ -61,7 +131,7 @@ describe("paymentWindow", () => {
     setUserAgent(LINE_UA);
     isLiffConfigured.mockReturnValue(false);
 
-    await expect(openPaymentWindow(url)).resolves.toBe("external");
+    await expect(openPaymentWindow(ecpay)).resolves.toBe("external");
     expect(navigateTo).toHaveBeenCalledWith(
       "https://pg.test/handoff/x?openExternalBrowser=1",
     );
@@ -74,7 +144,7 @@ describe("paymentWindow", () => {
     const openWindow = vi.fn();
     ensureLiff.mockResolvedValue({ isInClient: () => true, openWindow });
 
-    await expect(openPaymentWindow(url)).resolves.toBe("external");
+    await expect(openPaymentWindow(ecpay)).resolves.toBe("external");
     expect(openWindow).toHaveBeenCalledWith({ url, external: true });
     expect(navigateTo).not.toHaveBeenCalled();
   });
@@ -87,7 +157,7 @@ describe("paymentWindow", () => {
       openWindow: vi.fn(),
     });
 
-    await expect(openPaymentWindow(url)).resolves.toBe("external");
+    await expect(openPaymentWindow(ecpay)).resolves.toBe("external");
     expect(navigateTo).toHaveBeenCalledWith(
       "https://pg.test/handoff/x?openExternalBrowser=1",
     );
@@ -98,7 +168,7 @@ describe("paymentWindow", () => {
     isLiffConfigured.mockReturnValue(true);
     ensureLiff.mockRejectedValue(new Error("init failed"));
 
-    await expect(openPaymentWindow(url)).resolves.toBe("external");
+    await expect(openPaymentWindow(ecpay)).resolves.toBe("external");
     expect(navigateTo).toHaveBeenCalledWith(
       "https://pg.test/handoff/x?openExternalBrowser=1",
     );
@@ -167,10 +237,30 @@ describe("paymentWindow", () => {
       const tab = fakeTab();
 
       await expect(
-        openPaymentWindow(url, tab as unknown as Window),
+        openPaymentWindow(ecpay, tab as unknown as Window),
       ).resolves.toBe("new-tab");
       expect(tab.location.href).toBe(url);
       expect(navigateTo).not.toHaveBeenCalled();
+    });
+
+    it("LINE Pay 도 미리 연 탭에 paymentUrl 을 연다", async () => {
+      setUserAgent(SAFARI_UA);
+      const tab = fakeTab();
+
+      await expect(
+        openPaymentWindow(linePay, tab as unknown as Window),
+      ).resolves.toBe("new-tab");
+      expect(tab.location.href).toBe(linePay.paymentUrl);
+    });
+
+    it("결제창 URL 이 없으면 미리 연 탭도 건드리지 않는다", async () => {
+      setUserAgent(SAFARI_UA);
+      const tab = fakeTab();
+
+      await expect(
+        openPaymentWindow({}, tab as unknown as Window),
+      ).resolves.toBeNull();
+      expect(tab.location.href).toBe("");
     });
 
     it("미리 연 탭을 사용자가 닫았으면 같은 탭으로 간다", async () => {
@@ -178,7 +268,7 @@ describe("paymentWindow", () => {
       const tab = { ...fakeTab(), closed: true };
 
       await expect(
-        openPaymentWindow(url, tab as unknown as Window),
+        openPaymentWindow(ecpay, tab as unknown as Window),
       ).resolves.toBe("same-tab");
       expect(navigateTo).toHaveBeenCalledWith(url);
     });
