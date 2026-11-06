@@ -26,6 +26,10 @@ const COPY: Record<ExternalPayment["mode"], { title: string; hint: string }> = {
     hint: "payment_external_hint",
   },
   "new-tab": { title: "payment_new_tab_title", hint: "payment_new_tab_hint" },
+  "line-app": {
+    title: "payment_line_app_title",
+    hint: "payment_line_app_hint",
+  },
 };
 
 interface OrderPaymentWaitingProps {

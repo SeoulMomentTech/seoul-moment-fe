@@ -20,8 +20,8 @@ import type * as UserOrderService from "@shared/services/userOrder";
 const openPaymentWindow = vi.fn();
 const openPaymentTab = vi.fn();
 vi.mock("./paymentWindow", () => ({
-  openPaymentWindow: (url: string, tab?: unknown) =>
-    openPaymentWindow(url, tab),
+  openPaymentWindow: (links: unknown, tab?: unknown) =>
+    openPaymentWindow(links, tab),
   openPaymentTab: (text: string) => openPaymentTab(text),
 }));
 
@@ -94,10 +94,7 @@ describe("useOrderRepay", () => {
       orderId: 481,
       languageCode: "ko",
     });
-    expect(openPaymentWindow).toHaveBeenCalledWith(
-      started.data.handoffUrl,
-      null,
-    );
+    expect(openPaymentWindow).toHaveBeenCalledWith(started.data, null);
     expect(result.current.isAwaiting).toBe(false);
   });
 
@@ -109,12 +106,22 @@ describe("useOrderRepay", () => {
 
     await act(() => result.current.repay());
 
-    expect(openPaymentWindow).toHaveBeenCalledWith(
-      started.data.handoffUrl,
-      tab,
-    );
+    expect(openPaymentWindow).toHaveBeenCalledWith(started.data, tab);
     expect(tab.close).not.toHaveBeenCalled();
     expect(result.current.isAwaiting).toBe(true);
+  });
+
+  it("열 결제창이 없으면 결제 시작 실패를 토스트하고 기다리지 않는다", async () => {
+    const tab = { close: vi.fn(), closed: false };
+    openPaymentTab.mockReturnValue(tab);
+    openPaymentWindow.mockResolvedValue(null);
+    const { result } = render();
+
+    await act(() => result.current.repay());
+
+    expect(toastError).toHaveBeenCalledWith(messages.payment_start_failed);
+    expect(tab.close).toHaveBeenCalledTimes(1);
+    expect(result.current.isAwaiting).toBe(false);
   });
 
   it("409(이미 결제됨·입금 대기)면 서버 문구를 토스트하고 주문을 다시 읽는다", async () => {

@@ -205,6 +205,23 @@ describe("OrderPaymentWaiting", () => {
     expect(screen.queryByText(ko.payment_external_title)).toBeNull();
   });
 
+  it("LINE 앱 모드면 LINE 에서 결제 중이라는 문구다", async () => {
+    getUserOrderDetail.mockResolvedValue(detail("PENDING"));
+
+    render(
+      <OrderPaymentWaiting
+        external={{ ...external, mode: "line-app" }}
+        isRetrying={false}
+        onRetry={vi.fn()}
+      />,
+      { wrapper },
+    );
+
+    expect(screen.getByText(ko.payment_line_app_title)).toBeInTheDocument();
+    expect(screen.getByText(ko.payment_line_app_hint)).toBeInTheDocument();
+    expect(screen.queryByText(ko.payment_external_title)).toBeNull();
+  });
+
   it("진행 마크가 돌고 다시 결제하기 안내가 함께 보인다", async () => {
     getUserOrderDetail.mockResolvedValue(detail("PENDING"));
 

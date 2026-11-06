@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 import { NextIntlClientProvider } from "next-intl";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import ko from "@/i18n/messages/ko.json";
 
@@ -15,14 +15,58 @@ const wrapper = ({ children }: { children: ReactNode }) => (
   </NextIntlClientProvider>
 );
 
+const SLACK_UA =
+  "Mozilla/5.0 (iPhone) AppleWebKit/605.1.15 Mobile/15E148 Slack/24.10";
+const SAFARI_UA =
+  "Mozilla/5.0 (iPhone) AppleWebKit/605.1.15 Version/17.0 Mobile Safari/604.1";
+
+const setUserAgent = (ua: string) =>
+  vi.spyOn(window.navigator, "userAgent", "get").mockReturnValue(ua);
+
 describe("OrderPaymentSection", () => {
-  it("LINE Pay 는 비활성이고 준비 중 문구가 붙는다", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("LINE Pay 와 ECPay 를 모두 고를 수 있다", () => {
     render(<OrderPaymentSection onChange={vi.fn()} value="ECPAY" />, {
       wrapper,
     });
 
-    expect(screen.getByRole("radio", { name: /LINE Pay/ })).toBeDisabled();
+    expect(screen.getByRole("radio", { name: /LINE Pay/ })).toBeEnabled();
     expect(screen.getByRole("radio", { name: /ECPay/ })).toBeEnabled();
-    expect(screen.getByText(ko.coming_soon)).toBeInTheDocument();
+    expect(screen.queryByText(ko.coming_soon)).toBeNull();
+  });
+
+  it("다른 앱의 인앱 브라우저에서 LINE Pay 를 고르면 안내한다", () => {
+    setUserAgent(SLACK_UA);
+
+    render(<OrderPaymentSection onChange={vi.fn()} value="LINE_PAY" />, {
+      wrapper,
+    });
+
+    expect(
+      screen.getByText(ko.payment_line_pay_inapp_warning),
+    ).toBeInTheDocument();
+  });
+
+  it("인앱 브라우저라도 ECPay 면 안내하지 않는다", () => {
+    setUserAgent(SLACK_UA);
+
+    render(<OrderPaymentSection onChange={vi.fn()} value="ECPAY" />, {
+      wrapper,
+    });
+
+    expect(screen.queryByText(ko.payment_line_pay_inapp_warning)).toBeNull();
+  });
+
+  it("일반 브라우저의 LINE Pay 는 안내하지 않는다", () => {
+    setUserAgent(SAFARI_UA);
+
+    render(<OrderPaymentSection onChange={vi.fn()} value="LINE_PAY" />, {
+      wrapper,
+    });
+
+    expect(screen.queryByText(ko.payment_line_pay_inapp_warning)).toBeNull();
   });
 });

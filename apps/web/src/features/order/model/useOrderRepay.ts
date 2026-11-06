@@ -19,7 +19,8 @@ interface UseOrderRepayParams {
 
 /**
  * 주문 상세의 "다시 결제하기". 결제 전(PENDING) 주문에 결제 시작만 다시 부른다 — 서버가 이전
- * 시도를 닫는다. 결제창 위치는 주문서와 같다(데스크톱 새 탭, LINE 외부 브라우저, 그 밖 같은 탭).
+ * 시도를 닫는다. 결제창 위치는 주문서와 같다(데스크톱 새 탭, LINE 안 ECPay 는 외부 브라우저·LINE Pay 는
+ * LINE 앱, 그 밖 같은 탭).
  * 새 탭·외부로 열었으면 `isAwaiting` 이 켜지고, 화면은 주문을 폴링해 결과를 반영한다.
  */
 export const useOrderRepay = ({ orderId, onChanged }: UseOrderRepayParams) => {
@@ -41,13 +42,13 @@ export const useOrderRepay = ({ orderId, onChanged }: UseOrderRepayParams) => {
 
     try {
       const { data: payment } = await startPayment.mutateAsync(orderId);
-      if (!payment.handoffUrl) {
+      const mode = await openPaymentWindow(payment, paymentTab);
+      if (!mode) {
         toast.error(t("payment_start_failed"));
 
         return;
       }
 
-      const mode = await openPaymentWindow(payment.handoffUrl, paymentTab);
       tabUsed = mode === "new-tab";
       if (mode !== "same-tab") setIsAwaiting(true);
     } catch (error) {

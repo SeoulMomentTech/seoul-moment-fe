@@ -1,13 +1,16 @@
 "use client";
 
-import { useId } from "react";
+import { useId, useSyncExternalStore } from "react";
 
 import { useTranslations } from "next-intl";
 
 import { cn } from "@shared/lib/style";
 import type { UserOrderPaymentMethod } from "@shared/services/userOrder";
+import { StatusNotice } from "@shared/ui/status-card";
 
 import { Label, RadioGroup, RadioGroupItem } from "@seoul-moment/ui";
+
+import { isOtherInAppBrowser } from "../model/paymentWindow";
 
 interface PaymentOption {
   value: UserOrderPaymentMethod;
@@ -25,8 +28,6 @@ const PAYMENT_OPTIONS: ReadonlyArray<PaymentOption> = [
     mark: "LINE Pay",
     markClassName: "bg-[#06c755] text-white",
     descriptionKey: "payment_line_pay_description",
-    // LINE Pay 샌드박스 키가 들어오기 전까지 결제 시작이 500 이다
-    disabled: true,
   },
   {
     value: "ECPAY",
@@ -35,6 +36,16 @@ const PAYMENT_OPTIONS: ReadonlyArray<PaymentOption> = [
     descriptionKey: "payment_ecpay_description",
   },
 ];
+
+const noopSubscribe = () => () => {};
+
+/** UA 는 바뀌지 않는다. 서버 렌더는 false 로 두고 하이드레이션 뒤에 읽는다 */
+const useIsOtherInAppBrowser = () =>
+  useSyncExternalStore(
+    noopSubscribe,
+    () => isOtherInAppBrowser(),
+    () => false,
+  );
 
 interface OrderPaymentSectionProps {
   value: UserOrderPaymentMethod;
@@ -53,6 +64,8 @@ export function OrderPaymentSection({
 }: OrderPaymentSectionProps) {
   const t = useTranslations();
   const groupId = useId();
+  // Slack·인스타그램 같은 인앱 브라우저에서는 LINE Pay 결제 페이지가 "LINE 앱 업데이트" 화면에 막힌다
+  const showInAppWarning = useIsOtherInAppBrowser() && value === "LINE_PAY";
 
   return (
     <>
@@ -99,6 +112,14 @@ export function OrderPaymentSection({
           );
         })}
       </RadioGroup>
+
+      {showInAppWarning && (
+        <div className="mt-3">
+          <StatusNotice tone="warn">
+            {t("payment_line_pay_inapp_warning")}
+          </StatusNotice>
+        </div>
+      )}
 
       <p className="text-body-5 text-neutral mt-3 leading-relaxed">
         {t("payment_external_note")}
