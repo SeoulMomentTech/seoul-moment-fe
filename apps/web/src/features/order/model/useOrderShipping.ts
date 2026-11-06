@@ -37,6 +37,13 @@ import {
   type OrderShippingValues,
 } from "./schema";
 
+/** `/order?cart=1,2` 에서 `?cart=1,2` 만 떼어 낸다. 주문 대상이 없으면 빈 문자열 */
+const toQueryString = (href: string | null): string => {
+  if (!href) return "";
+  const index = href.indexOf("?");
+  return index < 0 ? "" : href.slice(index);
+};
+
 interface UseOrderShippingParams {
   profile?: UserProfile;
   userInfo?: UserInfo;
@@ -248,8 +255,9 @@ export const useOrderShipping = ({
   );
 
   /**
-   * 전자지도로 떠난다. 떠나기 직전에 입력 전부를 draft 로 남기고, 복귀 주소는 쿼리 없는
-   * 주문서 경로만 넘긴다(주문 대상은 draft 가 들고 있다).
+   * 전자지도로 떠난다. 떠나기 직전에 입력 전부를 draft 로 남기고, 복귀 주소에는 주문 대상
+   * 쿼리(`?cart=`/`?buy=`)까지 붙여 넘긴다 — 서버가 `&cvsStoreToken=` 을 합쳐 같은 주문서로
+   * 돌려보낸다. draft 의 `sourceHref` 는 쿼리가 유실됐을 때의 대비다.
    */
   const leaveForMap = useCallback(
     (next: CvsChain) => {
@@ -275,7 +283,7 @@ export const useOrderShipping = ({
       navigateTo(
         getLogisticsCvsMapUrl({
           chain: next,
-          returnUrl: `${window.location.origin}${getPathname({ href: "/order", locale })}`,
+          returnUrl: `${window.location.origin}${getPathname({ href: "/order", locale })}${toQueryString(sourceHref)}`,
         }),
       );
     },

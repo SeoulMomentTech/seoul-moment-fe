@@ -153,10 +153,9 @@
   **즉시 삭제**한다. SNS 로그인의 `linePending`처럼 "읽으면서 지우기" 때문에 생긴 버그를
   피하려고 삭제를 미루지는 않는다. 여기서는 LIFF 같은 이중 리다이렉트가 없고,
   StrictMode 이중 실행은 `useRef`로 한 번만 처리한다. (제 판단)
-- `returnUrl`은 **쿼리 없는** 주문서 경로다: `{origin}/{locale}/order`. 서버가
-  `{returnUrl}?cvsStoreToken=…`을 문자 그대로 붙이는지 `&`로 합치는지 알 수 없으므로
-  쿼리가 있는 URL을 넘기지 않는다. 주문 대상은 draft의 `sourceHref`가 들고 있다.
-  (제 판단 — 어느 쪽이든 깨지지 않는 쪽을 골랐다.)
+- `returnUrl`은 주문 대상 쿼리까지 붙인 주문서 주소다: `{origin}/{locale}/order?buy=…`.
+  서버가 `&cvsStoreToken=…`으로 합쳐 같은 주문서로 돌려보낸다(2026-11-06 결정). draft의
+  `sourceHref`는 쿼리가 유실돼 돌아왔을 때 원래 주문서로 되돌리는 대비로 남긴다.
 - 복귀 처리: `/order?cvsStoreToken=x`로 돌아오면 URL에 주문 대상이 없으므로 draft를 먼저
   읽는다. draft가 있으면 토큰을 draft의 `cvs.storeToken`에 넣고 `router.replace(sourceHref)`로
   원래 주문서(`?cart=`/`?buy=`)로 옮긴 뒤, 거기서 draft를 복원한다. draft가 없거나 만료면

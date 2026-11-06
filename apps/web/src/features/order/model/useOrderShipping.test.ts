@@ -213,7 +213,7 @@ describe("useOrderShipping", () => {
       expect(result.current.submitShipping).toBeNull();
     });
 
-    it("칩을 누르면 draft 를 저장하고 쿼리 없는 복귀 주소로 지도에 간다", () => {
+    it("칩을 누르면 draft 를 저장하고 주문 대상 쿼리가 붙은 복귀 주소로 지도에 간다", () => {
       const { result } = render({ source, profile, userInfo });
 
       act(() => result.current.setShippingMethod("CVS"));
@@ -227,7 +227,7 @@ describe("useOrderShipping", () => {
       });
       expect(navigateTo).toHaveBeenCalledWith(
         expect.stringContaining(
-          `returnUrl=${encodeURIComponent(`${window.location.origin}/ko/order`)}`,
+          `returnUrl=${encodeURIComponent(`${window.location.origin}/ko/order?cart=1,2`)}`,
         ),
       );
       expect(navigateTo).toHaveBeenCalledWith(
