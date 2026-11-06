@@ -9,6 +9,7 @@ import type { OrderSource } from "@entities/order";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook, waitFor } from "@testing-library/react";
 
+import { INVOICE_DEFAULT_VALUES } from "./invoiceSchema";
 import { peekOrderDraft, saveOrderDraft, type OrderDraft } from "./orderDraft";
 import { useOrderShipping } from "./useOrderShipping";
 
@@ -440,6 +441,43 @@ describe("useOrderShipping", () => {
       act(() => result.current.setUseDefaultShipping(true));
       await waitFor(() =>
         expect(result.current.shipping.recipientName).toBe("李佳蓉"),
+      );
+    });
+  });
+
+  describe("전자발표 draft 연결", () => {
+    const invoiceValues = {
+      ...INVOICE_DEFAULT_VALUES,
+      type: "DONATION" as const,
+      loveCode: "168001",
+    };
+
+    it("지도로 떠날 때 invoice draft 를 같이 저장한다", () => {
+      const { result } = render({
+        source,
+        profile,
+        userInfo,
+        invoice: { getDraft: () => invoiceValues, restoreDraft: vi.fn() },
+      });
+
+      act(() => result.current.cvs.openCvsMap("FAMI"));
+
+      expect(peekOrderDraft()?.invoice).toEqual(invoiceValues);
+    });
+
+    it("돌아와서 복원할 때 invoice 를 restoreDraft 로 넘긴다", async () => {
+      saveOrderDraft({ ...cvsDraft, invoice: invoiceValues });
+      const restoreDraft = vi.fn();
+
+      render({
+        source,
+        profile,
+        userInfo,
+        invoice: { getDraft: () => INVOICE_DEFAULT_VALUES, restoreDraft },
+      });
+
+      await waitFor(() =>
+        expect(restoreDraft).toHaveBeenCalledWith(invoiceValues),
       );
     });
   });

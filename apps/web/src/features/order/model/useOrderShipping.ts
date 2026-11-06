@@ -23,6 +23,7 @@ import { getPathname } from "@/i18n/navigation";
 import { useLogisticsCvsStoreQuery } from "@entities/logistics";
 import { toOrderHref, type OrderSource } from "@entities/order";
 
+import type { OrderInvoiceValues } from "./invoiceSchema";
 import { navigateTo } from "./navigate";
 import { saveOrderDraft, takeOrderDraft } from "./orderDraft";
 import {
@@ -49,6 +50,14 @@ interface UseOrderShippingParams {
   userInfo?: UserInfo;
   /** 주문 대상. draft 의 주인을 가리는 키이자 지도로 떠날 때 저장하는 값이다 */
   source: OrderSource | null;
+  /**
+   * 지도 왕복 draft 에 같이 싣는 다른 섹션(전자발표)의 입력. 떠날 때 `getDraft`, 돌아와
+   * 복원할 때 `restoreDraft` 를 부른다. 호출부는 안정된 객체(useMemo)를 넘긴다.
+   */
+  invoice?: {
+    getDraft(): OrderInvoiceValues;
+    restoreDraft(values: OrderInvoiceValues | undefined): void;
+  };
 }
 
 /** 미리보기에 넘기는 배송 입력. 편의점은 매장 조회가 끝난 뒤에만 토큰을 품는다 */
@@ -116,6 +125,7 @@ export const useOrderShipping = ({
   profile,
   userInfo,
   source,
+  invoice,
 }: UseOrderShippingParams) => {
   const locale = useLanguage();
   const phone = userInfo?.phone;
@@ -194,8 +204,9 @@ export const useOrderShipping = ({
         recipientName: draft.cvs.recipientName,
         phone: draft.cvs.phone,
       });
+      invoice?.restoreDraft(draft.invoice);
     },
-    [sourceHref, reset, resetCvs],
+    [sourceHref, reset, resetCvs, invoice],
   );
 
   useEffect(
@@ -275,6 +286,7 @@ export const useOrderShipping = ({
             phone: cvsValues.phone,
           },
           paymentMethod,
+          invoice: invoice?.getDraft(),
         });
       }
 
@@ -294,6 +306,7 @@ export const useOrderShipping = ({
       useDefaultShipping,
       paymentMethod,
       locale,
+      invoice,
     ],
   );
 
