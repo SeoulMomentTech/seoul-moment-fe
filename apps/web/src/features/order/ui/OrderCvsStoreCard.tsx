@@ -1,7 +1,12 @@
 "use client";
 
+import type { ReactNode } from "react";
+
+import { StoreIcon } from "lucide-react";
+
 import { useTranslations } from "next-intl";
 
+import { cn } from "@shared/lib/style";
 import type { GetLogisticsCvsStoreRes } from "@shared/services/logistics";
 
 import { Skeleton } from "@seoul-moment/ui";
@@ -49,11 +54,30 @@ export function OrderCvsStoreCard({
   }
 
   if (isExpired) {
-    return <p className="text-body-4 text-danger">{t("cvs_store_expired")}</p>;
+    return (
+      <EmptyCard
+        action={
+          <button
+            className="text-body-4 text-primary mt-1 cursor-pointer"
+            onClick={onReselect}
+            type="button"
+          >
+            {`${t("cvs_store_reselect")} ›`}
+          </button>
+        }
+        title={t("cvs_store_expired")}
+        tone="danger"
+      />
+    );
   }
 
   if (!store) {
-    return <p className="text-body-4 text-neutral">{t("cvs_store_empty")}</p>;
+    return (
+      <EmptyCard
+        hint={t("cvs_store_empty")}
+        title={t("cvs_store_empty_title")}
+      />
+    );
   }
 
   return (
@@ -69,6 +93,43 @@ export function OrderCvsStoreCard({
       >
         {`${t("cvs_store_reselect")} ›`}
       </button>
+    </div>
+  );
+}
+
+interface EmptyCardProps {
+  title: string;
+  hint?: string;
+  action?: ReactNode;
+  tone?: "neutral" | "danger";
+}
+
+/**
+ * 매장 자리를 비워 두는 점선 카드. 매장 카드·스켈레톤과 높이를 맞춰, 매장을 고른 뒤
+ * 레이아웃이 뛰지 않게 한다. 문구만 있으면 "여기에 뭔가 채워진다" 는 목표가 보이지 않는다.
+ */
+function EmptyCard({ title, hint, action, tone = "neutral" }: EmptyCardProps) {
+  return (
+    <div className="grid min-h-24 place-items-center rounded-[4px] border border-dashed border-black/20 px-4 py-5 text-center">
+      <div className="grid justify-items-center gap-1">
+        <StoreIcon
+          aria-hidden
+          className={cn(
+            "size-5",
+            tone === "danger" ? "text-danger" : "text-black/40",
+          )}
+        />
+        <p
+          className={cn(
+            "text-body-3 font-semibold",
+            tone === "danger" && "text-danger",
+          )}
+        >
+          {title}
+        </p>
+        {hint && <p className="text-body-4 text-neutral">{hint}</p>}
+        {action}
+      </div>
     </div>
   );
 }

@@ -69,11 +69,20 @@ describe("OrderCvsPickupPanel", () => {
     onRetry.mockReset();
   });
 
-  it("매장이 없으면 안내 문구와 체인 칩 세 개를 그린다", () => {
+  it("매장이 없으면 빈 카드(제목·안내)와 체인 칩 세 개를 그린다", () => {
     render(<Panel />, { wrapper });
 
+    expect(screen.getByText(ko.cvs_store_empty_title)).toBeInTheDocument();
     expect(screen.getByText(ko.cvs_store_empty)).toBeInTheDocument();
     expect(screen.getAllByRole("button", { pressed: false })).toHaveLength(3);
+  });
+
+  it("체인 칩은 이동 표시 › 를 달되 접근 가능한 이름에는 넣지 않는다", () => {
+    render(<Panel />, { wrapper });
+
+    const chip = screen.getByRole("button", { name: "全家" });
+
+    expect(chip.textContent).toContain("›");
   });
 
   it("칩을 누르면 그 체인으로 onOpenMap 을 부른다", () => {
@@ -114,10 +123,17 @@ describe("OrderCvsPickupPanel", () => {
     expect(screen.queryByText(ko.cvs_store_empty)).not.toBeInTheDocument();
   });
 
-  it("만료면 만료 문구를 그린다", () => {
+  it("만료면 만료 문구와 다시 고르기 버튼을 그리고, 버튼은 onReselect 를 부른다", () => {
     render(<Panel chain="UNIMART" isStoreExpired />, { wrapper });
 
     expect(screen.getByText(ko.cvs_store_expired)).toBeInTheDocument();
+
+    fireEvent.click(
+      screen.getByRole("button", { name: new RegExp(ko.cvs_store_reselect) }),
+    );
+
+    expect(onReselect).toHaveBeenCalledTimes(1);
+    expect(onOpenMap).not.toHaveBeenCalled();
   });
 
   it("받는 분·휴대폰 입력칸이 있고 휴대폰은 +886 접두가 없다", () => {

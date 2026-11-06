@@ -562,10 +562,11 @@
   "shipping_method_home": "Home delivery",
   "shipping_method_cvs": "Convenience store pickup",
   "cvs_chain": "Convenience store",
-  "cvs_store_empty": "Choose a convenience store to pick a branch",
+  "cvs_store_empty": "Tap a convenience store above to open the store map",
   "cvs_store_expired": "Your store selection expired. Please choose again",
   "cvs_store_reselect": "Choose another store",
   "cvs_recipient_placeholder": "Full name (2–5 Chinese or 4–10 English letters)",
   "cvs_recipient_invalid": "ID is checked at pickup. Enter your real name: 2–5 Chinese or 4–10 English letters",
-  "cvs_phone_invalid": "Enter a 10-digit mobile number starting with 09"
+  "cvs_phone_invalid": "Enter a 10-digit mobile number starting with 09",
+  "cvs_store_empty_title": "No store chosen yet"
 }

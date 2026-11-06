@@ -82,6 +82,10 @@ export function OrderCvsPickupPanel({
               type="button"
             >
               {item.label}
+              {/* 누르면 지도로 떠난다는 표시. 접근 가능한 이름은 체인명만 남긴다 */}
+              <span aria-hidden className="ml-1 opacity-60">
+                ›
+              </span>
             </Chip>
           ))}
         </div>
