@@ -49,9 +49,12 @@ describe("StatusCard", () => {
     ).toHaveAttribute("data-total", "true");
   });
 
-  it("StatusNotice 는 톤을 싣는다", () => {
+  it("StatusNotice 는 톤을 싣고, 색 클래스가 있어도 글자 크기를 잃지 않는다", () => {
     render(<StatusNotice tone="danger">x</StatusNotice>);
 
-    expect(screen.getByText("x")).toHaveAttribute("data-tone", "danger");
+    const notice = screen.getByText("x");
+    expect(notice).toHaveAttribute("data-tone", "danger");
+    // tailwind-merge 기본 설정은 text-body-* 를 글자 색으로 보고 text-black/80 과 겹친다며 지운다
+    expect(notice.className).toContain("text-body-4");
   });
 });

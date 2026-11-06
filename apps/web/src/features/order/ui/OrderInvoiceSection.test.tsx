@@ -91,6 +91,7 @@ describe("OrderInvoiceSection", () => {
 
     const message = await screen.findByText(ko.invoice_mobile_barcode_invalid);
     expect(message).toHaveClass("text-danger");
+    expect(message).toHaveClass("text-body-5");
     expect(mobileCheck).not.toHaveBeenCalled();
   });
 

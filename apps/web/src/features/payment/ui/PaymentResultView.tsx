@@ -17,7 +17,6 @@ import {
   StatusCard,
   StatusInfo,
   StatusNotice,
-  StatusPill,
   type StatusInfoRow,
 } from "@shared/ui/status-card";
 
@@ -52,10 +51,18 @@ const ICON_CLASS = "size-7";
 
 interface PaymentResultViewProps {
   state: PaymentResultState;
+  /**
+   * 로그인이 없는 브라우저 — LINE 에서 외부 브라우저로 넘어와 결제한 경우다. 이때만 "LINE 으로
+   * 돌아가면 완료로 바뀌어 있다" 를 안내한다(PC 에서 결제한 사람에게는 소음이다).
+   */
+  isGuest?: boolean;
 }
 
 /** PG 에서 돌아온 브라우저가 처음 보는 화면. 로그인이 없을 수 있어 주문 정보는 토큰이 준 것만 */
-export function PaymentResultView({ state }: PaymentResultViewProps) {
+export function PaymentResultView({
+  state,
+  isGuest = false,
+}: PaymentResultViewProps) {
   const t = useTranslations();
 
   switch (state.kind) {
@@ -115,19 +122,14 @@ export function PaymentResultView({ state }: PaymentResultViewProps) {
           icon={
             <CheckIcon aria-hidden className={ICON_CLASS} strokeWidth={2.4} />
           }
-          meta={
-            <>
-              <OrderNumber value={orderNumber} />
-              <StatusPill>
-                {`${methodLabel(payment.method)} · ${toNTCurrency(payment.amount)}`}
-              </StatusPill>
-            </>
-          }
+          meta={<OrderNumber value={orderNumber} />}
           title={t("payment_paid_title")}
           tone="success"
         >
           <StatusInfo rows={rows} />
-          <StatusNotice>{t("payment_paid_line_hint")}</StatusNotice>
+          {isGuest && (
+            <StatusNotice>{t("payment_paid_line_hint")}</StatusNotice>
+          )}
         </StatusCard>
       );
     }

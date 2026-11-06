@@ -159,10 +159,12 @@ export function StatusNotice({
 }) {
   return (
     <p
-      className={cn(
-        "text-body-4 rounded-[8px] px-4 py-3 text-left leading-relaxed",
+      // 글자 크기는 cn 밖에 둔다 — tailwind-merge 기본 설정이 text-body-* 를 글자 색으로 보고
+      // 톤의 text-* 색과 겹친다며 지운다
+      className={`text-body-4 ${cn(
+        "rounded-[8px] px-4 py-3 text-left leading-relaxed",
         NOTICE_TONE[tone],
-      )}
+      )}`}
       data-tone={tone}
     >
       {children}

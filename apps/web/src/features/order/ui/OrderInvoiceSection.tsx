@@ -327,7 +327,8 @@ function StatusLine({
 }) {
   return (
     <p
-      className={cn("text-body-5 min-h-4 leading-4", TONE_CLASS[tone])}
+      // 글자 크기는 cn 밖에 둔다(tailwind-merge 가 text-body-* 를 색으로 보고 지운다)
+      className={`text-body-5 ${cn("min-h-4 leading-4", TONE_CLASS[tone])}`}
       id={id}
       // role 을 바꾸면 문구가 바뀌는 순간 live region 이 아니어서 읽어 주지 않는다 — 고정한다
       role="status"

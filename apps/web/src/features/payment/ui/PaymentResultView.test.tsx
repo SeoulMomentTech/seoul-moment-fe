@@ -129,8 +129,8 @@ describe("PaymentResultView", () => {
 
     expect(screen.getByText(ko.payment_paid_title)).toBeInTheDocument();
     expect(screen.getByText("SM-20261104-000481")).toBeInTheDocument();
-    expect(screen.getByText(/ECPay · NT\$1,160/)).toBeInTheDocument();
-    expect(screen.getByText(ko.payment_paid_line_hint)).toBeInTheDocument();
+    expect(screen.getByText("NT$1,160")).toBeInTheDocument();
+    expect(screen.queryByText(ko.payment_paid_line_hint)).toBeNull();
     expect(
       screen.getByRole("link", { name: ko.payment_continue_shopping }),
     ).toHaveAttribute("href", "/ko/");
@@ -230,6 +230,8 @@ describe("PaymentResultView", () => {
       "success",
     );
     expect(screen.getByText(ko.payment_paid_at)).toBeInTheDocument();
+    // 금액은 표에만 — 알약으로 한 번 더 보여 주지 않는다
+    expect(screen.getAllByText(/NT\$1,160/)).toHaveLength(1);
     expect(screen.getByText("2026/11/06 14:32")).toBeInTheDocument();
     expect(screen.getByText(ko.payment_method_label)).toBeInTheDocument();
   });
@@ -282,5 +284,17 @@ describe("PaymentResultView", () => {
 
     expect(writeText).toHaveBeenCalledWith("5219111913127434");
     expect(await screen.findByText(ko.payment_copied)).toBeInTheDocument();
+  });
+
+  it("로그인 없는 브라우저(외부로 넘어온 경우)에서만 LINE 안내를 보인다", () => {
+    render(
+      <PaymentResultView
+        isGuest
+        state={{ kind: "paid", result: result({ status: "PAID" }) }}
+      />,
+      { wrapper },
+    );
+
+    expect(screen.getByText(ko.payment_paid_line_hint)).toBeInTheDocument();
   });
 });
