@@ -32,6 +32,8 @@ export type CreateUserOrderVariables = DistributiveOmit<
 
 interface UserOrderQueryArgs {
   enabled?: boolean;
+  /** 결제 결과를 기다리는 화면이 주기적으로 다시 읽을 때 (ms). 기본은 폴링 없음 */
+  refetchInterval?: number | false;
 }
 
 interface UserOrderMutationArgs {
@@ -44,7 +46,7 @@ interface UserOrderMutationArgs {
  */
 export function useUserOrderDetailQuery(
   orderId: number | null,
-  { enabled }: UserOrderQueryArgs = {},
+  { enabled, refetchInterval = false }: UserOrderQueryArgs = {},
 ) {
   const id = useUserAuthStore((state) => state.id);
 
@@ -62,6 +64,7 @@ export function useUserOrderDetailQuery(
     },
     select: (res) => res.data,
     enabled: enabled !== false && orderId !== null && !!id,
+    refetchInterval,
   });
 }
 
