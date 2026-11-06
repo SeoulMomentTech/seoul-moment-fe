@@ -56,17 +56,12 @@ export function PaymentResultPage() {
   return (
     <div
       className={cn(
-        "pt-26.5 pb-15 mx-auto w-full max-w-7xl px-5",
-        "max-sm:pt-19 max-sm:pb-20",
+        "pt-30 mx-auto w-full max-w-7xl px-5 pb-20",
+        "max-sm:pt-21 max-sm:px-4 max-sm:pb-12",
       )}
     >
-      <h1
-        className={cn(
-          "text-title-3 max-sm:text-title-4 mb-5 font-bold tracking-[-0.02em]",
-        )}
-      >
-        {t("payment_result_title")}
-      </h1>
+      {/* 카드 제목이 상태를 말하므로 페이지 제목은 보조기술에만 둔다 */}
+      <h1 className="sr-only">{t("payment_result_title")}</h1>
       <PaymentResultView state={state} />
     </div>
   );

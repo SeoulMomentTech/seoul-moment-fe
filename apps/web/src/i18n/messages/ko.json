@@ -619,5 +619,12 @@
   "seo_payment_result_title": "결제 결과 | Seoul Moment",
   "payment_opening_window": "결제창을 여는 중…",
   "payment_new_tab_title": "새 탭에서 결제 중",
-  "payment_new_tab_hint": "결제 탭에서 결제를 마치면 이 화면이 자동으로 바뀝니다. 탭을 닫았다면 다시 결제하기를 눌러 주세요"
+  "payment_new_tab_hint": "결제 탭에서 결제를 마치면 이 화면이 자동으로 바뀝니다. 탭을 닫았다면 다시 결제하기를 눌러 주세요",
+  "payment_paid_at": "결제 일시",
+  "payment_method_label": "결제 수단",
+  "payment_copy": "복사",
+  "payment_copied": "복사했어요",
+  "payment_retry_notice": "결제창을 닫았거나 보이지 않으면 다시 결제하기를 눌러 주세요",
+  "payment_result_not_found_title": "결제 정보를 찾을 수 없어요",
+  "payment_result_not_found_hint": "링크가 잘못됐거나 7일이 지났어요"
 }

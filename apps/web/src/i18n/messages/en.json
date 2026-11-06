@@ -619,5 +619,12 @@
   "seo_payment_result_title": "Payment result | Seoul Moment",
   "payment_opening_window": "Opening the payment page…",
   "payment_new_tab_title": "Paying in a new tab",
-  "payment_new_tab_hint": "This screen updates automatically once you finish in the payment tab. If you closed it, press Pay again"
+  "payment_new_tab_hint": "This screen updates automatically once you finish in the payment tab. If you closed it, press Pay again",
+  "payment_paid_at": "Paid at",
+  "payment_method_label": "Payment method",
+  "payment_copy": "Copy",
+  "payment_copied": "Copied",
+  "payment_retry_notice": "If you closed the payment page or can't see it, press Pay again",
+  "payment_result_not_found_title": "We couldn't find this payment",
+  "payment_result_not_found_hint": "The link may be wrong or older than 7 days"
 }

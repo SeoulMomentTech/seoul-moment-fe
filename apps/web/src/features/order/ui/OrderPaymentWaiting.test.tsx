@@ -204,4 +204,42 @@ describe("OrderPaymentWaiting", () => {
     expect(screen.getByText(ko.payment_new_tab_hint)).toBeInTheDocument();
     expect(screen.queryByText(ko.payment_external_title)).toBeNull();
   });
+
+  it("진행 마크가 돌고 다시 결제하기 안내가 함께 보인다", async () => {
+    getUserOrderDetail.mockResolvedValue(detail("PENDING"));
+
+    render(
+      <OrderPaymentWaiting
+        external={external}
+        isRetrying={false}
+        onRetry={vi.fn()}
+      />,
+      { wrapper },
+    );
+
+    const mark = screen.getByTestId("status-mark");
+    expect(mark).toHaveAttribute("data-tone", "progress");
+    expect(mark).toHaveAttribute("data-spinning", "true");
+    expect(screen.getByText(ko.payment_retry_notice)).toBeInTheDocument();
+  });
+
+  it("이번 시도가 실패하면 빨강 마크로 바뀌고 돌지 않는다", async () => {
+    getUserOrderDetail.mockResolvedValue(
+      detail("PENDING", { paymentId: 12, status: "FAILED" }),
+    );
+
+    render(
+      <OrderPaymentWaiting
+        external={external}
+        isRetrying={false}
+        onRetry={vi.fn()}
+      />,
+      { wrapper },
+    );
+
+    await screen.findByText(ko.payment_failed_title);
+    const mark = screen.getByTestId("status-mark");
+    expect(mark).toHaveAttribute("data-tone", "danger");
+    expect(mark).toHaveAttribute("data-spinning", "false");
+  });
 });

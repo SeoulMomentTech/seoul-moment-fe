@@ -619,5 +619,12 @@
   "seo_payment_result_title": "付款結果 | Seoul Moment",
   "payment_opening_window": "正在開啟付款頁面…",
   "payment_new_tab_title": "正在新分頁付款",
-  "payment_new_tab_hint": "在付款分頁完成付款後，此畫面會自動更新。若已關閉分頁，請按「重新付款」"
+  "payment_new_tab_hint": "在付款分頁完成付款後，此畫面會自動更新。若已關閉分頁，請按「重新付款」",
+  "payment_paid_at": "付款時間",
+  "payment_method_label": "付款方式",
+  "payment_copy": "複製",
+  "payment_copied": "已複製",
+  "payment_retry_notice": "若已關閉付款頁面或看不到，請按「重新付款」",
+  "payment_result_not_found_title": "找不到付款資訊",
+  "payment_result_not_found_hint": "連結可能有誤或已超過 7 天"
 }

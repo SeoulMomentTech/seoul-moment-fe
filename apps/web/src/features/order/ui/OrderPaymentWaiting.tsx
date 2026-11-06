@@ -2,9 +2,11 @@
 
 import { useEffect } from "react";
 
-import { ExternalLinkIcon } from "lucide-react";
+import { CircleAlert, ExternalLinkIcon } from "lucide-react";
 
 import { useTranslations } from "next-intl";
+
+import { StatusCard, StatusNotice, StatusPill } from "@shared/ui/status-card";
 
 import { useRouter } from "@/i18n/navigation";
 
@@ -72,41 +74,37 @@ export function OrderPaymentWaiting({
   };
 
   return (
-    <div className="grid justify-items-center gap-4 py-16 text-center max-sm:py-10">
-      <ExternalLinkIcon
-        aria-hidden
-        className="size-10 text-black/30"
-        strokeWidth={1.6}
-      />
-      <div className="grid gap-1">
-        <p className="text-body-1 font-bold">
-          {t(
-            isAttemptFailed
-              ? "payment_failed_title"
-              : COPY[external.mode].title,
-          )}
-        </p>
-        <p className="text-body-4 text-neutral" role="status">
-          {t(
-            isAttemptFailed
-              ? "payment_not_paid_retry_hint"
-              : COPY[external.mode].hint,
-          )}
-        </p>
-      </div>
-      <p className="text-body-4 text-neutral tabular-nums">
-        <span className="mr-1.5">{t("payment_order_number")}</span>
-        <span className="text-black">{external.orderNumber}</span>
-      </p>
-      <Button
-        className="mt-2 h-11 rounded-[4px] px-6"
-        disabled={isRetrying}
-        onClick={() => void handleRetry()}
-        type="button"
-        variant="outline"
-      >
-        {t(isRetrying ? "payment_processing" : "payment_retry")}
-      </Button>
-    </div>
+    <StatusCard
+      actions={
+        <Button
+          disabled={isRetrying}
+          onClick={() => void handleRetry()}
+          type="button"
+          variant="outline"
+        >
+          {t(isRetrying ? "payment_processing" : "payment_retry")}
+        </Button>
+      }
+      description={t(
+        isAttemptFailed
+          ? "payment_not_paid_retry_hint"
+          : COPY[external.mode].hint,
+      )}
+      icon={
+        isAttemptFailed ? (
+          <CircleAlert aria-hidden className="size-7" />
+        ) : (
+          <ExternalLinkIcon aria-hidden className="size-7" />
+        )
+      }
+      meta={<StatusPill>{external.orderNumber}</StatusPill>}
+      spinning={!isAttemptFailed}
+      title={t(
+        isAttemptFailed ? "payment_failed_title" : COPY[external.mode].title,
+      )}
+      tone={isAttemptFailed ? "danger" : "progress"}
+    >
+      <StatusNotice>{t("payment_retry_notice")}</StatusNotice>
+    </StatusCard>
   );
 }

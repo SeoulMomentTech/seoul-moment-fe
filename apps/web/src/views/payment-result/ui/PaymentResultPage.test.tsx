@@ -114,7 +114,7 @@ describe("PaymentResultPage", () => {
     renderPage("?h=expired");
 
     expect(
-      await screen.findByText(ko.payment_result_not_found),
+      await screen.findByText(ko.payment_result_not_found_title),
     ).toBeInTheDocument();
   });
 
@@ -122,7 +122,7 @@ describe("PaymentResultPage", () => {
     renderPage("");
 
     expect(
-      await screen.findByText(ko.payment_result_not_found),
+      await screen.findByText(ko.payment_result_not_found_title),
     ).toBeInTheDocument();
     expect(getPaymentResult).not.toHaveBeenCalled();
   });

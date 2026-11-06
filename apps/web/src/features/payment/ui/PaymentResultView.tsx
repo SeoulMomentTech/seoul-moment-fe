@@ -1,20 +1,25 @@
 "use client";
 
-import type { ReactNode } from "react";
-
 import {
-  CheckCircle2,
+  CheckIcon,
   CircleAlert,
   Clock3Icon,
-  LoaderCircleIcon,
+  CreditCardIcon,
   SearchXIcon,
 } from "lucide-react";
 
 import { useTranslations } from "next-intl";
 
-import { cn } from "@shared/lib/style";
+import { useCopyToClipboard } from "@shared/lib/hooks";
 import { toNTCurrency } from "@shared/lib/utils";
 import type { GetPaymentResultRes } from "@shared/services/payment";
+import {
+  StatusCard,
+  StatusInfo,
+  StatusNotice,
+  StatusPill,
+  type StatusInfoRow,
+} from "@shared/ui/status-card";
 
 import { Link } from "@/i18n/navigation";
 
@@ -27,16 +32,23 @@ import type {
 } from "../model/paymentResultState";
 import { formatTaipeiDateTime } from "../model/taipeiTime";
 
-const METHOD_LABEL: Record<GetPaymentResultRes["payment"]["method"], string> = {
+const METHOD_LABEL: Partial<
+  Record<GetPaymentResultRes["payment"]["method"], string>
+> = {
   ECPAY: "ECPay",
   LINE_PAY: "LINE Pay",
 };
+
+const methodLabel = (method: string) =>
+  METHOD_LABEL[method as keyof typeof METHOD_LABEL] ?? method;
 
 const REASON_KEY: Record<PaymentFailureReason, string> = {
   canceled: "payment_reason_canceled",
   expired: "payment_reason_expired",
   failed: "payment_reason_failed",
 };
+
+const ICON_CLASS = "size-7";
 
 interface PaymentResultViewProps {
   state: PaymentResultState;
@@ -50,203 +62,200 @@ export function PaymentResultView({ state }: PaymentResultViewProps) {
     case "loading":
     case "checking":
       return (
-        <Frame
-          icon={
-            <LoaderCircleIcon
-              aria-hidden
-              className="size-10 animate-spin text-black/40"
-              strokeWidth={1.6}
-            />
-          }
-          title={t("payment_checking_title")}
+        <StatusCard
+          actions={<ContinueShopping />}
+          description={t("payment_checking_title")}
+          icon={<CreditCardIcon aria-hidden className={ICON_CLASS} />}
+          spinning
+          title={t("payment_result_title")}
+          tone="progress"
         >
           {state.kind === "checking" && state.delayed && (
-            <p className="text-body-4 text-neutral" role="status">
-              {t("payment_checking_delayed")}
-            </p>
+            <StatusNotice>{t("payment_checking_delayed")}</StatusNotice>
           )}
-          <Actions />
-        </Frame>
+        </StatusCard>
       );
 
     case "not-found":
       return (
-        <Frame
-          icon={
-            <SearchXIcon
-              aria-hidden
-              className="size-10 text-black/30"
-              strokeWidth={1.6}
-            />
-          }
-          title={t("payment_result_not_found")}
-        >
-          <Actions />
-        </Frame>
+        <StatusCard
+          actions={<ContinueShopping />}
+          description={t("payment_result_not_found_hint")}
+          icon={<SearchXIcon aria-hidden className={ICON_CLASS} />}
+          title={t("payment_result_not_found_title")}
+          tone="muted"
+        />
       );
 
-    case "paid":
+    case "paid": {
+      const { payment, orderNumber } = state.result;
+      const rows: StatusInfoRow[] = [
+        ...(payment.paidAt
+          ? [
+              {
+                label: t("payment_paid_at"),
+                value: formatTaipeiDateTime(payment.paidAt),
+              },
+            ]
+          : []),
+        {
+          label: t("payment_method_label"),
+          value: methodLabel(payment.method),
+        },
+        {
+          label: t("payment_amount"),
+          value: toNTCurrency(payment.amount),
+          total: true,
+        },
+      ];
+
       return (
-        <Frame
+        <StatusCard
+          actions={<ContinueShopping />}
           icon={
-            <CheckCircle2
-              aria-hidden
-              className="size-10 text-black"
-              strokeWidth={1.6}
-            />
+            <CheckIcon aria-hidden className={ICON_CLASS} strokeWidth={2.4} />
+          }
+          meta={
+            <>
+              <OrderNumber value={orderNumber} />
+              <StatusPill>
+                {`${methodLabel(payment.method)} · ${toNTCurrency(payment.amount)}`}
+              </StatusPill>
+            </>
           }
           title={t("payment_paid_title")}
+          tone="success"
         >
-          <OrderNumber value={state.result.orderNumber} />
-          <p className="text-body-3 tabular-nums">
-            {`${METHOD_LABEL[state.result.payment.method]} · ${toNTCurrency(state.result.payment.amount)}`}
-          </p>
-          <p className="text-body-5 text-neutral">
-            {t("payment_paid_line_hint")}
-          </p>
-          <Actions />
-        </Frame>
+          <StatusInfo rows={rows} />
+          <StatusNotice>{t("payment_paid_line_hint")}</StatusNotice>
+        </StatusCard>
       );
+    }
 
     case "waiting":
       return (
-        <Frame
-          icon={
-            <Clock3Icon
-              aria-hidden
-              className="size-10 text-black"
-              strokeWidth={1.6}
-            />
-          }
+        <StatusCard
+          actions={<ContinueShopping />}
+          icon={<Clock3Icon aria-hidden className={ICON_CLASS} />}
+          meta={<OrderNumber value={state.result.orderNumber} />}
           title={t("payment_waiting_title")}
+          tone="progress"
         >
-          <OrderNumber value={state.result.orderNumber} />
           <DepositInfo payment={state.result.payment} />
-          <Actions />
-        </Frame>
+        </StatusCard>
       );
 
     case "failed":
       return (
-        <Frame
-          icon={
-            <CircleAlert
-              aria-hidden
-              className="text-danger size-10"
-              strokeWidth={1.6}
-            />
+        <StatusCard
+          actions={
+            <>
+              <Button asChild variant="outline">
+                <Link href="/cart">{t("go_to_cart")}</Link>
+              </Button>
+              <Button asChild>
+                <Link href="/">{t("payment_continue_shopping")}</Link>
+              </Button>
+            </>
           }
+          icon={<CircleAlert aria-hidden className={ICON_CLASS} />}
+          meta={<OrderNumber value={state.result.orderNumber} />}
           title={t("payment_failed_title")}
+          tone="danger"
         >
-          <p className="text-body-4 text-neutral">
-            {t(REASON_KEY[state.reason])}
+          <StatusNotice tone="danger">
+            <b className="text-danger font-semibold">
+              {t(REASON_KEY[state.reason])}
+            </b>
             {state.result.payment.failureCode && (
               <span className="text-body-5 ml-1.5 text-black/40">
                 ({state.result.payment.failureCode})
               </span>
             )}
-          </p>
-          <OrderNumber value={state.result.orderNumber} />
-          <p className="text-body-4">{t("payment_order_kept")}</p>
-          <Actions showCart />
-        </Frame>
+            <br />
+            {t("payment_order_kept")}
+          </StatusNotice>
+        </StatusCard>
       );
   }
 }
 
-function Frame({
-  icon,
-  title,
-  children,
-}: {
-  icon: ReactNode;
-  title: string;
-  children?: ReactNode;
-}) {
+function OrderNumber({ value }: { value: string }) {
   return (
-    <div className="grid justify-items-center gap-4 py-16 text-center max-sm:py-10">
-      {icon}
-      <h2 className="text-body-1 font-bold">{title}</h2>
-      {children}
-    </div>
+    <p className="text-body-4 font-mono tabular-nums text-black/50">{value}</p>
   );
 }
 
-function OrderNumber({ value }: { value: string }) {
+function ContinueShopping() {
   const t = useTranslations();
 
   return (
-    <p className="text-body-4 text-neutral tabular-nums">
-      <span className="mr-1.5">{t("payment_order_number")}</span>
-      <span className="text-black">{value}</span>
-    </p>
+    <Button asChild>
+      <Link href="/">{t("payment_continue_shopping")}</Link>
+    </Button>
   );
 }
 
-/** ATM 은 은행·가상계좌, 편의점은 납부 코드. 둘 다 입금 기한을 대만 시각으로 */
+/** ATM 은 은행·가상계좌, 편의점은 납부 코드. 번호는 복사할 수 있고, 기한은 대만 시각으로 */
 function DepositInfo({ payment }: { payment: GetPaymentResultRes["payment"] }) {
   const t = useTranslations();
   const info = payment.depositInfo;
   if (!info) return null;
 
   const isAtm = info.paymentType.startsWith("ATM_");
+  const number = (isAtm ? info.account : info.paymentNo) ?? "";
+
+  const rows: StatusInfoRow[] = [
+    ...(isAtm
+      ? [
+          {
+            label: "ATM 轉帳",
+            value: `${getBankName(info.bankCode ?? "")} (${info.bankCode ?? ""})`,
+          },
+        ]
+      : []),
+    {
+      label: isAtm ? t("payment_virtual_account") : t("payment_cvs_code_label"),
+      value: <CopyableNumber value={number} />,
+    },
+    {
+      label: t("payment_amount"),
+      value: toNTCurrency(payment.amount),
+      total: true,
+    },
+  ];
 
   return (
-    <div className="text-body-3 grid w-full max-w-sm gap-2 rounded-[4px] border border-black/10 p-4 text-left">
-      {isAtm ? (
-        <>
-          <Row label="ATM 轉帳">{getBankName(info.bankCode ?? "")}</Row>
-          <Row label={t("payment_virtual_account")}>
-            <span className="text-body-2 font-bold tabular-nums tracking-wide">
-              {info.account}
-            </span>
-          </Row>
-        </>
-      ) : (
-        <Row label={t("payment_cvs_code_label")}>
-          <span className="text-body-2 font-bold tabular-nums tracking-wide">
-            {info.paymentNo}
-          </span>
-        </Row>
-      )}
-      <Row label={t("payment_amount")}>
-        <span className="font-bold tabular-nums">
-          {toNTCurrency(payment.amount)}
-        </span>
-      </Row>
+    <>
+      <StatusInfo rows={rows} />
       {payment.expireAt && (
-        <p className="text-body-5 text-danger mt-1">
+        <StatusNotice tone="warn">
           {t("payment_deadline", {
             date: formatTaipeiDateTime(payment.expireAt),
           })}
-        </p>
+        </StatusNotice>
       )}
-    </div>
+    </>
   );
 }
 
-function Row({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className="flex items-baseline justify-between gap-4">
-      <span className="text-neutral shrink-0">{label}</span>
-      <span className="text-right">{children}</span>
-    </div>
-  );
-}
-
-function Actions({ showCart = false }: { showCart?: boolean }) {
+function CopyableNumber({ value }: { value: string }) {
   const t = useTranslations();
+  const { copy, copiedText } = useCopyToClipboard();
+  const copied = copiedText === value;
 
   return (
-    <div className={cn("mt-4 flex flex-wrap justify-center gap-2")}>
-      {showCart && (
-        <Button asChild className="h-11 rounded-[4px] px-6" variant="outline">
-          <Link href="/cart">{t("go_to_cart")}</Link>
-        </Button>
-      )}
-      <Button asChild className="h-11 rounded-[4px] px-6">
-        <Link href="/">{t("payment_continue_shopping")}</Link>
-      </Button>
-    </div>
+    <span className="inline-flex items-center gap-2">
+      <span className="text-body-2 font-mono font-bold tracking-wide">
+        {value}
+      </span>
+      <button
+        className="text-body-5 shrink-0 rounded-[4px] border border-black/15 bg-white px-2 py-1 font-semibold"
+        onClick={() => void copy(value)}
+        type="button"
+      >
+        {t(copied ? "payment_copied" : "payment_copy")}
+      </button>
+    </span>
   );
 }

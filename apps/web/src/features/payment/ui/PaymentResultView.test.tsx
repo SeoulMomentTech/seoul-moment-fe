@@ -7,7 +7,7 @@ import type { GetPaymentResultRes } from "@shared/services/payment";
 
 import ko from "@/i18n/messages/ko.json";
 
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 
 import { PaymentResultView } from "./PaymentResultView";
 import { toPaymentResultState } from "../model/paymentResultState";
@@ -211,6 +211,76 @@ describe("PaymentResultView", () => {
   it("not-found", () => {
     renderView({ kind: "not-found" });
 
-    expect(screen.getByText(ko.payment_result_not_found)).toBeInTheDocument();
+    expect(
+      screen.getByText(ko.payment_result_not_found_title),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(ko.payment_result_not_found_hint),
+    ).toBeInTheDocument();
+  });
+
+  it("완료 화면은 초록 마크와 결제 일시(대만 시각)·수단·금액을 보여 준다", () => {
+    renderView({
+      kind: "paid",
+      result: result({ status: "PAID", paidAt: "2026-11-06T06:32:00Z" }),
+    });
+
+    expect(screen.getByTestId("status-mark")).toHaveAttribute(
+      "data-tone",
+      "success",
+    );
+    expect(screen.getByText(ko.payment_paid_at)).toBeInTheDocument();
+    expect(screen.getByText("2026/11/06 14:32")).toBeInTheDocument();
+    expect(screen.getByText(ko.payment_method_label)).toBeInTheDocument();
+  });
+
+  it("확인 중은 진행 마크가 돈다", () => {
+    renderView({ kind: "checking", delayed: false });
+
+    const mark = screen.getByTestId("status-mark");
+    expect(mark).toHaveAttribute("data-tone", "progress");
+    expect(mark).toHaveAttribute("data-spinning", "true");
+  });
+
+  it("실패는 빨강 마크다", () => {
+    renderView({
+      kind: "failed",
+      result: result({ status: "CANCELED" }, "PENDING"),
+      reason: "canceled",
+    });
+
+    expect(screen.getByTestId("status-mark")).toHaveAttribute(
+      "data-tone",
+      "danger",
+    );
+  });
+
+  it("입금 대기는 가상계좌를 복사할 수 있다", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "clipboard", {
+      value: { writeText },
+      configurable: true,
+    });
+
+    renderView({
+      kind: "waiting",
+      result: result(
+        {
+          status: "WAITING_DEPOSIT",
+          depositInfo: {
+            paymentType: "ATM_LAND",
+            bankCode: "005",
+            account: "5219111913127434",
+          },
+          expireAt: "2026-11-06T15:59:59Z",
+        },
+        "PAYMENT_WAITING",
+      ),
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: ko.payment_copy }));
+
+    expect(writeText).toHaveBeenCalledWith("5219111913127434");
+    expect(await screen.findByText(ko.payment_copied)).toBeInTheDocument();
   });
 });
