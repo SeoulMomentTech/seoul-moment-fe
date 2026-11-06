@@ -224,7 +224,7 @@ describe("useOrderShipping", () => {
         sourceHref: "/order?cart=1,2",
         shippingMethod: "CVS",
         cvs: { chain: "FAMI" },
-        paymentMethod: "LINE_PAY",
+        paymentMethod: "ECPAY",
       });
       expect(navigateTo).toHaveBeenCalledWith(
         expect.stringContaining(
@@ -479,6 +479,35 @@ describe("useOrderShipping", () => {
       await waitFor(() =>
         expect(restoreDraft).toHaveBeenCalledWith(invoiceValues),
       );
+    });
+  });
+
+  describe("결제수단·매장 만료", () => {
+    it("기본 결제수단은 ECPAY 다", () => {
+      const { result } = render({ source, profile, userInfo });
+
+      expect(result.current.paymentMethod).toBe("ECPAY");
+    });
+
+    it("draft 의 LINE_PAY 는 ECPAY 로 복원된다", async () => {
+      saveOrderDraft({ ...cvsDraft, paymentMethod: "LINE_PAY" });
+      const { result } = render({ source, profile, userInfo });
+
+      await waitFor(() => expect(result.current.shippingMethod).toBe("CVS"));
+      expect(result.current.paymentMethod).toBe("ECPAY");
+    });
+
+    it("expireStore 는 매장을 만료 처리한다", async () => {
+      saveOrderDraft(cvsDraft);
+      const { result } = render({ source, profile, userInfo });
+
+      await waitFor(() => expect(result.current.cvs.store).toEqual(store));
+
+      act(() => result.current.cvs.expireStore());
+
+      expect(result.current.cvs.isStoreExpired).toBe(true);
+      expect(result.current.cvs.storeToken).toBeNull();
+      await waitFor(() => expect(result.current.submitShipping).toBeNull());
     });
   });
 });

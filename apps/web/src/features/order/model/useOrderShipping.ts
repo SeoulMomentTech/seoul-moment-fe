@@ -135,7 +135,7 @@ export const useOrderShipping = ({
   const [shippingMethod, setShippingMethod] =
     useState<UserOrderShippingType>("HOME");
   const [paymentMethod, setPaymentMethod] =
-    useState<UserOrderPaymentMethod>("LINE_PAY");
+    useState<UserOrderPaymentMethod>("ECPAY");
   const [useDefaultShipping, setUseDefaultShippingState] = useState(true);
 
   const form = useForm<OrderShippingValues>({
@@ -194,7 +194,10 @@ export const useOrderShipping = ({
 
       skipProfileFillRef.current = !draft.home.useDefaultShipping;
       setShippingMethod(draft.shippingMethod);
-      setPaymentMethod(draft.paymentMethod);
+      // LINE Pay 는 아직 결제 시작이 안 된다(샌드박스 키 없음). 옛 draft 의 선택은 ECPay 로 되돌린다.
+      setPaymentMethod(
+        draft.paymentMethod === "LINE_PAY" ? "ECPAY" : draft.paymentMethod,
+      );
       setUseDefaultShippingState(draft.home.useDefaultShipping);
       reset(draft.home.values);
       setChain(draft.cvs.chain);
@@ -329,6 +332,12 @@ export const useOrderShipping = ({
     void refetchStore();
   }, [refetchStore]);
 
+  /** 주문 생성이 매장 토큰 만료(400)를 돌려줬을 때. 404 조회 만료와 같은 화면으로 보낸다 */
+  const expireStore = useCallback(() => {
+    setIsStoreExpired(true);
+    setStoreToken(null);
+  }, []);
+
   const values = watch();
   const cvsValues = watchCvs();
 
@@ -430,6 +439,7 @@ export const useOrderShipping = ({
       openCvsMap,
       reselectStore,
       retryStore,
+      expireStore,
     },
     previewShipping,
     isValid,

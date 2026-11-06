@@ -4,13 +4,18 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useForm } from "react-hook-form";
 
-import type { UserOrderInvoiceType } from "@shared/services/userOrder";
+import type {
+  UserOrderInvoice,
+  UserOrderInvoiceType,
+} from "@shared/services/userOrder";
 
 import {
+  fetchUserInvoiceCheck,
   useUserInvoiceCompanyCheckQuery,
   useUserInvoiceLoveCodeCheckQuery,
   useUserInvoiceMobileBarcodeCheckQuery,
 } from "@entities/invoice";
+import { useQueryClient } from "@tanstack/react-query";
 
 import {
   INVOICE_CHECK_FIELD,
@@ -107,6 +112,7 @@ export const useOrderInvoice = () => {
   const type = values.type;
 
   const [checked, setChecked] = useState<CheckedValues>(EMPTY_CHECKED);
+  const queryClient = useQueryClient();
 
   const current = useMemo(() => toCheckedValues(values), [values]);
 
@@ -160,6 +166,14 @@ export const useOrderInvoice = () => {
       check.status === "valid" ||
       check.status === "unverified");
 
+  /**
+   * 결제 버튼을 열어도 되는지. 형식만 맞으면 아직 blur 로 확인되지 않은 값도 허용한다 —
+   * 제출 핸들러가 `ensureChecked` 로 확인을 끝내고 기다린다. 확인 결과가 "등록되지 않음"
+   * 이거나 서버가 거절한 칸은 막는다.
+   */
+  const isSubmittable =
+    isFormatValid && !hasFieldError && check.status !== "invalid";
+
   const submitInvoice = useMemo(
     () => (isValid ? toSubmitInvoice(values) : undefined),
     [isValid, values],
@@ -206,6 +220,35 @@ export const useOrderInvoice = () => {
     [getValues, setError],
   );
 
+  /**
+   * 제출 직전: 현재 값을 확정하고 확인 API 를 기다린다. 형식이 틀리거나 `valid: false` 면
+   * `ok: false`(칸에 문구가 이미/곧 뜬다). API 실패·`verified: false` 는 통과시킨다.
+   */
+  const ensureChecked = useCallback(async (): Promise<
+    { ok: true; invoice: UserOrderInvoice | undefined } | { ok: false }
+  > => {
+    const current = getValues();
+    if (!orderInvoiceSchema.safeParse(current).success) return { ok: false };
+
+    const currentType = current.type;
+    if (!isCheckable(currentType))
+      return { ok: true, invoice: toSubmitInvoice(current) };
+
+    const value = toCheckedValues(current)[currentType];
+    setChecked((prev) =>
+      prev[currentType] === value ? prev : { ...prev, [currentType]: value },
+    );
+
+    try {
+      const data = await fetchUserInvoiceCheck(queryClient, currentType, value);
+      if (!data.valid) return { ok: false };
+    } catch {
+      // 확인을 못 한 것은 거절이 아니다 — 주문 생성이 같은 검사를 다시 한다
+    }
+
+    return { ok: true, invoice: toSubmitInvoice(current) };
+  }, [getValues, queryClient]);
+
   const getDraft = useCallback(() => getValues(), [getValues]);
 
   /** 지도에서 돌아온 draft. 복원값을 확정값으로 삼아 확인 API 가 한 번 나간다(캐시가 있으면 즉시) */
@@ -226,6 +269,8 @@ export const useOrderInvoice = () => {
     confirmField,
     check,
     isValid,
+    isSubmittable,
+    ensureChecked,
     submitInvoice,
     applyServerFieldError,
     getDraft,
