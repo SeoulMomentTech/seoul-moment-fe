@@ -74,37 +74,40 @@ export function OrderPaymentWaiting({
   };
 
   return (
-    <StatusCard
-      actions={
-        <Button
-          disabled={isRetrying}
-          onClick={() => void handleRetry()}
-          type="button"
-          variant="outline"
-        >
-          {t(isRetrying ? "payment_processing" : "payment_retry")}
-        </Button>
-      }
-      description={t(
-        isAttemptFailed
-          ? "payment_not_paid_retry_hint"
-          : COPY[external.mode].hint,
-      )}
-      icon={
-        isAttemptFailed ? (
-          <CircleAlert aria-hidden className="size-7" />
-        ) : (
-          <ExternalLinkIcon aria-hidden className="size-7" />
-        )
-      }
-      meta={<StatusPill>{external.orderNumber}</StatusPill>}
-      spinning={!isAttemptFailed}
-      title={t(
-        isAttemptFailed ? "payment_failed_title" : COPY[external.mode].title,
-      )}
-      tone={isAttemptFailed ? "danger" : "progress"}
-    >
-      <StatusNotice>{t("payment_retry_notice")}</StatusNotice>
-    </StatusCard>
+    // 주문서 제목 아래 남은 첫 화면 안에서 카드를 세로 가운데에 둔다
+    <div className="flex min-h-[60svh] items-center justify-center py-10 max-sm:py-6">
+      <StatusCard
+        actions={
+          <Button
+            disabled={isRetrying}
+            onClick={() => void handleRetry()}
+            type="button"
+            variant="outline"
+          >
+            {t(isRetrying ? "payment_processing" : "payment_retry")}
+          </Button>
+        }
+        description={t(
+          isAttemptFailed
+            ? "payment_not_paid_retry_hint"
+            : COPY[external.mode].hint,
+        )}
+        icon={
+          isAttemptFailed ? (
+            <CircleAlert aria-hidden className="size-7" />
+          ) : (
+            <ExternalLinkIcon aria-hidden className="size-7" />
+          )
+        }
+        meta={<StatusPill>{external.orderNumber}</StatusPill>}
+        spinning={!isAttemptFailed}
+        title={t(
+          isAttemptFailed ? "payment_failed_title" : COPY[external.mode].title,
+        )}
+        tone={isAttemptFailed ? "danger" : "progress"}
+      >
+        <StatusNotice>{t("payment_retry_notice")}</StatusNotice>
+      </StatusCard>
+    </div>
   );
 }

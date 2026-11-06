@@ -56,8 +56,9 @@ export function PaymentResultPage() {
   return (
     <div
       className={cn(
-        "pt-30 mx-auto w-full max-w-7xl px-5 pb-20",
-        "max-sm:pt-21 max-sm:px-4 max-sm:pb-12",
+        // 첫 화면 안에서 카드를 세로 가운데에 둔다. 헤더가 fixed 라 위쪽 여백을 더 준다.
+        "mx-auto flex min-h-svh w-full max-w-7xl items-center justify-center px-5 pb-20 pt-28",
+        "max-sm:px-4 max-sm:pb-12 max-sm:pt-24",
       )}
     >
       {/* 카드 제목이 상태를 말하므로 페이지 제목은 보조기술에만 둔다 */}
