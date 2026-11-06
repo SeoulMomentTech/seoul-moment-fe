@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 
 import { useCopyToClipboard } from "@shared/lib/hooks";
 import { toNTCurrency } from "@shared/lib/utils";
+import type { UserOrderPayment } from "@shared/services/userOrder";
 import {
   StatusInfo,
   StatusNotice,
