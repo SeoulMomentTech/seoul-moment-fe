@@ -29,7 +29,8 @@ export const toPaymentResultState = (
   query: PaymentResultQueryLike,
   delayed: boolean,
 ): PaymentResultState => {
-  if (query.isError) return { kind: "not-found" };
+  // 폴링 중 한 번 실패해도 TanStack 은 직전 data 를 들고 있다 — 그걸 "찾을 수 없음" 으로 덮지 않는다
+  if (query.isError && !query.data) return { kind: "not-found" };
   if (!query.data)
     return query.isPending ? { kind: "loading" } : { kind: "not-found" };
 

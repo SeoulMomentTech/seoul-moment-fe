@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -67,6 +67,11 @@ interface UseOrderSubmitParams {
   onStoreExpired(): void;
   /** 주문 생성 409(구매 불가 라인) — 미리보기를 다시 받아 화면을 맞춘다 */
   onPreviewStale(): void;
+  /**
+   * 제출 직전 최신 미리보기. 화면의 미리보기는 캐시(keepPreviousData)일 수 있어 — 장바구니
+   * 수량을 고치고 돌아온 직후·bfcache 복귀 — 그것으로 키를 만들면 옛 금액의 주문을 재사용한다.
+   */
+  getFreshPreview(): Promise<PostUserOrderPreviewRes | undefined>;
 }
 
 /**
@@ -85,6 +90,7 @@ export const useOrderSubmit = ({
   invoice,
   onStoreExpired,
   onPreviewStale,
+  getFreshPreview,
 }: UseOrderSubmitParams) => {
   const t = useTranslations();
   const createOrder = useCreateUserOrderMutation({ toastOnError: false });
@@ -113,7 +119,7 @@ export const useOrderSubmit = ({
       if (!payment.handoffUrl) {
         toast.error(t("payment_start_failed"));
 
-        return;
+        return null;
       }
 
       const mode = await openPaymentWindow(payment.handoffUrl);
@@ -125,6 +131,8 @@ export const useOrderSubmit = ({
           resultToken: payment.resultToken,
         });
       }
+
+      return mode;
     },
     [startPayment, t],
   );
@@ -196,9 +204,16 @@ export const useOrderSubmit = ({
     setIsSubmitting(true);
     setStockShortage(null);
 
+    // 같은 탭으로 떠나는 중이면 가드를 풀지 않는다 — 풀면 페이지가 바뀌기 전 두 번째 탭이
+    // 결제 시작을 다시 불러, 서버가 지금 열리는 결제창의 시도를 닫아 버린다
+    let leaving = false;
+
     try {
       const checked = await invoice.ensureChecked();
       if (!checked.ok) return;
+
+      const snapshot =
+        (await getFreshPreview().catch(() => undefined)) ?? preview;
 
       const body = {
         ...toOrderSourceBody(source),
@@ -207,7 +222,7 @@ export const useOrderSubmit = ({
         ...(checked.invoice && { invoice: checked.invoice }),
       } as CreateUserOrderVariables;
       const sourceHref = toOrderHref(source);
-      const bodyKey = toPendingBodyKey(body, preview);
+      const bodyKey = toPendingBodyKey(body, snapshot);
 
       let order = findPendingOrder(sourceHref, bodyKey);
 
@@ -239,13 +254,15 @@ export const useOrderSubmit = ({
       }
 
       try {
-        await startAndOpen(order);
+        leaving = (await startAndOpen(order)) === "same-tab";
       } catch (error) {
         await handleStartError(error);
       }
     } finally {
-      submittingRef.current = false;
-      setIsSubmitting(false);
+      if (!leaving) {
+        submittingRef.current = false;
+        setIsSubmitting(false);
+      }
     }
   }, [
     source,
@@ -257,7 +274,21 @@ export const useOrderSubmit = ({
     startAndOpen,
     handleCreateError,
     handleStartError,
+    getFreshPreview,
   ]);
+
+  // 결제창에서 뒤로 오면 bfcache 가 "처리 중" 상태 그대로 페이지를 되살린다. 그때만 가드를 푼다.
+  useEffect(function releaseOnBfcacheRestore() {
+    const onPageShow = (event: PageTransitionEvent) => {
+      if (!event.persisted) return;
+
+      submittingRef.current = false;
+      setIsSubmitting(false);
+    };
+    window.addEventListener("pageshow", onPageShow);
+
+    return () => window.removeEventListener("pageshow", onPageShow);
+  }, []);
 
   /**
    * 대기 화면의 "다시 결제하기". 결제 시작만 다시 부른다. 409(이미 결제됨 — 폴링 지연)는

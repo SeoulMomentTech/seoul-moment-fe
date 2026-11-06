@@ -94,6 +94,19 @@ describe("toPaymentResultState", () => {
     ).toMatchObject({ kind: "failed", reason: "failed" });
   });
 
+  it("폴링 중 일시 실패는 직전 결과를 유지한다", () => {
+    expect(
+      toPaymentResultState(
+        {
+          data: result({ status: "REQUESTED" }),
+          isPending: false,
+          isError: true,
+        },
+        false,
+      ),
+    ).toEqual({ kind: "checking", delayed: false });
+  });
+
   it("에러면 not-found, 아직 없으면 loading", () => {
     expect(
       toPaymentResultState(

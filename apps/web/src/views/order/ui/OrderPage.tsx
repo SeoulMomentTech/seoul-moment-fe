@@ -122,6 +122,7 @@ export function OrderPage() {
     invoice,
     onStoreExpired: shipping.cvs.expireStore,
     onPreviewStale: () => void refetchPreview(),
+    getFreshPreview: async () => (await refetchPreview()).data,
   });
 
   const canSubmit =

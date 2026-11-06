@@ -137,6 +137,7 @@ const ensureChecked = vi.fn();
 const applyServerFieldError = vi.fn();
 const onStoreExpired = vi.fn();
 const onPreviewStale = vi.fn();
+const getFreshPreview = vi.fn();
 
 const baseParams = (): Params => ({
   source,
@@ -146,6 +147,7 @@ const baseParams = (): Params => ({
   invoice: { ensureChecked, applyServerFieldError },
   onStoreExpired,
   onPreviewStale,
+  getFreshPreview,
 });
 
 const render = (params: Params = baseParams()) =>
@@ -159,6 +161,7 @@ describe("useOrderSubmit", () => {
     createUserOrder.mockResolvedValue(createdOrder);
     postUserOrderPayment.mockResolvedValue(startedPayment);
     openPaymentWindow.mockResolvedValue("same-tab");
+    getFreshPreview.mockResolvedValue(preview);
   });
 
   afterEach(() => {
@@ -189,7 +192,6 @@ describe("useOrderSubmit", () => {
       startedPayment.data.handoffUrl,
     );
     expect(sessionStorage.getItem(ORDER_DRAFT_KEY)).toBeNull();
-    expect(result.current.isSubmitting).toBe(false);
     expect(result.current.external).toBeNull();
   });
 
@@ -409,5 +411,60 @@ describe("useOrderSubmit", () => {
     await act(() => result.current.retryPayment());
 
     expect(openPaymentWindow).toHaveBeenCalledTimes(2);
+  });
+
+  it("같은 탭으로 떠나는 중에는 버튼이 다시 열리지 않아 두 번째 결제 시작이 없다", async () => {
+    const { result } = render();
+
+    await act(() => result.current.submit());
+    expect(result.current.isSubmitting).toBe(true);
+
+    await act(() => result.current.submit());
+
+    expect(postUserOrderPayment).toHaveBeenCalledTimes(1);
+  });
+
+  it("bfcache 로 돌아오면(pageshow persisted) 다시 누를 수 있다", async () => {
+    const { result } = render();
+
+    await act(() => result.current.submit());
+    act(() => {
+      const event = new Event("pageshow") as PageTransitionEvent;
+      Object.defineProperty(event, "persisted", { value: true });
+      window.dispatchEvent(event);
+    });
+
+    expect(result.current.isSubmitting).toBe(false);
+    await act(() => result.current.submit());
+    expect(postUserOrderPayment).toHaveBeenCalledTimes(2);
+    expect(createUserOrder).toHaveBeenCalledTimes(1);
+  });
+
+  it("제출할 때 미리보기를 새로 받아 키를 만든다 — 화면의 옛 미리보기로 옛 주문을 재사용하지 않는다", async () => {
+    const body = {
+      cartItemIds: [12],
+      paymentMethod: "ECPAY" as const,
+      shippingType: "HOME" as const,
+      useDefaultShipping: true as const,
+    };
+    // 화면(preview)은 옛 수량 그대로, 서버의 최신 미리보기는 수량이 바뀌었다
+    savePendingOrder({
+      sourceHref: "/order?cart=12",
+      bodyKey: toPendingBodyKey(body, preview),
+      orderId: 480,
+      orderNumber: "SM-0480",
+      totalAmount: 1160,
+    });
+    getFreshPreview.mockResolvedValue({ ...preview, totalAmount: 2260 });
+    const { result } = render();
+
+    await act(() => result.current.submit());
+
+    expect(getFreshPreview).toHaveBeenCalledTimes(1);
+    expect(createUserOrder).toHaveBeenCalledTimes(1);
+    expect(postUserOrderPayment).toHaveBeenCalledWith({
+      orderId: 481,
+      languageCode: "ko",
+    });
   });
 });
