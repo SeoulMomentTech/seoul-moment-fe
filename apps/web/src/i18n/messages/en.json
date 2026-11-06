@@ -569,7 +569,7 @@
   "cvs_recipient_invalid": "ID is checked at pickup. Enter your real name: 2–5 Chinese or 4–10 English letters",
   "cvs_phone_invalid": "Enter a 10-digit mobile number starting with 09",
   "cvs_store_empty_title": "No store chosen yet",
-  "invoice_section_title": "電子發票",
+  "invoice_section_title": "E-invoice (電子發票)",
   "invoice_auto_issue_note": "Issued automatically after payment",
   "invoice_type_member_carrier": "會員載具 (sent to your member email)",
   "invoice_member_carrier_hint": "If you don't choose another option, the invoice is issued to your member email",
