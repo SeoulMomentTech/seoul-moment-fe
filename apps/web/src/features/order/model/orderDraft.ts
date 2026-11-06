@@ -4,6 +4,7 @@ import type {
   UserOrderShippingType,
 } from "@shared/services/userOrder";
 
+import type { OrderInvoiceValues } from "./invoiceSchema";
 import type { OrderShippingValues } from "./schema";
 
 export const ORDER_DRAFT_KEY = "order:draft";
@@ -27,6 +28,8 @@ export interface OrderDraft {
     phone: string;
   };
   paymentMethod: UserOrderPaymentMethod;
+  /** 전자발표 입력. 2026-11-06 이전에 저장된 draft 에는 없다 — 없으면 기본값(회원 載具)으로 둔다 */
+  invoice?: OrderInvoiceValues;
   savedAt: number;
 }
 

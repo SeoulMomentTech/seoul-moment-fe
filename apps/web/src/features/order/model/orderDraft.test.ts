@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { INVOICE_DEFAULT_VALUES } from "./invoiceSchema";
 import {
   clearOrderDraft,
   ORDER_DRAFT_KEY,
@@ -79,6 +80,30 @@ describe("orderDraft", () => {
     });
 
     expect(() => saveOrderDraft(draft)).not.toThrow();
+  });
+
+  it("invoice 를 저장하고 그대로 돌려준다", () => {
+    const invoice = {
+      ...INVOICE_DEFAULT_VALUES,
+      type: "DONATION" as const,
+      loveCode: "168001",
+    };
+
+    saveOrderDraft({ ...draft, invoice });
+
+    expect(takeOrderDraft(draft.sourceHref)?.invoice).toEqual(invoice);
+  });
+
+  it("invoice 가 없는 옛 draft 도 읽힌다", () => {
+    sessionStorage.setItem(
+      ORDER_DRAFT_KEY,
+      JSON.stringify({ ...draft, savedAt: Date.now() }),
+    );
+
+    const restored = peekOrderDraft();
+
+    expect(restored?.cvs.chain).toBe("UNIMART");
+    expect(restored?.invoice).toBeUndefined();
   });
 
   it("clearOrderDraft 는 저장된 draft 를 지운다", () => {

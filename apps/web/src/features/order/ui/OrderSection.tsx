@@ -7,6 +7,8 @@ interface OrderSectionProps extends PropsWithChildren {
   title: string;
   /** 제목 오른쪽 보조 표기 (예: 주문 라인 수) */
   badge?: string;
+  /** 제목 오른쪽 보조 문구 (예: "결제 후 자동 발행"). badge 와 달리 강조하지 않는다 */
+  description?: string;
   className?: string;
 }
 
@@ -19,6 +21,7 @@ interface OrderSectionProps extends PropsWithChildren {
 export function OrderSection({
   title,
   badge,
+  description,
   children,
   className,
 }: OrderSectionProps) {
@@ -44,6 +47,11 @@ export function OrderSection({
         {badge && (
           <span className="text-brand ml-1.5 font-bold tabular-nums">
             {badge}
+          </span>
+        )}
+        {description && (
+          <span className="text-body-4 text-neutral ml-2 font-normal tracking-normal">
+            {description}
           </span>
         )}
       </h2>

@@ -1,5 +1,7 @@
 "use client";
 
+import { useMemo } from "react";
+
 import { ShoppingCartIcon } from "lucide-react";
 
 import { useTranslations } from "next-intl";
@@ -17,12 +19,14 @@ import {
   getCvsChainLabel,
   OrderAmountRows,
   OrderBar,
+  OrderInvoiceSection,
   OrderItemList,
   OrderPaymentSection,
   OrderSection,
   OrderShippingSection,
   OrderSummary,
   useOrderCvsReturn,
+  useOrderInvoice,
   useOrderItems,
   useOrderShipping,
 } from "@features/order";
@@ -79,7 +83,21 @@ export function OrderPage() {
   const source = useOrderSource();
   const { isRedirecting } = useOrderCvsReturn(source);
 
-  const shipping = useOrderShipping({ profile, userInfo, source });
+  // 배송 훅보다 먼저 — 지도에서 돌아온 draft 복원이 배송 훅 안에서 돌면서 발표 입력도 되돌린다
+  const invoice = useOrderInvoice();
+  const invoiceDraft = useMemo(
+    () => ({
+      getDraft: invoice.getDraft,
+      restoreDraft: invoice.restoreDraft,
+    }),
+    [invoice.getDraft, invoice.restoreDraft],
+  );
+  const shipping = useOrderShipping({
+    profile,
+    userInfo,
+    source,
+    invoice: invoiceDraft,
+  });
 
   // 라인도 금액도 미리보기 응답에서 읽는다.
   const {
@@ -173,6 +191,13 @@ export function OrderPage() {
                   />
                 </OrderSection>
 
+                <OrderSection
+                  description={t("invoice_auto_issue_note")}
+                  title={t("invoice_section_title")}
+                >
+                  <OrderInvoiceSection invoice={invoice} />
+                </OrderSection>
+
                 <OrderSection title={t("payment_method")}>
                   <OrderPaymentSection
                     onChange={shipping.setPaymentMethod}
@@ -191,7 +216,7 @@ export function OrderPage() {
 
               <OrderSummary
                 {...amounts}
-                canSubmit={shipping.isValid}
+                canSubmit={shipping.isValid && invoice.isValid}
                 className="top-19 sticky max-sm:hidden"
               />
             </div>
@@ -201,7 +226,7 @@ export function OrderPage() {
               direction="bottom"
             >
               <OrderBar
-                canSubmit={shipping.isValid}
+                canSubmit={shipping.isValid && invoice.isValid}
                 totalAmount={amounts.totalAmount}
               />
             </FixedBox>
