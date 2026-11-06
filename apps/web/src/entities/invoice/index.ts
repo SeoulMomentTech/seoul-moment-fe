@@ -4,3 +4,7 @@ export {
   useUserInvoiceMobileBarcodeCheckQuery,
 } from "./api/useUserInvoiceCheck";
 export { USER_INVOICE_QUERY_KEY, userInvoiceQueryKeys } from "./api/queryKey";
+export {
+  fetchUserInvoiceCheck,
+  type UserInvoiceCheckType,
+} from "./api/fetchUserInvoiceCheck";

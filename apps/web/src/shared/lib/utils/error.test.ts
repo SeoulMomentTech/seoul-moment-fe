@@ -118,6 +118,33 @@ describe("readErrorInfo", () => {
     );
   });
 
+  it("본문의 data(field·productVariantIds)를 그대로 넘긴다", async () => {
+    const info = await readErrorInfo(
+      httpError({
+        status: 409,
+        body: JSON.stringify({
+          message: "Some items are out of stock",
+          code: "CONFLICT",
+          data: { productVariantIds: [101], field: "carrierNum" },
+        }),
+      }),
+    );
+
+    expect(info).toMatchObject({
+      status: 409,
+      code: "CONFLICT",
+      data: { productVariantIds: [101], field: "carrierNum" },
+    });
+  });
+
+  it("data 가 없으면 undefined 다", async () => {
+    const info = await readErrorInfo(
+      httpError({ status: 400, body: JSON.stringify({ message: "m" }) }),
+    );
+
+    expect(info.data).toBeUndefined();
+  });
+
   it("본문을 읽어도 원래 응답은 그대로 읽을 수 있다", async () => {
     // clone 하지 않으면 호출부가 같은 본문을 다시 읽지 못한다.
     const error = httpError({

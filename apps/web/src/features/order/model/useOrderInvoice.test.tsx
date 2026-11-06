@@ -237,6 +237,83 @@ describe("useOrderInvoice", () => {
     expect(result.current.submitInvoice).toBeUndefined();
   });
 
+  it("ensureChecked 는 blur 없이도 확인을 한 번 부르고 결과를 준다", async () => {
+    mobileCheck.mockResolvedValue(ok({ valid: true, verified: true }));
+    const { result } = render();
+
+    act(() => result.current.setType("MOBILE_BARCODE"));
+    act(() => result.current.form.setValue("mobileBarcode", "/abc1234"));
+
+    await expect(result.current.ensureChecked()).resolves.toEqual({
+      ok: true,
+      invoice: { type: "MOBILE_BARCODE", carrierNum: "/ABC1234" },
+    });
+    expect(mobileCheck).toHaveBeenCalledTimes(1);
+    expect(mobileCheck).toHaveBeenCalledWith("/ABC1234");
+    await waitFor(() => expect(result.current.check.status).toBe("valid"));
+  });
+
+  it("ensureChecked 는 valid:false 면 ok:false", async () => {
+    mobileCheck.mockResolvedValue(ok({ valid: false, verified: true }));
+    const { result } = render();
+
+    act(() => result.current.setType("MOBILE_BARCODE"));
+    act(() => result.current.form.setValue("mobileBarcode", "/ABC1234"));
+
+    await expect(result.current.ensureChecked()).resolves.toEqual({
+      ok: false,
+    });
+  });
+
+  it("ensureChecked 는 API 실패면 ok:true", async () => {
+    mobileCheck.mockRejectedValue(new Error("500"));
+    const { result } = render();
+
+    act(() => result.current.setType("MOBILE_BARCODE"));
+    act(() => result.current.form.setValue("mobileBarcode", "/ABC1234"));
+
+    await expect(result.current.ensureChecked()).resolves.toEqual({
+      ok: true,
+      invoice: { type: "MOBILE_BARCODE", carrierNum: "/ABC1234" },
+    });
+  });
+
+  it("ensureChecked 는 형식이 틀리면 호출 없이 ok:false", async () => {
+    const { result } = render();
+
+    act(() => result.current.setType("MOBILE_BARCODE"));
+    act(() => result.current.form.setValue("mobileBarcode", "ABC"));
+
+    await expect(result.current.ensureChecked()).resolves.toEqual({
+      ok: false,
+    });
+    expect(mobileCheck).not.toHaveBeenCalled();
+  });
+
+  it("ensureChecked 는 MEMBER_CARRIER 면 호출 없이 invoice undefined", async () => {
+    const { result } = render();
+
+    await expect(result.current.ensureChecked()).resolves.toEqual({
+      ok: true,
+      invoice: undefined,
+    });
+    expect(mobileCheck).not.toHaveBeenCalled();
+  });
+
+  it("isSubmittable 은 형식만 맞으면 blur 전에도 true, invalid 면 false", async () => {
+    mobileCheck.mockResolvedValue(ok({ valid: false, verified: true }));
+    const { result } = render();
+
+    act(() => result.current.setType("MOBILE_BARCODE"));
+    act(() => result.current.form.setValue("mobileBarcode", "/ABC1234"));
+    expect(result.current.isSubmittable).toBe(true);
+    expect(result.current.isValid).toBe(false);
+
+    act(() => result.current.confirmField());
+    await waitFor(() => expect(result.current.check.status).toBe("invalid"));
+    expect(result.current.isSubmittable).toBe(false);
+  });
+
   it("restoreDraft 는 값을 복원하고 확인을 한 번 부른다", async () => {
     loveCheck.mockResolvedValue(ok({ valid: true, verified: true, name: "x" }));
     const { result } = render();

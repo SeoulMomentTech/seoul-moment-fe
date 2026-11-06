@@ -4,10 +4,19 @@ import { isHTTPError, isTimeoutError } from "ky";
  * 서버가 에러 응답 본문으로 내려주는 공통 shape.
  * swagger 의 4xx/5xx 응답이 모두 이 형태다.
  */
+/** 일부 4xx 가 본문 `data` 로 더 주는 정보 */
+export interface ApiErrorData {
+  /** 400 — 어느 입력 칸이 틀렸는지 (예: carrierNum · loveCode · companyTaxId · storeToken) */
+  field?: string;
+  /** 409 — 재고가 모자란 SKU */
+  productVariantIds?: number[];
+}
+
 export interface ApiErrorBody {
   message?: string;
   code?: string;
   traceId?: string;
+  data?: ApiErrorData;
 }
 
 export interface ErrorInfo {
@@ -26,6 +35,8 @@ export interface ErrorInfo {
   message?: string;
   code?: string;
   traceId?: string;
+  /** 서버가 본문 `data` 로 준 부가 정보. readErrorInfo 만 채운다 */
+  data?: ApiErrorData;
 }
 
 /** 빈 문자열은 메시지가 없는 것으로 취급한다. */
@@ -98,5 +109,6 @@ export const readErrorInfo = async (error: unknown): Promise<ErrorInfo> => {
     message: body.message ?? info.message,
     code: body.code,
     traceId: body.traceId,
+    data: body.data,
   };
 };

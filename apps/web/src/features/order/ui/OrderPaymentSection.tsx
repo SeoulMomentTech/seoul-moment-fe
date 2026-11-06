@@ -15,6 +15,8 @@ interface PaymentOption {
   mark: string;
   markClassName: string;
   descriptionKey: string;
+  /** 아직 결제 시작이 안 되는 수단. 보이되 고를 수 없고 "준비 중" 을 붙인다 */
+  disabled?: boolean;
 }
 
 const PAYMENT_OPTIONS: ReadonlyArray<PaymentOption> = [
@@ -23,6 +25,8 @@ const PAYMENT_OPTIONS: ReadonlyArray<PaymentOption> = [
     mark: "LINE Pay",
     markClassName: "bg-[#06c755] text-white",
     descriptionKey: "payment_line_pay_description",
+    // LINE Pay 샌드박스 키가 들어오기 전까지 결제 시작이 500 이다
+    disabled: true,
   },
   {
     value: "ECPAY",
@@ -63,15 +67,23 @@ export function OrderPaymentSection({
           return (
             <Label
               className={cn(
-                "flex cursor-pointer items-center gap-3 border p-4",
-                value === option.value
-                  ? "border-black"
-                  : "border-black/20 hover:border-black/40",
+                "flex items-center gap-3 border p-4",
+                option.disabled
+                  ? "cursor-not-allowed border-black/10 opacity-60"
+                  : "cursor-pointer",
+                !option.disabled &&
+                  (value === option.value
+                    ? "border-black"
+                    : "border-black/20 hover:border-black/40"),
               )}
               htmlFor={id}
               key={option.value}
             >
-              <RadioGroupItem id={id} value={option.value} />
+              <RadioGroupItem
+                disabled={option.disabled}
+                id={id}
+                value={option.value}
+              />
               <span
                 className={cn(
                   "text-body-5 rounded-[2px] px-1.5 py-1 font-semibold",
@@ -80,7 +92,9 @@ export function OrderPaymentSection({
               >
                 {option.mark}
               </span>
-              <span className="text-body-3">{t(option.descriptionKey)}</span>
+              <span className="text-body-3">
+                {t(option.disabled ? "coming_soon" : option.descriptionKey)}
+              </span>
             </Label>
           );
         })}

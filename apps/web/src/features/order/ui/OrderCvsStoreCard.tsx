@@ -120,10 +120,10 @@ function EmptyCard({ title, hint, action, tone = "neutral" }: EmptyCardProps) {
           )}
         />
         <p
-          className={cn(
-            "text-body-3 font-semibold",
+          className={`text-body-3 ${cn(
+            "font-semibold",
             tone === "danger" && "text-danger",
-          )}
+          )}`}
         >
           {title}
         </p>
