@@ -620,9 +620,6 @@
   "payment_opening_window": "Opening the payment page…",
   "payment_new_tab_title": "Paying in a new tab",
   "payment_new_tab_hint": "This screen updates automatically once you finish in the payment tab. If you closed it, press Pay again",
-  "payment_line_app_title": "Paying in LINE",
-  "payment_line_app_hint": "This screen updates automatically once you finish paying in LINE Pay",
-  "payment_line_pay_inapp_warning": "LINE Pay may not open in this app's browser. Please open this page in the LINE app or in Safari or Chrome",
   "payment_paid_at": "Paid at",
   "payment_method_label": "Payment method",
   "payment_copy": "Copy",
@@ -642,5 +639,8 @@
   "order_repay_notice": "This order hasn't been paid yet. It's cancelled automatically if not paid within 24 hours",
   "order_detail_not_found": "We couldn't find this order",
   "invoice_no": "Invoice number",
-  "invoice_issuing": "Issued once payment is confirmed"
+  "invoice_issuing": "Issued once payment is confirmed",
+  "payment_line_app_title": "Paying in LINE",
+  "payment_line_app_hint": "This screen updates automatically once you finish paying in LINE Pay",
+  "payment_line_pay_inapp_warning": "LINE Pay may not open in this app's browser. Please open this page in the LINE app or in Safari or Chrome"
 }
