@@ -217,7 +217,7 @@ export const useOrderSubmit = ({
     // 같은 탭으로 떠나는 중이면 가드를 풀지 않는다 — 풀면 페이지가 바뀌기 전 두 번째 탭이
     // 결제 시작을 다시 불러, 서버가 지금 열리는 결제창의 시도를 닫아 버린다
     let leaving = false;
-    // 데스크톱은 클릭과 같은 틱에 빈 탭을 연다(첫 await 전). 결제창이 거기 열리지 않으면 닫는다.
+    // 로컬 개발 서버의 데스크톱은 클릭과 같은 틱에 빈 탭을 연다(첫 await 전). 결제창이 거기 열리지 않으면 닫는다.
     const paymentTab = openPaymentTab(t("payment_opening_window"));
     let tabUsed = false;
 

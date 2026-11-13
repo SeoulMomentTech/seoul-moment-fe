@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   isLineInAppBrowser,
@@ -190,11 +190,16 @@ describe("paymentWindow", () => {
     const setPointer = (fine: boolean) =>
       vi.stubGlobal("matchMedia", vi.fn().mockReturnValue({ matches: fine }));
 
-    afterEach(() => {
-      vi.unstubAllGlobals();
+    beforeEach(() => {
+      vi.stubEnv("NODE_ENV", "development");
     });
 
-    it("마우스 기기면 빈 탭을 먼저 열고 opener 를 끊는다", () => {
+    afterEach(() => {
+      vi.unstubAllGlobals();
+      vi.unstubAllEnvs();
+    });
+
+    it("로컬 개발 서버의 마우스 기기면 빈 탭을 먼저 열고 opener 를 끊는다", () => {
       setUserAgent(SAFARI_UA);
       setPointer(true);
       const tab = fakeTab();
@@ -204,6 +209,16 @@ describe("paymentWindow", () => {
       expect(open).toHaveBeenCalledWith("", "_blank");
       expect(tab.opener).toBeNull();
       expect(tab.document.body.textContent).toBe("결제창을 여는 중…");
+    });
+
+    it("배포 빌드면 마우스 기기여도 열지 않는다 — 결제창은 같은 탭에서 돌아온다", () => {
+      vi.stubEnv("NODE_ENV", "production");
+      setUserAgent(SAFARI_UA);
+      setPointer(true);
+      const open = vi.spyOn(window, "open");
+
+      expect(openPaymentTab("x")).toBeNull();
+      expect(open).not.toHaveBeenCalled();
     });
 
     it("터치 기기면 열지 않는다", () => {

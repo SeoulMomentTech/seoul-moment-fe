@@ -5,7 +5,7 @@ import { navigateTo } from "./navigate";
 
 /**
  * 결제창을 어디에 열었는지. `same-tab` 이 아니면 이 화면은 남아서 결과를 기다려야 한다 —
- * `external` 은 LINE 밖 브라우저, `new-tab` 은 데스크톱의 새 탭, `line-app` 은 LINE 앱의
+ * `external` 은 LINE 밖 브라우저, `new-tab` 은 로컬 개발 서버 데스크톱의 새 탭, `line-app` 은 LINE 앱의
  * LINE Pay 화면(`line://` 로 넘겨도 이 페이지가 남을 수 있다).
  */
 export type PaymentWindowMode =
@@ -49,6 +49,12 @@ export const withExternalBrowser = (url: string): string => {
   return next.toString();
 };
 
+/**
+ * 로컬 개발 서버(`next dev`). 배포 환경은 결제창이 같은 탭에서 결과 페이지로 리다이렉트해
+ * 돌아오므로 새 탭을 쓰지 않는다 — 로컬 테스트에서만 주문서를 남겨 두려고 새 탭으로 연다.
+ */
+const isLocalDev = () => process.env.NODE_ENV === "development";
+
 /** 마우스 기기(데스크톱). 모바일은 탭이 쌓이면 원래 탭을 잃기 쉬워 같은 탭으로 간다 */
 const isFinePointer = () =>
   typeof window !== "undefined" &&
@@ -58,10 +64,11 @@ const isFinePointer = () =>
 /**
  * 결제하기 클릭 순간 빈 탭을 먼저 연다. 결제창 URL 은 API 세 번 뒤에 오는데, 브라우저는
  * `await` 뒤의 `window.open` 을 팝업으로 보고 막는다 — 그래서 클릭과 같은 틱에 열어 두고
- * 나중에 주소만 바꾼다. 데스크톱이 아니거나 LINE 안이거나 팝업이 막히면 null(같은 탭).
+ * 나중에 주소만 바꾼다. 로컬 개발 서버의 데스크톱에서만 열고, 그 밖(배포 환경·모바일·LINE 안)
+ * 이거나 팝업이 막히면 null(같은 탭).
  */
 export const openPaymentTab = (loadingText: string): Window | null => {
-  if (isLineInAppBrowser() || !isFinePointer()) return null;
+  if (!isLocalDev() || isLineInAppBrowser() || !isFinePointer()) return null;
 
   const tab = window.open("", "_blank");
   if (!tab) return null;
@@ -81,7 +88,7 @@ export const openPaymentTab = (loadingText: string): Window | null => {
 /**
  * 결제 시작 응답의 결제창으로 보낸다. 열 주소가 없으면 null — 아무 데도 가지 않는다.
  *
- * - 데스크톱(미리 연 탭): 그 탭에 연다(ECPay handoffUrl, LINE Pay paymentUrl).
+ * - 로컬 데스크톱(미리 연 탭): 그 탭에 연다(ECPay handoffUrl, LINE Pay paymentUrl).
  * - LINE Pay: LINE 안이면 appUrl(LINE 앱 결제 화면), 밖이면 paymentUrl 로 같은 탭에서 간다.
  *   외부 브라우저로 넘기지 않는다 — LINE Pay 는 LINE 앱과 붙어 있어야 한다.
  * - ECPay: LINE 안에서는 인앱 브라우저로 결제가 깨질 수 있어 외부 브라우저로 넘긴다 — LIFF
