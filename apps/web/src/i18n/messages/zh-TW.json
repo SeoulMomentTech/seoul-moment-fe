@@ -620,9 +620,6 @@
   "payment_opening_window": "正在開啟付款頁面…",
   "payment_new_tab_title": "正在新分頁付款",
   "payment_new_tab_hint": "在付款分頁完成付款後，此畫面會自動更新。若已關閉分頁，請按「重新付款」",
-  "payment_line_app_title": "正在 LINE 中付款",
-  "payment_line_app_hint": "在 LINE Pay 完成付款後，此畫面會自動更新",
-  "payment_line_pay_inapp_warning": "此 App 的瀏覽器可能無法開啟 LINE Pay，請改用 LINE App 或 Safari、Chrome 開啟此頁面",
   "payment_paid_at": "付款時間",
   "payment_method_label": "付款方式",
   "payment_copy": "複製",
@@ -642,5 +639,8 @@
   "order_repay_notice": "此訂單尚未付款，24 小時內未付款將自動取消",
   "order_detail_not_found": "找不到此訂單",
   "invoice_no": "發票號碼",
-  "invoice_issuing": "付款確認後開立"
+  "invoice_issuing": "付款確認後開立",
+  "payment_line_app_title": "正在 LINE 中付款",
+  "payment_line_app_hint": "在 LINE Pay 完成付款後，此畫面會自動更新",
+  "payment_line_pay_inapp_warning": "此 App 的瀏覽器可能無法開啟 LINE Pay，請改用 LINE App 或 Safari、Chrome 開啟此頁面"
 }
