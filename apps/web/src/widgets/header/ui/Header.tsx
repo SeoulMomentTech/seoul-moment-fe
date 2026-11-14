@@ -2,7 +2,7 @@
 
 import { lazy, useState, Fragment } from "react";
 
-import { MenuIcon, ChevronRightIcon, LogIn, LogOut } from "lucide-react";
+import { MenuIcon, ChevronRightIcon, LogOut, UserRound } from "lucide-react";
 
 import Image from "next/image";
 import { useTranslations } from "next-intl";
@@ -318,13 +318,14 @@ function Mobile() {
               <LogOut className="size-5" />
             </button>
           ) : (
+            // 로그인 전에는 글자를 붙여 비로그인 상태를 드러낸다
             <Link
-              aria-label="Login"
-              className="flex items-center"
+              className="text-body-4 flex items-center gap-1"
               href="/login"
               prefetch={ENABLE_HEADER_PREFETCH}
             >
-              <LogIn className="size-5" />
+              <UserRound aria-hidden="true" className="size-5" />
+              {t("login")}
             </Link>
           ))}
       </div>
