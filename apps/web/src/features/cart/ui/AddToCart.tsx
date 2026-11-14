@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
-import { useMediaQuery } from "@shared/lib/hooks";
+import { useFloatingOffset, useMediaQuery } from "@shared/lib/hooks";
 import { cn } from "@shared/lib/style";
 import type { GetProductDetailRes } from "@shared/services/product";
 import FixedBox from "@shared/ui/fixed-box";
@@ -30,6 +30,26 @@ interface AddToCartProps {
 }
 
 const MOBILE_QUERY = "(max-width: 639px)";
+
+/**
+ * 모바일 하단 고정 구매 바. 바 높이를 전역 오프셋으로 내보내 챗봇 런처가 바 위로 올라가게 한다.
+ * `isMobile` 은 마운트 뒤에야 true 가 되므로, 바가 실제로 그려질 때 ref 가 잡히도록 컴포넌트로 뺐다.
+ */
+function MobileActionBar({ children }: { children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useFloatingOffset(ref);
+
+  return (
+    <FixedBox
+      className="left-0 z-10 px-5 py-4 drop-shadow-[0_-4px_5px_rgba(0,0,0,0.08)]"
+      direction="bottom"
+      ref={ref}
+    >
+      {children}
+    </FixedBox>
+  );
+}
 
 export function AddToCart({ product, likeSlot }: AddToCartProps) {
   const t = useTranslations();
@@ -136,15 +156,12 @@ export function AddToCart({ product, likeSlot }: AddToCartProps) {
   if (isMobile) {
     return (
       <>
-        <FixedBox
-          className="left-0 z-10 px-5 py-4 drop-shadow-[0_-4px_5px_rgba(0,0,0,0.08)]"
-          direction="bottom"
-        >
+        <MobileActionBar>
           {actions({
             onAddToCart: () => setSheetOpen(true),
             onBuyNow: () => setSheetOpen(true),
           })}
-        </FixedBox>
+        </MobileActionBar>
 
         <Drawer onOpenChange={setSheetOpen} open={isSheetOpen}>
           <DrawerContent className="px-5 pb-4">
