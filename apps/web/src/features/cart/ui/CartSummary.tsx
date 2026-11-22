@@ -41,7 +41,6 @@ export function CartSummary({
   selectedCount,
   amount,
   shippingFee,
-  amountToFreeShipping,
   remoteIslandFee,
   totalAmount,
   orderHref,
@@ -50,67 +49,80 @@ export function CartSummary({
   const t = useTranslations();
 
   return (
-    <div className={cn("border border-black/20 p-6", className)}>
-      <p className="text-body-3 text-neutral tabular-nums">
-        {t("cart_selected_count", { count: selectedCount })}
-      </p>
-      <p className="text-body-3 mt-3.5">{t("total_product_amount")}</p>
-      <p className="text-title-2 mt-0.5 font-bold tabular-nums tracking-[-0.03em]">
-        {toNTCurrency(amount)}
-      </p>
+    <div className={cn("grid gap-4", className)}>
+      <section
+        aria-labelledby="cart-order-amount-title"
+        className="border border-black/20 p-5 max-sm:p-4"
+      >
+        <h2
+          className="text-body-1 flex items-baseline justify-between gap-2 font-bold"
+          id="cart-order-amount-title"
+        >
+          {t("order_amount")}
+          <span className="text-body-5 text-neutral font-normal tabular-nums">
+            {t("cart_selected_count", { count: selectedCount })}
+          </span>
+        </h2>
 
-      <div className="text-body-3 mt-4 flex justify-between gap-4">
-        {/* 배송지가 아직 없어 본섬 기준으로 계산한 값이다. 금액 옆에서 바로 알 수 있어야
-            사용자가 이 숫자를 확정 배송비로 읽지 않는다 — 확정은 주문서에서 한다. */}
-        <span>{t("cart_shipping_fee_estimate")}</span>
-        <span className="tabular-nums">
-          {shippingFee > 0 ? toNTCurrency(shippingFee) : t("free_shipping")}
-        </span>
-      </div>
+        <dl className="text-body-3 mt-5 grid gap-3">
+          <div className="flex justify-between gap-4">
+            <dt>{t("total_product_amount")}</dt>
+            <dd className="tabular-nums">{toNTCurrency(amount)}</dd>
+          </div>
+          <div className="flex justify-between gap-4">
+            {/* 배송지가 아직 없어 본섬 기준으로 계산한 값이다. 금액 옆에서 바로 알 수 있어야
+                사용자가 이 숫자를 확정 배송비로 읽지 않는다 — 확정은 주문서에서 한다. */}
+            <dt>{t("cart_shipping_fee_estimate")}</dt>
+            <dd
+              className={cn(
+                "tabular-nums",
+                shippingFee === 0 && amount > 0 && "text-brand font-semibold",
+              )}
+            >
+              {shippingFee > 0 ? toNTCurrency(shippingFee) : t("free_shipping")}
+            </dd>
+          </div>
+        </dl>
 
-      {amountToFreeShipping > 0 && (
-        <p className="text-body-5 text-brand mt-1.5 tabular-nums">
-          {t("free_shipping_remaining", {
-            amount: toNTCurrency(amountToFreeShipping),
-          })}
-        </p>
-      )}
+        <div className="mt-5 flex items-baseline justify-between gap-4 border-t border-black/10 pt-5">
+          <span className="text-body-2 font-bold">
+            {t("estimated_total_amount")}
+          </span>
+          <span className="text-title-4 font-bold tabular-nums tracking-[-0.02em]">
+            {toNTCurrency(totalAmount)}
+          </span>
+        </div>
+      </section>
 
-      <hr className="my-5 border-0 border-t border-black/10" />
-
-      <div className="flex items-baseline justify-between gap-4">
-        <span className="text-body-3">{t("estimated_total_amount")}</span>
-        <span className="text-title-4 font-bold tabular-nums tracking-[-0.02em]">
-          {toNTCurrency(totalAmount)}
-        </span>
-      </div>
-
-      {orderHref ? (
-        <Button asChild className="mt-5 h-12 w-full rounded-[4px] px-0">
-          <Link
-            className="flex h-full w-full items-center justify-center"
-            href={orderHref}
-          >
-            {t("place_order")}
-          </Link>
-        </Button>
-      ) : (
-        <>
-          <Button
-            aria-describedby="cart-order-hint"
-            className="mt-5 h-12 w-full rounded-[4px]"
-            disabled
-            type="button"
-          >
-            {t("place_order")}
+      {/* 모바일은 하단 고정 바(CartBar)가 같은 CTA 를 들고 있다 — 두 번 그리지 않는다 */}
+      <div className="max-sm:hidden">
+        {orderHref ? (
+          <Button asChild className="h-12 w-full rounded-[4px] px-0">
+            <Link
+              className="flex w-full items-center justify-center"
+              href={orderHref}
+            >
+              {t("place_order")}
+            </Link>
           </Button>
-          <p className="text-body-5 text-neutral mt-2" id="cart-order-hint">
-            {t("select_items_to_order")}
-          </p>
-        </>
-      )}
+        ) : (
+          <>
+            <Button
+              aria-describedby="cart-order-hint"
+              className="h-12 w-full rounded-[4px]"
+              disabled
+              type="button"
+            >
+              {t("place_order")}
+            </Button>
+            <p className="text-body-5 text-neutral mt-2" id="cart-order-hint">
+              {t("select_items_to_order")}
+            </p>
+          </>
+        )}
+      </div>
 
-      <p className="text-body-5 text-neutral mt-3.5 leading-relaxed">
+      <p className="text-body-5 text-neutral leading-relaxed">
         {t("cart_shipping_estimate_note", {
           amount: toNTCurrency(remoteIslandFee),
         })}

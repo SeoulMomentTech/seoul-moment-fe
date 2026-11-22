@@ -52,7 +52,7 @@ export function CartBar({
       {orderHref ? (
         <Button asChild className="h-12 w-full rounded-[4px]">
           <Link
-            className="flex h-full w-full items-center justify-center"
+            className="flex w-full items-center justify-center"
             href={orderHref}
           >
             {t("place_order")}
