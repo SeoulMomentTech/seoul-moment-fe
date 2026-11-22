@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 
 import { getLocale } from "next-intl/server";
+import { ErrorBoundary } from "react-error-boundary";
 
 import { cn } from "@shared/lib/style";
 import { getNewsList } from "@shared/services/news";
@@ -17,9 +18,12 @@ export default async function News() {
   const promise = getNewsList({ count: 9, languageCode: locale });
 
   return (
-    <Suspense fallback={<NewsSkeleton />}>
-      <NewsClient promise={promise} />
-    </Suspense>
+    // 섹션 하나의 요청이 실패해도 홈 전체가 에러 페이지로 넘어가지 않게 그 섹션만 뺀다
+    <ErrorBoundary fallback={null}>
+      <Suspense fallback={<NewsSkeleton />}>
+        <NewsClient promise={promise} />
+      </Suspense>
+    </ErrorBoundary>
   );
 }
 
