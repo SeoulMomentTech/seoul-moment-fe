@@ -620,9 +620,6 @@
   "payment_opening_window": "결제창을 여는 중…",
   "payment_new_tab_title": "새 탭에서 결제 중",
   "payment_new_tab_hint": "결제 탭에서 결제를 마치면 이 화면이 자동으로 바뀝니다. 탭을 닫았다면 다시 결제하기를 눌러 주세요",
-  "payment_line_app_title": "LINE에서 결제 중",
-  "payment_line_app_hint": "LINE Pay 화면에서 결제를 마치면 이 화면이 자동으로 바뀝니다",
-  "payment_line_pay_inapp_warning": "이 앱의 브라우저에서는 LINE Pay가 열리지 않을 수 있어요. LINE 앱이나 Safari·Chrome에서 이 페이지를 열어 주세요",
   "payment_paid_at": "결제 일시",
   "payment_method_label": "결제 수단",
   "payment_copy": "복사",
@@ -642,5 +639,8 @@
   "order_repay_notice": "아직 결제되지 않은 주문이에요. 24시간 안에 결제하지 않으면 자동으로 취소돼요",
   "order_detail_not_found": "주문을 찾을 수 없어요",
   "invoice_no": "발표 번호",
-  "invoice_issuing": "결제가 확정되면 발행돼요"
+  "invoice_issuing": "결제가 확정되면 발행돼요",
+  "payment_line_app_title": "LINE에서 결제 중",
+  "payment_line_app_hint": "LINE Pay 화면에서 결제를 마치면 이 화면이 자동으로 바뀝니다",
+  "payment_line_pay_inapp_warning": "이 앱의 브라우저에서는 LINE Pay가 열리지 않을 수 있어요. LINE 앱이나 Safari·Chrome에서 이 페이지를 열어 주세요"
 }
