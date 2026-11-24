@@ -656,5 +656,16 @@
   "tier_current": "Current",
   "international_shipping_discount": "International shipping discount",
   "tier_discount_and_free_shipping": "{amount} off and free main-island shipping",
-  "next_benefit": "Next benefit"
+  "next_benefit": "Next benefit",
+  "order_history": "Order history",
+  "order_filter_all": "All",
+  "order_filter_in_progress": "In progress",
+  "order_filter_completed": "Completed",
+  "order_filter_canceled": "Canceled",
+  "order_period": "Period",
+  "order_period_months": "Last {months} months",
+  "order_period_all": "All time",
+  "order_more_items": "+{count} more",
+  "order_list_empty": "No orders yet",
+  "order_list_error": "Couldn't load your orders"
 }
