@@ -51,8 +51,7 @@ const EMPTY_BRAND_GROUPS: UserCartBrandGroup[] = [];
 export const useCart = () => {
   const t = useTranslations();
 
-  const { data, dataUpdatedAt, isPending, isError, refetch } =
-    useUserCartQuery();
+  const { data, isPending, isError, refetch } = useUserCartQuery();
 
   const setItemQuantity = useSetCartItemQuantity();
   const fetchUserCart = useFetchUserCart();
@@ -231,11 +230,6 @@ export const useCart = () => {
     freeShippingThreshold: data?.freeShippingThreshold ?? 0,
     /** 라인 개수(수량 합이 아니다) */
     totalCount: data?.totalCount ?? 0,
-    /**
-     * 장바구니 캐시가 마지막으로 바뀐 시각. 낙관적 반영과 서버 재조회 때마다 바뀐다.
-     * 서버 계산(주문서 미리보기)을 이 값에 묶어 두면 수량 전송이 끝난 뒤 다시 계산된다.
-     */
-    updatedAt: dataUpdatedAt,
     isPending,
     isError,
     /** 첫 조회가 실패했을 때 화면이 다시 시도할 수단 */

@@ -4,37 +4,40 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useUserAuthStore } from "@shared/lib/hooks/useUserAuthStore";
 
+import { USER_CART_QUERY_KEY } from "@entities/cart";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, renderHook } from "@testing-library/react";
 
 import { useCartPreview } from "./useCartPreview";
 
-const postUserOrderPreview = vi.fn();
-vi.mock("@shared/services/userOrder", async (importOriginal) => ({
-  ...(await importOriginal<typeof UserOrderService>()),
-  postUserOrderPreview: (req: unknown) => postUserOrderPreview(req),
+const postUserCartPreview = vi.fn();
+vi.mock("@shared/services/userCart", async (importOriginal) => ({
+  ...(await importOriginal<typeof UserCartService>()),
+  postUserCartPreview: (req: unknown) => postUserCartPreview(req),
 }));
 
 // eslint-disable-next-line import/order
-import type * as UserOrderService from "@shared/services/userOrder";
+import type * as UserCartService from "@shared/services/userCart";
 
 vi.mock("next/navigation", () => ({ useParams: () => ({ locale: "ko" }) }));
+// @entities/cart 공개 API 가 라인 UI(Link)까지 끌어온다
+vi.mock("@/i18n/navigation", () => ({ Link: () => null }));
 
 const preview = (totalProductAmount: number) => ({
   result: true,
   data: {
     brandGroups: [],
     totalProductAmount,
-    shippingFee: 60,
-    isRemoteIsland: false,
-    isShippingEstimated: true,
+    estimatedShippingFee: 60,
+    remoteIslandFee: 100,
     freeShippingThreshold: 1500,
     amountToFreeShipping: 0,
     internationalDiscount: 0,
     nextDiscountThreshold: 4000,
     nextDiscountAmount: 120,
     amountToNextDiscount: 4000 - totalProductAmount,
-    totalAmount: totalProductAmount + 60,
+    estimatedTotalAmount: totalProductAmount + 60,
+    totalCount: 1,
   },
 });
 
@@ -59,7 +62,7 @@ describe("useCartPreview", () => {
       defaultOptions: { queries: { retry: false } },
     });
     useUserAuthStore.setState({ id: 1, isAuthenticated: true });
-    postUserOrderPreview.mockResolvedValue(preview(1000));
+    postUserCartPreview.mockResolvedValue(preview(1000));
   });
 
   afterEach(() => {
@@ -68,13 +71,13 @@ describe("useCartPreview", () => {
   });
 
   it("고른 라인만 정렬해 미리보기에 넘기고 그 금액을 돌려준다", async () => {
-    const { result } = renderHook(() => useCartPreview(new Set([3, 1]), 100), {
+    const { result } = renderHook(() => useCartPreview(new Set([3, 1])), {
       wrapper,
     });
 
     await flush();
 
-    expect(postUserOrderPreview).toHaveBeenCalledWith({
+    expect(postUserCartPreview).toHaveBeenCalledWith({
       cartItemIds: [1, 3],
       languageCode: "ko",
     });
@@ -83,20 +86,20 @@ describe("useCartPreview", () => {
   });
 
   it("아무것도 고르지 않았으면 부르지 않는다", async () => {
-    const { result } = renderHook(() => useCartPreview(new Set(), 100), {
+    const { result } = renderHook(() => useCartPreview(new Set()), {
       wrapper,
     });
 
     await flush();
 
-    expect(postUserOrderPreview).not.toHaveBeenCalled();
+    expect(postUserCartPreview).not.toHaveBeenCalled();
     expect(result.current.preview).toBeUndefined();
     expect(result.current.isRecalculating).toBe(false);
   });
 
   it("첫 선택은 바로 묻고, 연달아 바꾸면 마지막 선택만 묻는다", async () => {
     const { rerender } = renderHook(
-      ({ ids }: { ids: number[] }) => useCartPreview(new Set(ids), 100),
+      ({ ids }: { ids: number[] }) => useCartPreview(new Set(ids)),
       { wrapper, initialProps: { ids: [1] } },
     );
 
@@ -105,32 +108,38 @@ describe("useCartPreview", () => {
     await flush();
 
     expect(
-      postUserOrderPreview.mock.calls.map(([req]) => req.cartItemIds),
+      postUserCartPreview.mock.calls.map(([req]) => req.cartItemIds),
     ).toEqual([[1], [1, 2, 3]]);
   });
 
-  it("같은 라인이어도 장바구니가 바뀌면(수량 반영) 다시 계산하고, 그동안 다시 계산 중으로 알린다", async () => {
-    const { result, rerender } = renderHook(
-      ({ updatedAt }: { updatedAt: number }) =>
-        useCartPreview(new Set([1]), updatedAt),
-      { wrapper, initialProps: { updatedAt: 100 } },
-    );
+  it("장바구니가 무효화되면(수량 변경·삭제 반영) 같은 라인이어도 다시 계산하고, 그동안 다시 계산 중으로 알린다", async () => {
+    const { result } = renderHook(() => useCartPreview(new Set([1])), {
+      wrapper,
+    });
 
     await flush();
     expect(result.current.preview?.totalProductAmount).toBe(1000);
 
-    postUserOrderPreview.mockResolvedValue(preview(2000));
-    rerender({ updatedAt: 200 });
+    // 응답을 붙잡아 두고 그사이 상태를 본다
+    let respond: (value: unknown) => void = () => {};
+    postUserCartPreview.mockReturnValue(
+      new Promise((resolve) => {
+        respond = resolve;
+      }),
+    );
+    await act(async () => {
+      void queryClient.invalidateQueries({ queryKey: USER_CART_QUERY_KEY });
+      await vi.advanceTimersByTimeAsync(0);
+    });
 
     // 새 금액이 오기 전에는 직전 금액을 보여주며 다시 계산 중이다
     expect(result.current.preview?.totalProductAmount).toBe(1000);
     expect(result.current.isRecalculating).toBe(true);
 
-    // 디바운스가 끝나야 요청이 나가고, 응답은 그다음 틱에 반영된다
-    await flush();
+    respond(preview(2000));
     await flush();
 
-    expect(postUserOrderPreview).toHaveBeenCalledTimes(2);
+    expect(postUserCartPreview).toHaveBeenCalledTimes(2);
     expect(result.current.preview?.totalProductAmount).toBe(2000);
     expect(result.current.isRecalculating).toBe(false);
   });

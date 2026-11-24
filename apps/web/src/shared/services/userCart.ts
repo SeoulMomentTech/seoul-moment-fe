@@ -1,3 +1,5 @@
+import { languageMap } from "@/i18n/const";
+
 import type { CommonRes, PublicLanguageCode } from "./";
 import { api } from "./";
 
@@ -108,6 +110,27 @@ export const getUserCart = ({ languageCode }: PublicLanguageCode) =>
       searchParams: {
         languageCode,
       },
+    })
+    .json<CommonRes<GetUserCartRes>>();
+
+export interface PostUserCartPreviewReq extends PublicLanguageCode {
+  /** 체크한 장바구니 라인 ID (1~100개). 빈 배열은 400 이라 고른 것이 없으면 부르지 않는다 */
+  cartItemIds: number[];
+}
+
+/**
+ * @description 장바구니 금액 미리보기 (체크한 상품만). 응답은 장바구니 조회와 같은 모양이고
+ * 고른 라인만 담긴다. 배송비는 본섬 기준 예상값이다. DB 를 변경하지 않는다.
+ */
+export const postUserCartPreview = ({
+  cartItemIds,
+  languageCode,
+}: PostUserCartPreviewReq) =>
+  api
+    .post("user/cart/preview", {
+      json: { cartItemIds },
+      // beforeRequest 훅은 GET 의 languageCode 쿼리만 Accept-language 로 옮긴다
+      headers: { "Accept-language": languageMap[languageCode] ?? "ko" },
     })
     .json<CommonRes<GetUserCartRes>>();
 

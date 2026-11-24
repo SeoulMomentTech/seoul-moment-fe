@@ -52,25 +52,6 @@ export const orderQueryKeys = {
   list: (userId: number, params: OrderListKeyInput) =>
     [...ORDER_QUERY_KEY, "list", userId, params] as const,
 
-  /**
-   * 장바구니 사이드 패널 금액. 고른 라인과 장바구니가 바뀐 시각을 키에 넣는다 — 같은 라인이라도
-   * 수량이 바뀌면 다시 계산해야 하는데, 수량은 장바구니 캐시가 바뀐 시각으로 드러난다.
-   */
-  cartPreview: (
-    userId: number,
-    cartItemIds: ReadonlyArray<number>,
-    cartUpdatedAt: number,
-    languageCode: LanguageType,
-  ) =>
-    [
-      ...ORDER_QUERY_KEY,
-      "cart-preview",
-      userId,
-      cartItemIds,
-      cartUpdatedAt,
-      languageCode,
-    ] as const,
-
   detail: (
     userId: number,
     orderId: number | null,

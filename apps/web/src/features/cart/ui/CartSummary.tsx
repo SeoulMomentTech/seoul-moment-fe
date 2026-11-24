@@ -36,7 +36,7 @@ interface CartSummaryProps extends CartSummaryValues {
 /**
  * 결제 금액 요약.
  *
- * 금액은 **고른 라인만** 서버(주문서 미리보기)가 계산한 값이다(`useCartPreview`). 배송지가
+ * 금액은 **고른 라인만** 서버(장바구니 미리보기)가 계산한 값이다(`useCartPreview`). 배송지가
  * 없어 배송비는 본섬 기준 예상값이고, 확정은 주문서에서 한다.
  *
  * `주문하기` 는 고른 라인을 주문서로 넘긴다. 비활성으로 남는 것은 주문서 마지막의

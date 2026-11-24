@@ -43,7 +43,6 @@ export function CartList() {
     updateQuantity,
     removeItems,
     restoreItems,
-    updatedAt,
   } = useCart();
 
   const items = useMemo(() => listCartItems(brandGroups), [brandGroups]);
@@ -60,7 +59,6 @@ export function CartList() {
   const selection = useCartSelection(items, unselectableIds);
   const { preview, isRecalculating } = useCartPreview(
     selection.selectedCartItemIds,
-    updatedAt,
   );
 
   // 되돌리기용 스냅샷. 토스트 액션이 실행될 시점에는 목록에서 이미 사라졌으므로 따로 들고 있는다.
@@ -136,7 +134,7 @@ export function CartList() {
       })
     : null;
 
-  // 사이드 패널 금액은 고른 라인 기준 서버 계산(주문서 미리보기)을 쓴다. 첫 응답 전이거나
+  // 사이드 패널 금액은 고른 라인 기준 서버 계산(장바구니 미리보기)을 쓴다. 첫 응답 전이거나
   // 실패했으면 화면 추정치로 채운다 — 할인은 서버만 알아서 그동안은 빼지 않는다.
   const summary = {
     orderHref,
@@ -148,8 +146,8 @@ export function CartList() {
           amount: preview.totalProductAmount,
           amountToFreeShipping: preview.amountToFreeShipping,
           discount: preview.internationalDiscount,
-          shippingFee: preview.shippingFee,
-          totalAmount: preview.totalAmount,
+          shippingFee: preview.estimatedShippingFee,
+          totalAmount: preview.estimatedTotalAmount,
         }
       : {
           amount: selectedAmount,
