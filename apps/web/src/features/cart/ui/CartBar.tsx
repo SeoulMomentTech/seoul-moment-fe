@@ -5,6 +5,7 @@ import { useRef } from "react";
 import { useTranslations } from "next-intl";
 
 import { useFloatingOffset } from "@shared/lib/hooks";
+import { cn } from "@shared/lib/style";
 import { toNTCurrency } from "@shared/lib/utils";
 
 import { Link } from "@/i18n/navigation";
@@ -24,6 +25,7 @@ export function CartBar({
   shippingFee,
   discount,
   totalAmount,
+  isRecalculating = false,
   orderHref,
 }: CartBarProps) {
   const t = useTranslations();
@@ -42,7 +44,13 @@ export function CartBar({
           {t("estimated_total_amount")} (
           {t("cart_selected_count", { count: selectedCount })})
         </span>
-        <span className="text-body-1 font-bold tabular-nums tracking-[-0.02em]">
+        <span
+          aria-busy={isRecalculating}
+          className={cn(
+            "text-body-1 font-bold tabular-nums tracking-[-0.02em] transition-opacity",
+            isRecalculating && "opacity-40",
+          )}
+        >
           {toNTCurrency(totalAmount)}
         </span>
       </div>

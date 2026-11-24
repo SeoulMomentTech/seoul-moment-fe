@@ -28,6 +28,7 @@ import { CartBrandGroupSection } from "./CartBrandGroup";
 import { CartEmpty } from "./CartEmpty";
 import { CartSelectionBar } from "./CartSelectionBar";
 import { CartSummary } from "./CartSummary";
+import { useCartPreview } from "../model/useCartPreview";
 import { useCartSelection } from "../model/useCartSelection";
 
 export function CartList() {
@@ -36,17 +37,13 @@ export function CartList() {
     brandGroups,
     estimatedShippingFee,
     freeShippingThreshold,
-    internationalDiscount,
-    nextDiscountThreshold,
-    nextDiscountAmount,
-    amountToNextDiscount,
-    totalProductAmount,
     isError,
     refetch,
     remoteIslandFee,
     updateQuantity,
     removeItems,
     restoreItems,
+    updatedAt,
   } = useCart();
 
   const items = useMemo(() => listCartItems(brandGroups), [brandGroups]);
@@ -61,6 +58,10 @@ export function CartList() {
   );
 
   const selection = useCartSelection(items, unselectableIds);
+  const { preview, isRecalculating } = useCartPreview(
+    selection.selectedCartItemIds,
+    updatedAt,
+  );
 
   // 되돌리기용 스냅샷. 토스트 액션이 실행될 시점에는 목록에서 이미 사라졌으므로 따로 들고 있는다.
   const removedRef = useRef<UserCartItem[]>([]);
@@ -135,19 +136,28 @@ export function CartList() {
       })
     : null;
 
-  // 서버 할인액은 장바구니 전체 기준이다. 아무것도 안 골랐으면 빼지 않고, 선택 금액을 넘지 않게 자른다.
-  const discount =
-    selectedAmount > 0 ? Math.min(internationalDiscount, selectedAmount) : 0;
-
+  // 사이드 패널 금액은 고른 라인 기준 서버 계산(주문서 미리보기)을 쓴다. 첫 응답 전이거나
+  // 실패했으면 화면 추정치로 채운다 — 할인은 서버만 알아서 그동안은 빼지 않는다.
   const summary = {
-    amount: selectedAmount,
-    amountToFreeShipping: shipping.amountToFreeShipping,
-    discount,
     orderHref,
     remoteIslandFee,
     selectedCount: selection.selectedCount,
-    shippingFee: shipping.fee,
-    totalAmount: selectedAmount + shipping.fee - discount,
+    isRecalculating,
+    ...(preview
+      ? {
+          amount: preview.totalProductAmount,
+          amountToFreeShipping: preview.amountToFreeShipping,
+          discount: preview.internationalDiscount,
+          shippingFee: preview.shippingFee,
+          totalAmount: preview.totalAmount,
+        }
+      : {
+          amount: selectedAmount,
+          amountToFreeShipping: shipping.amountToFreeShipping,
+          discount: 0,
+          shippingFee: shipping.fee,
+          totalAmount: selectedAmount + shipping.fee,
+        }),
   };
 
   return (
@@ -186,15 +196,20 @@ export function CartList() {
 
         <div className="top-19 sticky grid gap-4 max-lg:static">
           <CartBenefitProgress
-            amount={selectedAmount}
-            discount={{
-              amount: totalProductAmount,
-              internationalDiscount,
-              nextDiscountThreshold,
-              nextDiscountAmount,
-              amountToNextDiscount,
-            }}
-            freeShippingThreshold={freeShippingThreshold}
+            amount={summary.amount}
+            discount={
+              preview && {
+                amount: preview.totalProductAmount,
+                internationalDiscount: preview.internationalDiscount,
+                nextDiscountThreshold: preview.nextDiscountThreshold,
+                nextDiscountAmount: preview.nextDiscountAmount,
+                amountToNextDiscount: preview.amountToNextDiscount,
+              }
+            }
+            freeShippingThreshold={
+              preview?.freeShippingThreshold ?? freeShippingThreshold
+            }
+            isRecalculating={isRecalculating}
           />
           <CartSummary {...summary} className="max-sm:hidden" />
         </div>

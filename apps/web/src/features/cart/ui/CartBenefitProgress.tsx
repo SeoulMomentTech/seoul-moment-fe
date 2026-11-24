@@ -24,6 +24,8 @@ interface CartBenefitProgressProps {
    * `amount` 는 서버가 구간을 잰 장바구니 전체 금액(구매 가능 라인 합)이다 — 선택과 무관하다.
    */
   discount?: UserInternationalDiscount & { amount: number };
+  /** 고른 라인·수량이 바뀌어 서버가 다시 계산하는 중. 지금 진행도는 직전 기준이다 */
+  isRecalculating?: boolean;
   className?: string;
 }
 
@@ -56,6 +58,7 @@ export function CartBenefitProgress({
   amount,
   freeShippingThreshold,
   discount,
+  isRecalculating = false,
   className,
 }: CartBenefitProgressProps) {
   const t = useTranslations();
@@ -126,8 +129,13 @@ export function CartBenefitProgress({
 
   return (
     <section
+      aria-busy={isRecalculating}
       aria-labelledby="cart-benefit-progress-title"
-      className={cn("border border-black/20 p-5 max-sm:p-4", className)}
+      className={cn(
+        "border border-black/20 p-5 transition-opacity max-sm:p-4",
+        isRecalculating && "opacity-60",
+        className,
+      )}
     >
       <div className="flex items-start justify-between gap-4">
         <h2
