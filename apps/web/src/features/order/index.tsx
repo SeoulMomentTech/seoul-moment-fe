@@ -5,6 +5,7 @@ export { OrderCvsStoreCard } from "./ui/OrderCvsStoreCard";
 export { OrderInvoiceSection } from "./ui/OrderInvoiceSection";
 export { OrderDetail } from "./ui/OrderDetail";
 export { OrderItemList } from "./ui/OrderItemList";
+export { OrderList } from "./ui/OrderList";
 export { OrderPaymentSection } from "./ui/OrderPaymentSection";
 export { OrderPaymentWaiting } from "./ui/OrderPaymentWaiting";
 export { OrderStockShortage } from "./ui/OrderStockShortage";

@@ -130,6 +130,42 @@ describe("OrderDetail", () => {
     expect(screen.queryByRole("button", { name: ko.payment_retry })).toBeNull();
   });
 
+  it("상태 배지는 서버 문구를 쓰고, 결제 완료면 배송 단계 진행바를 그린다", async () => {
+    getUserOrderDetail.mockResolvedValue(
+      ok({
+        ...base,
+        statusLabel: "已付款",
+        deliveryStage: "PREPARING_ORDER",
+        deliveryStageLabel: "商品準備中",
+        deliveryStep: 2,
+      }),
+    );
+
+    render(<OrderDetail orderId={481} />, { wrapper });
+
+    expect(await screen.findByText("已付款")).toBeInTheDocument();
+    const progress = screen.getByRole("progressbar", { name: "商品準備中" });
+    expect(progress).toHaveAttribute("aria-valuenow", "2");
+  });
+
+  it("취소된 주문은 진행바 없이 배지로만 보여준다", async () => {
+    getUserOrderDetail.mockResolvedValue(
+      ok({
+        ...base,
+        status: "CANCELED",
+        statusLabel: "訂單已取消",
+        deliveryStage: "ORDER_CONFIRMED",
+        deliveryStageLabel: "訂單確認",
+        deliveryStep: 1,
+      }),
+    );
+
+    render(<OrderDetail orderId={481} />, { wrapper });
+
+    expect(await screen.findByText("訂單已取消")).toBeInTheDocument();
+    expect(screen.queryByRole("progressbar")).toBeNull();
+  });
+
   it("국제배송비 지원 할인이 있으면 금액 표에 할인 행을 그리고, 없으면 숨긴다", async () => {
     getUserOrderDetail.mockResolvedValue(
       ok({ ...base, internationalDiscount: 120, totalAmount: 1410 }),
