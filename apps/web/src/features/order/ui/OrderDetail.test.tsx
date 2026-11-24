@@ -16,7 +16,8 @@ const getUserOrderDetail = vi.fn();
 const postUserOrderPayment = vi.fn();
 vi.mock("@shared/services/userOrder", async (importOriginal) => ({
   ...(await importOriginal<typeof UserOrderService>()),
-  getUserOrderDetail: (id: number) => getUserOrderDetail(id),
+  getUserOrderDetail: ({ orderId }: { orderId: number }) =>
+    getUserOrderDetail(orderId),
   postUserOrderPayment: (req: unknown) => postUserOrderPayment(req),
 }));
 

@@ -1,7 +1,11 @@
 import { languageMap, type LanguageType } from "@/i18n/const";
 
 import type { CvsStore } from "./logistics";
-import type { UserCartBrandGroup, UserCartItem } from "./userCart";
+import type {
+  UserCartBrandGroup,
+  UserCartItem,
+  UserInternationalDiscount,
+} from "./userCart";
 
 import type { CommonRes, PublicLanguageCode } from "./";
 import { api } from "./";
@@ -62,7 +66,7 @@ export interface UserOrderPreviewBrandGroup
   items: UserOrderPreviewItem[];
 }
 
-export interface PostUserOrderPreviewRes {
+export interface PostUserOrderPreviewRes extends UserInternationalDiscount {
   /** 브랜드별 묶음 (표시용) */
   brandGroups: UserOrderPreviewBrandGroup[];
   totalProductAmount: number;
@@ -311,6 +315,18 @@ export type UserOrderShippingInfo =
       cvsStore: CvsStore;
     };
 
+/**
+ * 배송 6단계. 결제·취소·환불 상태(status)와 독립이다.
+ * INTERNATIONAL_SHIPPING 은 실제 국제운송이 시작된 때만이고, ARRIVED_TAIWAN 은 통관 완료와 다르다.
+ */
+export type UserOrderDeliveryStage =
+  | "ORDER_CONFIRMED"
+  | "PREPARING_ORDER"
+  | "INTERNATIONAL_SHIPPING"
+  | "ARRIVED_TAIWAN"
+  | "LOCAL_DELIVERY"
+  | "DELIVERED";
+
 export interface GetUserOrderDetailRes {
   orderId: number;
   orderNumber: string;
@@ -322,7 +338,16 @@ export interface GetUserOrderDetailRes {
   isRemoteIsland: boolean;
   /** 주문 시점의 무료배송 임계금액 */
   freeShippingThreshold: number;
+  /** 국제배송비 지원 할인액 스냅샷(NT$). 없으면 0 */
+  internationalDiscount: number;
   totalAmount: number;
+  /** 주문 상태 문구 (Accept-language 로 번역) */
+  statusLabel: string;
+  deliveryStage: UserOrderDeliveryStage;
+  /** 배송 단계 문구 */
+  deliveryStageLabel: string;
+  /** 진행바 위치 (1~6) */
+  deliveryStep: number;
   orderedAt: string;
   paidAt?: string | null;
   /** 가장 최근 결제 시도. 결제를 시작하기 전이면 null */
@@ -333,11 +358,98 @@ export interface GetUserOrderDetailRes {
   shipping: UserOrderShippingInfo;
 }
 
+export interface GetUserOrderDetailReq extends PublicLanguageCode {
+  orderId: number;
+}
+
 /**
- * @description 주문 상세 조회
+ * @description 주문 상세 조회. 언어는 statusLabel · deliveryStageLabel 문구에 쓰인다.
  */
-export const getUserOrderDetail = (orderId: number) =>
-  api.get(`user/order/${orderId}`).json<CommonRes<GetUserOrderDetailRes>>();
+export const getUserOrderDetail = ({
+  orderId,
+  languageCode,
+}: GetUserOrderDetailReq) =>
+  api
+    .get(`user/order/${orderId}`, {
+      searchParams: {
+        languageCode,
+      },
+    })
+    .json<CommonRes<GetUserOrderDetailRes>>();
+
+/**
+ * 주문 목록 필터. ALL 전체 / IN_PROGRESS 입금 대기·배송 전~배송 중 /
+ * COMPLETED 배송 완료 / CANCELED 취소·환불 대상
+ */
+export type UserOrderListStatusFilter =
+  | "ALL"
+  | "IN_PROGRESS"
+  | "COMPLETED"
+  | "CANCELED";
+
+export interface GetUserOrderListReq extends PublicLanguageCode {
+  /** 기본 ALL. 결제 전(PENDING) 주문은 어느 필터에도 나오지 않는다 */
+  status?: UserOrderListStatusFilter;
+  /** 최근 N개월만. 생략하면 전체 기간 */
+  months?: number;
+  /** 기본 1 */
+  page?: number;
+  /** 페이지 크기. 기본 10, 최대 50 */
+  count?: number;
+}
+
+export interface UserOrderListItem {
+  orderId: number;
+  orderNumber: string;
+  orderedAt: string;
+  paidAt?: string | null;
+  /** 결제 전(PENDING) 주문은 목록에 나오지 않는다 */
+  status: Exclude<UserOrderStatus, "PENDING">;
+  /** 주문 상태 문구 (Accept-language 로 번역) */
+  statusLabel: string;
+  /** 취소·환불은 이 값에 섞지 않고 status 로 본다 */
+  deliveryStage: UserOrderDeliveryStage;
+  /** 배송 단계 문구 */
+  deliveryStageLabel: string;
+  /** 진행바 위치 (1~6) */
+  deliveryStep: number;
+  /** 최종 결제 금액 NT$ */
+  totalAmount: number;
+  /** 국제배송비 지원 할인액 NT$ */
+  internationalDiscount: number;
+  representativeProductName?: string | null;
+  representativeImageUrl?: string | null;
+  representativeOptionText?: string | null;
+  /** 주문 상품 라인 수 ("외 N건" 계산용) */
+  itemCount: number;
+}
+
+export interface GetUserOrderListRes {
+  total: number;
+  list: UserOrderListItem[];
+}
+
+/**
+ * @description 내 주문 목록 (주문조회). 최신 주문부터 내려오며 결제 전(PENDING) 주문은 빠진다.
+ */
+export const getUserOrderList = ({
+  status,
+  months,
+  page,
+  count,
+  languageCode,
+}: GetUserOrderListReq) =>
+  api
+    .get("user/order", {
+      searchParams: {
+        status,
+        months,
+        page,
+        count,
+        languageCode,
+      },
+    })
+    .json<CommonRes<GetUserOrderListRes>>();
 
 export interface PostUserOrderPaymentReq extends PublicLanguageCode {
   orderId: number;

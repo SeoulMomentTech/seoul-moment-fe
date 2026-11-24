@@ -68,7 +68,22 @@ export interface UserCartBrandGroup {
   productAmount: number;
 }
 
-export interface GetUserCartRes {
+/**
+ * 국제배송비 지원 할인. 상품 합계 구간에 따라 할인액이 정해지고 합계에서 1회 차감된다.
+ * 장바구니 조회와 주문서 미리보기가 같은 필드를 내려준다.
+ */
+export interface UserInternationalDiscount {
+  /** 국제배송비 지원 할인액(NT$). 기능이 꺼져 있으면 0 */
+  internationalDiscount: number;
+  /** 다음 할인 구간의 상품 합계 기준(NT$). 기능이 꺼져 있거나 마지막 구간이면 null */
+  nextDiscountThreshold?: number | null;
+  /** 다음 구간에서 받는 할인액(NT$). 없으면 null */
+  nextDiscountAmount?: number | null;
+  /** 다음 할인 구간까지 남은 금액(NT$). 다음 구간이 없으면 0 */
+  amountToNextDiscount: number;
+}
+
+export interface GetUserCartRes extends UserInternationalDiscount {
   /** 브랜드별 묶음은 표시용이다. 배송비는 브랜드와 무관하게 주문 1건당 1회다 */
   brandGroups: UserCartBrandGroup[];
   /** 상품 금액 합 (구매 가능 라인만) */

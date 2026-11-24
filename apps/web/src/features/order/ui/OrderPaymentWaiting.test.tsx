@@ -15,7 +15,8 @@ import { OrderPaymentWaiting } from "./OrderPaymentWaiting";
 const getUserOrderDetail = vi.fn();
 vi.mock("@shared/services/userOrder", async (importOriginal) => ({
   ...(await importOriginal<typeof UserOrderService>()),
-  getUserOrderDetail: (orderId: number) => getUserOrderDetail(orderId),
+  getUserOrderDetail: ({ orderId }: { orderId: number }) =>
+    getUserOrderDetail(orderId),
 }));
 
 // eslint-disable-next-line import/order
@@ -25,6 +26,8 @@ const replace = vi.fn();
 vi.mock("@/i18n/navigation", () => ({
   useRouter: () => ({ replace, push: vi.fn() }),
 }));
+
+vi.mock("next/navigation", () => ({ useParams: () => ({ locale: "ko" }) }));
 
 const detail = (
   status: string,
