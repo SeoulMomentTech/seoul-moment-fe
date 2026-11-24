@@ -36,6 +36,7 @@ import { HomeBannersPage } from "@pages/HomeBannerPage";
 import HomePage from "@pages/HomePage";
 import LoginPage from "@pages/LoginPage";
 import NewsPage from "@pages/NewsPage";
+import { OrderListPage } from "@pages/OrderPage";
 import { ProductBannerPage } from "@pages/ProductBannerPage";
 import ProductCategoriesPage from "@pages/ProductCategoriesPage";
 import {
@@ -101,6 +102,10 @@ const privateRoutes: RouteObject[] = [
       {
         path: PATH.INDEX,
         element: <HomePage />,
+      },
+      {
+        path: PATH.ORDERS,
+        element: <OrderListPage />,
       },
       {
         path: PATH.PRODUCTS,

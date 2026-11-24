@@ -11,6 +11,7 @@ import {
   BookOpenText,
   Ticket,
   Users,
+  ClipboardList,
 } from "lucide-react";
 
 import { PATH } from "@shared/constants/route";
@@ -58,6 +59,12 @@ const menuItems: MenuItemConfig[] = [
     path: PATH.MEMBERS,
     label: "회원 관리",
     icon: <Users className="h-5 w-5" />,
+  },
+  {
+    id: "orders",
+    path: PATH.ORDERS,
+    label: "주문 및 발주 관리",
+    icon: <ClipboardList className="h-5 w-5" />,
   },
   //{
   //  id: "users",
