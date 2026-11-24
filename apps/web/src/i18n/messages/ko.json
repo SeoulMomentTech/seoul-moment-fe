@@ -654,5 +654,7 @@
   "tier_applied": "{benefit} 적용 중",
   "tier_view_all": "전체 혜택 단계 보기",
   "tier_current": "현재 적용",
-  "international_shipping_discount": "국제배송비 지원 할인"
+  "international_shipping_discount": "국제배송비 지원 할인",
+  "tier_discount_and_free_shipping": "{amount} 할인과 본섬 무료배송",
+  "next_benefit": "다음 혜택"
 }
