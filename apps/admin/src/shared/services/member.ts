@@ -289,3 +289,30 @@ export const getAdminMemberRecentList = (
     `/admin/member/${userId}/recent`,
     { params },
   );
+
+/** 마케팅 수신 동의 변경. 보낸 필드만 바뀌고 셋 다 비어 있으면 400 이다 */
+export interface PatchAdminMemberAgreementRequest {
+  /** 신상품·기획전 알림. true 면 서버가 현재 시각으로 동의 일시를 넣고 false 면 비운다 */
+  newProduct?: boolean;
+  /** 광고·이벤트 이메일 */
+  ad?: boolean;
+  /** 개인 맞춤 상품 추천 */
+  recommend?: boolean;
+}
+
+/**
+ * @description 회원 강제 탈퇴 (super_admin 전용). 본인 탈퇴와 같은 처리라 식별정보가 익명화되고
+ * SNS 연동·좋아요·최근 본 상품이 지워지며 토큰이 무효화된다. 복구되지 않는다
+ * Swagger: AdminMemberController_deleteMember
+ */
+export const deleteAdminMember = (userId: AdminMemberId) =>
+  fetcher.delete(`/admin/member/${userId}`);
+
+/**
+ * @description 회원 마케팅 수신 동의 변경 (super_admin 전용). 이용약관·개인정보 동의는 바꿀 수 없다
+ * Swagger: AdminMemberController_patchMemberAgreement
+ */
+export const updateAdminMemberAgreement = (
+  userId: AdminMemberId,
+  payload: PatchAdminMemberAgreementRequest,
+) => fetcher.patch(`/admin/member/${userId}/agreement`, payload);

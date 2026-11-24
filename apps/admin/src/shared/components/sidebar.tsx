@@ -11,6 +11,8 @@ import {
   BookOpenText,
   Ticket,
   Users,
+  ClipboardList,
+  Settings,
 } from "lucide-react";
 
 import { PATH } from "@shared/constants/route";
@@ -58,6 +60,12 @@ const menuItems: MenuItemConfig[] = [
     path: PATH.MEMBERS,
     label: "회원 관리",
     icon: <Users className="h-5 w-5" />,
+  },
+  {
+    id: "orders",
+    path: PATH.ORDERS,
+    label: "주문 및 발주 관리",
+    icon: <ClipboardList className="h-5 w-5" />,
   },
   //{
   //  id: "users",
@@ -145,9 +153,28 @@ const menuItems: MenuItemConfig[] = [
     path: PATH.PROMOTION,
     icon: <Ticket className="h-5 w-5" />,
   },
+  {
+    id: "settings",
+    label: "설정",
+    path: "",
+    icon: <Settings className="h-5 w-5" />,
+    subItems: [
+      {
+        id: "shipping-policy",
+        label: "배송비 정책",
+        path: PATH.SHIPPING_POLICY,
+      },
+    ],
+  },
 ];
 
-const defaultExpandedMenus: MenuItem[] = ["users", "products", "brand", "news"];
+const defaultExpandedMenus: MenuItem[] = [
+  "users",
+  "products",
+  "brand",
+  "news",
+  "settings",
+];
 
 export default function Sidebar({
   isMobileMenuOpen,

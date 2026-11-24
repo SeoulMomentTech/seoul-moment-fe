@@ -36,6 +36,7 @@ import { HomeBannersPage } from "@pages/HomeBannerPage";
 import HomePage from "@pages/HomePage";
 import LoginPage from "@pages/LoginPage";
 import NewsPage from "@pages/NewsPage";
+import { OrderListPage } from "@pages/OrderPage";
 import { ProductBannerPage } from "@pages/ProductBannerPage";
 import ProductCategoriesPage from "@pages/ProductCategoriesPage";
 import {
@@ -47,6 +48,7 @@ import ProductOptionsPage from "@pages/ProductOptionsPage";
 import ProductsPage from "@pages/ProductPage";
 import ProductSubCategoriesPage from "@pages/ProductSubCategoriesPage";
 import PromotionPage from "@pages/PromotionPage";
+import { ShippingPolicyPage } from "@pages/ShippingPolicyPage";
 import SignUpPage from "@pages/SignUpPage";
 import UserPage from "@pages/UserPage";
 
@@ -101,6 +103,14 @@ const privateRoutes: RouteObject[] = [
       {
         path: PATH.INDEX,
         element: <HomePage />,
+      },
+      {
+        path: PATH.ORDERS,
+        element: <OrderListPage />,
+      },
+      {
+        path: PATH.SHIPPING_POLICY,
+        element: <ShippingPolicyPage />,
       },
       {
         path: PATH.PRODUCTS,

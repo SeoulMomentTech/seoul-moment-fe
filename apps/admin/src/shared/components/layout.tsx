@@ -19,6 +19,7 @@ export type MenuItem =
   | "orders"
   | "analytics"
   | "settings"
+  | "shipping-policy"
   | "banner"
   | "home-banner"
   | "product-banner"
