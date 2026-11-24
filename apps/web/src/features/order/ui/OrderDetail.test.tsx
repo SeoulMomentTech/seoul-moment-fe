@@ -130,6 +130,28 @@ describe("OrderDetail", () => {
     expect(screen.queryByRole("button", { name: ko.payment_retry })).toBeNull();
   });
 
+  it("국제배송비 지원 할인이 있으면 금액 표에 할인 행을 그리고, 없으면 숨긴다", async () => {
+    getUserOrderDetail.mockResolvedValue(
+      ok({ ...base, internationalDiscount: 120, totalAmount: 1410 }),
+    );
+
+    const { unmount } = render(<OrderDetail orderId={481} />, { wrapper });
+
+    expect(
+      await screen.findByText(ko.international_shipping_discount),
+    ).toBeInTheDocument();
+    expect(screen.getByText("-NT$120")).toBeInTheDocument();
+
+    unmount();
+    getUserOrderDetail.mockResolvedValue(
+      ok({ ...base, internationalDiscount: 0 }),
+    );
+    render(<OrderDetail orderId={481} />, { wrapper });
+
+    expect(await screen.findByText("SM-20261106-000011")).toBeInTheDocument();
+    expect(screen.queryByText(ko.international_shipping_discount)).toBeNull();
+  });
+
   it("편의점 픽업이면 체인·매장명·매장 주소를 그린다", async () => {
     getUserOrderDetail.mockResolvedValue(
       ok({

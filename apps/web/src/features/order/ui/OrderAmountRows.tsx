@@ -11,7 +11,9 @@ export interface OrderAmountValues {
   shippingFee: number | null;
   /** 배송비가 정해진 근거 표기 (예: `臺北市 信義區 · 본섬`). 미확정이면 `null` */
   regionLabel: string | null;
-  /** 배송비가 미확정이면 상품 금액과 같다 */
+  /** 국제배송비 지원 할인액. 0 이면 행을 그리지 않는다 */
+  discount?: number;
+  /** 상품 금액 + 배송비 - 할인. 배송비가 미확정이면 배송비를 빼고 계산한다 */
   totalAmount: number;
   /**
    * 주소를 바꿔 금액을 다시 묻는 중. 지금 보이는 배송비·합계는 직전 주소 기준이라
@@ -30,6 +32,7 @@ export function OrderAmountRows({
   productAmount,
   shippingFee,
   regionLabel,
+  discount = 0,
   totalAmount,
   isRecalculating = false,
 }: OrderAmountValues) {
@@ -69,6 +72,21 @@ export function OrderAmountRows({
         >
           {regionLabel}
         </p>
+      )}
+
+      {discount > 0 && (
+        <div className="text-body-3 flex justify-between gap-4 py-1.5">
+          <span>{t("international_shipping_discount")}</span>
+          <span
+            aria-busy={isRecalculating}
+            className={cn(
+              "text-brand font-semibold tabular-nums transition-opacity",
+              isRecalculating && "opacity-40",
+            )}
+          >
+            -{toNTCurrency(discount)}
+          </span>
+        </div>
       )}
 
       <hr className="my-4 border-0 border-t border-black/10" />

@@ -23,10 +23,12 @@ import { toOrderHref } from "@entities/order";
 import { Button } from "@seoul-moment/ui";
 
 import { CartBar } from "./CartBar";
+import { CartBenefitProgress } from "./CartBenefitProgress";
 import { CartBrandGroupSection } from "./CartBrandGroup";
 import { CartEmpty } from "./CartEmpty";
 import { CartSelectionBar } from "./CartSelectionBar";
 import { CartSummary } from "./CartSummary";
+import { useCartPreview } from "../model/useCartPreview";
 import { useCartSelection } from "../model/useCartSelection";
 
 export function CartList() {
@@ -55,6 +57,9 @@ export function CartList() {
   );
 
   const selection = useCartSelection(items, unselectableIds);
+  const { preview, isRecalculating } = useCartPreview(
+    selection.selectedCartItemIds,
+  );
 
   // 되돌리기용 스냅샷. 토스트 액션이 실행될 시점에는 목록에서 이미 사라졌으므로 따로 들고 있는다.
   const removedRef = useRef<UserCartItem[]>([]);
@@ -129,14 +134,28 @@ export function CartList() {
       })
     : null;
 
+  // 사이드 패널 금액은 고른 라인 기준 서버 계산(장바구니 미리보기)을 쓴다. 첫 응답 전이거나
+  // 실패했으면 화면 추정치로 채운다 — 할인은 서버만 알아서 그동안은 빼지 않는다.
   const summary = {
-    amount: selectedAmount,
-    amountToFreeShipping: shipping.amountToFreeShipping,
     orderHref,
     remoteIslandFee,
     selectedCount: selection.selectedCount,
-    shippingFee: shipping.fee,
-    totalAmount: selectedAmount + shipping.fee,
+    isRecalculating,
+    ...(preview
+      ? {
+          amount: preview.totalProductAmount,
+          amountToFreeShipping: preview.amountToFreeShipping,
+          discount: preview.internationalDiscount,
+          shippingFee: preview.estimatedShippingFee,
+          totalAmount: preview.estimatedTotalAmount,
+        }
+      : {
+          amount: selectedAmount,
+          amountToFreeShipping: shipping.amountToFreeShipping,
+          discount: 0,
+          shippingFee: shipping.fee,
+          totalAmount: selectedAmount + shipping.fee,
+        }),
   };
 
   return (
@@ -173,7 +192,25 @@ export function CartList() {
           ))}
         </div>
 
-        <CartSummary {...summary} className="top-19 sticky max-sm:hidden" />
+        <div className="top-19 sticky grid gap-4 max-lg:static">
+          <CartBenefitProgress
+            amount={summary.amount}
+            discount={
+              preview && {
+                amount: preview.totalProductAmount,
+                internationalDiscount: preview.internationalDiscount,
+                nextDiscountThreshold: preview.nextDiscountThreshold,
+                nextDiscountAmount: preview.nextDiscountAmount,
+                amountToNextDiscount: preview.amountToNextDiscount,
+              }
+            }
+            freeShippingThreshold={
+              preview?.freeShippingThreshold ?? freeShippingThreshold
+            }
+            isRecalculating={isRecalculating}
+          />
+          <CartSummary {...summary} className="max-sm:hidden" />
+        </div>
       </div>
 
       {/* 모바일에서는 sticky 패널 대신 하단 고정 바 */}

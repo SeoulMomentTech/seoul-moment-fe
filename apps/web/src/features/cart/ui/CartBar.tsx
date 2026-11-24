@@ -5,6 +5,7 @@ import { useRef } from "react";
 import { useTranslations } from "next-intl";
 
 import { useFloatingOffset } from "@shared/lib/hooks";
+import { cn } from "@shared/lib/style";
 import { toNTCurrency } from "@shared/lib/utils";
 
 import { Link } from "@/i18n/navigation";
@@ -22,7 +23,9 @@ interface CartBarProps extends CartSummaryValues {
 export function CartBar({
   selectedCount,
   shippingFee,
+  discount,
   totalAmount,
+  isRecalculating = false,
   orderHref,
 }: CartBarProps) {
   const t = useTranslations();
@@ -41,18 +44,30 @@ export function CartBar({
           {t("estimated_total_amount")} (
           {t("cart_selected_count", { count: selectedCount })})
         </span>
-        <span className="text-body-1 font-bold tabular-nums tracking-[-0.02em]">
+        <span
+          aria-busy={isRecalculating}
+          className={cn(
+            "text-body-1 font-bold tabular-nums tracking-[-0.02em] transition-opacity",
+            isRecalculating && "opacity-40",
+          )}
+        >
           {toNTCurrency(totalAmount)}
         </span>
       </div>
       <p className="text-body-5 text-neutral -mt-1.5 tabular-nums">
         {t("cart_shipping_fee_estimate")}{" "}
         {shippingFee > 0 ? toNTCurrency(shippingFee) : t("free_shipping")}
+        {discount > 0 && (
+          <>
+            {" · "}
+            {t("international_shipping_discount")} -{toNTCurrency(discount)}
+          </>
+        )}
       </p>
       {orderHref ? (
         <Button asChild className="h-12 w-full rounded-[4px]">
           <Link
-            className="flex h-full w-full items-center justify-center"
+            className="flex w-full items-center justify-center"
             href={orderHref}
           >
             {t("place_order")}
