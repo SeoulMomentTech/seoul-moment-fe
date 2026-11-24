@@ -10,7 +10,6 @@ import type {
   GetUserOrderDetailRes,
   UserOrderInvoiceInfo,
   UserOrderInvoiceType,
-  UserOrderStatus,
 } from "@shared/services/userOrder";
 import {
   StatusCard,
@@ -26,26 +25,21 @@ import { formatTaipeiDateTime, PaymentDepositInfo } from "@entities/payment";
 import { Button, Skeleton } from "@seoul-moment/ui";
 
 import { OrderAmountRows } from "./OrderAmountRows";
+import { OrderDeliveryProgress } from "./OrderDeliveryProgress";
 import { OrderItemList } from "./OrderItemList";
 import { OrderSection } from "./OrderSection";
 import {
   canRepay,
   ORDER_STATUS_KEY,
+  ORDER_STATUS_TONE,
   toCvsStoreLabel,
   toOrderItemGroups,
 } from "../model/orderDetail";
+import { showsDeliveryProgress } from "../model/orderList";
 import { useOrderRepay } from "../model/useOrderRepay";
 
 /** 다시 결제를 새 탭·외부로 연 뒤 주문을 다시 묻는 간격 */
 const ORDER_POLL_MS = 4000;
-
-const STATUS_TONE: Record<UserOrderStatus, string> = {
-  PENDING: "bg-brand/10 text-[#b5541a]",
-  PAYMENT_WAITING: "bg-brand/10 text-[#b5541a]",
-  PAID: "bg-[#e6f2ec] text-[#2f7d5d]",
-  CANCELED: "bg-black/5 text-black/50",
-  FAILED: "bg-danger/10 text-danger",
-};
 
 const INVOICE_TYPE_KEY: Record<UserOrderInvoiceType, string> = {
   MEMBER_CARRIER: "invoice_type_member_carrier",
@@ -120,12 +114,21 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
         <span
           className={`text-body-4 ${cn(
             "rounded-full px-3 py-1 font-semibold",
-            STATUS_TONE[order.status],
+            ORDER_STATUS_TONE[order.status],
           )}`}
         >
-          {t(ORDER_STATUS_KEY[order.status])}
+          {/* 서버 문구(Accept-Language 번역)를 쓴다. 비어 오면 코드로 정한 문구로 대신한다 */}
+          {order.statusLabel || t(ORDER_STATUS_KEY[order.status])}
         </span>
       </header>
+
+      {showsDeliveryProgress(order.status) && (
+        <OrderDeliveryProgress
+          className="pb-4"
+          label={order.deliveryStageLabel}
+          step={order.deliveryStep}
+        />
+      )}
 
       {canRepay(order.status) && (
         <div className="mb-4 flex flex-wrap items-center gap-3 max-sm:grid">

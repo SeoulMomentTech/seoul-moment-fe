@@ -6,7 +6,11 @@ import { cn } from "@shared/lib/style";
 
 import { Link, usePathname } from "@/i18n/navigation";
 
-import { SIDEBAR_GROUPS, type SidebarItem } from "../model/navigation";
+import {
+  isSidebarItemActive,
+  SIDEBAR_GROUPS,
+  type SidebarItem,
+} from "../model/navigation";
 
 interface MyPageSidebarProps {
   className?: string;
@@ -28,7 +32,7 @@ function SidebarGroup({
       <h3 className="text-body-1 font-semibold text-black">{title}</h3>
       <ul className="flex flex-col gap-3">
         {items.map((item) => {
-          const active = pathname === item.href;
+          const active = isSidebarItemActive(pathname, item.href);
 
           return (
             <li key={item.href}>

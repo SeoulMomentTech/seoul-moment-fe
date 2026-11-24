@@ -4,3 +4,4 @@ export { MyPageCustomInfo } from "./ui/MyPageCustomInfo";
 export { MyPageLoginInfo } from "./ui/MyPageLoginInfo";
 export { MyPageProfile } from "./ui/MyPageProfile";
 export { MyPageOrderDetail } from "./ui/MyPageOrderDetail";
+export { MyPageOrderList } from "./ui/MyPageOrderList";

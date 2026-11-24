@@ -15,6 +15,15 @@ export const ORDER_STATUS_KEY: Record<UserOrderStatus, string> = {
   FAILED: "order_status_failed",
 };
 
+/** 주문 상태 배지 색. 상세와 목록이 같은 색을 쓴다 */
+export const ORDER_STATUS_TONE: Record<UserOrderStatus, string> = {
+  PENDING: "bg-brand/10 text-[#b5541a]",
+  PAYMENT_WAITING: "bg-brand/10 text-[#b5541a]",
+  PAID: "bg-[#e6f2ec] text-[#2f7d5d]",
+  CANCELED: "bg-black/5 text-black/50",
+  FAILED: "bg-danger/10 text-danger",
+};
+
 /**
  * 결제 전 주문만 다시 결제할 수 있다. 입금 대기 중에는 서버가 결제 시작을 409 로 막고,
  * 완료·취소·실패(환불 대상)는 다시 결제할 대상이 아니다.

@@ -17,20 +17,32 @@ interface InfoItem {
   href: string;
 }
 
+/** 모바일은 사이드바가 없어 데스크톱 사이드바의 쇼핑 정보 메뉴를 여기서 연다 */
+const SHOPPING_ITEMS: ReadonlyArray<InfoItem> = [
+  { labelKey: "favorites", href: "/mypage/interest" },
+  { labelKey: "order_history", href: "/mypage/order" },
+];
+
 const ITEMS: ReadonlyArray<InfoItem> = [
   { labelKey: "login_info", href: "/mypage/login-info" },
   { labelKey: "profile_settings", href: "/mypage/profile" },
   { labelKey: "personalized_info", href: "/mypage/custom-info" },
 ];
 
-export default function MyPageInfoList({ className }: MyPageInfoListProps) {
+function InfoGroup({
+  title,
+  items,
+}: {
+  title: string;
+  items: ReadonlyArray<InfoItem>;
+}) {
   const t = useTranslations();
 
   return (
-    <section className={cn("flex flex-col gap-3", className)}>
-      <h2 className="text-body-1 font-bold text-black">{t("my_profile")}</h2>
+    <section className="flex flex-col gap-3">
+      <h2 className="text-body-1 font-bold text-black">{title}</h2>
       <ul className="flex flex-col">
-        {ITEMS.map((item) => (
+        {items.map((item) => (
           <li key={item.labelKey}>
             <Link
               className="text-body-3 flex items-center justify-between border-b border-black/10 py-[16px] text-black/80 transition-colors last:border-b-0 hover:text-black"
@@ -43,5 +55,16 @@ export default function MyPageInfoList({ className }: MyPageInfoListProps) {
         ))}
       </ul>
     </section>
+  );
+}
+
+export default function MyPageInfoList({ className }: MyPageInfoListProps) {
+  const t = useTranslations();
+
+  return (
+    <div className={cn("flex flex-col gap-[30px]", className)}>
+      <InfoGroup items={SHOPPING_ITEMS} title={t("shopping_info")} />
+      <InfoGroup items={ITEMS} title={t("my_profile")} />
+    </div>
   );
 }
