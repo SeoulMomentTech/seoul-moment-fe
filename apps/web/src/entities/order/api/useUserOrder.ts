@@ -3,15 +3,19 @@
 import type { HTTPError } from "ky";
 
 import { useLanguage } from "@shared/lib/hooks";
+import useAppInfiniteQuery from "@shared/lib/hooks/query/useAppInfiniteQuery";
 import useAppMutation from "@shared/lib/hooks/query/useAppMutation";
 import useAppQuery from "@shared/lib/hooks/query/useAppQuery";
 import { useUserAuthStore } from "@shared/lib/hooks/useUserAuthStore";
 import {
   createUserOrder,
   getUserOrderDetail,
+  getUserOrderList,
   postUserOrderPayment,
   type CreateUserOrderReq,
   type GetUserOrderDetailRes,
+  type GetUserOrderListRes,
+  type UserOrderListStatusFilter,
 } from "@shared/services/userOrder";
 
 import { orderQueryKeys } from "./queryKey";
@@ -41,6 +45,64 @@ interface UserOrderMutationArgs {
   toastOnError?: boolean;
 }
 
+interface UserOrderListQueryArgs {
+  /** 기본 ALL. 결제 전(PENDING) 주문은 어느 필터에도 나오지 않는다 */
+  status?: UserOrderListStatusFilter;
+  /** 최근 N개월만. 생략하면 전체 기간 */
+  months?: number;
+  /** 한 번에 불러올 개수. 최대 50 */
+  count?: number;
+  enabled?: boolean;
+}
+
+/**
+ * @description 내 주문 목록 (주문조회) 무한 스크롤. 로그인 전이면 부르지 않는다.
+ * 받은 개수가 total 에 닿거나 빈 페이지가 오면 다음 페이지가 없다.
+ */
+export function useUserOrderListInfiniteQuery({
+  status = "ALL",
+  months,
+  count = 10,
+  enabled,
+}: UserOrderListQueryArgs = {}) {
+  const id = useUserAuthStore((state) => state.id);
+  const languageCode = useLanguage();
+
+  return useAppInfiniteQuery<
+    Awaited<ReturnType<typeof getUserOrderList>>,
+    HTTPError,
+    GetUserOrderListRes,
+    ReturnType<typeof orderQueryKeys.list>
+  >({
+    queryKey: orderQueryKeys.list(id, { status, months, count, languageCode }),
+    queryFn: ({ pageParam }) =>
+      getUserOrderList({
+        status,
+        months,
+        // 래퍼가 TPageParam 을 받지 않아 unknown 으로 온다. initialPageParam 이 숫자다
+        page: pageParam as number,
+        count,
+        languageCode,
+      }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      const fetched = allPages.reduce(
+        (sum, page) => sum + page.data.list.length,
+        0,
+      );
+      const hasMore =
+        lastPage.data.list.length > 0 && fetched < lastPage.data.total;
+
+      return hasMore ? allPages.length + 1 : undefined;
+    },
+    select: (data) => ({
+      total: data.pages.at(-1)?.data.total ?? 0,
+      list: data.pages.flatMap((page) => page.data.list),
+    }),
+    enabled: enabled !== false && !!id,
+  });
+}
+
 /**
  * @description 주문 상세 조회. 로그인 전이거나 orderId 가 없으면 부르지 않는다.
  */
@@ -49,18 +111,19 @@ export function useUserOrderDetailQuery(
   { enabled, refetchInterval = false }: UserOrderQueryArgs = {},
 ) {
   const id = useUserAuthStore((state) => state.id);
+  const languageCode = useLanguage();
 
   return useAppQuery<
     Awaited<ReturnType<typeof getUserOrderDetail>>,
     HTTPError,
     GetUserOrderDetailRes
   >({
-    queryKey: orderQueryKeys.detail(id, orderId),
+    queryKey: orderQueryKeys.detail(id, orderId, languageCode),
     queryFn: () => {
       // enabled 가 막고 있어 여기서는 orderId 가 반드시 있다
       if (orderId === null) throw new Error("order detail needs an orderId");
 
-      return getUserOrderDetail(orderId);
+      return getUserOrderDetail({ orderId, languageCode });
     },
     select: (res) => res.data,
     enabled: enabled !== false && orderId !== null && !!id,
