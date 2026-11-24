@@ -17,8 +17,9 @@ interface InfoItem {
   href: string;
 }
 
-/** 모바일은 사이드바가 없어 쇼핑 정보 중 별도 화면인 주문내역을 여기서 연다 */
+/** 모바일은 사이드바가 없어 데스크톱 사이드바의 쇼핑 정보 메뉴를 여기서 연다 */
 const SHOPPING_ITEMS: ReadonlyArray<InfoItem> = [
+  { labelKey: "favorites", href: "/mypage/interest" },
   { labelKey: "order_history", href: "/mypage/order" },
 ];
 
