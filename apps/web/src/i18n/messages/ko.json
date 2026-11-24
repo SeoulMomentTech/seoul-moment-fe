@@ -642,5 +642,17 @@
   "invoice_issuing": "결제가 확정되면 발행돼요",
   "payment_line_app_title": "LINE에서 결제 중",
   "payment_line_app_hint": "LINE Pay 화면에서 결제를 마치면 이 화면이 자동으로 바뀝니다",
-  "payment_line_pay_inapp_warning": "이 앱의 브라우저에서는 LINE Pay가 열리지 않을 수 있어요. LINE 앱이나 Safari·Chrome에서 이 페이지를 열어 주세요"
+  "payment_line_pay_inapp_warning": "이 앱의 브라우저에서는 LINE Pay가 열리지 않을 수 있어요. LINE 앱이나 Safari·Chrome에서 이 페이지를 열어 주세요",
+  "cart_benefit_progress": "구매 혜택 진행도",
+  "current_amount": "현재 금액",
+  "free_shipping_achieved": "본섬 무료배송이 적용됐어요",
+  "order_amount": "주문 금액",
+  "tier_discount": "{amount} 할인",
+  "tier_free_shipping": "본섬 무료배송",
+  "tier_free_shipping_short": "본섬 무료",
+  "tier_next_hint": "{amount} 더 담으면 {benefit}",
+  "tier_applied": "{benefit} 적용 중",
+  "tier_view_all": "전체 혜택 단계 보기",
+  "tier_current": "현재 적용",
+  "international_shipping_discount": "국제배송비 지원 할인"
 }

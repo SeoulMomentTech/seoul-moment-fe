@@ -642,5 +642,17 @@
   "invoice_issuing": "Issued once payment is confirmed",
   "payment_line_app_title": "Paying in LINE",
   "payment_line_app_hint": "This screen updates automatically once you finish paying in LINE Pay",
-  "payment_line_pay_inapp_warning": "LINE Pay may not open in this app's browser. Please open this page in the LINE app or in Safari or Chrome"
+  "payment_line_pay_inapp_warning": "LINE Pay may not open in this app's browser. Please open this page in the LINE app or in Safari or Chrome",
+  "cart_benefit_progress": "Shopping benefits",
+  "current_amount": "Current amount",
+  "free_shipping_achieved": "Free main-island shipping applied",
+  "order_amount": "Order summary",
+  "tier_discount": "{amount} off",
+  "tier_free_shipping": "Free main-island shipping",
+  "tier_free_shipping_short": "Free ship",
+  "tier_next_hint": "Add {amount} more for {benefit}",
+  "tier_applied": "{benefit} applied",
+  "tier_view_all": "View all benefit tiers",
+  "tier_current": "Current",
+  "international_shipping_discount": "International shipping discount"
 }
