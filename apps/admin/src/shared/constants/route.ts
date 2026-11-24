@@ -18,6 +18,9 @@ export const PATH = {
   // Order
   ORDERS: "/orders",
 
+  // Settings
+  SHIPPING_POLICY: "/settings/shipping",
+
   // Banner
   HOME_BANNER: "/banner/home",
   PRODUCT_BANNER: "/banner/product",

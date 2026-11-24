@@ -12,6 +12,7 @@ import {
   Ticket,
   Users,
   ClipboardList,
+  Settings,
 } from "lucide-react";
 
 import { PATH } from "@shared/constants/route";
@@ -152,9 +153,28 @@ const menuItems: MenuItemConfig[] = [
     path: PATH.PROMOTION,
     icon: <Ticket className="h-5 w-5" />,
   },
+  {
+    id: "settings",
+    label: "설정",
+    path: "",
+    icon: <Settings className="h-5 w-5" />,
+    subItems: [
+      {
+        id: "shipping-policy",
+        label: "배송비 정책",
+        path: PATH.SHIPPING_POLICY,
+      },
+    ],
+  },
 ];
 
-const defaultExpandedMenus: MenuItem[] = ["users", "products", "brand", "news"];
+const defaultExpandedMenus: MenuItem[] = [
+  "users",
+  "products",
+  "brand",
+  "news",
+  "settings",
+];
 
 export default function Sidebar({
   isMobileMenuOpen,
