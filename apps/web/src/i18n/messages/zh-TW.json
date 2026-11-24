@@ -656,5 +656,16 @@
   "tier_current": "目前適用",
   "international_shipping_discount": "國際運費補助折扣",
   "tier_discount_and_free_shipping": "{amount} 折扣及台灣本島免運",
-  "next_benefit": "下一個優惠"
+  "next_benefit": "下一個優惠",
+  "order_history": "我的訂單",
+  "order_filter_all": "全部",
+  "order_filter_in_progress": "進行中",
+  "order_filter_completed": "已完成",
+  "order_filter_canceled": "取消",
+  "order_period": "查詢期間",
+  "order_period_months": "最近 {months} 個月",
+  "order_period_all": "全部期間",
+  "order_more_items": "等 {count} 件",
+  "order_list_empty": "目前沒有訂單",
+  "order_list_error": "無法載入訂單"
 }

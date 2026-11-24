@@ -656,5 +656,16 @@
   "tier_current": "현재 적용",
   "international_shipping_discount": "국제배송비 지원 할인",
   "tier_discount_and_free_shipping": "{amount} 할인과 본섬 무료배송",
-  "next_benefit": "다음 혜택"
+  "next_benefit": "다음 혜택",
+  "order_history": "주문내역",
+  "order_filter_all": "전체",
+  "order_filter_in_progress": "진행 중",
+  "order_filter_completed": "완료",
+  "order_filter_canceled": "취소",
+  "order_period": "조회 기간",
+  "order_period_months": "최근 {months}개월",
+  "order_period_all": "전체 기간",
+  "order_more_items": "외 {count}건",
+  "order_list_empty": "주문 내역이 없어요",
+  "order_list_error": "주문 내역을 불러오지 못했어요"
 }
