@@ -654,5 +654,7 @@
   "tier_applied": "已享{benefit}",
   "tier_view_all": "查看所有優惠階段",
   "tier_current": "目前適用",
-  "international_shipping_discount": "國際運費補助折扣"
+  "international_shipping_discount": "國際運費補助折扣",
+  "tier_discount_and_free_shipping": "{amount} 折扣及台灣本島免運",
+  "next_benefit": "下一個優惠"
 }
