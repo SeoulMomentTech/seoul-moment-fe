@@ -17,8 +17,11 @@ export interface CartSummaryValues {
   shippingFee: number;
   /** 무료배송까지 남은 금액. 0 이면 이미 무료배송이다 */
   amountToFreeShipping: number;
+  /** 국제배송비 지원 할인액. 0 이면 행을 그리지 않는다 */
+  discount: number;
   /** 외섬 배송비 (안내용) */
   remoteIslandFee: number;
+  /** 상품 금액 + 배송비 - 할인 */
   totalAmount: number;
 }
 
@@ -41,6 +44,7 @@ export function CartSummary({
   selectedCount,
   amount,
   shippingFee,
+  discount,
   remoteIslandFee,
   totalAmount,
   orderHref,
@@ -82,6 +86,14 @@ export function CartSummary({
               {shippingFee > 0 ? toNTCurrency(shippingFee) : t("free_shipping")}
             </dd>
           </div>
+          {discount > 0 && (
+            <div className="flex justify-between gap-4">
+              <dt>{t("international_shipping_discount")}</dt>
+              <dd className="text-brand font-semibold tabular-nums">
+                -{toNTCurrency(discount)}
+              </dd>
+            </div>
+          )}
         </dl>
 
         <div className="mt-5 flex items-baseline justify-between gap-4 border-t border-black/10 pt-5">

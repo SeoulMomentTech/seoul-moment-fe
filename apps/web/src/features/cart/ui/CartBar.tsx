@@ -22,6 +22,7 @@ interface CartBarProps extends CartSummaryValues {
 export function CartBar({
   selectedCount,
   shippingFee,
+  discount,
   totalAmount,
   orderHref,
 }: CartBarProps) {
@@ -48,6 +49,12 @@ export function CartBar({
       <p className="text-body-5 text-neutral -mt-1.5 tabular-nums">
         {t("cart_shipping_fee_estimate")}{" "}
         {shippingFee > 0 ? toNTCurrency(shippingFee) : t("free_shipping")}
+        {discount > 0 && (
+          <>
+            {" · "}
+            {t("international_shipping_discount")} -{toNTCurrency(discount)}
+          </>
+        )}
       </p>
       {orderHref ? (
         <Button asChild className="h-12 w-full rounded-[4px]">

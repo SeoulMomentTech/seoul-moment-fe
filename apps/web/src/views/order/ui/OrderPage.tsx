@@ -131,6 +131,8 @@ export function OrderPage() {
   // 주소(또는 매장)가 없으면 서버가 본섬 기준 예상 배송비를 주지만 주문서는 확정값만 그린다 —
   // 예상값을 그대로 쓰면 주소를 넣기 전인데 확정 금액처럼 읽힌다.
   const productAmount = preview?.totalProductAmount ?? 0;
+  // 할인은 상품 합계로만 정해져 배송지와 무관하다. 주소를 넣기 전에도 빼서 보여준다.
+  const discount = preview?.internationalDiscount ?? 0;
   const isShippingFixed = preview != null && !preview.isShippingEstimated;
 
   const cvsStore =
@@ -148,7 +150,10 @@ export function OrderPage() {
     productAmount,
     shippingFee: isShippingFixed ? preview.shippingFee : null,
     regionLabel,
-    totalAmount: isShippingFixed ? preview.totalAmount : productAmount,
+    discount,
+    totalAmount: isShippingFixed
+      ? preview.totalAmount
+      : productAmount - discount,
     isRecalculating,
   };
 

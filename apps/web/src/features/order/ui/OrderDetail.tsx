@@ -172,6 +172,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
 
       <OrderSection title={t("payment_amount")}>
         <OrderAmountRows
+          discount={order.internationalDiscount}
           productAmount={order.totalProductAmount}
           regionLabel={toRegionLabel(order, t)}
           shippingFee={order.shippingFee}

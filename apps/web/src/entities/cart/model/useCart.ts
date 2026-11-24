@@ -228,6 +228,12 @@ export const useCart = () => {
     estimatedShippingFee: data?.estimatedShippingFee ?? 0,
     remoteIslandFee: data?.remoteIslandFee ?? 0,
     freeShippingThreshold: data?.freeShippingThreshold ?? 0,
+    /** 국제배송비 지원 할인액. 장바구니 전체 기준이고 기능이 꺼져 있으면 0 */
+    internationalDiscount: data?.internationalDiscount ?? 0,
+    /** 다음 할인 구간 기준 금액. 꺼져 있거나 마지막 구간이면 null */
+    nextDiscountThreshold: data?.nextDiscountThreshold ?? null,
+    nextDiscountAmount: data?.nextDiscountAmount ?? null,
+    amountToNextDiscount: data?.amountToNextDiscount ?? 0,
     /** 라인 개수(수량 합이 아니다) */
     totalCount: data?.totalCount ?? 0,
     isPending,

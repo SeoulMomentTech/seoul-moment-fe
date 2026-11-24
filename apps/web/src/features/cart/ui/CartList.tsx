@@ -23,6 +23,7 @@ import { toOrderHref } from "@entities/order";
 import { Button } from "@seoul-moment/ui";
 
 import { CartBar } from "./CartBar";
+import { CartBenefitProgress } from "./CartBenefitProgress";
 import { CartBrandGroupSection } from "./CartBrandGroup";
 import { CartEmpty } from "./CartEmpty";
 import { CartSelectionBar } from "./CartSelectionBar";
@@ -35,6 +36,11 @@ export function CartList() {
     brandGroups,
     estimatedShippingFee,
     freeShippingThreshold,
+    internationalDiscount,
+    nextDiscountThreshold,
+    nextDiscountAmount,
+    amountToNextDiscount,
+    totalProductAmount,
     isError,
     refetch,
     remoteIslandFee,
@@ -129,14 +135,19 @@ export function CartList() {
       })
     : null;
 
+  // 서버 할인액은 장바구니 전체 기준이다. 아무것도 안 골랐으면 빼지 않고, 선택 금액을 넘지 않게 자른다.
+  const discount =
+    selectedAmount > 0 ? Math.min(internationalDiscount, selectedAmount) : 0;
+
   const summary = {
     amount: selectedAmount,
     amountToFreeShipping: shipping.amountToFreeShipping,
+    discount,
     orderHref,
     remoteIslandFee,
     selectedCount: selection.selectedCount,
     shippingFee: shipping.fee,
-    totalAmount: selectedAmount + shipping.fee,
+    totalAmount: selectedAmount + shipping.fee - discount,
   };
 
   return (
@@ -173,7 +184,20 @@ export function CartList() {
           ))}
         </div>
 
-        <CartSummary {...summary} className="top-19 sticky max-sm:hidden" />
+        <div className="top-19 sticky grid gap-4 max-lg:static">
+          <CartBenefitProgress
+            amount={selectedAmount}
+            discount={{
+              amount: totalProductAmount,
+              internationalDiscount,
+              nextDiscountThreshold,
+              nextDiscountAmount,
+              amountToNextDiscount,
+            }}
+            freeShippingThreshold={freeShippingThreshold}
+          />
+          <CartSummary {...summary} className="max-sm:hidden" />
+        </div>
       </div>
 
       {/* 모바일에서는 sticky 패널 대신 하단 고정 바 */}
