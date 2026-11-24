@@ -642,5 +642,17 @@
   "invoice_issuing": "付款確認後開立",
   "payment_line_app_title": "正在 LINE 中付款",
   "payment_line_app_hint": "在 LINE Pay 完成付款後，此畫面會自動更新",
-  "payment_line_pay_inapp_warning": "此 App 的瀏覽器可能無法開啟 LINE Pay，請改用 LINE App 或 Safari、Chrome 開啟此頁面"
+  "payment_line_pay_inapp_warning": "此 App 的瀏覽器可能無法開啟 LINE Pay，請改用 LINE App 或 Safari、Chrome 開啟此頁面",
+  "cart_benefit_progress": "購物優惠進度",
+  "current_amount": "目前金額",
+  "free_shipping_achieved": "已享台灣本島免運",
+  "order_amount": "訂單金額",
+  "tier_discount": "折 {amount}",
+  "tier_free_shipping": "台灣本島免運",
+  "tier_free_shipping_short": "本島免運",
+  "tier_next_hint": "再購買 {amount}，即可享{benefit}",
+  "tier_applied": "已享{benefit}",
+  "tier_view_all": "查看所有優惠階段",
+  "tier_current": "目前適用",
+  "international_shipping_discount": "國際運費補助折扣"
 }
