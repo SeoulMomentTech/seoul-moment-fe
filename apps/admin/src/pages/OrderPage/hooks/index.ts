@@ -1,15 +1,27 @@
-
 import { useAppMutation } from "@shared/hooks/useAppMutation";
 import { useAppQuery } from "@shared/hooks/useAppQuery";
 import {
   createAdminOrderPurchase,
+  deleteAdminOrderCancelRequest,
   getAdminOrderDetail,
   getAdminOrderList,
   getAdminOrderSummary,
+  updateAdminOrderDeliveryStage,
+  updateAdminOrderLocalDelivery,
   type AdminOrderId,
   type GetAdminOrderListParams,
+  type PatchAdminOrderLocalDeliveryRequest,
+  type PostAdminOrderDeliveryStageRequest,
   type PostAdminOrderPurchaseRequest,
 } from "@shared/services/order";
+import {
+  completeAdminOrderRefund,
+  createAdminOrderRefund,
+  deleteAdminOrderRefund,
+  retryAdminOrderInvoiceAdjustment,
+  type PostAdminOrderRefundCompleteRequest,
+  type PostAdminOrderRefundRequest,
+} from "@shared/services/refund";
 
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -63,3 +75,79 @@ export const useAdminOrderPurchaseMutation = () => {
       queryClient.invalidateQueries({ queryKey: ORDER_QUERY_KEY }),
   });
 };
+
+/**
+ * 주문 상태를 바꾸는 작업은 대부분 204 라 본문이 없다. 409(다른 관리자가 먼저 바꿈 등)여도
+ * 최신 상태를 보여줘야 하므로 성공·실패 모두 상세·목록·KPI 를 다시 부른다.
+ */
+const useOrderActionMutation = <TVariables, TData>(
+  mutationFn: (variables: TVariables) => Promise<TData>,
+) => {
+  const queryClient = useQueryClient();
+
+  return useAppMutation({
+    mutationFn,
+    onSettled: () =>
+      queryClient.invalidateQueries({ queryKey: ORDER_QUERY_KEY }),
+  });
+};
+
+/** 배송 단계 변경. 드로어에서도 orderIds: [id] 로 보낸다 */
+export const useAdminOrderDeliveryStageMutation = () =>
+  useOrderActionMutation((payload: PostAdminOrderDeliveryStageRequest) =>
+    updateAdminOrderDeliveryStage(payload),
+  );
+
+/** 대만 국내운송사·운송장 입력. 배송 단계는 바뀌지 않는다 */
+export const useAdminOrderLocalDeliveryMutation = () =>
+  useOrderActionMutation(
+    ({
+      orderId,
+      payload,
+    }: {
+      orderId: AdminOrderId;
+      payload: PatchAdminOrderLocalDeliveryRequest;
+    }) => updateAdminOrderLocalDelivery(orderId, payload),
+  );
+
+/** 취소·계약해제 접수 철회 */
+export const useAdminOrderCancelWithdrawMutation = () =>
+  useOrderActionMutation((orderId: AdminOrderId) =>
+    deleteAdminOrderCancelRequest(orderId),
+  );
+
+/** 환불 실행 · 재시도 (super_admin) */
+export const useAdminOrderRefundMutation = () =>
+  useOrderActionMutation(
+    ({
+      orderId,
+      payload,
+    }: {
+      orderId: AdminOrderId;
+      payload: PostAdminOrderRefundRequest;
+    }) => createAdminOrderRefund(orderId, payload),
+  );
+
+/** 끝나지 않은 환불 요청 취소 (super_admin) */
+export const useAdminOrderRefundCancelMutation = () =>
+  useOrderActionMutation((orderId: AdminOrderId) =>
+    deleteAdminOrderRefund(orderId),
+  );
+
+/** 수동 환불 완료 입력 (super_admin) */
+export const useAdminOrderRefundCompleteMutation = () =>
+  useOrderActionMutation(
+    ({
+      orderId,
+      payload,
+    }: {
+      orderId: AdminOrderId;
+      payload: PostAdminOrderRefundCompleteRequest;
+    }) => completeAdminOrderRefund(orderId, payload),
+  );
+
+/** 전자발표 정정 재시도 (super_admin) */
+export const useAdminOrderInvoiceAdjustMutation = () =>
+  useOrderActionMutation((orderId: AdminOrderId) =>
+    retryAdminOrderInvoiceAdjustment(orderId),
+  );

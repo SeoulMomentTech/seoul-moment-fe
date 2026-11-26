@@ -1,8 +1,8 @@
-import type { ReactNode } from "react";
+import { useState } from "react";
 
 import { Copy, X } from "lucide-react";
 
-
+import { CompactButton } from "@shared/components/compact-form";
 import useCopyToClipBoard from "@shared/hooks/useCopyToClipBoard";
 import type {
   AdminOrderId,
@@ -13,7 +13,6 @@ import { EMPTY_VALUE, formatCurrency } from "@shared/utils/format";
 import { toast } from "sonner";
 
 import {
-  Button,
   Drawer,
   DrawerContent,
   DrawerDescription,
@@ -28,12 +27,15 @@ import {
 
 import { PAYMENT_METHOD_LABEL, TIMER_BADGE_CLASS } from "../constants";
 import { useAdminOrderDetailQuery } from "../hooks";
+import { OrderDeliveryTab } from "./OrderDeliveryTab";
+import { Row, Section } from "./OrderDetailParts";
+import { OrderEventsTab } from "./OrderEventsTab";
+import { OrderRefundTab } from "./OrderRefundTab";
 import { OrderTimerBadge } from "./OrderTimerBadge";
 import { canStartEarlyPurchase } from "../lib/purchase";
 import { formatTaipeiDateTime } from "../lib/taipeiDate";
 
-/** 응답에 데이터가 아직 없는 탭. 다음 스코프(통관·물류, 취소·환불, 이력)에서 연다 */
-const UPCOMING_TABS = ["통관·배송", "취소·환불", "작업 이력"] as const;
+type DrawerTab = "order" | "purchase" | "delivery" | "refund" | "events";
 
 interface OrderDrawerProps {
   orderId: AdminOrderId | null;
@@ -66,6 +68,8 @@ export function OrderDrawer({
         ) : (
           <DrawerBody
             detail={detail}
+            // 다른 주문을 열면 탭을 주문 정보로 되돌린다
+            key={detail.order.orderId}
             now={now}
             onClose={onClose}
             onStartPurchase={onStartPurchase}
@@ -103,6 +107,7 @@ function DrawerBody({
 }) {
   const { order, purchase, timer } = detail;
   const { copy } = useCopyToClipBoard();
+  const [tab, setTab] = useState<DrawerTab>("order");
 
   const handleCopy = async () => {
     if (await copy(order.orderNumber)) {
@@ -155,33 +160,39 @@ function DrawerBody({
 
         <div className="flex flex-wrap gap-2">
           {canEarly ? (
-            <Button onClick={() => onStartPurchase(timer)} variant="outline">
+            <CompactButton
+              onClick={() => onStartPurchase(timer)}
+              variant="outline"
+            >
               조기 발주 (사유 입력)
-            </Button>
+            </CompactButton>
           ) : (
-            <Button
+            <CompactButton
               disabled={!timer.canStartPurchase}
               onClick={() => onStartPurchase(timer)}
             >
               {purchase.purchaseStatus === "ORDERED"
                 ? "발주 완료"
                 : "한국 발주 시작"}
-            </Button>
+            </CompactButton>
           )}
-          <Button disabled title="다음 스코프에서 열립니다" variant="outline">
+          <CompactButton onClick={() => setTab("refund")} variant="outline">
             취소/환불 관리
-          </Button>
+            {detail.cancellation.requestedAt && (
+              <span className="ml-1 rounded bg-pink-100 px-1 text-xs text-pink-700">
+                접수
+              </span>
+            )}
+          </CompactButton>
         </div>
 
-        <Tabs defaultValue="order">
+        <Tabs onValueChange={(value) => setTab(value as DrawerTab)} value={tab}>
           <TabsList className="w-full justify-start overflow-x-auto">
             <TabsTrigger value="order">주문 정보</TabsTrigger>
             <TabsTrigger value="purchase">발주·매입</TabsTrigger>
-            {UPCOMING_TABS.map((label) => (
-              <TabsTrigger disabled key={label} value={label}>
-                {label}
-              </TabsTrigger>
-            ))}
+            <TabsTrigger value="delivery">통관·배송</TabsTrigger>
+            <TabsTrigger value="refund">취소·환불</TabsTrigger>
+            <TabsTrigger value="events">작업 이력</TabsTrigger>
           </TabsList>
 
           <TabsContent className="grid gap-5 pt-3" value="order">
@@ -227,7 +238,9 @@ function DrawerBody({
                 <Row label="배송비">
                   {formatCurrency(order.shippingFee)}
                   {order.isRemoteIsland && (
-                    <span className="ml-1 text-xs text-gray-500">(외곽 섬)</span>
+                    <span className="ml-1 text-xs text-gray-500">
+                      (외곽 섬)
+                    </span>
                   )}
                 </Row>
                 <div className="mt-1 border-t border-gray-200 pt-2">
@@ -279,9 +292,7 @@ function DrawerBody({
                   )}
                 </Row>
                 <Row label="주문 상태">{order.statusLabel}</Row>
-                <Row label="결제일시">
-                  {formatTaipeiDateTime(order.paidAt)}
-                </Row>
+                <Row label="결제일시">{formatTaipeiDateTime(order.paidAt)}</Row>
                 <Row label="배송 단계">
                   {order.deliveryStageLabel} · {order.deliveryStep}/6
                 </Row>
@@ -296,7 +307,9 @@ function DrawerBody({
             <Section title="발주 확인">
               <dl className="grid gap-1.5 text-sm">
                 <Row label="발주 상태">
-                  {purchase.purchaseStatus === "ORDERED" ? "발주 완료" : "미발주"}
+                  {purchase.purchaseStatus === "ORDERED"
+                    ? "발주 완료"
+                    : "미발주"}
                 </Row>
                 <Row label="발주 시각">
                   {formatTaipeiDateTime(purchase.supplierOrderedAt)}
@@ -313,41 +326,20 @@ function DrawerBody({
               </dl>
             </Section>
           </TabsContent>
+
+          <TabsContent className="pt-3" value="delivery">
+            <OrderDeliveryTab detail={detail} />
+          </TabsContent>
+
+          <TabsContent className="pt-3" value="refund">
+            <OrderRefundTab detail={detail} />
+          </TabsContent>
+
+          <TabsContent className="pt-3" value="events">
+            <OrderEventsTab events={detail.events} />
+          </TabsContent>
         </Tabs>
       </div>
     </>
-  );
-}
-
-function Section({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <section>
-      <h3 className="mb-2 text-xs font-medium text-gray-500">{title}</h3>
-      {children}
-    </section>
-  );
-}
-
-function Row({
-  label,
-  children,
-  strong = false,
-}: {
-  label: string;
-  children: ReactNode;
-  strong?: boolean;
-}) {
-  return (
-    <div className="flex justify-between gap-4">
-      <dt className="shrink-0 text-gray-500">{label}</dt>
-      <dd
-        className={cn(
-          "text-right tabular-nums text-gray-900",
-          strong && "font-semibold",
-        )}
-      >
-        {children}
-      </dd>
-    </div>
   );
 }

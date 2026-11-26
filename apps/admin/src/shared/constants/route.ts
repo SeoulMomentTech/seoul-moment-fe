@@ -17,6 +17,7 @@ export const PATH = {
   PRODUCT_OPTIONS_EDIT: "/products/options/edit/:id",
   // Order
   ORDERS: "/orders",
+  SHIPMENTS: "/shipments",
 
   // Settings
   SHIPPING_POLICY: "/settings/shipping",

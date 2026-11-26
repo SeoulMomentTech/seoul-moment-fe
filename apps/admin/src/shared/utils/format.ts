@@ -42,3 +42,13 @@ export const toDateInputValue = (date: Date) => {
     .toISOString()
     .slice(0, 10);
 };
+
+/** `<input type="datetime-local">` 에 넣을 수 있는 YYYY-MM-DDTHH:mm (이 PC 시간) 로 바꾼다 */
+export const toDateTimeInputValue = (value?: string | null) => {
+  if (!value) return "";
+  const date = new Date(value);
+  const offsetMinutes = date.getTimezoneOffset();
+  return new Date(date.getTime() - offsetMinutes * 60_000)
+    .toISOString()
+    .slice(0, 16);
+};
