@@ -1,3 +1,10 @@
+import {
+  type AdminInvoiceAdjustment,
+  type AdminInvoiceAdjustStatus,
+  type AdminRefund,
+  type AdminRefundStatus,
+} from "./refund";
+import { type AdminShipment } from "./shipment";
 import { type ApiResponse, type SortDirection } from "./types";
 
 import { fetcher } from ".";
@@ -162,10 +169,12 @@ export type AdminOrderInvoiceType =
   | "DONATION"
   | "COMPANY";
 
+/** 발표 발행 상태. PENDING 결제 전·발행 대기 / ISSUED 발행됨 / FAILED 발행 실패(서버가 다시 시도한다) */
+export type AdminOrderInvoiceStatus = "PENDING" | "ISSUED" | "FAILED";
+
 export interface AdminOrderInvoice {
   type: AdminOrderInvoiceType;
-  /** PENDING 결제 전·발행 대기 / ISSUED 발행됨 / FAILED 발행 실패(서버가 다시 시도한다) */
-  status: "PENDING" | "ISSUED" | "FAILED";
+  status: AdminOrderInvoiceStatus;
   carrierNum: string | null;
   loveCode: string | null;
   companyTaxId: string | null;
@@ -175,6 +184,8 @@ export interface AdminOrderInvoice {
   invoiceDate: string | null;
   /** 랜덤 번호 4자리 */
   randomNumber: string | null;
+  /** 환불 뒤 발표 정정 상태 */
+  adjustStatus: AdminInvoiceAdjustStatus;
 }
 
 export interface AdminOrderItem {
@@ -221,6 +232,16 @@ export interface AdminOrderShipping {
   cvsStore: AdminOrderCvsStore | null;
 }
 
+/** 고객에게 보이는 가장 최근 환불. 전액이 환불되면 주문 status 가 CANCELED 로 바뀐다 */
+export interface AdminOrderCustomerRefund {
+  /** FAILED 는 고객에게 환불 처리 지연으로 보인다 */
+  status: AdminRefundStatus;
+  /** 결제 금액보다 작으면 부분 환불 */
+  amount: number;
+  requestedAt: string;
+  completedAt: string | null;
+}
+
 /** 고객 주문조회 상세와 같은 내용 (상품·가격내역·배송지·결제·발표) */
 export interface AdminOrderCustomerDetail {
   orderId: AdminOrderId;
@@ -244,8 +265,26 @@ export interface AdminOrderCustomerDetail {
   deliveryStep: number;
   orderedAt: string;
   paidAt: string | null;
+  /** 실제 수령·배송 완료 시각. 배송 완료 전이면 null */
+  deliveredAt: string | null;
+  /** 대만 국내운송사 */
+  localCarrier: string | null;
+  /** 대만 국내운송장 번호 */
+  localTrackingNo: string | null;
+  /** 취소·계약해제 신청 버튼 노출 여부. 이미 접수했으면 false */
+  canRequestCancel: boolean;
+  /** 24시간 간편취소 구간인지 (서버 시각 기준). 안내 문구만 바꾸는 값이다 */
+  isQuickCancelPeriod: boolean;
+  /** 간편취소 구간이 끝나는 시각 (결제 완료 + 24시간) */
+  quickCancelUntil: string | null;
+  /** 취소·계약해제를 접수한 시각. 접수 전이면 null */
+  cancellationRequestedAt: string | null;
   /** 가장 최근 결제 시도. 결제를 시작하기 전이면 null */
   payment: AdminOrderPayment | null;
+  /** 가장 최근 환불. 환불이 시작되지 않았으면 null */
+  refund: AdminOrderCustomerRefund | null;
+  /** 환불이 완료된 합계 NT$. 없으면 0 */
+  refundedAmount: number;
   /** 전자발표. 결제가 확정되면 invoiceNo 가 채워진다 */
   invoice: AdminOrderInvoice | null;
   items: AdminOrderItem[];
@@ -263,10 +302,75 @@ export interface AdminOrderPurchase {
   purchasedByAdminId: number | null;
 }
 
+/** 통관·배송 탭 */
+export interface AdminOrderDelivery {
+  deliveryStage: AdminOrderDeliveryStage;
+  deliveryStageLabel: string;
+  /** 진행바 위치 (1~6) */
+  deliveryStep: number;
+  /** 실제 수령·배송 완료 시각. 법정 기간 계산의 기준이다 */
+  deliveredAt: string | null;
+  localCarrier: string | null;
+  localTrackingNo: string | null;
+  /** 이 주문이 실린 국제배송 묶음. 없으면 빈 배열 */
+  shipments: AdminShipment[];
+}
+
+/** 취소·환불 탭 중 취소 접수 */
+export interface AdminOrderCancellation {
+  /** 취소·계약해제 통지를 접수한 시각. 접수 전이면 null */
+  requestedAt: string | null;
+  /** 고객이 적은 사유 */
+  reason: string | null;
+  /** 결제 후 24시간 안에 접수됐는지. 접수 전이면 null. false 여도 법정 계약해제 통지로 처리한다 */
+  withinQuickCancelPeriod: boolean | null;
+}
+
+export type AdminOrderEventType =
+  | "CANCEL_REQUESTED"
+  | "CANCEL_REQUEST_WITHDRAWN"
+  | "PURCHASED"
+  | "DELIVERY_STAGE_CHANGED"
+  | "LOCAL_DELIVERY_UPDATED"
+  | "SHIPMENT_UPDATED"
+  | "REFUND_REQUESTED"
+  | "REFUND_COMPLETED"
+  | "REFUND_FAILED"
+  | "REFUND_CANCELED"
+  | "INVOICE_ADJUSTED"
+  | "INVOICE_ADJUST_FAILED";
+
+/** 작업 이력 */
+export interface AdminOrderEvent {
+  eventId: number;
+  type: AdminOrderEventType;
+  /** 처리한 관리자 ID */
+  adminId: number | null;
+  /** 요청한 고객 ID */
+  userId: number | null;
+  /** 무엇이 어떻게 바뀌었는지 */
+  message: string | null;
+  createdAt: string;
+}
+
 export interface GetAdminOrderDetailResponse {
   order: AdminOrderCustomerDetail;
   purchase: AdminOrderPurchase;
   timer: AdminOrderListItem;
+  delivery: AdminOrderDelivery;
+  cancellation: AdminOrderCancellation;
+  /** 최신순 */
+  events: AdminOrderEvent[];
+  /** 가장 최근 환불. 끝나지 않은 환불(재시도·완료 입력 대상)이 있으면 그 환불이다 */
+  refund: AdminRefund | null;
+  /** 이 주문의 환불 전부 (오래된 순). 부분 환불이면 여러 건이다 */
+  refunds: AdminRefund[];
+  /** 환불이 완료된 합계 NT$ */
+  refundedAmount: number;
+  /** 앞으로 환불할 수 있는 금액 NT$. 부분 환불 금액 입력의 상한이다 */
+  refundableAmount: number;
+  /** 전자발표 정정. 발표 행이 없는 주문이면 null */
+  invoiceAdjustment: AdminInvoiceAdjustment | null;
 }
 
 export interface PostAdminOrderPurchaseRequest {
@@ -274,6 +378,23 @@ export interface PostAdminOrderPurchaseRequest {
   supplierOrderNo?: string;
   /** 24시간이 지나기 전(조기 발주)이면 필수. 사유가 주문에 기록된다 */
   earlyReason?: string;
+}
+
+export interface PostAdminOrderDeliveryStageRequest {
+  /** 단계를 바꿀 주문 ID (1~100개). 하나라도 없거나 결제 완료가 아니면 전부 바뀌지 않는다 */
+  orderIds: AdminOrderId[];
+  /** 앞·뒤 어느 쪽으로든 바꿀 수 있다. 통관 상태와는 따로다 */
+  deliveryStage: AdminOrderDeliveryStage;
+  /** DELIVERED 일 때 실제 수령 시각 (ISO 8601). 생략하면 지금. 미래·다른 단계와 함께면 400 */
+  deliveredAt?: string;
+}
+
+/** 보낸 필드만 고친다. 빈 문자열·null 이면 지운다 */
+export interface PatchAdminOrderLocalDeliveryRequest {
+  /** 대만 국내운송사 */
+  localCarrier?: string | null;
+  /** 대만 국내운송장 번호 */
+  localTrackingNo?: string | null;
 }
 
 /**
@@ -313,3 +434,29 @@ export const createAdminOrderPurchase = (
   orderId: AdminOrderId,
   payload: PostAdminOrderPurchaseRequest,
 ) => fetcher.post(`/admin/order/${orderId}/purchase`, payload);
+
+/**
+ * @description 취소·계약해제 접수 철회. 고객이 취소 의사를 거둔 경우에만 쓴다.
+ * 끝나지 않은 환불이 있으면 409 — 환불 요청을 먼저 취소하거나 환불을 끝낸다
+ * Swagger: AdminOrderController_deleteAdminOrderCancelRequest
+ */
+export const deleteAdminOrderCancelRequest = (orderId: AdminOrderId) =>
+  fetcher.delete(`/admin/order/${orderId}/cancel-request`);
+
+/**
+ * @description 배송 단계 변경 (여러 주문 한 번에). 하나라도 결제 완료가 아니면 전부 바뀌지 않는다(409).
+ * 통관 상태와는 따로다
+ * Swagger: AdminOrderController_postAdminOrderDeliveryStage
+ */
+export const updateAdminOrderDeliveryStage = (
+  payload: PostAdminOrderDeliveryStageRequest,
+) => fetcher.post("/admin/order/delivery-stage", payload);
+
+/**
+ * @description 대만 국내운송사·운송장 입력. 배송 단계는 바뀌지 않는다
+ * Swagger: AdminOrderController_patchAdminOrderLocalDelivery
+ */
+export const updateAdminOrderLocalDelivery = (
+  orderId: AdminOrderId,
+  payload: PatchAdminOrderLocalDeliveryRequest,
+) => fetcher.patch(`/admin/order/${orderId}/local-delivery`, payload);
