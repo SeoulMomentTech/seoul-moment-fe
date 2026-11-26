@@ -10,8 +10,9 @@ import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from "@shared/constants/page";
 import { useDebounceValue } from "@shared/hooks/useDebounceValue";
 import type { AdminUser } from "@shared/services/user";
 
-import { PermissionDialog, UserTable } from "./components";
+import { ApprovalDialog, PermissionDialog, UserTable } from "./components";
 import { useAdminUserListQuery } from "./hooks";
+import type { ApprovalAction } from "./lib/permission";
 
 /** 관리자 권한. 어드민 로그인 계정의 역할·상태를 바꾼다(서비스 회원은 회원 관리) */
 export default function UserPage() {
@@ -19,6 +20,10 @@ export default function UserPage() {
   const [page, setPage] = useState(DEFAULT_PAGE);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [editTarget, setEditTarget] = useState<AdminUser | null>(null);
+  const [approvalTarget, setApprovalTarget] = useState<{
+    user: AdminUser;
+    action: ApprovalAction;
+  } | null>(null);
 
   const debouncedQuery = useDebounceValue(searchQuery, 300);
 
@@ -43,7 +48,7 @@ export default function UserPage() {
   return (
     <div className="p-8 pt-24">
       <PageHeader
-        description="관리자 계정의 역할과 상태를 바꿉니다. 최고 관리자(super_admin)만 바꿀 수 있습니다."
+        description="가입 신청을 승인하고, 관리자 계정의 역할과 상태를 바꿉니다. 최고 관리자(super_admin)만 할 수 있습니다."
         title="관리자 권한"
       />
 
@@ -79,6 +84,7 @@ export default function UserPage() {
             hasSearchQuery={Boolean(debouncedQuery)}
             isFetching={isFetching}
             isLoading={isLoading}
+            onApproval={(user, action) => setApprovalTarget({ user, action })}
             onEdit={setEditTarget}
             users={users}
           />
@@ -98,10 +104,16 @@ export default function UserPage() {
       </div>
 
       <p className="mt-3 text-xs text-gray-500">
-        가입 직후 계정은 ‘관리자 · 승인 대기’입니다. 최고 관리자 기능(환불·강제
-        탈퇴·권한 관리)은 역할이 최고 관리자이면서 상태가 정상이어야 쓸 수
-        있습니다. 자기 계정은 다른 최고 관리자가 바꿔야 합니다.
+        가입 직후 계정은 ‘관리자 · 승인 대기’라 승인하기 전에는 로그인할 수
+        없습니다. 최고 관리자 기능(환불·강제 탈퇴·권한 관리)은 역할이 최고
+        관리자이면서 상태가 정상이어야 쓸 수 있습니다. 자기 계정은 다른 최고
+        관리자가 바꿔야 합니다.
       </p>
+
+      <ApprovalDialog
+        onClose={() => setApprovalTarget(null)}
+        target={approvalTarget}
+      />
 
       {editTarget && (
         <PermissionDialog

@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 
-import { Link, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 
 import { Lock } from "lucide-react";
 
@@ -21,8 +21,16 @@ import {
   Flex,
 } from "@seoul-moment/ui";
 
+/** 회원가입이 로그인 화면으로 넘길 때 함께 보낸다 */
+interface LoginLocationState {
+  signedUpEmail?: string;
+}
+
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
+  const location = useLocation();
+  const signedUpEmail = (location.state as LoginLocationState | null)
+    ?.signedUpEmail;
+  const [email, setEmail] = useState(signedUpEmail ?? "");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -62,9 +70,14 @@ export default function LoginPage() {
 
       navigate(PATH.INDEX, { replace: true });
     } catch (err) {
+      const response = (
+        err as { response?: { status?: number; data?: { message?: string } } }
+      ).response;
       const message =
-        (err as { response?: { data?: { message?: string } } }).response?.data
-          ?.message ?? "로그인에 실패했습니다. 다시 시도해주세요.";
+        response?.status === 403
+          ? "아직 승인되지 않았거나 정지된 계정입니다. 최고 관리자에게 승인을 요청하세요."
+          : (response?.data?.message ??
+            "로그인에 실패했습니다. 다시 시도해주세요.");
       setError(message);
     } finally {
       setIsLoading(false);
@@ -89,6 +102,15 @@ export default function LoginPage() {
           </div>
         </CardHeader>
         <CardContent>
+          {signedUpEmail && (
+            <div
+              className="mb-4 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800"
+              role="status"
+            >
+              가입 신청이 완료됐습니다. 최고 관리자가 승인하면 로그인할 수
+              있습니다.
+            </div>
+          )}
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-2">
               <Label htmlFor="email">이메일</Label>
