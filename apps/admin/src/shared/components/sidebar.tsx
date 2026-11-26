@@ -13,8 +13,6 @@ import {
   Users,
   ClipboardList,
   Settings,
-  Truck,
-  ReceiptText,
 } from "lucide-react";
 
 import { PATH } from "@shared/constants/route";
@@ -65,21 +63,14 @@ const menuItems: MenuItemConfig[] = [
   },
   {
     id: "orders",
-    path: PATH.ORDERS,
-    label: "주문 및 발주 관리",
+    label: "주문 관리",
+    path: "",
     icon: <ClipboardList className="h-5 w-5" />,
-  },
-  {
-    id: "shipments",
-    path: PATH.SHIPMENTS,
-    label: "통관·물류 관리",
-    icon: <Truck className="h-5 w-5" />,
-  },
-  {
-    id: "refunds",
-    path: PATH.REFUNDS,
-    label: "취소/환불 내역",
-    icon: <ReceiptText className="h-5 w-5" />,
+    subItems: [
+      { id: "orders", label: "주문 목록", path: PATH.ORDERS },
+      { id: "shipments", label: "통관·물류", path: PATH.SHIPMENTS },
+      { id: "refunds", label: "취소/환불 내역", path: PATH.REFUNDS },
+    ],
   },
   //{
   //  id: "users",
@@ -183,6 +174,7 @@ const menuItems: MenuItemConfig[] = [
 ];
 
 const defaultExpandedMenus: MenuItem[] = [
+  "orders",
   "users",
   "products",
   "brand",

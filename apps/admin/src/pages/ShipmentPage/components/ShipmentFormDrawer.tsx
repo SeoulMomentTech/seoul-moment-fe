@@ -296,8 +296,8 @@ function ShipmentForm({
             </SelectContent>
           </Select>
           <p className="text-xs text-gray-500">
-            주문의 배송 단계는 바뀌지 않습니다. 단계는 주문 및 발주 관리에서
-            따로 바꿉니다.
+            주문의 배송 단계는 바뀌지 않습니다. 단계는 주문 목록에서 따로
+            바꿉니다.
           </p>
         </div>
 

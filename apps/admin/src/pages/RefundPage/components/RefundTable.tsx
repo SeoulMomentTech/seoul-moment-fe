@@ -111,8 +111,8 @@ export function RefundTable({
                     : "아직 시작된 환불이 없습니다"}
                 </p>
                 <p className="max-w-sm text-sm text-gray-500">
-                  환불을 시작하지 않은 취소 신청은 주문 및 발주 관리의 ‘취소
-                  요청’에 있습니다.
+                  환불을 시작하지 않은 취소 신청은 주문 목록의 ‘취소 요청’에
+                  있습니다.
                 </p>
               </div>
             </TableCell>
