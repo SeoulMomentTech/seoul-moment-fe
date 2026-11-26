@@ -48,6 +48,7 @@ import ProductOptionsPage from "@pages/ProductOptionsPage";
 import ProductsPage from "@pages/ProductPage";
 import ProductSubCategoriesPage from "@pages/ProductSubCategoriesPage";
 import PromotionPage from "@pages/PromotionPage";
+import { RefundListPage } from "@pages/RefundPage";
 import { ShipmentListPage } from "@pages/ShipmentPage";
 import { ShippingPolicyPage } from "@pages/ShippingPolicyPage";
 import SignUpPage from "@pages/SignUpPage";
@@ -112,6 +113,10 @@ const privateRoutes: RouteObject[] = [
       {
         path: PATH.SHIPMENTS,
         element: <ShipmentListPage />,
+      },
+      {
+        path: PATH.REFUNDS,
+        element: <RefundListPage />,
       },
       {
         path: PATH.SHIPPING_POLICY,

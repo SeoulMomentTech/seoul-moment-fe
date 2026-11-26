@@ -14,6 +14,7 @@ import {
   ClipboardList,
   Settings,
   Truck,
+  ReceiptText,
 } from "lucide-react";
 
 import { PATH } from "@shared/constants/route";
@@ -73,6 +74,12 @@ const menuItems: MenuItemConfig[] = [
     path: PATH.SHIPMENTS,
     label: "통관·물류 관리",
     icon: <Truck className="h-5 w-5" />,
+  },
+  {
+    id: "refunds",
+    path: PATH.REFUNDS,
+    label: "취소/환불 내역",
+    icon: <ReceiptText className="h-5 w-5" />,
   },
   //{
   //  id: "users",

@@ -35,13 +35,20 @@ import { OrderTimerBadge } from "./OrderTimerBadge";
 import { canStartEarlyPurchase } from "../lib/purchase";
 import { formatTaipeiDateTime } from "../lib/taipeiDate";
 
-type DrawerTab = "order" | "purchase" | "delivery" | "refund" | "events";
+export type OrderDrawerTab =
+  | "order"
+  | "purchase"
+  | "delivery"
+  | "refund"
+  | "events";
 
 interface OrderDrawerProps {
   orderId: AdminOrderId | null;
   now: number;
   onClose(): void;
   onStartPurchase(timer: AdminOrderListItem): void;
+  /** 열 때 보일 탭. 취소/환불 내역에서는 취소·환불 탭으로 연다 */
+  initialTab?: OrderDrawerTab;
 }
 
 /**
@@ -52,6 +59,7 @@ export function OrderDrawer({
   now,
   onClose,
   onStartPurchase,
+  initialTab = "order",
 }: OrderDrawerProps) {
   const { data, dataUpdatedAt, isLoading } = useAdminOrderDetailQuery(orderId);
   const detail = data?.data;
@@ -68,7 +76,8 @@ export function OrderDrawer({
         ) : (
           <DrawerBody
             detail={detail}
-            // 다른 주문을 열면 탭을 주문 정보로 되돌린다
+            initialTab={initialTab}
+            // 다른 주문을 열면 탭을 처음 탭으로 되돌린다
             key={detail.order.orderId}
             now={now}
             onClose={onClose}
@@ -98,16 +107,18 @@ function DrawerBody({
   now,
   onClose,
   onStartPurchase,
+  initialTab,
 }: {
   detail: GetAdminOrderDetailResponse;
   receivedAt: number;
   now: number;
   onClose(): void;
   onStartPurchase(timer: AdminOrderListItem): void;
+  initialTab: OrderDrawerTab;
 }) {
   const { order, purchase, timer } = detail;
   const { copy } = useCopyToClipBoard();
-  const [tab, setTab] = useState<DrawerTab>("order");
+  const [tab, setTab] = useState<OrderDrawerTab>(initialTab);
 
   const handleCopy = async () => {
     if (await copy(order.orderNumber)) {
@@ -186,7 +197,10 @@ function DrawerBody({
           </CompactButton>
         </div>
 
-        <Tabs onValueChange={(value) => setTab(value as DrawerTab)} value={tab}>
+        <Tabs
+          onValueChange={(value) => setTab(value as OrderDrawerTab)}
+          value={tab}
+        >
           <TabsList className="w-full justify-start overflow-x-auto">
             <TabsTrigger value="order">주문 정보</TabsTrigger>
             <TabsTrigger value="purchase">발주·매입</TabsTrigger>

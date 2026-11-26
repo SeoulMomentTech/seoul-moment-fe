@@ -18,6 +18,7 @@ export type MenuItem =
   | "inventory"
   | "orders"
   | "shipments"
+  | "refunds"
   | "analytics"
   | "settings"
   | "shipping-policy"
