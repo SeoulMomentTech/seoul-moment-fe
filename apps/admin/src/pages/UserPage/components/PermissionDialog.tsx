@@ -1,7 +1,6 @@
 import { useState } from "react";
 
 import { OrderConfirmDialog } from "@pages/OrderPage/components";
-import { getOrderActionErrorMessage } from "@pages/OrderPage/lib/actionError";
 import { CompactSelectTrigger } from "@shared/components/compact-form";
 import type {
   AdminUser,
@@ -25,6 +24,7 @@ import {
   ADMIN_STATUSES,
   ADMIN_STATUS_LABEL,
   canUseSuperAdminApi,
+  getPermissionErrorMessage,
   toPermissionPatch,
   type PermissionValues,
 } from "../lib/permission";
@@ -59,11 +59,7 @@ export function PermissionDialog({ user, onClose }: PermissionDialogProps) {
         },
         onError: (error) =>
           toast.error(
-            getOrderActionErrorMessage(error, "권한을 바꾸지 못했습니다.", {
-              403: "최고 관리자(super_admin)만 권한을 바꿀 수 있습니다.",
-              404: "없는 관리자 계정입니다. 목록을 새로고침해주세요.",
-              409: "자기 자신의 권한은 바꿀 수 없습니다. 다른 최고 관리자에게 요청하세요.",
-            }),
+            getPermissionErrorMessage(error, "권한을 바꾸지 못했습니다."),
           ),
       },
     );
