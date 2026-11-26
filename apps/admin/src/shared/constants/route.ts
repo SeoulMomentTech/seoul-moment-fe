@@ -22,6 +22,7 @@ export const PATH = {
 
   // Settings
   SHIPPING_POLICY: "/settings/shipping",
+  ADMIN_ROLES: "/settings/admins",
 
   // Banner
   HOME_BANNER: "/banner/home",
@@ -47,12 +48,9 @@ export const PATH = {
   BRAND_PROMOTION_ADD: "/brand/promotion/add",
   BRAND_PROMOTION_EDIT: "/brand/promotion/edit/:id",
 
-  // Member (서비스 회원 — /users 는 관리자 계정이라 다른 도메인이다)
+  // Member (서비스 회원 — 관리자 계정은 ADMIN_ROLES 라 다른 도메인이다)
   MEMBERS: "/members",
   MEMBER_DETAIL: "/members/:memberId",
-
-  // User
-  USERS: "/users",
 
   // Promotion
   PROMOTION: "/promotion",

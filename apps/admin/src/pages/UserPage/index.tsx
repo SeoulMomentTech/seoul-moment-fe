@@ -1,134 +1,115 @@
 import { useState } from "react";
 
-import { Pagination } from "@shared/components/pagination";
-import { useDebounceValue } from "@shared/hooks/useDebounceValue";
-import { type SortDirection } from "@shared/services/types";
+import { Search } from "lucide-react";
 
-import { UserFilters, UserTable } from "./components";
+import { CompactInput } from "@shared/components/compact-form";
+import { PageHeader } from "@shared/components/page-header";
+import { PageSizeSelect } from "@shared/components/page-size-select";
+import { Pagination } from "@shared/components/pagination";
+import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from "@shared/constants/page";
+import { useDebounceValue } from "@shared/hooks/useDebounceValue";
+import type { AdminUser } from "@shared/services/user";
+
+import { PermissionDialog, UserTable } from "./components";
 import { useAdminUserListQuery } from "./hooks";
 
+/** 관리자 권한. 어드민 로그인 계정의 역할·상태를 바꾼다(서비스 회원은 회원 관리) */
 export default function UserPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [sort, setSort] = useState<SortDirection>("DESC");
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [page, setPage] = useState(DEFAULT_PAGE);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [editTarget, setEditTarget] = useState<AdminUser | null>(null);
 
   const debouncedQuery = useDebounceValue(searchQuery, 300);
 
-  const {
-    data: userResponse,
-    isLoading,
-    isFetching,
-    refetch,
-  } = useAdminUserListQuery({
-    page: currentPage,
-    count: itemsPerPage,
-    search: debouncedQuery || undefined,
-    sort,
-  }, {
-    enabled: false
-  });
+  const { data, isLoading, isFetching } = useAdminUserListQuery(
+    {
+      page,
+      count: pageSize,
+      search: debouncedQuery || undefined,
+      sort: "DESC",
+    },
+    { placeholderData: (previous) => previous, toastOnError: true },
+  );
 
-  const users = userResponse?.data.list ?? [];
-  const totalItems = userResponse?.data.total ?? 0;
-  const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
+  const users = data?.data.list ?? [];
+  const totalItems = data?.data.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
 
-  const handleSearchChange = (value: string) => {
-    setSearchQuery(value);
-    setCurrentPage(1);
-  };
-
-  const handleSortChange = (value: SortDirection) => {
-    setSort(value);
-    setCurrentPage(1);
-  };
-
-  const handleItemsPerPageChange = (value: number) => {
-    setItemsPerPage(value);
-    setCurrentPage(1);
-  };
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(Math.min(Math.max(1, page), totalPages));
-  };
-
-  // Action handlers (Placeholders)
-  const handleApprove = async (id: string) => {
-    if (confirm("해당 유저의 가입을 승인하시겠습니까?")) {
-      // TODO: Implement approve mutation
-      alert(`유저 ${id} 승인 처리 (API 미구현)`);
-      refetch();
-    }
-  };
-
-  const handleReject = async (id: string) => {
-    if (confirm("해당 유저의 가입을 거부하시겠습니까?")) {
-      // TODO: Implement reject mutation
-      alert(`유저 ${id} 거부 처리 (API 미구현)`);
-      refetch();
-    }
-  };
-
-  const handleBlock = async (id: string) => {
-    if (confirm("해당 유저를 차단하시겠습니까?")) {
-      // TODO: Implement block mutation
-      alert(`유저 ${id} 차단 처리 (API 미구현)`);
-      refetch();
-    }
-  };
-
-  const handleUnblock = async (id: string) => {
-    if (confirm("해당 유저의 차단을 해제하시겠습니까?")) {
-      // TODO: Implement unblock mutation
-      alert(`유저 ${id} 차단 해제 처리 (API 미구현)`);
-      refetch();
-    }
+  const handlePageChange = (nextPage: number) => {
+    setPage(Math.min(Math.max(1, nextPage), totalPages));
   };
 
   return (
     <div className="p-8 pt-24">
-      <div className="mb-6">
-        <h2 className="mb-2 text-2xl font-bold text-gray-900">유저 관리</h2>
-        <p className="text-gray-600">유저 가입 승인 및 상태를 관리하세요.</p>
-      </div>
+      <PageHeader
+        description="관리자 계정의 역할과 상태를 바꿉니다. 최고 관리자(super_admin)만 바꿀 수 있습니다."
+        title="관리자 권한"
+      />
 
       <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-        <div className="border-b border-gray-200 bg-white px-6 py-4">
-          <p className="text-sm text-gray-600">총 {totalItems}명의 사용자</p>
+        <div className="flex flex-wrap items-center gap-2 border-b border-gray-200 bg-gray-50 px-4 py-3">
+          <div className="relative w-full max-w-xs">
+            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
+            <CompactInput
+              aria-label="관리자 검색"
+              className="bg-white pl-9"
+              onChange={(event) => {
+                setSearchQuery(event.target.value);
+                setPage(DEFAULT_PAGE);
+              }}
+              placeholder="이름 또는 이메일"
+              value={searchQuery}
+            />
+          </div>
+
+          <div className="ml-auto">
+            <PageSizeSelect
+              onChange={(size) => {
+                setPageSize(size);
+                setPage(DEFAULT_PAGE);
+              }}
+              value={pageSize}
+            />
+          </div>
         </div>
 
-        <UserFilters
-          itemsPerPage={itemsPerPage}
-          onItemsPerPageChange={handleItemsPerPageChange}
-          onSearchChange={handleSearchChange}
-          onSortChange={handleSortChange}
-          searchQuery={searchQuery}
-          sort={sort}
-        />
-
-        <UserTable
-          hasSearchQuery={Boolean(searchQuery)}
-          isFetching={isFetching}
-          isLoading={isLoading}
-          onApprove={handleApprove}
-          onBlock={handleBlock}
-          onReject={handleReject}
-          onUnblock={handleUnblock}
-          users={users}
-        />
+        <div className="overflow-x-auto">
+          <UserTable
+            hasSearchQuery={Boolean(debouncedQuery)}
+            isFetching={isFetching}
+            isLoading={isLoading}
+            onEdit={setEditTarget}
+            users={users}
+          />
+        </div>
 
         <div className="border-t border-gray-200 p-4">
           <Pagination
             countOnPage={users.length}
-            disableNext={isLoading || isFetching || currentPage === totalPages || totalItems === 0}
-            disablePrev={isLoading || isFetching || currentPage === 1 || totalItems === 0}
-            onNext={() => handlePageChange(currentPage + 1)}
-            onPrev={() => handlePageChange(currentPage - 1)}
-            page={currentPage}
+            disableNext={isFetching || page >= totalPages || totalItems === 0}
+            disablePrev={isFetching || page <= 1}
+            onNext={() => handlePageChange(page + 1)}
+            onPrev={() => handlePageChange(page - 1)}
+            page={page}
             totalPages={totalPages}
           />
         </div>
       </div>
+
+      <p className="mt-3 text-xs text-gray-500">
+        가입 직후 계정은 ‘관리자 · 승인 대기’입니다. 최고 관리자 기능(환불·강제
+        탈퇴·권한 관리)은 역할이 최고 관리자이면서 상태가 정상이어야 쓸 수
+        있습니다. 자기 계정은 다른 최고 관리자가 바꿔야 합니다.
+      </p>
+
+      {editTarget && (
+        <PermissionDialog
+          key={editTarget.id}
+          onClose={() => setEditTarget(null)}
+          user={editTarget}
+        />
+      )}
     </div>
   );
 }

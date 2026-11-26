@@ -1,2 +1,2 @@
-export * from "./UserFilters";
+export * from "./PermissionDialog";
 export * from "./UserTable";

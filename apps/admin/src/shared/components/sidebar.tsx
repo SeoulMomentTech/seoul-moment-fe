@@ -169,6 +169,7 @@ const menuItems: MenuItemConfig[] = [
         label: "배송비 정책",
         path: PATH.SHIPPING_POLICY,
       },
+      { id: "user-roles", label: "관리자 권한", path: PATH.ADMIN_ROLES },
     ],
   },
 ];
