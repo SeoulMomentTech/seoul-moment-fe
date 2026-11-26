@@ -239,7 +239,7 @@ const privateRoutes: RouteObject[] = [
         element: <MemberDetailPage />,
       },
       {
-        path: PATH.USERS,
+        path: PATH.ADMIN_ROLES,
         element: <UserPage />,
       },
       {

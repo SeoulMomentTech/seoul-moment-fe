@@ -1,198 +1,145 @@
-import { Check, X, Ban, RefreshCcw } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 
-import { type AdminUser, type AdminUserStatus } from "@shared/services/user";
+import { CompactButton } from "@shared/components/compact-form";
+import type {
+  AdminUser,
+  AdminUserRole,
+  AdminUserStatus,
+} from "@shared/services/user";
+import { formatDateTime } from "@shared/utils/format";
 
 import {
-  Button,
+  Skeleton,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
+  cn,
 } from "@seoul-moment/ui";
+
+import { ADMIN_ROLE_LABEL, ADMIN_STATUS_LABEL } from "../lib/permission";
+
+const SKELETON_ROW_KEYS = ["row-1", "row-2", "row-3", "row-4", "row-5"];
+const COLUMN_COUNT = 7;
+
+const CELL_CLASS = "px-4 py-3";
+const HEAD_CLASS = "px-4 text-xs font-medium text-gray-500";
+
+const ROLE_BADGE_CLASS: Record<AdminUserRole, string> = {
+  super_admin: "bg-gray-900 text-white",
+  admin: "border border-gray-200 bg-white text-gray-700",
+};
+
+const STATUS_BADGE_CLASS: Record<AdminUserStatus, string> = {
+  WAIT: "bg-amber-50 text-amber-700",
+  NORMAL: "bg-green-50 text-green-700",
+  BLOCK: "bg-red-50 text-red-700",
+  DELETE: "bg-gray-100 text-gray-500",
+};
+
+const BADGE_CLASS = "inline-flex rounded px-1.5 py-0.5 text-xs font-medium";
 
 interface UserTableProps {
   users: AdminUser[];
   isLoading: boolean;
   isFetching: boolean;
   hasSearchQuery: boolean;
-  onApprove(id: string): void;
-  onReject(id: string): void;
-  onBlock(id: string): void;
-  onUnblock(id: string): void;
+  onEdit(user: AdminUser): void;
 }
-
-const formatDate = (dateString: string) => {
-  if (!dateString) return "-";
-  return new Date(dateString).toLocaleString("ko-KR", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  });
-};
-
-const StatusBadge = ({ status }: { status: AdminUserStatus }) => {
-  switch (status) {
-    case "WAIT":
-      return (
-        <span className="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-800 ring-1 ring-inset ring-gray-500/10">
-          승인대기
-        </span>
-      );
-    case "NORMAL":
-      return (
-        <span className="inline-flex items-center rounded-md bg-gray-900 px-2 py-1 text-xs font-medium text-white ring-1 ring-inset ring-gray-900/10">
-          정상
-        </span>
-      );
-    case "BLOCK":
-      return (
-        <span className="inline-flex items-center rounded-md bg-red-600 px-2 py-1 text-xs font-medium text-white ring-1 ring-inset ring-red-600/10">
-          차단
-        </span>
-      );
-    case "DELETE":
-      return (
-        <span className="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">
-          탈퇴
-        </span>
-      );
-    default:
-      return null;
-  }
-};
-
-const RoleBadge = ({ role }: { role: string }) => {
-  // Assuming role is just a string for now, distinct from status
-  // Figma shows "사용자", "관리자" badges which look like basic gray badges
-  return (
-    <span className="inline-flex items-center rounded-md border border-gray-200 bg-white px-2 py-1 text-xs font-medium text-gray-900">
-      {role === "ADMIN" ? "관리자" : "사용자"}
-    </span>
-  );
-};
 
 export function UserTable({
   users,
   isLoading,
   isFetching,
   hasSearchQuery,
-  onApprove,
-  onReject,
-  onBlock,
-  onUnblock,
+  onEdit,
 }: UserTableProps) {
-  const isListLoading = isLoading || isFetching;
-
-  if (isListLoading) {
-    return (
-      <div className="flex w-full items-center justify-center p-12">
-        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900" />
-      </div>
-    );
-  }
-
   return (
-    <div className="border-t border-gray-200">
-      <Table>
-        <TableHeader className="bg-white">
+    <Table
+      aria-busy={isFetching}
+      className={cn(
+        "duration-normal transition-opacity",
+        isFetching && !isLoading && "opacity-60",
+      )}
+    >
+      <TableHeader>
+        <TableRow>
+          <TableHead className={HEAD_CLASS}>ID</TableHead>
+          <TableHead className={HEAD_CLASS}>이름</TableHead>
+          <TableHead className={HEAD_CLASS}>이메일</TableHead>
+          <TableHead className={HEAD_CLASS}>역할</TableHead>
+          <TableHead className={HEAD_CLASS}>상태</TableHead>
+          <TableHead className={HEAD_CLASS}>가입일</TableHead>
+          <TableHead className={cn(HEAD_CLASS, "text-right")}>
+            <span className="sr-only">작업</span>
+          </TableHead>
+        </TableRow>
+      </TableHeader>
+
+      <TableBody>
+        {isLoading ? (
+          SKELETON_ROW_KEYS.map((key) => (
+            <TableRow key={key}>
+              {Array.from({ length: COLUMN_COUNT }, (_, index) => (
+                <TableCell className={CELL_CLASS} key={`${key}-${index}`}>
+                  <Skeleton className="h-4 w-16" rounded />
+                </TableCell>
+              ))}
+            </TableRow>
+          ))
+        ) : users.length === 0 ? (
           <TableRow className="hover:bg-transparent">
-            <TableHead className="w-[50px] font-medium text-black">ID</TableHead>
-            <TableHead className="w-[200px] font-medium text-black">이메일</TableHead>
-            <TableHead className="w-[100px] font-medium text-black">역할</TableHead>
-            <TableHead className="w-[100px] font-medium text-black">상태</TableHead>
-            <TableHead className="w-[180px] font-medium text-black">가입일</TableHead>
-            <TableHead className="w-[180px] font-medium text-black">수정일</TableHead>
-            <TableHead className="w-[180px] font-medium text-black">액션</TableHead>
+            <TableCell className="px-4 py-16" colSpan={COLUMN_COUNT}>
+              <div className="flex flex-col items-center gap-2 text-center">
+                <ShieldCheck className="size-8 text-gray-300" />
+                <p className="font-medium text-gray-900">
+                  {hasSearchQuery
+                    ? "검색 결과가 없습니다"
+                    : "등록된 관리자 계정이 없습니다"}
+                </p>
+              </div>
+            </TableCell>
           </TableRow>
-        </TableHeader>
-        <TableBody>
-          {isListLoading ? (
-            <TableRow>
-              <TableCell className="h-[400px] text-center text-gray-500" colSpan={8}>
-                유저 정보를 불러오는 중입니다...
+        ) : (
+          users.map((user) => (
+            <TableRow key={user.id}>
+              <TableCell className={cn(CELL_CLASS, "tabular-nums")}>
+                {user.id}
+              </TableCell>
+              <TableCell className={CELL_CLASS}>{user.name}</TableCell>
+              <TableCell className={cn(CELL_CLASS, "text-gray-600")}>
+                {user.email}
+              </TableCell>
+              <TableCell className={CELL_CLASS}>
+                <span className={cn(BADGE_CLASS, ROLE_BADGE_CLASS[user.role])}>
+                  {ADMIN_ROLE_LABEL[user.role] ?? user.role}
+                </span>
+              </TableCell>
+              <TableCell className={CELL_CLASS}>
+                <span
+                  className={cn(BADGE_CLASS, STATUS_BADGE_CLASS[user.status])}
+                >
+                  {ADMIN_STATUS_LABEL[user.status]}
+                </span>
+              </TableCell>
+              <TableCell className={cn(CELL_CLASS, "text-sm text-gray-500")}>
+                {formatDateTime(user.createDate)}
+              </TableCell>
+              <TableCell className={cn(CELL_CLASS, "text-right")}>
+                <CompactButton
+                  onClick={() => onEdit(user)}
+                  size="sm"
+                  variant={user.status === "WAIT" ? "default" : "outline"}
+                >
+                  {user.status === "WAIT" ? "승인·권한 설정" : "권한 변경"}
+                </CompactButton>
               </TableCell>
             </TableRow>
-          ) : users.length === 0 ? (
-            <TableRow>
-              <TableCell className="h-[400px] text-center text-gray-500" colSpan={8}>
-                {hasSearchQuery
-                  ? "검색 결과가 없습니다."
-                  : "등록된 유저가 없습니다."}
-              </TableCell>
-            </TableRow>
-          ) : (
-            users.map((user) => (
-              <TableRow className="hover:bg-gray-50" key={user.id}>
-                <TableCell className="font-normal">{user.id}</TableCell>
-                <TableCell className="font-normal text-gray-600">
-                  {user.email}
-                </TableCell>
-                <TableCell>
-                  <RoleBadge role={user.role} />
-                </TableCell>
-                <TableCell>
-                  <StatusBadge status={user.status} />
-                </TableCell>
-                <TableCell className="text-gray-600 text-sm">
-                  {formatDate(user.createdAt)}
-                </TableCell>
-                <TableCell className="text-gray-600 text-sm">
-                  {formatDate(user.updatedAt)}
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    {user.status === "WAIT" && (
-                      <>
-                        <Button
-                          className="h-8 gap-1 bg-gray-900 px-3 hover:bg-gray-800"
-                          onClick={() => onApprove(user.id)}
-                          size="sm"
-                        >
-                          <Check className="h-3.5 w-3.5" />
-                          승인
-                        </Button>
-                        <Button
-                          className="h-8 gap-1 border border-gray-200 bg-white px-3 text-black hover:bg-gray-50"
-                          onClick={() => onReject(user.id)}
-                          size="sm"
-                        >
-                          <X className="h-3.5 w-3.5" />
-                          거부
-                        </Button>
-                      </>
-                    )}
-                    {user.status === "NORMAL" && (
-                      <Button
-                        className="h-8 gap-1 border border-gray-200 bg-white px-3 text-black hover:bg-gray-50"
-                        onClick={() => onBlock(user.id)}
-                        size="sm"
-                      >
-                        <Ban className="h-3.5 w-3.5" />
-                        차단
-                      </Button>
-                    )}
-                    {user.status === "BLOCK" && (
-                      <Button
-                        className="h-8 gap-1 bg-gray-900 px-3 hover:bg-gray-800"
-                        onClick={() => onUnblock(user.id)}
-                        size="sm"
-                      >
-                        <RefreshCcw className="h-3.5 w-3.5" />
-                        차단 해제
-                      </Button>
-                    )}
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
-    </div>
+          ))
+        )}
+      </TableBody>
+    </Table>
   );
 }

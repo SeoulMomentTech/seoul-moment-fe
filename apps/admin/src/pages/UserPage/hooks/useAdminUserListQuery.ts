@@ -1,9 +1,11 @@
-import { useAppQuery, type UseAppQueryOptions } from "@shared/hooks/useAppQuery";
+import {
+  useAppQuery,
+  type UseAppQueryOptions,
+} from "@shared/hooks/useAppQuery";
 import {
   getAdminUserList,
   type GetAdminUserListParams,
 } from "@shared/services/user";
-
 
 import { userQueryKeys } from "./queryKeys";
 
