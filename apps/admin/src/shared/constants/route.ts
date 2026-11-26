@@ -18,6 +18,7 @@ export const PATH = {
   // Order
   ORDERS: "/orders",
   SHIPMENTS: "/shipments",
+  REFUNDS: "/refunds",
 
   // Settings
   SHIPPING_POLICY: "/settings/shipping",

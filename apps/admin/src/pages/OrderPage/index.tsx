@@ -105,7 +105,7 @@ export function OrderListPage() {
     <div className="p-8 pt-24">
       <PageHeader
         description="결제된 주문을 확인하고, 결제 후 24시간이 지난 주문을 한국에 발주합니다."
-        title="주문 및 발주 관리"
+        title="주문 목록"
       />
 
       <OrderKpiCards

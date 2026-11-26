@@ -90,7 +90,7 @@ export function ShipmentListPage() {
             묶음 등록
           </Button>
         }
-        title="통관·물류 관리"
+        title="통관·물류"
       />
 
       <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
