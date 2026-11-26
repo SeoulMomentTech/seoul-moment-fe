@@ -3,6 +3,7 @@ import { useAppMutation } from "@shared/hooks/useAppMutation";
 import { useAppQuery } from "@shared/hooks/useAppQuery";
 import {
   createAdminShipment,
+  deleteAdminShipment,
   getAdminShipmentList,
   updateAdminShipment,
   type AdminShipmentId,
@@ -57,6 +58,16 @@ export const useUpdateAdminShipmentMutation = () => {
       shipmentId: AdminShipmentId;
       payload: PatchAdminShipmentRequest;
     }) => updateAdminShipment(shipmentId, payload),
+    onSuccess: invalidate,
+  });
+};
+
+export const useDeleteAdminShipmentMutation = () => {
+  const invalidate = useInvalidateShipment();
+
+  return useAppMutation({
+    mutationFn: (shipmentId: AdminShipmentId) =>
+      deleteAdminShipment(shipmentId),
     onSuccess: invalidate,
   });
 };

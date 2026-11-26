@@ -145,3 +145,11 @@ export const updateAdminShipment = (
     `/admin/shipment/${shipmentId}`,
     payload,
   );
+
+/**
+ * @description 통관·물류 삭제. 실린 주문의 작업 이력에 한 줄이 남고, 배송 단계·대만 운송장은 바뀌지 않는다.
+ * 되돌리는 API 는 없다 — 다시 등록한다
+ * Swagger: AdminShipmentController_deleteAdminShipment
+ */
+export const deleteAdminShipment = (shipmentId: AdminShipmentId) =>
+  fetcher.delete(`/admin/shipment/${shipmentId}`);

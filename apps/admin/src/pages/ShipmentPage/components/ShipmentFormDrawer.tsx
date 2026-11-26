@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 
 import { X } from "lucide-react";
 
+import { OrderConfirmDialog } from "@pages/OrderPage/components";
 import {
   CompactSelectTrigger,
   CompactButton,
@@ -32,6 +33,7 @@ import {
 
 import {
   useCreateAdminShipmentMutation,
+  useDeleteAdminShipmentMutation,
   useUpdateAdminShipmentMutation,
 } from "../hooks";
 import { ShipmentOrderPicker } from "./ShipmentOrderPicker";
@@ -115,6 +117,13 @@ const getSaveErrorMessage = (error: unknown) => {
   return "묶음을 저장하지 못했습니다. 잠시 후 다시 시도해주세요.";
 };
 
+const getDeleteErrorMessage = (error: unknown) => {
+  if (axios.isAxiosError(error) && error.response?.status === 404) {
+    return "이미 삭제됐거나 없는 묶음입니다. 목록을 새로고침해주세요.";
+  }
+  return "묶음을 삭제하지 못했습니다. 잠시 후 다시 시도해주세요.";
+};
+
 function ShipmentForm({
   shipment,
   onClose,
@@ -128,7 +137,12 @@ function ShipmentForm({
 
   const createMutation = useCreateAdminShipmentMutation();
   const updateMutation = useUpdateAdminShipmentMutation();
-  const isPending = createMutation.isPending || updateMutation.isPending;
+  const deleteMutation = useDeleteAdminShipmentMutation();
+  const isPending =
+    createMutation.isPending ||
+    updateMutation.isPending ||
+    deleteMutation.isPending;
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   const validationError = validateShipmentForm(values);
   const patch = isEdit ? toPatchShipmentPayload(initial, values) : null;
@@ -170,177 +184,219 @@ function ShipmentForm({
     }
   };
 
+  const handleDelete = () => {
+    if (!isEdit) return;
+    deleteMutation.mutate(shipment.shipmentId, {
+      onSuccess: () => {
+        toast.success(`묶음 #${shipment.shipmentId} 을 삭제했습니다.`);
+        setIsDeleteOpen(false);
+        onClose();
+      },
+      onError: (error) => {
+        toast.error(getDeleteErrorMessage(error));
+        setIsDeleteOpen(false);
+      },
+    });
+  };
+
+  // 확인 모달은 form 밖에 둔다. 포털이어도 React 이벤트는 트리를 따라 올라가 저장 submit 이 같이 돈다
   return (
-    <form className="flex min-h-full flex-col" onSubmit={handleSubmit}>
-      <header className="sticky top-0 z-10 flex items-center gap-2 border-b border-gray-200 bg-white px-6 py-4">
-        <DrawerTitle className="text-lg font-semibold text-gray-900">
-          {isEdit ? `묶음 #${shipment.shipmentId}` : "묶음 등록"}
-        </DrawerTitle>
-        <DrawerDescription className="sr-only">
-          국제배송 묶음의 운송장·수입신고번호·통관 상태
-        </DrawerDescription>
-        <button
-          aria-label="닫기"
-          className="ml-auto rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900"
-          onClick={onClose}
-          type="button"
-        >
-          <X className="size-5" />
-        </button>
-      </header>
-
-      <div className="grid flex-1 content-start gap-5 p-6">
-        <fieldset className="grid gap-2">
-          <legend className="mb-1 text-xs font-medium text-gray-600">
-            실린 주문 (필수 · {values.orders.length}/{ORDERS_MAX})
-          </legend>
-          {values.orders.length > 0 && (
-            <ul className="flex flex-wrap gap-1.5">
-              {values.orders.map((order) => (
-                <li
-                  className="inline-flex items-center gap-1 rounded bg-gray-100 py-0.5 pl-2 pr-1 text-xs tabular-nums text-gray-800"
-                  key={order.orderId}
-                >
-                  {order.orderNumber}
-                  <button
-                    aria-label={`${order.orderNumber} 빼기`}
-                    className="rounded p-0.5 text-gray-500 hover:bg-gray-200 hover:text-gray-900"
-                    onClick={() =>
-                      setField(
-                        "orders",
-                        values.orders.filter(
-                          (item) => item.orderId !== order.orderId,
-                        ),
-                      )
-                    }
-                    type="button"
-                  >
-                    <X className="size-3" />
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-          <ShipmentOrderPicker
-            disabled={values.orders.length >= ORDERS_MAX}
-            onAdd={(order) =>
-              setField("orders", [
-                ...values.orders,
-                { orderId: order.orderId, orderNumber: order.orderNumber },
-              ])
-            }
-            selectedOrderIds={
-              new Set(values.orders.map((order) => order.orderId))
-            }
-          />
-          {isEdit && (
-            <p className="text-xs text-gray-500">
-              주문을 넣거나 빼면 실린 주문 목록이 통째로 바뀝니다.
-            </p>
-          )}
-        </fieldset>
-
-        <div className="grid grid-cols-2 gap-3">
-          <TextField
-            id="intl-carrier"
-            label="국제운송사"
-            maxLength={CARRIER_MAX}
-            onChange={(value) => setField("intlCarrier", value)}
-            placeholder="EMS"
-            value={values.intlCarrier}
-          />
-          <TextField
-            id="intl-tracking"
-            label="국제운송장 번호"
-            maxLength={NUMBER_MAX}
-            onChange={(value) => setField("intlTrackingNo", value)}
-            placeholder="EG123456789KR"
-            value={values.intlTrackingNo}
-          />
-          <TextField
-            id="hawb"
-            label="분할운송장(HAWB)"
-            maxLength={NUMBER_MAX}
-            onChange={(value) => setField("houseAirwaybillNo", value)}
-            value={values.houseAirwaybillNo}
-          />
-          <TextField
-            id="import-declaration"
-            label="수입신고번호"
-            maxLength={NUMBER_MAX}
-            onChange={(value) => setField("importDeclarationNo", value)}
-            placeholder="AA 26 123 45678"
-            value={values.importDeclarationNo}
-          />
-        </div>
-
-        <div className="grid gap-1.5">
-          <Label className="text-xs text-gray-600" htmlFor="customs-status">
-            통관 상태
-          </Label>
-          <Select
-            onValueChange={(value) =>
-              setField("customsStatus", value as AdminShipmentCustomsStatus)
-            }
-            value={values.customsStatus}
+    <>
+      <form className="flex min-h-full flex-col" onSubmit={handleSubmit}>
+        <header className="sticky top-0 z-10 flex items-center gap-2 border-b border-gray-200 bg-white px-6 py-4">
+          <DrawerTitle className="text-lg font-semibold text-gray-900">
+            {isEdit ? `묶음 #${shipment.shipmentId}` : "묶음 등록"}
+          </DrawerTitle>
+          <DrawerDescription className="sr-only">
+            국제배송 묶음의 운송장·수입신고번호·통관 상태
+          </DrawerDescription>
+          <button
+            aria-label="닫기"
+            className="ml-auto rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+            onClick={onClose}
+            type="button"
           >
-            <CompactSelectTrigger id="customs-status">
-              <SelectValue />
-            </CompactSelectTrigger>
-            <SelectContent className="**:cursor-pointer bg-white">
-              {CUSTOMS_STATUSES.map((status) => (
-                <SelectItem key={status.value} value={status.value}>
-                  {status.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <p className="text-xs text-gray-500">
-            주문의 배송 단계는 바뀌지 않습니다. 단계는 주문 목록에서 따로
-            바꿉니다.
-          </p>
+            <X className="size-5" />
+          </button>
+        </header>
+
+        <div className="grid flex-1 content-start gap-5 p-6">
+          <fieldset className="grid gap-2">
+            <legend className="mb-1 text-xs font-medium text-gray-600">
+              실린 주문 (필수 · {values.orders.length}/{ORDERS_MAX})
+            </legend>
+            {values.orders.length > 0 && (
+              <ul className="flex flex-wrap gap-1.5">
+                {values.orders.map((order) => (
+                  <li
+                    className="inline-flex items-center gap-1 rounded bg-gray-100 py-0.5 pl-2 pr-1 text-xs tabular-nums text-gray-800"
+                    key={order.orderId}
+                  >
+                    {order.orderNumber}
+                    <button
+                      aria-label={`${order.orderNumber} 빼기`}
+                      className="rounded p-0.5 text-gray-500 hover:bg-gray-200 hover:text-gray-900"
+                      onClick={() =>
+                        setField(
+                          "orders",
+                          values.orders.filter(
+                            (item) => item.orderId !== order.orderId,
+                          ),
+                        )
+                      }
+                      type="button"
+                    >
+                      <X className="size-3" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <ShipmentOrderPicker
+              disabled={values.orders.length >= ORDERS_MAX}
+              onAdd={(order) =>
+                setField("orders", [
+                  ...values.orders,
+                  { orderId: order.orderId, orderNumber: order.orderNumber },
+                ])
+              }
+              selectedOrderIds={
+                new Set(values.orders.map((order) => order.orderId))
+              }
+            />
+            {isEdit && (
+              <p className="text-xs text-gray-500">
+                주문을 넣거나 빼면 실린 주문 목록이 통째로 바뀝니다.
+              </p>
+            )}
+          </fieldset>
+
+          <div className="grid grid-cols-2 gap-3">
+            <TextField
+              id="intl-carrier"
+              label="국제운송사"
+              maxLength={CARRIER_MAX}
+              onChange={(value) => setField("intlCarrier", value)}
+              placeholder="EMS"
+              value={values.intlCarrier}
+            />
+            <TextField
+              id="intl-tracking"
+              label="국제운송장 번호"
+              maxLength={NUMBER_MAX}
+              onChange={(value) => setField("intlTrackingNo", value)}
+              placeholder="EG123456789KR"
+              value={values.intlTrackingNo}
+            />
+            <TextField
+              id="hawb"
+              label="분할운송장(HAWB)"
+              maxLength={NUMBER_MAX}
+              onChange={(value) => setField("houseAirwaybillNo", value)}
+              value={values.houseAirwaybillNo}
+            />
+            <TextField
+              id="import-declaration"
+              label="수입신고번호"
+              maxLength={NUMBER_MAX}
+              onChange={(value) => setField("importDeclarationNo", value)}
+              placeholder="AA 26 123 45678"
+              value={values.importDeclarationNo}
+            />
+          </div>
+
+          <div className="grid gap-1.5">
+            <Label className="text-xs text-gray-600" htmlFor="customs-status">
+              통관 상태
+            </Label>
+            <Select
+              onValueChange={(value) =>
+                setField("customsStatus", value as AdminShipmentCustomsStatus)
+              }
+              value={values.customsStatus}
+            >
+              <CompactSelectTrigger id="customs-status">
+                <SelectValue />
+              </CompactSelectTrigger>
+              <SelectContent className="**:cursor-pointer bg-white">
+                {CUSTOMS_STATUSES.map((status) => (
+                  <SelectItem key={status.value} value={status.value}>
+                    {status.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-gray-500">
+              주문의 배송 단계는 바뀌지 않습니다. 단계는 주문 목록에서 따로
+              바꿉니다.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <TextField
+              id="declared-at"
+              label="수입신고 일시"
+              onChange={(value) => setField("declaredAt", value)}
+              type="datetime-local"
+              value={values.declaredAt}
+            />
+            <TextField
+              id="cleared-at"
+              label="통관 완료 일시"
+              onChange={(value) => setField("clearedAt", value)}
+              type="datetime-local"
+              value={values.clearedAt}
+            />
+          </div>
+
+          <div className="grid gap-1.5">
+            <Label className="text-xs text-gray-600" htmlFor="memo">
+              메모 (고객 비노출)
+            </Label>
+            <CompactTextarea
+              id="memo"
+              maxLength={MEMO_MAX}
+              onChange={(event) => setField("memo", event.target.value)}
+              rows={3}
+              value={values.memo}
+            />
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          <TextField
-            id="declared-at"
-            label="수입신고 일시"
-            onChange={(value) => setField("declaredAt", value)}
-            type="datetime-local"
-            value={values.declaredAt}
-          />
-          <TextField
-            id="cleared-at"
-            label="통관 완료 일시"
-            onChange={(value) => setField("clearedAt", value)}
-            type="datetime-local"
-            value={values.clearedAt}
-          />
-        </div>
+        <footer className="sticky bottom-0 flex justify-end gap-2 border-t border-gray-200 bg-white px-6 py-4">
+          {isEdit && (
+            <CompactButton
+              className="mr-auto text-red-600 hover:text-red-700"
+              disabled={isPending}
+              onClick={() => setIsDeleteOpen(true)}
+              type="button"
+              variant="outline"
+            >
+              삭제
+            </CompactButton>
+          )}
+          <CompactButton onClick={onClose} type="button" variant="outline">
+            닫기
+          </CompactButton>
+          <CompactButton disabled={isPending || isUnchanged} type="submit">
+            {isPending ? "저장 중…" : isEdit ? "저장" : "등록"}
+          </CompactButton>
+        </footer>
+      </form>
 
-        <div className="grid gap-1.5">
-          <Label className="text-xs text-gray-600" htmlFor="memo">
-            메모 (고객 비노출)
-          </Label>
-          <CompactTextarea
-            id="memo"
-            maxLength={MEMO_MAX}
-            onChange={(event) => setField("memo", event.target.value)}
-            rows={3}
-            value={values.memo}
-          />
-        </div>
-      </div>
-
-      <footer className="sticky bottom-0 flex justify-end gap-2 border-t border-gray-200 bg-white px-6 py-4">
-        <CompactButton onClick={onClose} type="button" variant="outline">
-          닫기
-        </CompactButton>
-        <CompactButton disabled={isPending || isUnchanged} type="submit">
-          {isPending ? "저장 중…" : isEdit ? "저장" : "등록"}
-        </CompactButton>
-      </footer>
-    </form>
+      {isEdit && (
+        <OrderConfirmDialog
+          confirmLabel="삭제"
+          description={`실린 주문 ${shipment.orders.length}건과의 연결이 끊기고, 각 주문의 작업 이력에 삭제가 남습니다. 주문의 배송 단계와 대만 운송장은 바뀌지 않습니다. 되돌릴 수 없어 다시 쓰려면 새로 등록해야 합니다.`}
+          destructive
+          isPending={deleteMutation.isPending}
+          onClose={() => setIsDeleteOpen(false)}
+          onConfirm={handleDelete}
+          open={isDeleteOpen}
+          title={`묶음 #${shipment.shipmentId} 삭제`}
+        />
+      )}
+    </>
   );
 }
 
