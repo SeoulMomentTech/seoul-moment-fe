@@ -7,11 +7,21 @@ import axios, {
 
 import { type ApiResponse } from "./types";
 
+declare module "axios" {
+  interface AxiosRequestConfig {
+    /**
+     * 403 이 "관리자 아님"이 아니라 "권한 부족(super_admin 전용)"인 API 에 켠다.
+     * 켜면 403 에도 로그아웃하지 않고 호출한 쪽이 에러를 처리한다.
+     */
+    skipForbiddenLogout?: boolean;
+  }
+}
+
 const api = axios.create({
   baseURL:
     import.meta.env.VITE_ADMIN_API_BASE_URL ??
     import.meta.env.VITE_API_BASE_URL ??
-    "https://api.seoulmoment.com.tw",
+    "https://api-dev.seoulmoment.com.tw",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
@@ -92,7 +102,7 @@ api.interceptors.response.use(
       useAuthStore.getState().logout();
     }
 
-    if (status === 403) {
+    if (status === 403 && !originalRequest.skipForbiddenLogout) {
       useAuthStore.getState().logout();
     }
 

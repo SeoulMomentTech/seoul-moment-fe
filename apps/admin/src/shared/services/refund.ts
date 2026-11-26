@@ -7,6 +7,9 @@ import { type ApiResponse } from "./types";
 
 import { fetcher } from ".";
 
+/** super_admin 전용 API 의 403 은 권한 부족이라 로그아웃하지 않는다 */
+const SUPER_ADMIN_ONLY = { skipForbiddenLogout: true } as const;
+
 export type AdminRefundId = Branded<number, "AdminRefundId">;
 
 /**
@@ -119,6 +122,7 @@ export const createAdminOrderRefund = (
   fetcher.post<ApiResponse<AdminRefund>>(
     `/admin/order/${orderId}/refund`,
     payload,
+    SUPER_ADMIN_ONLY,
   );
 
 /**
@@ -127,7 +131,7 @@ export const createAdminOrderRefund = (
  * Swagger: AdminRefundController_deleteAdminOrderRefund
  */
 export const deleteAdminOrderRefund = (orderId: AdminOrderId) =>
-  fetcher.delete(`/admin/order/${orderId}/refund`);
+  fetcher.delete(`/admin/order/${orderId}/refund`, SUPER_ADMIN_ONLY);
 
 /**
  * @description 수동 환불 완료 입력. super_admin 전용. 돈을 보내지 않고 PG 밖에서 돌려준
@@ -141,6 +145,7 @@ export const completeAdminOrderRefund = (
   fetcher.post<ApiResponse<AdminRefund>>(
     `/admin/order/${orderId}/refund/complete`,
     payload,
+    SUPER_ADMIN_ONLY,
   );
 
 /**
@@ -151,4 +156,6 @@ export const completeAdminOrderRefund = (
 export const retryAdminOrderInvoiceAdjustment = (orderId: AdminOrderId) =>
   fetcher.post<ApiResponse<AdminInvoiceAdjustment>>(
     `/admin/order/${orderId}/invoice-adjust`,
+    undefined,
+    SUPER_ADMIN_ONLY,
   );
