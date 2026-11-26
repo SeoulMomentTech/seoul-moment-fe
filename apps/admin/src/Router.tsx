@@ -48,6 +48,7 @@ import ProductOptionsPage from "@pages/ProductOptionsPage";
 import ProductsPage from "@pages/ProductPage";
 import ProductSubCategoriesPage from "@pages/ProductSubCategoriesPage";
 import PromotionPage from "@pages/PromotionPage";
+import { ShipmentListPage } from "@pages/ShipmentPage";
 import { ShippingPolicyPage } from "@pages/ShippingPolicyPage";
 import SignUpPage from "@pages/SignUpPage";
 import UserPage from "@pages/UserPage";
@@ -107,6 +108,10 @@ const privateRoutes: RouteObject[] = [
       {
         path: PATH.ORDERS,
         element: <OrderListPage />,
+      },
+      {
+        path: PATH.SHIPMENTS,
+        element: <ShipmentListPage />,
       },
       {
         path: PATH.SHIPPING_POLICY,

@@ -1,22 +1,23 @@
 import { useState, type FormEvent } from "react";
 
+import {
+  CompactButton,
+  CompactInput,
+  CompactTextarea,
+} from "@shared/components/compact-form";
 import type { AdminOrderListItem } from "@shared/services/order";
 import { formatCurrency } from "@shared/utils/format";
 import axios from "axios";
 import { toast } from "sonner";
 
-
 import {
-  Button,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  Input,
   Label,
-  Textarea,
 } from "@seoul-moment/ui";
 
 import { EARLY_REASON_MAX, SUPPLIER_ORDER_NO_MAX } from "../constants";
@@ -120,7 +121,7 @@ function PurchaseForm({
         <Label className="text-xs text-gray-600" htmlFor="supplier-order-no">
           공급처 발주번호 (선택)
         </Label>
-        <Input
+        <CompactInput
           autoComplete="off"
           id="supplier-order-no"
           maxLength={SUPPLIER_ORDER_NO_MAX}
@@ -135,7 +136,7 @@ function PurchaseForm({
           <Label className="text-xs text-gray-600" htmlFor="early-reason">
             조기 발주 사유 (필수)
           </Label>
-          <Textarea
+          <CompactTextarea
             id="early-reason"
             maxLength={EARLY_REASON_MAX}
             onChange={(event) => setEarlyReason(event.target.value)}
@@ -152,12 +153,12 @@ function PurchaseForm({
       </p>
 
       <DialogFooter>
-        <Button onClick={onClose} type="button" variant="outline">
+        <CompactButton onClick={onClose} type="button" variant="outline">
           취소
-        </Button>
-        <Button disabled={!canSubmit} type="submit">
+        </CompactButton>
+        <CompactButton disabled={!canSubmit} type="submit">
           {isPending ? "처리 중…" : isEarly ? "조기 발주" : "발주 시작"}
-        </Button>
+        </CompactButton>
       </DialogFooter>
     </form>
   );

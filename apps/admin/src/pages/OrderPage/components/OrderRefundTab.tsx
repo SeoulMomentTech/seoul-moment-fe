@@ -1,11 +1,16 @@
 import { useState } from "react";
 
+import {
+  CompactButton,
+  CompactInput,
+  CompactTextarea,
+} from "@shared/components/compact-form";
 import type { GetAdminOrderDetailResponse } from "@shared/services/order";
 import type { AdminRefund } from "@shared/services/refund";
 import { EMPTY_VALUE, formatCurrency } from "@shared/utils/format";
 import { toast } from "sonner";
 
-import { Button, Input, Label, Textarea } from "@seoul-moment/ui";
+import { Label } from "@seoul-moment/ui";
 
 import {
   INVOICE_ADJUST_STATUS_LABEL,
@@ -174,13 +179,13 @@ export function OrderRefundTab({ detail }: OrderRefundTabProps) {
       <Section
         action={
           canWithdrawCancelRequest(detail) && (
-            <Button
+            <CompactButton
               onClick={() => setAction("withdraw")}
               size="sm"
               variant="outline"
             >
               접수 철회
-            </Button>
+            </CompactButton>
           )
         }
         title="취소 접수"
@@ -257,7 +262,7 @@ export function OrderRefundTab({ detail }: OrderRefundTabProps) {
                     환불 금액 (비우면 전액 · 최대{" "}
                     {formatCurrency(detail.refundableAmount)})
                   </Label>
-                  <Input
+                  <CompactInput
                     aria-invalid={isAmountInvalid}
                     autoComplete="off"
                     id="refund-amount"
@@ -281,7 +286,7 @@ export function OrderRefundTab({ detail }: OrderRefundTabProps) {
                   >
                     환불 사유
                   </Label>
-                  <Textarea
+                  <CompactTextarea
                     id="refund-reason"
                     maxLength={REFUND_REASON_MAX}
                     onChange={(event) => setReason(event.target.value)}
@@ -293,13 +298,13 @@ export function OrderRefundTab({ detail }: OrderRefundTabProps) {
               </>
             )}
             <div className="flex justify-end">
-              <Button
+              <CompactButton
                 disabled={isAmountInvalid}
                 onClick={() => setAction("refund")}
                 variant="destructive"
               >
                 {isRetry ? "환불 재시도" : "환불 실행"}
-              </Button>
+              </CompactButton>
             </div>
           </div>
         )}
@@ -329,13 +334,13 @@ export function OrderRefundTab({ detail }: OrderRefundTabProps) {
       <Section
         action={
           canRetryInvoiceAdjustment(detail) && (
-            <Button
+            <CompactButton
               onClick={() => setAction("invoiceAdjust")}
               size="sm"
               variant="outline"
             >
               발표 정정 재시도
-            </Button>
+            </CompactButton>
           )
         }
         title="전자발표 정정"
@@ -406,7 +411,7 @@ export function OrderRefundTab({ detail }: OrderRefundTabProps) {
           <Label className="text-xs text-gray-600" htmlFor="refund-reference">
             돌려준 근거 (필수)
           </Label>
-          <Input
+          <CompactInput
             autoComplete="off"
             id="refund-reference"
             maxLength={REFUND_REFERENCE_MAX}
@@ -525,14 +530,14 @@ function RefundCard({
       {(onComplete || onCancel) && (
         <div className="flex justify-end gap-2">
           {onCancel && (
-            <Button onClick={onCancel} size="sm" variant="outline">
+            <CompactButton onClick={onCancel} size="sm" variant="outline">
               환불 요청 취소
-            </Button>
+            </CompactButton>
           )}
           {onComplete && (
-            <Button onClick={onComplete} size="sm">
+            <CompactButton onClick={onComplete} size="sm">
               환불 완료 입력
-            </Button>
+            </CompactButton>
           )}
         </div>
       )}

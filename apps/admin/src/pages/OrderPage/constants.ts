@@ -9,7 +9,6 @@ import type {
   AdminInvoiceAdjustStatus,
   AdminRefundStatus,
 } from "@shared/services/refund";
-import type { AdminShipmentCustomsStatus } from "@shared/services/shipment";
 
 /** 목록 상태 칩. KPI 카드와 같은 기준으로 센다 */
 export const ORDER_CHIPS: { value: AdminOrderChip; label: string }[] = [
@@ -104,14 +103,6 @@ export const INVOICE_ADJUST_STATUS_LABEL: Record<
   ALLOWANCED: "折讓",
   FAILED: "정정 실패",
 };
-
-export const CUSTOMS_STATUS_LABEL: Record<AdminShipmentCustomsStatus, string> =
-  {
-    WAITING: "대기",
-    IN_PROGRESS: "진행",
-    HELD: "보류",
-    CLEARED: "완료",
-  };
 
 /** 작업 이력 문구. message 는 변경 내용 그대로라 보조로만 붙인다 */
 export const ORDER_EVENT_LABEL: Record<AdminOrderEventType, string> = {

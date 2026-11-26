@@ -1,7 +1,8 @@
 import type { FormEvent, ReactNode } from "react";
 
+import { CompactButton } from "@shared/components/compact-form";
+
 import {
-  Button,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -59,16 +60,16 @@ export function OrderConfirmDialog({
           {children}
 
           <DialogFooter>
-            <Button onClick={onClose} type="button" variant="outline">
+            <CompactButton onClick={onClose} type="button" variant="outline">
               닫기
-            </Button>
-            <Button
+            </CompactButton>
+            <CompactButton
               disabled={isPending || disabled}
               type="submit"
               variant={destructive ? "destructive" : "default"}
             >
               {isPending ? "처리 중…" : confirmLabel}
-            </Button>
+            </CompactButton>
           </DialogFooter>
         </form>
       </DialogContent>

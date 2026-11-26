@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { Copy, X } from "lucide-react";
 
+import { CompactButton } from "@shared/components/compact-form";
 import useCopyToClipBoard from "@shared/hooks/useCopyToClipBoard";
 import type {
   AdminOrderId,
@@ -12,7 +13,6 @@ import { EMPTY_VALUE, formatCurrency } from "@shared/utils/format";
 import { toast } from "sonner";
 
 import {
-  Button,
   Drawer,
   DrawerContent,
   DrawerDescription,
@@ -160,27 +160,30 @@ function DrawerBody({
 
         <div className="flex flex-wrap gap-2">
           {canEarly ? (
-            <Button onClick={() => onStartPurchase(timer)} variant="outline">
+            <CompactButton
+              onClick={() => onStartPurchase(timer)}
+              variant="outline"
+            >
               조기 발주 (사유 입력)
-            </Button>
+            </CompactButton>
           ) : (
-            <Button
+            <CompactButton
               disabled={!timer.canStartPurchase}
               onClick={() => onStartPurchase(timer)}
             >
               {purchase.purchaseStatus === "ORDERED"
                 ? "발주 완료"
                 : "한국 발주 시작"}
-            </Button>
+            </CompactButton>
           )}
-          <Button onClick={() => setTab("refund")} variant="outline">
+          <CompactButton onClick={() => setTab("refund")} variant="outline">
             취소/환불 관리
             {detail.cancellation.requestedAt && (
               <span className="ml-1 rounded bg-pink-100 px-1 text-xs text-pink-700">
                 접수
               </span>
             )}
-          </Button>
+          </CompactButton>
         </div>
 
         <Tabs onValueChange={(value) => setTab(value as DrawerTab)} value={tab}>

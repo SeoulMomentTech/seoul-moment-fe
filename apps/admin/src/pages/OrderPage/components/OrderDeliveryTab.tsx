@@ -1,5 +1,11 @@
 import { useState, type FormEvent } from "react";
 
+import {
+  CompactSelectTrigger,
+  CompactButton,
+  CompactInput,
+} from "@shared/components/compact-form";
+import { CUSTOMS_STATUS_LABEL } from "@shared/constants/shipment";
 import type {
   AdminOrderDeliveryStage,
   GetAdminOrderDetailResponse,
@@ -8,21 +14,14 @@ import { EMPTY_VALUE } from "@shared/utils/format";
 import { toast } from "sonner";
 
 import {
-  Button,
-  Input,
   Label,
   Select,
   SelectContent,
   SelectItem,
-  SelectTrigger,
   SelectValue,
 } from "@seoul-moment/ui";
 
-import {
-  CUSTOMS_STATUS_LABEL,
-  DELIVERY_STAGES,
-  LOCAL_DELIVERY_FIELD_MAX,
-} from "../constants";
+import { DELIVERY_STAGES, LOCAL_DELIVERY_FIELD_MAX } from "../constants";
 import {
   useAdminOrderDeliveryStageMutation,
   useAdminOrderLocalDeliveryMutation,
@@ -163,9 +162,12 @@ function DeliveryStageForm({ detail }: OrderDeliveryTabProps) {
             }
             value={stage}
           >
-            <SelectTrigger aria-label="바꿀 배송 단계" className="flex-1">
+            <CompactSelectTrigger
+              aria-label="바꿀 배송 단계"
+              className="flex-1"
+            >
               <SelectValue />
-            </SelectTrigger>
+            </CompactSelectTrigger>
             <SelectContent className="**:cursor-pointer bg-white">
               {DELIVERY_STAGES.map((option, index) => (
                 <SelectItem key={option.value} value={option.value}>
@@ -174,9 +176,9 @@ function DeliveryStageForm({ detail }: OrderDeliveryTabProps) {
               ))}
             </SelectContent>
           </Select>
-          <Button disabled={!isChanged || isPending} type="submit">
+          <CompactButton disabled={!isChanged || isPending} type="submit">
             {isPending ? "변경 중…" : "변경"}
-          </Button>
+          </CompactButton>
         </div>
 
         {isDelivered && (
@@ -184,7 +186,7 @@ function DeliveryStageForm({ detail }: OrderDeliveryTabProps) {
             <Label className="text-xs text-gray-600" htmlFor="delivered-at">
               실제 수령 시각 (이 PC 시간 기준 · 비우면 지금)
             </Label>
-            <Input
+            <CompactInput
               id="delivered-at"
               onChange={(event) => setDeliveredAt(event.target.value)}
               type="datetime-local"
@@ -249,7 +251,7 @@ function LocalDeliveryForm({ detail }: OrderDeliveryTabProps) {
             <Label className="text-xs text-gray-600" htmlFor="local-carrier">
               운송사
             </Label>
-            <Input
+            <CompactInput
               autoComplete="off"
               id="local-carrier"
               maxLength={LOCAL_DELIVERY_FIELD_MAX}
@@ -262,7 +264,7 @@ function LocalDeliveryForm({ detail }: OrderDeliveryTabProps) {
             <Label className="text-xs text-gray-600" htmlFor="local-tracking">
               운송장 번호
             </Label>
-            <Input
+            <CompactInput
               autoComplete="off"
               id="local-tracking"
               maxLength={LOCAL_DELIVERY_FIELD_MAX}
@@ -274,13 +276,13 @@ function LocalDeliveryForm({ detail }: OrderDeliveryTabProps) {
         </div>
         <div className="flex items-center justify-between gap-2">
           <Hint>비우고 저장하면 지워집니다. 배송 단계는 바뀌지 않습니다.</Hint>
-          <Button
+          <CompactButton
             disabled={!isChanged || isPending}
             type="submit"
             variant="outline"
           >
             {isPending ? "저장 중…" : "저장"}
-          </Button>
+          </CompactButton>
         </div>
       </form>
     </Section>

@@ -13,6 +13,7 @@ import {
   Users,
   ClipboardList,
   Settings,
+  Truck,
 } from "lucide-react";
 
 import { PATH } from "@shared/constants/route";
@@ -66,6 +67,12 @@ const menuItems: MenuItemConfig[] = [
     path: PATH.ORDERS,
     label: "주문 및 발주 관리",
     icon: <ClipboardList className="h-5 w-5" />,
+  },
+  {
+    id: "shipments",
+    path: PATH.SHIPMENTS,
+    label: "통관·물류 관리",
+    icon: <Truck className="h-5 w-5" />,
   },
   //{
   //  id: "users",
