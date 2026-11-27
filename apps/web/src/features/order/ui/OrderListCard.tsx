@@ -11,7 +11,9 @@ import { Link } from "@/i18n/navigation";
 
 import { formatTaipeiDateTime } from "@entities/payment";
 
+import { OrderCancelRequestedBadge } from "./OrderCancelRequestedBadge";
 import { OrderDeliveryProgress } from "./OrderDeliveryProgress";
+import { showsCancelRequestedBadge } from "../model/orderCancel";
 import { ORDER_STATUS_TONE } from "../model/orderDetail";
 import { getExtraItemCount, showsDeliveryProgress } from "../model/orderList";
 
@@ -64,14 +66,23 @@ export function OrderListCard({ order }: { order: UserOrderListItem }) {
           </div>
 
           <div className="grid shrink-0 justify-items-end gap-2">
-            <span
-              className={`text-body-5 ${cn(
-                "rounded-full px-2.5 py-0.5 font-semibold",
-                ORDER_STATUS_TONE[order.status],
-              )}`}
-            >
-              {order.statusLabel}
-            </span>
+            {/* 취소 접수는 결제 상태와 따로 간다. 진행바에 섞지 않고 상태 배지 옆에 붙인다 */}
+            <div className="flex flex-wrap justify-end gap-1.5">
+              {showsCancelRequestedBadge(
+                order.status,
+                order.cancellationRequested,
+              ) && (
+                <OrderCancelRequestedBadge className="text-body-5 px-2.5 py-0.5" />
+              )}
+              <span
+                className={`text-body-5 ${cn(
+                  "rounded-full px-2.5 py-0.5 font-semibold",
+                  ORDER_STATUS_TONE[order.status],
+                )}`}
+              >
+                {order.statusLabel}
+              </span>
+            </div>
             <p className="text-body-2 max-sm:text-body-3 font-bold tabular-nums">
               {toNTCurrency(order.totalAmount)}
             </p>

@@ -1,6 +1,7 @@
 import type {
   GetUserOrderDetailRes,
   UserOrderRefundStatus,
+  UserOrderStatus,
 } from "@shared/services/userOrder";
 
 /** 사유는 서버 검증과 같다 */
@@ -47,3 +48,12 @@ export const getCancelNotice = ({
   if (!refund && cancellationRequestedAt) return "received";
   return null;
 };
+
+/**
+ * 상태 배지 옆 "취소 신청됨". 접수는 결제 상태와 따로 가므로 따로 알리되,
+ * 이미 취소된 주문은 상태 배지가 같은 말을 하므로 붙이지 않는다
+ */
+export const showsCancelRequestedBadge = (
+  status: UserOrderStatus,
+  cancellationRequested: boolean,
+): boolean => cancellationRequested && status !== "CANCELED";

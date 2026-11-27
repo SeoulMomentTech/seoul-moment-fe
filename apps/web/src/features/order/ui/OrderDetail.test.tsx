@@ -435,6 +435,41 @@ describe("OrderDetail", () => {
       ).toBeNull();
     });
 
+    it("취소를 접수한 결제 완료 주문은 헤더 상태 배지 옆에 취소 신청됨을 붙인다", async () => {
+      getUserOrderDetail.mockResolvedValue(
+        ok({
+          ...cancellable,
+          canRequestCancel: false,
+          cancellationRequestedAt: "2026-11-06T08:00:00Z",
+        }),
+      );
+
+      render(<OrderDetail orderId={481} />, { wrapper });
+
+      const header = (await screen.findByText("SM-20261106-000011")).closest(
+        "header",
+      ) as HTMLElement;
+      expect(
+        within(header).getByText(ko.order_cancel_requested_badge),
+      ).toBeInTheDocument();
+    });
+
+    it("이미 취소된 주문은 취소 신청됨을 따로 붙이지 않는다", async () => {
+      getUserOrderDetail.mockResolvedValue(
+        ok({
+          ...cancellable,
+          status: "CANCELED",
+          canRequestCancel: false,
+          cancellationRequestedAt: "2026-11-06T08:00:00Z",
+        }),
+      );
+
+      render(<OrderDetail orderId={481} />, { wrapper });
+
+      await screen.findByText("SM-20261106-000011");
+      expect(screen.queryByText(ko.order_cancel_requested_badge)).toBeNull();
+    });
+
     it("환불이 지연되면 고객센터 확인 안내를 보인다", async () => {
       getUserOrderDetail.mockResolvedValue(
         ok({
