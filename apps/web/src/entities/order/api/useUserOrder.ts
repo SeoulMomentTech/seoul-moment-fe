@@ -11,6 +11,7 @@ import {
   createUserOrder,
   getUserOrderDetail,
   getUserOrderList,
+  postUserOrderCancelRequest,
   postUserOrderPayment,
   type CreateUserOrderReq,
   type GetUserOrderDetailRes,
@@ -18,7 +19,9 @@ import {
   type UserOrderListStatusFilter,
 } from "@shared/services/userOrder";
 
-import { orderQueryKeys } from "./queryKey";
+import { useQueryClient } from "@tanstack/react-query";
+
+import { ORDER_QUERY_KEY, orderQueryKeys } from "./queryKey";
 
 /**
  * 유니온에 `Omit` 을 바로 걸면 공통 키만 남아 HOME/CVS 분기가 사라진다.
@@ -173,6 +176,33 @@ export function useUserOrderPaymentMutation({
     number
   >({
     mutationFn: (orderId) => postUserOrderPayment({ orderId, languageCode }),
+    toastOnError,
+    logOnError: !toastOnError,
+  });
+}
+
+export interface UserOrderCancelRequestVariables {
+  orderId: number;
+  /** 취소 사유 (선택, 500자) */
+  reason?: string;
+}
+
+/**
+ * @description 취소·계약해제 신청. 응답은 204 뿐이라, 자동 환불이 시작됐는지는 주문 상세를
+ * 다시 불러 refund 로 본다 — 그래서 주문 상세·목록 캐시를 함께 무효화한다.
+ * 409(결제 완료 주문이 아님)는 화면이 문구를 정하도록 토스트를 기본으로 끈다.
+ */
+export function useUserOrderCancelRequestMutation({
+  toastOnError = false,
+}: UserOrderMutationArgs = {}) {
+  const queryClient = useQueryClient();
+  const languageCode = useLanguage();
+
+  return useAppMutation<void, HTTPError, UserOrderCancelRequestVariables>({
+    mutationFn: ({ orderId, reason }) =>
+      postUserOrderCancelRequest({ orderId, reason, languageCode }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ORDER_QUERY_KEY }),
     toastOnError,
     logOnError: !toastOnError,
   });

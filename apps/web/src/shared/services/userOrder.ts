@@ -327,6 +327,24 @@ export type UserOrderDeliveryStage =
   | "LOCAL_DELIVERY"
   | "DELIVERED";
 
+/** 환불 상태. REQUESTED·PROCESSING 진행 중 / COMPLETED 완료 / FAILED 처리 지연(고객센터 확인 중) */
+export type UserOrderRefundStatus =
+  | "REQUESTED"
+  | "PROCESSING"
+  | "COMPLETED"
+  | "FAILED";
+
+/** 가장 최근 환불 */
+export interface UserOrderRefund {
+  status: UserOrderRefundStatus;
+  /** 이 환불의 금액 NT$. 결제 금액보다 작으면 부분 환불이다 */
+  amount: number;
+  /** 환불 접수 시각 */
+  requestedAt: string;
+  /** 환불 완료 시각. 카드 명세서 반영은 카드사에 따라 더 걸릴 수 있다 */
+  completedAt?: string | null;
+}
+
 export interface GetUserOrderDetailRes {
   orderId: number;
   orderNumber: string;
@@ -356,6 +374,33 @@ export interface GetUserOrderDetailRes {
   invoice?: UserOrderInvoiceInfo | null;
   items: UserOrderItem[];
   shipping: UserOrderShippingInfo;
+  /** 실제 수령·배송 완료 시각. 배송 완료 전이면 null */
+  deliveredAt?: string | null;
+  /** 대만 국내운송사 */
+  localCarrier?: string | null;
+  /** 대만 국내운송장 번호 */
+  localTrackingNo?: string | null;
+  /**
+   * 취소·계약해제 신청 버튼을 보여도 되는지. 결제 완료 주문이면 발주·해외배송·수령 뒤에도
+   * true 다. 이미 접수했으면 false
+   */
+  canRequestCancel: boolean;
+  /**
+   * 24시간 간편취소 구간인지(서버 시각 기준). 안내 문구만 바꾸는 값이다 — false 여도
+   * canRequestCancel 이 true 면 신청 경로를 숨기지 않는다
+   */
+  isQuickCancelPeriod: boolean;
+  /** 간편취소 구간이 끝나는 시각 (결제 완료 + 24시간) */
+  quickCancelUntil?: string | null;
+  /** 취소·계약해제를 접수한 시각. 접수 전이면 null */
+  cancellationRequestedAt?: string | null;
+  /**
+   * 가장 최근 환불. 시작되지 않았으면 null. 결제 후 24시간 안 · 발주 전에 취소를 신청하면
+   * 신청 직후에 생긴다(자동 환불). 전액 환불이면 status 가 CANCELED, 부분 환불이면 PAID 그대로다
+   */
+  refund?: UserOrderRefund | null;
+  /** 지금까지 환불이 완료된 합계 NT$. 부분 환불이 여러 번이면 더한 값. 없으면 0 */
+  refundedAmount: number;
 }
 
 export interface GetUserOrderDetailReq extends PublicLanguageCode {
@@ -422,6 +467,8 @@ export interface UserOrderListItem {
   representativeOptionText?: string | null;
   /** 주문 상품 라인 수 ("외 N건" 계산용) */
   itemCount: number;
+  /** 취소·계약해제가 접수된 주문인지. 배송 진행바에 섞지 않고 배지로 보여준다 */
+  cancellationRequested: boolean;
 }
 
 export interface GetUserOrderListRes {
@@ -492,3 +539,26 @@ export const postUserOrderPayment = ({
       headers: acceptLanguageHeaders(languageCode),
     })
     .json<CommonRes<PostUserOrderPaymentRes>>();
+
+export interface PostUserOrderCancelRequestReq extends PublicLanguageCode {
+  orderId: number;
+  /** 취소·계약해제 사유 (선택, 500자). 없어도 접수된다 */
+  reason?: string;
+}
+
+/**
+ * @description 취소·계약해제 신청 (통지 접수). 결제 완료(PAID) 주문이면 발주·배송·수령과 무관하게
+ * 접수되고 한국 발주를 막는다. 결제 후 24시간 안 · 발주 전이면 자동 환불도 시작하지만 응답은
+ * 그대로 204 라 주문 상세를 다시 불러 refund 를 본다. 이미 접수된 주문에 다시 보내도 204.
+ * 409 는 결제 완료 주문이 아님(결제 전·입금 대기·취소·실패).
+ */
+export const postUserOrderCancelRequest = async ({
+  orderId,
+  reason,
+  languageCode,
+}: PostUserOrderCancelRequestReq) => {
+  await api.post(`user/order/${orderId}/cancel-request`, {
+    headers: acceptLanguageHeaders(languageCode),
+    json: reason ? { reason } : {},
+  });
+};

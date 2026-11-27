@@ -25,6 +25,7 @@ import { formatTaipeiDateTime, PaymentDepositInfo } from "@entities/payment";
 import { Button, Skeleton } from "@seoul-moment/ui";
 
 import { OrderAmountRows } from "./OrderAmountRows";
+import { OrderCancelSection } from "./OrderCancelSection";
 import { OrderDeliveryProgress } from "./OrderDeliveryProgress";
 import { OrderItemList } from "./OrderItemList";
 import { OrderSection } from "./OrderSection";
@@ -182,6 +183,8 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
           totalAmount={order.totalAmount}
         />
       </OrderSection>
+
+      <OrderCancelSection order={order} />
     </div>
   );
 }
