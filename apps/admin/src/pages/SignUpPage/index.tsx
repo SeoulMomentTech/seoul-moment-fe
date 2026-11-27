@@ -62,13 +62,20 @@ export default function SignupPage() {
         password,
         name,
       });
+      // 가입 직후는 승인 대기(WAIT)라 바로 로그인할 수 없다. 로그인 화면에서 안내한다
       navigate(PATH.LOGIN, {
         replace: true,
+        state: { signedUpEmail: email },
       });
     } catch (err) {
+      const response = (
+        err as { response?: { status?: number; data?: { message?: string } } }
+      ).response;
       const message =
-        (err as { response?: { data?: { message?: string } } }).response?.data
-          ?.message ?? "회원가입에 실패했습니다. 다시 시도해주세요.";
+        response?.status === 409
+          ? "이미 가입한 이메일입니다. 승인 전이라면 최고 관리자에게 승인을 요청하세요."
+          : (response?.data?.message ??
+            "회원가입에 실패했습니다. 다시 시도해주세요.");
       setError(message);
     } finally {
       setIsLoading(false);

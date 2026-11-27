@@ -19,7 +19,11 @@ import {
   cn,
 } from "@seoul-moment/ui";
 
-import { ADMIN_ROLE_LABEL, ADMIN_STATUS_LABEL } from "../lib/permission";
+import {
+  ADMIN_ROLE_LABEL,
+  ADMIN_STATUS_LABEL,
+  type ApprovalAction,
+} from "../lib/permission";
 
 const SKELETON_ROW_KEYS = ["row-1", "row-2", "row-3", "row-4", "row-5"];
 const COLUMN_COUNT = 7;
@@ -47,6 +51,7 @@ interface UserTableProps {
   isFetching: boolean;
   hasSearchQuery: boolean;
   onEdit(user: AdminUser): void;
+  onApproval(user: AdminUser, action: ApprovalAction): void;
 }
 
 export function UserTable({
@@ -55,6 +60,7 @@ export function UserTable({
   isFetching,
   hasSearchQuery,
   onEdit,
+  onApproval,
 }: UserTableProps) {
   return (
     <Table
@@ -128,13 +134,34 @@ export function UserTable({
                 {formatDateTime(user.createDate)}
               </TableCell>
               <TableCell className={cn(CELL_CLASS, "text-right")}>
-                <CompactButton
-                  onClick={() => onEdit(user)}
-                  size="sm"
-                  variant={user.status === "WAIT" ? "default" : "outline"}
-                >
-                  {user.status === "WAIT" ? "승인·권한 설정" : "권한 변경"}
-                </CompactButton>
+                <div className="flex justify-end gap-1.5">
+                  {user.status === "WAIT" ? (
+                    <>
+                      <CompactButton
+                        onClick={() => onApproval(user, "approve")}
+                        size="sm"
+                      >
+                        승인
+                      </CompactButton>
+                      <CompactButton
+                        className="text-red-600 hover:text-red-700"
+                        onClick={() => onApproval(user, "reject")}
+                        size="sm"
+                        variant="outline"
+                      >
+                        거절
+                      </CompactButton>
+                    </>
+                  ) : (
+                    <CompactButton
+                      onClick={() => onEdit(user)}
+                      size="sm"
+                      variant="outline"
+                    >
+                      권한 변경
+                    </CompactButton>
+                  )}
+                </div>
               </TableCell>
             </TableRow>
           ))
