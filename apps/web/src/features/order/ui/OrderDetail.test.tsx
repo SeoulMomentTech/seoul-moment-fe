@@ -8,17 +8,25 @@ import { useUserAuthStore } from "@shared/lib/hooks/useUserAuthStore";
 import ko from "@/i18n/messages/ko.json";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 
 import { OrderDetail } from "./OrderDetail";
 
 const getUserOrderDetail = vi.fn();
 const postUserOrderPayment = vi.fn();
+const postUserOrderCancelRequest = vi.fn();
 vi.mock("@shared/services/userOrder", async (importOriginal) => ({
   ...(await importOriginal<typeof UserOrderService>()),
   getUserOrderDetail: ({ orderId }: { orderId: number }) =>
     getUserOrderDetail(orderId),
   postUserOrderPayment: (req: unknown) => postUserOrderPayment(req),
+  postUserOrderCancelRequest: (req: unknown) => postUserOrderCancelRequest(req),
 }));
 
 // eslint-disable-next-line import/order
@@ -328,5 +336,159 @@ describe("OrderDetail", () => {
       0,
     );
     expect(screen.queryByText(/undefined/)).toBeNull();
+  });
+
+  describe("취소·환불", () => {
+    const cancellable = {
+      ...base,
+      canRequestCancel: true,
+      isQuickCancelPeriod: true,
+      quickCancelUntil: "2026-11-07T07:09:00Z",
+      cancellationRequestedAt: null,
+      refund: null,
+      refundedAmount: 0,
+    };
+
+    it("신청할 수 있으면 간편 취소 기한과 신청 버튼을 보인다", async () => {
+      getUserOrderDetail.mockResolvedValue(ok(cancellable));
+
+      render(<OrderDetail orderId={481} />, { wrapper });
+
+      expect(
+        await screen.findByRole("button", { name: ko.order_cancel_request }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getAllByText(
+          ko.order_cancel_quick_hint.replace("{time}", "2026/11/07 15:09"),
+        ).length,
+      ).toBeGreaterThan(0);
+    });
+
+    it("신청할 수 없으면 영역을 그리지 않는다", async () => {
+      getUserOrderDetail.mockResolvedValue(
+        ok({ ...cancellable, canRequestCancel: false }),
+      );
+
+      render(<OrderDetail orderId={481} />, { wrapper });
+
+      await screen.findByText("SM-20261106-000011");
+      expect(screen.queryByText(ko.order_cancel_section)).toBeNull();
+    });
+
+    it("사유와 함께 신청하고 주문을 다시 불러온다", async () => {
+      getUserOrderDetail.mockResolvedValue(ok(cancellable));
+      postUserOrderCancelRequest.mockResolvedValue(undefined);
+
+      render(<OrderDetail orderId={481} />, { wrapper });
+
+      fireEvent.click(
+        await screen.findByRole("button", { name: ko.order_cancel_request }),
+      );
+      fireEvent.change(
+        await screen.findByLabelText(ko.order_cancel_reason_label),
+        { target: { value: "  사이즈를 잘못 골랐어요  " } },
+      );
+      const dialog = await screen.findByRole("dialog");
+      fireEvent.click(
+        within(dialog).getByRole("button", { name: ko.order_cancel_request }),
+      );
+
+      await waitFor(() =>
+        expect(postUserOrderCancelRequest).toHaveBeenCalledWith(
+          expect.objectContaining({
+            orderId: 481,
+            reason: "사이즈를 잘못 골랐어요",
+          }),
+        ),
+      );
+      await waitFor(() => expect(getUserOrderDetail).toHaveBeenCalledTimes(2));
+    });
+
+    it("접수된 주문은 신청 시각과 환불 상태를 보이고 버튼은 없다", async () => {
+      getUserOrderDetail.mockResolvedValue(
+        ok({
+          ...cancellable,
+          status: "CANCELED",
+          canRequestCancel: false,
+          isQuickCancelPeriod: false,
+          cancellationRequestedAt: "2026-11-06T08:00:00Z",
+          refund: {
+            status: "COMPLETED",
+            amount: 1530,
+            requestedAt: "2026-11-06T08:00:00Z",
+            completedAt: "2026-11-06T08:01:00Z",
+          },
+          refundedAmount: 1530,
+        }),
+      );
+
+      render(<OrderDetail orderId={481} />, { wrapper });
+
+      expect(
+        await screen.findByText(ko.order_cancel_section),
+      ).toBeInTheDocument();
+      expect(screen.getByText("2026/11/06 16:00")).toBeInTheDocument();
+      expect(screen.getByText(ko.order_refund_completed)).toBeInTheDocument();
+      expect(screen.getByText(ko.order_refund_card_notice)).toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: ko.order_cancel_request }),
+      ).toBeNull();
+    });
+
+    it("취소를 접수한 결제 완료 주문은 헤더 상태 배지 옆에 취소 신청됨을 붙인다", async () => {
+      getUserOrderDetail.mockResolvedValue(
+        ok({
+          ...cancellable,
+          canRequestCancel: false,
+          cancellationRequestedAt: "2026-11-06T08:00:00Z",
+        }),
+      );
+
+      render(<OrderDetail orderId={481} />, { wrapper });
+
+      const header = (await screen.findByText("SM-20261106-000011")).closest(
+        "header",
+      ) as HTMLElement;
+      expect(
+        within(header).getByText(ko.order_cancel_requested_badge),
+      ).toBeInTheDocument();
+    });
+
+    it("이미 취소된 주문은 취소 신청됨을 따로 붙이지 않는다", async () => {
+      getUserOrderDetail.mockResolvedValue(
+        ok({
+          ...cancellable,
+          status: "CANCELED",
+          canRequestCancel: false,
+          cancellationRequestedAt: "2026-11-06T08:00:00Z",
+        }),
+      );
+
+      render(<OrderDetail orderId={481} />, { wrapper });
+
+      await screen.findByText("SM-20261106-000011");
+      expect(screen.queryByText(ko.order_cancel_requested_badge)).toBeNull();
+    });
+
+    it("환불이 지연되면 고객센터 확인 안내를 보인다", async () => {
+      getUserOrderDetail.mockResolvedValue(
+        ok({
+          ...cancellable,
+          canRequestCancel: false,
+          cancellationRequestedAt: "2026-11-06T08:00:00Z",
+          refund: {
+            status: "FAILED",
+            amount: 1530,
+            requestedAt: "2026-11-06T08:00:00Z",
+          },
+        }),
+      );
+
+      render(<OrderDetail orderId={481} />, { wrapper });
+
+      expect(
+        await screen.findByText(ko.order_refund_delayed_notice),
+      ).toBeInTheDocument();
+    });
   });
 });

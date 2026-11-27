@@ -25,9 +25,12 @@ import { formatTaipeiDateTime, PaymentDepositInfo } from "@entities/payment";
 import { Button, Skeleton } from "@seoul-moment/ui";
 
 import { OrderAmountRows } from "./OrderAmountRows";
+import { OrderCancelRequestedBadge } from "./OrderCancelRequestedBadge";
+import { OrderCancelSection } from "./OrderCancelSection";
 import { OrderDeliveryProgress } from "./OrderDeliveryProgress";
 import { OrderItemList } from "./OrderItemList";
 import { OrderSection } from "./OrderSection";
+import { showsCancelRequestedBadge } from "../model/orderCancel";
 import {
   canRepay,
   ORDER_STATUS_KEY,
@@ -111,15 +114,22 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
             </span>
           </p>
         </div>
-        <span
-          className={`text-body-4 ${cn(
-            "rounded-full px-3 py-1 font-semibold",
-            ORDER_STATUS_TONE[order.status],
-          )}`}
-        >
-          {/* 서버 문구(Accept-Language 번역)를 쓴다. 비어 오면 코드로 정한 문구로 대신한다 */}
-          {order.statusLabel || t(ORDER_STATUS_KEY[order.status])}
-        </span>
+        {/* 취소 접수는 결제 상태와 따로 간다. 진행바에 섞지 않고 상태 배지 옆에 붙인다 */}
+        <div className="flex flex-wrap items-center gap-1.5">
+          {showsCancelRequestedBadge(
+            order.status,
+            Boolean(order.cancellationRequestedAt),
+          ) && <OrderCancelRequestedBadge className="text-body-4 px-3 py-1" />}
+          <span
+            className={`text-body-4 ${cn(
+              "rounded-full px-3 py-1 font-semibold",
+              ORDER_STATUS_TONE[order.status],
+            )}`}
+          >
+            {/* 서버 문구(Accept-Language 번역)를 쓴다. 비어 오면 코드로 정한 문구로 대신한다 */}
+            {order.statusLabel || t(ORDER_STATUS_KEY[order.status])}
+          </span>
+        </div>
       </header>
 
       {showsDeliveryProgress(order.status) && (
@@ -182,6 +192,8 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
           totalAmount={order.totalAmount}
         />
       </OrderSection>
+
+      <OrderCancelSection order={order} />
     </div>
   );
 }

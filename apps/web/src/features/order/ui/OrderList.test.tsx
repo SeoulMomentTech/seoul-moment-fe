@@ -44,6 +44,7 @@ const order = (id: number, extra: object = {}) => ({
   representativeImageUrl: null,
   representativeOptionText: "레드 / S",
   itemCount: 2,
+  cancellationRequested: false,
   ...extra,
 });
 
@@ -94,6 +95,48 @@ describe("OrderList", () => {
 
     expect(await screen.findByText("주문 취소")).toBeInTheDocument();
     expect(screen.queryByRole("progressbar")).toBeNull();
+  });
+
+  it("취소를 신청한 주문은 상태 배지 옆에 취소 신청됨을 붙인다", async () => {
+    getUserOrderList.mockResolvedValue(
+      page([order(27, { cancellationRequested: true })], 1),
+    );
+
+    render(<OrderList />, { wrapper });
+
+    expect(
+      await screen.findByText(ko.order_cancel_requested_badge),
+    ).toBeInTheDocument();
+    expect(screen.getByText("결제 완료")).toBeInTheDocument();
+  });
+
+  it("이미 취소된 주문은 취소 신청됨을 따로 붙이지 않는다", async () => {
+    getUserOrderList.mockResolvedValue(
+      page(
+        [
+          order(26, {
+            status: "CANCELED",
+            statusLabel: "주문 취소",
+            cancellationRequested: true,
+          }),
+        ],
+        1,
+      ),
+    );
+
+    render(<OrderList />, { wrapper });
+
+    await screen.findByText("주문 취소");
+    expect(screen.queryByText(ko.order_cancel_requested_badge)).toBeNull();
+  });
+
+  it("취소 신청이 없으면 취소 신청됨을 그리지 않는다", async () => {
+    getUserOrderList.mockResolvedValue(page([order(27)], 1));
+
+    render(<OrderList />, { wrapper });
+
+    await screen.findByText("결제 완료");
+    expect(screen.queryByText(ko.order_cancel_requested_badge)).toBeNull();
   });
 
   it("더 받을 주문이 있으면 더보기로 다음 페이지를 부른다", async () => {
